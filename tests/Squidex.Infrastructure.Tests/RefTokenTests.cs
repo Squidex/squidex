@@ -90,6 +90,7 @@ namespace Squidex.Infrastructure
             Assert.True(token1a.Equals(token1b));
 
             Assert.False(token1a.Equals(token2a));
+            Assert.False(token1b.Equals(token2a));
         }
 
         [Fact]
@@ -102,6 +103,7 @@ namespace Squidex.Infrastructure
             Assert.Equal(token1a.GetHashCode(), token1b.GetHashCode());
 
             Assert.NotEqual(token1a.GetHashCode(), token2a.GetHashCode());
+            Assert.NotEqual(token1b.GetHashCode(), token2a.GetHashCode());
         }
 
         [Fact]

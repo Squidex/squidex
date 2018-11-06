@@ -14,7 +14,8 @@ import {
     AppsState,
     AttachClientForm,
     ClientsState,
-    CreateAppClientDto
+    CreateAppClientDto,
+    RolesState
 } from '@app/shared';
 
 @Component({
@@ -28,11 +29,14 @@ export class ClientsPageComponent implements OnInit {
     constructor(
         public readonly appsState: AppsState,
         public readonly clientsState: ClientsState,
+        public readonly rolesState: RolesState,
         private readonly formBuilder: FormBuilder
     ) {
     }
 
     public ngOnInit() {
+        this.rolesState.load().pipe(onErrorResumeNext()).subscribe();
+
         this.clientsState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
@@ -46,7 +50,7 @@ export class ClientsPageComponent implements OnInit {
         if (value) {
             const requestDto = new CreateAppClientDto(value.name);
 
-            this.clientsState.attach(requestDto).pipe(onErrorResumeNext())
+            this.clientsState.attach(requestDto)
                 .subscribe(() => {
                     this.addClientForm.submitCompleted();
                 }, error => {

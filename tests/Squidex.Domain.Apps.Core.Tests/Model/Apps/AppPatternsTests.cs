@@ -16,61 +16,61 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 {
     public class AppPatternsTests
     {
-        private readonly AppPatterns patterns_1;
+        private readonly AppPatterns patterns_0;
         private readonly Guid firstId = Guid.NewGuid();
         private readonly Guid id = Guid.NewGuid();
 
         public AppPatternsTests()
         {
-            patterns_1 = AppPatterns.Empty.Add(firstId, "Default", "Default Pattern", "Message");
+            patterns_0 = AppPatterns.Empty.Add(firstId, "Default", "Default Pattern", "Message");
         }
 
         [Fact]
         public void Should_add_pattern()
         {
-            var patterns_2 = patterns_1.Add(id, "NewPattern", "New Pattern", "Message");
+            var patterns_1 = patterns_0.Add(id, "NewPattern", "New Pattern", "Message");
 
-            patterns_2[id].Should().BeEquivalentTo(new AppPattern("NewPattern", "New Pattern", "Message"));
+            patterns_1[id].Should().BeEquivalentTo(new AppPattern("NewPattern", "New Pattern", "Message"));
         }
 
         [Fact]
         public void Should_throw_exception_if_add_pattern_with_same_id()
         {
-            var patterns_2 = patterns_1.Add(id, "NewPattern", "New Pattern", "Message");
+            var patterns_1 = patterns_0.Add(id, "NewPattern", "New Pattern", "Message");
 
-            Assert.Throws<ArgumentException>(() => patterns_2.Add(id, "NewPattern", "New Pattern", "Message"));
+            Assert.Throws<ArgumentException>(() => patterns_1.Add(id, "NewPattern", "New Pattern", "Message"));
         }
 
         [Fact]
         public void Should_update_pattern()
         {
-            var patterns_2 = patterns_1.Update(firstId, "UpdatePattern", "Update Pattern", "Message");
+            var patterns_1 = patterns_0.Update(firstId, "UpdatePattern", "Update Pattern", "Message");
 
-            patterns_2[firstId].Should().BeEquivalentTo(new AppPattern("UpdatePattern", "Update Pattern", "Message"));
+            patterns_1[firstId].Should().BeEquivalentTo(new AppPattern("UpdatePattern", "Update Pattern", "Message"));
         }
 
         [Fact]
         public void Should_return_same_patterns_if_pattern_not_found()
         {
-            var patterns_2 = patterns_1.Update(id, "NewPattern", "NewPattern", "Message");
+            var patterns_1 = patterns_0.Update(id, "NewPattern", "NewPattern", "Message");
 
-            Assert.Same(patterns_1, patterns_2);
+            Assert.Same(patterns_0, patterns_1);
         }
 
         [Fact]
         public void Should_remove_pattern()
         {
-            var patterns_2 = patterns_1.Remove(firstId);
+            var patterns_1 = patterns_0.Remove(firstId);
 
-            Assert.Empty(patterns_2);
+            Assert.Empty(patterns_1);
         }
 
         [Fact]
         public void Should_do_nothing_if_remove_pattern_not_found()
         {
-            var patterns_2 = patterns_1.Remove(id);
+            var patterns_1 = patterns_0.Remove(id);
 
-            Assert.NotSame(patterns_1, patterns_2);
+            Assert.NotSame(patterns_0, patterns_1);
         }
     }
 }

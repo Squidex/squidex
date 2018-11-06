@@ -8,9 +8,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 import {
+    AnalyticsService,
     ApiUrlConfig,
     HTTP,
     Model,
@@ -53,7 +54,8 @@ export class EditAppPatternDto {
 export class AppPatternsService {
     constructor(
         private readonly http: HttpClient,
-        private readonly apiUrl: ApiUrlConfig
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService
     ) {
     }
 
@@ -94,6 +96,9 @@ export class AppPatternsService {
 
                 return new Versioned(response.version, pattern);
             }),
+            tap(() => {
+                this.analytics.trackEvent('Patterns', 'Created', appName);
+            }),
             pretifyError('Failed to add pattern. Please reload.'));
     }
 
@@ -101,6 +106,9 @@ export class AppPatternsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(
+            tap(() => {
+                this.analytics.trackEvent('Patterns', 'Updated', appName);
+            }),
             pretifyError('Failed to update pattern. Please reload.'));
     }
 
@@ -108,6 +116,9 @@ export class AppPatternsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
 
         return HTTP.deleteVersioned(this.http, url, version).pipe(
+            tap(() => {
+                this.analytics.trackEvent('Patterns', 'Configured', appName);
+            }),
             pretifyError('Failed to remove pattern. Please reload.'));
     }
 }

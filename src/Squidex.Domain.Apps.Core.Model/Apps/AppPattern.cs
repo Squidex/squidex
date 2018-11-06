@@ -10,41 +10,26 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class AppPattern
+    public sealed class AppPattern : Named
     {
-        private readonly string name;
-        private readonly string pattern;
-        private readonly string message;
+        public string Pattern { get; }
 
-        public string Name
-        {
-            get { return name; }
-        }
-
-        public string Pattern
-        {
-            get { return pattern; }
-        }
-
-        public string Message
-        {
-            get { return message; }
-        }
+        public string Message { get; }
 
         public AppPattern(string name, string pattern, string message = null)
+            : base(name)
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
             Guard.NotNullOrEmpty(pattern, nameof(pattern));
+            
+            Pattern = pattern;
 
-            this.name = name;
-            this.pattern = pattern;
-            this.message = message;
+            Message = message;
         }
 
         [Pure]
-        public AppPattern Update(string name, string pattern, string message)
+        public AppPattern Update(string newName, string newPattern, string newMessage)
         {
-            return new AppPattern(name, pattern, message);
+            return new AppPattern(newName, newPattern, newMessage);
         }
     }
 }

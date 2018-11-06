@@ -17,24 +17,22 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Extensions.Actions;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Rules
 {
     /// <summary>
     /// Manages and retrieves information about schemas.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
-    [AppApi]
     [ApiExplorerSettings(GroupName = nameof(Rules))]
-    [MustBeAppDeveloper]
     public sealed class RulesController : ApiController
     {
-        private static readonly string RuleActionsEtag = string.Join(";", RuleElementRegistry.Actions.Select(x => x.Key)).Sha256();
-        private static readonly string RuleTriggersEtag = string.Join(";", RuleElementRegistry.Triggers.Select(x => x.Key)).Sha256();
+        private static readonly string RuleActionsEtag = string.Join(";", RuleElementRegistry.Actions.Select(x => x.Key)).Sha256Base64();
+        private static readonly string RuleTriggersEtag = string.Join(";", RuleElementRegistry.Triggers.Select(x => x.Key)).Sha256Base64();
         private readonly IAppProvider appProvider;
         private readonly IRuleEventRepository ruleEventsRepository;
 
@@ -56,6 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpGet]
         [Route("rules/actions/")]
         [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), 200)]
+        [ApiPermission]
         [ApiCosts(0)]
         public IActionResult GetActions()
         {
@@ -75,6 +74,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpGet]
         [Route("rules/triggers/")]
         [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), 200)]
+        [ApiPermission]
         [ApiCosts(0)]
         public IActionResult GetTriggers()
         {
@@ -96,6 +96,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpGet]
         [Route("apps/{app}/rules/")]
         [ProducesResponseType(typeof(RuleDto[]), 200)]
+        [ApiPermission(Permissions.AppRulesRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetRules(string app)
         {
@@ -122,6 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [Route("apps/{app}/rules/")]
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppRulesCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostRule(string app, [FromBody] CreateRuleDto request)
         {
@@ -150,6 +152,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpPut]
         [Route("apps/{app}/rules/{id}/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppRulesUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutRule(string app, Guid id, [FromBody] UpdateRuleDto request)
         {
@@ -170,6 +173,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/rules/{id}/enable/")]
+        [ApiPermission(Permissions.AppRulesDisable)]
         [ApiCosts(1)]
         public async Task<IActionResult> EnableRule(string app, Guid id)
         {
@@ -190,6 +194,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/rules/{id}/disable/")]
+        [ApiPermission(Permissions.AppRulesDisable)]
         [ApiCosts(1)]
         public async Task<IActionResult> DisableRule(string app, Guid id)
         {
@@ -209,6 +214,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/rules/{id}/")]
+        [ApiPermission(Permissions.AppRulesDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteRule(string app, Guid id)
         {

@@ -7,7 +7,6 @@
 
 using System;
 using System.Linq;
-using System.Security;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -19,15 +18,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppContributors
     {
-        public static Task CanAssign(AppContributors contributors, AssignContributor command, IUserResolver users, IAppLimitsPlan plan)
+        public static Task CanAssign(AppContributors contributors, AssignContributor command, IUserResolver users, IAppLimitsPlan plan, Roles roles)
         {
             Guard.NotNull(command, nameof(command));
 
             return Validate.It(() => "Cannot assign contributor.", async e =>
             {
-                if (!command.Permission.IsEnumValue())
+                if (!roles.ContainsKey(command.Role))
                 {
-                    e("Permission is not valid.", nameof(command.Permission));
+                    e("Role is not valid.", nameof(command.Role));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.ContributorId))
@@ -47,14 +46,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase) && !command.FromRestore)
                 {
-                    throw new SecurityException("You cannot change your own permission.");
+                    throw new DomainForbiddenException("You cannot change your own role.");
                 }
 
                 if (contributors.TryGetValue(command.ContributorId, out var existing))
                 {
-                    if (existing == command.Permission)
+                    if (existing == command.Role)
                     {
-                        e("Contributor has already this permission.", nameof(command.Permission));
+                        e("Contributor has already this role.", nameof(command.Role));
                     }
                 }
                 else if (plan.MaxContributors == contributors.Count)
@@ -75,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     e("Contributor id is required.", nameof(command.ContributorId));
                 }
 
-                var ownerIds = contributors.Where(x => x.Value == AppContributorPermission.Owner).Select(x => x.Key).ToList();
+                var ownerIds = contributors.Where(x => x.Value == Role.Owner).Select(x => x.Key).ToList();
 
                 if (ownerIds.Count == 1 && ownerIds.Contains(command.ContributorId))
                 {

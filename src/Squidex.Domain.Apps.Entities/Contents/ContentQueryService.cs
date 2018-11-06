@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.OData;
 using Squidex.Domain.Apps.Core.Contents;
@@ -21,6 +22,9 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared;
+using Squidex.Shared.Identity;
+using Squidex.Shared.Users;
 
 #pragma warning disable RECS0147
 
@@ -73,6 +77,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var schema = await GetSchemaAsync(context);
 
+            CheckPermission(schema, context.Base.User);
+
             using (Profiler.TraceMethod<ContentQueryService>())
             {
                 var isVersioned = version > EtagVersion.Empty;
@@ -86,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 if (content == null || (content.Status != Status.Published && !context.Base.IsFrontendClient) || content.SchemaId.Id != schema.Id)
                 {
-                    throw new DomainObjectNotFoundException(id.ToString(), typeof(ISchemaEntity));
+                    throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
                 }
 
                 return Transform(context.Base, schema, true, content);
@@ -98,6 +104,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Guard.NotNull(context, nameof(context));
 
             var schema = await GetSchemaAsync(context);
+
+            CheckPermission(schema, context.Base.User);
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
@@ -255,6 +263,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
 
             return schema;
+        }
+
+        private void CheckPermission(ISchemaEntity schema, ClaimsPrincipal user)
+        {
+            var permissions = user.Permissions();
+            var permission = Permissions.ForApp(Permissions.AppContentsRead, schema.AppId.Name, schema.Name);
+
+            if (!permissions.Allows(permission))
+            {
+                throw new DomainForbiddenException("You do not have permission for this schema.");
+            }
         }
 
         private static Status[] GetFindStatus(QueryContext context)

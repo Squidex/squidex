@@ -17,6 +17,7 @@ export * from './components/history.component';
 export * from './components/history-list.component';
 export * from './components/language-selector.component';
 export * from './components/markdown-editor.component';
+export * from './components/permission.directive';
 export * from './components/pipes';
 export * from './components/rich-editor.component';
 export * from './components/schema-category.component';

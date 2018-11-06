@@ -6,44 +6,50 @@
     </ng-container>
     
     <ng-container content>
-        <ul class="nav nav-panel nav-dark flex-column" *ngIf="appsState.selectedApp | async; let selectedApp">
-            <li class="nav-item" *ngIf="selectedApp.permission === 'Owner'">
+        <ul class="nav nav-panel nav-dark flex-column">
+            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.backups.read'">
                 <a class="nav-link" routerLink="backups" routerLinkActive="active">
                     Backups
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.clients.read'">
                 <a class="nav-link" routerLink="clients" routerLinkActive="active">
                     Clients
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="selectedApp.permission === 'Owner'">
+            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.contributors.read'">
                 <a class="nav-link" routerLink="contributors" routerLinkActive="active">
                     Contributors
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.roles.read'">
+                <a class="nav-link" routerLink="roles" routerLinkActive="active">
+                    Roles
+                    <i class="icon-angle-right"></i>
+                </a>
+            </li>
+            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.languages.read'">
                 <a class="nav-link" routerLink="languages" routerLinkActive="active">
                     Languages
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.patterns.read'">
                 <a class="nav-link" routerLink="patterns" routerLinkActive="active">
                     Patterns
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="selectedApp.permission === 'Owner'">
+            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.plans.read'">
                 <a class="nav-link" routerLink="plans" routerLinkActive="active">
                     Subscription
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="selectedApp.permission === 'Owner'">
+            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.delete'">
                 <a class="nav-link" routerLink="more" routerLinkActive="active">
                     More
                     <i class="icon-angle-right"></i>

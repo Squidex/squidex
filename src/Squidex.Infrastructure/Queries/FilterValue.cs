@@ -20,6 +20,7 @@ namespace Squidex.Infrastructure.Queries
         public object Value { get; }
 
         public FilterValueType ValueType { get; }
+
         public bool IsList { get; }
 
         public FilterValue(Guid value)

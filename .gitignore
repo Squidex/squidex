@@ -4,6 +4,8 @@
 *.vs
 *.log
 
+.awCache
+
 .vscode
 .awcache
 

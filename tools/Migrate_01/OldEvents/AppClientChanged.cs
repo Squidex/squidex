@@ -6,9 +6,7 @@
 // ==========================================================================
 
 using System;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities
 {
@@ -28,6 +29,6 @@ namespace Squidex.Domain.Apps.Entities
 
         Task<List<IRuleEntity>> GetRulesAsync(Guid appId);
 
-        Task<List<IAppEntity>> GetUserApps(string userId);
+        Task<List<IAppEntity>> GetUserApps(string userId, PermissionSet permissions);
     }
 }

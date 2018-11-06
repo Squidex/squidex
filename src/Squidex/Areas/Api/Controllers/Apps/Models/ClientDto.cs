@@ -8,10 +8,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Reflection;
+using Roles = Squidex.Domain.Apps.Core.Apps.Role;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -36,11 +36,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public string Name { get; set; }
 
         /// <summary>
-        /// The permissions of the client.
+        /// The role of the client.
         /// </summary>
-        [Required]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public AppClientPermission Permission { get; set; }
+        public string Role { get; set; }
 
         public static ClientDto FromKvp(KeyValuePair<string, AppClient> kvp)
         {
@@ -49,7 +47,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static ClientDto FromCommand(AttachClient command)
         {
-            return SimpleMapper.Map(command, new ClientDto { Name = command.Id, Permission = AppClientPermission.Editor });
+            return SimpleMapper.Map(command, new ClientDto { Name = command.Id, Role = Roles.Editor });
         }
     }
 }

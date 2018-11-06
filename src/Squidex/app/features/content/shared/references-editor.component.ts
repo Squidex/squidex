@@ -89,24 +89,24 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
                 this.contentsService.getContents(this.appsState.appName, this.schemaId, 10000, 0, undefined, contentIds)
                     .subscribe(dtos => {
-                        this.contentItems = ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)).filter(r => !!r).map(r => r!));
+                        this.setContentItems(ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)!).filter(r => !!r)));
 
                         if (this.contentItems.length !== contentIds.length) {
                             this.updateValue();
                         }
-
-                        this.changeDetector.markForCheck();
                     }, () => {
-                        this.contentItems = ImmutableArray.empty();
-
-                        this.changeDetector.markForCheck();
+                        this.setContentItems(ImmutableArray.empty());
                     });
             }
         } else {
-            this.contentItems = ImmutableArray.empty();
-
-            this.changeDetector.markForCheck();
+            this.setContentItems(ImmutableArray.empty());
         }
+    }
+
+    public setContentItems(contents: ImmutableArray<ContentDto>) {
+        this.contentItems = contents;
+
+        this.changeDetector.markForCheck();
     }
 
     public setDisabledState(isDisabled: boolean): void {

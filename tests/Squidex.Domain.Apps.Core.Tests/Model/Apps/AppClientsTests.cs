@@ -23,15 +23,15 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var clients_1 = clients_0.Add("2", "my-secret");
 
-            clients_1["2"].Should().BeEquivalentTo(new AppClient("2", "my-secret", AppClientPermission.Editor));
+            clients_1["2"].Should().BeEquivalentTo(new AppClient("2", "my-secret", Role.Editor));
         }
 
         [Fact]
         public void Should_assign_clients_with_permission()
         {
-            var clients_1 = clients_0.Add("2", new AppClient("my-name", "my-secret", AppClientPermission.Reader));
+            var clients_1 = clients_0.Add("2", new AppClient("my-name", "my-secret", Role.Reader));
 
-            clients_1["2"].Should().BeEquivalentTo(new AppClient("my-name", "my-secret", AppClientPermission.Reader));
+            clients_1["2"].Should().BeEquivalentTo(new AppClient("my-name", "my-secret", Role.Reader));
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var clients_1 = clients_0.Rename("1", "new-name");
 
-            clients_1["1"].Should().BeEquivalentTo(new AppClient("new-name", "my-secret", AppClientPermission.Editor));
+            clients_1["1"].Should().BeEquivalentTo(new AppClient("new-name", "my-secret", Role.Editor));
         }
 
         [Fact]
@@ -61,15 +61,15 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_update_client()
         {
-            var client_1 = clients_0.Update("1", AppClientPermission.Reader);
+            var client_1 = clients_0.Update("1", Role.Reader);
 
-            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", AppClientPermission.Reader));
+            client_1["1"].Should().BeEquivalentTo(new AppClient("1", "my-secret", Role.Reader));
         }
 
         [Fact]
         public void Should_return_same_clients_if_client_to_update_not_found()
         {
-            var clients_1 = clients_0.Update("2", AppClientPermission.Reader);
+            var clients_1 = clients_0.Update("2", Role.Reader);
 
             Assert.Same(clients_0, clients_1);
         }

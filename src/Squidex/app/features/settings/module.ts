@@ -28,6 +28,8 @@ import {
     PatternComponent,
     PatternsPageComponent,
     PlansPageComponent,
+    RoleComponent,
+    RolesPageComponent,
     SettingsAreaComponent
 } from './declarations';
 
@@ -130,6 +132,26 @@ const routes: Routes = [
                 ]
             },
             {
+                path: 'roles',
+                component: RolesPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.roles'
+                        }
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/roles'
+                        }
+                    }
+                ]
+            },
+            {
                 path: 'languages',
                 component: LanguagesPageComponent,
                 children: [
@@ -172,6 +194,8 @@ const routes: Routes = [
         PatternComponent,
         PatternsPageComponent,
         PlansPageComponent,
+        RoleComponent,
+        RolesPageComponent,
         SettingsAreaComponent
     ]
 })

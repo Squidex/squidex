@@ -10,12 +10,16 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
+using Squidex.Infrastructure.Security;
+using Squidex.Shared;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Areas.OrleansDashboard.Middlewares
 {
     public sealed class OrleansDashboardAuthenticationMiddleware
     {
+        private static readonly Permission OrleansPermissions = new Permission(Permissions.AdminOrleans);
+
         private readonly RequestDelegate next;
 
         public OrleansDashboardAuthenticationMiddleware(RequestDelegate next)
@@ -27,7 +31,7 @@ namespace Squidex.Areas.OrleansDashboard.Middlewares
         {
             var authentication = await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            if (!authentication.Succeeded || !authentication.Principal.IsInRole(SquidexRoles.Administrator))
+            if (!authentication.Succeeded || !authentication.Principal.Permissions().Allows(OrleansPermissions))
             {
                 await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
                 {

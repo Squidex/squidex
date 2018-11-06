@@ -20,6 +20,8 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Security;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities
 {
@@ -158,21 +160,44 @@ namespace Squidex.Domain.Apps.Entities
             });
         }
 
-        public Task<List<IAppEntity>> GetUserApps(string userId)
+        public Task<List<IAppEntity>> GetUserApps(string userId, PermissionSet permissions)
         {
+            Guard.NotNull(userId, nameof(userId));
+            Guard.NotNull(permissions, nameof(permissions));
+
             return localCache.GetOrCreateAsync($"GetUserApps({userId})", async () =>
             {
                 using (Profiler.TraceMethod<AppProvider>())
                 {
-                    var ids = await grainFactory.GetGrain<IAppsByUserIndex>(userId).GetAppIdsAsync();
+                    var ids =
+                        await Task.WhenAll(
+                            GetAppIdsByUserAsync(userId),
+                            GetAppIdsAsync(permissions.ToAppNames()));
 
                     var apps =
-                        await Task.WhenAll(
-                            ids.Select(id => grainFactory.GetGrain<IAppGrain>(id).GetStateAsync()));
+                        await Task.WhenAll(ids
+                            .SelectMany(x => x)
+                            .Select(id => grainFactory.GetGrain<IAppGrain>(id).GetStateAsync()));
 
                     return apps.Where(a => IsFound(a.Value)).Select(a => a.Value).ToList();
                 }
             });
+        }
+
+        private async Task<List<Guid>> GetAppIdsByUserAsync(string userId)
+        {
+            using (Profiler.TraceMethod<AppProvider>())
+            {
+                return await grainFactory.GetGrain<IAppsByUserIndex>(userId).GetAppIdsAsync();
+            }
+        }
+
+        private async Task<List<Guid>> GetAppIdsAsync(IEnumerable<string> names)
+        {
+            using (Profiler.TraceMethod<AppProvider>())
+            {
+                return await grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).GetAppIdsAsync(names.ToArray());
+            }
         }
 
         private async Task<Guid> GetAppIdAsync(string name)

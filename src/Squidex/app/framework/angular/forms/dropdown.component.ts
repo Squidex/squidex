@@ -95,8 +95,10 @@ export class DropdownComponent implements AfterContentInit, ControlValueAccessor
                 return false;
             case KEY_ESCAPE:
             case KEY_ENTER:
-                this.close();
-                return false;
+                if (this.dropdown.isOpen) {
+                    this.close();
+                    return false;
+                }
         }
 
         return true;

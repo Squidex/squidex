@@ -14,7 +14,7 @@
         </div>
         
         <div class="grid-footer">
-            <form [formGroup]="commentForm.form" (submit)="comment()">
+            <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
                 <input class="form-control" name="text" formControlName="text" placeholder="Create a comment" />
             </form>
         </div>

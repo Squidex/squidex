@@ -22,8 +22,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
     /// <summary>
     /// Uploads and retrieves assets.
     /// </summary>
-    [ApiExceptionFilter]
-    [AppApi]
     [ApiExplorerSettings(GroupName = nameof(Assets))]
     public sealed class AssetContentController : ApiController
     {

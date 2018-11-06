@@ -11,15 +11,13 @@ using Squidex.Areas.Api.Controllers.Plans.Models;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Plans
 {
     /// <summary>
     /// Manages and configures plans.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
-    [AppApi]
     [ApiExplorerSettings(GroupName = nameof(Plans))]
     public sealed class AppPlansController : ApiController
     {
@@ -43,10 +41,10 @@ namespace Squidex.Areas.Api.Controllers.Plans
         /// 200 => App plan information returned.
         /// 404 => App not found.
         /// </returns>
-        [MustBeAppOwner]
         [HttpGet]
         [Route("apps/{app}/plans/")]
         [ProducesResponseType(typeof(AppPlansDto), 200)]
+        [ApiPermission(Permissions.AppPlansRead)]
         [ApiCosts(0)]
         public IActionResult GetPlans(string app)
         {
@@ -69,11 +67,11 @@ namespace Squidex.Areas.Api.Controllers.Plans
         /// 400 => Plan not owned by user.
         /// 404 => App not found.
         /// </returns>
-        [MustBeAppOwner]
         [HttpPut]
         [Route("apps/{app}/plan/")]
         [ProducesResponseType(typeof(PlanChangedDto), 200)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppPlansChange)]
         [ApiCosts(0)]
         public async Task<IActionResult> ChangePlanAsync(string app, [FromBody] ChangePlanDto request)
         {

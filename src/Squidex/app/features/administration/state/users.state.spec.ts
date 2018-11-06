@@ -22,11 +22,11 @@ import {
 
 describe('UsersState', () => {
     const oldUsers = [
-        new UserDto('id1', 'mail1@mail.de', 'name1', false),
-        new UserDto('id2', 'mail2@mail.de', 'name2', true)
+        new UserDto('id1', 'mail1@mail.de', 'name1', ['Permission1'], false),
+        new UserDto('id2', 'mail2@mail.de', 'name2', ['Permission2'], true)
     ];
 
-    const newUser = new UserDto('id3', 'mail3@mail.de', 'name3', false);
+    const newUser = new UserDto('id3', 'mail3@mail.de', 'name3', ['Permission3'], false);
 
     let authService: IMock<AuthService>;
     let dialogs: IMock<DialogService>;
@@ -73,8 +73,8 @@ describe('UsersState', () => {
         usersState.select('id1').subscribe();
 
         const newUsers = [
-            new UserDto('id1', 'mail1@mail.de_new', 'name1_new', false),
-            new UserDto('id2', 'mail2@mail.de_new', 'name2_new', true)
+            new UserDto('id1', 'mail1@mail.de_new', 'name1_new', ['Permission1_New'], false),
+            new UserDto('id2', 'mail2@mail.de_new', 'name2_new', ['Permission2_New'], true)
         ];
 
         usersService.setup(x => x.getUsers(10, 0, undefined))
@@ -168,7 +168,7 @@ describe('UsersState', () => {
     });
 
     it('should update user properties when updated', () => {
-        const request = new UpdateUserDto('new@mail.com', 'New');
+        const request = new UpdateUserDto('new@mail.com', 'New', ['Permission1']);
 
         usersService.setup(x => x.putUser('id1', request))
             .returns(() => of({}));
@@ -184,7 +184,7 @@ describe('UsersState', () => {
     });
 
     it('should add user to snapshot when created', () => {
-        const request = new CreateUserDto(newUser.email, newUser.displayName, 'password');
+        const request = new CreateUserDto(newUser.email, newUser.displayName, newUser.permissions, 'password');
 
         usersService.setup(x => x.postUser(request))
             .returns(() => of(newUser));

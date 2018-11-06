@@ -21,9 +21,6 @@ namespace Squidex.Areas.Api.Controllers.UI
     /// <summary>
     /// Manages ui settings and configs.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
-    [AppApi]
     [ApiExplorerSettings(GroupName = nameof(UI))]
     public sealed class UIController : ApiController
     {
@@ -53,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [HttpGet]
         [Route("apps/{app}/ui/settings/")]
         [ProducesResponseType(typeof(UISettingsDto), 200)]
-        [ApiCosts(0)]
+        [ApiPermission]
         public async Task<IActionResult> GetSettings(string app)
         {
             var result = await grainFactory.GetGrain<IAppUISettingsGrain>(App.Id).GetAsync();
@@ -77,7 +74,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/ui/settings/{key}")]
-        [ApiCosts(0)]
+        [ApiPermission]
         public async Task<IActionResult> PutSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
             await grainFactory.GetGrain<IAppUISettingsGrain>(App.Id).SetAsync(key, request.Value);
@@ -96,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/ui/settings/{key}")]
-        [ApiCosts(0)]
+        [ApiPermission]
         public async Task<IActionResult> DeleteSetting(string app, string key)
         {
             await grainFactory.GetGrain<IAppUISettingsGrain>(App.Id).RemoveAsync(key);

@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
@@ -34,7 +33,6 @@ interface Snapshot {
     isLoaded?: boolean;
 }
 
-@Injectable()
 export class CommentsState extends State<Snapshot> {
     public comments =
         this.changes.pipe(map(x => x.comments),

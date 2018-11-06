@@ -196,7 +196,7 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
         });
     }
 
-    public onAssetsSelected(assets: AssetDto[]) {
+    public insertAssets(assets: AssetDto[]) {
         let content = '';
 
         for (let asset of assets) {

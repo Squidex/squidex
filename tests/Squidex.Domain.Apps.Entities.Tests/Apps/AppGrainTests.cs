@@ -32,6 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly string contributorId = Guid.NewGuid().ToString();
         private readonly string clientId = "client";
         private readonly string clientNewName = "My Client";
+        private readonly string roleName = "My Role";
         private readonly string planId = "premium";
         private readonly AppGrain sut;
         private readonly Guid patternId1 = Guid.NewGuid();
@@ -85,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppCreated { Name = AppName }),
-                    CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Permission = AppContributorPermission.Owner }),
+                    CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Role = Role.Owner }),
                     CreateEvent(new AppLanguageAdded { Language = Language.EN }),
                     CreateEvent(new AppPatternAdded { PatternId = patternId1, Name = "Number", Pattern = "[0-9]" }),
                     CreateEvent(new AppPatternAdded { PatternId = patternId2, Name = "Numbers", Pattern = "[0-9]*" })
@@ -158,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task AssignContributor_should_create_events_and_update_state()
         {
-            var command = new AssignContributor { ContributorId = contributorId, Permission = AppContributorPermission.Editor };
+            var command = new AssignContributor { ContributorId = contributorId, Role = Role.Editor };
 
             await ExecuteCreateAsync();
 
@@ -166,11 +167,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(EntityCreatedResult.Create(contributorId, 5));
 
-            Assert.Equal(AppContributorPermission.Editor, sut.Snapshot.Contributors[contributorId]);
+            Assert.Equal(Role.Editor, sut.Snapshot.Contributors[contributorId]);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Permission = AppContributorPermission.Editor })
+                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Role = Role.Editor })
                 );
         }
 
@@ -236,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task UpdateClient_should_create_events_and_update_state()
         {
-            var command = new UpdateClient { Id = clientId, Name = clientNewName, Permission = AppClientPermission.Developer };
+            var command = new UpdateClient { Id = clientId, Name = clientNewName, Role = Role.Developer };
 
             await ExecuteCreateAsync();
             await ExecuteAttachClientAsync();
@@ -250,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppClientRenamed { Id = clientId, Name = clientNewName }),
-                    CreateEvent(new AppClientUpdated { Id = clientId, Permission = AppClientPermission.Developer })
+                    CreateEvent(new AppClientUpdated { Id = clientId, Role = Role.Developer })
                 );
         }
 
@@ -310,6 +311,63 @@ namespace Squidex.Domain.Apps.Entities.Apps
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppLanguageUpdated { Language = Language.DE, Fallback = new List<Language> { Language.EN } })
+                );
+        }
+
+        [Fact]
+        public async Task AddRole_should_create_events_and_update_state()
+        {
+            var command = new AddRole { Name = roleName };
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(5));
+
+            Assert.Equal(5, sut.Snapshot.Roles.Count);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppRoleAdded { Name = roleName })
+                );
+        }
+
+        [Fact]
+        public async Task DeleteRole_should_create_events_and_update_state()
+        {
+            var command = new DeleteRole { Name = roleName };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddRoleAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(6));
+
+            Assert.Equal(4, sut.Snapshot.Roles.Count);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppRoleDeleted { Name = roleName })
+                );
+        }
+
+        [Fact]
+        public async Task UpdateRole_should_create_events_and_update_state()
+        {
+            var command = new UpdateRole { Name = roleName, Permissions = new[] { "clients.read" } };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddRoleAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(6));
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppRoleUpdated { Name = roleName, Permissions = new[] { "clients.read" } })
                 );
         }
 
@@ -402,12 +460,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private Task ExecuteAssignContributorAsync()
         {
-            return sut.ExecuteAsync(CreateCommand(new AssignContributor { ContributorId = contributorId, Permission = AppContributorPermission.Editor }));
+            return sut.ExecuteAsync(CreateCommand(new AssignContributor { ContributorId = contributorId, Role = Role.Editor }));
         }
 
         private Task ExecuteAttachClientAsync()
         {
             return sut.ExecuteAsync(CreateCommand(new AttachClient { Id = clientId }));
+        }
+
+        private Task ExecuteAddRoleAsync()
+        {
+            return sut.ExecuteAsync(CreateCommand(new AddRole { Name = roleName }));
         }
 
         private Task ExecuteAddLanguageAsync(Language language)

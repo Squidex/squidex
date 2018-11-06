@@ -16,6 +16,7 @@ import {
     AssignContributorForm,
     AutocompleteSource,
     ContributorsState,
+    RolesState,
     Types,
     UserDto,
     UsersService
@@ -53,19 +54,20 @@ export class UsersDataSource implements AutocompleteSource {
     ]
 })
 export class ContributorsPageComponent implements OnInit {
-    public usersPermissions = [ 'Owner', 'Developer', 'Editor' ];
-
     public assignContributorForm = new AssignContributorForm(this.formBuilder);
 
     constructor(
         public readonly appsState: AppsState,
         public readonly contributorsState: ContributorsState,
+        public readonly rolesState: RolesState,
         public readonly usersDataSource: UsersDataSource,
         private readonly formBuilder: FormBuilder
     ) {
     }
 
     public ngOnInit() {
+        this.rolesState.load().pipe(onErrorResumeNext()).subscribe();
+
         this.contributorsState.load().pipe(onErrorResumeNext()).subscribe();
     }
 
@@ -77,8 +79,8 @@ export class ContributorsPageComponent implements OnInit {
         this.contributorsState.revoke(contributor).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public changePermission(contributor: AppContributorDto, permission: string) {
-        this.contributorsState.assign(new AppContributorDto(contributor.contributorId, permission)).pipe(onErrorResumeNext()).subscribe();
+    public changeRole(contributor: AppContributorDto, role: string) {
+        this.contributorsState.assign(new AppContributorDto(contributor.contributorId, role)).pipe(onErrorResumeNext()).subscribe();
     }
 
     public assignContributor() {

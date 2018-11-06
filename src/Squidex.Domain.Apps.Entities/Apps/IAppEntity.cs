@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
     {
         string Name { get; }
 
+        Roles Roles { get; }
+
         AppPlan Plan { get; }
 
         AppClients Clients { get; }

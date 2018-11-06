@@ -16,6 +16,7 @@ import {
     DateTime,
     HTTP,
     Model,
+    Permission,
     pretifyError
 } from '@app/framework';
 
@@ -23,7 +24,7 @@ export class AppDto extends Model {
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly permission: string,
+        public readonly permissions: Permission[],
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
         public readonly planName: string,
@@ -60,10 +61,12 @@ export class AppsService {
                     const items: any[] = body;
 
                     return items.map(item => {
+                        const permissions = (<string[]>item.permissions).map(x => new Permission(x));
+
                         return new AppDto(
                             item.id,
                             item.name,
-                            item.permission,
+                            permissions,
                             DateTime.parseISO(item.created),
                             DateTime.parseISO(item.lastModified),
                             item.planName,
@@ -82,7 +85,9 @@ export class AppsService {
 
                     now = now || DateTime.now();
 
-                    return new AppDto(body.id, dto.name, body.permission, now, now, body.planName, body.planUpgrade);
+                    const permissions = (<string[]>body.permissions).map(x => new Permission(x));
+
+                    return new AppDto(body.id, dto.name, permissions, now, now, body.planName, body.planUpgrade);
                 }),
                 tap(() => {
                     this.analytics.trackEvent('App', 'Created', dto.name);

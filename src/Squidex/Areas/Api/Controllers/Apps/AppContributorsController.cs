@@ -12,16 +12,13 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Apps
 {
     /// <summary>
     /// Manages and configures apps.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
-    [AppApi]
-    [MustBeAppOwner]
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppContributorsController : ApiController
     {
@@ -44,6 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/contributors/")]
         [ProducesResponseType(typeof(ContributorsDto), 200)]
+        [ApiPermission(Permissions.AppContributorsRead)]
         [ApiCosts(0)]
         public IActionResult GetContributors(string app)
         {
@@ -68,8 +66,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [Route("apps/{app}/contributors/")]
         [ProducesResponseType(typeof(ContributorAssignedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppContributorsAssign)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostContributor(string app, [FromBody] AssignAppContributorDto request)
+        public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto request)
         {
             var command = request.ToCommand();
             var context = await CommandBus.PublishAsync(command);
@@ -93,6 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/contributors/{id}/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppContributorsRevoke)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContributor(string app, string id)
         {

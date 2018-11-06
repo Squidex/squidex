@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AddPattern { PatternId = patternId, Name = string.Empty, Pattern = ".*" };
 
-            ValidationAssert.Throws(() => GuardAppPattern.CanAdd(patterns_0, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_0, command),
                 new ValidationError("Name is required.", "Name"));
         }
 
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = string.Empty };
 
-            ValidationAssert.Throws(() => GuardAppPattern.CanAdd(patterns_0, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_0, command),
                 new ValidationError("Pattern is required.", "Pattern"));
         }
 
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
 
-            ValidationAssert.Throws(() => GuardAppPattern.CanAdd(patterns_0, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_0, command),
                 new ValidationError("Pattern is not a valid regular expression.", "Pattern"));
         }
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
 
-            ValidationAssert.Throws(() => GuardAppPattern.CanAdd(patterns_1, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_1, command),
                 new ValidationError("A pattern with the same name already exists."));
         }
 
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new AddPattern { PatternId = patternId, Name = "other", Pattern = "[a-z]" };
 
-            ValidationAssert.Throws(() => GuardAppPattern.CanAdd(patterns_1, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_1, command),
                 new ValidationError("This pattern already exists but with another name."));
         }
 
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
 
-            GuardAppPattern.CanAdd(patterns_0, command);
+            GuardAppPatterns.CanAdd(patterns_0, command);
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new DeletePattern { PatternId = patternId };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPattern.CanDelete(patterns_0, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPatterns.CanDelete(patterns_0, command));
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new DeletePattern { PatternId = patternId };
 
-            GuardAppPattern.CanDelete(patterns_1, command);
+            GuardAppPatterns.CanDelete(patterns_1, command);
         }
 
         [Fact]
@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = patternId, Name = string.Empty, Pattern = ".*" };
 
-            ValidationAssert.Throws(() => GuardAppPattern.CanUpdate(patterns_1, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_1, command),
                 new ValidationError("Name is required.", "Name"));
         }
 
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = patternId, Name = "any", Pattern = string.Empty };
 
-            ValidationAssert.Throws(() => GuardAppPattern.CanUpdate(patterns_1, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_1, command),
                 new ValidationError("Pattern is required.", "Pattern"));
         }
 
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
 
-            ValidationAssert.Throws(() => GuardAppPattern.CanUpdate(patterns_1, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_1, command),
                 new ValidationError("Pattern is not a valid regular expression.", "Pattern"));
         }
 
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = id2, Name = "Pattern1", Pattern = "[0-4]" };
 
-            ValidationAssert.Throws(() => GuardAppPattern.CanUpdate(patterns_2, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_2, command),
                 new ValidationError("A pattern with the same name already exists."));
         }
 
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = id2, Name = "Pattern2", Pattern = "[0-5]" };
 
-            ValidationAssert.Throws(() => GuardAppPattern.CanUpdate(patterns_2, command),
+            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_2, command),
                 new ValidationError("This pattern already exists but with another name."));
         }
 
@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new UpdatePattern { PatternId = patternId, Name = "Pattern1", Pattern = ".*" };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPattern.CanUpdate(patterns_0, command));
+            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPatterns.CanUpdate(patterns_0, command));
         }
 
         [Fact]
@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new UpdatePattern { PatternId = patternId, Name = "Pattern1", Pattern = ".*" };
 
-            GuardAppPattern.CanUpdate(patterns_1, command);
+            GuardAppPatterns.CanUpdate(patterns_1, command);
         }
     }
 }

@@ -10,7 +10,7 @@ import { Injectable} from '@angular/core';
 import { empty, Observable, throwError } from 'rxjs';
 import { catchError, switchMap, take } from 'rxjs/operators';
 
-import { ApiUrlConfig } from '@app/framework';
+import { ApiUrlConfig, ErrorDto } from '@app/framework';
 
 import { AuthService, Profile } from './../services/auth.service';
 
@@ -39,14 +39,14 @@ export class AuthInterceptor implements HttpInterceptor {
     private makeRequest(req: HttpRequest<any>, next: HttpHandler, user: Profile | null, renew = false): Observable<HttpEvent<any>> {
         const token = user ? user.authToken : '';
 
-        const authReq = req.clone({
+        req = req.clone({
             headers: req.headers
                 .set('Authorization', token)
                 .set('Accept-Language', '*')
                 .set('Pragma', 'no-cache')
         });
 
-        return next.handle(authReq).pipe(
+        return next.handle(req).pipe(
             catchError((error: HttpErrorResponse) => {
                 if (error.status === 401 && renew) {
                     return this.authService.loginSilent().pipe(
@@ -57,9 +57,13 @@ export class AuthInterceptor implements HttpInterceptor {
                         }),
                         switchMap(u => this.makeRequest(req, next, u)));
                 } else if (error.status === 401 || error.status === 403) {
-                    this.authService.logoutRedirect();
+                    if (req.method === 'GET') {
+                        this.authService.logoutRedirect();
 
-                    return empty();
+                        return empty();
+                    } else {
+                        return throwError(new ErrorDto(403, 'You do not have the permissions to do this.'));
+                    }
                 }
 
                 return throwError(error);

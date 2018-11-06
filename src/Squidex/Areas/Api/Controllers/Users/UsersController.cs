@@ -24,7 +24,6 @@ namespace Squidex.Areas.Api.Controllers.Users
     /// <summary>
     /// Readonly API to retrieve information about squidex users.
     /// </summary>
-    [ApiExceptionFilter]
     [ApiExplorerSettings(GroupName = nameof(Users))]
     public sealed class UsersController : ApiController
     {
@@ -68,10 +67,10 @@ namespace Squidex.Areas.Api.Controllers.Users
         /// <returns>
         /// 200 => Users returned.
         /// </returns>
-        [ApiAuthorize]
         [HttpGet]
         [Route("users/")]
         [ProducesResponseType(typeof(PublicUserDto[]), 200)]
+        [ApiPermission]
         public async Task<IActionResult> GetUsers(string query)
         {
             try
@@ -100,10 +99,10 @@ namespace Squidex.Areas.Api.Controllers.Users
         /// 200 => User found.
         /// 404 => User not found.
         /// </returns>
-        [ApiAuthorize]
         [HttpGet]
         [Route("users/{id}/")]
         [ProducesResponseType(typeof(PublicUserDto), 200)]
+        [ApiPermission]
         public async Task<IActionResult> GetUser(string id)
         {
             try

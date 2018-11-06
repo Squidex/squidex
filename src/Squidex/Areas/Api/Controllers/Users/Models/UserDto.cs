@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared.Users;
 
@@ -37,9 +38,17 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         [Required]
         public bool IsLocked { get; set; }
 
+        /// <summary>
+        /// Additional permissions for the user.
+        /// </summary>
+        [Required]
+        public string[] Permissions { get; set; }
+
         public static UserDto FromUser(IUser user)
         {
-            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName() });
+            var permissions = user.Permissions().ToIds().ToArray();
+
+            return SimpleMapper.Map(user, new UserDto { DisplayName = user.DisplayName(), Permissions = permissions });
         }
     }
 }

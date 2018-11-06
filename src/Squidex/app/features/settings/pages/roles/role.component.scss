@@ -1,0 +1,34 @@
+@import '_vars';
+@import '_mixins';
+
+.form-group {
+    & {
+        margin-bottom: .375rem;
+    }
+
+    &:last-child {
+        margin: 0;
+    }
+}
+
+.rule-name {
+    @include truncate;
+}
+
+.text-decent {
+    color: $color-text-decent;
+}
+
+.text-force {
+    color: $color-text;
+}
+
+.built {
+    font-weight: bold;
+}
+
+.table-items-row-details {
+    &::before {
+        right: 4.4rem;
+    }
+}

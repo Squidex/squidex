@@ -56,11 +56,11 @@ describe('AppContributorsService', () => {
             contributors: [
                 {
                     contributorId: '123',
-                    permission: 'Owner'
+                    role: 'Owner'
                 },
                 {
                     contributorId: '456',
-                    permission: 'Owner'
+                    role: 'Owner'
                 }
             ],
             maxContributors: 100

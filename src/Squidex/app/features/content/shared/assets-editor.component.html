@@ -23,10 +23,10 @@
         <ng-container *ngIf="!isListView; else listTemplate">
             <div class="row no-gutters">
                 <sqx-asset *ngFor="let file of newAssets" [initFile]="file" 
-                    (failed)="onAssetFailed(file)" (loaded)="onAssetLoaded(file, $event)">
+                    (failed)="removeLoadingAsset(file)" (loaded)="addAsset(file, $event)">
                 </sqx-asset>
                 <sqx-asset *ngFor="let asset of oldAssets" [asset]="asset" removeMode="true" isDisabled="true"
-                    (removing)="onAssetRemoving($event)">
+                    (removing)="removeLoadedAsset($event)">
                 </sqx-asset>
             </div>
         </ng-container>
@@ -34,13 +34,13 @@
         <ng-template #listTemplate>
             <div class="list-view">
                 <sqx-asset *ngFor="let file of newAssets" [initFile]="file"
-                    [isListView]="true" (failed)="onAssetFailed(file)" (loaded)="onAssetLoaded(file, $event)">
+                    [isListView]="true" (failed)="removeLoadingAsset(file)" (loaded)="addAsset(file, $event)">
                 </sqx-asset>
                 
-                <div [sqxSortModel]="oldAssets.values" (sqxSorted)="sort($event)">
+                <div [sqxSortModel]="oldAssets.values" (sqxSorted)="sortAssets($event)">
                     <div *ngFor="let asset of oldAssets">
                         <sqx-asset [asset]="asset" removeMode="true" isDisabled="true"
-                            [isListView]="true" (removing)="onAssetRemoving($event)">
+                            [isListView]="true" (removing)="removeLoadedAsset($event)">
                         </sqx-asset>
                     </div>
                 </div>
@@ -50,5 +50,5 @@
 </div>
 
 <ng-container *sqxModalView="assetsDialog;onRoot:true;closeAuto:false">
-    <sqx-assets-selector (selected)="onAssetsSelected($event)"></sqx-assets-selector>
+    <sqx-assets-selector (selected)="selectAssets($event)"></sqx-assets-selector>
 </ng-container>

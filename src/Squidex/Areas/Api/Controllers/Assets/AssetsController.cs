@@ -24,15 +24,13 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Assets
 {
     /// <summary>
     /// Uploads and retrieves assets.
     /// </summary>
-    [ApiAuthorize]
-    [ApiExceptionFilter]
-    [AppApi]
     [ApiExplorerSettings(GroupName = nameof(Assets))]
     public sealed class AssetsController : ApiController
     {
@@ -72,10 +70,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <remarks>
         /// Get all tags for assets.
         /// </remarks>
-        [MustBeAppReader]
         [HttpGet]
         [Route("apps/{app}/assets/tags")]
         [ProducesResponseType(typeof(Dictionary<string, int>), 200)]
+        [ApiPermission(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetTags(string app)
         {
@@ -96,10 +94,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <remarks>
         /// Get all assets for the app.
         /// </remarks>
-        [MustBeAppReader]
         [HttpGet]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
+        [ApiPermission(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null)
         {
@@ -128,10 +126,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// 200 => Asset found.
         /// 404 => Asset or app not found.
         /// </returns>
-        [MustBeAppReader]
         [HttpGet]
         [Route("apps/{app}/assets/{id}/")]
         [ProducesResponseType(typeof(AssetsDto), 200)]
+        [ApiPermission(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAsset(string app, Guid id)
         {
@@ -169,11 +167,12 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <remarks>
         /// You can only upload one file at a time. The mime type of the file is not calculated by Squidex and is required correctly.
         /// </remarks>
-        [MustBeAppEditor]
         [HttpPost]
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppAssetsCreate)]
+        [ApiCosts(1)]
         public async Task<IActionResult> PostAsset(string app, [SwaggerIgnore] List<IFormFile> file)
         {
             var assetFile = await CheckAssetFileAsync(file);
@@ -201,11 +200,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <remarks>
         /// Use multipart request to upload an asset.
         /// </remarks>
-        [MustBeAppEditor]
         [HttpPut]
         [Route("apps/{app}/assets/{id}/content/")]
         [ProducesResponseType(typeof(AssetReplacedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetContent(string app, Guid id, [SwaggerIgnore] List<IFormFile> file)
         {
@@ -231,10 +230,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// 400 => Asset name not valid.
         /// 404 => Asset or app not found.
         /// </returns>
-        [MustBeAppReader]
         [HttpPut]
         [Route("apps/{app}/assets/{id}/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] UpdateAssetDto request)
         {
@@ -252,9 +251,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// 204 => Asset has been deleted.
         /// 404 => Asset or app not found.
         /// </returns>
-        [MustBeAppEditor]
         [HttpDelete]
         [Route("apps/{app}/assets/{id}/")]
+        [ApiPermission(Permissions.AppAssetsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteAsset(string app, Guid id)
         {

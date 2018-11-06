@@ -19,7 +19,12 @@
                 No client created yet.
             </div>
         
-            <sqx-client *ngFor="let client of clients; trackBy: trackByClient" [client]="client"></sqx-client>
+            <ng-container *ngIf="rolesState.roles | async; let roles">
+                <sqx-client *ngFor="let client of clients; trackBy: trackByClient" 
+                    [client]="client"
+                    [clientRoles]="roles">
+                </sqx-client>
+            </ng-container>
 
             <div class="table-items-footer">
                 <form [formGroup]="addClientForm.form" (ngSubmit)="attachClient()">

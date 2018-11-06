@@ -84,7 +84,7 @@ describe('ClientsState', () => {
     });
 
     it('should update properties when updated', () => {
-        const request = new UpdateAppClientDto('NewName', 'NewPermission');
+        const request = new UpdateAppClientDto('NewName', 'NewRole');
 
         clientsService.setup(x => x.putClient(app, oldClients[0].id, request, version))
             .returns(() => of(new Versioned<any>(newVersion, {})));
@@ -94,7 +94,7 @@ describe('ClientsState', () => {
         const client_1 = clientsState.snapshot.clients.at(0);
 
         expect(client_1.name).toBe('NewName');
-        expect(client_1.permission).toBe('NewPermission');
+        expect(client_1.role).toBe('NewRole');
         expect(clientsState.snapshot.version).toEqual(newVersion);
     });
 

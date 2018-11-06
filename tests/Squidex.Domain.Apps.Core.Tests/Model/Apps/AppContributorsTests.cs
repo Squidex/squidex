@@ -19,26 +19,26 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         [Fact]
         public void Should_assign_new_contributor()
         {
-            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Developer);
-            var contributors_2 = contributors_1.Assign("2", AppContributorPermission.Editor);
+            var contributors_1 = contributors_0.Assign("1", Role.Developer);
+            var contributors_2 = contributors_1.Assign("2", Role.Editor);
 
-            Assert.Equal(AppContributorPermission.Developer, contributors_2["1"]);
-            Assert.Equal(AppContributorPermission.Editor, contributors_2["2"]);
+            Assert.Equal(Role.Developer, contributors_2["1"]);
+            Assert.Equal(Role.Editor, contributors_2["2"]);
         }
 
         [Fact]
         public void Should_replace_contributor_if_already_exists()
         {
-            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Developer);
-            var contributors_2 = contributors_1.Assign("1", AppContributorPermission.Owner);
+            var contributors_1 = contributors_0.Assign("1", Role.Developer);
+            var contributors_2 = contributors_1.Assign("1", Role.Owner);
 
-            Assert.Equal(AppContributorPermission.Owner, contributors_2["1"]);
+            Assert.Equal(Role.Owner, contributors_2["1"]);
         }
 
         [Fact]
         public void Should_remove_contributor()
         {
-            var contributors_1 = contributors_0.Assign("1", AppContributorPermission.Developer);
+            var contributors_1 = contributors_0.Assign("1", Role.Developer);
             var contributors_2 = contributors_1.Remove("1");
 
             Assert.Empty(contributors_2);

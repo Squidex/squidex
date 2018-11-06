@@ -29,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var plan = plans.GetPlanForApp(app);
 
-            var contributors = app.Contributors.Select(x => new ContributorDto { ContributorId = x.Key, Permission = x.Value }).ToArray();
+            var contributors = app.Contributors.Select(x => new ContributorDto { ContributorId = x.Key, Role = x.Value }).ToArray();
 
             return new ContributorsDto { Contributors = contributors, MaxContributors = plan.MaxContributors };
         }

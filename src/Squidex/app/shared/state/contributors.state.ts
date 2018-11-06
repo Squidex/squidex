@@ -98,7 +98,7 @@ export class ContributorsState extends State<Snapshot> {
     public assign(request: AppContributorDto): Observable<any> {
         return this.appContributorsService.postContributor(this.appName, request, this.version).pipe(
             tap(dto => {
-                const contributors = this.updateContributors(dto.payload.contributorId, request.permission, dto.version);
+                const contributors = this.updateContributors(dto.payload.contributorId, request.role, dto.version);
 
                 this.replaceContributors(contributors, dto.version);
             }),
@@ -112,8 +112,8 @@ export class ContributorsState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    private updateContributors(id: string, permission: string, version: Version) {
-        const contributor = new AppContributorDto(id, permission);
+    private updateContributors(id: string, role: string, version: Version) {
+        const contributor = new AppContributorDto(id, role);
         const contributors = this.snapshot.contributors;
 
         if (contributors.find(x => x.contributor.contributorId === id)) {

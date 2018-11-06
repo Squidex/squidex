@@ -23,6 +23,7 @@
         "**/*.user": true,
         "**/*.xproj": true,
         "**/*.gitattributes": true,
+        ".awcache": true,
         ".vs:": true,
         ".vscode:": true
     }

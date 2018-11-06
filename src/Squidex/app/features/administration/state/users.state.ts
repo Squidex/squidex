@@ -57,18 +57,31 @@ export class UserForm extends Form<FormGroup> {
                 [
                     ValidatorsEx.match('password', 'Passwords must be the same.')
                 ]
-            ]
+            ],
+            permissions: ['']
         }));
     }
 
     public load(user?: UserDto) {
         if (user) {
             this.form.controls['password'].setValidators(null);
+
+            super.load({ ...user, permissions: user.permissions.join('\n') });
         } else {
             this.form.controls['password'].setValidators(Validators.required);
+
+            super.load(undefined);
+        }
+    }
+
+    public submit() {
+        const result = super.submit();
+
+        if (result) {
+            result['permissions'] = result['permissions'].split('\n').filter((x: any) => !!x);
         }
 
-        super.load(user);
+        return result;
     }
 }
 

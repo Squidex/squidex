@@ -13,16 +13,13 @@ using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Apps
 {
     /// <summary>
     /// Manages and configures app patterns.
     /// </summary>
-    [ApiAuthorize]
-    [MustBeAppDeveloper]
-    [ApiExceptionFilter]
-    [AppApi]
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppPatternsController : ApiController
     {
@@ -45,6 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpGet]
         [Route("apps/{app}/patterns/")]
         [ProducesResponseType(typeof(AppPatternDto[]), 200)]
+        [ApiPermission(Permissions.AppPatternsRead)]
         [ApiCosts(0)]
         public IActionResult GetPatterns(string app)
         {
@@ -56,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Create a new app patterm.
+        /// Create a new app pattern.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Pattern to be added to the app.</param>
@@ -68,6 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/patterns/")]
         [ProducesResponseType(typeof(AppPatternDto), 201)]
+        [ApiPermission(Permissions.AppPatternsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostPattern(string app, [FromBody] UpdatePatternDto request)
         {
@@ -81,7 +80,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Update an existing app patterm.
+        /// Update an existing app pattern.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the pattern to be updated.</param>
@@ -94,6 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/patterns/{id}/")]
         [ProducesResponseType(typeof(AppPatternDto), 201)]
+        [ApiPermission(Permissions.AppPatternsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> UpdatePattern(string app, Guid id, [FromBody] UpdatePatternDto request)
         {
@@ -116,6 +116,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpDelete]
         [Route("apps/{app}/patterns/{id}/")]
+        [ApiPermission(Permissions.AppPatternsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeletePattern(string app, Guid id)
         {

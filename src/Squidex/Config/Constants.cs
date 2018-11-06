@@ -25,6 +25,8 @@ namespace Squidex.Config
 
         public static readonly string RoleScope = "role";
 
+        public static readonly string PermissionsScope = "permissions";
+
         public static readonly string ProfileScope = "squidex-profile";
 
         public static readonly string FrontendClient = "squidex-frontend";

@@ -33,8 +33,6 @@ export class ProfileMenuComponent implements OnDestroy, OnInit {
     public profileDisplayName = '';
     public profileId = '';
 
-    public isAdmin = false;
-
     public profileUrl = this.apiUrl.buildUrl('/identity-server/account/profile');
 
     constructor(
@@ -54,8 +52,6 @@ export class ProfileMenuComponent implements OnDestroy, OnInit {
                 .subscribe(user => {
                     this.profileId = user!.id;
                     this.profileDisplayName = user!.displayName;
-
-                    this.isAdmin = user!.isAdmin;
 
                     this.changeDetector.markForCheck();
                 });

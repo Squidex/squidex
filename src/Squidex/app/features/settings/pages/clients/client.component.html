@@ -67,11 +67,11 @@
     </div>
     <div class="row no-gutters">
         <div class="col-4 col-form-label">
-            Permission:
+            Role:
         </div>
         <div class="col">
-            <select class="form-control" [ngModel]="client.permission" (ngModelChange)="update($event)">
-                <option *ngFor="let permission of clientPermissions" [ngValue]="permission">{{permission}}</option>
+            <select class="form-control" [ngModel]="client.role" (ngModelChange)="update($event)">
+                <option *ngFor="let role of clientRoles" [ngValue]="role.name">{{role.name}}</option>
             </select>
         </div>
         <div class="col col-auto cell-actions">

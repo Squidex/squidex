@@ -106,6 +106,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
+        public async Task Should_return_many_app_ids()
+        {
+            await sut.AddAppAsync(appId1, appName1);
+            await sut.AddAppAsync(appId2, appName2);
+
+            var ids = await sut.GetAppIdsAsync(appName1, appName2);
+
+            Assert.Equal(new List<Guid> { appId1, appId2 }, ids);
+        }
+
+        [Fact]
         public async Task Should_remove_app_id_from_index()
         {
             await sut.AddAppAsync(appId1, appName1);

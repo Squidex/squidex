@@ -24,8 +24,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         Task RemoveReservationAsync(Guid appId, string name);
 
-        Task<Guid> GetAppIdAsync(string name);
-
         Task<List<Guid>> GetAppIdsAsync();
+
+        Task<List<Guid>> GetAppIdsAsync(string[] names);
+
+        Task<Guid> GetAppIdAsync(string name);
     }
 }

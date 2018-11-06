@@ -17,18 +17,17 @@ using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using NSwag.Annotations;
 using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
-    [SwaggerIgnore]
     public sealed class AccountController : IdentityServerController
     {
         private readonly SignInManager<IUser> signInManager;
@@ -317,7 +316,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                 return TaskHelper.True;
             }
 
-            return MakeIdentityOperation(() => userManager.AddToRoleAsync(user, SquidexRoles.Administrator));
+            return MakeIdentityOperation(() => userManager.AddClaimAsync(user, new Claim(SquidexClaimTypes.Permissions, Permissions.Admin)));
         }
 
         private IUser CreateUser(ExternalLoginInfo externalLogin, string email)

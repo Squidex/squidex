@@ -91,6 +91,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<SchemaHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
+            services.AddSingletonAs<RolePermissionsProvider>()
+                .AsSelf();
+
             services.AddSingletonAs<EdmModelBuilder>()
                 .AsSelf();
 
@@ -241,6 +244,9 @@ namespace Squidex.Config.Domain
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildSnapshots>()
+                .As<IMigration>();
+
+            services.AddTransientAs<RebuildApps>()
                 .As<IMigration>();
 
             services.AddTransientAs<RebuildAssets>()

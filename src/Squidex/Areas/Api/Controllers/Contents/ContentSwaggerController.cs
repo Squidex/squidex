@@ -7,7 +7,6 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Commands;
@@ -16,8 +15,6 @@ using Squidex.Pipeline;
 namespace Squidex.Areas.Api.Controllers.Contents
 {
     [ApiExceptionFilter]
-    [AppApi]
-    [SwaggerIgnore]
     public sealed class ContentSwaggerController : ApiController
     {
         private readonly IAppProvider appProvider;

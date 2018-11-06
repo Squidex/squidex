@@ -21,8 +21,9 @@ import { UserForm, UsersState } from './../../state/users.state';
 export class UserPageComponent implements OnDestroy, OnInit {
     private selectedUserSubscription: Subscription;
 
-    public user?: { user: UserDto, isCurrentUser: boolean };
+    public canUpdate = false;
 
+    public user?: { user: UserDto, isCurrentUser: boolean };
     public userForm = new UserForm(this.formBuilder);
 
     constructor(

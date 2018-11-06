@@ -24,7 +24,7 @@ module.exports = webpackMerge(testConfig, {
             test: /\.ts$/,
             use: [{
                 loader: 'istanbul-instrumenter-loader'
-            },{
+            }, {
                 loader: 'awesome-typescript-loader'
             }, {
                 loader: 'angular-router-loader'

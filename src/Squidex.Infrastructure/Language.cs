@@ -15,8 +15,6 @@ namespace Squidex.Infrastructure
     {
         private static readonly Regex CultureRegex = new Regex("^([a-z]{2})(\\-[a-z]{2})?$", RegexOptions.IgnoreCase);
         private static readonly Dictionary<string, Language> AllLanguagesField = new Dictionary<string, Language>(StringComparer.OrdinalIgnoreCase);
-        private readonly string iso2Code;
-        private readonly string englishName;
 
         private static Language AddLanguage(string iso2Code, string englishName)
         {
@@ -42,21 +40,15 @@ namespace Squidex.Infrastructure
             get { return AllLanguagesField.Values; }
         }
 
-        public string EnglishName
-        {
-            get { return englishName; }
-        }
+        public string EnglishName { get; }
 
-        public string Iso2Code
-        {
-            get { return iso2Code; }
-        }
+        public string Iso2Code { get; }
 
         private Language(string iso2Code, string englishName)
         {
-            this.iso2Code = iso2Code;
+            Iso2Code = iso2Code;
 
-            this.englishName = englishName;
+            EnglishName = englishName;
         }
 
         public static bool IsValidLanguage(string iso2Code)

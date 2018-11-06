@@ -63,6 +63,10 @@ export module HTTP {
 
 export const pretifyError = (message: string) => <T>(source: Observable<T>) =>
     source.pipe(catchError((response: HttpErrorResponse) => {
+        if (Types.is(response, ErrorDto)) {
+            return throwError(response);
+        }
+
         let result: ErrorDto | null = null;
 
         if (!Types.is(response.error, Error)) {

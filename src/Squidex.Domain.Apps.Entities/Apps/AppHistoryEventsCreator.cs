@@ -19,8 +19,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public AppHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
             : base(typeNameRegistry)
         {
+            AddEventMessage("AppContributorAssignedEvent",
+                "assigned {user:[Contributor]} as {[Role]}");
+
+            AddEventMessage("AppClientUpdatedEvent",
+                "updated client {[Id]}");
+
             AddEventMessage<AppContributorAssigned>(
-                "assigned {user:[Contributor]} as {[Permission]}");
+                "assigned {user:[Contributor]} as {[Role]}");
 
             AddEventMessage<AppContributorRemoved>(
                 "removed {user:[Contributor]} from app");
@@ -57,6 +63,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             AddEventMessage<AppPatternUpdated>(
                 "updated pattern {[Name]}");
+
+            AddEventMessage<AppRoleAdded>(
+                "added role {[Name]}");
+
+            AddEventMessage<AppRoleDeleted>(
+                "deleted role {[Name]}");
+
+            AddEventMessage<AppRoleUpdated>(
+                "updated role {[Name]}");
         }
 
         protected Task<HistoryEventToStore> On(AppContributorRemoved @event)
@@ -74,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             return Task.FromResult(
                 ForEvent(@event, channel)
-                    .AddParameter("Contributor", @event.ContributorId).AddParameter("Permission", @event.Permission));
+                    .AddParameter("Contributor", @event.ContributorId).AddParameter("Role", @event.Role));
         }
 
         protected Task<HistoryEventToStore> On(AppClientAttached @event)
@@ -165,6 +180,33 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return Task.FromResult(
                 ForEvent(@event, channel)
                     .AddParameter("PatternId", @event.PatternId));
+        }
+
+        protected Task<HistoryEventToStore> On(AppRoleAdded @event)
+        {
+            const string channel = "settings.roles";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Name", @event.Name));
+        }
+
+        protected Task<HistoryEventToStore> On(AppRoleUpdated @event)
+        {
+            const string channel = "settings.roles";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Name", @event.Name));
+        }
+
+        protected Task<HistoryEventToStore> On(AppRoleDeleted @event)
+        {
+            const string channel = "settings.roles";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Name", @event.Name));
         }
 
         protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)

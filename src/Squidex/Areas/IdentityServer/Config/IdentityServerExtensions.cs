@@ -15,7 +15,8 @@ using Microsoft.Extensions.Options;
 using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Log;
-using Squidex.Shared.Identity;
+using Squidex.Infrastructure.Security;
+using Squidex.Shared;
 using Squidex.Shared.Users;
 
 namespace Squidex.Areas.IdentityServer.Config
@@ -27,23 +28,6 @@ namespace Squidex.Areas.IdentityServer.Config
              app.UseIdentityServer();
 
             return app;
-        }
-
-        public static IServiceProvider UseMyAdminRole(this IServiceProvider services)
-        {
-            var roleManager = services.GetRequiredService<RoleManager<IRole>>();
-
-            Task.Run(async () =>
-            {
-                if (!await roleManager.RoleExistsAsync(SquidexRoles.Administrator))
-                {
-                    var role = services.GetRequiredService<IRoleFactory>().Create(SquidexRoles.Administrator);
-
-                    await roleManager.CreateAsync(role);
-                }
-            }).Wait();
-
-            return services;
         }
 
         public static IServiceProvider UseMyAdmin(this IServiceProvider services)
@@ -66,9 +50,9 @@ namespace Squidex.Areas.IdentityServer.Config
                     {
                         try
                         {
-                            var user = await userManager.CreateAsync(userFactory, adminEmail, adminEmail, adminPass);
+                            var permissions = new PermissionSet(Permissions.Admin);
 
-                            await userManager.AddToRoleAsync(user, SquidexRoles.Administrator);
+                            await userManager.CreateAsync(userFactory, adminEmail, adminEmail, adminPass, permissions);
                         }
                         catch (Exception ex)
                         {
