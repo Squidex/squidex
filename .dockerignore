@@ -23,3 +23,5 @@
 
 **/src/Squidex/appsettings.Development.json
 **/src/Squidex/Properties/launchSettings.json
+
+CHANGELOG.md

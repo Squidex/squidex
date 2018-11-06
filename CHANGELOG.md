@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.12.0 - 2018-11-06
+
+### Features
+
+* **Contents**: Comments for content items.
+* **Contents**: Specify limits for max number of assets via options
+* **Assets**: Specify limits for max number of assets via options
+* **UI**: List view for assets
+* **UI**: Reorder contents in references fields.
+
+### Bugfixes
+
+* **GraphQL**: Fix languages with region support.
+
+Various small bugfixes for UI and API.
+
 ## v1.11.0 - 2018-09-24
 
 ### Features
