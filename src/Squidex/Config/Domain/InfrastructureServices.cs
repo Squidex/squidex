@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.UsageTracking;
 
 #pragma warning disable RECS0092 // Convert field to readonly
@@ -34,6 +35,12 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<AsyncLocalCache>()
                 .As<ILocalCache>();
+
+            services.AddSingletonAs<GCHealthCheck>()
+                .As<IHealthCheck>();
+
+            services.AddSingletonAs<OrleansHealthCheck>()
+                .As<IHealthCheck>();
 
             services.AddSingletonAs<HttpContextAccessor>()
                 .As<IHttpContextAccessor>();

@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Squidex.Pipeline;
+using Squidex.Pipeline.Diagnostics;
 
 namespace Squidex.Config.Web
 {
@@ -23,6 +24,13 @@ namespace Squidex.Config.Web
         public static IApplicationBuilder UseMyTracking(this IApplicationBuilder app)
         {
             app.UseMiddleware<RequestLogPerformanceMiddleware>();
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseMyHealthCheck(this IApplicationBuilder app)
+        {
+            app.Map("/healthz", builder => builder.UseMiddleware<HealthCheckMiddleware>());
 
             return app;
         }

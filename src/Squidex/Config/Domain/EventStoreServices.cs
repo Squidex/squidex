@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.States;
@@ -45,6 +46,9 @@ namespace Squidex.Config.Domain
                     var eventStorePrefix = config.GetValue<string>("eventStore:getEventStore:prefix");
 
                     var connection = EventStoreConnection.Create(eventStoreConfiguration);
+
+                    services.AddSingletonAs(c => new GetEventStoreHealthCheck(connection))
+                        .As<IHealthCheck>();
 
                     services.AddSingletonAs(c => new GetEventStore(connection, eventStorePrefix, eventStoreProjectionHost))
                         .As<IInitializable>()

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -49,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     ["id3"] = "name3"
                 });
 
-            sut = new AssetQueryService(tagService, assetRepository, new AssetOptions());
+            sut = new AssetQueryService(tagService, assetRepository, Options.Create(new AssetOptions()));
         }
 
         [Fact]
