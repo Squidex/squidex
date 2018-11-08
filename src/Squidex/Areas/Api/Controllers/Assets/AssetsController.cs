@@ -39,19 +39,19 @@ namespace Squidex.Areas.Api.Controllers.Assets
         private readonly IAppPlansProvider appPlanProvider;
         private readonly IOptions<MyContentsControllerOptions> controllerOptions;
         private readonly ITagService tagService;
-        private readonly AssetConfig assetsConfig;
+        private readonly AssetOptions assetOptions;
 
         public AssetsController(
             ICommandBus commandBus,
             IAssetQueryService assetQuery,
             IAssetStatsRepository assetStatsRepository,
             IAppPlansProvider appPlanProvider,
-            IOptions<AssetConfig> assetsConfig,
+            IOptions<AssetOptions> assetOptions,
             IOptions<MyContentsControllerOptions> controllerOptions,
             ITagService tagService)
             : base(commandBus)
         {
-            this.assetsConfig = assetsConfig.Value;
+            this.assetOptions = assetOptions.Value;
             this.assetQuery = assetQuery;
             this.assetStatsRepository = assetStatsRepository;
             this.appPlanProvider = appPlanProvider;
@@ -273,9 +273,9 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var formFile = file[0];
 
-            if (formFile.Length > assetsConfig.MaxSize)
+            if (formFile.Length > assetOptions.MaxSize)
             {
-                var error = new ValidationError($"File size cannot be longer than {assetsConfig.MaxSize.ToReadableSize()}.");
+                var error = new ValidationError($"File size cannot be longer than {assetOptions.MaxSize.ToReadableSize()}.");
 
                 throw new ValidationException("Cannot create asset.", error);
             }
