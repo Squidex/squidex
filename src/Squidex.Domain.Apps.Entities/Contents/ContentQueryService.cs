@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IContentRepository contentRepository,
             IContentVersionLoader contentVersionLoader,
             IScriptEngine scriptEngine,
-            ContentOptions options,
+            IOptions<ContentOptions> options,
             EdmModelBuilder modelBuilder)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
@@ -62,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentRepository = contentRepository;
             this.contentVersionLoader = contentVersionLoader;
             this.modelBuilder = modelBuilder;
-            this.options = options;
+            this.options = options.Value;
             this.scriptEngine = scriptEngine;
         }
 

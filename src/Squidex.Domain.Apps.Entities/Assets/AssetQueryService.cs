@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Edm;
@@ -26,14 +27,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetRepository assetRepository;
         private readonly AssetOptions options;
 
-        public AssetQueryService(ITagService tagService, IAssetRepository assetRepository, AssetOptions options)
+        public AssetQueryService(ITagService tagService, IAssetRepository assetRepository, IOptions<AssetOptions> options)
         {
             Guard.NotNull(tagService, nameof(tagService));
             Guard.NotNull(options, nameof(options));
             Guard.NotNull(assetRepository, nameof(assetRepository));
 
             this.assetRepository = assetRepository;
-            this.options = options;
+            this.options = options.Value;
             this.tagService = tagService;
         }
 

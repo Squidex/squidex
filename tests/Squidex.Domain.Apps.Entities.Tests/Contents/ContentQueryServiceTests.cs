@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -69,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             context = new ContentQueryContext(QueryContext.Create(app, user));
 
-            sut = new ContentQueryService(appProvider, contentRepository, contentVersionLoader, scriptEngine, new ContentOptions(), modelBuilder);
+            sut = new ContentQueryService(appProvider, contentRepository, contentVersionLoader, scriptEngine, Options.Create(new ContentOptions()), modelBuilder);
         }
 
         [Fact]

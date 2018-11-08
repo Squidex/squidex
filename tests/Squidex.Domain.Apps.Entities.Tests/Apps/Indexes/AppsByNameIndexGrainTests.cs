@@ -146,6 +146,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             Assert.Equal(new List<Guid> { appId1, appId2 }, await sut.GetAppIdsAsync());
 
+            Assert.Equal(2, await sut.CountAsync());
+
             A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByNameIndexGrain.State>.Ignored))
                 .MustHaveHappened();
         }

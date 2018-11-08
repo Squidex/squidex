@@ -130,5 +130,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             return Task.FromResult(state.Apps.Values.ToList());
         }
+
+        public Task<long> CountAsync()
+        {
+            return Task.FromResult((long)state.Apps.Count);
+        }
     }
 }

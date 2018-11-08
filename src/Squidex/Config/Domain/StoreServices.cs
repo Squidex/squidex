@@ -28,6 +28,7 @@ using Squidex.Domain.Users;
 using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
@@ -59,6 +60,9 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(mongoDatabase)
                         .As<IMongoDatabase>();
+
+                    services.AddSingletonAs<MongoDBHealthCheck>()
+                        .As<IHealthCheck>();
 
                     services.AddSingletonAs<MongoXmlRepository>()
                         .As<IXmlRepository>()
