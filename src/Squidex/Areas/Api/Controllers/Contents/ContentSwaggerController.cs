@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Domain.Apps.Entities;
@@ -31,6 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpGet]
         [Route("content/{app}/docs/")]
         [ApiCosts(0)]
+        [AllowAnonymous]
         public IActionResult Docs(string app)
         {
             var vm = new DocsVM { Specification = $"~/content/{app}/swagger/v1/swagger.json" };
@@ -41,6 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpGet]
         [Route("content/{app}/swagger/v1/swagger.json")]
         [ApiCosts(0)]
+        [AllowAnonymous]
         public async Task<IActionResult> GetSwagger(string app)
         {
             var schemas = await appProvider.GetSchemasAsync(AppId);
