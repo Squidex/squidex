@@ -58,7 +58,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [ApiCosts(0)]
         public async Task<IActionResult> GetMonthlyCalls(string app)
         {
-            var count = await usageTracker.GetMonthlyCallsAsync(App.Id.ToString(), DateTime.Today);
+            var count = await usageTracker.GetMonthlyCallsAsync(AppId.ToString(), DateTime.Today);
 
             var plan = appPlanProvider.GetPlanForApp(App);
 
@@ -90,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
                 return BadRequest();
             }
 
-            var entities = await usageTracker.QueryAsync(App.Id.ToString(), fromDate.Date, toDate.Date);
+            var entities = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date);
 
             var response = entities.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsageDto.FromUsage).ToList());
 
@@ -112,7 +112,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [ApiCosts(0)]
         public async Task<IActionResult> GetCurrentStorageSize(string app)
         {
-            var size = await assetStatsRepository.GetTotalSizeAsync(App.Id);
+            var size = await assetStatsRepository.GetTotalSizeAsync(AppId);
 
             var plan = appPlanProvider.GetPlanForApp(App);
 
@@ -144,7 +144,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
                 return BadRequest();
             }
 
-            var entities = await assetStatsRepository.QueryAsync(App.Id, fromDate.Date, toDate.Date);
+            var entities = await assetStatsRepository.QueryAsync(AppId, fromDate.Date, toDate.Date);
 
             var models = entities.Select(StorageUsageDto.FromStats).ToList();
 

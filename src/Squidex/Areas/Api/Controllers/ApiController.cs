@@ -37,11 +37,6 @@ namespace Squidex.Areas.Api.Controllers
             }
         }
 
-        protected string AppName
-        {
-            get { return App.Name; }
-        }
-
         protected Guid AppId
         {
             get { return App.Id; }

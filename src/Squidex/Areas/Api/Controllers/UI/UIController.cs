@@ -53,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> GetSettings(string app)
         {
-            var result = await grainFactory.GetGrain<IAppUISettingsGrain>(App.Id).GetAsync();
+            var result = await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).GetAsync();
 
             result.Value["mapType"] = uiOptions.Map?.Type ?? "OSM";
             result.Value["mapKey"] = uiOptions.Map?.GoogleMaps?.Key;
@@ -77,7 +77,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> PutSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
-            await grainFactory.GetGrain<IAppUISettingsGrain>(App.Id).SetAsync(key, request.Value);
+            await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).SetAsync(key, request.Value);
 
             return NoContent();
         }
@@ -96,7 +96,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> DeleteSetting(string app, string key)
         {
-            await grainFactory.GetGrain<IAppUISettingsGrain>(App.Id).RemoveAsync(key);
+            await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).RemoveAsync(key);
 
             return NoContent();
         }

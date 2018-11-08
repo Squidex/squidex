@@ -77,7 +77,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetTags(string app)
         {
-            var response = await tagService.GetTagsAsync(App.Id, TagGroups.Assets);
+            var response = await tagService.GetTagsAsync(AppId, TagGroups.Assets);
 
             return Ok(response);
         }
@@ -282,7 +282,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var plan = appPlanProvider.GetPlanForApp(App);
 
-            var currentSize = await assetStatsRepository.GetTotalSizeAsync(App.Id);
+            var currentSize = await assetStatsRepository.GetTotalSizeAsync(AppId);
 
             if (plan.MaxAssetSize > 0 && plan.MaxAssetSize < currentSize + formFile.Length)
             {

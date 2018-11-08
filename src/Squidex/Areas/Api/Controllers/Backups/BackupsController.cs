@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiCosts(0)]
         public async Task<IActionResult> GetJobs(string app)
         {
-            var backupGrain = grainFactory.GetGrain<IBackupGrain>(App.Id);
+            var backupGrain = grainFactory.GetGrain<IBackupGrain>(AppId);
 
             var jobs = await backupGrain.GetStateAsync();
 
@@ -73,7 +73,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiCosts(0)]
         public IActionResult PostBackup(string app)
         {
-            var backupGrain = grainFactory.GetGrain<IBackupGrain>(App.Id);
+            var backupGrain = grainFactory.GetGrain<IBackupGrain>(AppId);
 
             backupGrain.RunAsync().Forget();
 
@@ -96,7 +96,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteBackup(string app, Guid id)
         {
-            var backupGrain = grainFactory.GetGrain<IBackupGrain>(App.Id);
+            var backupGrain = grainFactory.GetGrain<IBackupGrain>(AppId);
 
             await backupGrain.DeleteAsync(id);
 
