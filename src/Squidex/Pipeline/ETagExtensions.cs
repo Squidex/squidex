@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Pipeline
 {
@@ -15,7 +16,10 @@ namespace Squidex.Pipeline
     {
         public static string ToManyEtag<T>(this IEnumerable<T> items, long total = 0) where T : IGenerateEtag
         {
-            return $"{total}_{string.Join(";", items.Select(x => $"{x.Id}{x.Version}"))}".Sha256Base64();
+            using (Profiler.Trace("CalculateEtag"))
+            {
+                return $"{total}_{string.Join(";", items.Select(x => $"{x.Id}{x.Version}"))}".Sha256Base64();
+            }
         }
 
         public static string ToSurrogateKeys<T>(this IEnumerable<T> items) where T : IGenerateEtag

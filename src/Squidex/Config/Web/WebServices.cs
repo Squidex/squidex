@@ -45,6 +45,7 @@ namespace Squidex.Config.Web
             {
                 options.Filters.Add<ETagFilter>();
                 options.Filters.Add<AppResolver>();
+                options.Filters.Add<MeasureResultFilter>();
             }).AddMySerializers();
 
             services.AddCors();
