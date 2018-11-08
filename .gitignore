@@ -25,6 +25,7 @@ node_modules/
 **/wwwroot/scripts/**/*.*
 
 /src/Squidex/appsettings.Development.json
+/src/Squidex/appsettings.Production.json
 /src/Squidex/Assets
 /src/Squidex/package-lock.json
 /src/Squidex/Properties/launchSettings.json

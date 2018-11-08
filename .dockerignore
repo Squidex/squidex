@@ -22,6 +22,7 @@
 **/src/Squidex/Assets/*.*
 
 **/src/Squidex/appsettings.Development.json
+**/src/Squidex/appsettings.Production.json
 **/src/Squidex/Properties/launchSettings.json
 
 CHANGELOG.md
