@@ -11,15 +11,15 @@ namespace Squidex.Infrastructure.Diagnostics
 {
     public sealed class HealthCheckResult
     {
-        public bool IsValid { get; }
+        public bool IsHealthy { get; }
 
         public string Description { get; }
 
         public Dictionary<string, object> Data { get; }
 
-        public HealthCheckResult(bool isValid, string description = null, Dictionary<string, object> data = null)
+        public HealthCheckResult(bool isHealthy, string description = null, Dictionary<string, object> data = null)
         {
-            IsValid = isValid;
+            IsHealthy = isHealthy;
             Data = data;
             Description = description;
         }

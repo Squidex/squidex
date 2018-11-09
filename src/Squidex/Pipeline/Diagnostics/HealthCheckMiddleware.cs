@@ -43,7 +43,7 @@ namespace Squidex.Pipeline.Diagnostics
                 context.Response.StatusCode = 200;
                 context.Response.Headers.Add("content-type", "application/json");
 
-                if (checks.Any(x => !x.Result.IsValid))
+                if (checks.Any(x => !x.Result.IsHealthy))
                 {
                     context.Response.StatusCode = 503;
                 }
