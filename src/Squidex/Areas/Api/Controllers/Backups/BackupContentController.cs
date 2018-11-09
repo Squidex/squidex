@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
@@ -40,6 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [Route("apps/{app}/backups/{id}")]
         [ProducesResponseType(200)]
         [ApiCosts(0)]
+        [AllowAnonymous]
         public IActionResult GetBackupContent(string app, Guid id)
         {
             return new FileCallbackResult("application/zip", "Backup.zip", bodyStream =>
