@@ -68,20 +68,18 @@ export class FieldComponent implements OnChanges {
                 this.editForm.form.disable();
             }
         }
+    }
 
-        if (changes['schema']) {
-            this.isEditing = false;
+    public toggleEditing() {
+        this.isEditing = !this.isEditing;
 
-            this.selectedTab = 0;
+        if (this.isEditing) {
+            this.editForm.load(this.field.properties);
         }
     }
 
     public selectTab(tab: number) {
         this.selectedTab = tab;
-    }
-
-    public toggleEditing() {
-        this.isEditing = !this.isEditing;
     }
 
     public cancel() {
