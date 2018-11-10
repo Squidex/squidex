@@ -67,10 +67,10 @@
                 <input type="checkbox" [ngModel]="schema.sendUnpublish" (ngModelChange)="toggle(schema, 'sendUnpublish')" />
             </td>
             <td class="text-center" title="Archived">
-                <input type="checkbox" [ngModel]="schema.sendArchived" (ngModelChange)="toggle(schema, 'sendArchived')" />
+                <input type="checkbox" [ngModel]="schema.sendArchive" (ngModelChange)="toggle(schema, 'sendArchive')" />
             </td>
             <td class="text-center" title="Restored">
-                <input type="checkbox" [ngModel]="schema.sendRestored" (ngModelChange)="toggle(schema, 'sendRestored')" />
+                <input type="checkbox" [ngModel]="schema.sendRestore" (ngModelChange)="toggle(schema, 'sendRestore')" />
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-link btn-secondary" (click)="removeSchema(schema)">

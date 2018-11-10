@@ -235,6 +235,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [HttpGet]
         [Route("apps/{app}/rules/events/")]
         [ProducesResponseType(typeof(RuleEventsDto), 200)]
+        [ApiPermission(Permissions.AppRulesRead)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetEvents(string app, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
