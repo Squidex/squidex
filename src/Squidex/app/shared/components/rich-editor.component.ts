@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -45,6 +45,7 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     public assetPluginClicked = new EventEmitter<any>();
 
     constructor(
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
     }
@@ -65,6 +66,8 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
 
     private showSelector = () => {
         this.assetsDialog.show();
+
+        this.changeDetector.detectChanges();
     }
 
     private getEditorOptions() {

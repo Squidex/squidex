@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Renderer2, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -49,6 +49,7 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
     public isFullscreen = false;
 
     constructor(
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2,
         private readonly resourceLoader: ResourceLoaderService
     ) {
@@ -81,6 +82,8 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
 
     private showSelector = () => {
         this.assetsDialog.show();
+
+        this.changeDetector.detectChanges();
     }
 
     public ngAfterViewInit() {
@@ -188,6 +191,8 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
                 }
 
                 this.renderer.appendChild(target, this.inner.nativeElement);
+
+                this.changeDetector.detectChanges();
             });
 
             this.simplemde.codemirror.on('blur', () => {
