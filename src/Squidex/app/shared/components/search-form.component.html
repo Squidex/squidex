@@ -34,7 +34,7 @@
     Search for content using full text search over all fields and languages!
 </sqx-onboarding-tooltip>
 
-<div class="dropdown-menu" *sqxModalView="searchModal" [sqxModalTarget]="inputFind">
+<div class="dropdown-menu" *sqxModalView="searchModal;onRoot:true" [sqxModalTarget]="inputFind">
     <div class="form-horizontal">
         <div [formGroup]="searchForm">
             <div class="form-group row">
