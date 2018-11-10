@@ -39,7 +39,12 @@ namespace Squidex.Extensions.Actions.Medium
                     new JProperty("canonicalUrl", Format(action.CanonicalUrl, @event)),
                     new JProperty("tags", ParseTags(@event, action)));
 
-            var ruleJob = new MediumJob { AccessToken = action.AccessToken, RequestBody = requestBody.ToString(Formatting.Indented) };
+            var ruleJob = new MediumJob
+            {
+                AccessToken = action.AccessToken,
+                PublicationId = action.PublicationId,
+                RequestBody = requestBody.ToString(Formatting.Indented)
+            };
 
             return (Description, ruleJob);
         }
@@ -75,34 +80,43 @@ namespace Squidex.Extensions.Actions.Medium
                 httpClient.DefaultRequestHeaders.Add("Accept-Charset", "utf-8");
                 httpClient.DefaultRequestHeaders.Add("User-Agent", "Squidex Headless CMS");
 
-                string id;
+                string path;
 
-                HttpResponseMessage response = null;
-
-                var meRequest = BuildMeRequest(job);
-                try
+                if (!string.IsNullOrWhiteSpace(job.PublicationId))
                 {
-                    response = await httpClient.SendAsync(meRequest);
-
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    var responseJson = JToken.Parse(responseString);
-
-                    id = responseJson["data"]["id"].ToString();
+                    path = $"v1/publications/{job.PublicationId}/posts";
                 }
-                catch (Exception ex)
+                else
                 {
-                    var requestDump = DumpFormatter.BuildDump(meRequest, response, ex.ToString());
+                    HttpResponseMessage response = null;
 
-                    return (requestDump, ex);
+                    var meRequest = BuildMeRequest(job);
+                    try
+                    {
+                        response = await httpClient.SendAsync(meRequest);
+
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        var responseJson = JToken.Parse(responseString);
+
+                        var id = responseJson["data"]["id"].ToString();
+
+                        path = $"v1/users/{id}/posts";
+                    }
+                    catch (Exception ex)
+                    {
+                        var requestDump = DumpFormatter.BuildDump(meRequest, response, ex.ToString());
+
+                        return (requestDump, ex);
+                    }
                 }
 
-                return await httpClient.OneWayRequestAsync(BuildPostRequest(job, id), job.RequestBody);
+                return await httpClient.OneWayRequestAsync(BuildPostRequest(job, path), job.RequestBody);
             }
         }
 
-        private static HttpRequestMessage BuildPostRequest(MediumJob job, string id)
+        private static HttpRequestMessage BuildPostRequest(MediumJob job, string path)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, $"https://api.medium.com/v1/users/{id}/posts")
+            var request = new HttpRequestMessage(HttpMethod.Post, $"https://api.medium.com/{path}")
             {
                 Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
             };
@@ -125,6 +139,8 @@ namespace Squidex.Extensions.Actions.Medium
     public sealed class MediumJob
     {
         public string RequestBody { get; set; }
+
+        public string PublicationId { get; set; }
 
         public string AccessToken { get; set; }
     }

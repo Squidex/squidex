@@ -34,6 +34,9 @@ namespace Squidex.Extensions.Actions.Medium
         [Display(Name = "Canonical Url", Description = "The original home of this content, if it was originally published elsewhere.")]
         public string CanonicalUrl { get; set; }
 
+        [Display(Name = "PublicationId", Description = "Optional publication id.")]
+        public string PublicationId { get; set; }
+
         [Display(Name = "Tags", Description = "The optional comma separated list of tags.")]
         public string Tags { get; set; }
 

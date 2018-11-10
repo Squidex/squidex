@@ -45,6 +45,9 @@ export class MediumActionComponent implements OnInit {
         this.actionForm.setControl('tags',
             new FormControl(this.action.tags || ''));
 
+        this.actionForm.setControl('publicationId',
+            new FormControl(this.action.publicationId || ''));
+
         this.actionForm.setControl('isHtml',
             new FormControl(this.action.isHtml || false));
     }

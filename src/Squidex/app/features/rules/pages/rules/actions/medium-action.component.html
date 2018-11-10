@@ -75,7 +75,21 @@
             <input type="text" class="form-control" id="tags" formControlName="tags" />
 
             <small class="form-text text-muted">
-                Comma-separated list of tags.
+                Optional comma-separated list of tags.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col col-3 col-form-label" for="publicationId">Publication</label>
+
+        <div class="col col-9">
+            <sqx-control-errors for="publicationId" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="publicationId" formControlName="publicationId" />
+
+            <small class="form-text text-muted">
+                Optional publication id. Go to <a href="https://medium.com/[PUBLICATION]>?format=json" target="_blank" rel="noopener">https://medium.com/[PUBLICATION]?format=json</a> to fetch the id.
             </small>
         </div>
     </div>
