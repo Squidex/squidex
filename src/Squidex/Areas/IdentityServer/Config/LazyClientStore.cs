@@ -43,7 +43,7 @@ namespace Squidex.Areas.IdentityServer.Config
                 return client;
             }
 
-            var token = clientId.Split(':');
+            var token = clientId.Split(':', '~');
 
             if (token.Length != 2)
             {
