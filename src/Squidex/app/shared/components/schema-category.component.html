@@ -20,15 +20,15 @@
                 <li class="nav-item" dnd-draggable [dragEnabled]="!isReadonly" [dragData]="schema">
                     <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active">
                         <div class="row" *ngIf="!isReadonly">
-                            <div class="col col-4">
+                            <div class="col-4">
                                 <span class="schema-name schema-name-accent">{{schema.displayName}}</span> 
                             </div>
-                            <div class="col col-4">
+                            <div class="col-4">
                                 <span class="schema-user">
                                     <i class="icon-user"></i> {{schema.lastModifiedBy | sqxUserNameRef}}
                                 </span>
                             </div>
-                            <div class="col col-4 schema-modified">
+                            <div class="col-4 schema-modified">
                                 <small class="item-modified">{{schema.lastModified | sqxFromNow}}</small>
                                 
                                 <span class="item-published" [class.unpublished]="!schema.isPublished"></span>

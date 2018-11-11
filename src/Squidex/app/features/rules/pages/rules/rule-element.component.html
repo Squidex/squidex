@@ -1,6 +1,6 @@
 <ng-container *ngIf="isSmall; else large">
     <div class="row no-gutters align-items-center small" *ngIf="element" [style.background]="element.iconColor" [sqxHoverBackground]="element.iconColor | sqxDarken:5">
-        <div class="col col-auto small-icon" [style.background]="element.iconColor | sqxDarken:5">
+        <div class="col-auto small-icon" [style.background]="element.iconColor | sqxDarken:5">
             <i class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></i>
         </div>
         <div class="col align-items-center">
@@ -12,7 +12,7 @@
 </ng-container>
 <ng-template #large>
     <div class="row no-gutters large">
-        <div class="col col-auto">
+        <div class="col-auto">
             <div class="large-icon" [style.background]="element.iconColor | sqxDarken:5">
                 <div class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></div>
             </div>

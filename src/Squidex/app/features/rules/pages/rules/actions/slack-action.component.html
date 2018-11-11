@@ -1,8 +1,8 @@
 <form [formGroup]="actionForm" class="form-horizontal">
     <div class="form-group row">
-        <label class="col col-3 col-form-label" for="webhookUrl">Webhook Url</label>
+        <label class="col-3 col-form-label" for="webhookUrl">Webhook Url</label>
 
-        <div class="col col-9">
+        <div class="col-9">
             <sqx-control-errors for="webhookUrl" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <input type="text" class="form-control" id="webhookUrl" formControlName="webhookUrl" />
@@ -14,9 +14,9 @@
     </div>
 
     <div class="form-group row">
-        <label class="col col-3 col-form-label" for="text">Text</label>
+        <label class="col-3 col-form-label" for="text">Text</label>
 
-        <div class="col col-9">
+        <div class="col-9">
             <sqx-control-errors for="text" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <textarea class="form-control" id="text" formControlName="text"></textarea>

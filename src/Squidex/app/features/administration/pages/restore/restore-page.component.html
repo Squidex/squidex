@@ -10,7 +10,7 @@
             <div class="card section">
                 <div class="card-header">
                     <div class="row no-gutters">
-                        <div class="col col-auto pr-2">
+                        <div class="col-auto pr-2">
                             <div *ngIf="job.status === 'Started'" class="restore-status restore-status-pending spin">
                                 <i class="icon-hour-glass"></i>
                             </div>
@@ -58,7 +58,7 @@
                     <div class="col pl-1">
                         <input class="form-control" name="name" formControlName="name" placeholder="Optional app name" />
                     </div>
-                    <div class="col col-auto pl-1">
+                    <div class="col-auto pl-1">
                         <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">Restore Backup</button>
                     </div>
                 </div>

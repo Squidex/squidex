@@ -34,7 +34,7 @@
                 
                 <div class="table-items-row" *ngFor="let backup of backups; trackBy: trackByBackup">
                     <div class="row">
-                        <div class="col col-auto">
+                        <div class="col-auto">
                             <div *ngIf="backup.status === 'Started'" class="backup-status backup-status-pending spin">
                                 <i class="icon-hour-glass"></i>
                             </div>
@@ -45,7 +45,7 @@
                                 <i class="icon-checkmark"></i>
                             </div>
                         </div>
-                        <div class="col col-auto">
+                        <div class="col-auto">
                             <div>
                                 Started:
                             </div>
@@ -53,7 +53,7 @@
                                 Duration:
                             </div>
                         </div>
-                        <div class="col col-auto">
+                        <div class="col-auto">
                             <div>
                                 {{backup.started | sqxISODate}}
                             </div>
@@ -78,7 +78,7 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="col col-auto">
+                        <div class="col-auto">
                             <button type="button" class="btn btn-link btn-danger" 
                                 (sqxConfirmClick)="delete(backup)" 
                                 confirmTitle="Delete backup"

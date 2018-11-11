@@ -7,7 +7,7 @@
     
     <ng-container menu>
         <div class="row no-gutters pl-1">
-            <div class="col col-auto offset-xl-4">
+            <div class="col-auto offset-xl-4">
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
                 <button class="btn btn-link btn-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">
@@ -16,7 +16,7 @@
             </div>
             <div class="col pl-1" style="width: 300px">
                 <div class="row no-gutters search">
-                    <div class="col col-6">
+                    <div class="col-6">
                         <sqx-tag-editor class="tags" singleLine="true" placeholder="Search by tags"
                             [suggestions]="assetsState.tagsNames | async"
                             [ngModel]="assetsState.selectedTagNames | async"
@@ -24,7 +24,7 @@
                             [undefinedWhenEmpty]="false">
                         </sqx-tag-editor>
                     </div>
-                    <div class="col col-6">
+                    <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="Search by asset name" fieldExample="fileSize"
                             (queryChanged)="search($event)" 
                             [query]="assetsState.assetsQuery | async"
@@ -34,7 +34,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col col-auto pl-1">
+            <div class="col-auto pl-1">
                 <div class="btn-group" data-toggle="buttons">
                     <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isListView" [disabled]="isListView" (click)="changeView(true)">
                         <i class="icon-list"></i>
@@ -68,7 +68,7 @@
                     <div class="col">
                         {{tag.name}}
                     </div>
-                    <div class="col col-auto">
+                    <div class="col-auto">
                         {{tag.count}}
                     </div>
                 </div>
@@ -83,7 +83,7 @@
                     <div class="col truncate">
                         {{query.name}}
                     </div>
-                    <div class="col col-auto">
+                    <div class="col-auto">
                         <a class="sidebar-item-remove" (click)="queries.remove(query.name)">
                             <i class="icon-close"></i>
                         </a>

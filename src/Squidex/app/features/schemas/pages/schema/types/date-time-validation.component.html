@@ -1,6 +1,6 @@
 <div [formGroup]="editForm">
     <div class="form-group row">
-        <div class="col col-9 offset-3">
+        <div class="col-9 offset-3">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldRequired" formControlName="isRequired" />    
                 <label class="form-check-label" for="{{field.fieldId}}_fieldRequired">
@@ -11,26 +11,26 @@
     </div>
 
     <div class="form-group row">
-        <label class="col col-3 col-form-label">Min Value</label>
+        <label class="col-3 col-form-label">Min Value</label>
 
-        <div class="col col-9">
+        <div class="col-9">
             <sqx-date-time-editor enforceTime="true" mode="DateTime" formControlName="minValue"></sqx-date-time-editor>
         </div>
     </div>
 
     <div class="form-group row">
-        <label class="col col-3 col-form-label">Max Value</label>
+        <label class="col-3 col-form-label">Max Value</label>
 
-        <div class="col col-9">
+        <div class="col-9">
             <sqx-date-time-editor enforceTime="true" mode="DateTime" formControlName="maxValue"></sqx-date-time-editor>
         </div>
     </div>
 
     <ng-container *ngIf="showDefaultValues | async">
         <div class="form-group row">
-            <label class="col col-3 col-form-label">Default Mode:</label>
+            <label class="col-3 col-form-label">Default Mode:</label>
 
-            <div class="col col-3">
+            <div class="col-3">
                 <select class="form-control" formControlName="calculatedDefaultValue">
                     <option></option>
                     <option *ngFor="let value of calculatedDefaultValues" [ngValue]="value">{{value}}</option>
@@ -39,9 +39,9 @@
         </div>
 
         <div class="form-group row" *ngIf="showDefaultValue | async">
-            <label class="col col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValue">Default Value</label>
+            <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldDefaultValue">Default Value</label>
 
-            <div class="col col-9">
+            <div class="col-9">
                 <sqx-date-time-editor enforceTime="true" mode="DateTime" formControlName="defaultValue"></sqx-date-time-editor>
             </div>
         </div>

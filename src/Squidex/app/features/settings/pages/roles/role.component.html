@@ -1,7 +1,7 @@
 <div class="table-items-row table-items-row-expandable"> 
     <div class="table-items-row-summary">        
         <div class="row">
-            <div class="col col-5" [class.built]="isDefaultRole">
+            <div class="col-5" [class.built]="isDefaultRole">
                 <span class="role-name">{{role.name}}</span>
             </div>
             <div class="col text-decent">
@@ -10,7 +10,7 @@
             <div class="col text-decent">
                 Users: <span [class.text-force]="role.numContributors > 0">{{role.numContributors}}</span>
             </div>
-            <div class="col col-auto">
+            <div class="col-auto">
                 <div class="float-right">
                     <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
                         <i class="icon-settings"></i>
@@ -43,7 +43,7 @@
 
                         <sqx-autocomplete [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
                     </div>
-                    <div class="col col-auto pl-1" *ngIf="!isDefaultRole">
+                    <div class="col-auto pl-1" *ngIf="!isDefaultRole">
                         <button type="button" class="btn btn-link btn-danger" (click)="removePermission(i)">
                             <i class="icon-bin2"></i>
                         </button>
@@ -54,7 +54,7 @@
                     <div class="col">
                         <sqx-autocomplete formControlName="permission" [source]="allPermissions" #addInput></sqx-autocomplete>
                     </div>
-                    <div class="col col-auto pl-1">
+                    <div class="col-auto pl-1">
                         <button type="submit" class="btn btn-success">
                             <i class="icon-plus"></i>
                         </button>

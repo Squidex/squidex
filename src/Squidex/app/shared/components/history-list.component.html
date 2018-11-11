@@ -1,6 +1,6 @@
 <ng-container *ngIf="events">
     <div *ngFor="let event of events; trackBy: trackByEvent" class="event row no-gutters">
-        <div class="col col-auto">
+        <div class="col-auto">
             <img class="user-picture" [attr.title]="event.actor | sqxUserNameRef:null" [attr.src]="event.actor | sqxUserPictureRef" />
         </div>
         <div class="col pl-2">

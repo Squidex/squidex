@@ -1,13 +1,13 @@
 <div class="table-items-row table-items-row-expandable language"> 
     <div class="table-items-row-summary">        
         <div class="row">
-            <div class="col col-2" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
+            <div class="col-2" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
                 {{language.iso2Code}}
             </div>
-            <div class="col col-6" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
+            <div class="col-6" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
                 {{language.englishName}}
             </div>
-            <div class="col col-auto">
+            <div class="col-auto">
                 <div class="float-right">
                     <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()" *ngIf="!language.isMaster">
                         <i class="icon-settings"></i>
@@ -35,16 +35,16 @@
 
             <div class="table-items-row-details-tab">
                 <div class="form-group row">
-                    <label class="col col-3 col-form-label fallback-label">Fallback</label>
+                    <label class="col-3 col-form-label fallback-label">Fallback</label>
 
-                    <div class="col col-9">
+                    <div class="col-9">
                         <div class="fallback-languages" [sqxSortModel]="fallbackLanguages.mutableValues" *ngIf="fallbackLanguages.length > 0">
                             <div class="fallback-language" *ngFor="let language of fallbackLanguages">
                                 <div class="row">
                                     <div class="col">
                                         {{language.englishName}}
                                     </div>
-                                    <div class="col col-auto">
+                                    <div class="col-auto">
                                         <button type="button" class="btn btn-link btn-secondary btn-sm" (click)="removeFallbackLanguage(language)">
                                             <i class="icon-close"></i>
                                         </button>
@@ -60,7 +60,7 @@
                                         <option *ngFor="let otherLanguage of fallbackLanguagesNew; trackBy: trackByLanguage" [ngValue]="otherLanguage">{{otherLanguage.englishName}}</option>
                                     </select>
                                 </div>
-                                <div class="col col-auto pl-1">
+                                <div class="col-auto pl-1">
                                     <button type="submit" class="btn btn-success">Add Language</button>
                                 </div>
                             </div>

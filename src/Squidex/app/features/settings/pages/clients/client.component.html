@@ -27,10 +27,10 @@
                 
             <div class="client-expires">Access tokens expire after 30 days</div>
         </div>
-        <div class="col col-auto">
+        <div class="col-auto">
             <button class="btn btn-secondary" (click)="createToken(client)">Create Token</button>
         </div>
-        <div class="col col-auto cell-actions">
+        <div class="col-auto cell-actions">
             <button type="button" class="btn btn-link btn-danger"
                 (sqxConfirmClick)="revoke()"
                 confirmTitle="Revoke client" 
@@ -46,7 +46,7 @@
         <div class="col">
             <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName />
         </div>
-        <div class="col col-auto cell-actions">
+        <div class="col-auto cell-actions">
             <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputName">
                 <i class="icon-copy"></i>
             </button>
@@ -59,7 +59,7 @@
         <div class="col">
             <input readonly class="form-control" [attr.value]="client.secret" #inputSecret />
         </div>
-        <div class="col col-auto cell-actions">
+        <div class="col-auto cell-actions">
             <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputSecret">
                 <i class="icon-copy"></i>
             </button>
@@ -74,7 +74,7 @@
                 <option *ngFor="let role of clientRoles" [ngValue]="role.name">{{role.name}}</option>
             </select>
         </div>
-        <div class="col col-auto cell-actions">
+        <div class="col-auto cell-actions">
         </div>
     </div>
 </div>
