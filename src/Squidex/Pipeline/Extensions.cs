@@ -22,7 +22,7 @@ namespace Squidex.Pipeline
         {
             var clientId = principal.FindFirst(OpenIdClaims.ClientId)?.Value;
 
-            var clientIdParts = clientId?.Split(':');
+            var clientIdParts = clientId?.Split(':', '~');
 
             if (clientIdParts?.Length != 2)
             {
