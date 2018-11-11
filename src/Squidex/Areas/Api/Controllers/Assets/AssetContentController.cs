@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Squidex.Pipeline;
 
 #pragma warning disable 1573
@@ -82,20 +83,32 @@ namespace Squidex.Areas.Api.Controllers.Assets
                     }
                     catch (AssetNotFoundException)
                     {
-                        using (var sourceStream = GetTempStream())
+                        using (Profiler.Trace("Resize"))
                         {
-                            using (var destinationStream = GetTempStream())
+                            using (var sourceStream = GetTempStream())
                             {
-                                await assetStore.DownloadAsync(assetId, entity.FileVersion, null, sourceStream);
-                                sourceStream.Position = 0;
+                                using (var destinationStream = GetTempStream())
+                                {
+                                    using (Profiler.Trace("ResizeDownload"))
+                                    {
+                                        await assetStore.DownloadAsync(assetId, entity.FileVersion, null, sourceStream);
+                                        sourceStream.Position = 0;
+                                    }
 
-                                await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, width, height, mode);
-                                destinationStream.Position = 0;
+                                    using (Profiler.Trace("ResizeImage"))
+                                    {
+                                        await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, width, height, mode);
+                                        destinationStream.Position = 0;
+                                    }
 
-                                await assetStore.UploadAsync(assetId, entity.FileVersion, assetSuffix, destinationStream);
-                                destinationStream.Position = 0;
+                                    using (Profiler.Trace("ResizeUpload"))
+                                    {
+                                        await assetStore.UploadAsync(assetId, entity.FileVersion, assetSuffix, destinationStream);
+                                        destinationStream.Position = 0;
+                                    }
 
-                                await destinationStream.CopyToAsync(bodyStream);
+                                    await destinationStream.CopyToAsync(bodyStream);
+                                }
                             }
                         }
                     }
