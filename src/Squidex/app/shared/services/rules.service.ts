@@ -77,6 +77,10 @@ export class RuleEventDto extends Model {
     ) {
         super();
     }
+
+    public with(value: Partial<RuleEventDto>): RuleEventDto {
+        return this.clone(value);
+    }
 }
 
 export class CreateRuleDto {
@@ -268,5 +272,15 @@ export class RulesService {
                 this.analytics.trackEvent('Rule', 'EventEnqueued', appName);
             }),
             pretifyError('Failed to enqueue rule event. Please reload.'));
+    }
+
+    public cancelEvent(appName: string, id: string): Observable<any> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events/${id}`);
+
+        return HTTP.deleteVersioned(this.http, url).pipe(
+            tap(() => {
+                this.analytics.trackEvent('Rule', 'EventDequeued', appName);
+            }),
+            pretifyError('Failed to cancel rule event. Please reload.'));
     }
 }

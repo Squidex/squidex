@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Pipeline.Robots
 {
-    public class RobotsTxtMiddleware : IMiddleware
+    public sealed class RobotsTxtMiddleware : IMiddleware
     {
         private readonly RobotsTxtOptions robotsTxtOptions;
 

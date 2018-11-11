@@ -250,7 +250,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         }
 
         /// <summary>
-        /// Enqueue the event to be send.
+        /// Enqueue the event to retry it immediate
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The event to enqueue.</param>
@@ -271,6 +271,32 @@ namespace Squidex.Areas.Api.Controllers.Rules
             }
 
             await ruleEventsRepository.EnqueueAsync(id, SystemClock.Instance.GetCurrentInstant());
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Cancels the event to not retry it again.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The event to enqueue.</param>
+        /// <returns>
+        /// 200 => Rule deqeued.
+        /// 404 => App or rule event not found.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/rules/events/{id}/")]
+        [ApiCosts(0)]
+        public async Task<IActionResult> DeleteEvent(string app, Guid id)
+        {
+            var entity = await ruleEventsRepository.FindAsync(id);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            await ruleEventsRepository.CancelAsync(id);
 
             return NoContent();
         }

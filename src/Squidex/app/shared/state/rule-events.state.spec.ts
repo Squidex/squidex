@@ -91,4 +91,15 @@ describe('RuleEventsState', () => {
 
         rulesService.verify(x => x.enqueueEvent(app, oldRuleEvents[0].id), Times.once());
     });
+
+    it('should call service when cancelling event', () => {
+        rulesService.setup(x => x.cancelEvent(app, oldRuleEvents[0].id))
+            .returns(() => of({}));
+
+        ruleEventsState.cancel(oldRuleEvents[0]).subscribe();
+
+        expect().nothing();
+
+        rulesService.verify(x => x.cancelEvent(app, oldRuleEvents[0].id), Times.once());
+    });
 });

@@ -12,6 +12,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         Pending,
         Success,
         Retry,
-        Failed
+        Failed,
+        Cancelled
     }
 }

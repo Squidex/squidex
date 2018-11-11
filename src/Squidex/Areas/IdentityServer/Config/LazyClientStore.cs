@@ -16,6 +16,7 @@ using Squidex.Config;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
+using Squidex.Pipeline;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
@@ -43,16 +44,16 @@ namespace Squidex.Areas.IdentityServer.Config
                 return client;
             }
 
-            var token = clientId.Split(':', '~');
+            var (appName, appClientId) = clientId.GetClientParts();
 
-            if (token.Length != 2)
+            if (appName == null)
             {
                 return null;
             }
 
-            var app = await appProvider.GetAppAsync(token[0]);
+            var app = await appProvider.GetAppAsync(appName);
 
-            var appClient = app?.Clients.GetOrDefault(token[1]);
+            var appClient = app?.Clients.GetOrDefault(appClientId);
 
             if (appClient == null)
             {

@@ -22,7 +22,7 @@
 
     <ng-container content>
         <div class="row no-gutters" *ngIf="step === 1">
-            <div *ngFor="let triggerType of ruleTriggers | sqxKeys" class="col-12 col-md-6">
+            <div *ngFor="let triggerType of ruleTriggers | sqxKeys" class="col col-12 col-md-6">
                 <div class="rule-element" (click)="selectTriggerType(triggerType)">
                     <sqx-rule-element [type]="triggerType" [isSmall]="false" [element]="ruleTriggers[triggerType]"></sqx-rule-element>
                 </div>

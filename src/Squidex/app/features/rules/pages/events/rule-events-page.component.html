@@ -60,23 +60,27 @@
                         </div>
                         
                         <div class="row event-stats">
-                            <div class="col-3">
+                            <div class="col col-4">
                                 <span class="badge badge-pill badge-{{event.result | sqxRuleEventBadgeClass}}">{{event.result}}</span>
                             </div>
-                            <div class="col-3">
+                            <div class="col col-4">
                                 Attempts: {{event.numCalls}}
                             </div>
-                            <div class="col-3">
+                            <div class="col col-4">
                                 Next: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
                             </div>
-                            <div class="col-3 text-right">
+                            <div class="col col-auto text-right">
+                                <button class="btn btn-success btn-sm" (click)="enqueue(event)">
+                                    Enqueue
+                                </button>
+
                                 <button class="btn btn-success btn-sm" (click)="enqueue(event)">
                                     Enqueue
                                 </button>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col col-12">
                                 <textarea class="event-dump form-control" readonly>{{event.lastDump}}</textarea>
                             </div>
                         </div>

@@ -48,6 +48,10 @@ export class RuleEventsPageComponent implements OnInit {
         this.ruleEventsState.enqueue(event).pipe(onErrorResumeNext()).subscribe();
     }
 
+    public cancel(event: RuleEventDto) {
+        this.ruleEventsState.cancel(event).pipe(onErrorResumeNext()).subscribe();
+    }
+
     public selectEvent(id: string) {
         this.selectedEventId = this.selectedEventId !== id ? id : null;
     }

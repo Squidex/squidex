@@ -85,6 +85,18 @@ export class RuleEventsState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
+    public cancel(event: RuleEventDto): Observable<any> {
+        return this.rulesService.cancelEvent(this.appsState.appName, event.id).pipe(
+            tap(() => {
+                return this.next(s => {
+                    const ruleEvents = s.ruleEvents.replaceBy('id', setCancelled(event));
+
+                    return { ...s, ruleEvents, isLoaded: true };
+                });
+            }),
+            notify(this.dialogs));
+    }
+
     public goNext(): Observable<any> {
         this.next(s => ({ ...s, ruleEventsPager: s.ruleEventsPager.goNext() }));
 
@@ -101,3 +113,6 @@ export class RuleEventsState extends State<Snapshot> {
         return this.appsState.appName;
     }
 }
+
+const setCancelled = (event: RuleEventDto) =>
+    event.with({ nextAttempt: null, jobResult: 'Cancelled' });
