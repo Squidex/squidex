@@ -42,6 +42,7 @@ namespace Squidex
             app.ApplicationServices.LogConfiguration();
 
             app.UseMyHealthCheck();
+            app.UseMyRobotsTxt();
             app.UseMyTracking();
             app.UseMyLocalCache();
             app.UseMyCors();

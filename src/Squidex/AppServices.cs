@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Extensions.Actions.Twitter;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
+using Squidex.Pipeline.Robots;
 
 namespace Squidex
 {
@@ -55,6 +56,8 @@ namespace Squidex
                 config.GetSection("mode"));
             services.Configure<TwitterOptions>(
                 config.GetSection("twitter"));
+            services.Configure<RobotsTxtOptions>(
+                config.GetSection("robots"));
             services.Configure<GCHealthCheckOptions>(
                 config.GetSection("healthz:gc"));
 

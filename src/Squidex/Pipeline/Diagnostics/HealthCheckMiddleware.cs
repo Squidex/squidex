@@ -36,22 +36,34 @@ namespace Squidex.Pipeline.Diagnostics
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            using (var cts = new CancellationTokenSource(Timeout))
+            if (CanServeRequest(context.Request))
             {
-                var checks = await Task.WhenAll(healthChecks.Select(x => MakeHealthCheckAsync(x.Key, x.Value, cts.Token)));
-
-                context.Response.StatusCode = 200;
-                context.Response.Headers.Add("content-type", "application/json");
-
-                if (checks.Any(x => !x.Result.IsHealthy))
+                using (var cts = new CancellationTokenSource(Timeout))
                 {
-                    context.Response.StatusCode = 503;
+                    var checks = await Task.WhenAll(healthChecks.Select(x => MakeHealthCheckAsync(x.Key, x.Value, cts.Token)));
+
+                    context.Response.StatusCode = 200;
+                    context.Response.Headers.Add("content-type", "application/json");
+
+                    if (checks.Any(x => !x.Result.IsHealthy))
+                    {
+                        context.Response.StatusCode = 503;
+                    }
+
+                    var response = checks.ToDictionary(x => x.Name, x => x.Result);
+
+                    await context.Response.WriteAsync(JsonConvert.SerializeObject(new { status = response }, Formatting.Indented, serializerSettings));
                 }
-
-                var response = checks.ToDictionary(x => x.Name, x => x.Result);
-
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(new { status = response }, Formatting.Indented, serializerSettings));
             }
+            else
+            {
+                await next(context);
+            }
+        }
+
+        private static bool CanServeRequest(HttpRequest request)
+        {
+            return request.Method == "GET" && (request.Path == "/" || string.IsNullOrEmpty(request.Path));
         }
 
         private static string GetName(IHealthCheck check)

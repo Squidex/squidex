@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Squidex.Pipeline;
 using Squidex.Pipeline.Diagnostics;
+using Squidex.Pipeline.Robots;
 
 namespace Squidex.Config.Web
 {
@@ -31,6 +32,13 @@ namespace Squidex.Config.Web
         public static IApplicationBuilder UseMyHealthCheck(this IApplicationBuilder app)
         {
             app.Map("/healthz", builder => builder.UseMiddleware<HealthCheckMiddleware>());
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseMyRobotsTxt(this IApplicationBuilder app)
+        {
+            app.Map("/robots.txt", builder => builder.UseMiddleware<RobotsTxtMiddleware>());
 
             return app;
         }
