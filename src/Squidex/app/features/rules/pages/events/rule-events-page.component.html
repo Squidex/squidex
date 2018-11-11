@@ -59,19 +59,19 @@
                             <h3>Last Invocation</h3>
                         </div>
                         
-                        <div class="row event-stats">
-                            <div class="col-4">
+                        <div class="row no-gutters event-stats">
+                            <div class="col-3">
                                 <span class="badge badge-pill badge-{{event.result | sqxRuleEventBadgeClass}}">{{event.result}}</span>
                             </div>
-                            <div class="col-4">
+                            <div class="col-2">
                                 Attempts: {{event.numCalls}}
                             </div>
                             <div class="col-4">
                                 Next: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
                             </div>
-                            <div class="col-auto text-right">
-                                <button class="btn btn-success btn-sm" (click)="enqueue(event)">
-                                    Enqueue
+                            <div class="col-3 text-right">
+                                <button class="btn btn-outline-danger btn-sm mr-1" (click)="cancel(event)" [class.hidden]="!event.nextAttempt">
+                                    Cancel
                                 </button>
 
                                 <button class="btn btn-success btn-sm" (click)="enqueue(event)">

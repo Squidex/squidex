@@ -260,6 +260,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/rules/events/{id}/")]
+        [ApiPermission(Permissions.AppRulesEvents)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutEvent(string app, Guid id)
         {
@@ -286,6 +287,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/rules/events/{id}/")]
+        [ApiPermission(Permissions.AppRulesEvents)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteEvent(string app, Guid id)
         {
