@@ -9,11 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
@@ -26,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
+        private readonly ICommandBus commandBus;
         private readonly IEnumerable<BackupHandler> handlers;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
@@ -43,6 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public RestoreGrain(IBackupArchiveLocation backupArchiveLocation,
             IClock clock,
+            ICommandBus commandBus,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             IEnumerable<BackupHandler> handlers,
@@ -52,6 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
             Guard.NotNull(clock, nameof(clock));
+            Guard.NotNull(commandBus, nameof(commandBus));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
             Guard.NotNull(handlers, nameof(handlers));
@@ -61,6 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             this.backupArchiveLocation = backupArchiveLocation;
             this.clock = clock;
+            this.commandBus = commandBus;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
             this.handlers = handlers;
@@ -228,6 +235,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     await WriteAsync();
                 }
             }
+        }
+
+        private async Task AssignContributorAsync()
+        {
+            await commandBus.PublishAsync(new AssignContributor
+            {
+                Actor = actor,
+                AppId = CurrentJob.AppId,
+                ContributorId = actor.Identifier,
+                FromRestore = true,
+                Role = Role.Owner
+            });
         }
 
         private async Task CleanupAsync()
