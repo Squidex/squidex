@@ -6,6 +6,7 @@
  */
 
 export * from './angular/forms/autocomplete.component';
+export * from './angular/forms/code-editor.component';
 export * from './angular/forms/confirm-click.directive';
 export * from './angular/forms/control-errors.component';
 export * from './angular/forms/copy.directive';
@@ -17,7 +18,6 @@ export * from './angular/forms/form-error.component';
 export * from './angular/forms/forms-helper';
 export * from './angular/forms/iframe-editor.component';
 export * from './angular/forms/indeterminate-value.directive';
-export * from './angular/forms/jscript-editor.component';
 export * from './angular/forms/json-editor.component';
 export * from './angular/forms/progress-bar.component';
 export * from './angular/forms/slider.component';

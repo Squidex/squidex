@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -15,17 +15,17 @@ import { ResourceLoaderService, Types } from '@app/framework/internal';
 declare var ace: any;
 
 export const SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => JscriptEditorComponent), multi: true
+    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CodeEditorComponent), multi: true
 };
 
 @Component({
-    selector: 'sqx-jscript-editor',
-    styleUrls: ['./jscript-editor.component.scss'],
-    templateUrl: './jscript-editor.component.html',
+    selector: 'sqx-code-editor',
+    styleUrls: ['./code-editor.component.scss'],
+    templateUrl: './code-editor.component.html',
     providers: [SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class JscriptEditorComponent implements ControlValueAccessor, AfterViewInit {
+export class CodeEditorComponent implements ControlValueAccessor, AfterViewInit {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
     private valueChanged = new Subject();
@@ -35,6 +35,9 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
 
     @ViewChild('editor')
     public editor: ElementRef;
+
+    @Input()
+    public mode = 'ace/mode/javascript';
 
     constructor(
         private readonly resourceLoader: ResourceLoaderService
@@ -75,7 +78,7 @@ export class JscriptEditorComponent implements ControlValueAccessor, AfterViewIn
         this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js').then(() => {
             this.aceEditor = ace.edit(this.editor.nativeElement);
 
-            this.aceEditor.getSession().setMode('ace/mode/javascript');
+            this.aceEditor.getSession().setMode(this.mode);
             this.aceEditor.setReadOnly(this.isDisabled);
             this.aceEditor.setFontSize(14);
 

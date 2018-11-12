@@ -52,6 +52,9 @@
 						<ng-container *ngSwitchCase="'RichText'">
 							<sqx-rich-editor [formControl]="control"></sqx-rich-editor>
 						</ng-container>
+						<ng-container *ngSwitchCase="'Html'">
+							<sqx-code-editor [formControl]="control" mode="ace/mode/html"></sqx-code-editor>
+						</ng-container>
 						<ng-container *ngSwitchCase="'Markdown'">
 							<sqx-markdown-editor [formControl]="control"></sqx-markdown-editor>
 						</ng-container>

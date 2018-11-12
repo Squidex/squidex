@@ -13,6 +13,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         Color,
         Markdown,
         Dropdown,
+        Html,
         Radio,
         RichText,
         Slug,
