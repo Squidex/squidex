@@ -3,7 +3,7 @@
 <form [formGroup]="userForm.form" (ngSubmit)="save()">
     <input style="display:none" type="password" name="foilautofill"/>
 
-    <sqx-panel desiredWidth="26rem" isBlank="true">
+    <sqx-panel desiredWidth="26rem" isBlank="true" [isLazyLoaded]="false">
         <ng-container title>
             <ng-container *ngIf="usersState.selectedUser | async; else noUserTitle">
                 Edit User
