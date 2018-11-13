@@ -170,7 +170,7 @@ namespace Squidex.Shared
 
             var result =
                 matching
-                    .Select(x => x.Id.Split('.'))
+                    .Select(x => x.Id.Split('.')).Where(x => x.Length > 2)
                     .Select(x => x[2])
                     .Distinct()
                     .ToArray();

@@ -439,6 +439,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/disable/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DisableNestedField(string app, string name, long parentId, long id)
         {
@@ -460,6 +461,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
+        [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteField(string app, string name, long id)
         {
@@ -482,6 +484,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/")]
+        [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteNestedField(string app, string name, long parentId, long id)
         {

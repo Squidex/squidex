@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -147,6 +148,91 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             Assert.True(lhs.Equals(rhs));
             Assert.True(lhs.Equals((object)rhs));
             Assert.Equal(lhs.GetHashCode(), rhs.GetHashCode());
+        }
+
+        [Fact]
+        public void Should_extract_strings()
+        {
+            var input =
+                new NamedContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", "hello"))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", "world"));
+
+            var result = input.ToFullText();
+
+            Assert.Equal("hello world", result);
+        }
+
+        [Fact]
+        public void Should_extract_strings_from_arrays()
+        {
+            var input =
+                new NamedContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", new JArray("hello", "loved")))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", "world"));
+
+            var result = input.ToFullText();
+
+            Assert.Equal("hello loved world", result);
+        }
+
+        [Fact]
+        public void Should_extract_strings_from_objects()
+        {
+            var input =
+                new NamedContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", new JArray(new JObject(new JProperty("p1", "hello")))))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", "world"));
+
+            var result = input.ToFullText();
+
+            Assert.Equal("hello world", result);
+        }
+
+        [Fact]
+        public void Should_skip_long_strings()
+        {
+            var input =
+                new NamedContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", "hello"))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", "you"));
+
+            var result = input.ToFullText(maxFieldLength: 3);
+
+            Assert.Equal("you", result);
+        }
+
+        [Fact]
+        public void Should_trim_long_results()
+        {
+            var input =
+                new NamedContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddValue("en", "hello"))
+                    .AddField("field2",
+                        new ContentFieldData()
+                            .AddValue("iv", "you"));
+
+            var result = input.ToFullText(maxTotalLength: 7);
+
+            Assert.Equal("hello y", result);
         }
     }
 }

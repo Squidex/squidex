@@ -7,6 +7,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -17,6 +21,57 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
     {
         private static readonly Func<IRootField, string> KeyNameResolver = f => f.Name;
         private static readonly Func<IRootField, long> KeyIdResolver = f => f.Id;
+
+        public static string ToFullText<T>(this ContentData<T> data, int maxTotalLength = 1024 * 1024, int maxFieldLength = 1000, string separator = " ")
+        {
+            var stringBuilder = new StringBuilder();
+
+            foreach (var value in data.Values.SelectMany(x => x.Values))
+            {
+                AppendText(value, stringBuilder, maxFieldLength, separator, false);
+            }
+
+            var result = stringBuilder.ToString();
+
+            if (result.Length > maxTotalLength)
+            {
+                result = result.Substring(0, maxTotalLength);
+            }
+
+            return result;
+        }
+
+        private static void AppendText(JToken value, StringBuilder stringBuilder, int maxFieldLength, string separator, bool allowObjects)
+        {
+            if (value?.Type == JTokenType.String)
+            {
+                var text = ((JValue)value).ToString(CultureInfo.InvariantCulture);
+
+                if (text.Length <= maxFieldLength)
+                {
+                    if (stringBuilder.Length > 0)
+                    {
+                        stringBuilder.Append(separator);
+                    }
+
+                    stringBuilder.Append(text);
+                }
+            }
+            else if (value?.Type == JTokenType.Array)
+            {
+                foreach (var item in value)
+                {
+                    AppendText(item, stringBuilder, maxFieldLength, separator, true);
+                }
+            }
+            else if (value?.Type == JTokenType.Object && allowObjects)
+            {
+                foreach (JProperty property in value)
+                {
+                    AppendText(property.Value, stringBuilder, maxFieldLength, separator, true);
+                }
+            }
+        }
 
         public static NamedContentData ConvertId2Name(this IdContentData content, Schema schema, params FieldConverter[] converters)
         {
