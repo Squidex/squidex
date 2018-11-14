@@ -16,6 +16,7 @@ import {
     AssetsDto,
     AssetsService,
     DateTime,
+    ErrorDto,
     RenameAssetDto,
     TagAssetDto,
     Version,
@@ -345,6 +346,29 @@ describe('AssetsService', () => {
                 new Version('2')));
     }));
 
+    it('should return proper error when upload failed with 403',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        let asset: AssetDto;
+        let error: ErrorDto;
+
+        assetsService.uploadFile('my-app', null!, user, now).subscribe(result => {
+            asset = <AssetDto>result;
+        }, e => {
+            error = e;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({}, { status: 413, statusText: 'Payload too large' });
+
+        expect(asset!).toBeUndefined();
+        expect(error!).toEqual(new ErrorDto(413, 'Asset is too big.'));
+    }));
+
     it('should make put request to replace asset content',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
@@ -375,6 +399,29 @@ describe('AssetsService', () => {
                 true,
                 1024,
                 2048));
+    }));
+
+    it('should return proper error when upload failed with 403',
+        inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+
+        let asset: AssetReplacedDto;
+        let error: ErrorDto;
+
+        assetsService.replaceFile('my-app', '123', null!, version).subscribe(result => {
+            asset = (<Versioned<AssetReplacedDto>>result).payload;
+        }, e => {
+            error = e;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123/content');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({}, { status: 413, statusText: 'Payload too large' });
+
+        expect(asset!).toBeUndefined();
+        expect(error!).toEqual(new ErrorDto(413, 'Asset is too big.'));
     }));
 
     it('should make put request to update asset',

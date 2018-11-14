@@ -5,15 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { filter, map, tap } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, filter, map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
+    ErrorDto,
     HTTP,
     Model,
     pretifyError,
@@ -235,6 +236,13 @@ export class AssetsService {
                         throw 'Invalid';
                     }
                 }),
+                catchError((error: any) => {
+                    if (Types.is(error, HttpErrorResponse) && error.status === 413) {
+                        return throwError(new ErrorDto(413, 'Asset is too big.'));
+                    } else {
+                        return throwError(error);
+                    }
+                }),
                 tap(() => {
                     this.analytics.trackEvent('Asset', 'Uploaded', appName);
                 }),
@@ -299,6 +307,13 @@ export class AssetsService {
                         return new Versioned(new Version(event.headers.get('etag')!), replaced);
                     } else {
                         throw 'Invalid';
+                    }
+                }),
+                catchError(error => {
+                    if (Types.is(error, HttpErrorResponse) && error.status === 413) {
+                        return throwError(new ErrorDto(413, 'Asset is too big.'));
+                    } else {
+                        return throwError(error);
                     }
                 }),
                 tap(() => {
