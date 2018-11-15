@@ -346,7 +346,7 @@ describe('AssetsService', () => {
                 new Version('2')));
     }));
 
-    it('should return proper error when upload failed with 403',
+    it('should return proper error when upload failed with 413',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
         let asset: AssetDto;
@@ -401,7 +401,7 @@ describe('AssetsService', () => {
                 2048));
     }));
 
-    it('should return proper error when upload failed with 403',
+    it('should return proper error when replace failed with 413',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
         let asset: AssetReplacedDto;
@@ -415,8 +415,8 @@ describe('AssetsService', () => {
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123/content');
 
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({}, { status: 413, statusText: 'Payload too large' });
 
