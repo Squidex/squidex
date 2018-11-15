@@ -8,7 +8,8 @@
         
         <table class="table table-items table-fixed" [class.disabled]="isDisabled" *ngIf="schema && contentItems && contentItems.length > 0"
             [sqxSortModel]="contentItems.values" 
-            (sqxSorted)="sort($event)">
+            (sqxSorted)="sort($event)"
+            dragHandle=".drag-handle">
             <tbody *ngFor="let content of contentItems">
                 <tr [sqxContent]="content"
                     [language]="language"

@@ -5,6 +5,10 @@
         (click)="$event.stopPropagation()" />
 </td>
 
+<td class="cell-select" *ngIf="isReference" (click)="shouldStop($event)">
+    <i class="icon-drag2 drag-handle"></i>
+</td>
+
 <td class="cell-auto" *ngFor="let field of schema.listFields; let i = index" (click)="shouldStop($event)">
     <div *ngIf="field.isInlineEditable && !isReadOnly" [formGroup]="patchForm.form" (click)="$event.stopPropagation()">
         <div [ngSwitch]="field.properties.fieldType">

@@ -60,7 +60,7 @@
         </div>
 
         <ng-container *ngIf="patternsState.patterns | async; let patterns">
-            <div class="schemas" [sqxSortModel]="schema.fields" (sqxSorted)="sortFields($event)">
+            <div class="schemas" [sqxSortModel]="schema.fields" (sqxSorted)="sortFields($event)" dragHandle=".drag-handle">
                 <div *ngFor="let field of schema.fields; trackBy: trackByField">
                     <sqx-field [field]="field" [schema]="schema" [patterns]="patterns"></sqx-field>
                 </div>

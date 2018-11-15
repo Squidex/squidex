@@ -1,5 +1,7 @@
 <div class="table-items-row table-items-row-expandable field"> 
-    <div class="table-items-row-summary">        
+    <div class="table-items-row-summary">       
+        <i class="icon-drag2 drag-handle"></i>
+
         <div class="row">
             <div class="col-6">
                 <span class="field-name">
@@ -105,7 +107,7 @@
         <ng-container *ngIf="field['nested']; let nested">
             <span class="nested-field-line-v"></span>
 
-            <div [sqxSortModel]="nested" (sqxSorted)="sortFields($event)">
+            <div [sqxSortModel]="nested" (sqxSorted)="sortFields($event)" dragHandle=".drag-handle">
                 <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByField">
                     <span class="nested-field-line-h"></span>
     

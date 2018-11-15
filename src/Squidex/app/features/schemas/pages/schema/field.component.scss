@@ -16,6 +16,15 @@ $padding: 1rem;
     }
 }
 
+.table-items-row-summary {
+    position: relative;
+    padding-left: 3rem;
+}
+
+.drag-handle {
+    @include absolute(1.75rem, auto, auto, .75rem);
+}
+
 .col {
     &-tags,
     &-options {
