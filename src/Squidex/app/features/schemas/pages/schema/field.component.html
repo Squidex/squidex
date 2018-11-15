@@ -107,7 +107,10 @@
         <ng-container *ngIf="field['nested']; let nested">
             <span class="nested-field-line-v"></span>
 
-            <div [sqxSortModel]="nested" (sqxSorted)="sortFields($event)" dragHandle=".drag-handle">
+            <div
+                [sqxSortModel]="nested"
+                (sqxSorted)="sortFields($event)"
+                dragHandle=".drag-handle">
                 <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByField">
                     <span class="nested-field-line-h"></span>
     
