@@ -27,6 +27,7 @@ body {
 
 .drag-handle {
     cursor: move;
+    color: $color-text-decent;
 }
 
 // Rich editor icon. Must be placed here, because element is not created by angular.
