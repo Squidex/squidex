@@ -16,7 +16,7 @@ export class SortedDirective implements OnDestroy, OnInit {
     private sortable: Sortable;
 
     @Input()
-    public dragHandle: string;
+    public dragHandle = '.drag-handle';
 
     @Input('sqxSortModel')
     public sortModel: any[];

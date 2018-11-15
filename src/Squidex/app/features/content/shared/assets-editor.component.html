@@ -39,8 +39,7 @@
                 
                 <div
                     [sqxSortModel]="oldAssets.values"
-                    (sqxSorted)="sortAssets($event)"
-                    dragHandle=".drag-handle">
+                    (sqxSorted)="sortAssets($event)">
                     <div *ngFor="let asset of oldAssets">
                         <sqx-asset [asset]="asset" removeMode="true" isDisabled="true"
                             [isListView]="true" (removing)="removeLoadedAsset($event)">

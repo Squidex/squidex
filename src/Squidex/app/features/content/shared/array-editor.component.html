@@ -1,7 +1,6 @@
 <div class="array-container" *ngIf="arrayControl.controls.length > 0" 
     [sqxSortModel]="arrayControl.controls"
-    (sqxSorted)="sort($event)"
-    dragHandle=".drag-handle">
+    (sqxSorted)="sort($event)">
     <div class="item" *ngFor="let itemForm of arrayControl.controls; let i = index">
         <sqx-array-item
             [form]="form"
