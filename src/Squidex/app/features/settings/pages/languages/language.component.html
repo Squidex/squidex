@@ -4,7 +4,7 @@
             <div class="col-2" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
                 {{language.iso2Code}}
             </div>
-            <div class="col-6" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
+            <div class="col-8" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
                 {{language.englishName}}
             </div>
             <div class="col-auto">
@@ -38,9 +38,12 @@
                     <label class="col-3 col-form-label fallback-label">Fallback</label>
 
                     <div class="col-9">
-                        <div class="fallback-languages" [sqxSortModel]="fallbackLanguages.mutableValues" *ngIf="fallbackLanguages.length > 0">
+                        <div class="fallback-languages" [sqxSortModel]="fallbackLanguages.mutableValues" dragHandle=".drag-handle" *ngIf="fallbackLanguages.length > 0">
                             <div class="fallback-language" *ngFor="let language of fallbackLanguages">
-                                <div class="row">
+                                <div class="row no-gutters">
+                                    <div class="col-auto">
+                                        <i class="icon-drag2 drag-handle mr-1"></i>
+                                    </div>
                                     <div class="col">
                                         {{language.englishName}}
                                     </div>

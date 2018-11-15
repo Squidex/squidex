@@ -21,6 +21,14 @@ body {
     font-size: .8rem;
 }
 
+.text-decent {
+    color: $color-text-decent;
+}
+
+.drag-handle {
+    cursor: move;
+}
+
 // Rich editor icon. Must be placed here, because element is not created by angular.
 .mce-i-assets {
     & {

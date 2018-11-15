@@ -15,6 +15,9 @@ import Sortable = require('sortablejs');
 export class SortedDirective implements OnDestroy, OnInit {
     private sortable: Sortable;
 
+    @Input()
+    public dragHandle: string;
+
     @Input('sqxSortModel')
     public sortModel: any[];
 
@@ -46,7 +49,9 @@ export class SortedDirective implements OnDestroy, OnInit {
 
                     this.sorted.emit(newModel);
                 }
-            }
+            },
+
+            handle: this.dragHandle
         });
     }
 }

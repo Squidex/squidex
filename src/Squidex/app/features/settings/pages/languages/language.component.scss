@@ -17,23 +17,19 @@ $field-header: #e7ebef;
     &-languages {
         @include border-radius;
         background: $color-border;
-        border: 0;
-        padding: .5rem;
+        border-top: .5rem solid $color-border;
+        border-bottom: 1px solid $color-border;
+        padding: 0 .5rem;
     }
 
     &-language {
-        & {
-            @include border-radius(2px);
-            padding: .5rem;
-            background: $color-dark-foreground;
-            border: 0;
-            margin-bottom: .5rem;
-            line-height: 2rem;
-        }
-
-        &:last-child {
-            margin: 0;
-        }
+        @include border-radius(2px);
+        padding: .5rem;
+        background: $color-dark-foreground;
+        border: 0;
+        margin: 0;
+        margin-bottom: .5rem;
+        line-height: 2rem;
     }
 
     &-label {

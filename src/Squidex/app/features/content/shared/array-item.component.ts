@@ -35,6 +35,9 @@ export class ArrayItemComponent implements OnChanges {
     public field: RootFieldDto;
 
     @Input()
+    public index: number;
+
+    @Input()
     public itemForm: FormGroup;
 
     @Input()
