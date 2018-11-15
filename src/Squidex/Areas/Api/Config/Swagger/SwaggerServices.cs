@@ -106,6 +106,7 @@ namespace Squidex.Areas.Api.Config.Swagger
             settings.GeneratorSettings.DocumentProcessors.Add(new RuleActionProcessor());
             settings.GeneratorSettings.DocumentProcessors.Add(new XmlTagProcessor());
 
+            settings.GeneratorSettings.OperationProcessors.Add(new TagByGroupNameProcessor());
             settings.GeneratorSettings.OperationProcessors.Add(new XmlResponseTypesProcessor());
 
             return settings;
