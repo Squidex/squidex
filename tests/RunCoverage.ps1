@@ -76,6 +76,6 @@ if ($all -Or $web) {
 	-oldStyle
 }
 
-&"$folderHome\.nuget\packages\ReportGenerator\4.0.2\tools\ReportGenerator.exe" `
+&"$folderHome\.nuget\packages\ReportGenerator\4.0.4\tools\ReportGenerator.exe" `
 -reports:"$folderWorking\$folderReports\*.xml" `
 -targetdir:"$folderWorking\$folderReports\Output"

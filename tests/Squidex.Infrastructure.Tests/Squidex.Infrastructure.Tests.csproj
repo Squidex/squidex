@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="4.9.1" />
     <PackageReference Include="FluentAssertions" Version="5.5.0" />
-    <PackageReference Include="Google.Cloud.Storage.V1" Version="2.2.0" />
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="2.2.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.1.2" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.1.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
