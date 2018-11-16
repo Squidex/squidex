@@ -1,21 +1,25 @@
-<div class="item" [class.invalid]="isInvalid | async">
-    <div class="header drag-handle">
-        <i class="icon-drag2 mr-1"></i>
+<div class="card item" [class.invalid]="isInvalid | async">
+    <div class="card-header drag-handle">
+        <span class="pull-left">
+            <i class="icon-drag2 mr-1"></i>
+    
+            <span class="header-text text-decent">Item #{{index + 1}}</span>
+        </span>
 
-        <span class="header-text text-decent">Item #{{index + 1}}</span>
-
-        <button type="button" class="btn btn-link btn-danger item-remove" (click)="removing.emit(); $event.preventDefault()">
+        <button type="button" class="btn btn-link btn-danger float-right" (click)="removing.emit(); $event.preventDefault()">
             <i class="icon-bin2"></i>
         </button>
     </div>
     
-    <div class="form-group" *ngFor="let fieldControl of fieldControls">
-        <sqx-field-editor
-            [form]="form"
-            [field]="fieldControl.field"
-            [language]="language"
-            [languages]="languages"
-            [control]="fieldControl.control">
-        </sqx-field-editor>
+    <div class="card-body">
+        <div class="form-group" *ngFor="let fieldControl of fieldControls">
+            <sqx-field-editor
+                [form]="form"
+                [field]="fieldControl.field"
+                [language]="language"
+                [languages]="languages"
+                [control]="fieldControl.control">
+            </sqx-field-editor>
+        </div>
     </div>
 </div>

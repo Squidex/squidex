@@ -23,6 +23,7 @@
 
     <Compile Remove="Assets\**" />
     <Content Remove="Assets\**" />
+    <Content Remove="package-lock.json" />
 
     <None Remove="Assets\**" />
   </ItemGroup>
