@@ -11,10 +11,12 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
+using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.UsageTracking;
+using Squidex.Shared.Users;
 
 #pragma warning disable RECS0092 // Convert field to readonly
 
@@ -47,6 +49,12 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<ActionContextAccessor>()
                 .As<IActionContextAccessor>();
+
+            services.AddSingletonAs<DefaultUserResolver>()
+                .As<IUserResolver>();
+
+            services.AddSingletonAs<AssetUserPictureStore>()
+                .As<IUserPictureStore>();
 
             services.AddTransient(typeof(Lazy<>), typeof(Lazier<>));
         }

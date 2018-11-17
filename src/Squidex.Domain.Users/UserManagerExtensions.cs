@@ -8,31 +8,88 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Security;
-using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Users
 {
     public static class UserManagerExtensions
     {
-        public static Task<IReadOnlyList<IUser>> QueryByEmailAsync(this UserManager<IUser> userManager, string email = null, int take = 10, int skip = 0)
+        public static async Task<UserWithClaims> GetUserWithClaimsAsync(this UserManager<IdentityUser> userManager, ClaimsPrincipal principal)
         {
-            var users = QueryUsers(userManager, email).Skip(skip).Take(take).ToList();
+            if (principal == null)
+            {
+                return null;
+            }
 
-            return Task.FromResult<IReadOnlyList<IUser>>(users);
+            var user = await userManager.FindByIdWithClaimsAsync(userManager.GetUserId(principal));
+
+            return user;
         }
 
-        public static Task<long> CountByEmailAsync(this UserManager<IUser> userManager, string email = null)
+        public static async Task<UserWithClaims> ResolveUserAsync(this UserManager<IdentityUser> userManager, IdentityUser user)
+        {
+            if (user == null)
+            {
+                return null;
+            }
+
+            var claims = await userManager.GetClaimsAsync(user);
+
+            return new UserWithClaims(user, claims);
+        }
+
+        public static async Task<UserWithClaims> FindByIdWithClaimsAsync(this UserManager<IdentityUser> userManager, string id)
+        {
+            if (id == null)
+            {
+                return null;
+            }
+
+            var user = await userManager.FindByIdAsync(id);
+
+            return await userManager.ResolveUserAsync(user);
+        }
+
+        public static async Task<UserWithClaims> FindByEmailWithClaimsAsyncAsync(this UserManager<IdentityUser> userManager, string email)
+        {
+            if (email == null)
+            {
+                return null;
+            }
+
+            var user = await userManager.FindByEmailAsync(email);
+
+            return await userManager.ResolveUserAsync(user);
+        }
+
+        public static Task<long> CountByEmailAsync(this UserManager<IdentityUser> userManager, string email = null)
         {
             var count = QueryUsers(userManager, email).LongCount();
 
             return Task.FromResult(count);
         }
 
-        private static IQueryable<IUser> QueryUsers(UserManager<IUser> userManager, string email = null)
+        public static async Task<List<UserWithClaims>> QueryByEmailAsync(this UserManager<IdentityUser> userManager, string email = null, int take = 10, int skip = 0)
+        {
+            var users = QueryUsers(userManager, email).Skip(skip).Take(take).ToList();
+
+            var result = await userManager.ResolveUsersAsync(users);
+
+            return result.ToList();
+        }
+
+        public static Task<UserWithClaims[]> ResolveUsersAsync(this UserManager<IdentityUser> userManager, IEnumerable<IdentityUser> users)
+        {
+            return Task.WhenAll(users.Select(async user =>
+            {
+                return await userManager.ResolveUserAsync(user);
+            }));
+        }
+
+        public static IQueryable<IdentityUser> QueryUsers(UserManager<IdentityUser> userManager, string email = null)
         {
             var result = userManager.Users;
 
@@ -46,25 +103,24 @@ namespace Squidex.Domain.Users
             return result;
         }
 
-        public static async Task<IUser> CreateAsync(this UserManager<IUser> userManager, IUserFactory factory, string email, string displayName, string password, PermissionSet permissions = null)
+        public static async Task<IdentityUser> CreateAsync(this UserManager<IdentityUser> userManager, IUserFactory factory, UserValues values)
         {
-            var user = factory.Create(email);
+            var user = factory.Create(values.Email);
 
             try
             {
-                user.SetDisplayName(displayName);
-                user.SetPictureUrlFromGravatar(email);
-
-                if (permissions != null)
-                {
-                    user.SetPermissions(permissions);
-                }
-
                 await DoChecked(() => userManager.CreateAsync(user), "Cannot create user.");
 
-                if (!string.IsNullOrWhiteSpace(password))
+                var claims = values.ToClaims().ToList();
+
+                if (claims.Count > 0)
                 {
-                    await DoChecked(() => userManager.AddPasswordAsync(user, password), "Cannot create user.");
+                    await DoChecked(() => userManager.AddClaimsAsync(user, claims), "Cannot add user.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(values.Password))
+                {
+                    await DoChecked(() => userManager.AddPasswordAsync(user, values.Password), "Cannot create user.");
                 }
             }
             catch
@@ -77,68 +133,73 @@ namespace Squidex.Domain.Users
             return user;
         }
 
-        public static Task<IdentityResult> UpdateAsync(this UserManager<IUser> userManager, IUser user, string email, string displayName, bool hidden)
-        {
-            user.SetHidden(hidden);
-            user.SetEmail(email);
-            user.SetDisplayName(displayName);
-
-            return userManager.UpdateAsync(user);
-        }
-
-        public static async Task UpdateAsync(this UserManager<IUser> userManager, string id, string email, string displayName, string password, PermissionSet permissions = null)
+        public static async Task UpdateAsync(this UserManager<IdentityUser> userManager, string id, UserValues values)
         {
             var user = await userManager.FindByIdAsync(id);
 
             if (user == null)
             {
-                throw new DomainObjectNotFoundException(id, typeof(IUser));
+                throw new DomainObjectNotFoundException(id, typeof(IdentityUser));
             }
 
-            if (!string.IsNullOrWhiteSpace(email))
+            await UpdateAsync(userManager, user, values);
+        }
+
+        public static async Task<IdentityResult> UpdateSafeAsync(this UserManager<IdentityUser> userManager, IdentityUser user, UserValues values)
+        {
+            try
             {
-                await DoChecked(() => userManager.SetEmailAsync(user, email), "Cannot update email.");
-                await DoChecked(() => userManager.SetUserNameAsync(user, email), "Cannot update email.");
+                await userManager.UpdateAsync(user, values);
+
+                return IdentityResult.Success;
             }
-
-            if (!string.IsNullOrWhiteSpace(displayName))
+            catch (ValidationException ex)
             {
-                user.SetDisplayName(displayName);
-            }
-
-            if (permissions != null)
-            {
-                user.SetPermissions(permissions);
-            }
-
-            await DoChecked(() => userManager.UpdateAsync(user), "Cannot update user.");
-
-            if (!string.IsNullOrWhiteSpace(password))
-            {
-                await DoChecked(() => userManager.RemovePasswordAsync(user), "Cannot update user.");
-                await DoChecked(() => userManager.AddPasswordAsync(user, password), "Cannot update user.");
+                return IdentityResult.Failed(ex.Errors.Select(x => new IdentityError { Description = x.Message }).ToArray());
             }
         }
 
-        public static async Task LockAsync(this UserManager<IUser> userManager, string id)
+        public static async Task UpdateAsync(this UserManager<IdentityUser> userManager, IdentityUser user, UserValues values)
+        {
+            if (user == null)
+            {
+                throw new DomainObjectNotFoundException("Id", typeof(IdentityUser));
+            }
+
+            if (!string.IsNullOrWhiteSpace(values.Email) && values.Email != user.Email)
+            {
+                await DoChecked(() => userManager.SetEmailAsync(user, values.Email), "Cannot update email.");
+                await DoChecked(() => userManager.SetUserNameAsync(user, values.Email), "Cannot update email.");
+            }
+
+            await DoChecked(() => userManager.SyncClaimsAsync(user, values.ToClaims().ToList()), "Cannot update user.");
+
+            if (!string.IsNullOrWhiteSpace(values.Password))
+            {
+                await DoChecked(() => userManager.RemovePasswordAsync(user), "Cannot replace password.");
+                await DoChecked(() => userManager.AddPasswordAsync(user, values.Password), "Cannot replace password.");
+            }
+        }
+
+        public static async Task LockAsync(this UserManager<IdentityUser> userManager, string id)
         {
             var user = await userManager.FindByIdAsync(id);
 
             if (user == null)
             {
-                throw new DomainObjectNotFoundException(id, typeof(IUser));
+                throw new DomainObjectNotFoundException(id, typeof(IdentityUser));
             }
 
             await DoChecked(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)), "Cannot lock user.");
         }
 
-        public static async Task UnlockAsync(this UserManager<IUser> userManager, string id)
+        public static async Task UnlockAsync(this UserManager<IdentityUser> userManager, string id)
         {
             var user = await userManager.FindByIdAsync(id);
 
             if (user == null)
             {
-                throw new DomainObjectNotFoundException(id, typeof(IUser));
+                throw new DomainObjectNotFoundException(id, typeof(IdentityUser));
             }
 
             await DoChecked(() => userManager.SetLockoutEndDateAsync(user, null), "Cannot unlock user.");
@@ -152,6 +213,37 @@ namespace Squidex.Domain.Users
             {
                 throw new ValidationException(message, result.Errors.Select(x => new ValidationError(x.Description)).ToArray());
             }
+        }
+
+        public static async Task<IdentityResult> SyncClaimsAsync(this UserManager<IdentityUser> userManager, IdentityUser user, IEnumerable<Claim> claims)
+        {
+            if (claims.Any())
+            {
+                var oldClaims = await userManager.GetClaimsAsync(user);
+                var oldClaimsToRemove = new List<Claim>();
+
+                foreach (var oldClaim in oldClaims)
+                {
+                    if (claims.Any(x => x.Type == oldClaim.Type))
+                    {
+                        oldClaimsToRemove.Add(oldClaim);
+                    }
+                }
+
+                if (oldClaimsToRemove.Count > 0)
+                {
+                    var result = await userManager.RemoveClaimsAsync(user, oldClaimsToRemove);
+
+                    if (!result.Succeeded)
+                    {
+                        return result;
+                    }
+                }
+
+                return await userManager.AddClaimsAsync(user, claims);
+            }
+
+            return IdentityResult.Success;
         }
     }
 }

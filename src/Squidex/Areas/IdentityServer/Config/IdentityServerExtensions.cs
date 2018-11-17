@@ -17,7 +17,6 @@ using Squidex.Domain.Users;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
-using Squidex.Shared.Users;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
@@ -34,7 +33,7 @@ namespace Squidex.Areas.IdentityServer.Config
         {
             var options = services.GetService<IOptions<MyIdentityOptions>>().Value;
 
-            var userManager = services.GetService<UserManager<IUser>>();
+            var userManager = services.GetService<UserManager<IdentityUser>>();
             var userFactory = services.GetService<IUserFactory>();
 
             var log = services.GetService<ISemanticLog>();
@@ -50,9 +49,15 @@ namespace Squidex.Areas.IdentityServer.Config
                     {
                         try
                         {
-                            var permissions = new PermissionSet(Permissions.Admin);
+                            var values = new UserValues
+                            {
+                                Email = adminEmail,
+                                Password = adminPass,
+                                Permissions = new PermissionSet(Permissions.Admin),
+                                DisplayName = adminEmail
+                            };
 
-                            await userManager.CreateAsync(userFactory, adminEmail, adminEmail, adminPass, permissions);
+                            await userManager.CreateAsync(userFactory, values);
                         }
                         catch (Exception ex)
                         {

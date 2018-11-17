@@ -17,17 +17,16 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
 using Squidex.Shared;
-using Squidex.Shared.Users;
 
 namespace Squidex.Areas.Api.Controllers.Users
 {
     [ApiModelValidation(true)]
     public sealed class UserManagementController : ApiController
     {
-        private readonly UserManager<IUser> userManager;
+        private readonly UserManager<IdentityUser> userManager;
         private readonly IUserFactory userFactory;
 
-        public UserManagementController(ICommandBus commandBus, UserManager<IUser> userManager, IUserFactory userFactory)
+        public UserManagementController(ICommandBus commandBus, UserManager<IdentityUser> userManager, IUserFactory userFactory)
             : base(commandBus)
         {
             this.userManager = userManager;
@@ -58,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersRead)]
         public async Task<IActionResult> GetUser(string id)
         {
-            var entity = await userManager.FindByIdAsync(id);
+            var entity = await userManager.FindByIdWithClaimsAsync(id);
 
             if (entity == null)
             {
@@ -75,7 +74,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersCreate)]
         public async Task<IActionResult> PostUser([FromBody] CreateUserDto request)
         {
-            var user = await userManager.CreateAsync(userFactory, request.Email, request.DisplayName, request.Password, new PermissionSet(request.Permissions));
+            var user = await userManager.CreateAsync(userFactory, request.ToValues());
 
             var response = new UserCreatedDto { Id = user.Id };
 
@@ -87,7 +86,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersUpdate)]
         public async Task<IActionResult> PutUser(string id, [FromBody] UpdateUserDto request)
         {
-            await userManager.UpdateAsync(id, request.Email, request.DisplayName, request.Password, new PermissionSet(request.Permissions));
+            await userManager.UpdateAsync(id, request.ToValues());
 
             return NoContent();
         }

@@ -5,196 +5,100 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
-using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Users.MongoDb
 {
-    public sealed class MongoUser : IUser
+    public sealed class MongoUser : IdentityUser
     {
-        [BsonRepresentation(BsonType.ObjectId)]
-        [BsonElement]
-        public string Id { get; set; }
+        public List<Claim> Claims { get; set; } = new List<Claim>();
 
-        [BsonIgnoreIfNull]
-        [BsonElement]
-        public string SecurityStamp { get; set; }
+        public List<UserTokenInfo> Tokens { get; set; } = new List<UserTokenInfo>();
 
-        [BsonRequired]
-        [BsonElement]
-        public string UserName { get; set; }
+        public List<UserLoginInfo> Logins { get; set; } = new List<UserLoginInfo>();
 
-        [BsonRequired]
-        [BsonElement]
-        public string NormalizedUserName { get; set; }
+        public HashSet<string> Roles { get; set; } = new HashSet<string>();
 
-        [BsonRequired]
-        [BsonElement]
-        public string Email { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public string NormalizedEmail { get; set; }
-
-        [BsonIgnoreIfNull]
-        [BsonElement]
-        public string PhoneNumber { get; set; }
-
-        [BsonIgnoreIfNull]
-        [BsonElement]
-        public string PasswordHash { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public bool EmailConfirmed { get; set; }
-
-        [BsonIgnoreIfDefault]
-        [BsonElement]
-        public bool PhoneNumberConfirmed { get; set; }
-
-        [BsonIgnoreIfDefault]
-        [BsonElement]
-        public bool TwoFactorEnabled { get; set; }
-
-        [BsonIgnoreIfDefault]
-        [BsonElement]
-        public bool LockoutEnabled { get; set; }
-
-        [BsonIgnoreIfNull]
-        [BsonElement]
-        public DateTime? LockoutEndDateUtc { get; set; }
-
-        [BsonIgnoreIfDefault]
-        [BsonElement]
-        public int AccessFailedCount { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public List<string> Roles { get; set; } = new List<string>();
-
-        [BsonRequired]
-        [BsonElement]
-        public List<MongoUserClaim> Claims { get; set; } = new List<MongoUserClaim>();
-
-        [BsonRequired]
-        [BsonElement]
-        public List<MongoUserToken> Tokens { get; set; } = new List<MongoUserToken>();
-
-        [BsonRequired]
-        [BsonElement]
-        public List<MongoUserLogin> Logins { get; set; } = new List<MongoUserLogin>();
-
-        public bool IsLocked
+        internal IdentityUserToken<string> FindTokenAsync(string loginProvider, string name)
         {
-            get { return LockoutEndDateUtc != null && LockoutEndDateUtc.Value > DateTime.UtcNow; }
+            return Tokens.FirstOrDefault(x => x.LoginProvider == loginProvider && x.Name == name);
         }
 
-        IReadOnlyList<Claim> IUser.Claims
+        internal void AddLogin(UserLoginInfo login)
         {
-            get { return Claims.Select(x => new Claim(x.Type, x.Value)).ToList(); }
+            Logins.Add(new UserLoginInfo(login.LoginProvider, login.ProviderKey, login.ProviderDisplayName));
         }
 
-        IReadOnlyList<ExternalLogin> IUser.Logins
-        {
-            get { return Logins.Select(x => new ExternalLogin(x.LoginProvider, x.ProviderKey, x.ProviderDisplayName)).ToList(); }
-        }
-
-        public MongoUser()
-        {
-            Id = ObjectId.GenerateNewId().ToString();
-        }
-
-        public void SetEmail(string email)
-        {
-            Email = UserName = email;
-        }
-
-        public void AddRole(string role)
+        internal void AddRole(string role)
         {
             Roles.Add(role);
         }
 
-        public void RemoveRole(string role)
+        internal void RemoveRole(string role)
         {
             Roles.Remove(role);
         }
 
-        public void AddLogin(UserLoginInfo login)
-        {
-            Logins.Add(login);
-        }
-
-        public void RemoveLogin(string loginProvider, string providerKey)
+        internal void RemoveLogin(string loginProvider, string providerKey)
         {
             Logins.RemoveAll(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
         }
 
-        public void RemoveClaims(string type)
-        {
-            Claims.RemoveAll(x => string.Equals(x.Type, type, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public void AddClaim(Claim claim)
+        internal void AddClaim(Claim claim)
         {
             Claims.Add(claim);
         }
 
-        public void AddClaims(IEnumerable<Claim> claims)
+        internal void AddClaims(IEnumerable<Claim> claims)
         {
             claims.Foreach(AddClaim);
         }
 
-        public void RemoveClaim(Claim claim)
+        internal void RemoveClaim(Claim claim)
         {
             Claims.RemoveAll(c => c.Type == claim.Type && c.Value == claim.Value);
         }
 
-        public void RemoveClaims(IEnumerable<Claim> claims)
+        internal void RemoveClaims(IEnumerable<Claim> claims)
         {
             claims.Foreach(RemoveClaim);
         }
 
-        public string GetToken(string loginProider, string name)
+        internal string GetToken(string loginProvider, string name)
         {
-            return Tokens.FirstOrDefault(t => t.LoginProvider == loginProider && t.Name == name)?.Value;
+            return Tokens.FirstOrDefault(t => t.LoginProvider == loginProvider && t.Name == name)?.Value;
         }
 
-        public void AddToken(string loginProvider, string name, string value)
+        internal void AddToken(string loginProvider, string name, string value)
         {
-            Tokens.Add(new MongoUserToken { LoginProvider = loginProvider, Name = name, Value = value });
+            Tokens.Add(new UserTokenInfo { LoginProvider = loginProvider, Name = name, Value = value });
         }
 
-        public void RemoveToken(string loginProvider, string name)
+        internal void RemoveToken(string loginProvider, string name)
         {
             Tokens.RemoveAll(t => t.LoginProvider == loginProvider && t.Name == name);
         }
 
-        public void SetClaim(string type, string value)
-        {
-            RemoveClaims(type);
-
-            AddClaim(new Claim(type, value));
-        }
-
-        public void ReplaceClaim(Claim existingClaim, Claim newClaim)
+        internal void ReplaceClaim(Claim existingClaim, Claim newClaim)
         {
             RemoveClaim(existingClaim);
 
             AddClaim(newClaim);
         }
 
-        public void SetToken(string loginProider, string name, string value)
+        internal void SetToken(string loginProider, string name, string value)
         {
             RemoveToken(loginProider, name);
 
             AddToken(loginProider, name, value);
         }
+    }
+
+    public sealed class UserTokenInfo : IdentityUserToken<string>
+    {
     }
 }

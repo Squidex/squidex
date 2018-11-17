@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Shared.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
@@ -28,8 +28,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
         public bool HasPasswordAuth { get; set; }
 
-        public IReadOnlyList<ExternalLogin> ExternalLogins { get; set; }
+        public IList<UserLoginInfo> ExternalLogins { get; set; }
 
-        public IReadOnlyList<ExternalProvider> ExternalProviders { get; set; }
+        public IList<ExternalProvider> ExternalProviders { get; set; }
     }
 }

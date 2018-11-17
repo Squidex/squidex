@@ -7,8 +7,6 @@
 
 using System;
 using System.Linq;
-using System.Security.Claims;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Identity;
 
@@ -16,49 +14,9 @@ namespace Squidex.Shared.Users
 {
     public static class UserExtensions
     {
-        public static void SetDisplayName(this IUser user, string displayName)
+        public static PermissionSet Permissions(this IUser user)
         {
-            user.SetClaim(SquidexClaimTypes.DisplayName, displayName);
-        }
-
-        public static void SetPictureUrl(this IUser user, string pictureUrl)
-        {
-            user.SetClaim(SquidexClaimTypes.PictureUrl, pictureUrl);
-        }
-
-        public static void SetPictureUrlToStore(this IUser user)
-        {
-            user.SetClaim(SquidexClaimTypes.PictureUrl, "store");
-        }
-
-        public static void SetPictureUrlFromGravatar(this IUser user, string email)
-        {
-            user.SetClaim(SquidexClaimTypes.PictureUrl, GravatarHelper.CreatePictureUrl(email));
-        }
-
-        public static void SetHidden(this IUser user, bool value)
-        {
-            user.SetClaim(SquidexClaimTypes.Hidden, value.ToString());
-        }
-
-        public static void SetConsent(this IUser user)
-        {
-            user.SetClaim(SquidexClaimTypes.Consent, "true");
-        }
-
-        public static void SetConsentForEmails(this IUser user, bool value)
-        {
-            user.SetClaim(SquidexClaimTypes.ConsentForEmails, value.ToString());
-        }
-
-        public static void SetPermissions(this IUser user, PermissionSet permissions)
-        {
-            user.RemoveClaims(SquidexClaimTypes.Permissions);
-
-            foreach (var permission in permissions)
-            {
-                user.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission.Id));
-            }
+            return new PermissionSet(user.GetClaimValues(SquidexClaimTypes.Permissions).Select(x => new Permission(x)));
         }
 
         public static bool IsHidden(this IUser user)
@@ -88,7 +46,7 @@ namespace Squidex.Shared.Users
 
         public static bool IsPictureUrlStored(this IUser user)
         {
-            return user.HasClaimValue(SquidexClaimTypes.PictureUrl, "store");
+            return user.HasClaimValue(SquidexClaimTypes.PictureUrl, SquidexClaimTypes.PictureUrlStore);
         }
 
         public static string PictureUrl(this IUser user)
@@ -99,11 +57,6 @@ namespace Squidex.Shared.Users
         public static string DisplayName(this IUser user)
         {
             return user.GetClaimValue(SquidexClaimTypes.DisplayName);
-        }
-
-        public static PermissionSet Permissions(this IUser user)
-        {
-            return new PermissionSet(user.GetClaimValues(SquidexClaimTypes.Permissions).Select(x => new Permission(x)));
         }
 
         public static string GetClaimValue(this IUser user, string type)

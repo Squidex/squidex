@@ -27,9 +27,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<NoopAppPlanBillingManager>()
                 .As<IAppPlanBillingManager>();
 
-            services.AddSingletonAs<AssetUserPictureStore>()
-                .As<IUserPictureStore>();
-
             services.AddSingletonAs<NoopUserEvents>()
                 .As<IUserEvents>();
         }

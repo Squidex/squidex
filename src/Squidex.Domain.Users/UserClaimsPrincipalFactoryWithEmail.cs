@@ -11,18 +11,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Security;
-using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Users
 {
-    public sealed class UserClaimsPrincipalFactoryWithEmail : UserClaimsPrincipalFactory<IUser, IRole>
+    public sealed class UserClaimsPrincipalFactoryWithEmail : UserClaimsPrincipalFactory<IdentityUser, IdentityRole>
     {
-        public UserClaimsPrincipalFactoryWithEmail(UserManager<IUser> userManager, RoleManager<IRole> roleManager, IOptions<IdentityOptions> optionsAccessor)
+        public UserClaimsPrincipalFactoryWithEmail(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<IdentityOptions> optionsAccessor)
             : base(userManager, roleManager, optionsAccessor)
         {
         }
 
-        public override async Task<ClaimsPrincipal> CreateAsync(IUser user)
+        public override async Task<ClaimsPrincipal> CreateAsync(IdentityUser user)
         {
             var principal = await base.CreateAsync(user);
 

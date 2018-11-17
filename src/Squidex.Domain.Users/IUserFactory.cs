@@ -5,12 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Shared.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace Squidex.Domain.Users
 {
     public interface IUserFactory
     {
-        IUser Create(string email);
+        IdentityUser Create(string email);
+
+        bool IsId(string id);
     }
 }

@@ -85,14 +85,12 @@ namespace Squidex.Config.Domain
                         .As<IInitializable>();
 
                     services.AddSingletonAs<MongoUserStore>()
-                        .As<IUserStore<IUser>>()
+                        .As<IUserStore<IdentityUser>>()
                         .As<IUserFactory>()
-                        .As<IUserResolver>()
                         .As<IInitializable>();
 
                     services.AddSingletonAs<MongoRoleStore>()
-                        .As<IRoleStore<IRole>>()
-                        .As<IRoleFactory>()
+                        .As<IRoleStore<IdentityRole>>()
                         .As<IInitializable>();
 
                     services.AddSingletonAs<MongoHistoryEventRepository>()

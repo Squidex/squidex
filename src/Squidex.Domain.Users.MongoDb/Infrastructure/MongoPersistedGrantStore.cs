@@ -10,7 +10,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 
@@ -23,7 +25,8 @@ namespace Squidex.Domain.Users.MongoDb.Infrastructure
             BsonClassMap.RegisterClassMap<PersistedGrant>(map =>
             {
                 map.AutoMap();
-                map.MapIdProperty(x => x.Key);
+
+                map.MapIdProperty(x => x.Key).SetSerializer(new StringSerializer(BsonType.ObjectId));
             });
         }
 

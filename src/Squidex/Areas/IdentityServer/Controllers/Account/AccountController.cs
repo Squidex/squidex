@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security;
@@ -30,20 +31,22 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
     public sealed class AccountController : IdentityServerController
     {
-        private readonly SignInManager<IUser> signInManager;
-        private readonly UserManager<IUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly UserManager<IdentityUser> userManager;
         private readonly IUserFactory userFactory;
         private readonly IUserEvents userEvents;
+        private readonly IUserResolver userResolver;
         private readonly IOptions<MyIdentityOptions> identityOptions;
         private readonly IOptions<MyUrlsOptions> urlOptions;
         private readonly ISemanticLog log;
         private readonly IIdentityServerInteractionService interactions;
 
         public AccountController(
-            SignInManager<IUser> signInManager,
-            UserManager<IUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            UserManager<IdentityUser> userManager,
             IUserFactory userFactory,
             IUserEvents userEvents,
+            IUserResolver userResolver,
             IOptions<MyIdentityOptions> identityOptions,
             IOptions<MyUrlsOptions> urlOptions,
             ISemanticLog log,
@@ -52,6 +55,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             this.log = log;
             this.urlOptions = urlOptions;
             this.userEvents = userEvents;
+            this.userResolver = userResolver;
             this.userManager = userManager;
             this.userFactory = userFactory;
             this.interactions = interactions;
@@ -115,12 +119,15 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                 return View(vm);
             }
 
-            var user = await userManager.GetUserAsync(User);
+            var user = await userManager.GetUserWithClaimsAsync(User);
 
-            user.SetConsentForEmails(model.ConsentToAutomatedEmails);
-            user.SetConsent();
+            var update = new UserValues
+            {
+                Consent = true,
+                ConsentForEmails = model.ConsentToAutomatedEmails
+            };
 
-            await userManager.UpdateAsync(user);
+            await userManager.UpdateAsync(user.Id, update);
 
             userEvents.OnConsentGiven(user);
 
@@ -232,36 +239,37 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             var isLoggedIn = result.Succeeded;
 
-            IUser user = null;
+            UserWithClaims user = null;
 
             if (!isLoggedIn)
             {
                 var email = externalLogin.Principal.FindFirst(ClaimTypes.Email).Value;
 
-                user = await userManager.FindByEmailAsync(email);
+                user = await userManager.FindByEmailWithClaimsAsyncAsync(email);
 
                 if (user != null)
                 {
                     isLoggedIn =
                         await AddLoginAsync(user, externalLogin) &&
+                        await AddClaimsAsync(user, externalLogin, email) &&
                         await LoginAsync(externalLogin);
                 }
                 else
                 {
-                    user = CreateUser(externalLogin, email);
+                    user = new UserWithClaims(userFactory.Create(email), new List<Claim>());
 
                     var isFirst = userManager.Users.LongCount() == 0;
 
                     isLoggedIn =
                         await AddUserAsync(user) &&
                         await AddLoginAsync(user, externalLogin) &&
-                        await MakeAdminAsync(user, isFirst) &&
+                        await AddClaimsAsync(user, externalLogin, email, isFirst) &&
                         await LockAsync(user, isFirst) &&
                         await LoginAsync(externalLogin);
 
                     userEvents.OnUserRegistered(user);
 
-                    if (user.IsLocked)
+                    if (await userManager.IsLockedOutAsync(user.Identity))
                     {
                         return View(nameof(LockedOut));
                     }
@@ -282,14 +290,14 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             }
         }
 
-        private Task<bool> AddLoginAsync(IUser user, UserLoginInfo externalLogin)
+        private Task<bool> AddLoginAsync(UserWithClaims user, UserLoginInfo externalLogin)
         {
-            return MakeIdentityOperation(() => userManager.AddLoginAsync(user, externalLogin));
+            return MakeIdentityOperation(() => userManager.AddLoginAsync(user.Identity, externalLogin));
         }
 
-        private Task<bool> AddUserAsync(IUser user)
+        private Task<bool> AddUserAsync(UserWithClaims user)
         {
-            return MakeIdentityOperation(() => userManager.CreateAsync(user));
+            return MakeIdentityOperation(() => userManager.CreateAsync(user.Identity));
         }
 
         private async Task<bool> LoginAsync(UserLoginInfo externalLogin)
@@ -299,46 +307,48 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             return result.Succeeded;
         }
 
-        private Task<bool> LockAsync(IUser user, bool isFirst)
+        private Task<bool> LockAsync(UserWithClaims user, bool isFirst)
         {
             if (isFirst || !identityOptions.Value.LockAutomatically)
             {
                 return TaskHelper.True;
             }
 
-            return MakeIdentityOperation(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)));
+            return MakeIdentityOperation(() => userManager.SetLockoutEndDateAsync(user.Identity, DateTimeOffset.UtcNow.AddYears(100)));
         }
 
-        private Task<bool> MakeAdminAsync(IUser user, bool isFirst)
+        private Task<bool> AddClaimsAsync(UserWithClaims user, ExternalLoginInfo externalLogin, string email, bool isFirst = false)
         {
-            if (!isFirst)
+            var newClaims = new List<Claim>();
+
+            void AddClaim(Claim claim)
             {
-                return TaskHelper.True;
+                newClaims.Add(claim);
+
+                user.Claims.Add(claim);
             }
-
-            return MakeIdentityOperation(() => userManager.AddClaimAsync(user, new Claim(SquidexClaimTypes.Permissions, Permissions.Admin)));
-        }
-
-        private IUser CreateUser(ExternalLoginInfo externalLogin, string email)
-        {
-            var user = userFactory.Create(email);
 
             foreach (var squidexClaim in externalLogin.Principal.GetSquidexClaims())
             {
-                user.AddClaim(squidexClaim);
+                AddClaim(squidexClaim);
             }
 
             if (!user.HasPictureUrl())
             {
-                user.SetPictureUrl(GravatarHelper.CreatePictureUrl(email));
+                AddClaim(new Claim(SquidexClaimTypes.PictureUrl, GravatarHelper.CreatePictureUrl(email)));
             }
 
             if (!user.HasDisplayName())
             {
-                user.SetDisplayName(email);
+                AddClaim(new Claim(SquidexClaimTypes.DisplayName, email));
             }
 
-            return user;
+            if (isFirst)
+            {
+                AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.Admin));
+            }
+
+            return MakeIdentityOperation(() => userManager.SyncClaimsAsync(user.Identity, newClaims));
         }
 
         private IActionResult RedirectToLogoutUrl(LogoutRequest context)

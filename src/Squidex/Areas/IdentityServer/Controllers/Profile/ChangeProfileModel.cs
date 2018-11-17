@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Users;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
@@ -19,5 +20,10 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         public string DisplayName { get; set; }
 
         public bool IsHidden { get; set; }
+
+        public UserValues ToValues()
+        {
+            return new UserValues { Email = Email, DisplayName = DisplayName, Hidden = IsHidden };
+        }
     }
 }

@@ -8,14 +8,28 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Users.MongoDb
 {
-    public sealed class MongoRoleStore : MongoRepositoryBase<MongoRole>, IRoleStore<IRole>, IRoleFactory
+    public sealed class MongoRoleStore : MongoRepositoryBase<IdentityRole>, IRoleStore<IdentityRole>
     {
+        static MongoRoleStore()
+        {
+            BsonClassMap.RegisterClassMap<IdentityRole<string>>(cm =>
+            {
+                cm.AutoMap();
+
+                cm.MapMember(x => x.Id).SetSerializer(new StringSerializer(BsonType.ObjectId));
+                cm.UnmapMember(x => x.ConcurrencyStamp);
+            });
+        }
+
         public MongoRoleStore(IMongoDatabase database)
             : base(database)
         {
@@ -26,10 +40,10 @@ namespace Squidex.Domain.Users.MongoDb
             return "Identity_Roles";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<MongoRole> collection, CancellationToken ct = default(CancellationToken))
+        protected override Task SetupCollectionAsync(IMongoCollection<IdentityRole> collection, CancellationToken ct = default(CancellationToken))
         {
             return collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoRole>(Index.Ascending(x => x.NormalizedName), new CreateIndexOptions { Unique = true }), cancellationToken: ct);
+                new CreateIndexModel<IdentityRole>(Index.Ascending(x => x.NormalizedName), new CreateIndexOptions { Unique = true }), cancellationToken: ct);
         }
 
         protected override MongoCollectionSettings CollectionSettings()
@@ -41,67 +55,67 @@ namespace Squidex.Domain.Users.MongoDb
         {
         }
 
-        public IRole Create(string name)
+        public IdentityRole Create(string name)
         {
-            return new MongoRole { Name = name };
+            return new IdentityRole { Name = name };
         }
 
-        public async Task<IRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
+        public async Task<IdentityRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
         {
             return await Collection.Find(x => x.Id == roleId).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<IRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
+        public async Task<IdentityRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
         {
             return await Collection.Find(x => x.NormalizedName == normalizedRoleName).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<IdentityResult> CreateAsync(IRole role, CancellationToken cancellationToken)
+        public async Task<IdentityResult> CreateAsync(IdentityRole role, CancellationToken cancellationToken)
         {
-            await Collection.InsertOneAsync((MongoRole)role, null, cancellationToken);
+            await Collection.InsertOneAsync(role, null, cancellationToken);
 
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> UpdateAsync(IRole role, CancellationToken cancellationToken)
+        public async Task<IdentityResult> UpdateAsync(IdentityRole role, CancellationToken cancellationToken)
         {
-            await Collection.ReplaceOneAsync(x => x.Id == ((MongoRole)role).Id, (MongoRole)role, null, cancellationToken);
+            await Collection.ReplaceOneAsync(x => x.Id == role.Id, role, null, cancellationToken);
 
             return IdentityResult.Success;
         }
 
-        public async Task<IdentityResult> DeleteAsync(IRole role, CancellationToken cancellationToken)
+        public async Task<IdentityResult> DeleteAsync(IdentityRole role, CancellationToken cancellationToken)
         {
-            await Collection.DeleteOneAsync(x => x.Id == ((MongoRole)role).Id, null, cancellationToken);
+            await Collection.DeleteOneAsync(x => x.Id == role.Id, null, cancellationToken);
 
             return IdentityResult.Success;
         }
 
-        public Task<string> GetRoleIdAsync(IRole role, CancellationToken cancellationToken)
+        public Task<string> GetRoleIdAsync(IdentityRole role, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoRole)role).Id);
+            return Task.FromResult(role.Id);
         }
 
-        public Task<string> GetRoleNameAsync(IRole role, CancellationToken cancellationToken)
+        public Task<string> GetRoleNameAsync(IdentityRole role, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoRole)role).Name);
+            return Task.FromResult(role.Name);
         }
 
-        public Task<string> GetNormalizedRoleNameAsync(IRole role, CancellationToken cancellationToken)
+        public Task<string> GetNormalizedRoleNameAsync(IdentityRole role, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoRole)role).NormalizedName);
+            return Task.FromResult(role.NormalizedName);
         }
 
-        public Task SetRoleNameAsync(IRole role, string roleName, CancellationToken cancellationToken)
+        public Task SetRoleNameAsync(IdentityRole role, string roleName, CancellationToken cancellationToken)
         {
-            ((MongoRole)role).Name = roleName;
+            role.Name = roleName;
 
             return TaskHelper.Done;
         }
 
-        public Task SetNormalizedRoleNameAsync(IRole role, string normalizedName, CancellationToken cancellationToken)
+        public Task SetNormalizedRoleNameAsync(IdentityRole role, string normalizedName, CancellationToken cancellationToken)
         {
-            ((MongoRole)role).NormalizedName = normalizedName;
+            role.NormalizedName = normalizedName;
 
             return TaskHelper.Done;
         }

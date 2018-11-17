@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Ben.Diagnostics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,8 +40,6 @@ namespace Squidex
         public void Configure(IApplicationBuilder app)
         {
             app.ApplicationServices.LogConfiguration();
-
-            app.UseBlockingDetection();
 
             app.UseMyHealthCheck();
             app.UseMyRobotsTxt();

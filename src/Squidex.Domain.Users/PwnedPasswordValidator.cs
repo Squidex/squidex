@@ -11,11 +11,10 @@ using Microsoft.AspNetCore.Identity;
 using SharpPwned.NET;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
-using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Users
 {
-    public sealed class PwnedPasswordValidator : IPasswordValidator<IUser>
+    public sealed class PwnedPasswordValidator : IPasswordValidator<IdentityUser>
     {
         private const string ErrorCode = "PwnedError";
         private const string ErrorText = "This password has previously appeared in a data breach and should never be used. If you've ever used it anywhere before, change it!";
@@ -31,7 +30,7 @@ namespace Squidex.Domain.Users
             this.log = log;
         }
 
-        public async Task<IdentityResult> ValidateAsync(UserManager<IUser> manager, IUser user, string password)
+        public async Task<IdentityResult> ValidateAsync(UserManager<IdentityUser> manager, IdentityUser user, string password)
         {
             try
             {
