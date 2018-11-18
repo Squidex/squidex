@@ -28,12 +28,6 @@ namespace Squidex.Areas.Api.Controllers.History.Models
         public string Actor { get; set; }
 
         /// <summary>
-        /// The type of the event.
-        /// </summary>
-        [Required]
-        public string EventType { get; set; }
-
-        /// <summary>
         /// Gets a unique id for the event.
         /// </summary>
         public Guid EventId { get; set; }
@@ -48,9 +42,9 @@ namespace Squidex.Areas.Api.Controllers.History.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static HistoryEventDto FromHistoryEvent(IHistoryEventEntity x)
+        public static HistoryEventDto FromHistoryEvent(ParsedHistoryEvent historyEvent)
         {
-            return SimpleMapper.Map(x, new HistoryEventDto());
+            return SimpleMapper.Map(historyEvent, new HistoryEventDto { EventId = historyEvent.Id });
         }
     }
 }

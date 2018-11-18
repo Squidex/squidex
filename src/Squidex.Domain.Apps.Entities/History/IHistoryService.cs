@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -9,12 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.UsageTracking
+namespace Squidex.Domain.Apps.Entities.History
 {
-    public interface IUsageStore
+    public interface IHistoryService
     {
-        Task TrackUsagesAsync(DateTime date, string key, string category, double count, double elapsedMs);
-
-        Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
+        Task<IReadOnlyList<ParsedHistoryEvent>> QueryByChannelAsync(Guid appId, string channelPrefix, int count);
     }
 }

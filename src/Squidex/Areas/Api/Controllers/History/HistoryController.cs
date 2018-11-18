@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.History.Models;
-using Squidex.Domain.Apps.Entities.History.Repositories;
+using Squidex.Domain.Apps.Entities.History;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 using Squidex.Shared;
@@ -22,12 +22,12 @@ namespace Squidex.Areas.Api.Controllers.History
     [ApiExplorerSettings(GroupName = nameof(History))]
     public sealed class HistoryController : ApiController
     {
-        private readonly IHistoryEventRepository historyEventRepository;
+        private readonly IHistoryService historyService;
 
-        public HistoryController(ICommandBus commandBus, IHistoryEventRepository historyEventRepository)
+        public HistoryController(ICommandBus commandBus, IHistoryService historyService)
             : base(commandBus)
         {
-            this.historyEventRepository = historyEventRepository;
+            this.historyService = historyService;
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.History
         [ApiCosts(0.1)]
         public async Task<IActionResult> GetHistory(string app, string channel)
         {
-            var entities = await historyEventRepository.QueryByChannelAsync(AppId, channel, 100);
+            var entities = await historyService.QueryByChannelAsync(AppId, channel, 100);
 
             var response = entities.Select(HistoryEventDto.FromHistoryEvent).ToList();
 

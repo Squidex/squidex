@@ -51,7 +51,6 @@ namespace Squidex.Config.Domain
                         .As<IHealthCheck>();
 
                     services.AddSingletonAs(c => new GetEventStore(connection, eventStorePrefix, eventStoreProjectionHost))
-                        .As<IInitializable>()
                         .As<IEventStore>();
                 }
             });

@@ -58,12 +58,16 @@ namespace Squidex.Config
         {
             services.AddSingleton(typeof(T), factory);
 
+            RegisterDefaults<T>(services);
+
             return new InterfaceRegistrator<T>(services);
         }
 
         public static InterfaceRegistrator<T> AddSingletonAs<T>(this IServiceCollection services, T instance) where T : class
         {
             services.AddSingleton(typeof(T), instance);
+
+            RegisterDefaults<T>(services);
 
             return new InterfaceRegistrator<T>(services);
         }
@@ -72,7 +76,17 @@ namespace Squidex.Config
         {
             services.AddSingleton<T, T>();
 
+            RegisterDefaults<T>(services);
+
             return new InterfaceRegistrator<T>(services);
+        }
+
+        private static void RegisterDefaults<T>(IServiceCollection services) where T : class
+        {
+            if (typeof(T).GetInterfaces().Contains(typeof(IInitializable)))
+            {
+                services.AddSingleton(typeof(IInitializable), c => c.GetRequiredService<T>());
+            }
         }
 
         public static T GetOptionalValue<T>(this IConfiguration config, string path, T defaultValue = default(T))

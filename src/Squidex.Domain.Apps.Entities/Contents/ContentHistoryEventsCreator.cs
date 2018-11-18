@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 "scheduled to change status of {[Schema]} content to {[Status]}.");
         }
 
-        protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
+        protected override Task<HistoryEvent> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
             var channel = $"contents.{@event.Headers.AggregateId()}";
 

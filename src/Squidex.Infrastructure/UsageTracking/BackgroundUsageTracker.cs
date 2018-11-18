@@ -19,19 +19,22 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
     {
+        public const string CounterTotalCalls = "TotalCalls";
+        public const string CounterTotalElapsedMs = "TotalElapsedMs";
+
         private const string FallbackCategory = "*";
         private const int Intervall = 60 * 1000;
-        private readonly IUsageStore usageStore;
+        private readonly IUsageRepository usageRepository;
         private readonly ISemanticLog log;
         private readonly CompletionTimer timer;
         private ConcurrentDictionary<(string Key, string Category), Usage> usages = new ConcurrentDictionary<(string Key, string Category), Usage>();
 
-        public BackgroundUsageTracker(IUsageStore usageStore, ISemanticLog log)
+        public BackgroundUsageTracker(IUsageRepository usageRepository, ISemanticLog log)
         {
-            Guard.NotNull(usageStore, nameof(usageStore));
+            Guard.NotNull(usageRepository, nameof(usageRepository));
             Guard.NotNull(log, nameof(log));
 
-            this.usageStore = usageStore;
+            this.usageRepository = usageRepository;
 
             this.log = log;
 
@@ -61,13 +64,29 @@ namespace Squidex.Infrastructure.UsageTracking
 
                 var localUsages = Interlocked.Exchange(ref usages, new ConcurrentDictionary<(string Key, string Category), Usage>());
 
-                await Task.WhenAll(localUsages.Select(x =>
-                    usageStore.TrackUsagesAsync(
-                        today,
-                        x.Key.Key,
-                        x.Key.Category,
-                        x.Value.Count,
-                        x.Value.ElapsedMs)));
+                if (localUsages.Count > 0)
+                {
+                    var updates = new UsageUpdate[localUsages.Count];
+                    var updateIndex = 0;
+
+                    foreach (var kvp in localUsages)
+                    {
+                        var counters = new Counters
+                        {
+                            [CounterTotalCalls] = kvp.Value.Count,
+                            [CounterTotalElapsedMs] = kvp.Value.ElapsedMs
+                        };
+
+                        updates[updateIndex].Key = kvp.Key.Key;
+                        updates[updateIndex].Category = kvp.Key.Category;
+                        updates[updateIndex].Counters = counters;
+                        updates[updateIndex].Date = today;
+
+                        updateIndex++;
+                    }
+
+                    await usageRepository.TrackUsagesAsync(updates);
+                }
             }
             catch (Exception ex)
             {
@@ -99,7 +118,7 @@ namespace Squidex.Infrastructure.UsageTracking
 
             ThrowIfDisposed();
 
-            var usagesFlat = await usageStore.QueryAsync(key, fromDate, toDate);
+            var usagesFlat = await usageRepository.QueryAsync(key, fromDate, toDate);
             var usagesByCategory = usagesFlat.GroupBy(x => CleanCategory(x.Category)).ToDictionary(x => x.Key, x => x.ToList());
 
             var result = new Dictionary<string, IReadOnlyList<DateUsage>>();
@@ -129,7 +148,16 @@ namespace Squidex.Infrastructure.UsageTracking
                     {
                         var stored = usagesDictionary.GetOrDefault(date);
 
-                        enriched.Add(new DateUsage(date, stored?.TotalCount ?? 0, stored?.TotalElapsedMs ?? 0));
+                        var totalCount = 0L;
+                        var totalElapsedMs = 0L;
+
+                        if (stored != null)
+                        {
+                            totalCount = (long)stored.Counters.Get(CounterTotalCalls);
+                            totalElapsedMs = (long)stored.Counters.Get(CounterTotalElapsedMs);
+                        }
+
+                        enriched.Add(new DateUsage(date, totalCount, totalElapsedMs));
                     }
 
                     result[category] = enriched;
@@ -148,9 +176,9 @@ namespace Squidex.Infrastructure.UsageTracking
             var dateFrom = new DateTime(date.Year, date.Month, 1);
             var dateTo = dateFrom.AddMonths(1).AddDays(-1);
 
-            var originalUsages = await usageStore.QueryAsync(key, dateFrom, dateTo);
+            var originalUsages = await usageRepository.QueryAsync(key, dateFrom, dateTo);
 
-            return originalUsages.Sum(x => x.TotalCount);
+            return originalUsages.Sum(x => (long)x.Counters.Get(CounterTotalCalls));
         }
 
         private static string CleanCategory(string category)

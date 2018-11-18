@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 "deleted field {[Field]} of schema {[Name]}.");
         }
 
-        protected override Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event)
+        protected override Task<HistoryEvent> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
             if (@event.Payload is SchemaEvent schemaEvent)
             {
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 return Task.FromResult(result);
             }
 
-            return Task.FromResult<HistoryEventToStore>(null);
+            return Task.FromResult<HistoryEvent>(null);
         }
     }
 }

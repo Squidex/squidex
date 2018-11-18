@@ -1,20 +1,20 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using System.Threading.Tasks;
-using MongoDB.Driver;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.UsageTracking;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public partial class MongoAssetStatsRepository
+    public partial class DefaultAssetStatsRepository
     {
         public string Name
         {
@@ -46,34 +46,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             return UpdateSizeAsync(@event.AppId.Id, headers.Timestamp().ToDateTimeUtc().Date, -@event.DeletedSize, -1);
         }
 
-        private async Task UpdateSizeAsync(Guid appId, DateTime date, long size, long count)
+        private Task UpdateSizeAsync(Guid appId, DateTime date, long size, long count)
         {
-            var id = $"{appId}_{date:yyyy-MM-dd}";
-
-            var assetStatsEntity =
-                await Collection.Find(x => x.Id == id)
-                    .FirstOrDefaultAsync();
-
-            if (assetStatsEntity == null)
+            var counters = new Counters
             {
-                var lastEntity =
-                    await Collection.Find(x => x.AssetId == appId).SortByDescending(x => x.Date)
-                        .FirstOrDefaultAsync();
+                [CounterTotalSize] = size,
+                [CounterTotalCount] = count
+            };
 
-                assetStatsEntity = new MongoAssetStatsEntity
-                {
-                    Id = id,
-                    Date = date,
-                    AssetId = appId,
-                    TotalSize = lastEntity?.TotalSize ?? 0,
-                    TotalCount = lastEntity?.TotalCount ?? 0
-                };
-            }
+            var key = appId.ToString();
 
-            assetStatsEntity.TotalSize += size;
-            assetStatsEntity.TotalCount += count;
-
-            await Collection.ReplaceOneAsync(x => x.Id == id, assetStatsEntity, Upsert);
+            return Task.WhenAll(
+                usageStore.TrackUsagesAsync(new UsageUpdate(date, key, Category, counters)),
+                usageStore.TrackUsagesAsync(new UsageUpdate(SummaryDate, key, Category, counters)));
         }
     }
 }

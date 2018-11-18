@@ -55,8 +55,7 @@ namespace Squidex.Config.Domain
                     if (enabled)
                     {
                         services.AddSingletonAs(c => new RabbitMqEventConsumer(c.GetRequiredService<JsonSerializerSettings>(), name, publisherConfig, exchange, eventsFilter))
-                            .As<IEventConsumer>()
-                            .As<IInitializable>();
+                            .As<IEventConsumer>();
                     }
                 }
                 else

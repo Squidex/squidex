@@ -6,18 +6,23 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.History
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public interface IHistoryEventEntity : IEntity
+    public sealed class AssetStats
     {
-        Guid EventId { get; }
+        public DateTime Date { get; }
 
-        RefToken Actor { get; }
+        public long TotalCount { get; }
 
-        string Message { get; }
+        public long TotalSize { get; }
 
-        long Version { get; }
+        public AssetStats(DateTime date, long totalCount, long totalSize)
+        {
+            Date = date;
+
+            TotalCount = totalCount;
+            TotalSize = totalSize;
+        }
     }
 }

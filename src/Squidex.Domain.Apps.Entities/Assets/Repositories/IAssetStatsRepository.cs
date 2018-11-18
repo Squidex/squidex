@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
 {
     public interface IAssetStatsRepository
     {
-        Task<IReadOnlyList<IAssetStatsEntity>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate);
+        Task<IReadOnlyList<AssetStats>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate);
 
         Task<long> GetTotalSizeAsync(Guid appId);
     }

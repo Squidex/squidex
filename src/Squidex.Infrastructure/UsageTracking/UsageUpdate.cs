@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -9,21 +9,21 @@ using System;
 
 namespace Squidex.Infrastructure.UsageTracking
 {
-    public sealed class StoredUsage
+    public struct UsageUpdate
     {
-        public string Category { get; }
+        public DateTime Date;
 
-        public DateTime Date { get; }
+        public string Key;
 
-        public Counters Counters { get;  }
+        public string Category;
 
-        public StoredUsage(string category, DateTime date, Counters counters)
+        public Counters Counters;
+
+        public UsageUpdate(DateTime date, string key, string category, Counters counters)
         {
-            Guard.NotNull(counters, nameof(counters));
-
+            Key = key;
             Category = category;
             Counters = counters;
-
             Date = date;
         }
     }

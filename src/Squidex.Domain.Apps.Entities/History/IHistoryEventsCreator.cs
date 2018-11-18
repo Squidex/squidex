@@ -15,6 +15,6 @@ namespace Squidex.Domain.Apps.Entities.History
     {
         IReadOnlyDictionary<string, string> Texts { get; }
 
-        Task<HistoryEventToStore> CreateEventAsync(Envelope<IEvent> @event);
+        Task<HistoryEvent> CreateEventAsync(Envelope<IEvent> @event);
     }
 }

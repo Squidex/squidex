@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public class BackgroundUsageTrackerTests
     {
-        private readonly IUsageStore usageStore = A.Fake<IUsageStore>();
+        private readonly IUsageRepository usageStore = A.Fake<IUsageRepository>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly BackgroundUsageTracker sut;
 
@@ -57,10 +57,10 @@ namespace Squidex.Infrastructure.UsageTracking
 
             IReadOnlyList<StoredUsage> originalData = new List<StoredUsage>
             {
-                new StoredUsage("category1", date.AddDays(1), 10, 15),
-                new StoredUsage("category1", date.AddDays(3), 13, 18),
-                new StoredUsage("category1", date.AddDays(5), 15, 20),
-                new StoredUsage("category1", date.AddDays(7), 17, 22)
+                new StoredUsage("category1", date.AddDays(1), Counters(10, 15)),
+                new StoredUsage("category1", date.AddDays(3), Counters(13, 18)),
+                new StoredUsage("category1", date.AddDays(5), Counters(15, 20)),
+                new StoredUsage("category1", date.AddDays(7), Counters(17, 22))
             };
 
             A.CallTo(() => usageStore.QueryAsync("MyKey1", new DateTime(2016, 1, 1), new DateTime(2016, 1, 31)))
@@ -79,11 +79,11 @@ namespace Squidex.Infrastructure.UsageTracking
 
             var originalData = new List<StoredUsage>
             {
-                new StoredUsage("MyCategory1", f.AddDays(1), 10, 15),
-                new StoredUsage("MyCategory1", f.AddDays(3), 13, 18),
-                new StoredUsage("MyCategory1", f.AddDays(4), 15, 20),
-                new StoredUsage(null, f.AddDays(0), 17, 22),
-                new StoredUsage(null, f.AddDays(2), 11, 14)
+                new StoredUsage("MyCategory1", f.AddDays(1), Counters(10, 15)),
+                new StoredUsage("MyCategory1", f.AddDays(3), Counters(13, 18)),
+                new StoredUsage("MyCategory1", f.AddDays(4), Counters(15, 20)),
+                new StoredUsage(null, f.AddDays(0), Counters(17, 22)),
+                new StoredUsage(null, f.AddDays(2), Counters(11, 14))
             };
 
             A.CallTo(() => usageStore.QueryAsync("MyKey1", f, t))
@@ -149,7 +149,8 @@ namespace Squidex.Infrastructure.UsageTracking
             sut.Next();
             sut.Dispose();
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(A<DateTime>.Ignored, A<string>.Ignored, A<string>.Ignored, A<double>.Ignored, A<double>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>.Ignored))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -164,17 +165,37 @@ namespace Squidex.Infrastructure.UsageTracking
 
             await sut.TrackAsync("MyKey3", "MyCategory1", 0.3, 4000);
             await sut.TrackAsync("MyKey3", "MyCategory1", 0.1, 5000);
+
             await sut.TrackAsync("MyKey3", null, 0.5, 2000);
             await sut.TrackAsync("MyKey3", null, 0.5, 6000);
+
+            UsageUpdate[] updates = null;
+
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>.Ignored))
+                .Invokes((UsageUpdate[] u) => updates = u);
 
             sut.Next();
             sut.Dispose();
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(today, "MyKey1", "MyCategory1", 1.0, 1000)).MustHaveHappened();
-            A.CallTo(() => usageStore.TrackUsagesAsync(today, "MyKey2", "MyCategory1", 1.5, 5000)).MustHaveHappened();
-            A.CallTo(() => usageStore.TrackUsagesAsync(today, "MyKey3", "MyCategory1", 0.4, 9000)).MustHaveHappened();
+            updates.Should().BeEquivalentTo(new[]
+            {
+                new UsageUpdate(today, "MyKey1", "MyCategory1", Counters(1.0, 1000)),
+                new UsageUpdate(today, "MyKey2", "MyCategory1", Counters(1.5, 5000)),
+                new UsageUpdate(today, "MyKey3", "MyCategory1", Counters(0.4, 9000)),
+                new UsageUpdate(today, "MyKey3", "*", Counters(1, 8000))
+            }, o => o.ComparingByMembers<UsageUpdate>());
 
-            A.CallTo(() => usageStore.TrackUsagesAsync(today, "MyKey3", "*", 1.0, 8000)).MustHaveHappened();
+            A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>.Ignored))
+                .MustHaveHappened();
+        }
+
+        private static Counters Counters(double count, long ms)
+        {
+            return new Counters
+            {
+                [BackgroundUsageTracker.CounterTotalCalls] = count,
+                [BackgroundUsageTracker.CounterTotalElapsedMs] = ms
+            };
         }
     }
 }

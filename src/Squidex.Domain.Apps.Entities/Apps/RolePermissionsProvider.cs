@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var schemas = await appProvider.GetSchemasAsync(app.Id);
 
-            var schemaNames = new List<string>(); ;
+            var schemaNames = new List<string>();
 
             schemaNames.Add(Permission.Any);
             schemaNames.AddRange(schemas.Select(x => x.Name));

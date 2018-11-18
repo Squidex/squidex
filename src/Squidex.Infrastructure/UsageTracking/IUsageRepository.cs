@@ -6,15 +6,15 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Infrastructure.UsageTracking
 {
-    public interface IAssetStatsEntity
+    public interface IUsageRepository
     {
-        DateTime Date { get; }
+        Task TrackUsagesAsync(params UsageUpdate[] updates);
 
-        long TotalSize { get; }
-
-        long TotalCount { get; }
+        Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
     }
 }

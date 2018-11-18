@@ -13,8 +13,10 @@ namespace Squidex.Domain.Apps.Entities.History.Repositories
 {
     public interface IHistoryEventRepository
     {
-        Task<IReadOnlyList<IHistoryEventEntity>> QueryByChannelAsync(Guid appId, string channelPrefix, int count);
+        Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(Guid appId, string channelPrefix, int count);
 
-        Task RemoveAsync(Guid appId);
+        Task InsertAsync(HistoryEvent item);
+
+        Task ClearAsync();
     }
 }

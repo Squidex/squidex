@@ -24,6 +24,7 @@ using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
@@ -72,11 +73,17 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetQueryService>()
                 .As<IAssetQueryService>();
 
+            services.AddSingletonAs<DefaultAssetStatsRepository>()
+                .As<IAssetStatsRepository>();
+
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
 
             services.AddSingletonAs<ContentVersionLoader>()
                 .As<IContentVersionLoader>();
+
+            services.AddSingletonAs<HistoryService>()
+                .As<IHistoryService>();
 
             services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();

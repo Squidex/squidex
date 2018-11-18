@@ -63,50 +63,35 @@ namespace Squidex.Config.Domain
                         .As<IHealthCheck>();
 
                     services.AddSingletonAs<MongoMigrationStatus>()
-                        .As<IMigrationStatus>()
-                        .As<IInitializable>();
+                        .As<IMigrationStatus>();
 
                     services.AddSingletonAs<MongoPersistedGrantStore>()
-                        .As<IPersistedGrantStore>()
-                        .As<IInitializable>();
+                        .As<IPersistedGrantStore>();
 
-                    services.AddSingletonAs<MongoUsageStore>()
-                        .As<IUsageStore>()
-                        .As<IInitializable>();
+                    services.AddSingletonAs<MongoUsageRepository>()
+                        .As<IUsageRepository>();
 
                     services.AddSingletonAs<MongoRuleEventRepository>()
-                        .As<IRuleEventRepository>()
-                        .As<IInitializable>();
+                        .As<IRuleEventRepository>();
+
+                    services.AddSingletonAs<MongoRoleStore>()
+                        .As<IRoleStore<IdentityRole>>();
+
+                    services.AddSingletonAs<MongoHistoryEventRepository>()
+                        .As<IHistoryEventRepository>();
 
                     services.AddSingletonAs<MongoUserStore>()
                         .As<IUserStore<IdentityUser>>()
-                        .As<IUserFactory>()
-                        .As<IInitializable>();
-
-                    services.AddSingletonAs<MongoRoleStore>()
-                        .As<IRoleStore<IdentityRole>>()
-                        .As<IInitializable>();
-
-                    services.AddSingletonAs<MongoHistoryEventRepository>()
-                        .As<IHistoryEventRepository>()
-                        .As<IEventConsumer>()
-                        .As<IInitializable>();
-
-                    services.AddSingletonAs<MongoAssetStatsRepository>()
-                        .As<IAssetStatsRepository>()
-                        .As<IEventConsumer>()
-                        .As<IInitializable>();
+                        .As<IUserFactory>();
 
                     services.AddSingletonAs<MongoAssetRepository>()
                         .As<IAssetRepository>()
-                        .As<ISnapshotStore<AssetState, Guid>>()
-                        .As<IInitializable>();
+                        .As<ISnapshotStore<AssetState, Guid>>();
 
                     services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetService<IAppProvider>()))
                         .As<IContentRepository>()
                         .As<ISnapshotStore<ContentState, Guid>>()
-                        .As<IEventConsumer>()
-                        .As<IInitializable>();
+                        .As<IEventConsumer>();
 
                     services.AddTransientAs<ConvertOldSnapshotStores>()
                         .As<IMigration>();

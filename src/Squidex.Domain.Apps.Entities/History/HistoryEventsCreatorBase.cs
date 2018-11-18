@@ -50,23 +50,23 @@ namespace Squidex.Domain.Apps.Entities.History
             return texts.ContainsKey(message);
         }
 
-        protected HistoryEventToStore ForEvent(IEvent @event, string channel)
+        protected HistoryEvent ForEvent(IEvent @event, string channel)
         {
             var message = typeNameRegistry.GetName(@event.GetType());
 
-            return new HistoryEventToStore(channel, message);
+            return new HistoryEvent(channel, message);
         }
 
-        public Task<HistoryEventToStore> CreateEventAsync(Envelope<IEvent> @event)
+        public Task<HistoryEvent> CreateEventAsync(Envelope<IEvent> @event)
         {
             if (HasEventText(@event.Payload))
             {
                 return CreateEventCoreAsync(@event);
             }
 
-            return Task.FromResult<HistoryEventToStore>(null);
+            return Task.FromResult<HistoryEvent>(null);
         }
 
-        protected abstract Task<HistoryEventToStore> CreateEventCoreAsync(Envelope<IEvent> @event);
+        protected abstract Task<HistoryEvent> CreateEventCoreAsync(Envelope<IEvent> @event);
     }
 }

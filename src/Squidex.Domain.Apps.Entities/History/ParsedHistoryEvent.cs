@@ -8,49 +8,38 @@
 using System;
 using System.Collections.Generic;
 using NodaTime;
-using Squidex.Domain.Apps.Entities.History;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.MongoDb.History
+namespace Squidex.Domain.Apps.Entities.History
 {
-    internal sealed class ParsedHistoryEvent : IHistoryEventEntity
+    public sealed class ParsedHistoryEvent
     {
-        private readonly MongoHistoryEventEntity inner;
+        private readonly HistoryEvent item;
         private readonly Lazy<string> message;
 
         public Guid Id
         {
-            get { return inner.Id; }
-        }
-
-        public Guid EventId
-        {
-            get { return inner.Id; }
+            get { return item.Id; }
         }
 
         public Instant Created
         {
-            get { return inner.Created; }
-        }
-
-        public Instant LastModified
-        {
-            get { return inner.LastModified; }
+            get { return item.Created; }
         }
 
         public RefToken Actor
         {
-            get { return inner.Actor; }
+            get { return item.Actor; }
         }
 
         public long Version
         {
-            get { return inner.Version; }
+            get { return item.Version; }
         }
 
         public string Channel
         {
-            get { return inner.Channel; }
+            get { return item.Channel; }
         }
 
         public string Message
@@ -58,15 +47,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
             get { return message.Value; }
         }
 
-        public ParsedHistoryEvent(MongoHistoryEventEntity inner, IReadOnlyDictionary<string, string> texts)
+        public ParsedHistoryEvent(HistoryEvent item, IReadOnlyDictionary<string, string> texts)
         {
-            this.inner = inner;
+            this.item = item;
 
             message = new Lazy<string>(() =>
             {
-                var result = texts[inner.Message];
+                var result = texts[item.Message];
 
-                foreach (var kvp in inner.Parameters)
+                foreach (var kvp in item.Parameters)
                 {
                     result = result.Replace("[" + kvp.Key + "]", kvp.Value);
                 }

@@ -33,10 +33,6 @@ namespace Squidex.Infrastructure.UsageTracking
 
         [BsonRequired]
         [BsonElement]
-        public double TotalCount { get; set; }
-
-        [BsonRequired]
-        [BsonElement]
-        public double TotalElapsedMs { get; set; }
+        public Counters Counters { get; set; } = new Counters();
     }
 }
