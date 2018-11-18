@@ -11,13 +11,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.UsageTracking;
 
 #pragma warning disable CS0649
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public partial class DefaultAssetStatsRepository : IAssetStatsRepository
+    public partial class AssetStatsRepository : IAssetStatsRepository, IEventConsumer
     {
         private const string Category = "Default";
         private const string CounterTotalCount = "TotalAssets";
@@ -25,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private static readonly DateTime SummaryDate;
         private readonly IUsageRepository usageStore;
 
-        public DefaultAssetStatsRepository(IUsageRepository usageStore)
+        public AssetStatsRepository(IUsageRepository usageStore)
         {
             Guard.NotNull(usageStore, nameof(usageStore));
 

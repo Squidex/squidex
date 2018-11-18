@@ -43,6 +43,7 @@ using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Pipeline;
 using Squidex.Pipeline.CommandMiddlewares;
@@ -61,6 +62,14 @@ namespace Squidex.Config.Domain
                     exposeSourceUrl))
                 .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>();
 
+            services.AddSingletonAs<HistoryService>()
+                .As<IEventConsumer>()
+                .As<IHistoryService>();
+
+            services.AddSingletonAs<AssetStatsRepository>()
+                .As<IEventConsumer>()
+                .As<IAssetStatsRepository>();
+
             services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();
 
@@ -73,17 +82,11 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetQueryService>()
                 .As<IAssetQueryService>();
 
-            services.AddSingletonAs<DefaultAssetStatsRepository>()
-                .As<IAssetStatsRepository>();
-
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
 
             services.AddSingletonAs<ContentVersionLoader>()
                 .As<IContentVersionLoader>();
-
-            services.AddSingletonAs<HistoryService>()
-                .As<IHistoryService>();
 
             services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();

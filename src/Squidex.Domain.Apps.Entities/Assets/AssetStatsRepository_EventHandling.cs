@@ -10,11 +10,12 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public partial class DefaultAssetStatsRepository
+    public partial class AssetStatsRepository
     {
         public string Name
         {
@@ -24,6 +25,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         public string EventsFilter
         {
             get { return "^asset-"; }
+        }
+
+        public Task ClearAsync()
+        {
+            return TaskHelper.Done;
         }
 
         public Task On(Envelope<IEvent> @event)

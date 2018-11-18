@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NodaTime;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -22,7 +21,6 @@ namespace Squidex.Domain.Apps.Entities.History
         private readonly Dictionary<string, string> texts = new Dictionary<string, string>();
         private readonly List<IHistoryEventsCreator> creators;
         private readonly IHistoryEventRepository repository;
-        private readonly IClock clock;
 
         public string Name
         {
@@ -34,13 +32,11 @@ namespace Squidex.Domain.Apps.Entities.History
             get { return ".*"; }
         }
 
-        public HistoryService(IHistoryEventRepository repository, IEnumerable<IHistoryEventsCreator> creators, IClock clock)
+        public HistoryService(IHistoryEventRepository repository, IEnumerable<IHistoryEventsCreator> creators)
         {
             Guard.NotNull(repository, nameof(repository));
-            Guard.NotNull(clock, nameof(clock));
             Guard.NotNull(creators, nameof(creators));
 
-            this.clock = clock;
             this.creators = creators.ToList();
 
             foreach (var creator in this.creators)
@@ -66,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.History
 
                     historyEvent.Actor = appEvent.Actor;
                     historyEvent.AppId = appEvent.AppId.Id;
-                    historyEvent.Created = clock.GetCurrentInstant();
+                    historyEvent.Created = @event.Headers.Timestamp();
                     historyEvent.Version = @event.Headers.EventStreamNumber();
 
                     await repository.InsertAsync(historyEvent);
