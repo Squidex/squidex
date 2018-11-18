@@ -40,7 +40,7 @@ namespace Squidex.Pipeline.Robots
 
         private static bool CanServeRequest(HttpRequest request)
         {
-            return request.Method == "GET" && string.IsNullOrEmpty(request.Path);
+            return HttpMethods.IsGet(request.Method) && string.IsNullOrEmpty(request.Path);
         }
     }
 }

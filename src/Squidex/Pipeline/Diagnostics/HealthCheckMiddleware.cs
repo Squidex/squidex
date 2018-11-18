@@ -43,7 +43,7 @@ namespace Squidex.Pipeline.Diagnostics
                     var checks = await Task.WhenAll(healthChecks.Select(x => MakeHealthCheckAsync(x.Key, x.Value, cts.Token)));
 
                     context.Response.StatusCode = 200;
-                    context.Response.Headers.Add("content-type", "application/json");
+                    context.Response.Headers.Add("Content-Type", "application/json");
 
                     if (checks.Any(x => !x.Result.IsHealthy))
                     {
@@ -63,7 +63,7 @@ namespace Squidex.Pipeline.Diagnostics
 
         private static bool CanServeRequest(HttpRequest request)
         {
-            return request.Method == "GET" && (request.Path == "/" || string.IsNullOrEmpty(request.Path));
+            return HttpMethods.IsGet(request.Method) && (request.Path == "/" || string.IsNullOrEmpty(request.Path));
         }
 
         private static string GetName(IHealthCheck check)

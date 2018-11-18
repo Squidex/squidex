@@ -7,7 +7,6 @@
 
 using System;
 using IdentityServer4.Stores;
-using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,7 +33,6 @@ using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
-using Squidex.Shared.Users;
 
 namespace Squidex.Config.Domain
 {
@@ -63,10 +61,6 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs<MongoDBHealthCheck>()
                         .As<IHealthCheck>();
-
-                    services.AddSingletonAs<MongoXmlRepository>()
-                        .As<IXmlRepository>()
-                        .As<IInitializable>();
 
                     services.AddSingletonAs<MongoMigrationStatus>()
                         .As<IMigrationStatus>()

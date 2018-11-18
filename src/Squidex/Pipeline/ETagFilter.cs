@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -19,7 +20,7 @@ namespace Squidex.Pipeline
 
             var httpContext = context.HttpContext;
 
-            if (httpContext.Request.Method == "GET" &&
+            if (HttpMethods.IsGet(httpContext.Request.Method) &&
                 httpContext.Request.Headers.TryGetValue("If-None-Match", out var noneMatch) &&
                 httpContext.Response.StatusCode == 200 &&
                 httpContext.Response.Headers.TryGetValue("ETag", out var etag) &&

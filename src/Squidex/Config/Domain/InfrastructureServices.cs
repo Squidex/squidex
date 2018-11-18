@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
@@ -52,6 +53,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<DefaultUserResolver>()
                 .As<IUserResolver>();
+
+            services.AddSingletonAs<DefaultXmlRepository>()
+                .As<IXmlRepository>();
 
             services.AddSingletonAs<AssetUserPictureStore>()
                 .As<IUserPictureStore>();
