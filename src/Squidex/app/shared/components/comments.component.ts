@@ -26,7 +26,7 @@ import {
     templateUrl: './comments.component.html'
 })
 export class CommentsComponent implements OnDestroy, OnInit {
-    private timer: Subscription;
+    private timerSubscription: Subscription;
 
     public state: CommentsState;
 
@@ -47,13 +47,15 @@ export class CommentsComponent implements OnDestroy, OnInit {
     }
 
     public ngOnDestroy() {
-        this.timer.unsubscribe();
+        this.timerSubscription.unsubscribe();
     }
 
     public ngOnInit() {
         this.state = new CommentsState(this.appsState, this.commentsId, this.commentsService, this.dialogs);
 
-        this.timer = timer(0, 4000).pipe(switchMap(() => this.state.load()), onErrorResumeNext()).subscribe();
+        this.timerSubscription =
+            timer(0, 4000).pipe(switchMap(() => this.state.load().pipe(onErrorResumeNext())))
+                .subscribe();
     }
 
     public delete(comment: CommentDto) {

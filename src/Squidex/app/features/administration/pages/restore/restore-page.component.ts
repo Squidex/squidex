@@ -8,7 +8,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Subscription, timer } from 'rxjs';
-import { filter, switchMap } from 'rxjs/operators';
+import { filter, onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import {
     AuthService,
@@ -43,7 +43,7 @@ export class RestorePageComponent implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.timerSubscription =
-            timer(0, 2000).pipe(switchMap(() => this.backupsService.getRestore()), filter(x => !!x))
+            timer(0, 2000).pipe(switchMap(() => this.backupsService.getRestore().pipe(onErrorResumeNext())), filter(x => !!x))
                 .subscribe(dto => {
                     this.restoreJob = dto!;
                 });

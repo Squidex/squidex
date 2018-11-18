@@ -8,7 +8,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { merge, Observable, timer } from 'rxjs';
-import { delay, switchMap } from 'rxjs/operators';
+import { delay, onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import {
     allParams,
@@ -51,7 +51,7 @@ export class ContentHistoryComponent {
             timer(0, 10000),
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000))
         ).pipe(
-            switchMap(() => this.historyService.getHistory(this.appsState.appName, this.channel)));
+            switchMap(() => this.historyService.getHistory(this.appsState.appName, this.channel).pipe(onErrorResumeNext())));
 
     constructor(
         private readonly appsState: AppsState,

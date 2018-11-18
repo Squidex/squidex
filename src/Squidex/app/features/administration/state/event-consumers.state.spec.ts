@@ -53,11 +53,11 @@ describe('EventConsumersState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
-    it('should show notification on load error when silent is true', () => {
+    it('should show notification on load error when silent is false', () => {
         eventConsumersService.setup(x => x.getEventConsumers())
             .returns(() => throwError({}));
 
-        eventConsumersState.load(true, true).pipe(onErrorResumeNext()).subscribe();
+        eventConsumersState.load(true, false).pipe(onErrorResumeNext()).subscribe();
 
         expect().nothing();
 
