@@ -15,7 +15,7 @@ using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public partial class AssetStatsRepository
+    public partial class AssetUsageTracker
     {
         public string Name
         {

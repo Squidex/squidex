@@ -18,7 +18,7 @@ using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public partial class AssetStatsRepository : IAssetStatsRepository, IEventConsumer
+    public partial class AssetUsageTracker : IAssetUsageTracker, IEventConsumer
     {
         private const string Category = "Default";
         private const string CounterTotalCount = "TotalAssets";
@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private static readonly DateTime SummaryDate;
         private readonly IUsageRepository usageStore;
 
-        public AssetStatsRepository(IUsageRepository usageStore)
+        public AssetUsageTracker(IUsageRepository usageStore)
         {
             Guard.NotNull(usageStore, nameof(usageStore));
 

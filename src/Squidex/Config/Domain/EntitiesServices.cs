@@ -66,9 +66,9 @@ namespace Squidex.Config.Domain
                 .As<IEventConsumer>()
                 .As<IHistoryService>();
 
-            services.AddSingletonAs<AssetStatsRepository>()
+            services.AddSingletonAs<AssetUsageTracker>()
                 .As<IEventConsumer>()
-                .As<IAssetStatsRepository>();
+                .As<IAssetUsageTracker>();
 
             services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();

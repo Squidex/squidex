@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
     public sealed class AssetsController : ApiController
     {
         private readonly IAssetQueryService assetQuery;
-        private readonly IAssetStatsRepository assetStatsRepository;
+        private readonly IAssetUsageTracker assetStatsRepository;
         private readonly IAppPlansProvider appPlanProvider;
         private readonly IOptions<MyContentsControllerOptions> controllerOptions;
         private readonly ITagService tagService;
@@ -44,7 +44,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         public AssetsController(
             ICommandBus commandBus,
             IAssetQueryService assetQuery,
-            IAssetStatsRepository assetStatsRepository,
+            IAssetUsageTracker assetStatsRepository,
             IAppPlansProvider appPlanProvider,
             IOptions<AssetOptions> assetOptions,
             IOptions<MyContentsControllerOptions> controllerOptions,

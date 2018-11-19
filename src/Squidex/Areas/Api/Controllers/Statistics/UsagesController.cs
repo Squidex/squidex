@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
 using Squidex.Domain.Apps.Entities.Apps.Services;
-using Squidex.Domain.Apps.Entities.Assets.Repositories;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
@@ -28,13 +28,13 @@ namespace Squidex.Areas.Api.Controllers.Statistics
     {
         private readonly IUsageTracker usageTracker;
         private readonly IAppPlansProvider appPlanProvider;
-        private readonly IAssetStatsRepository assetStatsRepository;
+        private readonly IAssetUsageTracker assetStatsRepository;
 
         public UsagesController(
             ICommandBus commandBus,
             IUsageTracker usageTracker,
             IAppPlansProvider appPlanProvider,
-            IAssetStatsRepository assetStatsRepository)
+            IAssetUsageTracker assetStatsRepository)
             : base(commandBus)
         {
             this.usageTracker = usageTracker;

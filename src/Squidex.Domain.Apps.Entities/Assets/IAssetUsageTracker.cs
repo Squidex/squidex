@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squidex.Domain.Apps.Entities.Assets.Repositories
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public interface IAssetStatsRepository
+    public interface IAssetUsageTracker
     {
         Task<IReadOnlyList<AssetStats>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate);
 
