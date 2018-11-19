@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Linq;
+using FakeItEasy;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -18,14 +20,22 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 {
     public class FieldConvertersTests
     {
+        private readonly IAssetUrlGenerator assetUrlGenerator = A.Fake<IAssetUrlGenerator>();
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
-        private readonly RootField<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);
+        private readonly RootField<JsonFieldProperties> jsonField = Fields.Json(1, "1", Partitioning.Invariant);
         private readonly RootField<StringFieldProperties> stringLanguageField = Fields.String(1, "1", Partitioning.Language);
         private readonly RootField<StringFieldProperties> stringInvariantField = Fields.String(1, "1", Partitioning.Invariant);
-        private readonly RootField<JsonFieldProperties> jsonField = Fields.Json(1, "1", Partitioning.Invariant);
+        private readonly RootField<NumberFieldProperties> numberField = Fields.Number(1, "1", Partitioning.Invariant);
+        private readonly RootField<AssetsFieldProperties> assetsField = Fields.Assets(1, "1", Partitioning.Invariant);
         private readonly RootField<ArrayFieldProperties> arrayField = Fields.Array(1, "1", Partitioning.Invariant,
             Fields.Number(1, "field1"),
             Fields.Number(2, "field2").Hide());
+
+        public FieldConvertersTests()
+        {
+            A.CallTo(() => assetUrlGenerator.GenerateUrl(A<string>.Ignored))
+                .ReturnsLazily(ctx => $"url/to/{ctx.GetArgument<string>(0)}");
+        }
 
         [Fact]
         public void Should_filter_for_value_conversion()
@@ -405,6 +415,70 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var result = FieldConverters.FilterLanguages(languagesConfig, null)(source, stringInvariantField);
 
             Assert.Same(source, result);
+        }
+
+        [Fact]
+        public void Should_convert_asset_ids_to_urls()
+        {
+            var source =
+                new ContentFieldData()
+                    .AddValue("iv", new JArray("1", "2"));
+
+            var expected =
+                new ContentFieldData()
+                    .AddValue("iv", new JArray("url/to/1", "url/to/2"));
+
+            var rtesult = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "1" }), assetUrlGenerator)(source, assetsField);
+
+            Assert.Equal(expected, source);
+        }
+
+        [Fact]
+        public void Should_convert_asset_ids_to_urls_for_wildcard_fields()
+        {
+            var source =
+                new ContentFieldData()
+                    .AddValue("iv", new JArray("1", "2"));
+
+            var expected =
+                new ContentFieldData()
+                    .AddValue("iv", new JArray("url/to/1", "url/to/2"));
+
+            var rtesult = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "*" }), assetUrlGenerator)(source, assetsField);
+
+            Assert.Equal(expected, source);
+        }
+
+        [Fact]
+        public void Should_not_convert_asset_ids_to_urls_when_field_does_not_match()
+        {
+            var source =
+                new ContentFieldData()
+                    .AddValue("iv", new JArray("1", "2"));
+
+            var expected =
+                new ContentFieldData()
+                    .AddValue("iv", new JArray("1", "2"));
+
+            var rtesult = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "2" }), assetUrlGenerator)(source, assetsField);
+
+            Assert.Equal(expected, source);
+        }
+
+        [Fact]
+        public void Should_not_convert_asset_ids_to_urls_when_field_is_specified()
+        {
+            var source =
+                new ContentFieldData()
+                    .AddValue("iv", new JArray("1", "2"));
+
+            var expected =
+                new ContentFieldData()
+                    .AddValue("iv", new JArray("1", "2"));
+
+            var rtesult = FieldConverters.ResolveAssetUrls(null, assetUrlGenerator)(source, assetsField);
+
+            Assert.Equal(expected, source);
         }
     }
 }

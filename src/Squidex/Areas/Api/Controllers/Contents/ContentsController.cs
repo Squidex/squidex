@@ -61,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLQuery query)
         {
-            var result = await graphQl.QueryAsync(Context().Base, query);
+            var result = await graphQl.QueryAsync(Context(), query);
 
             if (result.HasError)
             {
@@ -92,7 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLQuery[] batch)
         {
-            var result = await graphQl.QueryAsync(Context().Base, batch);
+            var result = await graphQl.QueryAsync(Context(), batch);
 
             if (result.HasError)
             {
@@ -124,14 +124,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(2)]
         public async Task<IActionResult> GetContents(string app, string name, [FromQuery] bool archived = false, [FromQuery] string ids = null)
         {
-            var context = Context().WithArchived(archived).WithSchemaName(name);
+            var context = Context().WithArchived(archived);
 
-            var result = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
+            var result = await contentQuery.QueryAsync(context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 
             var response = new ContentsDto
             {
                 Total = result.Total,
-                Items = result.Take(200).Select(x => ContentDto.FromContent(x, context.Base)).ToArray()
+                Items = result.Take(200).Select(x => ContentDto.FromContent(x, context)).ToArray()
             };
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
@@ -163,10 +163,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string name, Guid id)
         {
-            var context = Context().WithSchemaName(name);
-            var content = await contentQuery.FindContentAsync(context, id);
+            var context = Context();
+            var content = await contentQuery.FindContentAsync(context, name, id);
 
-            var response = ContentDto.FromContent(content, context.Base);
+            var response = ContentDto.FromContent(content, context);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
@@ -199,10 +199,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string app, string name, Guid id, int version)
         {
-            var context = Context().WithSchemaName(name);
-            var content = await contentQuery.FindContentAsync(context, id, version);
+            var context = Context();
+            var content = await contentQuery.FindContentAsync(context, name, id, version);
 
-            var response = ContentDto.FromContent(content, context.Base);
+            var response = ContentDto.FromContent(content, context);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
@@ -235,7 +235,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context().WithSchemaName(name));
+            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
 
             var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
 
@@ -269,7 +269,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context().WithSchemaName(name));
+            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
 
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned(), AsDraft = asDraft };
             var context = await CommandBus.PublishAsync(command);
@@ -302,7 +302,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context().WithSchemaName(name));
+            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
 
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned(), AsDraft = asDraft };
             var context = await CommandBus.PublishAsync(command);
@@ -334,7 +334,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PublishContent(string app, string name, Guid id, string dueTime = null)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context().WithSchemaName(name));
+            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
 
             var command = CreateCommand(id, Status.Published, dueTime);
 
@@ -364,7 +364,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> UnpublishContent(string app, string name, Guid id, string dueTime = null)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context().WithSchemaName(name));
+            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
 
             var command = CreateCommand(id, Status.Draft, dueTime);
 
@@ -394,7 +394,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> ArchiveContent(string app, string name, Guid id, string dueTime = null)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context().WithSchemaName(name));
+            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
 
             var command = CreateCommand(id, Status.Archived, dueTime);
 
@@ -424,7 +424,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> RestoreContent(string app, string name, Guid id, string dueTime = null)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context().WithSchemaName(name));
+            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
 
             var command = CreateCommand(id, Status.Draft, dueTime);
 
@@ -453,7 +453,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> DiscardChanges(string app, string name, Guid id)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context().WithSchemaName(name));
+            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
 
             var command = new DiscardChanges { ContentId = id };
 
@@ -481,7 +481,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContent(string app, string name, Guid id)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context().WithSchemaName(name));
+            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
 
             var command = new DeleteContent { ContentId = id };
 
@@ -507,11 +507,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
             return new ChangeContentStatus { Status = status, ContentId = id, DueTime = dt };
         }
 
-        private ContentQueryContext Context()
+        private QueryContext Context()
         {
-            return new ContentQueryContext(QueryContext.Create(App, User)
-                .WithLanguages(Request.Headers["X-Languages"]))
+            return QueryContext.Create(App, User)
+                .WithAssetFieldsToResolve(Request.Headers["X-AssetFields"])
                 .WithFlatten(Request.Headers.ContainsKey("X-Flatten"))
+                .WithLanguages(Request.Headers["X-Languages"])
                 .WithUnpublished(Request.Headers.ContainsKey("X-Unpublished"));
         }
     }

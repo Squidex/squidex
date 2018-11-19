@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (content == null)
             {
-                content = await contentQuery.FindContentAsync(new ContentQueryContext(context).WithSchemaId(schemaId), id);
+                content = await contentQuery.FindContentAsync(context, schemaId.ToString(), id);
 
                 if (content != null)
                 {
@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task<IResultList<IContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
         {
-            var result = await contentQuery.QueryAsync(new ContentQueryContext(context).WithSchemaName(schemaIdOrName), Q.Empty.WithODataQuery(query));
+            var result = await contentQuery.QueryAsync(context, schemaIdOrName, Q.Empty.WithODataQuery(query));
 
             foreach (var content in result)
             {
@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (notLoadedContents.Count > 0)
             {
-                var result = await contentQuery.QueryAsync(new ContentQueryContext(context).WithSchemaId(schemaId), Q.Empty.WithIds(notLoadedContents));
+                var result = await contentQuery.QueryAsync(context, schemaId.ToString(), Q.Empty.WithIds(notLoadedContents));
 
                 foreach (var content in result)
                 {

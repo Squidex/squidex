@@ -63,6 +63,37 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
+        public static FieldConverter ResolveAssetUrls(ISet<string> fields, IAssetUrlGenerator urlGenerator)
+        {
+            if (fields?.Any() != true)
+            {
+                return (data, field) => data;
+            }
+
+            var isAll = fields.First() == "*";
+
+            return (data, field) =>
+            {
+                if (field is IField<AssetsFieldProperties> assetField && (isAll || fields.Contains(field.Name)))
+                {
+                    foreach (var partition in data)
+                    {
+                        if (partition.Value is JArray array)
+                        {
+                            for (var i = 0; i < array.Count; i++)
+                            {
+                                var id = array[i].ToString();
+
+                                array[i] = urlGenerator.GenerateUrl(id);
+                            }
+                        }
+                    }
+                }
+
+                return data;
+            };
+        }
+
         public static FieldConverter ResolveInvariant(LanguagesConfig config)
         {
             var codeForInvariant = InvariantPartitioning.Instance.Master.Key;

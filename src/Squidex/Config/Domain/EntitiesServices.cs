@@ -13,6 +13,7 @@ using Migrate_01;
 using Migrate_01.Migrations;
 using Orleans;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Tags;
@@ -60,7 +61,7 @@ namespace Squidex.Config.Domain
                     c.GetRequiredService<IOptions<MyUrlsOptions>>(),
                     c.GetRequiredService<IAssetStore>(),
                     exposeSourceUrl))
-                .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>();
+                .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>().As<IAssetUrlGenerator>();
 
             services.AddSingletonAs<HistoryService>()
                 .As<IEventConsumer>()

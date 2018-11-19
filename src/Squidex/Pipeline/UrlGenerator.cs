@@ -8,6 +8,7 @@
 using System;
 using Microsoft.Extensions.Options;
 using Squidex.Config;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -19,7 +20,7 @@ using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Pipeline
 {
-    public sealed class UrlGenerator : IGraphQLUrlGenerator, IRuleUrlGenerator
+    public sealed class UrlGenerator : IGraphQLUrlGenerator, IRuleUrlGenerator, IAssetUrlGenerator
     {
         private readonly IAssetStore assetStore;
         private readonly MyUrlsOptions urlsOptions;
@@ -42,6 +43,11 @@ namespace Squidex.Pipeline
             }
 
             return urlsOptions.BuildUrl($"api/assets/{asset.Id}?version={asset.Version}&width=100&mode=Max");
+        }
+
+        public string GenerateUrl(string assetId)
+        {
+            return urlsOptions.BuildUrl($"api/assets/{assetId}");
         }
 
         public string GenerateAssetUrl(IAppEntity app, IAssetEntity asset)

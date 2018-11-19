@@ -40,12 +40,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IContentRepository contentRepository;
         private readonly IContentVersionLoader contentVersionLoader;
         private readonly IAppProvider appProvider;
+        private readonly IAssetUrlGenerator assetUrlGenerator;
         private readonly IScriptEngine scriptEngine;
         private readonly ContentOptions options;
         private readonly EdmModelBuilder modelBuilder;
 
         public ContentQueryService(
             IAppProvider appProvider,
+            IAssetUrlGenerator assetUrlGenerator,
             IContentRepository contentRepository,
             IContentVersionLoader contentVersionLoader,
             IScriptEngine scriptEngine,
@@ -53,6 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             EdmModelBuilder modelBuilder)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(assetUrlGenerator, nameof(assetUrlGenerator));
             Guard.NotNull(contentRepository, nameof(contentRepository));
             Guard.NotNull(contentVersionLoader, nameof(contentVersionLoader));
             Guard.NotNull(modelBuilder, nameof(modelBuilder));
@@ -60,6 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
 
             this.appProvider = appProvider;
+            this.assetUrlGenerator = assetUrlGenerator;
             this.contentRepository = contentRepository;
             this.contentVersionLoader = contentVersionLoader;
             this.modelBuilder = modelBuilder;
@@ -67,66 +71,66 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.scriptEngine = scriptEngine;
         }
 
-        public Task ThrowIfSchemaNotExistsAsync(ContentQueryContext context)
+        public Task ThrowIfSchemaNotExistsAsync(QueryContext context, string schemaIdOrName)
         {
-            return GetSchemaAsync(context);
+            return GetSchemaAsync(context, schemaIdOrName);
         }
 
-        public async Task<IContentEntity> FindContentAsync(ContentQueryContext context, Guid id, long version = -1)
+        public async Task<IContentEntity> FindContentAsync(QueryContext context, string schemaIdOrName, Guid id, long version = -1)
         {
             Guard.NotNull(context, nameof(context));
 
-            var schema = await GetSchemaAsync(context);
+            var schema = await GetSchemaAsync(context, schemaIdOrName);
 
-            CheckPermission(schema, context.Base.User);
+            CheckPermission(schema, context.User);
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
                 var isVersioned = version > EtagVersion.Empty;
 
-                var status = GetFindStatus(context.Base);
+                var status = GetFindStatus(context);
 
                 var content =
                     isVersioned ?
                     await FindContentByVersionAsync(id, version) :
-                    await FindContentAsync(context.Base, id, status, schema);
+                    await FindContentAsync(context, id, status, schema);
 
-                if (content == null || (content.Status != Status.Published && !context.Base.IsFrontendClient) || content.SchemaId.Id != schema.Id)
+                if (content == null || (content.Status != Status.Published && !context.IsFrontendClient) || content.SchemaId.Id != schema.Id)
                 {
                     throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
                 }
 
-                return Transform(context.Base, schema, true, content);
+                return Transform(context, schema, true, content);
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(ContentQueryContext context, Q query)
+        public async Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, string schemaIdOrName, Q query)
         {
             Guard.NotNull(context, nameof(context));
 
-            var schema = await GetSchemaAsync(context);
+            var schema = await GetSchemaAsync(context, schemaIdOrName);
 
-            CheckPermission(schema, context.Base.User);
+            CheckPermission(schema, context.User);
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var status = GetQueryStatus(context.Base);
+                var status = GetQueryStatus(context);
 
                 IResultList<IContentEntity> contents;
 
                 if (query.Ids?.Count > 0)
                 {
-                    contents = await contentRepository.QueryAsync(context.Base.App, schema, status, new HashSet<Guid>(query.Ids));
+                    contents = await contentRepository.QueryAsync(context.App, schema, status, new HashSet<Guid>(query.Ids));
                     contents = Sort(contents, query.Ids);
                 }
                 else
                 {
-                    var parsedQuery = ParseQuery(context.Base, query.ODataQuery, schema);
+                    var parsedQuery = ParseQuery(context, query.ODataQuery, schema);
 
-                    contents = await contentRepository.QueryAsync(context.Base.App, schema, status, parsedQuery);
+                    contents = await contentRepository.QueryAsync(context.App, schema, status, parsedQuery);
                 }
 
-                return Transform(context.Base, schema, true, contents);
+                return Transform(context, schema, true, contents);
             }
         }
 
@@ -183,7 +187,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private static IEnumerable<FieldConverter> GenerateConverters(QueryContext context, bool checkType)
+        private IEnumerable<FieldConverter> GenerateConverters(QueryContext context, bool checkType)
         {
             if (!context.IsFrontendClient)
             {
@@ -207,6 +211,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 if (context.Languages?.Any() == true)
                 {
                     yield return FieldConverters.FilterLanguages(context.App.LanguagesConfig, context.Languages);
+                }
+
+                if (context.AssetFieldsToResolve?.Any() == true)
+                {
+                    yield return FieldConverters.ResolveAssetUrls(context.AssetFieldsToResolve,  assetUrlGenerator);
                 }
             }
         }
@@ -244,23 +253,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public async Task<ISchemaEntity> GetSchemaAsync(ContentQueryContext context)
+        public async Task<ISchemaEntity> GetSchemaAsync(QueryContext context, string schemaIdOrName)
         {
             ISchemaEntity schema = null;
 
-            if (Guid.TryParse(context.SchemaIdOrName, out var id))
+            if (Guid.TryParse(schemaIdOrName, out var id))
             {
-                schema = await appProvider.GetSchemaAsync(context.Base.App.Id, id);
+                schema = await appProvider.GetSchemaAsync(context.App.Id, id);
             }
 
             if (schema == null)
             {
-                schema = await appProvider.GetSchemaAsync(context.Base.App.Id, context.SchemaIdOrName);
+                schema = await appProvider.GetSchemaAsync(context.App.Id, schemaIdOrName);
             }
 
             if (schema == null)
             {
-                throw new DomainObjectNotFoundException(context.SchemaIdOrName, typeof(ISchemaEntity));
+                throw new DomainObjectNotFoundException(schemaIdOrName, typeof(ISchemaEntity));
             }
 
             return schema;

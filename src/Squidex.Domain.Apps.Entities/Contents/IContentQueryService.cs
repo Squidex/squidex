@@ -13,10 +13,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentQueryService
     {
-        Task<IResultList<IContentEntity>> QueryAsync(ContentQueryContext context, Q query);
+        Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, string schemaIdOrName, Q query);
 
-        Task<IContentEntity> FindContentAsync(ContentQueryContext context, Guid id, long version = EtagVersion.Any);
+        Task<IContentEntity> FindContentAsync(QueryContext context, string schemaIdOrName, Guid id, long version = EtagVersion.Any);
 
-        Task ThrowIfSchemaNotExistsAsync(ContentQueryContext context);
+        Task ThrowIfSchemaNotExistsAsync(QueryContext context, string schemaIdOrName);
     }
 }

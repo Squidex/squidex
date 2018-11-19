@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -40,6 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly IAppEntity app = A.Fake<IAppEntity>();
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+        private readonly IAssetUrlGenerator urlGenerator = A.Fake<IAssetUrlGenerator>();
         private readonly Guid appId = Guid.NewGuid();
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly Guid contentId = Guid.NewGuid();
@@ -51,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly ClaimsPrincipal user;
         private readonly ClaimsIdentity identity = new ClaimsIdentity();
         private readonly EdmModelBuilder modelBuilder = A.Fake<EdmModelBuilder>();
-        private readonly ContentQueryContext context;
+        private readonly QueryContext context;
         private readonly ContentQueryService sut;
 
         public ContentQueryServiceTests()
@@ -68,9 +70,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => schema.SchemaDef).Returns(new Schema(schemaName));
             A.CallTo(() => schema.ScriptQuery).Returns(script);
 
-            context = new ContentQueryContext(QueryContext.Create(app, user));
+            context = QueryContext.Create(app, user);
 
-            sut = new ContentQueryService(appProvider, contentRepository, contentVersionLoader, scriptEngine, Options.Create(new ContentOptions()), modelBuilder);
+            sut = new ContentQueryService(
+                appProvider,
+                urlGenerator,
+                contentRepository,
+                contentVersionLoader,
+                scriptEngine,
+                Options.Create(new ContentOptions()), modelBuilder);
         }
 
         [Fact]
@@ -78,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchema();
 
-            var result = await sut.GetSchemaAsync(context.WithSchemaId(schemaId));
+            var result = await sut.GetSchemaAsync(context, schemaId.ToString());
 
             Assert.Equal(schema, result);
         }
@@ -88,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchema();
 
-            var result = await sut.GetSchemaAsync(context.WithSchemaName(schemaName));
+            var result = await sut.GetSchemaAsync(context, schemaName);
 
             Assert.Equal(schema, result);
         }
@@ -98,7 +106,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchemaNotFound();
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaAsync(context.WithSchemaName(schemaName)));
+            var ctx = context;
+
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaAsync(ctx, schemaName));
         }
 
         [Fact]
@@ -106,7 +116,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchemaNotFound();
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.ThrowIfSchemaNotExistsAsync(context.WithSchemaName(schemaName)));
+            var ctx = context;
+
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.ThrowIfSchemaNotExistsAsync(ctx, schemaName));
         }
 
         public static IEnumerable<object[]> SingleDataFrontend = new[]
@@ -127,9 +139,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupClaims(false, false);
             SetupSchema();
 
-            var ctx = context.WithSchemaId(schemaId);
+            var ctx = context;
 
-            await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindContentAsync(ctx, contentId));
+            await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindContentAsync(ctx, schemaId.ToString(), contentId));
         }
 
         [Fact]
@@ -141,9 +153,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.FindContentAsync(app, schema, new[] { Status.Published }, contentId))
                 .Returns((IContentEntity)null);
 
-            var ctx = context.WithSchemaId(schemaId);
+            var ctx = context;
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindContentAsync(ctx, contentId));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindContentAsync(ctx, schemaId.ToString(), contentId));
         }
 
         [Theory]
@@ -159,9 +171,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.FindContentAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), contentId))
                 .Returns(content);
 
-            var ctx = context.WithSchemaId(schemaId).WithUnpublished(unpublished);
+            var ctx = context.WithUnpublished(unpublished);
 
-            var result = await sut.FindContentAsync(ctx, contentId);
+            var result = await sut.FindContentAsync(ctx, schemaId.ToString(), contentId);
 
             Assert.Equal(contentTransformed, result.Data);
             Assert.Equal(content.Id, result.Id);
@@ -183,9 +195,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentRepository.FindContentAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), contentId))
                 .Returns(content);
 
-            var ctx = context.WithSchemaId(schemaId).WithUnpublished(unpublished);
+            var ctx = context.WithUnpublished(unpublished);
 
-            var result = await sut.FindContentAsync(ctx, contentId);
+            var result = await sut.FindContentAsync(ctx, schemaId.ToString(), contentId);
 
             Assert.Equal(contentTransformed, result.Data);
             Assert.Equal(content.Id, result.Id);
@@ -206,9 +218,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentVersionLoader.LoadAsync(contentId, 10))
                 .Returns(content);
 
-            var ctx = context.WithSchemaId(schemaId);
+            var ctx = context;
 
-            var result = await sut.FindContentAsync(ctx, contentId, 10);
+            var result = await sut.FindContentAsync(ctx, schemaId.ToString(), contentId, 10);
 
             Assert.Equal(contentTransformed, result.Data);
             Assert.Equal(content.Id, result.Id);
@@ -236,9 +248,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupClaims(false, false);
             SetupSchema();
 
-            var ctx = context.WithSchemaId(schemaId);
+            var ctx = context;
 
-            await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.QueryAsync(ctx, Q.Empty));
+            await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.QueryAsync(ctx, schemaId.ToString(), Q.Empty));
         }
 
         [Theory]
@@ -254,9 +266,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupScripting(contentId);
             SetupContents(status, count, total, content);
 
-            var ctx = context.WithSchemaId(schemaId).WithArchived(archive).WithUnpublished(unpublished);
+            var ctx = context.WithArchived(archive).WithUnpublished(unpublished);
 
-            var result = await sut.QueryAsync(ctx, Q.Empty);
+            var result = await sut.QueryAsync(ctx, schemaId.ToString(), Q.Empty);
 
             Assert.Equal(contentData, result[0].Data);
             Assert.Equal(content.Id, result[0].Id);
@@ -280,9 +292,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupScripting(contentId);
             SetupContents(status, count, total, content);
 
-            var ctx = context.WithSchemaId(schemaId).WithArchived(archive).WithUnpublished(unpublished);
+            var ctx = context.WithArchived(archive).WithUnpublished(unpublished);
 
-            var result = await sut.QueryAsync(ctx, Q.Empty);
+            var result = await sut.QueryAsync(ctx, schemaId.ToString(), Q.Empty);
 
             Assert.Equal(contentData, result[0].Data);
             Assert.Equal(contentId, result[0].Id);
@@ -302,7 +314,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => modelBuilder.BuildEdmModel(schema, app))
                 .Throws(new ODataException());
 
-            return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context.WithSchemaId(schemaId), Q.Empty.WithODataQuery("query")));
+            return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context, schemaId.ToString(), Q.Empty.WithODataQuery("query")));
         }
 
         public static IEnumerable<object[]> ManyIdDataFrontend = new[]
@@ -334,9 +346,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupScripting(ids.ToArray());
             SetupContents(status, total, ids);
 
-            var ctx = context.WithSchemaId(schemaId).WithArchived(archive).WithUnpublished(unpublished);
+            var ctx = context.WithArchived(archive).WithUnpublished(unpublished);
 
-            var result = await sut.QueryAsync(ctx, Q.Empty.WithIds(ids));
+            var result = await sut.QueryAsync(ctx, schemaId.ToString(), Q.Empty.WithIds(ids));
 
             Assert.Equal(ids, result.Select(x => x.Id).ToList());
             Assert.Equal(total, result.Total);
@@ -358,9 +370,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupScripting(ids.ToArray());
             SetupContents(status, total, ids);
 
-            var ctx = context.WithSchemaId(schemaId).WithArchived(archive).WithUnpublished(unpublished);
+            var ctx = context.WithArchived(archive).WithUnpublished(unpublished);
 
-            var result = await sut.QueryAsync(ctx, Q.Empty.WithIds(ids));
+            var result = await sut.QueryAsync(ctx, schemaId.ToString(), Q.Empty.WithIds(ids));
 
             Assert.Equal(ids, result.Select(x => x.Id).ToList());
             Assert.Equal(total, result.Total);

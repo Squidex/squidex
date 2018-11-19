@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -15,6 +16,8 @@ namespace Squidex.Domain.Apps.Entities
 {
     public sealed class QueryContext : Cloneable<QueryContext>
     {
+        private static readonly char[] Separators = { ',', ';' };
+
         public ClaimsPrincipal User { get; private set; }
 
         public IAppEntity App { get; private set; }
@@ -25,7 +28,9 @@ namespace Squidex.Domain.Apps.Entities
 
         public bool Unpublished { get; set; }
 
-        public IEnumerable<Language> Languages { get; private set; }
+        public ISet<string> AssetFieldsToResolve { get; private set; }
+
+        public ISet<Language> Languages { get; private set; }
 
         private QueryContext()
         {
@@ -51,19 +56,45 @@ namespace Squidex.Domain.Apps.Entities
             return Clone(c => c.Flatten = flatten);
         }
 
+        public QueryContext WithAssetFieldsToResolve(IEnumerable<string> fieldNames)
+        {
+            if (fieldNames != null)
+            {
+                return Clone(c =>
+                {
+                    var fields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                    foreach (var part in fieldNames)
+                    {
+                        foreach (var fieldName in part.Split(Separators, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            fields.Add(fieldName.Trim());
+                        }
+                    }
+
+                    c.AssetFieldsToResolve = fields;
+                });
+            }
+
+            return this;
+        }
+
         public QueryContext WithLanguages(IEnumerable<string> languageCodes)
         {
             if (languageCodes != null)
             {
                 return Clone(c =>
                 {
-                    var languages = new List<Language>();
+                    var languages = new HashSet<Language>();
 
-                    foreach (var iso2Code in languageCodes)
+                    foreach (var part in languageCodes)
                     {
-                        if (Language.TryGetLanguage(iso2Code, out var language))
+                        foreach (var iso2Code in part.Split(Separators, StringSplitOptions.RemoveEmptyEntries))
                         {
-                            languages.Add(language);
+                            if (Language.TryGetLanguage(iso2Code.Trim(), out var language))
+                            {
+                                languages.Add(language);
+                            }
                         }
                     }
 
