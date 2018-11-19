@@ -64,11 +64,11 @@ describe('EventConsumersState', () => {
         dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
     });
 
-    it('should not show notification on load error when flag is false', () => {
+    it('should not show notification on load error when silent is true', () => {
         eventConsumersService.setup(x => x.getEventConsumers())
             .returns(() => throwError({}));
 
-        eventConsumersState.load().pipe(onErrorResumeNext()).subscribe();
+        eventConsumersState.load(true, true).pipe(onErrorResumeNext()).subscribe();
 
         expect().nothing();
 

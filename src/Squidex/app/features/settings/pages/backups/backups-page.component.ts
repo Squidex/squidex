@@ -34,7 +34,7 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit() {
-        this.backupsState.load(false, true).pipe(onErrorResumeNext()).subscribe();
+        this.backupsState.load().pipe(onErrorResumeNext()).subscribe();
 
         this.timerSubscription =
             timer(3000, 3000).pipe(switchMap(t => this.backupsState.load(true, true).pipe(onErrorResumeNext())))

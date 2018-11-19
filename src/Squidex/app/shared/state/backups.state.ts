@@ -66,7 +66,7 @@ export class BackupsState extends State<Snapshot> {
                 });
             }),
             catchError(error => {
-                if (silent) {
+                if (!silent) {
                     this.dialogs.notifyError(error);
                 }
 

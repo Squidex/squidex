@@ -63,22 +63,22 @@ describe('BackupsState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
-    it('should show notification on load error when silent is true', () => {
+    it('should show notification on load error when silent is false', () => {
         backupsService.setup(x => x.getBackups(app))
             .returns(() => throwError({}));
 
-        backupsState.load(true, true).pipe(onErrorResumeNext()).subscribe();
+        backupsState.load(true, false).pipe(onErrorResumeNext()).subscribe();
 
         expect().nothing();
 
         dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
     });
 
-    it('should not show notification on load error when flag is false', () => {
+    it('should not show notification on load error when silent is true', () => {
         backupsService.setup(x => x.getBackups(app))
             .returns(() => throwError({}));
 
-        backupsState.load().pipe(onErrorResumeNext()).subscribe();
+        backupsState.load(true, true).pipe(onErrorResumeNext()).subscribe();
 
         expect().nothing();
 
