@@ -35,30 +35,35 @@ namespace Squidex.Infrastructure.UsageTracking
                 new CreateIndexModel<MongoUsage>(Index.Ascending(x => x.Key).Ascending(x => x.Category).Ascending(x => x.Date)), cancellationToken: ct);
         }
 
+        public async Task TrackUsagesAsync(UsageUpdate update)
+        {
+            Guard.NotNull(update, nameof(update));
+
+            if (update.Counters.Count > 0)
+            {
+                var (filter, updateStatement) = CreateOperation(update);
+
+                await Collection.UpdateOneAsync(filter, updateStatement);
+            }
+        }
+
         public async Task TrackUsagesAsync(params UsageUpdate[] updates)
         {
             if (updates.Length == 1)
             {
-                var value = updates[0];
-
-                if (value.Counters.Count > 0)
-                {
-                    var (filter, update) = CreateOperation(value);
-
-                    await Collection.UpdateOneAsync(filter, update, Upsert);
-                }
+                await TrackUsagesAsync(updates[0]);
             }
             else if (updates.Length > 0)
             {
                 var writes = new List<WriteModel<MongoUsage>>();
 
-                foreach (var value in updates)
+                foreach (var update in updates)
                 {
-                    if (value.Counters.Count > 0)
+                    if (update.Counters.Count > 0)
                     {
-                        var (filter, update) = CreateOperation(value);
+                        var (filter, updateStatement) = CreateOperation(update);
 
-                        writes.Add(new UpdateOneModel<MongoUsage>(filter, update) { IsUpsert = true });
+                        writes.Add(new UpdateOneModel<MongoUsage>(filter, updateStatement) { IsUpsert = true });
                     }
                 }
 

@@ -47,7 +47,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var schemas = await appProvider.GetSchemasAsync(AppId);
 
-            var swaggerDocument = await schemasSwaggerGenerator.Generate(App, schemas);
+            var swaggerDocument = await schemasSwaggerGenerator.Generate(HttpContext, App, schemas);
 
             return Content(swaggerDocument.ToJson(), "application/json");
         }

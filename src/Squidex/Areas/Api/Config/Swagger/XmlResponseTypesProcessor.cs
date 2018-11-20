@@ -70,8 +70,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 
         private static void RemoveOkResponse(SwaggerOperation operation)
         {
-            if (operation.Responses.TryGetValue("200", out var response) &&
-                response.Description?.Contains("=>") == true)
+            if (operation.Responses.TryGetValue("200", out var response) && response.Description?.Contains("=>") == true)
             {
                 operation.Responses.Remove("200");
             }

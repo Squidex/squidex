@@ -13,6 +13,7 @@ using NJsonSchema.Generation.TypeMappers;
 using NodaTime;
 using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
+using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Security;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.Rules.Models;
@@ -26,73 +27,72 @@ namespace Squidex.Areas.Api.Config.Swagger
     {
         public static void AddMySwaggerSettings(this IServiceCollection services)
         {
-            services.AddSingleton(typeof(SwaggerSettings<SwaggerGeneratorSettings>), s =>
+            services.AddSingletonAs<RuleActionProcessor>()
+                .As<IDocumentProcessor>();
+
+            services.AddSingletonAs<XmlTagProcessor>()
+                .As<IDocumentProcessor>();
+
+            services.AddSingletonAs<TagByGroupNameProcessor>()
+                .As<IOperationProcessor>();
+
+            services.AddSingletonAs<XmlResponseTypesProcessor>()
+                .As<IOperationProcessor>();
+
+            services.AddSingleton(c =>
             {
-                var urlOptions = s.GetService<IOptions<MyUrlsOptions>>().Value;
+                var settings = new SwaggerDocumentSettings { SchemaType = SchemaType.OpenApi3 };
 
-                var settings = new SwaggerSettings<SwaggerGeneratorSettings>()
-                        .AddAssetODataParams()
-                        .ConfigureNames()
-                        .ConfigurePaths(urlOptions)
-                        .ConfigureSchemaSettings()
-                        .ConfigureIdentity(urlOptions);
+                return new SwaggerDocumentRegistration(settings.DocumentName, generator);
+            }))
 
-                return settings;
+                
+
+            settings.DocumentProcessors.Add(new RuleActionProcessor());
+            settings.DocumentProcessors.Add(new XmlTagProcessor());
+
+            settings.OperationProcessors.Add(new TagByGroupNameProcessor());
+            settings.OperationProcessors.Add(new XmlResponseTypesProcessor());
+
+            services.AddOpenApiDocument(configure =>
+            {
+                var urlOptions = configure.GetService<IOptions<MyUrlsOptions>>().Value;
+
+                configure.AddAssetODataParams();
+                configure.ConfigureNames();
+                configure.ConfigurePaths(urlOptions);
+                configure.ConfigureSchemaSettings();
+                configure.ConfigureIdentity(urlOptions);
             });
 
             services.AddTransient<SchemasSwaggerGenerator>();
         }
 
-        public static SwaggerSettings<T> ConfigureNames<T>(this SwaggerSettings<T> settings) where T : SwaggerGeneratorSettings, new()
+        public static void AddAssetODataParams<T>(this T settings) where T : SwaggerGeneratorSettings
         {
-            settings.GeneratorSettings.Title = "Squidex API";
-            settings.GeneratorSettings.Version = "1.0";
-
-            return settings;
+            settings.OperationProcessors.Add(new ODataQueryParamsProcessor("/apps/{app}/assets", "assets", false));
         }
 
-        public static SwaggerSettings<T> AddAssetODataParams<T>(this SwaggerSettings<T> settings) where T : SwaggerGeneratorSettings, new()
+        public static void ConfigureNames<T>(this T settings) where T : SwaggerGeneratorSettings
         {
-            settings.GeneratorSettings.OperationProcessors.Add(new ODataQueryParamsProcessor("/apps/{app}/assets", "assets", false));
-
-            return settings;
+            settings.Title = "Squidex API";
         }
 
-        public static SwaggerSettings<T> ConfigureIdentity<T>(this SwaggerSettings<T> settings, MyUrlsOptions urlOptions) where T : SwaggerGeneratorSettings, new()
+        public static void ConfigureIdentity<T>(this T settings, MyUrlsOptions urlOptions) where T : SwaggerGeneratorSettings
         {
-            settings.GeneratorSettings.DocumentProcessors.Add(
+            settings.DocumentProcessors.Add(
                 new SecurityDefinitionAppender(
                     Constants.SecurityDefinition, SwaggerHelper.CreateOAuthSchema(urlOptions)));
 
-            settings.GeneratorSettings.OperationProcessors.Add(new ScopesProcessor());
-
-            return settings;
+            settings.OperationProcessors.Add(new ScopesProcessor());
         }
 
-        public static SwaggerSettings<T> ConfigurePaths<T>(this SwaggerSettings<T> settings, MyUrlsOptions urlOptions) where T : SwaggerGeneratorSettings, new()
+        public static void ConfigureSchemaSettings<T>(this T settings) where T : SwaggerGeneratorSettings
         {
-            settings.SwaggerRoute = $"{Constants.ApiPrefix}/swagger/v1/swagger.json";
+            settings.DefaultEnumHandling = EnumHandling.String;
+            settings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase;
 
-            settings.PostProcess = document =>
-            {
-                document.BasePath = Constants.ApiPrefix;
-                document.Info.ExtensionData = new Dictionary<string, object>
-                {
-                    ["x-logo"] = new { url = urlOptions.BuildUrl("images/logo-white.png", false), backgroundColor = "#3f83df" }
-                };
-            };
-
-            settings.MiddlewareBasePath = Constants.ApiPrefix;
-
-            return settings;
-        }
-
-        public static SwaggerSettings<T> ConfigureSchemaSettings<T>(this SwaggerSettings<T> settings) where T : SwaggerGeneratorSettings, new()
-        {
-            settings.GeneratorSettings.DefaultEnumHandling = EnumHandling.String;
-            settings.GeneratorSettings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase;
-
-            settings.GeneratorSettings.TypeMappers = new List<ITypeMapper>
+            settings.TypeMappers = new List<ITypeMapper>
             {
                 new PrimitiveTypeMapper(typeof(Instant), schema =>
                 {
@@ -103,13 +103,11 @@ namespace Squidex.Areas.Api.Config.Swagger
                 new PrimitiveTypeMapper(typeof(RefToken), s => s.Type = JsonObjectType.String)
             };
 
-            settings.GeneratorSettings.DocumentProcessors.Add(new RuleActionProcessor());
-            settings.GeneratorSettings.DocumentProcessors.Add(new XmlTagProcessor());
+            settings.DocumentProcessors.Add(new RuleActionProcessor());
+            settings.DocumentProcessors.Add(new XmlTagProcessor());
 
-            settings.GeneratorSettings.OperationProcessors.Add(new TagByGroupNameProcessor());
-            settings.GeneratorSettings.OperationProcessors.Add(new XmlResponseTypesProcessor());
-
-            return settings;
+            settings.OperationProcessors.Add(new TagByGroupNameProcessor());
+            settings.OperationProcessors.Add(new XmlResponseTypesProcessor());
         }
     }
 }

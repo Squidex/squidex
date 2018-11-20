@@ -14,6 +14,7 @@ using NJsonSchema;
 using NSwag;
 using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
+using Squidex.Areas.Api.Config.Swagger;
 using Squidex.Config;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -24,26 +25,26 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemasSwaggerGenerator
     {
-        private readonly HttpContext context;
-        private readonly SwaggerSettings<SwaggerGeneratorSettings> settings;
         private readonly MyUrlsOptions urlOptions;
+        private readonly SwaggerDocumentSettings settings = new SwaggerDocumentSettings();
         private SwaggerJsonSchemaGenerator schemaGenerator;
-        private JsonSchemaResolver schemaResolver;
         private SwaggerDocument document;
+        private JsonSchemaResolver schemaResolver;
 
-        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings<SwaggerGeneratorSettings> settings, IOptions<MyUrlsOptions> urlOptions)
+        public SchemasSwaggerGenerator(IOptions<MyUrlsOptions> urlOptions)
         {
-            this.context = context.HttpContext;
-            this.settings = settings;
             this.urlOptions = urlOptions.Value;
+
+            settings.ConfigureNames();
+            settings.Conf
         }
 
-        public async Task<SwaggerDocument> Generate(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
+        public async Task<SwaggerDocument> Generate(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas)
         {
-            document = SwaggerHelper.CreateApiDocument(context, urlOptions, app.Name);
+            document = SwaggerHelper.CreateApiDocument(httpContext, urlOptions, app.Name);
 
-            schemaGenerator = new SwaggerJsonSchemaGenerator(settings.GeneratorSettings);
-            schemaResolver = new SwaggerSchemaResolver(document, settings.GeneratorSettings);
+            schemaGenerator = new SwaggerJsonSchemaGenerator(settings);
+            schemaResolver = new SwaggerSchemaResolver(document, settings);
 
             GenerateSchemasOperations(schemas, app);
 

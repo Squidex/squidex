@@ -18,7 +18,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
-    public class ScopesProcessor : IOperationProcessor
+    public sealed class ScopesProcessor : IOperationProcessor
     {
         public Task<bool> ProcessAsync(OperationProcessorContext context)
         {
@@ -28,8 +28,9 @@ namespace Squidex.Areas.Api.Config.Swagger
             }
 
             var authorizeAttributes =
-                context.MethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Union(
-                context.MethodInfo.DeclaringType.GetTypeInfo().GetCustomAttributes(true).OfType<AuthorizeAttribute>()).ToArray();
+                context.MethodInfo.GetCustomAttributes<AuthorizeAttribute>(true).Union(
+                context.MethodInfo.DeclaringType.GetCustomAttributes<AuthorizeAttribute>(true))
+                    .ToArray();
 
             if (authorizeAttributes.Any())
             {

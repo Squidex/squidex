@@ -13,6 +13,8 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public interface IUsageRepository
     {
+        Task TrackUsagesAsync(UsageUpdate update);
+
         Task TrackUsagesAsync(params UsageUpdate[] updates);
 
         Task<IReadOnlyList<StoredUsage>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
