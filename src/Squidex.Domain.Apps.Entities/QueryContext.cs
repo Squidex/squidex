@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public bool Unpublished { get; set; }
 
-        public ISet<string> AssetFieldsToResolve { get; private set; }
+        public ISet<string> AssetUrlsToResolve { get; private set; }
 
         public ISet<Language> Languages { get; private set; }
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities
             return Clone(c => c.Flatten = flatten);
         }
 
-        public QueryContext WithAssetFieldsToResolve(IEnumerable<string> fieldNames)
+        public QueryContext WithAssetUrlsToResolve(IEnumerable<string> fieldNames)
         {
             if (fieldNames != null)
             {
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities
                         }
                     }
 
-                    c.AssetFieldsToResolve = fields;
+                    c.AssetUrlsToResolve = fields;
                 });
             }
 

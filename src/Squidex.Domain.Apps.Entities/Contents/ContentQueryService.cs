@@ -213,9 +213,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     yield return FieldConverters.FilterLanguages(context.App.LanguagesConfig, context.Languages);
                 }
 
-                if (context.AssetFieldsToResolve?.Any() == true)
+                if (context.AssetUrlsToResolve?.Any() == true)
                 {
-                    yield return FieldConverters.ResolveAssetUrls(context.AssetFieldsToResolve,  assetUrlGenerator);
+                    yield return FieldConverters.ResolveAssetUrls(context.AssetUrlsToResolve,  assetUrlGenerator);
                 }
             }
         }

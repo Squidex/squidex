@@ -510,7 +510,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         private QueryContext Context()
         {
             return QueryContext.Create(App, User)
-                .WithAssetFieldsToResolve(Request.Headers["X-AssetFields"])
+                .WithAssetUrlsToResolve(Request.Headers["X-Resolve-Urls"])
                 .WithFlatten(Request.Headers.ContainsKey("X-Flatten"))
                 .WithLanguages(Request.Headers["X-Languages"])
                 .WithUnpublished(Request.Headers.ContainsKey("X-Unpublished"));
