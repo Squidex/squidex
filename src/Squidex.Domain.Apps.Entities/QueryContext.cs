@@ -64,6 +64,8 @@ namespace Squidex.Domain.Apps.Entities
                 {
                     var fields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+                    c.AssetUrlsToResolve?.Foreach(x => fields.Add(x));
+
                     foreach (var part in fieldNames)
                     {
                         foreach (var fieldName in part.Split(Separators, StringSplitOptions.RemoveEmptyEntries))
@@ -86,6 +88,8 @@ namespace Squidex.Domain.Apps.Entities
                 return Clone(c =>
                 {
                     var languages = new HashSet<Language>();
+
+                    c.Languages?.Foreach(x => languages.Add(x));
 
                     foreach (var part in languageCodes)
                     {
