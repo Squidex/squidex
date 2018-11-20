@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             };
         }
 
-        public static FieldConverter ResolveAssetUrls(ISet<string> fields, IAssetUrlGenerator urlGenerator)
+        public static FieldConverter ResolveAssetUrls(IReadOnlyCollection<string> fields, IAssetUrlGenerator urlGenerator)
         {
             if (fields?.Any() != true)
             {

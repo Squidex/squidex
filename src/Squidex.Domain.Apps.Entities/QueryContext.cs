@@ -28,9 +28,9 @@ namespace Squidex.Domain.Apps.Entities
 
         public bool Unpublished { get; set; }
 
-        public ISet<string> AssetUrlsToResolve { get; private set; }
+        public IReadOnlyCollection<string> AssetUrlsToResolve { get; private set; }
 
-        public ISet<Language> Languages { get; private set; }
+        public IReadOnlyCollection<Language> Languages { get; private set; }
 
         private QueryContext()
         {
