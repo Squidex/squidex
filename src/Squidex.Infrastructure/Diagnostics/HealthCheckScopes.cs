@@ -5,16 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Squidex.Infrastructure.Diagnostics
 {
-    public interface IHealthCheck
+    public static class HealthCheckScopes
     {
-        IEnumerable<string> Scopes { get; }
-
-        Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default(CancellationToken));
+        public const string Any = "*";
+        public const string Node = "node";
+        public const string Cluster = "cluster";
     }
 }

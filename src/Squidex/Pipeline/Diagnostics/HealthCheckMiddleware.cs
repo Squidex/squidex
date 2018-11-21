@@ -17,40 +17,46 @@ using Squidex.Infrastructure.Diagnostics;
 
 namespace Squidex.Pipeline.Diagnostics
 {
-    public sealed class HealthCheckMiddleware : IMiddleware
+    public sealed class HealthCheckMiddleware
     {
         private const string Suffix = "HealthCheck";
         private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
 
         private readonly Dictionary<string, IHealthCheck> healthChecks;
         private readonly JsonSerializerSettings serializerSettings;
+        private readonly RequestDelegate next;
+        private readonly List<string> scopes;
 
-        public HealthCheckMiddleware(IEnumerable<IHealthCheck> healthChecks, JsonSerializerSettings serializerSettings)
+        public HealthCheckMiddleware(IEnumerable<IHealthCheck> healthChecks, JsonSerializerSettings serializerSettings, RequestDelegate next, string scopes)
         {
             Guard.NotNull(healthChecks, nameof(healthChecks));
             Guard.NotNull(serializerSettings, nameof(serializerSettings));
 
             this.healthChecks = healthChecks.ToDictionary(GetName);
+            this.next = next;
+            this.scopes = SplitScopes(scopes);
             this.serializerSettings = serializerSettings;
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        public async Task Invoke(HttpContext context)
         {
             if (CanServeRequest(context.Request))
             {
                 using (var cts = new CancellationTokenSource(Timeout))
                 {
-                    var checks = await Task.WhenAll(healthChecks.Select(x => MakeHealthCheckAsync(x.Key, x.Value, cts.Token)));
+                    var matchingChecks = healthChecks.Where(x => CanUseCheck(x.Value));
+
+                    var results = await Task.WhenAll(matchingChecks.Select(x => MakeHealthCheckAsync(x.Key, x.Value, cts.Token)));
 
                     context.Response.StatusCode = 200;
                     context.Response.Headers.Add("Content-Type", "application/json");
 
-                    if (checks.Any(x => !x.Result.IsHealthy))
+                    if (results.Any(x => !x.Result.IsHealthy))
                     {
                         context.Response.StatusCode = 503;
                     }
 
-                    var response = checks.ToDictionary(x => x.Name, x => x.Result);
+                    var response = results.ToDictionary(x => x.Name, x => x.Result);
 
                     await context.Response.WriteAsync(JsonConvert.SerializeObject(new { status = response }, Formatting.Indented, serializerSettings));
                 }
@@ -61,9 +67,19 @@ namespace Squidex.Pipeline.Diagnostics
             }
         }
 
-        private static bool CanServeRequest(HttpRequest request)
+        private bool CanUseCheck(IHealthCheck check)
+        {
+            return scopes.Count == 0 || check.Scopes.Intersect(scopes).Any();
+        }
+
+        private bool CanServeRequest(HttpRequest request)
         {
             return HttpMethods.IsGet(request.Method) && (request.Path == "/" || string.IsNullOrEmpty(request.Path));
+        }
+
+        private static List<string> SplitScopes(string scopes)
+        {
+            return scopes.Split(",").Where(x => x != "*").ToList();
         }
 
         private static string GetName(IHealthCheck check)
