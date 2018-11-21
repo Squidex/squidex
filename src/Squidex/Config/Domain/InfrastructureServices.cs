@@ -42,9 +42,6 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<GCHealthCheck>()
                 .As<IHealthCheck>();
 
-            services.AddSingletonAs<OrleansHealthCheck>()
-                .As<IHealthCheck>();
-
             services.AddSingletonAs<HttpContextAccessor>()
                 .As<IHttpContextAccessor>();
 
