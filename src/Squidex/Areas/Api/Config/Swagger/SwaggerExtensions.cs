@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Config.Swagger
         {
             app.UseSwagger(settings =>
             {
-                settings.Path = $"{Constants.ApiPrefix}/swagger/v1/swagger.json";
+                settings.Path = $"{Constants.ApiPrefix}/swagger/{{documentName}}/swagger.json";
             });
         }
     }

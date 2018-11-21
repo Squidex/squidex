@@ -60,12 +60,10 @@ namespace Squidex.Areas.Api.Config.Swagger
 
         private static async Task AddInternalErrorResponseAsync(OperationProcessorContext context, SwaggerOperation operation)
         {
-            if (operation.Responses.ContainsKey("500"))
+            if (!operation.Responses.ContainsKey("500"))
             {
-                return;
+                operation.AddResponse("500", "Operation failed", await context.SchemaGenerator.GetErrorDtoSchemaAsync(context.SchemaResolver));
             }
-
-            operation.AddResponse("500", "Operation failed", await context.SchemaGenerator.GetErrorDtoSchemaAsync(context.SchemaResolver));
         }
 
         private static void RemoveOkResponse(SwaggerOperation operation)

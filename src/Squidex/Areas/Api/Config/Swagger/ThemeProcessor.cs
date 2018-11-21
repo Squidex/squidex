@@ -15,15 +15,15 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
-    public class LogoProcessor : IDocumentProcessor
+    public sealed class ThemeProcessor : IDocumentProcessor
     {
         private const string Background = "#3f83df";
 
-        private readonly string logo;
+        private readonly string url;
 
-        public LogoProcessor(IOptions<MyUrlsOptions> urlOptions)
+        public ThemeProcessor(IOptions<MyUrlsOptions> urlOptions)
         {
-            logo = urlOptions.Value.BuildUrl("images/logo-white.png", false);
+            url = urlOptions.Value.BuildUrl("images/logo-white.png", false);
         }
 
         public Task ProcessAsync(DocumentProcessorContext context)
@@ -32,7 +32,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 
             context.Document.Info.ExtensionData = new Dictionary<string, object>
             {
-                ["x-logo"] = new { url = logo, backgroundColor = Background }
+                ["x-logo"] = new { url, backgroundColor = Background }
             };
 
             return TaskHelper.Done;

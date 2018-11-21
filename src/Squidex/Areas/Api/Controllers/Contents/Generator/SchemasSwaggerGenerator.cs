@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ using NJsonSchema;
 using NSwag;
 using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
+using NSwag.SwaggerGeneration.Processors;
+using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Areas.Api.Config.Swagger;
 using Squidex.Config;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -31,12 +34,16 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         private SwaggerDocument document;
         private JsonSchemaResolver schemaResolver;
 
-        public SchemasSwaggerGenerator(IOptions<MyUrlsOptions> urlOptions)
+        public SchemasSwaggerGenerator(IOptions<MyUrlsOptions> urlOptions, IEnumerable<IDocumentProcessor> documentProcessors)
         {
             this.urlOptions = urlOptions.Value;
 
-            settings.ConfigureNames();
-            settings.Conf
+            settings.ConfigureSchemaSettings();
+
+            foreach (var processor in documentProcessors)
+            {
+                settings.DocumentProcessors.Add(processor);
+            }
         }
 
         public async Task<SwaggerDocument> Generate(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas)
@@ -49,6 +56,19 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             GenerateSchemasOperations(schemas, app);
 
             await GenerateDefaultErrorsAsync();
+
+            var context =
+                new DocumentProcessorContext(document,
+                    Enumerable.Empty<Type>(),
+                    Enumerable.Empty<Type>(),
+                    schemaResolver,
+                    schemaGenerator,
+                    settings);
+
+            foreach (var processor in settings.DocumentProcessors)
+            {
+                await processor.ProcessAsync(context);
+            }
 
             return document;
         }

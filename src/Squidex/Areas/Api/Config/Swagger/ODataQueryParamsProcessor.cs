@@ -23,6 +23,7 @@ namespace Squidex.Areas.Api.Config.Swagger
         public ODataQueryParamsProcessor(string supportedPath, string entity, bool supportSearch)
         {
             this.entity = entity;
+
             this.supportSearch = supportSearch;
             this.supportedPath = supportedPath;
         }
