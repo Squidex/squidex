@@ -57,7 +57,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Converters
 
         public FieldPropertiesDto Visit(TagsFieldProperties properties)
         {
-            return SimpleMapper.Map(properties, new TagsFieldPropertiesDto());
+            var result = SimpleMapper.Map(properties, new TagsFieldPropertiesDto());
+
+            result.AllowedValues = properties.AllowedValues?.ToArray();
+
+            return result;
         }
 
         public FieldPropertiesDto Visit(AssetsFieldProperties properties)

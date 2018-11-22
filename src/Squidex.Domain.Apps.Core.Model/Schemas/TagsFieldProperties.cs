@@ -6,15 +6,20 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
+using System.Collections.Immutable;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("TagsField")]
     public sealed class TagsFieldProperties : FieldProperties
     {
+        public ImmutableList<string> AllowedValues { get; set; }
+
         public int? MinItems { get; set; }
 
         public int? MaxItems { get; set; }
+
+        public TagsFieldEditor Editor { get; set; }
 
         public TagsFieldNormalization Normalization { get; set; }
 

@@ -104,7 +104,19 @@
 					<sqx-assets-editor [formControl]="control"></sqx-assets-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Tags'">
-					<sqx-tag-editor [formControl]="control"></sqx-tag-editor>
+                    <ng-container [ngSwitch]="field.properties['editor']">
+                        <ng-container *ngSwitchCase="'Tags'">
+                            <sqx-tag-editor [formControl]="control" [placeholder]="field.displayPlaceholder" [suggestions]="field.properties['allowedValues']"></sqx-tag-editor>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Checkboxes'">
+                            <sqx-checkbox-group [formControl]="control" [values]="field.properties['allowedValues']"></sqx-checkbox-group>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Dropdown'">
+                            <select multiple class="form-control" [formControl]="control">
+                                <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
+                            </select>
+                        </ng-container>
+                    </ng-container>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Array'">
 					<sqx-array-editor 

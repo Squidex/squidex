@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             if (field.Properties.AllowedValues != null)
             {
-                yield return new AllowedValuesValidator<double>(field.Properties.AllowedValues.ToArray());
+                yield return new AllowedValuesValidator<double>(field.Properties.AllowedValues);
             }
         }
 
@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             if (field.Properties.AllowedValues != null)
             {
-                yield return new AllowedValuesValidator<string>(field.Properties.AllowedValues.ToArray());
+                yield return new AllowedValuesValidator<string>(field.Properties.AllowedValues);
             }
         }
 
@@ -154,6 +154,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             if (field.Properties.IsRequired || field.Properties.MinItems.HasValue || field.Properties.MaxItems.HasValue)
             {
                 yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
+            }
+
+            if (field.Properties.AllowedValues != null)
+            {
+                yield return new CollectionItemValidator(new AllowedValuesValidator<string>(field.Properties.AllowedValues));
             }
 
             yield return new CollectionItemValidator(new RequiredStringValidator());

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
@@ -14,9 +15,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class AllowedValuesValidator<T> : IValidator
     {
-        private readonly T[] allowedValues;
+        private readonly IEnumerable<T> allowedValues;
 
         public AllowedValuesValidator(params T[] allowedValues)
+            : this((IEnumerable<T>)allowedValues)
+        {
+        }
+
+        public AllowedValuesValidator(IEnumerable<T> allowedValues)
         {
             Guard.NotNull(allowedValues, nameof(allowedValues));
 

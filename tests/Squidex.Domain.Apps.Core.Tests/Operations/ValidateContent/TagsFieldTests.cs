@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -100,6 +101,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must have not more than 1 item(s)." });
+        }
+
+        [Fact]
+        public async Task Should_add_errors_if_value_contains_an_not_allowed_values()
+        {
+            var sut = Field(new TagsFieldProperties { AllowedValues = ImmutableList.Create("tag-2", "tag-3") });
+
+            await sut.ValidateAsync(CreateValue("tag-1", "tag-2", null), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "[1]: Not an allowed value." });
         }
 
         private static JToken CreateValue(params string[] ids)

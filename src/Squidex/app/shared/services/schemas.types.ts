@@ -73,7 +73,7 @@ export function createProperties(fieldType: string, values: Object | null = null
             properties = new StringFieldPropertiesDto('Input');
             break;
         case 'Tags':
-            properties = new TagsFieldPropertiesDto();
+            properties = new TagsFieldPropertiesDto('Tags');
             break;
         default:
             throw 'Invalid properties type';
@@ -302,11 +302,12 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto {
 
     public readonly minItems?: number;
     public readonly maxItems?: number;
+    public readonly allowedValues?: string[];
 
-    constructor(
+    constructor(editor: string,
         props?: Partial<TagsFieldPropertiesDto>
     ) {
-        super('Default', props);
+        super('Tags', props);
     }
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {

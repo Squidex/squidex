@@ -250,6 +250,12 @@ export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorF
             validators.push(Validators.maxLength(properties.maxItems));
         }
 
+        if (properties.allowedValues && properties.allowedValues.length > 0) {
+            const values: (string | null)[] = properties.allowedValues;
+
+            validators.push(ValidatorsEx.validArrayValues(values));
+        }
+
         return validators;
     }
 
