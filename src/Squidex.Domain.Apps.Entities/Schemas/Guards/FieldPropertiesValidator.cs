@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if ((properties.Editor == TagsFieldEditor.Checkboxes || properties.Editor == TagsFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Count == 0))
             {
-                yield return new ValidationError("Chekboxes or dropdown list need allowed values.",
+                yield return new ValidationError("Checkboxes or dropdown list need allowed values.",
                     nameof(properties.AllowedValues));
             }
 

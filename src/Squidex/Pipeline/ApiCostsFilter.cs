@@ -53,7 +53,7 @@ namespace Squidex.Pipeline
                 {
                     var plan = appPlanProvider.GetPlanForApp(appFeature.App);
 
-                    var usage = await usageTracker.GetMonthlyCallsAsync(appFeature.App.Id.ToString(), DateTime.Today);
+                    var usage = await usageTracker.GetMonthlyCallsAsync(appFeature.App.Id, DateTime.Today);
 
                     if (plan.MaxApiCalls >= 0 && usage > plan.MaxApiCalls * 1.1)
                     {
@@ -72,7 +72,7 @@ namespace Squidex.Pipeline
                 {
                     var elapsedMs = watch.Stop();
 
-                    await usageTracker.TrackAsync(appFeature.App.Id.ToString(), context.HttpContext.User.OpenIdClientId(), FilterDefinition.Weight, elapsedMs);
+                    await usageTracker.TrackAsync(appFeature.App.Id, context.HttpContext.User.OpenIdClientId(), FilterDefinition.Weight, elapsedMs);
                 }
             }
             else

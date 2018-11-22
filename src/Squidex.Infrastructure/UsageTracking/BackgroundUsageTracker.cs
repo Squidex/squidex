@@ -96,15 +96,15 @@ namespace Squidex.Infrastructure.UsageTracking
             }
         }
 
-        public Task TrackAsync(string key, string category, double weight, double elapsedMs)
+        public Task TrackAsync(Guid appId, string category, double weight, double elapsedMs)
         {
-            Guard.NotNull(key, nameof(key));
+            var key = GetKey(appId);
 
             ThrowIfDisposed();
 
             if (weight > 0)
             {
-                category = CleanCategory(category);
+                category = GetCategory(category);
 
                 usages.AddOrUpdate((key, category), _ => new Usage(elapsedMs, weight), (k, x) => x.Add(elapsedMs, weight));
             }
@@ -112,14 +112,14 @@ namespace Squidex.Infrastructure.UsageTracking
             return TaskHelper.Done;
         }
 
-        public async Task<IReadOnlyDictionary<string, IReadOnlyList<DateUsage>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
+        public async Task<IReadOnlyDictionary<string, IReadOnlyList<DateUsage>>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate)
         {
-            Guard.NotNull(key, nameof(key));
-
             ThrowIfDisposed();
 
+            var key = GetKey(appId);
+
             var usagesFlat = await usageRepository.QueryAsync(key, fromDate, toDate);
-            var usagesByCategory = usagesFlat.GroupBy(x => CleanCategory(x.Category)).ToDictionary(x => x.Key, x => x.ToList());
+            var usagesByCategory = usagesFlat.GroupBy(x => GetCategory(x.Category)).ToDictionary(x => x.Key, x => x.ToList());
 
             var result = new Dictionary<string, IReadOnlyList<DateUsage>>();
 
@@ -167,11 +167,11 @@ namespace Squidex.Infrastructure.UsageTracking
             return result;
         }
 
-        public async Task<long> GetMonthlyCallsAsync(string key, DateTime date)
+        public async Task<long> GetMonthlyCallsAsync(Guid appId, DateTime date)
         {
-            Guard.NotNull(key, nameof(key));
-
             ThrowIfDisposed();
+
+            var key = GetKey(appId);
 
             var dateFrom = new DateTime(date.Year, date.Month, 1);
             var dateTo = dateFrom.AddMonths(1).AddDays(-1);
@@ -181,9 +181,14 @@ namespace Squidex.Infrastructure.UsageTracking
             return originalUsages.Sum(x => (long)x.Counters.Get(CounterTotalCalls));
         }
 
-        private static string CleanCategory(string category)
+        private static string GetCategory(string category)
         {
             return !string.IsNullOrWhiteSpace(category) ? category.Trim() : "*";
+        }
+
+        private static string GetKey(Guid appId)
+        {
+            return $"{appId}_API";
         }
     }
 }

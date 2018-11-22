@@ -34,7 +34,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public async Task<long> GetTotalSizeAsync(Guid appId)
         {
-            var entries = await usageStore.QueryAsync(appId.ToString(), SummaryDate, SummaryDate);
+            var key = GetKey(appId);
+
+            var entries = await usageStore.QueryAsync(key, SummaryDate, SummaryDate);
 
             return (long)entries.Select(x => x.Counters.Get(CounterTotalSize)).FirstOrDefault();
         }

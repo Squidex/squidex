@@ -14,13 +14,14 @@ using Xunit;
 
 namespace Squidex.Infrastructure.UsageTracking
 {
-    public class ThreadingUsageTrackerTests
+    public class CachingUsageTrackerTests
     {
         private readonly MemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+        private readonly Guid appId = Guid.NewGuid();
         private readonly IUsageTracker inner = A.Fake<IUsageTracker>();
         private readonly IUsageTracker sut;
 
-        public ThreadingUsageTrackerTests()
+        public CachingUsageTrackerTests()
         {
             sut = new CachingUsageTracker(inner, cache);
         }
@@ -28,34 +29,34 @@ namespace Squidex.Infrastructure.UsageTracking
         [Fact]
         public async Task Should_forward_track_call()
         {
-            await sut.TrackAsync("MyKey", "MyCategory", 123, 456);
+            await sut.TrackAsync(appId, "MyCategory", 123, 456);
 
-            A.CallTo(() => inner.TrackAsync("MyKey", "MyCategory", 123, 456))
+            A.CallTo(() => inner.TrackAsync(appId, "MyCategory", 123, 456))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_forward_query_call()
         {
-            await sut.QueryAsync("MyKey", DateTime.MaxValue, DateTime.MinValue);
+            await sut.QueryAsync(appId, DateTime.MaxValue, DateTime.MinValue);
 
-            A.CallTo(() => inner.QueryAsync("MyKey", DateTime.MaxValue, DateTime.MinValue))
+            A.CallTo(() => inner.QueryAsync(appId, DateTime.MaxValue, DateTime.MinValue))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_cache_monthly_usage()
         {
-            A.CallTo(() => inner.GetMonthlyCallsAsync("MyKey", DateTime.Today))
+            A.CallTo(() => inner.GetMonthlyCallsAsync(appId, DateTime.Today))
                 .Returns(100);
 
-            var result1 = await sut.GetMonthlyCallsAsync("MyKey", DateTime.Today);
-            var result2 = await sut.GetMonthlyCallsAsync("MyKey", DateTime.Today);
+            var result1 = await sut.GetMonthlyCallsAsync(appId, DateTime.Today);
+            var result2 = await sut.GetMonthlyCallsAsync(appId, DateTime.Today);
 
             Assert.Equal(100, result1);
             Assert.Equal(100, result2);
 
-            A.CallTo(() => inner.GetMonthlyCallsAsync("MyKey", DateTime.Today))
+            A.CallTo(() => inner.GetMonthlyCallsAsync(appId, DateTime.Today))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
     }

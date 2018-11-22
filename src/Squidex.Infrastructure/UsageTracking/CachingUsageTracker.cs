@@ -25,27 +25,25 @@ namespace Squidex.Infrastructure.UsageTracking
             this.inner = inner;
         }
 
-        public Task<IReadOnlyDictionary<string, IReadOnlyList<DateUsage>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
+        public Task<IReadOnlyDictionary<string, IReadOnlyList<DateUsage>>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate)
         {
-            return inner.QueryAsync(key, fromDate, toDate);
+            return inner.QueryAsync(appId, fromDate, toDate);
         }
 
-        public Task TrackAsync(string key, string category, double weight, double elapsedMs)
+        public Task TrackAsync(Guid appId, string category, double weight, double elapsedMs)
         {
-            return inner.TrackAsync(key, category, weight, elapsedMs);
+            return inner.TrackAsync(appId, category, weight, elapsedMs);
         }
 
-        public Task<long> GetMonthlyCallsAsync(string key, DateTime date)
+        public Task<long> GetMonthlyCallsAsync(Guid appId, DateTime date)
         {
-            Guard.NotNull(key, nameof(key));
-
-            var cacheKey = string.Concat(key, date);
+            var cacheKey = string.Concat(appId, date);
 
             return Cache.GetOrCreateAsync(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
-                return inner.GetMonthlyCallsAsync(key, date);
+                return inner.GetMonthlyCallsAsync(appId, date);
             });
         }
     }
