@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.UsageTracking
     {
         private readonly IUsageRepository usageStore = A.Fake<IUsageRepository>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
-        private readonly Guid appId = Guid.NewGuid();
+        private readonly string key = Guid.NewGuid().ToString();
         private readonly BackgroundUsageTracker sut;
 
         public BackgroundUsageTrackerTests()
@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             sut.Dispose();
 
-            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync(appId, "category1", 1, 1000));
+            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync(key, "category1", 1, 1000));
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             sut.Dispose();
 
-            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.QueryAsync(appId, DateTime.Today, DateTime.Today.AddDays(1)));
+            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.QueryAsync(key, DateTime.Today, DateTime.Today.AddDays(1)));
         }
 
         [Fact]
@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             sut.Dispose();
 
-            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.GetMonthlyCallsAsync(appId, DateTime.Today));
+            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.GetMonthlyCallsAsync(key, DateTime.Today));
         }
 
         [Fact]
@@ -64,10 +64,10 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage("category1", date.AddDays(7), Counters(17, 22))
             };
 
-            A.CallTo(() => usageStore.QueryAsync($"{appId}_API", new DateTime(2016, 1, 1), new DateTime(2016, 1, 31)))
+            A.CallTo(() => usageStore.QueryAsync($"{key}_API", new DateTime(2016, 1, 1), new DateTime(2016, 1, 31)))
                 .Returns(originalData);
 
-            var result = await sut.GetMonthlyCallsAsync(appId, date);
+            var result = await sut.GetMonthlyCallsAsync(key, date);
 
             Assert.Equal(55, result);
         }
@@ -87,10 +87,10 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage(null, f.AddDays(2), Counters(11, 14))
             };
 
-            A.CallTo(() => usageStore.QueryAsync($"{appId}_API", f, t))
+            A.CallTo(() => usageStore.QueryAsync($"{key}_API", f, t))
                 .Returns(originalData);
 
-            var result = await sut.QueryAsync(appId, f, t);
+            var result = await sut.QueryAsync(key, f, t);
 
             var expected = new Dictionary<string, List<DateUsage>>
             {
@@ -121,10 +121,10 @@ namespace Squidex.Infrastructure.UsageTracking
             var f = DateTime.Today;
             var t = DateTime.Today.AddDays(4);
 
-            A.CallTo(() => usageStore.QueryAsync($"{appId}_API", f, t))
+            A.CallTo(() => usageStore.QueryAsync($"{key}_API", f, t))
                 .Returns(new List<StoredUsage>());
 
-            var result = await sut.QueryAsync(appId, f, t);
+            var result = await sut.QueryAsync(key, f, t);
 
             var expected = new Dictionary<string, List<DateUsage>>
             {
@@ -144,8 +144,8 @@ namespace Squidex.Infrastructure.UsageTracking
         [Fact]
         public async Task Should_not_track_if_weight_less_than_zero()
         {
-            await sut.TrackAsync(appId, "MyCategory", -1, 1000);
-            await sut.TrackAsync(appId, "MyCategory", 0, 1000);
+            await sut.TrackAsync(key, "MyCategory", -1, 1000);
+            await sut.TrackAsync(key, "MyCategory", 0, 1000);
 
             sut.Next();
             sut.Dispose();
@@ -157,22 +157,22 @@ namespace Squidex.Infrastructure.UsageTracking
         [Fact]
         public async Task Should_aggregate_and_store_on_dispose()
         {
-            var appId1 = Guid.NewGuid();
-            var appId2 = Guid.NewGuid();
-            var appId3 = Guid.NewGuid();
+            var key1 = Guid.NewGuid().ToString();
+            var key2 = Guid.NewGuid().ToString();
+            var key3 = Guid.NewGuid().ToString();
 
             var today = DateTime.Today;
 
-            await sut.TrackAsync(appId1, "MyCategory1", 1, 1000);
+            await sut.TrackAsync(key1, "MyCategory1", 1, 1000);
 
-            await sut.TrackAsync(appId2, "MyCategory1", 1.0, 2000);
-            await sut.TrackAsync(appId2, "MyCategory1", 0.5, 3000);
+            await sut.TrackAsync(key2, "MyCategory1", 1.0, 2000);
+            await sut.TrackAsync(key2, "MyCategory1", 0.5, 3000);
 
-            await sut.TrackAsync(appId3, "MyCategory1", 0.3, 4000);
-            await sut.TrackAsync(appId3, "MyCategory1", 0.1, 5000);
+            await sut.TrackAsync(key3, "MyCategory1", 0.3, 4000);
+            await sut.TrackAsync(key3, "MyCategory1", 0.1, 5000);
 
-            await sut.TrackAsync(appId3, null, 0.5, 2000);
-            await sut.TrackAsync(appId3, null, 0.5, 6000);
+            await sut.TrackAsync(key3, null, 0.5, 2000);
+            await sut.TrackAsync(key3, null, 0.5, 6000);
 
             UsageUpdate[] updates = null;
 
@@ -184,10 +184,10 @@ namespace Squidex.Infrastructure.UsageTracking
 
             updates.Should().BeEquivalentTo(new[]
             {
-                new UsageUpdate(today, $"{appId1}_API", "MyCategory1", Counters(1.0, 1000)),
-                new UsageUpdate(today, $"{appId2}_API", "MyCategory1", Counters(1.5, 5000)),
-                new UsageUpdate(today, $"{appId3}_API", "MyCategory1", Counters(0.4, 9000)),
-                new UsageUpdate(today, $"{appId3}_API", "*", Counters(1, 8000))
+                new UsageUpdate(today, $"{key1}_API", "MyCategory1", Counters(1.0, 1000)),
+                new UsageUpdate(today, $"{key2}_API", "MyCategory1", Counters(1.5, 5000)),
+                new UsageUpdate(today, $"{key3}_API", "MyCategory1", Counters(0.4, 9000)),
+                new UsageUpdate(today, $"{key3}_API", "*", Counters(1, 8000))
             }, o => o.ComparingByMembers<UsageUpdate>());
 
             A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>.Ignored))

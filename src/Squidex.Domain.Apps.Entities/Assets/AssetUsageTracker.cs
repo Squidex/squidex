@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var enriched = new List<AssetStats>();
 
-            var usagesFlat = await usageStore.QueryAsync(appId.ToString(), fromDate, toDate);
+            var usagesFlat = await usageStore.QueryAsync(GetKey(appId), fromDate, toDate);
 
             for (var date = fromDate; date <= toDate; date = date.AddDays(1))
             {

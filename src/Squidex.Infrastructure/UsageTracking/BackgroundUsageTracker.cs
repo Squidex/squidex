@@ -96,9 +96,9 @@ namespace Squidex.Infrastructure.UsageTracking
             }
         }
 
-        public Task TrackAsync(Guid appId, string category, double weight, double elapsedMs)
+        public Task TrackAsync(string key, string category, double weight, double elapsedMs)
         {
-            var key = GetKey(appId);
+            key = GetKey(key);
 
             ThrowIfDisposed();
 
@@ -112,11 +112,11 @@ namespace Squidex.Infrastructure.UsageTracking
             return TaskHelper.Done;
         }
 
-        public async Task<IReadOnlyDictionary<string, IReadOnlyList<DateUsage>>> QueryAsync(Guid appId, DateTime fromDate, DateTime toDate)
+        public async Task<IReadOnlyDictionary<string, IReadOnlyList<DateUsage>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
         {
-            ThrowIfDisposed();
+            key = GetKey(key);
 
-            var key = GetKey(appId);
+            ThrowIfDisposed();
 
             var usagesFlat = await usageRepository.QueryAsync(key, fromDate, toDate);
             var usagesByCategory = usagesFlat.GroupBy(x => GetCategory(x.Category)).ToDictionary(x => x.Key, x => x.ToList());
@@ -167,11 +167,11 @@ namespace Squidex.Infrastructure.UsageTracking
             return result;
         }
 
-        public async Task<long> GetMonthlyCallsAsync(Guid appId, DateTime date)
+        public async Task<long> GetMonthlyCallsAsync(string key, DateTime date)
         {
-            ThrowIfDisposed();
+            key = GetKey(key);
 
-            var key = GetKey(appId);
+            ThrowIfDisposed();
 
             var dateFrom = new DateTime(date.Year, date.Month, 1);
             var dateTo = dateFrom.AddMonths(1).AddDays(-1);
@@ -186,9 +186,11 @@ namespace Squidex.Infrastructure.UsageTracking
             return !string.IsNullOrWhiteSpace(category) ? category.Trim() : "*";
         }
 
-        private static string GetKey(Guid appId)
+        private static string GetKey(string key)
         {
-            return $"{appId}_API";
+            Guard.NotNull(key, nameof(key));
+
+            return $"{key}_API";
         }
     }
 }

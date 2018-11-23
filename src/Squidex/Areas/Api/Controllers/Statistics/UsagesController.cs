@@ -58,7 +58,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         [ApiCosts(0)]
         public async Task<IActionResult> GetMonthlyCalls(string app)
         {
-            var count = await usageTracker.GetMonthlyCallsAsync(AppId, DateTime.Today);
+            var count = await usageTracker.GetMonthlyCallsAsync(AppId.ToString(), DateTime.Today);
 
             var plan = appPlanProvider.GetPlanForApp(App);
 
@@ -90,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
                 return BadRequest();
             }
 
-            var entities = await usageTracker.QueryAsync(AppId, fromDate.Date, toDate.Date);
+            var entities = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date);
 
             var response = entities.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsageDto.FromUsage).ToList());
 
