@@ -39,7 +39,7 @@ namespace Squidex.Areas.Api.Controllers.Languages
         [ApiPermission]
         public IActionResult GetLanguages()
         {
-            var response = Language.AllLanguages.Select(LanguageDto.FromLanguage).ToList();
+            var response = Language.AllLanguages.Select(LanguageDto.FromLanguage).ToArray();
 
             Response.Headers["Etag"] = "1";
 

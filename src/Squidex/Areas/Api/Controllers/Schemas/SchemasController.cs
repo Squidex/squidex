@@ -13,6 +13,7 @@ using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 using Squidex.Shared;
@@ -50,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var schemas = await appProvider.GetSchemasAsync(AppId);
 
-            var response = schemas.Select(SchemaDto.FromSchema).ToList();
+            var response = schemas.ToArray(SchemaDto.FromSchema);
 
             Response.Headers["ETag"] = response.ToManyEtag();
 

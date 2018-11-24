@@ -5,16 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.Schemas
+namespace Squidex.Infrastructure.Log
 {
-    public interface IField : IFieldSettings
+    public interface IObjectWriterFactory
     {
-        long Id { get; }
+        IObjectWriter Create();
 
-        string Name { get; }
-
-        FieldProperties RawProperties { get; }
-
-        T Accept<T>(IFieldVisitor<T> visitor);
+        void Release(IObjectWriter writer);
     }
 }

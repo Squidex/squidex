@@ -45,13 +45,20 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public abstract FieldProperties RawProperties { get; }
 
-        protected NestedField(long id, string name)
+        protected NestedField(long id, string name, IFieldSettings settings = null)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.GreaterThan(id, 0, nameof(id));
 
             fieldId = id;
             fieldName = name;
+
+            if (settings != null)
+            {
+                isLocked = settings.IsLocked;
+                isHidden = settings.IsHidden;
+                isDisabled = settings.IsDisabled;
+            }
         }
 
         [Pure]

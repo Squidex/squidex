@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
@@ -35,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// Associated list of permissions.
         /// </summary>
         [Required]
-        public string[] Permissions { get; set; }
+        public IEnumerable<string> Permissions { get; set; }
 
         public static RoleDto FromRole(Role role, IAppEntity app)
         {
@@ -46,7 +47,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 Name = role.Name,
                 NumClients = app.Clients.Count(x => string.Equals(x.Value.Role, role.Name, StringComparison.OrdinalIgnoreCase)),
                 NumContributors = app.Contributors.Count(x => string.Equals(x.Value, role.Name, StringComparison.OrdinalIgnoreCase)),
-                Permissions = permissions.ToIds().ToArray()
+                Permissions = permissions.ToIds()
             };
         }
     }

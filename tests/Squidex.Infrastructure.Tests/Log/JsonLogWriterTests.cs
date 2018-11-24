@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Log
 {
     public class JsonLogWriterTests
     {
-        private readonly IObjectWriter sut = new JsonLogWriter();
+        private readonly IObjectWriter sut = JsonLogWriterFactory.Default().Create();
 
         [Fact]
         public void Should_write_boolean_property()
@@ -59,6 +59,7 @@ namespace Squidex.Infrastructure.Log
         public void Should_write_datetimeoffset_property()
         {
             var value = DateTimeOffset.UtcNow;
+
             var result = sut.WriteProperty("property", value).ToString();
 
             Assert.Equal($"{{\"property\":\"{value:o}\"}}", result);
@@ -68,6 +69,7 @@ namespace Squidex.Infrastructure.Log
         public void Should_write_date_property()
         {
             var value = DateTime.UtcNow;
+
             var result = sut.WriteProperty("property", value).ToString();
 
             Assert.Equal($"{{\"property\":\"{value:o}\"}}", result);
@@ -125,6 +127,7 @@ namespace Squidex.Infrastructure.Log
         public void Should_write_datetimeoffset_value()
         {
             var value = DateTimeOffset.UtcNow;
+
             var result = sut.WriteArray("property", a => a.WriteValue(value)).ToString();
 
             Assert.Equal($"{{\"property\":[\"{value:o}\"]}}", result);
@@ -134,6 +137,7 @@ namespace Squidex.Infrastructure.Log
         public void Should_write_date_value()
         {
             var value = DateTime.UtcNow;
+
             var result = sut.WriteArray("property", a => a.WriteValue(value)).ToString();
 
             Assert.Equal($"{{\"property\":[\"{value:yyyy-MM-ddTHH:mm:ssZ}\"]}}", result);
@@ -150,7 +154,7 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_write_pretty_json()
         {
-            IObjectWriter prettySut = new JsonLogWriter(Formatting.Indented);
+            var prettySut = new JsonLogWriterFactory(Formatting.Indented).Create();
 
             var result = prettySut.WriteProperty("property", 1.5).ToString();
 
@@ -160,7 +164,7 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_write_extra_line_after_object()
         {
-            IObjectWriter prettySut = new JsonLogWriter(Formatting.None, true);
+            var prettySut = new JsonLogWriterFactory(Formatting.None, true).Create();
 
             var result = prettySut.WriteProperty("property", 1.5).ToString();
 

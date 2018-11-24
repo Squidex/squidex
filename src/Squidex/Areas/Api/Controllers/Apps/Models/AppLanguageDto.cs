@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
@@ -34,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The fallback languages.
         /// </summary>
         [Required]
-        public List<Language> Fallback { get; set; }
+        public Language[] Fallback { get; set; }
 
         /// <summary>
         /// Indicates if the language is the master language.
@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static AppLanguageDto FromCommand(AddLanguage command)
         {
-            return SimpleMapper.Map(command.Language, new AppLanguageDto { Fallback = new List<Language>() });
+            return SimpleMapper.Map(command.Language, new AppLanguageDto { Fallback = Array.Empty<Language>() });
         }
 
         public static AppLanguageDto[] FromApp(IAppEntity app)
@@ -63,7 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 {
                     IsMaster = x == app.LanguagesConfig.Master,
                     IsOptional = x.IsOptional,
-                    Fallback = x.LanguageFallbacks.ToList()
+                    Fallback = x.LanguageFallbacks.ToArray()
                 });
         }
     }

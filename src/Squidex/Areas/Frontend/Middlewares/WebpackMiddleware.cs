@@ -18,7 +18,7 @@ namespace Squidex.Areas.Frontend.Middlewares
         private const string Host = "localhost";
         private const string Port = "3000";
         private static readonly string[] Scripts = { "shims.js", "app.js" };
-        private static readonly string[] Styles = new string[0];
+        private static readonly string[] Styles = Array.Empty<string>();
         private readonly RequestDelegate next;
 
         public WebpackMiddleware(RequestDelegate next)

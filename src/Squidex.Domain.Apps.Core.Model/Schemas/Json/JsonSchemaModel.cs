@@ -5,15 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using Newtonsoft.Json;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
     public sealed class JsonSchemaModel
     {
-        private static readonly RootField[] Empty = new RootField[0];
+        private static readonly RootField[] Empty = Array.Empty<RootField>();
 
         [JsonProperty]
         public string Name { get; set; }
@@ -25,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         public SchemaProperties Properties { get; set; }
 
         [JsonProperty]
-        public List<JsonFieldModel> Fields { get; set; }
+        public JsonFieldModel[] Fields { get; set; }
 
         public JsonSchemaModel()
         {
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
             Properties = schema.Properties;
 
             Fields =
-                schema.Fields.Select(x =>
+                schema.Fields.ToArray(x =>
                     new JsonFieldModel
                     {
                         Id = x.Id,
@@ -49,16 +50,16 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         IsDisabled = x.IsDisabled,
                         Partitioning = x.Partitioning.Key,
                         Properties = x.RawProperties
-                    }).ToList();
+                    });
 
             IsPublished = schema.IsPublished;
         }
 
-        private static List<JsonNestedFieldModel> CreateChildren(IField field)
+        private static JsonNestedFieldModel[] CreateChildren(IField field)
         {
             if (field is ArrayField arrayField)
             {
-                return arrayField.Fields.Select(x =>
+                return arrayField.Fields.ToArray(x =>
                     new JsonNestedFieldModel
                     {
                         Id = x.Id,
@@ -66,7 +67,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         IsHidden = x.IsHidden,
                         IsDisabled = x.IsDisabled,
                         Properties = x.RawProperties
-                    }).ToList();
+                    });
             }
 
             return null;
@@ -78,55 +79,28 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
             if (Fields != null)
             {
-                fields = new RootField[Fields.Count];
-
-                for (var i = 0; i < fields.Length; i++)
+                fields = Fields.ToArray(fieldModel =>
                 {
-                    var fieldModel = Fields[i];
-
                     var parititonKey = new Partitioning(fieldModel.Partitioning);
 
-                    var field = registry.CreateRootField(fieldModel.Id, fieldModel.Name, parititonKey, fieldModel.Properties);
+                    RootField field;
 
-                    if (field is ArrayField arrayField && fieldModel.Children?.Count > 0)
+                    if (fieldModel.Properties is ArrayFieldProperties arrayProperties && fieldModel.Children?.Length > 0)
                     {
-                        foreach (var nestedFieldModel in fieldModel.Children)
+                        var nestedFields = fieldModel.Children.ToArray(nestedFieldModel =>
                         {
-                            var nestedField = registry.CreateNestedField(nestedFieldModel.Id, nestedFieldModel.Name, nestedFieldModel.Properties);
+                            return registry.CreateNestedField(nestedFieldModel.Id, nestedFieldModel.Name, nestedFieldModel.Properties, nestedFieldModel);
+                        });
 
-                            if (nestedFieldModel.IsHidden)
-                            {
-                                nestedField = nestedField.Hide();
-                            }
-
-                            if (nestedFieldModel.IsDisabled)
-                            {
-                                nestedField = nestedField.Disable();
-                            }
-
-                            arrayField = arrayField.AddField(nestedField);
-                        }
-
-                        field = arrayField;
+                        field = new ArrayField(fieldModel.Id, fieldModel.Name, parititonKey, nestedFields, arrayProperties, fieldModel);
                     }
-
-                    if (fieldModel.IsDisabled)
+                    else
                     {
-                        field = field.Disable();
+                        field = registry.CreateRootField(fieldModel.Id, fieldModel.Name, parititonKey, fieldModel.Properties, fieldModel);
                     }
 
-                    if (fieldModel.IsLocked)
-                    {
-                        field = field.Lock();
-                    }
-
-                    if (fieldModel.IsHidden)
-                    {
-                        field = field.Hide();
-                    }
-
-                    fields[i] = field;
-                }
+                    return field;
+                });
             }
 
             return new Schema(Name, fields, Properties, IsPublished);

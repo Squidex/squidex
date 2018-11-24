@@ -17,12 +17,12 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
         /// <summary>
         /// The created comments including the updates.
         /// </summary>
-        public List<CommentDto> CreatedComments { get; set; }
+        public CommentDto[] CreatedComments { get; set; }
 
         /// <summary>
         /// The updates comments since the last version.
         /// </summary>
-        public List<CommentDto> UpdatedComments { get; set; }
+        public CommentDto[] UpdatedComments { get; set; }
 
         /// <summary>
         /// The deleted comments since the last version.
@@ -38,8 +38,8 @@ namespace Squidex.Areas.Api.Controllers.Comments.Models
         {
             return new CommentsDto
             {
-                CreatedComments = result.CreatedComments.Select(CommentDto.FromComment).ToList(),
-                UpdatedComments = result.UpdatedComments.Select(CommentDto.FromComment).ToList(),
+                CreatedComments = result.CreatedComments.Select(CommentDto.FromComment).ToArray(),
+                UpdatedComments = result.UpdatedComments.Select(CommentDto.FromComment).ToArray(),
                 DeletedComments = result.DeletedComments,
                 Version = result.Version
             };

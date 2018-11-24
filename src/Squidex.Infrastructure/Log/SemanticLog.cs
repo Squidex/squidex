@@ -13,20 +13,21 @@ namespace Squidex.Infrastructure.Log
 {
     public sealed class SemanticLog : ISemanticLog
     {
-        private readonly IEnumerable<ILogChannel> channels;
-        private readonly IEnumerable<ILogAppender> appenders;
-        private readonly Func<IObjectWriter> writerFactory;
+        private readonly ILogChannel[] channels;
+        private readonly ILogAppender[] appenders;
+        private readonly IObjectWriterFactory writerFactory;
 
         public SemanticLog(
             IEnumerable<ILogChannel> channels,
             IEnumerable<ILogAppender> appenders,
-            Func<IObjectWriter> writerFactory)
+            IObjectWriterFactory writerFactory)
         {
             Guard.NotNull(channels, nameof(channels));
             Guard.NotNull(appenders, nameof(appenders));
+            Guard.NotNull(writerFactory, nameof(writerFactory));
 
-            this.channels = channels;
-            this.appenders = appenders;
+            this.channels = channels.ToArray();
+            this.appenders = appenders.ToArray();
             this.writerFactory = writerFactory;
         }
 
@@ -38,11 +39,11 @@ namespace Squidex.Infrastructure.Log
 
             List<Exception> exceptions = null;
 
-            foreach (var channel in channels)
+            for (var i = 0; i < channels.Length; i++)
             {
                 try
                 {
-                    channel.Log(logLevel, formattedText);
+                    channels[i].Log(logLevel, formattedText);
                 }
                 catch (Exception ex)
                 {
@@ -63,18 +64,25 @@ namespace Squidex.Infrastructure.Log
 
         private string FormatText(SemanticLogLevel logLevel, Action<IObjectWriter> objectWriter)
         {
-            var writer = writerFactory();
+            var writer = writerFactory.Create();
 
-            writer.WriteProperty(nameof(logLevel), logLevel.ToString());
-
-            objectWriter(writer);
-
-            foreach (var appender in appenders)
+            try
             {
-                appender.Append(writer);
-            }
+                writer.WriteProperty(nameof(logLevel), logLevel.ToString());
 
-            return writer.ToString();
+                objectWriter(writer);
+
+                for (var i = 0; i < appenders.Length; i++)
+                {
+                    appenders[i].Append(writer);
+                }
+
+                return writer.ToString();
+            }
+            finally
+            {
+                writerFactory.Release(writer);
+            }
         }
 
         public ISemanticLog CreateScope(Action<IObjectWriter> objectWriter)

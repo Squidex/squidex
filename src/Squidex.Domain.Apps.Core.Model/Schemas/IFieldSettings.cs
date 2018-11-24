@@ -1,20 +1,18 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public interface IField : IFieldSettings
+    public interface IFieldSettings
     {
-        long Id { get; }
+        bool IsLocked { get; }
 
-        string Name { get; }
+        bool IsDisabled { get; }
 
-        FieldProperties RawProperties { get; }
-
-        T Accept<T>(IFieldVisitor<T> visitor);
+        bool IsHidden { get; }
     }
 }

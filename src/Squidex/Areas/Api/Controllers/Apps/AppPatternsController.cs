@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetPatterns(string app)
         {
-            var response = App.Patterns.Select(AppPatternDto.FromKvp).OrderBy(x => x.Name).ToList();
+            var response = App.Patterns.Select(AppPatternDto.FromKvp).OrderBy(x => x.Name).ToArray();
 
             Response.Headers["ETag"] = App.Version.ToString();
 

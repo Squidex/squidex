@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 using Squidex.Shared;
@@ -45,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetClients(string app)
         {
-            var response = App.Clients.Select(ClientDto.FromKvp).ToList();
+            var response = App.Clients.Select(ClientDto.FromKvp).ToArray();
 
             Response.Headers["ETag"] = App.Version.ToString();
 

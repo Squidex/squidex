@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Log
         private readonly List<ILogChannel> channels = new List<ILogChannel>();
         private readonly Lazy<SemanticLog> log;
         private readonly ILogChannel channel = A.Fake<ILogChannel>();
-        private string output;
+        private string output = string.Empty;
 
         public SemanticLog Log
         {
@@ -35,10 +35,29 @@ namespace Squidex.Infrastructure.Log
             A.CallTo(() => channel.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored))
                 .Invokes((SemanticLogLevel level, string message) =>
                 {
-                    output = message;
+                    output += message;
                 });
 
-            log = new Lazy<SemanticLog>(() => new SemanticLog(channels, appenders, () => new JsonLogWriter()));
+            log = new Lazy<SemanticLog>(() => new SemanticLog(channels, appenders, JsonLogWriterFactory.Default()));
+        }
+
+        [Fact]
+        public void Should_log_multiple_lines()
+        {
+            Log.Log(SemanticLogLevel.Error, w => w.WriteProperty("logMessage", "Msg1"));
+            Log.Log(SemanticLogLevel.Error, w => w.WriteProperty("logMessage", "Msg2"));
+
+            var expected1 =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Error")
+                    .WriteProperty("logMessage", "Msg1"));
+
+            var expected2 =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Error")
+                    .WriteProperty("logMessage", "Msg2"));
+
+            Assert.Equal(expected1 + expected2, output);
         }
 
         [Fact]
@@ -307,7 +326,7 @@ namespace Squidex.Infrastructure.Log
             A.CallTo(() => channel1.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored)).Throws(exception1);
             A.CallTo(() => channel2.Log(A<SemanticLogLevel>.Ignored, A<string>.Ignored)).Throws(exception2);
 
-            var sut = new SemanticLog(new[] { channel1, channel2 }, Enumerable.Empty<ILogAppender>(), () => new JsonLogWriter());
+            var sut = new SemanticLog(new[] { channel1, channel2 }, Enumerable.Empty<ILogAppender>(), JsonLogWriterFactory.Default());
 
             try
             {
@@ -324,7 +343,7 @@ namespace Squidex.Infrastructure.Log
 
         private static string LogTest(Action<IObjectWriter> writer)
         {
-            IObjectWriter sut = new JsonLogWriter();
+            var sut = JsonLogWriterFactory.Default().Create();
 
             writer(sut);
 

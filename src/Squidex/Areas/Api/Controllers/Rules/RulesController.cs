@@ -101,7 +101,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var entities = await appProvider.GetRulesAsync(AppId);
 
-            var response = entities.Select(RuleDto.FromRule);
+            var response = entities.Select(RuleDto.FromRule).ToArray();
 
             Response.Headers["ETag"] = response.ToManyEtag(0);
 

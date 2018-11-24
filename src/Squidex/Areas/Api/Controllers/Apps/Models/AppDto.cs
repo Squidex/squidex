@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
@@ -80,7 +81,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             var response = SimpleMapper.Map(app, new AppDto());
 
-            response.Permissions = permissions.Select(x => x.Id).ToArray();
+            response.Permissions = permissions.ToArray(x => x.Id);
             response.PlanName = plans.GetPlanForApp(app)?.Name;
             response.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
 

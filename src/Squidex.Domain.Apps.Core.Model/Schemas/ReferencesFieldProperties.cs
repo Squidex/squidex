@@ -29,14 +29,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit((IField<ReferencesFieldProperties>)field);
         }
 
-        public override RootField CreateRootField(long id, string name, Partitioning partitioning)
+        public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings settings = null)
         {
-            return Fields.References(id, name, partitioning, this);
+            return Fields.References(id, name, partitioning, this, settings);
         }
 
-        public override NestedField CreateNestedField(long id, string name)
+        public override NestedField CreateNestedField(long id, string name, IFieldSettings settings = null)
         {
-            return Fields.References(id, name, this);
+            return Fields.References(id, name, this, settings);
         }
     }
 }

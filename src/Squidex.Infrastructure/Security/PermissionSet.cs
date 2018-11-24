@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.Security
 {
     public sealed class PermissionSet : IReadOnlyCollection<Permission>
     {
-        public static readonly PermissionSet Empty = new PermissionSet(new string[0]);
+        public static readonly PermissionSet Empty = new PermissionSet(Array.Empty<string>());
 
         private readonly List<Permission> permissions;
         private readonly Lazy<string> display;

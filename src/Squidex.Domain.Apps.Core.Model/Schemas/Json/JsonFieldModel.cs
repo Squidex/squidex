@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
-    public sealed class JsonFieldModel
+    public sealed class JsonFieldModel : IFieldSettings
     {
         [JsonProperty]
         public long Id { get; set; }
@@ -34,6 +33,6 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         public FieldProperties Properties { get; set; }
 
         [JsonProperty]
-        public List<JsonNestedFieldModel> Children { get; set; }
+        public JsonNestedFieldModel[] Children { get; set; }
     }
 }

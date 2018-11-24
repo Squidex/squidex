@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.History.Models;
 using Squidex.Domain.Apps.Entities.History;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 using Squidex.Shared;
@@ -48,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.History
         {
             var entities = await historyService.QueryByChannelAsync(AppId, channel, 100);
 
-            var response = entities.Select(HistoryEventDto.FromHistoryEvent).ToList();
+            var response = entities.ToArray(HistoryEventDto.FromHistoryEvent);
 
             return Ok(response);
         }

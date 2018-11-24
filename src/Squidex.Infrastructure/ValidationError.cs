@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure
     [Serializable]
     public sealed class ValidationError
     {
-        private static readonly string[] FallbackProperties = new string[0];
+        private static readonly string[] FallbackProperties = Array.Empty<string>();
         private readonly string message;
         private readonly string[] propertyNames;
 

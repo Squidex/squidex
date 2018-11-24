@@ -23,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
         /// The schema settings.
         /// </summary>
         [Required]
-        public List<ContentChangedTriggerSchemaDto> Schemas { get; set; }
+        public ContentChangedTriggerSchemaDto[] Schemas { get; set; }
 
         /// <summary>
         /// Determines whether the trigger should handle all content changes events.

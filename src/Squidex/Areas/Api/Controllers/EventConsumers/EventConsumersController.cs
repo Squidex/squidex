@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         {
             var entities = await GetGrain().GetConsumersAsync();
 
-            var response = entities.Value.OrderBy(x => x.Name).Select(EventConsumerDto.FromEventConsumerInfo).ToList();
+            var response = entities.Value.OrderBy(x => x.Name).Select(EventConsumerDto.FromEventConsumerInfo).ToArray();
 
             return Ok(response);
         }

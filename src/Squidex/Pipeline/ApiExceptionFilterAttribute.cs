@@ -61,7 +61,7 @@ namespace Squidex.Pipeline
 
         private static IActionResult OnValidationException(ValidationException ex)
         {
-            return ErrorResult(400, new ErrorDto { Message = ex.Summary, Details = ex.Errors?.Select(e => e.Message).ToArray() });
+            return ErrorResult(400, new ErrorDto { Message = ex.Summary, Details = ex.Errors?.ToArray(e => e.Message) });
         }
 
         private static IActionResult ErrorResult(int statusCode, ErrorDto error)

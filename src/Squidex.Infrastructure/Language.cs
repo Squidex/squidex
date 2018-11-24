@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure
             }
         }
 
-        public static IEnumerable<Language> AllLanguages
+        public static IReadOnlyCollection<Language> AllLanguages
         {
             get { return AllLanguagesField.Values; }
         }
