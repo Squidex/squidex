@@ -8,11 +8,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 nestedSchema[nestedField.Name] = (false, new FieldValidator(nestedField.Accept(this).ToArray(), nestedField));
             }
 
-            yield return new CollectionItemValidator(new ObjectValidator<JToken>(nestedSchema, false, "field", JValue.CreateNull()));
+            yield return new CollectionItemValidator(new ObjectValidator<IJsonValue>(nestedSchema, false, "field", JsonValue.Null));
         }
 
         public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field)

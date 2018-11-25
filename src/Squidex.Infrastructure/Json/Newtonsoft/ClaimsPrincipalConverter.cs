@@ -10,7 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using Newtonsoft.Json;
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
     public sealed class ClaimsPrincipalConverter : JsonClassConverter<ClaimsPrincipal>
     {

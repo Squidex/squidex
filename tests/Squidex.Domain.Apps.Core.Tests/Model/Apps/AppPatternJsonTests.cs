@@ -7,8 +7,6 @@
 
 using System;
 using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Xunit;
 
@@ -16,8 +14,6 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 {
     public class AppPatternJsonTests
     {
-        private readonly JsonSerializer serializer = TestData.DefaultSerializer();
-
         [Fact]
         public void Should_serialize_and_deserialize()
         {
@@ -35,9 +31,9 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 
             patterns = patterns.Remove(guid1);
 
-            var appPatterns = JToken.FromObject(patterns, serializer).ToObject<AppPatterns>(serializer);
+            var serialized = patterns.SerializeAndDeserialize();
 
-            appPatterns.Should().BeEquivalentTo(patterns);
+            serialized.Should().BeEquivalentTo(patterns);
         }
     }
 }

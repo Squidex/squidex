@@ -8,9 +8,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -103,9 +103,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "Custom Error Message." });
         }
 
-        private static JValue CreateValue(object v)
+        private static IJsonValue CreateValue(string v)
         {
-            return new JValue(v);
+            return JsonValue.Create(v);
         }
 
         private static RootField<StringFieldProperties> Field(StringFieldProperties properties)

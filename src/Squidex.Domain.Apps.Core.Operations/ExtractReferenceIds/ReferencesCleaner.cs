@@ -7,44 +7,44 @@
 
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
-    public sealed class ReferencesCleaner : IFieldVisitor<JToken>
+    public sealed class ReferencesCleaner : IFieldVisitor<IJsonValue>
     {
-        private readonly JToken value;
+        private readonly IJsonValue value;
         private readonly ICollection<Guid> oldReferences;
 
-        private ReferencesCleaner(JToken value, ICollection<Guid> oldReferences)
+        private ReferencesCleaner(IJsonValue value, ICollection<Guid> oldReferences)
         {
             this.value = value;
 
             this.oldReferences = oldReferences;
         }
 
-        public static JToken CleanReferences(IField field, JToken value, ICollection<Guid> oldReferences)
+        public static IJsonValue CleanReferences(IField field, IJsonValue value, ICollection<Guid> oldReferences)
         {
             return field.Accept(new ReferencesCleaner(value, oldReferences));
         }
 
-        public JToken Visit(IField<AssetsFieldProperties> field)
+        public IJsonValue Visit(IField<AssetsFieldProperties> field)
         {
             return CleanIds();
         }
 
-        public JToken Visit(IField<ReferencesFieldProperties> field)
+        public IJsonValue Visit(IField<ReferencesFieldProperties> field)
         {
             if (oldReferences.Contains(field.Properties.SchemaId))
             {
-                return new JArray();
+                return JsonValue.Array();
             }
 
             return CleanIds();
         }
 
-        private JToken CleanIds()
+        private IJsonValue CleanIds()
         {
             var ids = value.ToGuidSet();
 
@@ -55,45 +55,45 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                 isRemoved |= ids.Remove(oldReference);
             }
 
-            return isRemoved ? ids.ToJToken() : value;
+            return isRemoved ? ids.ToJsonArray() : value;
         }
 
-        public JToken Visit(IField<BooleanFieldProperties> field)
+        public IJsonValue Visit(IField<BooleanFieldProperties> field)
         {
             return value;
         }
 
-        public JToken Visit(IField<DateTimeFieldProperties> field)
+        public IJsonValue Visit(IField<DateTimeFieldProperties> field)
         {
             return value;
         }
 
-        public JToken Visit(IField<GeolocationFieldProperties> field)
+        public IJsonValue Visit(IField<GeolocationFieldProperties> field)
         {
             return value;
         }
 
-        public JToken Visit(IField<JsonFieldProperties> field)
+        public IJsonValue Visit(IField<JsonFieldProperties> field)
         {
             return value;
         }
 
-        public JToken Visit(IField<NumberFieldProperties> field)
+        public IJsonValue Visit(IField<NumberFieldProperties> field)
         {
             return value;
         }
 
-        public JToken Visit(IField<StringFieldProperties> field)
+        public IJsonValue Visit(IField<StringFieldProperties> field)
         {
             return value;
         }
 
-        public JToken Visit(IField<TagsFieldProperties> field)
+        public IJsonValue Visit(IField<TagsFieldProperties> field)
         {
             return value;
         }
 
-        public JToken Visit(IArrayField field)
+        public IJsonValue Visit(IArrayField field)
         {
             return value;
         }

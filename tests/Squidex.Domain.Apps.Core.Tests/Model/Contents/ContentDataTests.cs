@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 #pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
@@ -23,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                     .AddField("field2",
                         new ContentFieldData()
                             .AddValue("en", 2)
-                            .AddValue("it", null));
+                            .AddValue("it", JsonValue.Null));
 
             var actual = input.ToCleaned();
 

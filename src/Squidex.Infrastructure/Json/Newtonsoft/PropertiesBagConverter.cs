@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using NodaTime;
 using NodaTime.Extensions;
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
     public sealed class PropertiesBagConverter<T> : JsonClassConverter<T> where T : PropertiesBag, new()
     {

@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -18,6 +17,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 using Xunit;
 
 #pragma warning disable xUnit2009 // Do not use boolean check to check for string equality
@@ -28,6 +28,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
     {
         private readonly IRuleTriggerHandler ruleTriggerHandler = A.Fake<IRuleTriggerHandler>();
         private readonly IRuleActionHandler ruleActionHandler = A.Fake<IRuleActionHandler>();
+        private readonly IJsonSerializer serializer = TestData.DefaultSerializer();
         private readonly IEventEnricher eventEnricher = A.Fake<IEventEnricher>();
         private readonly IClock clock = A.Fake<IClock>();
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
@@ -67,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.TriggerType)
                 .Returns(typeof(ContentChangedTrigger));
 
-            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, clock, typeNameRegistry);
+            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, serializer, clock, typeNameRegistry);
         }
 
         [Fact]
@@ -129,7 +130,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             ruleEnvelope.SetTimestamp(now.Minus(Duration.FromDays(3)));
 
-            var actionData = new JObject();
+            var actionData = "{}";
             var actionDescription = "MyDescription";
 
             A.CallTo(() => clock.GetCurrentInstant())
@@ -159,7 +160,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             ruleEnvelope.SetTimestamp(now);
 
             var actionName = "ValidAction";
-            var actionData = new JObject();
+            var actionData = "{}";
             var actionDescription = "MyDescription";
 
             A.CallTo(() => clock.GetCurrentInstant())
@@ -188,7 +189,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_succeeded_job_with_full_dump_when_handler_returns_no_exception()
         {
-            var ruleJob = new JObject();
+            var ruleJob = "{}";
 
             var actionDump = "MyDump";
 
@@ -206,7 +207,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_failed_job_with_full_dump_when_handler_returns_exception()
         {
-            var ruleJob = new JObject();
+            var ruleJob = "{}";
 
             var actionDump = "MyDump";
 
@@ -224,7 +225,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_timedout_job_with_full_dump_when_exception_from_handler_indicates_timeout()
         {
-            var ruleJob = new JObject();
+            var ruleJob = "{}";
 
             var actionDump = "MyDump";
 
@@ -243,7 +244,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_exception_details_when_job_to_execute_failed()
         {
-            var ruleJob = new JObject();
+            var ruleJob = "{}";
             var ruleError = new InvalidOperationException();
 
             A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))

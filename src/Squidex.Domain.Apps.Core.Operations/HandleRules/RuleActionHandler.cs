@@ -7,7 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
@@ -25,6 +24,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             get { return typeof(TAction); }
         }
 
+        Type IRuleActionHandler.DataType
+        {
+            get { return typeof(TData); }
+        }
+
         protected RuleActionHandler(RuleEventFormatter formatter)
         {
             Guard.NotNull(formatter, nameof(formatter));
@@ -34,20 +38,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         protected virtual string ToPayloadJson<T>(T @event)
         {
-            return formatter.ToPayload(@event).ToString();
-        }
-
-        protected virtual string ToEnvelopeJson(EnrichedEvent @event)
-        {
-            return formatter.ToEnvelope(@event).ToString();
-        }
-
-        protected virtual JObject ToPayload<T>(T @event)
-        {
             return formatter.ToPayload(@event);
         }
 
-        protected virtual JObject ToEnvelope(EnrichedEvent @event)
+        protected virtual string ToEnvelopeJson(EnrichedEvent @event)
         {
             return formatter.ToEnvelope(@event);
         }
@@ -62,16 +56,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return formatter.Format(text, @event);
         }
 
-        async Task<(string Description, JObject Data)> IRuleActionHandler.CreateJobAsync(EnrichedEvent @event, RuleAction action)
+        async Task<(string Description, object Data)> IRuleActionHandler.CreateJobAsync(EnrichedEvent @event, RuleAction action)
         {
             var (description, data) = await CreateJobAsync(@event, (TAction)action);
 
-            return (description, JObject.FromObject(data));
+            return (description, data);
         }
 
-        async Task<(string Dump, Exception Exception)> IRuleActionHandler.ExecuteJobAsync(JObject data)
+        async Task<(string Dump, Exception Exception)> IRuleActionHandler.ExecuteJobAsync(object data)
         {
-            var typedData = data.ToObject<TData>();
+            var typedData = (TData)data;
 
             return await ExecuteJobAsync(typedData);
         }

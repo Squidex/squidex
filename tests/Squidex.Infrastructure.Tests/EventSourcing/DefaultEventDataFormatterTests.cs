@@ -7,9 +7,7 @@
 
 using System;
 using System.Linq;
-using Newtonsoft.Json;
 using NodaTime;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -27,18 +25,16 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
-        private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private readonly DefaultEventDataFormatter sut;
 
         public DefaultEventDataFormatterTests()
         {
-            serializerSettings.Converters.Add(new PropertiesBagConverter<EnvelopeHeaders>());
+            var typeNameRegistry =
+                new TypeNameRegistry()
+                    .Map(typeof(MyEvent), "Event")
+                    .Map(typeof(MyOldEvent), "OldEvent");
 
-            typeNameRegistry.Map(typeof(MyEvent), "Event");
-            typeNameRegistry.Map(typeof(MyOldEvent), "OldEvent");
-
-            sut = new DefaultEventDataFormatter(typeNameRegistry, JsonSerializer.Create(serializerSettings));
+            sut = new DefaultEventDataFormatter(typeNameRegistry, JsonHelper.DefaultSerializer(typeNameRegistry));
         }
 
         [Fact]

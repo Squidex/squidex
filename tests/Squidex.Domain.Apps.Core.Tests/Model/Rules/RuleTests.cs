@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Xunit;
@@ -21,8 +19,6 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
 {
     public class RuleTests
     {
-        private readonly JsonSerializer serializer = TestData.DefaultSerializer();
-
         public static readonly List<object[]> Triggers =
             typeof(Rule).Assembly.GetTypes()
                 .Where(x => x.BaseType == typeof(RuleTrigger))
@@ -123,9 +119,9 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         {
             var rule_1 = rule_0.Disable();
 
-            var appClients = JToken.FromObject(rule_1, serializer).ToObject<Rule>(serializer);
+            var serialized = rule_1.SerializeAndDeserialize();
 
-            appClients.Should().BeEquivalentTo(rule_1);
+            serialized.Should().BeEquivalentTo(rule_1);
         }
 
         [Theory]

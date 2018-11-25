@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -111,7 +110,9 @@ namespace Squidex.Infrastructure
         {
             RefToken value = null;
 
-            value.SerializeAndDeserialize(new RefTokenConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -119,7 +120,9 @@ namespace Squidex.Infrastructure
         {
             var value = RefToken.Parse("client:client1");
 
-            value.SerializeAndDeserialize(new RefTokenConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
     }
 }

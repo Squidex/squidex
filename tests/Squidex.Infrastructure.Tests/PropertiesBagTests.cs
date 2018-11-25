@@ -10,7 +10,6 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.CSharp.RuntimeBinder;
 using NodaTime;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -30,7 +29,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_serialize_and_deserialize_empty_bag()
         {
-            var output = bag.SerializeAndDeserializeAndReturn(new PropertiesBagConverter<PropertiesBag>());
+            var output = bag.SerializeAndDeserialize();
 
             Assert.Equal(bag.Count, output.Count);
         }
@@ -46,7 +45,7 @@ namespace Squidex.Infrastructure
             bag.Set("Key4", true);
             bag.Set("Key5", Guid.NewGuid());
 
-            var output = bag.SerializeAndDeserializeAndReturn(new PropertiesBagConverter<PropertiesBag>());
+            var output = bag.SerializeAndDeserialize();
 
             foreach (var kvp in output.Properties.Take(4))
             {

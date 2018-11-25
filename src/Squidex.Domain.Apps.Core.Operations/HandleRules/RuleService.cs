@@ -11,12 +11,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
@@ -26,15 +26,18 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers;
         private readonly TypeNameRegistry typeNameRegistry;
         private readonly IEventEnricher eventEnricher;
+        private readonly IJsonSerializer jsonSerializer;
         private readonly IClock clock;
 
         public RuleService(
             IEnumerable<IRuleTriggerHandler> ruleTriggerHandlers,
             IEnumerable<IRuleActionHandler> ruleActionHandlers,
             IEventEnricher eventEnricher,
+            IJsonSerializer jsonSerializer,
             IClock clock,
             TypeNameRegistry typeNameRegistry)
         {
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
             Guard.NotNull(ruleTriggerHandlers, nameof(ruleTriggerHandlers));
             Guard.NotNull(ruleActionHandlers, nameof(ruleActionHandlers));
             Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
@@ -47,6 +50,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.ruleActionHandlers = ruleActionHandlers.ToDictionary(x => x.ActionType);
 
             this.eventEnricher = eventEnricher;
+
+            this.jsonSerializer = jsonSerializer;
 
             this.clock = clock;
         }
@@ -104,11 +109,13 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             var actionName = typeNameRegistry.GetName(actionType);
             var actionData = await actionHandler.CreateJobAsync(enrichedEvent, rule.Action);
 
+            var json = jsonSerializer.Serialize(actionData);
+
             var job = new RuleJob
             {
                 JobId = Guid.NewGuid(),
                 ActionName = actionName,
-                ActionData = actionData.Data,
+                ActionData = json,
                 AggregateId = enrichedEvent.AggregateId,
                 AppId = appEvent.AppId.Id,
                 Created = now,
@@ -120,14 +127,18 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return job;
         }
 
-        public virtual async Task<(string Dump, RuleResult Result, TimeSpan Elapsed)> InvokeAsync(string actionName, JObject job)
+        public virtual async Task<(string Dump, RuleResult Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job)
         {
             try
             {
                 var actionType = typeNameRegistry.GetType(actionName);
                 var actionWatch = Stopwatch.StartNew();
 
-                var result = await ruleActionHandlers[actionType].ExecuteJobAsync(job);
+                var actionHandler = ruleActionHandlers[actionType];
+
+                var deserialized = jsonSerializer.Deserialize<object>(job, actionHandler.DataType);
+
+                var result = await actionHandler.ExecuteJobAsync(deserialized);
 
                 actionWatch.Stop();
 

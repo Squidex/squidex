@@ -9,10 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
@@ -37,14 +37,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 CreateFormatter(errors));
         }
 
-        public static Task ValidateAsync(this IField field, JToken value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateAsync(this IField field, IJsonValue value, IList<string> errors, ValidationContext context = null)
         {
             return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field).ValidateAsync(value,
                 CreateContext(context),
                 CreateFormatter(errors));
         }
 
-        public static Task ValidateOptionalAsync(this IField field, JToken value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateOptionalAsync(this IField field, IJsonValue value, IList<string> errors, ValidationContext context = null)
         {
             return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field).ValidateAsync(value,
                 CreateContext(context).Optional(true),

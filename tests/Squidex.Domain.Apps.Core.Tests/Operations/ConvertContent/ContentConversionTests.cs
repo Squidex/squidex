@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("en", new JArray("hello", "loved")))
+                            .AddValue("en", new JsonArray("hello", "loved")))
                     .AddField("field2",
                         new ContentFieldData()
                             .AddValue("iv", "world"));
@@ -191,7 +191,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("en", new JArray(new JObject(new JProperty("p1", "hello")))))
+                            .AddValue("en", new JsonArray(JsonValue.Object().Add("p1", "hello"))))
                     .AddField("field2",
                         new ContentFieldData()
                             .AddValue("iv", "world"));

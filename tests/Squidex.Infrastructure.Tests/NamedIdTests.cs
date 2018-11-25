@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -91,7 +90,9 @@ namespace Squidex.Infrastructure
         {
             NamedId<Guid> value = null;
 
-            value.SerializeAndDeserialize(new NamedGuidIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -99,7 +100,9 @@ namespace Squidex.Infrastructure
         {
             var value = NamedId.Of(Guid.NewGuid(), "my-name");
 
-            value.SerializeAndDeserialize(new NamedGuidIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -107,7 +110,9 @@ namespace Squidex.Infrastructure
         {
             NamedId<long> value = null;
 
-            value.SerializeAndDeserialize(new NamedLongIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -115,7 +120,9 @@ namespace Squidex.Infrastructure
         {
             var value = NamedId.Of(123L, "my-name");
 
-            value.SerializeAndDeserialize(new NamedLongIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -123,7 +130,9 @@ namespace Squidex.Infrastructure
         {
             NamedId<string> value = null;
 
-            value.SerializeAndDeserialize(new NamedStringIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -131,27 +140,27 @@ namespace Squidex.Infrastructure
         {
             var value = NamedId.Of(Guid.NewGuid().ToString(), "my-name");
 
-            value.SerializeAndDeserialize(new NamedStringIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
         public void Should_throw_exception_if_string_id_is_not_valid()
         {
-            JsonHelper.DoesNotDeserialize<NamedId<string>>("123", new NamedStringIdConverter());
+            Assert.ThrowsAny<Exception>(() => JsonHelper.Deserialize<NamedId<string>>("123"));
         }
 
         [Fact]
         public void Should_throw_exception_if_long_id_is_not_valid()
         {
-            JsonHelper.DoesNotDeserialize<NamedId<long>>("123", new NamedLongIdConverter());
-            JsonHelper.DoesNotDeserialize<NamedId<long>>("invalid-long,name", new NamedLongIdConverter());
+            Assert.ThrowsAny<Exception>(() => JsonHelper.Deserialize<NamedId<long>>("invalid-long,name"));
         }
 
         [Fact]
         public void Should_throw_exception_if_guid_id_is_not_valid()
         {
-            JsonHelper.DoesNotDeserialize<NamedId<Guid>>("123", new NamedGuidIdConverter());
-            JsonHelper.DoesNotDeserialize<NamedId<Guid>>("invalid-guid,name", new NamedGuidIdConverter());
+            Assert.ThrowsAny<Exception>(() => JsonHelper.Deserialize<NamedId<Guid>>("invalid-guid,name"));
         }
     }
 }

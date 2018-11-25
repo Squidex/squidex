@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Contents
             {
                 var resultValue = new ContentFieldData();
 
-                foreach (var partitionValue in fieldValue.Value.Where(x => !x.Value.IsNull()))
+                foreach (var partitionValue in fieldValue.Value.Where(x => x.Value.Type != JsonValueType.Null))
                 {
                     resultValue[partitionValue.Key] = partitionValue.Value;
                 }

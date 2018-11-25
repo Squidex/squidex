@@ -8,7 +8,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
     public abstract class JsonClassConverter<T> : JsonConverter where T : class
     {

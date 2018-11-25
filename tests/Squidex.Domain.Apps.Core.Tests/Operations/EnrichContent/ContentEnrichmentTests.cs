@@ -6,13 +6,13 @@
 // ==========================================================================
 
 using System;
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.EnrichContent;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 #pragma warning disable xUnit2004 // Do not use equality check to test for boolean conditions
@@ -53,14 +53,14 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
 
             data.Enrich(schema, languagesConfig.ToResolver());
 
-            Assert.Equal(456, (int)data["my-number"]["iv"]);
+            Assert.Equal(456, ((JsonScalar<double>)data["my-number"]["iv"]).Value);
 
-            Assert.Equal("de-string", (string)data["my-string"]["de"]);
-            Assert.Equal("en-string", (string)data["my-string"]["en"]);
+            Assert.Equal("de-string", data["my-string"]["de"].ToString());
+            Assert.Equal("en-string", data["my-string"]["en"].ToString());
 
-            Assert.Equal(Now.ToString(), (string)data["my-datetime"]["iv"]);
+            Assert.Equal(Now.ToString(), data["my-datetime"]["iv"].ToString());
 
-            Assert.True((bool)data["my-boolean"]["iv"]);
+            Assert.True(((JsonScalar<bool>)data["my-boolean"]["iv"]).Value);
         }
 
         [Fact]
@@ -77,8 +77,8 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
 
             data.Enrich(schema, languagesConfig.ToResolver());
 
-            Assert.Equal("en-string", (string)data["my-string"]["de"]);
-            Assert.Equal("en-string", (string)data["my-string"]["en"]);
+            Assert.Equal("en-string", data["my-string"]["de"].ToString());
+            Assert.Equal("en-string", data["my-string"]["en"].ToString());
         }
 
         [Fact]
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.Assets(1, "1", Partitioning.Invariant,
                     new AssetsFieldProperties());
 
-            Assert.Equal(new JArray(), DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.Boolean(1, "1", Partitioning.Invariant,
                     new BooleanFieldProperties { DefaultValue = true });
 
-            Assert.Equal(true, DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal(JsonValue.True, DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.DateTime(1, "1", Partitioning.Invariant,
                     new DateTimeFieldProperties { DefaultValue = FutureDays(15) });
 
-            Assert.Equal(FutureDays(15).ToString(), DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal(JsonValue.Create(FutureDays(15).ToString()), DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.DateTime(1, "1", Partitioning.Invariant,
                     new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Today });
 
-            Assert.Equal("2017-10-12", DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal(JsonValue.Create("2017-10-12"), DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.DateTime(1, "1", Partitioning.Invariant,
                     new DateTimeFieldProperties { CalculatedDefaultValue = DateTimeCalculatedDefaultValue.Now });
 
-            Assert.Equal("2017-10-12T16:30:10Z", DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal(JsonValue.Create("2017-10-12T16:30:10Z"), DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
@@ -138,7 +138,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.Json(1, "1", Partitioning.Invariant,
                     new JsonFieldProperties());
 
-            Assert.Equal(new JObject(), DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal(JsonValue.Object(), DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.Geolocation(1, "1", Partitioning.Invariant,
                     new GeolocationFieldProperties());
 
-            Assert.Equal(JValue.CreateNull(), DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal(JsonValue.Null, DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.Number(1, "1", Partitioning.Invariant,
                     new NumberFieldProperties { DefaultValue = 12 });
 
-            Assert.Equal(12, DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal(JsonValue.Create(12), DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.References(1, "1", Partitioning.Invariant,
                     new ReferencesFieldProperties());
 
-            Assert.Equal(new JArray(), DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
@@ -178,7 +178,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.String(1, "1", Partitioning.Invariant,
                     new StringFieldProperties { DefaultValue = "default" });
 
-            Assert.Equal("default", DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal(JsonValue.Create("default"), DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         [Fact]
@@ -188,7 +188,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.Tags(1, "1", Partitioning.Invariant,
                     new TagsFieldProperties());
 
-            Assert.Equal(new JArray(), DefaultValueFactory.CreateDefaultValue(field, Now));
+            Assert.Equal(JsonValue.Array(), DefaultValueFactory.CreateDefaultValue(field, Now));
         }
 
         private static Instant FutureDays(int days)

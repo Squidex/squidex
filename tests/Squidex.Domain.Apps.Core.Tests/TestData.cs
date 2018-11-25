@@ -17,13 +17,14 @@ using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core
 {
     public static class TestData
     {
-        public static JsonSerializer DefaultSerializer()
+        public static IJsonSerializer DefaultSerializer()
         {
             var typeNameRegistry = new TypeNameRegistry();
 
@@ -35,6 +36,7 @@ namespace Squidex.Domain.Apps.Core
                     new AppClientsConverter(),
                     new AppContributorsConverter(),
                     new AppPatternsConverter(),
+                    new ClaimsPrincipalConverter(),
                     new InstantConverter(),
                     new LanguageConverter(),
                     new LanguagesConfigConverter(),
@@ -50,7 +52,7 @@ namespace Squidex.Domain.Apps.Core
                 TypeNameHandling = TypeNameHandling.Auto
             };
 
-            return JsonSerializer.Create(serializerSettings);
+            return new NewtonsoftJsonSerializer(serializerSettings);
         }
 
         public static Schema MixedSchema()
@@ -98,6 +100,13 @@ namespace Squidex.Domain.Apps.Core
                 .LockField(105);
 
             return schema;
+        }
+
+        public static T SerializeAndDeserialize<T>(this T value)
+        {
+            var serializer = DefaultSerializer();
+
+            return serializer.Deserialize<T>(serializer.Serialize(value));
         }
 
         public static void TestFreeze(IFreezable freezable)

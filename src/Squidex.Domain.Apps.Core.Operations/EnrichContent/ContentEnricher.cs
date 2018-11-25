@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.EnrichContent
 {
@@ -56,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
 
             var defaultValue = DefaultValueFactory.CreateDefaultValue(field, SystemClock.Instance.GetCurrentInstant());
 
-            if (field.RawProperties.IsRequired || defaultValue.IsNull())
+            if (field.RawProperties.IsRequired || defaultValue.Type == JsonValueType.Null)
             {
                 return;
             }
@@ -65,13 +64,13 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
 
             if (!fieldData.TryGetValue(key, out var value) || ShouldApplyDefaultValue(field, value))
             {
-                fieldData.AddValue(key, defaultValue);
+                fieldData.AddJsonValue(key, defaultValue);
             }
         }
 
-        private static bool ShouldApplyDefaultValue(IField field, JToken value)
+        private static bool ShouldApplyDefaultValue(IField field, IJsonValue value)
         {
-            return value.IsNull() || (field is IField<StringFieldProperties> && value is JValue jValue && Equals(jValue.Value, string.Empty));
+            return value.Type == JsonValueType.Null || (field is IField<StringFieldProperties> && value is JsonScalar<string> s && string.IsNullOrEmpty(s.Value));
         }
     }
 }

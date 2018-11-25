@@ -11,7 +11,7 @@ using NodaTime;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
     public class ConverterContractResolverTests
     {
@@ -77,7 +77,9 @@ namespace Squidex.Infrastructure.Json
         {
             var value = Instant.FromDateTimeUtc(DateTime.UtcNow.Date);
 
-            value.SerializeAndDeserialize(new ConverterContractResolver(new InstantConverter()));
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
     }
 }

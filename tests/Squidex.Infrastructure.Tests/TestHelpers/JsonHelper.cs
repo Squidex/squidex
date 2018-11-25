@@ -7,64 +7,59 @@
 
 using System;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Xunit;
+using Newtonsoft.Json.Converters;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Infrastructure.TestHelpers
 {
     public static class JsonHelper
     {
-        public static void SerializeAndDeserialize<T>(this T value, IContractResolver contractResolver)
+        public static IJsonSerializer DefaultSerializer(TypeNameRegistry typeNameRegistry = null)
         {
             var serializerSettings = new JsonSerializerSettings
             {
-                ContractResolver = contractResolver,
-                NullValueHandling = NullValueHandling.Include
+                SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry ?? new TypeNameRegistry()),
+
+                ContractResolver = new ConverterContractResolver(
+                    new ClaimsPrincipalConverter(),
+                    new InstantConverter(),
+                    new JsonValueConverter(),
+                    new LanguageConverter(),
+                    new NamedGuidIdConverter(),
+                    new NamedLongIdConverter(),
+                    new NamedStringIdConverter(),
+                    new PropertiesBagConverter<EnvelopeHeaders>(),
+                    new PropertiesBagConverter<PropertiesBag>(),
+                    new RefTokenConverter(),
+                    new StringEnumConverter()),
+
+                TypeNameHandling = TypeNameHandling.Auto
             };
 
-            var result = JsonConvert.SerializeObject(Tuple.Create(value), serializerSettings);
-            var output = JsonConvert.DeserializeObject<Tuple<T>>(result, serializerSettings);
-
-            Assert.Equal(value, output.Item1);
+            return new NewtonsoftJsonSerializer(serializerSettings);
         }
 
-        public static void SerializeAndDeserialize<T>(this T value, JsonConverter converter)
+        public static T SerializeAndDeserialize<T>(this T value)
         {
-            var output = SerializeAndDeserializeAndReturn(value, converter);
+            var serializer = DefaultSerializer();
 
-            Assert.Equal(value, output);
+            return serializer.Deserialize<Tuple<T>>(serializer.Serialize(Tuple.Create(value))).Item1;
         }
 
-        public static T SerializeAndDeserializeAndReturn<T>(this T value, JsonConverter converter)
+        public static T Deserialize<T>(string value)
         {
-            var serializerSettings = CreateSettings(converter);
+            var serializer = DefaultSerializer();
 
-            var result = JsonConvert.SerializeObject(Tuple.Create(value), serializerSettings);
-            var output = JsonConvert.DeserializeObject<Tuple<T>>(result, serializerSettings);
-
-            return output.Item1;
+            return serializer.Deserialize<Tuple<T>>($"{{ \"Item1\": \"{value}\" }}").Item1;
         }
 
-        public static void DoesNotDeserialize<T>(string value, JsonConverter converter)
+        public static T Deserialize<T>(object value)
         {
-            var serializerSettings = CreateSettings(converter);
+            var serializer = DefaultSerializer();
 
-            Assert.ThrowsAny<JsonException>(() => JsonConvert.DeserializeObject<Tuple<T>>($"{{ \"Item1\": \"{value}\" }}", serializerSettings));
-        }
-
-        private static JsonSerializerSettings CreateSettings(JsonConverter converter)
-        {
-            var serializerSettings = new JsonSerializerSettings();
-
-            if (converter != null)
-            {
-                serializerSettings.Converters.Add(converter);
-            }
-
-            serializerSettings.NullValueHandling = NullValueHandling.Include;
-            serializerSettings.TypeNameHandling = TypeNameHandling.Auto;
-
-            return serializerSettings;
+            return serializer.Deserialize<Tuple<T>>($"{{ \"Item1\": {value} }}").Item1;
         }
     }
 }

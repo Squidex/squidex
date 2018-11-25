@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Xunit;
@@ -24,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
     public class RuleEventFormatterTests
     {
-        private readonly JsonSerializer serializer = JsonSerializer.CreateDefault();
+        private readonly IJsonSerializer serializer = TestData.DefaultSerializer();
         private readonly IUser user = A.Fake<IUser>();
         private readonly IRuleUrlGenerator urlGenerator = A.Fake<IRuleUrlGenerator>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var result = sut.ToPayload(new { Value = 1 });
 
-            Assert.True(result is JObject);
+            Assert.True(result is string);
         }
 
         [Fact]
@@ -58,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = sut.ToPayload(@event);
 
-            Assert.True(result is JObject);
+            Assert.True(result is string);
         }
 
         [Fact]
@@ -68,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = sut.ToEnvelope(@event);
 
-            Assert.Equal("MyEventName", result["type"]);
+            Assert.Contains("MyEventName", result);
         }
 
         [Fact]

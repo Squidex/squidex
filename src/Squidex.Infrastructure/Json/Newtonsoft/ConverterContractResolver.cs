@@ -9,7 +9,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
     public sealed class ConverterContractResolver : CamelCasePropertyNamesContractResolver
     {

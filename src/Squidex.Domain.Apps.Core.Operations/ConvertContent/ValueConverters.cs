@@ -7,41 +7,41 @@
 
 using System;
 using System.Text;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
-    public delegate JToken ValueConverter(JToken value, IField field);
+    public delegate IJsonValue ValueConverter(IJsonValue value, IField field);
 
     public static class ValueConverters
     {
-        public static ValueConverter DecodeJson()
+        public static ValueConverter DecodeJson(IJsonSerializer jsonSerializer)
         {
             return (value, field) =>
             {
-                if (!value.IsNull() && field is IField<JsonFieldProperties>)
+                if (field is IField<JsonFieldProperties> && value is JsonScalar<string> s)
                 {
-                    var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(value.ToString()));
+                    var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(s.Value));
 
-                   return JToken.Parse(decoded);
+                    return jsonSerializer.Deserialize<IJsonValue>(decoded);
                 }
 
                 return value;
             };
         }
 
-        public static ValueConverter EncodeJson()
+        public static ValueConverter EncodeJson(IJsonSerializer jsonSerializer)
         {
             return (value, field) =>
             {
-                if (!value.IsNull() && field is IField<JsonFieldProperties>)
+                if (value.Type != JsonValueType.Null && field is IField<JsonFieldProperties>)
                 {
-                    var encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(value.ToString()));
+                    var encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonSerializer.Serialize(value)));
 
-                    return encoded;
+                    return JsonValue.Create(encoded);
                 }
 
                 return value;
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
         {
             return (value, field) =>
             {
-                if (value.IsNull())
+                if (value.Type == JsonValueType.Null)
                 {
                     return value;
                 }

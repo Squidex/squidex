@@ -7,8 +7,7 @@
 
 using System;
 using Newtonsoft.Json;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {

@@ -7,45 +7,80 @@
 
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
     public sealed class JsonValueConverter : IFieldVisitor<object>
     {
-        private readonly JToken value;
+        private readonly IJsonValue value;
 
-        private JsonValueConverter(JToken value)
+        private JsonValueConverter(IJsonValue value)
         {
             this.value = value;
         }
 
-        public static object ConvertValue(IField field, JToken json)
+        public static object ConvertValue(IField field, IJsonValue json)
         {
             return field.Accept(new JsonValueConverter(json));
         }
 
         public object Visit(IArrayField field)
         {
-            return value.ToObject<List<JObject>>();
+            return ConvertToObjectList();
         }
 
         public object Visit(IField<AssetsFieldProperties> field)
         {
-            return value.ToObject<List<Guid>>();
+            return ConvertToGuidList();
+        }
+
+        public object Visit(IField<ReferencesFieldProperties> field)
+        {
+            return ConvertToGuidList();
+        }
+
+        public object Visit(IField<TagsFieldProperties> field)
+        {
+            return ConvertToStringList();
         }
 
         public object Visit(IField<BooleanFieldProperties> field)
         {
-            return (bool?)value;
+            if (value is JsonScalar<bool> b)
+            {
+                return b.Value;
+            }
+
+            throw new InvalidCastException("Invalid json type, expected boolean.");
+        }
+
+        public object Visit(IField<NumberFieldProperties> field)
+        {
+            if (value is JsonScalar<double> b)
+            {
+                return b.Value;
+            }
+
+            throw new InvalidCastException("Invalid json type, expected number.");
+        }
+
+        public object Visit(IField<StringFieldProperties> field)
+        {
+            if (value is JsonScalar<string> b)
+            {
+                return b.Value;
+            }
+
+            throw new InvalidCastException("Invalid json type, expected string.");
         }
 
         public object Visit(IField<DateTimeFieldProperties> field)
         {
-            if (value.Type == JTokenType.String)
+            if (value.Type == JsonValueType.String)
             {
                 var parseResult = InstantPattern.General.Parse(value.ToString());
 
@@ -62,31 +97,49 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         public object Visit(IField<GeolocationFieldProperties> field)
         {
-            var geolocation = (JObject)value;
-
-            foreach (var property in geolocation.Properties())
+            if (value is JsonObject geolocation)
             {
-                if (!string.Equals(property.Name, "latitude", StringComparison.OrdinalIgnoreCase) &&
-                    !string.Equals(property.Name, "longitude", StringComparison.OrdinalIgnoreCase))
+                foreach (var propertyName in geolocation.Keys)
                 {
-                    throw new InvalidCastException("Geolocation can only have latitude and longitude property.");
+                    if (!string.Equals(propertyName, "latitude", StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(propertyName, "longitude", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidCastException("Geolocation can only have latitude and longitude property.");
+                    }
                 }
+
+                if (geolocation.TryGetValue("latitude", out var latValue) && latValue is JsonScalar<double> latNumber)
+                {
+                    var lat = latNumber.Value;
+
+                    if (!lat.IsBetween(-90, 90))
+                    {
+                        throw new InvalidCastException("Latitude must be between -90 and 90.");
+                    }
+                }
+                else
+                {
+                    throw new InvalidCastException("Invalid json type, expected latitude/longitude object.");
+                }
+
+                if (geolocation.TryGetValue("longitude", out var lonValue) && lonValue is JsonScalar<double> lonNumber)
+                {
+                    var lon = lonNumber.Value;
+
+                    if (!lon.IsBetween(-180, 180))
+                    {
+                        throw new InvalidCastException("Longitude must be between -180 and 180.");
+                    }
+                }
+                else
+                {
+                    throw new InvalidCastException("Invalid json type, expected latitude/longitude object.");
+                }
+
+                return value;
             }
 
-            var lat = (double)geolocation["latitude"];
-            var lon = (double)geolocation["longitude"];
-
-            if (!lat.IsBetween(-90, 90))
-            {
-                throw new InvalidCastException("Latitude must be between -90 and 90.");
-            }
-
-            if (!lon.IsBetween(-180, 180))
-            {
-                throw new InvalidCastException("Longitude must be between -180 and 180.");
-            }
-
-            return value;
+            throw new InvalidCastException("Invalid json type, expected latitude/longitude object.");
         }
 
         public object Visit(IField<JsonFieldProperties> field)
@@ -94,24 +147,76 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return value;
         }
 
-        public object Visit(IField<NumberFieldProperties> field)
+        private object ConvertToGuidList()
         {
-            return (double?)value;
+            if (value is JsonArray array)
+            {
+                var result = new List<Guid>();
+
+                foreach (var item in array)
+                {
+                    if (item is JsonScalar<string> s && Guid.TryParse(s.Value, out var guid))
+                    {
+                        result.Add(guid);
+                    }
+                    else
+                    {
+                        throw new InvalidCastException("Invalid json type, expected array of guid strings.");
+                    }
+                }
+
+                return result;
+            }
+
+            throw new InvalidCastException("Invalid json type, expected array of guid strings.");
         }
 
-        public object Visit(IField<ReferencesFieldProperties> field)
+        private object ConvertToStringList()
         {
-            return value.ToObject<List<Guid>>();
+            if (value is JsonArray array)
+            {
+                var result = new List<string>();
+
+                foreach (var item in array)
+                {
+                    if (item is JsonScalar<string> s)
+                    {
+                        result.Add(s.Value);
+                    }
+                    else
+                    {
+                        throw new InvalidCastException("Invalid json type, expected array of strings.");
+                    }
+                }
+
+                return result;
+            }
+
+            throw new InvalidCastException("Invalid json type, expected array of strings.");
         }
 
-        public object Visit(IField<StringFieldProperties> field)
+        private object ConvertToObjectList()
         {
-            return value.ToString();
-        }
+            if (value is JsonArray array)
+            {
+                var result = new List<JsonObject>();
 
-        public object Visit(IField<TagsFieldProperties> field)
-        {
-            return value.ToObject<List<string>>();
+                foreach (var item in array)
+                {
+                    if (item is JsonObject obj)
+                    {
+                        result.Add(obj);
+                    }
+                    else
+                    {
+                        throw new InvalidCastException("Invalid json type, expected array of objects.");
+                    }
+                }
+
+                return result;
+            }
+
+            throw new InvalidCastException("Invalid json type, expected array of objects.");
         }
     }
 }

@@ -8,9 +8,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new NumberFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(JsonValue.Null, errors);
 
             Assert.Empty(errors);
         }
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new NumberFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(JsonValue.Null, errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
@@ -86,15 +86,15 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new NumberFieldProperties());
 
-            await sut.ValidateAsync(CreateValue("Invalid"), errors);
+            await sut.ValidateAsync(JsonValue.Create("Invalid"), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
         }
 
-        private static JValue CreateValue(object v)
+        private static IJsonValue CreateValue(double v)
         {
-            return new JValue(v);
+            return JsonValue.Create(v);
         }
 
         private static RootField<NumberFieldProperties> Field(NumberFieldProperties properties)

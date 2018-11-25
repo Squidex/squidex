@@ -32,8 +32,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static EventStoreData Write(EventData eventData)
         {
-            var body = Encoding.UTF8.GetBytes(eventData.Payload.ToString());
-            var meta = Encoding.UTF8.GetBytes(eventData.Metadata.ToString());
+            var body = Encoding.UTF8.GetBytes(eventData.Payload);
+            var meta = Encoding.UTF8.GetBytes(eventData.Metadata);
 
             return new EventStoreData(Guid.NewGuid(), eventData.Type, true, body, meta);
         }

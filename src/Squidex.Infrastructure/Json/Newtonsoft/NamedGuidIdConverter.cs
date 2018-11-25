@@ -8,16 +8,16 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public sealed class NamedLongIdConverter : JsonClassConverter<NamedId<long>>
+    public sealed class NamedGuidIdConverter : JsonClassConverter<NamedId<Guid>>
     {
-        protected override void WriteValue(JsonWriter writer, NamedId<long> value, JsonSerializer serializer)
+        protected override void WriteValue(JsonWriter writer, NamedId<Guid> value, JsonSerializer serializer)
         {
             writer.WriteValue($"{value.Id},{value.Name}");
         }
 
-        protected override NamedId<long> ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
+        protected override NamedId<Guid> ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.String)
             {
@@ -26,7 +26,7 @@ namespace Squidex.Infrastructure.Json
 
             try
             {
-                return NamedId<long>.Parse(reader.Value.ToString(), long.TryParse);
+                return NamedId<Guid>.Parse(reader.Value.ToString(), Guid.TryParse);
             }
             catch (ArgumentException ex)
             {

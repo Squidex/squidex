@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using NodaTime;
 using NodaTime.Text;
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
     public sealed class InstantConverter : JsonConverter
     {

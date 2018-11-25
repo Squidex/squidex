@@ -9,11 +9,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 #pragma warning disable SA1028, IDE0004 // Code must not contain trailing whitespace
 
@@ -22,7 +22,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
     public sealed class ContentValidator
     {
         private static readonly ContentFieldData DefaultFieldData = new ContentFieldData();
-        private static readonly JToken DefaultValue = JValue.CreateNull();
         private readonly Schema schema;
         private readonly PartitionResolver partitionResolver;
         private readonly ValidationContext context;
@@ -96,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             var type = isLanguage ? "language" : "invariant value";
 
-            return new ObjectValidator<JToken>(fieldsValidators, isPartial, type, DefaultValue);
+            return new ObjectValidator<IJsonValue>(fieldsValidators, isPartial, type, JsonValue.Null);
         }
     }
 }

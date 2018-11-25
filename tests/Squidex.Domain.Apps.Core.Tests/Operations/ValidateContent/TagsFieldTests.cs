@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new TagsFieldProperties());
 
-            await sut.ValidateAsync("invalid", errors);
+            await sut.ValidateAsync(JsonValue.Create("invalid"), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
@@ -114,9 +114,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new[] { "[1]: Not an allowed value." });
         }
 
-        private static JToken CreateValue(params string[] ids)
+        private static IJsonValue CreateValue(params string[] ids)
         {
-            return ids == null ? JValue.CreateNull() : (JToken)new JArray(ids.OfType<object>().ToArray());
+            return ids == null ? (IJsonValue)JsonValue.Null : JsonValue.Array(ids.OfType<object>().ToArray());
         }
 
         private static RootField<TagsFieldProperties> Field(TagsFieldProperties properties)

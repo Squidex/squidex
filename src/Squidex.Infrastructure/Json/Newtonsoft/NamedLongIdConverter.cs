@@ -6,33 +6,32 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using Newtonsoft.Json;
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public sealed class NamedStringIdConverter : JsonClassConverter<NamedId<string>>
+    public sealed class NamedLongIdConverter : JsonClassConverter<NamedId<long>>
     {
-        protected override void WriteValue(JsonWriter writer, NamedId<string> value, JsonSerializer serializer)
+        protected override void WriteValue(JsonWriter writer, NamedId<long> value, JsonSerializer serializer)
         {
             writer.WriteValue($"{value.Id},{value.Name}");
         }
 
-        protected override NamedId<string> ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
+        protected override NamedId<long> ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.String)
             {
                 throw new JsonException($"Expected String, but got {reader.TokenType}.");
             }
 
-            var parts = reader.Value.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (parts.Length < 2)
+            try
             {
-                throw new JsonException("Named id must have more than 2 parts divided by colon.");
+                return NamedId<long>.Parse(reader.Value.ToString(), long.TryParse);
             }
-
-            return NamedId.Of(parts[0], string.Join(",", parts.Skip(1)));
+            catch (ArgumentException ex)
+            {
+                throw new JsonException(ex.Message);
+            }
         }
     }
 }
