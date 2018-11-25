@@ -31,12 +31,12 @@ namespace Squidex.Areas.IdentityServer.Config
 
         public static IServiceProvider UseMyAdmin(this IServiceProvider services)
         {
-            var options = services.GetService<IOptions<MyIdentityOptions>>().Value;
+            var options = services.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
 
-            var userManager = services.GetService<UserManager<IdentityUser>>();
-            var userFactory = services.GetService<IUserFactory>();
+            var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+            var userFactory = services.GetRequiredService<IUserFactory>();
 
-            var log = services.GetService<ISemanticLog>();
+            var log = services.GetRequiredService<ISemanticLog>();
 
             if (options.IsAdminConfigured())
             {

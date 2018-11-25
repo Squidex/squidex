@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Object();
 
-            var result = ValueConverters.EncodeJson(TestData.DefaultSerializer)(source, jsonField);
+            var result = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, jsonField);
 
             Assert.Equal(JsonValue.Create("e30="), result);
         }
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Null;
 
-            var result = ValueConverters.EncodeJson(TestData.DefaultSerializer)(source, jsonField);
+            var result = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, jsonField);
 
             Assert.Same(source, result);
         }
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Create("NO-JSON");
 
-            var result = ValueConverters.EncodeJson(TestData.DefaultSerializer)(source, stringField);
+            var result = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, stringField);
 
             Assert.Same(source, result);
         }
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Create("e30=");
 
-            var result = ValueConverters.DecodeJson(TestData.DefaultSerializer)(source, jsonField);
+            var result = ValueConverters.DecodeJson(TestUtils.DefaultSerializer)(source, jsonField);
 
             Assert.Equal(JsonValue.Object(), result);
         }
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Null;
 
-            var result = ValueConverters.DecodeJson(TestData.DefaultSerializer)(source, jsonField);
+            var result = ValueConverters.DecodeJson(TestUtils.DefaultSerializer)(source, jsonField);
 
             Assert.Same(source, result);
         }
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source = JsonValue.Null;
 
-            var result = ValueConverters.EncodeJson(TestData.DefaultSerializer)(source, stringField);
+            var result = ValueConverters.EncodeJson(TestUtils.DefaultSerializer)(source, stringField);
 
             Assert.Same(source, result);
         }

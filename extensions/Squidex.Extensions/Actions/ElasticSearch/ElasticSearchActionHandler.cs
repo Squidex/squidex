@@ -60,7 +60,9 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                 {
                     ruleDescription = $"Upsert to index: {action.IndexName}";
 
-                    ruleJob.Content = ToPayload(contentEvent);
+                    var json = ToJson(contentEvent);
+
+                    ruleJob.Content = JObject.Parse(json);
                     ruleJob.Content["objectID"] = contentId;
                 }
 

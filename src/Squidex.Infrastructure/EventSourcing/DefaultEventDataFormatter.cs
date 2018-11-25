@@ -25,12 +25,12 @@ namespace Squidex.Infrastructure.EventSourcing
             this.serializer = serializer;
         }
 
-        public Envelope<IEvent> Parse(EventData eventData, bool migrate = true)
+        public Envelope<IEvent> Parse(EventData eventData, bool migrate = true, Func<string, string> stringConverter = null)
         {
             var eventType = typeNameRegistry.GetType(eventData.Type);
 
-            var eventHeaders = serializer.Deserialize<EnvelopeHeaders>(eventData.Metadata);
-            var eventContent = serializer.Deserialize<IEvent>(eventData.Payload, eventType);
+            var eventHeaders = serializer.Deserialize<EnvelopeHeaders>(eventData.Metadata, null, stringConverter);
+            var eventContent = serializer.Deserialize<IEvent>(eventData.Payload, eventType, stringConverter);
 
             if (migrate && eventContent is IMigratedEvent migratedEvent)
             {

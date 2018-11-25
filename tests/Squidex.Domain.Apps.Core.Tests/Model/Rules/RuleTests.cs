@@ -128,7 +128,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         [MemberData(nameof(Triggers))]
         public void Should_freeze_triggers(RuleTrigger trigger)
         {
-            TestData.TestFreeze(trigger);
+            TestUtils.TestFreeze(trigger);
         }
     }
 }

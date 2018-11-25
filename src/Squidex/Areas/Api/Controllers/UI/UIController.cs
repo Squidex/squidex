@@ -55,9 +55,10 @@ namespace Squidex.Areas.Api.Controllers.UI
         {
             var result = await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).GetAsync();
 
-            result.Value["mapType"] = uiOptions.Map?.Type ?? "OSM";
-            result.Value["mapKey"] = uiOptions.Map?.GoogleMaps?.Key;
-            result.Value["supportTwitterAction"] = twitterOptions.IsConfigured();
+            result.Value.Add("mapType", uiOptions.Map?.Type ?? "OSM");
+            result.Value.Add("mapKey", uiOptions.Map?.GoogleMaps?.Key);
+
+            result.Value.Add("supportTwitterAction", twitterOptions.IsConfigured());
 
             return Ok(result.Value);
         }

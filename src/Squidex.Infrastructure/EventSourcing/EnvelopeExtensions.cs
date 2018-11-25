@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Globalization;
 using NodaTime;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -27,7 +26,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static long EventStreamNumber(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.EventStreamNumber].ToInt64(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.EventStreamNumber].ToInt64();
         }
 
         public static Envelope<T> SetEventStreamNumber<T>(this Envelope<T> envelope, long value) where T : class
@@ -39,7 +38,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Guid CommitId(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.CommitId].ToGuid(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.CommitId].ToGuid();
         }
 
         public static Envelope<T> SetCommitId<T>(this Envelope<T> envelope, Guid value) where T : class
@@ -51,7 +50,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Guid AggregateId(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.AggregateId].ToGuid(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.AggregateId].ToGuid();
         }
 
         public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, Guid value) where T : class
@@ -63,7 +62,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Guid EventId(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.EventId].ToGuid(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.EventId].ToGuid();
         }
 
         public static Envelope<T> SetEventId<T>(this Envelope<T> envelope, Guid value) where T : class
@@ -75,7 +74,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Instant Timestamp(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.Timestamp].ToInstant(CultureInfo.InvariantCulture);
+            return headers[CommonHeaders.Timestamp].ToInstant();
         }
 
         public static Envelope<T> SetTimestamp<T>(this Envelope<T> envelope, Instant value) where T : class

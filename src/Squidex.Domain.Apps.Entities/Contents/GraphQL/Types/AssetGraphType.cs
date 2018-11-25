@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "created",
                 ResolvedType = AllTypes.NonNullDate,
-                Resolver = Resolve(x => x.Created.ToDateTimeUtc()),
+                Resolver = Resolve(x => x.Created),
                 Description = "The date and time when the asset has been created."
             });
 
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "lastModified",
                 ResolvedType = AllTypes.NonNullDate,
-                Resolver = Resolve(x => x.LastModified.ToDateTimeUtc()),
+                Resolver = Resolve(x => x.LastModified),
                 Description = "The date and time when the asset has been modified last."
             });
 

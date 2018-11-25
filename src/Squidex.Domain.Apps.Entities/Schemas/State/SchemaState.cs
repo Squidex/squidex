@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events;
@@ -22,43 +22,43 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
     [CollectionName("Schemas")]
     public class SchemaState : DomainObjectState<SchemaState>, ISchemaEntity
     {
-        [JsonProperty]
+        [DataMember]
         public NamedId<Guid> AppId { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public string Name { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public string Category { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public int TotalFields { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public bool IsDeleted { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public bool IsSingleton { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public string ScriptQuery { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public string ScriptCreate { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public string ScriptUpdate { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public string ScriptDelete { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public string ScriptChange { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public Schema SchemaDef { get; set; }
 
-        [JsonIgnore]
+        [IgnoreDataMember]
         public bool IsPublished
         {
             get { return SchemaDef.IsPublished; }

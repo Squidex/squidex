@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "me") });
 
-            sut = new RuleEventFormatter(TestData.DefaultSerializer, urlGenerator);
+            sut = new RuleEventFormatter(TestUtils.DefaultSerializer, urlGenerator);
         }
 
         [Fact]

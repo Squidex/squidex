@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure
 
         private static Language AddLanguage(string iso2Code, string englishName)
         {
-            return AllLanguagesField.GetOrAdd(iso2Code, code => new Language(code, englishName));
+            return AllLanguagesField.GetOrAdd(iso2Code, englishName, (c, n) => new Language(c, n));
         }
 
         public static Language GetLanguage(string iso2Code)

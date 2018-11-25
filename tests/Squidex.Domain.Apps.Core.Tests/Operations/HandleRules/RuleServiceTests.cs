@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.TriggerType)
                 .Returns(typeof(ContentChangedTrigger));
 
-            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, TestData.DefaultSerializer, clock, typeNameRegistry);
+            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, TestUtils.DefaultSerializer, clock, typeNameRegistry);
         }
 
         [Fact]

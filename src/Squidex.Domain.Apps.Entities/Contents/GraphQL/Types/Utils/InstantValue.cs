@@ -6,20 +6,20 @@
 // ==========================================================================
 
 using GraphQL.Language.AST;
-using Squidex.Infrastructure.Json.Objects;
+using NodaTime;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
-    public sealed class JsonValue : ValueNode<IJsonValue>
+    public sealed class InstantValue : ValueNode<Instant>
     {
-        public JsonValue(IJsonValue value)
+        public InstantValue(Instant value)
         {
             Value = value;
         }
 
-        protected override bool Equals(ValueNode<IJsonValue> node)
+        protected override bool Equals(ValueNode<Instant> node)
         {
-            return false;
+            return Value.Equals(node.Value);
         }
     }
 }

@@ -13,14 +13,15 @@ using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     internal sealed class MongoContentPublishedCollection : MongoContentCollection
     {
-        public MongoContentPublishedCollection(IMongoDatabase database)
-            : base(database, "State_Content_Published")
+        public MongoContentPublishedCollection(IMongoDatabase database, IJsonSerializer serializer)
+            : base(database, serializer, "State_Content_Published")
         {
         }
 
@@ -42,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 await Collection.Find(x => x.IndexedSchemaId == schema.Id && x.Id == id).Not(x => x.DataText)
                     .FirstOrDefaultAsync();
 
-            contentEntity?.ParseData(schema.SchemaDef);
+            contentEntity?.ParseData(schema.SchemaDef, Serializer);
 
             return contentEntity;
         }

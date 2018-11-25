@@ -12,12 +12,12 @@ namespace Squidex.Infrastructure.Json
 {
     public interface IJsonSerializer
     {
-        string Serialize<T>(T value);
+        string Serialize<T>(T value, bool intented = false);
 
         void Serialize<T>(T value, Stream stream);
 
-        T Deserialize<T>(string value, Type actualType = null);
+        T Deserialize<T>(string value, Type actualType = null, Func<string, string> stringConverter = null);
 
-        T Deserialize<T>(Stream stream, Type actualType = null);
+        T Deserialize<T>(Stream stream, Type actualType = null, Func<string, string> stringConverter = null);
     }
 }

@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -24,22 +24,22 @@ namespace Squidex.Domain.Apps.Entities
         IUpdateableEntityWithLastModifiedBy
         where T : Cloneable
     {
-        [JsonProperty]
+        [DataMember]
         public Guid Id { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public RefToken CreatedBy { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public RefToken LastModifiedBy { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public Instant Created { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public Instant LastModified { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public long Version { get; set; } = EtagVersion.Empty;
 
         public T Clone()

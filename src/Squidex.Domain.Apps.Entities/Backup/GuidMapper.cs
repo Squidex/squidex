@@ -7,112 +7,39 @@
 
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class GuidMapper
+    internal sealed class GuidMapper
     {
         private static readonly int GuidLength = Guid.Empty.ToString().Length;
-        private readonly List<(JObject Source, string NewKey, string OldKey)> mappings = new List<(JObject Source, string NewKey, string OldKey)>();
         private readonly Dictionary<Guid, Guid> oldToNewGuid = new Dictionary<Guid, Guid>();
         private readonly Dictionary<Guid, Guid> newToOldGuid = new Dictionary<Guid, Guid>();
-
-        public Guid NewGuid(Guid oldGuid)
-        {
-            return oldToNewGuid.GetOrDefault(oldGuid);
-        }
 
         public Guid OldGuid(Guid newGuid)
         {
             return newToOldGuid.GetOrDefault(newGuid);
         }
 
-        public string NewGuidString(string key)
+        public string NewGuidOrNull(string value)
         {
-            if (Guid.TryParse(key, out var guid))
+            if (TryGenerateNewGuidString(value, out var result) || TryGenerateNewNamedId(value, out result))
             {
-                return GenerateNewGuid(guid).ToString();
+                return result;
             }
 
             return null;
         }
 
-        public JToken NewGuids(JToken jToken)
+        public string NewGuidOrValue(string value)
         {
-            var result = NewGuidsCore(jToken);
-
-            if (mappings.Count > 0)
+            if (TryGenerateNewGuidString(value, out var result) || TryGenerateNewNamedId(value, out result))
             {
-                foreach (var mapping in mappings)
-                {
-                    if (mapping.Source.TryGetValue(mapping.OldKey, out var value))
-                    {
-                        mapping.Source.Remove(mapping.OldKey);
-                        mapping.Source[mapping.NewKey] = value;
-                    }
-                }
-
-                mappings.Clear();
+                return result;
             }
 
-            return result;
-        }
-
-        private JToken NewGuidsCore(JToken jToken)
-        {
-            switch (jToken.Type)
-            {
-                case JTokenType.String:
-                    if (TryConvertString(jToken.ToString(), out var result))
-                    {
-                        return result;
-                    }
-
-                    break;
-                case JTokenType.Guid:
-                    return GenerateNewGuid((Guid)jToken);
-                case JTokenType.Object:
-                    NewGuidsCore((JObject)jToken);
-                    break;
-                case JTokenType.Array:
-                    NewGuidsCore((JArray)jToken);
-                    break;
-            }
-
-            return jToken;
-        }
-
-        private void NewGuidsCore(JArray jArray)
-        {
-            for (var i = 0; i < jArray.Count; i++)
-            {
-                jArray[i] = NewGuidsCore(jArray[i]);
-            }
-        }
-
-        private void NewGuidsCore(JObject jObject)
-        {
-            foreach (var jProperty in jObject.Properties())
-            {
-                var newValue = NewGuidsCore(jProperty.Value);
-
-                if (!ReferenceEquals(newValue, jProperty.Value))
-                {
-                    jProperty.Value = newValue;
-                }
-
-                if (TryConvertString(jProperty.Name, out var newKey))
-                {
-                    mappings.Add((jObject, newKey, jProperty.Name));
-                }
-            }
-        }
-
-        private bool TryConvertString(string value, out string result)
-        {
-            return TryGenerateNewGuidString(value, out result) || TryGenerateNewNamedId(value, out result);
+            return value;
         }
 
         private bool TryGenerateNewGuidString(string value, out string result)

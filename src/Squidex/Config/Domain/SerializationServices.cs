@@ -20,7 +20,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Extensions.Actions;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Config.Domain
 {
@@ -49,6 +49,7 @@ namespace Squidex.Config.Domain
                 new AppPatternsConverter(),
                 new ClaimsPrincipalConverter(),
                 new InstantConverter(),
+                new JsonValueConverter(),
                 new LanguageConverter(),
                 new LanguagesConfigConverter(),
                 new NamedGuidIdConverter(),
@@ -85,6 +86,8 @@ namespace Squidex.Config.Domain
             services.AddSingleton(DefaultJsonSettings);
             services.AddSingleton(DefaultJsonSerializer);
             services.AddSingleton(TypeNameRegistry);
+
+            services.AddSingleton(new NewtonsoftJsonSerializer(DefaultJsonSettings));
 
             return services;
         }

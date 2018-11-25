@@ -1,12 +1,11 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright () Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
-using System.Globalization;
 using System.Linq;
 using Microsoft.CSharp.RuntimeBinder;
 using NodaTime;
@@ -17,7 +16,6 @@ namespace Squidex.Infrastructure
 {
     public class PropertiesBagTests
     {
-        private readonly CultureInfo c = CultureInfo.InvariantCulture;
         private readonly PropertiesBag bag = new PropertiesBag();
         private readonly dynamic dynamicBag;
 
@@ -52,7 +50,7 @@ namespace Squidex.Infrastructure
                 Assert.Equal(kvp.Value.RawValue, bag[kvp.Key].RawValue);
             }
 
-            Assert.Equal(bag["Key5"].ToGuid(c), output["Key5"].ToGuid(c));
+            Assert.Equal(bag["Key5"].ToGuid(), output["Key5"].ToGuid());
         }
 
         [Fact]
@@ -84,7 +82,7 @@ namespace Squidex.Infrastructure
             Assert.True(bag.Contains("NewKey"));
 
             Assert.Equal(1, bag.Count);
-            Assert.Equal(123, bag["NewKey"].ToInt64(c));
+            Assert.Equal(123, bag["NewKey"].ToInt64());
 
             Assert.False(bag.Contains("OldKey"));
         }
@@ -172,7 +170,7 @@ namespace Squidex.Infrastructure
         {
             bag.Set("Key", "abc");
 
-            Assert.Throws<InvalidCastException>(() => bag["Key"].ToInt64(CultureInfo.InvariantCulture));
+            Assert.Throws<InvalidCastException>(() => bag["Key"].ToInt64());
         }
 
         [Fact]
@@ -212,7 +210,7 @@ namespace Squidex.Infrastructure
         {
             bag.Set("Key", long.MaxValue);
 
-            Assert.Throws<InvalidCastException>(() => bag["Key"].ToInt32(c));
+            Assert.Throws<InvalidCastException>(() => bag["Key"].ToInt32());
         }
 
         [Fact]
@@ -236,7 +234,7 @@ namespace Squidex.Infrastructure
         {
             bag.Set("Key", double.MaxValue);
 
-            Assert.Equal(float.PositiveInfinity, bag["Key"].ToSingle(c));
+            Assert.Equal(float.PositiveInfinity, bag["Key"].ToSingle());
         }
 
         [Fact]
@@ -340,7 +338,7 @@ namespace Squidex.Infrastructure
         {
             bag.Set("Key", SystemClock.Instance.GetCurrentInstant());
 
-            Assert.Throws<InvalidCastException>(() => bag["Key"].ToGuid(CultureInfo.InvariantCulture));
+            Assert.Throws<InvalidCastException>(() => bag["Key"].ToGuid());
         }
 
         private void AssertNumber()
@@ -366,8 +364,8 @@ namespace Squidex.Infrastructure
 
         private void AssertBoolean(bool expected)
         {
-            Assert.Equal(expected, bag["Key"].ToBoolean(c));
-            Assert.Equal(expected, bag["Key"].ToNullableBoolean(c));
+            Assert.Equal(expected, bag["Key"].ToBoolean());
+            Assert.Equal(expected, bag["Key"].ToNullableBoolean());
 
             Assert.Equal(expected, (bool)dynamicBag.Key);
             Assert.Equal(expected, (bool?)dynamicBag.Key);
@@ -375,8 +373,8 @@ namespace Squidex.Infrastructure
 
         private void AssertInstant(Instant expected)
         {
-            Assert.Equal(expected, bag["Key"].ToInstant(c));
-            Assert.Equal(expected, bag["Key"].ToNullableInstant(c).Value);
+            Assert.Equal(expected, bag["Key"].ToInstant());
+            Assert.Equal(expected, bag["Key"].ToNullableInstant().Value);
 
             Assert.Equal(expected, (Instant)dynamicBag.Key);
             Assert.Equal(expected, (Instant?)dynamicBag.Key);
@@ -384,8 +382,8 @@ namespace Squidex.Infrastructure
 
         private void AssertGuid(Guid expected)
         {
-            Assert.Equal(expected, bag["Key"].ToGuid(c));
-            Assert.Equal(expected, bag["Key"].ToNullableGuid(c));
+            Assert.Equal(expected, bag["Key"].ToGuid());
+            Assert.Equal(expected, bag["Key"].ToNullableGuid());
 
             Assert.Equal(expected, (Guid)dynamicBag.Key);
             Assert.Equal(expected, (Guid?)dynamicBag.Key);
@@ -393,8 +391,8 @@ namespace Squidex.Infrastructure
 
         private void AssertDouble(double expected)
         {
-            Assert.Equal(expected, bag["Key"].ToDouble(c));
-            Assert.Equal(expected, bag["Key"].ToNullableDouble(c));
+            Assert.Equal(expected, bag["Key"].ToDouble());
+            Assert.Equal(expected, bag["Key"].ToNullableDouble());
 
             Assert.Equal(expected, (double)dynamicBag.Key);
             Assert.Equal(expected, (double?)dynamicBag.Key);
@@ -402,8 +400,8 @@ namespace Squidex.Infrastructure
 
         private void AssertSingle(float expected)
         {
-            Assert.Equal(expected, bag["Key"].ToSingle(c));
-            Assert.Equal(expected, bag["Key"].ToNullableSingle(c));
+            Assert.Equal(expected, bag["Key"].ToSingle());
+            Assert.Equal(expected, bag["Key"].ToNullableSingle());
 
             Assert.Equal(expected, (float)dynamicBag.Key);
             Assert.Equal(expected, (float?)dynamicBag.Key);
@@ -411,8 +409,8 @@ namespace Squidex.Infrastructure
 
         private void AssertInt32(long expected)
         {
-            Assert.Equal(expected, bag["Key"].ToInt64(c));
-            Assert.Equal(expected, bag["Key"].ToNullableInt64(c));
+            Assert.Equal(expected, bag["Key"].ToInt64());
+            Assert.Equal(expected, bag["Key"].ToNullableInt64());
 
             Assert.Equal(expected, (long)dynamicBag.Key);
             Assert.Equal(expected, (long?)dynamicBag.Key);
@@ -420,8 +418,8 @@ namespace Squidex.Infrastructure
 
         private void AssertInt64(int expected)
         {
-            Assert.Equal(expected, bag["Key"].ToInt64(c));
-            Assert.Equal(expected, bag["Key"].ToNullableInt64(c));
+            Assert.Equal(expected, bag["Key"].ToInt64());
+            Assert.Equal(expected, bag["Key"].ToNullableInt64());
 
             Assert.Equal(expected, (int)dynamicBag.Key);
             Assert.Equal(expected, (int?)dynamicBag.Key);

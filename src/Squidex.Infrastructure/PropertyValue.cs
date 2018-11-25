@@ -18,24 +18,24 @@ namespace Squidex.Infrastructure
     {
         private readonly object rawValue;
 
-        private static readonly Dictionary<Type, Func<PropertyValue, CultureInfo, object>> Parsers =
-            new Dictionary<Type, Func<PropertyValue, CultureInfo, object>>
+        private static readonly Dictionary<Type, Func<PropertyValue, object>> Parsers =
+            new Dictionary<Type, Func<PropertyValue, object>>
             {
-                { typeof(string),   (p, c) => p.ToString() },
-                { typeof(bool),     (p, c) => p.ToBoolean(c) },
-                { typeof(bool?),    (p, c) => p.ToNullableBoolean(c) },
-                { typeof(float),    (p, c) => p.ToSingle(c) },
-                { typeof(float?),   (p, c) => p.ToNullableSingle(c) },
-                { typeof(double),   (p, c) => p.ToDouble(c) },
-                { typeof(double?),  (p, c) => p.ToNullableDouble(c) },
-                { typeof(int),      (p, c) => p.ToInt32(c) },
-                { typeof(int?),     (p, c) => p.ToNullableInt32(c) },
-                { typeof(long),     (p, c) => p.ToInt64(c) },
-                { typeof(long?),    (p, c) => p.ToNullableInt64(c) },
-                { typeof(Instant),  (p, c) => p.ToInstant(c) },
-                { typeof(Instant?), (p, c) => p.ToNullableInstant(c) },
-                { typeof(Guid),     (p, c) => p.ToGuid(c) },
-                { typeof(Guid?),    (p, c) => p.ToNullableGuid(c) }
+                { typeof(string),   p => p.ToString() },
+                { typeof(bool),     p => p.ToBoolean() },
+                { typeof(bool?),    p => p.ToNullableBoolean() },
+                { typeof(float),    p => p.ToSingle() },
+                { typeof(float?),   p => p.ToNullableSingle() },
+                { typeof(double),   p => p.ToDouble() },
+                { typeof(double?),  p => p.ToNullableDouble() },
+                { typeof(int),      p => p.ToInt32() },
+                { typeof(int?),     p => p.ToNullableInt32() },
+                { typeof(long),     p => p.ToInt64() },
+                { typeof(long?),    p => p.ToNullableInt64() },
+                { typeof(Instant),  p => p.ToInstant() },
+                { typeof(Instant?), p => p.ToNullableInstant() },
+                { typeof(Guid),     p => p.ToGuid() },
+                { typeof(Guid?),    p => p.ToNullableGuid() }
             };
 
         public object RawValue
@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure
                 return false;
             }
 
-            result = parser(this, CultureInfo.InvariantCulture);
+            result = parser(this);
 
             return true;
         }
@@ -72,74 +72,74 @@ namespace Squidex.Infrastructure
             return rawValue?.ToString();
         }
 
-        public bool ToBoolean(CultureInfo culture)
+        public bool ToBoolean()
         {
-            return ToOrParseValue(culture, ParseBoolean);
+            return ToOrParseValue(CultureInfo.InvariantCulture, ParseBoolean);
         }
 
-        public bool? ToNullableBoolean(CultureInfo culture)
+        public bool? ToNullableBoolean()
         {
-            return ToNullableOrParseValue(culture, ParseBoolean);
+            return ToNullableOrParseValue(CultureInfo.InvariantCulture, ParseBoolean);
         }
 
-        public float ToSingle(CultureInfo culture)
+        public float ToSingle()
         {
-            return ToOrParseValue(culture, x => float.Parse(x, culture));
+            return ToOrParseValue(CultureInfo.InvariantCulture, x => float.Parse(x, CultureInfo.InvariantCulture));
         }
 
-        public float? ToNullableSingle(CultureInfo culture)
+        public float? ToNullableSingle()
         {
-            return ToNullableOrParseValue(culture, x => float.Parse(x, culture));
+            return ToNullableOrParseValue(CultureInfo.InvariantCulture, x => float.Parse(x, CultureInfo.InvariantCulture));
         }
 
-        public double ToDouble(CultureInfo culture)
+        public double ToDouble()
         {
-            return ToOrParseValue(culture, x => double.Parse(x, culture));
+            return ToOrParseValue(CultureInfo.InvariantCulture, x => double.Parse(x, CultureInfo.InvariantCulture));
         }
 
-        public double? ToNullableDouble(CultureInfo culture)
+        public double? ToNullableDouble()
         {
-            return ToNullableOrParseValue(culture, x => double.Parse(x, culture));
+            return ToNullableOrParseValue(CultureInfo.InvariantCulture, x => double.Parse(x, CultureInfo.InvariantCulture));
         }
 
-        public int ToInt32(CultureInfo culture)
+        public int ToInt32()
         {
-            return ToOrParseValue(culture, x => int.Parse(x, culture));
+            return ToOrParseValue(CultureInfo.InvariantCulture, x => int.Parse(x, CultureInfo.InvariantCulture));
         }
 
-        public int? ToNullableInt32(CultureInfo culture)
+        public int? ToNullableInt32()
         {
-            return ToNullableOrParseValue(culture, x => int.Parse(x, culture));
+            return ToNullableOrParseValue(CultureInfo.InvariantCulture, x => int.Parse(x, CultureInfo.InvariantCulture));
         }
 
-        public long ToInt64(CultureInfo culture)
+        public long ToInt64()
         {
-            return ToOrParseValue(culture, x => long.Parse(x, culture));
+            return ToOrParseValue(CultureInfo.InvariantCulture, x => long.Parse(x, CultureInfo.InvariantCulture));
         }
 
-        public long? ToNullableInt64(CultureInfo culture)
+        public long? ToNullableInt64()
         {
-            return ToNullableOrParseValue(culture, x => long.Parse(x, culture));
+            return ToNullableOrParseValue(CultureInfo.InvariantCulture, x => long.Parse(x, CultureInfo.InvariantCulture));
         }
 
-        public Instant ToInstant(CultureInfo culture)
+        public Instant ToInstant()
         {
-            return ToOrParseValue(culture, x => InstantPattern.General.Parse(x).Value);
+            return ToOrParseValue(CultureInfo.InvariantCulture, x => InstantPattern.General.Parse(x).Value);
         }
 
-        public Instant? ToNullableInstant(CultureInfo culture)
+        public Instant? ToNullableInstant()
         {
-            return ToNullableOrParseValue(culture, x => InstantPattern.General.Parse(x).Value);
+            return ToNullableOrParseValue(CultureInfo.InvariantCulture, x => InstantPattern.General.Parse(x).Value);
         }
 
-        public Guid ToGuid(CultureInfo culture)
+        public Guid ToGuid()
         {
-            return ToOrParseValue(culture, Guid.Parse);
+            return ToOrParseValue(CultureInfo.InvariantCulture, Guid.Parse);
         }
 
-        public Guid? ToNullableGuid(CultureInfo culture)
+        public Guid? ToNullableGuid()
         {
-            return ToNullableOrParseValue(culture, Guid.Parse);
+            return ToNullableOrParseValue(CultureInfo.InvariantCulture, Guid.Parse);
         }
 
         private T? ToNullableOrParseValue<T>(IFormatProvider culture, Func<string, T> parser) where T : struct

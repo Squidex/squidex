@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Runtime.Serialization;
 using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
@@ -24,8 +25,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 
         public long Version { get; set; }
 
+        [IgnoreDataMember]
         public abstract Guid AggregateId { get; }
 
+        [IgnoreDataMember]
         public IUser User { get; set; }
     }
 }

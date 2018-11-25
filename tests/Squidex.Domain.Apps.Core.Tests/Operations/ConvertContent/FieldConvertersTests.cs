@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Object());
 
-            var actual = FieldConverters.ForValues(ValueConverters.EncodeJson(TestData.DefaultSerializer))(input, jsonField);
+            var actual = FieldConverters.ForValues(ValueConverters.EncodeJson(TestUtils.DefaultSerializer))(input, jsonField);
 
             var expected =
                 new ContentFieldData()

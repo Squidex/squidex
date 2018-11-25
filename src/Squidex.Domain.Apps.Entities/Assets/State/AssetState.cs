@@ -7,7 +7,7 @@
 
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
@@ -20,37 +20,37 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 {
     public class AssetState : DomainObjectState<AssetState>, IAssetEntity
     {
-        [JsonProperty]
+        [DataMember]
         public NamedId<Guid> AppId { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public string FileName { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public string MimeType { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public long FileVersion { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public long FileSize { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public long TotalSize { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public bool IsImage { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public int? PixelWidth { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public int? PixelHeight { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public bool IsDeleted { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public HashSet<string> Tags { get; set; }
 
         Guid IAssetInfo.AssetId

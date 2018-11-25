@@ -278,7 +278,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_serialize_and_deserialize_schema()
         {
-            var schemaSource = TestData.MixedSchema();
+            var schemaSource = TestUtils.MixedSchema();
             var schemaTarget = schemaSource.SerializeAndDeserialize();
 
             schemaTarget.Should().BeEquivalentTo(schemaSource);

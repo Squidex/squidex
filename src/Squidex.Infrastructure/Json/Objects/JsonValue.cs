@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using NodaTime;
 
 namespace Squidex.Infrastructure.Json.Objects
 {
@@ -59,6 +60,8 @@ namespace Squidex.Infrastructure.Json.Objects
                     return Create(i);
                 case long l:
                     return Create(l);
+                case Instant i:
+                    return Create(i);
             }
 
             throw new ArgumentException("Invalid json type");
@@ -74,6 +77,16 @@ namespace Squidex.Infrastructure.Json.Objects
             Guard.ValidNumber(value, nameof(value));
 
             return new JsonScalar<double>(JsonValueType.Number, value);
+        }
+
+        public static IJsonValue Create(Instant? value)
+        {
+            if (value == null)
+            {
+                return Null;
+            }
+
+            return Create(value.Value.ToString());
         }
 
         public static IJsonValue Create(double? value)

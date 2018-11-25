@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
@@ -19,28 +19,28 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
     [CollectionName("Apps")]
     public class AppState : DomainObjectState<AppState>, IAppEntity
     {
-        [JsonProperty]
+        [DataMember]
         public string Name { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public Roles Roles { get; set; } = Roles.Empty;
 
-        [JsonProperty]
+        [DataMember]
         public AppPlan Plan { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public AppClients Clients { get; set; } = AppClients.Empty;
 
-        [JsonProperty]
+        [DataMember]
         public AppPatterns Patterns { get; set; } = AppPatterns.Empty;
 
-        [JsonProperty]
+        [DataMember]
         public AppContributors Contributors { get; set; } = AppContributors.Empty;
 
-        [JsonProperty]
+        [DataMember]
         public LanguagesConfig LanguagesConfig { get; set; } = LanguagesConfig.English;
 
-        [JsonProperty]
+        [DataMember]
         public bool IsArchived { get; set; }
 
         protected void On(AppCreated @event)

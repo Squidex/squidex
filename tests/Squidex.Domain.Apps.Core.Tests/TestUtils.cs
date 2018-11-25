@@ -16,17 +16,18 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core
 {
-    public static class TestData
+    public static class TestUtils
     {
         public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
 
-        private static IJsonSerializer CreateSerializer()
+        public static IJsonSerializer CreateSerializer(TypeNameHandling typeNameHandling = TypeNameHandling.Auto)
         {
             var typeNameRegistry = new TypeNameRegistry();
 
@@ -46,13 +47,15 @@ namespace Squidex.Domain.Apps.Core
                     new NamedGuidIdConverter(),
                     new NamedLongIdConverter(),
                     new NamedStringIdConverter(),
+                    new PropertiesBagConverter<EnvelopeHeaders>(),
+                    new PropertiesBagConverter<PropertiesBag>(),
                     new RefTokenConverter(),
                     new RolesConverter(),
                     new RuleConverter(),
                     new SchemaConverter(),
                     new StringEnumConverter()),
 
-                TypeNameHandling = TypeNameHandling.Auto
+                TypeNameHandling = typeNameHandling
             };
 
             return new NewtonsoftJsonSerializer(serializerSettings);

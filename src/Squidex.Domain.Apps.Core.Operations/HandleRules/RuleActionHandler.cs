@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.formatter = formatter;
         }
 
-        protected virtual string ToPayloadJson<T>(T @event)
+        protected virtual string ToJson<T>(T @event)
         {
             return formatter.ToPayload(@event);
         }

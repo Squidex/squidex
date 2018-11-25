@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 
@@ -32,25 +32,28 @@ namespace Squidex.Extensions.Actions.Discourse
         {
             var url = $"{action.Url.ToString().TrimEnd('/')}/posts.json?api_key={action.ApiKey}&api_username={action.ApiUsername}";
 
-            var json =
-                new JObject(
-                    new JProperty("raw", Format(action.Text, @event)),
-                    new JProperty("title", Format(action.Title, @event)));
+            var json = new Dictionary<string, object>
+            {
+                ["raw"] = Format(action.Text, @event),
+                ["title"] = Format(action.Title, @event)
+            };
 
             if (action.Topic.HasValue)
             {
-                json.Add(new JProperty("topic_id", action.Topic.Value));
+                json.Add("topic_id", action.Topic.Value);
             }
 
             if (action.Category.HasValue)
             {
-                json.Add(new JProperty("category", action.Category.Value));
+                json.Add("category", action.Category.Value);
             }
+
+            var requestBody = ToJson(json);
 
             var ruleJob = new DiscourseJob
             {
                 RequestUrl = url,
-                RequestBody = json.ToString()
+                RequestBody = requestBody
             };
 
             var description =

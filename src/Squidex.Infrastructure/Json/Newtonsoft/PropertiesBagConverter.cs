@@ -22,9 +22,9 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             {
                 writer.WritePropertyName(kvp.Key);
 
-                if (kvp.Value.RawValue is Instant)
+                if (kvp.Value.RawValue is Instant instant)
                 {
-                    writer.WriteValue(kvp.Value.ToString());
+                    writer.WriteValue(instant.ToString());
                 }
                 else
                 {

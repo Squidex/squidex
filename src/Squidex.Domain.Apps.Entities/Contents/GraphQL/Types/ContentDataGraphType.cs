@@ -9,10 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
                     fieldGraphType.Description = $"The structure of the {fieldName} field of the {schemaName} content type.";
 
-                    var fieldResolver = new FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, JToken>>(c =>
+                    var fieldResolver = new FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, IJsonValue>>(c =>
                     {
                         return c.Source.GetOrDefault(field.Name);
                     });

@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .Invokes(new Action<EventConsumerState>(s => state = s));
 
-            A.CallTo(() => formatter.Parse(eventData, true)).Returns(envelope);
+            A.CallTo(() => formatter.Parse(eventData, true, null)).Returns(envelope);
 
             sut = new MyEventConsumerGrain(
                 x => eventConsumer,
@@ -192,7 +192,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_ignore_old_events()
         {
-            A.CallTo(() => formatter.Parse(eventData, true))
+            A.CallTo(() => formatter.Parse(eventData, true, null))
                 .Throws(new TypeNameNotFoundException());
 
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
@@ -326,7 +326,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             var ex = new InvalidOperationException();
 
-            A.CallTo(() => formatter.Parse(eventData, true))
+            A.CallTo(() => formatter.Parse(eventData, true, null))
                 .Throws(ex);
 
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);

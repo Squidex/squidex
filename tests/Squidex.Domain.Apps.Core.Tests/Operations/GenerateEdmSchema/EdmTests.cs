@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateEdmSchema
         {
             var languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
 
-            var edmModel = TestData.MixedSchema().BuildEdmType(languagesConfig.ToResolver(), x => x);
+            var edmModel = TestUtils.MixedSchema().BuildEdmType(languagesConfig.ToResolver(), x => x);
 
             Assert.NotNull(edmModel);
         }

@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
@@ -20,13 +20,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
     [CollectionName("Rules")]
     public class RuleState : DomainObjectState<RuleState>, IRuleEntity
     {
-        [JsonProperty]
+        [DataMember]
         public NamedId<Guid> AppId { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public Rule RuleDef { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public bool IsDeleted { get; set; }
 
         protected void On(RuleCreated @event)

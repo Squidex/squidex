@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             try
             {
-                return context?.ServiceProvider?.GetService<IJsonSerializer>() ?? J.DefaultSerializer;
+                return context?.ServiceProvider?.GetRequiredService<IJsonSerializer>() ?? J.DefaultSerializer;
             }
             catch
             {

@@ -41,10 +41,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
             new NamedContentData()
                 .AddField("my-field1",
                 new ContentFieldData()
-                        .AddValue(null))
+                        .AddValue("iv", null))
                 .AddField("my-field2",
                     new ContentFieldData()
-                        .AddValue(1));
+                        .AddValue("iv", 1));
         private readonly NamedContentData data =
             new NamedContentData()
                 .AddField("my-field1",

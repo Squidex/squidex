@@ -10,15 +10,12 @@ using System.Globalization;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
+
 namespace Squidex.Infrastructure.Json.Newtonsoft
 {
     public sealed class JsonValueConverter : JsonConverter
     {
-        public override bool CanConvert(Type objectType)
-        {
-            return typeof(IJsonValue).IsAssignableFrom(objectType);
-        }
-
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             return ReadJson(reader);
@@ -125,36 +122,46 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     writer.WriteValue(s.Value);
                     break;
                 case JsonScalar<double> s:
-                    writer.WriteValue(s.Value);
+
+                    if (s.Value % 1 == 0)
+                    {
+                        writer.WriteValue((long)s.Value);
+                    }
+                    else
+                    {
+                        writer.WriteValue(s.Value);
+                    }
+
                     break;
                 case JsonArray array:
+                    writer.WriteStartArray();
+
+                    foreach (var item in array)
                     {
-                        writer.WriteStartArray();
-
-                        foreach (var item in array)
-                        {
-                            WriteJson(writer, item);
-                        }
-
-                        writer.WriteEndArray();
-                        break;
+                        WriteJson(writer, item);
                     }
+
+                    writer.WriteEndArray();
+                    break;
 
                 case JsonObject obj:
+                    writer.WriteStartObject();
+
+                    foreach (var kvp in obj)
                     {
-                        writer.WriteStartObject();
+                        writer.WritePropertyName(kvp.Key);
 
-                        foreach (var kvp in obj)
-                        {
-                            writer.WritePropertyName(kvp.Key);
-
-                            WriteJson(writer, kvp.Value);
-                        }
-
-                        writer.WriteEndObject();
-                        break;
+                        WriteJson(writer, kvp.Value);
                     }
+
+                    writer.WriteEndObject();
+                    break;
             }
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return typeof(IJsonValue).IsAssignableFrom(objectType);
         }
     }
 }

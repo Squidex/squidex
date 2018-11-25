@@ -7,7 +7,7 @@
 
 using GraphQL.Language.AST;
 using GraphQL.Types;
-using Newtonsoft.Json.Linq;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
@@ -21,12 +21,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 
         public IValue Convert(object value, IGraphType type)
         {
-            return new JsonValue(value as JObject);
+            return new JsonValue(value as JsonObject);
         }
 
         public bool Matches(object value, IGraphType type)
         {
-            return value is JObject;
+            return value is JsonObject;
         }
     }
 }
