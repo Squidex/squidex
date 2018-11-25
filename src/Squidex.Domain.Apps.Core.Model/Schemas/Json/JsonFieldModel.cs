@@ -6,6 +6,10 @@
 // ==========================================================================
 
 using Newtonsoft.Json;
+using Squidex.Infrastructure;
+using System;
+using System.Linq;
+using P = Squidex.Domain.Apps.Core.Partitioning;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
@@ -34,5 +38,21 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         [JsonProperty]
         public JsonNestedFieldModel[] Children { get; set; }
+
+        public RootField ToField()
+        {
+            var partitioning = P.FromString(Partitioning);
+
+            if (Properties is ArrayFieldProperties arrayProperties)
+            {
+                var nested = Children?.ToArray(n => n.ToNestedField()) ?? Array.Empty<NestedField>();
+
+                return new ArrayField(Id, Name, partitioning, nested, arrayProperties, this);
+            }
+            else
+            {
+                return Properties.CreateRootField(Id, Name, partitioning, this);
+            }
+        }
     }
 }

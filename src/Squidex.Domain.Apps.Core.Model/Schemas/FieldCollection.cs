@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
@@ -17,10 +16,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
     public sealed class FieldCollection<T> : Cloneable<FieldCollection<T>> where T : IField
     {
         public static readonly FieldCollection<T> Empty = new FieldCollection<T>();
+        
+        private static readonly Dictionary<long, T> EmptyById = new Dictionary<long, T>();
+        private static readonly Dictionary<string, T> EmptyByString = new Dictionary<string, T>();
 
-        private ImmutableArray<T> fieldsOrdered = ImmutableArray<T>.Empty;
-        private ImmutableDictionary<long, T> fieldsById;
-        private ImmutableDictionary<string, T> fieldsByName;
+        private T[] fieldsOrdered;
+        private Dictionary<long, T> fieldsById;
+        private Dictionary<string, T> fieldsByName;
 
         public IReadOnlyList<T> Ordered
         {
@@ -35,11 +37,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 {
                     if (fieldsOrdered.Length == 0)
                     {
-                        fieldsById = ImmutableDictionary<long, T>.Empty;
+                        fieldsById = EmptyById;
                     }
                     else
                     {
-                        fieldsById = fieldsOrdered.ToImmutableDictionary(x => x.Id);
+                        fieldsById = fieldsOrdered.ToDictionary(x => x.Id);
                     }
                 }
 
@@ -55,11 +57,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 {
                     if (fieldsOrdered.Length == 0)
                     {
-                        fieldsByName = ImmutableDictionary<string, T>.Empty;
+                        fieldsByName = EmptyByString;
                     }
                     else
                     {
-                        fieldsByName = fieldsOrdered.ToImmutableDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+                        fieldsByName = fieldsOrdered.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
                     }
                 }
 
@@ -69,13 +71,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         private FieldCollection()
         {
+            fieldsOrdered = Array.Empty<T>();
         }
 
         public FieldCollection(T[] fields)
         {
             Guard.NotNull(fields, nameof(fields));
 
-            fieldsOrdered = ImmutableArray.Create(fields);
+            fieldsOrdered = fields;
         }
 
         protected override void OnCloned()
@@ -94,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             return Clone(clone =>
             {
-                clone.fieldsOrdered = fieldsOrdered.Remove(field);
+                clone.fieldsOrdered = fieldsOrdered.Where(x => x.Id != fieldId).ToArray();
             });
         }
 
@@ -110,7 +113,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             return Clone(clone =>
             {
-                clone.fieldsOrdered = fieldsOrdered.OrderBy(f => ids.IndexOf(f.Id)).ToImmutableArray();
+                clone.fieldsOrdered = fieldsOrdered.OrderBy(f => ids.IndexOf(f.Id)).ToArray();
             });
         }
 
@@ -126,7 +129,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             return Clone(clone =>
             {
-                clone.fieldsOrdered = clone.fieldsOrdered.Add(field);
+                clone.fieldsOrdered = clone.fieldsOrdered.Union(Enumerable.Repeat(field, 1)).ToArray();
             });
         }
 
@@ -154,7 +157,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             return Clone(clone =>
             {
-                clone.fieldsOrdered = clone.fieldsOrdered.Replace(field, typedField);
+                clone.fieldsOrdered = clone.fieldsOrdered.Select(x => ReferenceEquals(x, field) ? newField : x).ToArray();
             });
         }
     }

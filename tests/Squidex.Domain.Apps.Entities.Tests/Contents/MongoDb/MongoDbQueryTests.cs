@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Immutable;
 using System.Linq;
 using FakeItEasy;
 using MongoDB.Bson.Serialization;
@@ -20,6 +19,7 @@ using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             schemaDef =
                 new Schema("user")
                     .AddString(1, "firstName", Partitioning.Language,
-                        new StringFieldProperties { Label = "FirstName", IsRequired = true, AllowedValues = ImmutableList.Create("1", "2") })
+                        new StringFieldProperties { Label = "FirstName", IsRequired = true, AllowedValues = ReadOnlyCollection.Create("1", "2") })
                     .AddString(2, "lastName", Partitioning.Language,
                         new StringFieldProperties { Hints = "Last Name", Editor = StringFieldEditor.Input })
                     .AddBoolean(3, "isAdmin", Partitioning.Invariant,

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules;
@@ -15,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             {
                 Trigger = new ContentChangedTrigger
                 {
-                    Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
+                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchema>()
                 },
                 Action = null
             });
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             {
                 Trigger = new ContentChangedTrigger
                 {
-                    Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
+                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchema>()
                 },
                 Action = new TestAction
                 {
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             {
                 Trigger = new ContentChangedTrigger
                 {
-                    Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
+                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchema>()
                 },
                 Action = new TestAction
                 {

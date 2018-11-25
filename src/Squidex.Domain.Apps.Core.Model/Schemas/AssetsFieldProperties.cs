@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
 using Squidex.Infrastructure;
+using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? AspectHeight { get; set; }
 
-        public ImmutableList<string> AllowedExtensions { get; set; }
+        public ReadOnlyCollection<string> AllowedExtensions { get; set; }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {

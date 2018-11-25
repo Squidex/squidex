@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
 using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -81,7 +81,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
 
             if (AllowedExtensions != null)
             {
-                result.AllowedExtensions = ImmutableList.Create(AllowedExtensions);
+                result.AllowedExtensions = ReadOnlyCollection.Create(AllowedExtensions);
             }
 
             return result;

@@ -30,5 +30,10 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         {
             get { return false; }
         }
+
+        public NestedField ToNestedField()
+        {
+            return Properties.CreateNestedField(Id, Name, this);
+        }
     }
 }

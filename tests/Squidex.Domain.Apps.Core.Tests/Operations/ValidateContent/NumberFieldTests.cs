@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_errors_if_number_is_not_allowed()
         {
-            var sut = Field(new NumberFieldProperties { AllowedValues = ImmutableList.Create(10d) });
+            var sut = Field(new NumberFieldProperties { AllowedValues = ReadOnlyCollection.Create(10d) });
 
             await sut.ValidateAsync(CreateValue(20), errors);
 

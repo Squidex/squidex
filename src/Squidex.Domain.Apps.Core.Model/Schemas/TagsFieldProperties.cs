@@ -6,14 +6,14 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("TagsField")]
     public sealed class TagsFieldProperties : FieldProperties
     {
-        public ImmutableList<string> AllowedValues { get; set; }
+        public ReadOnlyCollection<string> AllowedValues { get; set; }
 
         public int? MinItems { get; set; }
 

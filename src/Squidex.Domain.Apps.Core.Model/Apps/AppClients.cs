@@ -5,24 +5,33 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class AppClients : DictionaryWrapper<string, AppClient>
+    public sealed class AppClients : ArrayDictionary<string, AppClient>
     {
         public static readonly AppClients Empty = new AppClients();
 
         private AppClients()
-            : base(ImmutableDictionary<string, AppClient>.Empty)
         {
         }
 
-        public AppClients(ImmutableDictionary<string, AppClient> inner)
-            : base(inner)
+        public AppClients(KeyValuePair<string, AppClient>[] items)
+            : base(items)
         {
+        }
+
+        [Pure]
+        public AppClients Revoke(string id)
+        {
+            Guard.NotNullOrEmpty(id, nameof(id));
+
+            return new AppClients(Without(id));
         }
 
         [Pure]
@@ -31,7 +40,12 @@ namespace Squidex.Domain.Apps.Core.Apps
             Guard.NotNullOrEmpty(id, nameof(id));
             Guard.NotNull(client, nameof(client));
 
-            return new AppClients(Inner.Add(id, client));
+            if (ContainsKey(id))
+            {
+                throw new ArgumentException("Id already exists.", nameof(id));
+            }
+
+            return new AppClients(With(id, client));
         }
 
         [Pure]
@@ -39,15 +53,12 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
-            return new AppClients(Inner.Add(id, new AppClient(id, secret, Role.Editor)));
-        }
+            if (ContainsKey(id))
+            {
+                throw new ArgumentException("Id already exists.", nameof(id));
+            }
 
-        [Pure]
-        public AppClients Revoke(string id)
-        {
-            Guard.NotNullOrEmpty(id, nameof(id));
-
-            return new AppClients(Inner.Remove(id));
+            return new AppClients(With(id, new AppClient(id, secret, Role.Editor)));
         }
 
         [Pure]
@@ -60,7 +71,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new AppClients(Inner.SetItem(id, client.Rename(newName)));
+            return new AppClients(With(id, client.Rename(newName)));
         }
 
         [Pure]
@@ -73,7 +84,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new AppClients(Inner.SetItem(id, client.Update(role)));
+            return new AppClients(With(id, client.Update(role)));
         }
     }
 }

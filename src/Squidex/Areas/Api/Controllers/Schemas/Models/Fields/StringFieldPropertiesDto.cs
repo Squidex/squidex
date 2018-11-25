@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -64,7 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
 
             if (AllowedValues != null)
             {
-                result.AllowedValues = ImmutableList.Create(AllowedValues);
+                result.AllowedValues = ReadOnlyCollection.Create(AllowedValues);
             }
 
             return result;

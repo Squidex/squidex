@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -16,6 +15,7 @@ using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
 using Xunit;
 
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core
                     new RefTokenConverter(),
                     new RolesConverter(),
                     new RuleConverter(),
-                    new SchemaConverter(new FieldRegistry(typeNameRegistry)),
+                    new SchemaConverter(),
                     new StringEnumConverter()),
 
                 TypeNameHandling = TypeNameHandling.Auto
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Core
                 .AddReferences(109, "root-references", Partitioning.Invariant,
                     new ReferencesFieldProperties())
                 .AddString(110, "root-string1", Partitioning.Invariant,
-                    new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ImmutableList.Create("a", "b") })
+                    new StringFieldProperties { Label = "My String1", IsRequired = true, AllowedValues = ReadOnlyCollection.Create("a", "b") })
                 .AddString(111, "root-string2", Partitioning.Invariant,
                     new StringFieldProperties { Hints = "My String1" })
                 .AddTags(112, "root-tags", Partitioning.Language,

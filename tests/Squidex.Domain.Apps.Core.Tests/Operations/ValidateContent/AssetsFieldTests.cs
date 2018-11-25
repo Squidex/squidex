@@ -7,13 +7,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_image_has_invalid_extension()
         {
-            var sut = Field(new AssetsFieldProperties { AllowedExtensions = ImmutableList.Create("mp4") });
+            var sut = Field(new AssetsFieldProperties { AllowedExtensions = ReadOnlyCollection.Create("mp4") });
 
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 

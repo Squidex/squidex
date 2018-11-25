@@ -4,25 +4,32 @@
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
+
 using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class AppPatterns : DictionaryWrapper<Guid, AppPattern>
+    public sealed class AppPatterns : ArrayDictionary<Guid, AppPattern>
     {
         public static readonly AppPatterns Empty = new AppPatterns();
 
         private AppPatterns()
-            : base(ImmutableDictionary<Guid, AppPattern>.Empty)
         {
         }
 
-        public AppPatterns(ImmutableDictionary<Guid, AppPattern> inner)
-            : base(inner)
+        public AppPatterns(KeyValuePair<Guid, AppPattern>[] items)
+            : base(items)
         {
+        }
+
+        [Pure]
+        public AppPatterns Remove(Guid id)
+        {
+            return new AppPatterns(Without(id));
         }
 
         [Pure]
@@ -30,13 +37,12 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             var newPattern = new AppPattern(name, pattern, message);
 
-            return new AppPatterns(Inner.Add(id, newPattern));
-        }
+            if (ContainsKey(id))
+            {
+                throw new ArgumentException("Id already exists.", nameof(id));
+            }
 
-        [Pure]
-        public AppPatterns Remove(Guid id)
-        {
-            return new AppPatterns(Inner.Remove(id));
+            return new AppPatterns(With(id, newPattern));
         }
 
         [Pure]
@@ -50,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new AppPatterns(Inner.SetItem(id, appPattern.Update(name, pattern, message)));
+            return new AppPatterns(With(id, appPattern.Update(name, pattern, message)));
         }
     }
 }

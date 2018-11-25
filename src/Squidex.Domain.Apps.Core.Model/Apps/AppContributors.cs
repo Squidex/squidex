@@ -5,23 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class AppContributors : DictionaryWrapper<string, string>
+    public sealed class AppContributors : ArrayDictionary<string, string>
     {
         public static readonly AppContributors Empty = new AppContributors();
 
         private AppContributors()
-            : base(ImmutableDictionary<string, string>.Empty)
         {
         }
 
-        public AppContributors(ImmutableDictionary<string, string> inner)
-            : base(inner)
+        public AppContributors(KeyValuePair<string, string>[] items)
+            : base(items)
         {
         }
 
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
             Guard.NotNullOrEmpty(role, nameof(role));
 
-            return new AppContributors(Inner.SetItem(contributorId, role));
+            return new AppContributors(With(contributorId, role));
         }
 
         [Pure]
@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(contributorId, nameof(contributorId));
 
-            return new AppContributors(Inner.Remove(contributorId));
+            return new AppContributors(Without(contributorId));
         }
     }
 }

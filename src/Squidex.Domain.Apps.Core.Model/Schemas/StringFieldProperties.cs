@@ -5,15 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
 using Squidex.Infrastructure;
+using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("StringField")]
     public sealed class StringFieldProperties : FieldProperties
     {
-        public ImmutableList<string> AllowedValues { get; set; }
+        public ReadOnlyCollection<string> AllowedValues { get; set; }
 
         public int? MinLength { get; set; }
 

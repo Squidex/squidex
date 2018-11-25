@@ -59,7 +59,7 @@ namespace Squidex.Config.Domain
                 new RefTokenConverter(),
                 new RolesConverter(),
                 new RuleConverter(),
-                new SchemaConverter(FieldRegistry),
+                new SchemaConverter(),
                 new StringEnumConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;

@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
@@ -32,7 +31,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 
         public override RuleTrigger ToTrigger()
         {
-            var schemas = Schemas.Select(x => SimpleMapper.Map(x, new ContentChangedTriggerSchema())).ToImmutableList();
+            var schemas = Schemas.Select(x => SimpleMapper.Map(x, new ContentChangedTriggerSchema())).ToReadOnlyCollection();
 
             return new ContentChangedTrigger { HandleAll = HandleAll, Schemas = schemas };
         }

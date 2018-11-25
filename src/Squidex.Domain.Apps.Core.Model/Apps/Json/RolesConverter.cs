@@ -10,7 +10,6 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Security;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace Squidex.Domain.Apps.Core.Apps.Json
@@ -33,7 +32,12 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         {
             var json = serializer.Deserialize<Dictionary<string, string[]>>(reader);
 
-            return new Roles(json.ToImmutableDictionary(x => x.Key, x => new Role(x.Key, new PermissionSet(x.Value))));
+            return new Roles(json.Select(Convert).ToArray());
+        }
+
+        private static KeyValuePair<string, Role> Convert(KeyValuePair<string, string[]> kvp)
+        {
+            return new KeyValuePair<string, Role>(kvp.Key, new Role(kvp.Key, new PermissionSet(kvp.Value)));
         }
     }
 }

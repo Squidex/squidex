@@ -5,15 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
 using Squidex.Infrastructure;
+using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("NumberField")]
     public sealed class NumberFieldProperties : FieldProperties
     {
-        public ImmutableList<double> AllowedValues { get; set; }
+        public ReadOnlyCollection<double> AllowedValues { get; set; }
 
         public double? MaxValue { get; set; }
 

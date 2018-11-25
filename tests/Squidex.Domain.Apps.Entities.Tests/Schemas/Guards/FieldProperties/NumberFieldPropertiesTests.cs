@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
         [Fact]
         public void Should_add_error_if_allowed_values_and_max_value_is_specified()
         {
-            var sut = new NumberFieldProperties { MaxValue = 10, AllowedValues = ImmutableList.Create(4d) };
+            var sut = new NumberFieldProperties { MaxValue = 10, AllowedValues = ReadOnlyCollection.Create(4d) };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
         [Fact]
         public void Should_add_error_if_allowed_values_and_min_value_is_specified()
         {
-            var sut = new NumberFieldProperties { MinValue = 10, AllowedValues = ImmutableList.Create(4d) };
+            var sut = new NumberFieldProperties { MinValue = 10, AllowedValues = ReadOnlyCollection.Create(4d) };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
         [InlineData(NumberFieldEditor.Stars)]
         public void Should_add_error_if_inline_editing_is_not_allowed_for_editor(NumberFieldEditor editor)
         {
-            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ImmutableList.Create(1.0) };
+            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ReadOnlyCollection.Create(1.0) };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
         [InlineData(NumberFieldEditor.Dropdown)]
         public void Should_not_add_error_if_inline_editing_is_allowed_for_editor(NumberFieldEditor editor)
         {
-            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ImmutableList.Create(1.0) };
+            var sut = new NumberFieldProperties { InlineEditable = true, Editor = editor, AllowedValues = ReadOnlyCollection.Create(1.0) };
 
             var errors = FieldPropertiesValidator.Validate(sut).ToList();
 

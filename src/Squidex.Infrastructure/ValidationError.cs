@@ -14,7 +14,6 @@ namespace Squidex.Infrastructure
     [Serializable]
     public sealed class ValidationError
     {
-        private static readonly string[] FallbackProperties = Array.Empty<string>();
         private readonly string message;
         private readonly string[] propertyNames;
 
@@ -34,7 +33,7 @@ namespace Squidex.Infrastructure
 
             this.message = message;
 
-            this.propertyNames = propertyNames ?? FallbackProperties;
+            this.propertyNames = propertyNames ?? Array.Empty<string>();
         }
 
         public ValidationError WithPrefix(string prefix)
