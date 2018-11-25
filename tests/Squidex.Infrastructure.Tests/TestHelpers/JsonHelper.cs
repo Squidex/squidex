@@ -16,7 +16,9 @@ namespace Squidex.Infrastructure.TestHelpers
 {
     public static class JsonHelper
     {
-        public static IJsonSerializer DefaultSerializer(TypeNameRegistry typeNameRegistry = null)
+        public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
+
+        public static IJsonSerializer CreateSerializer(TypeNameRegistry typeNameRegistry = null)
         {
             var serializerSettings = new JsonSerializerSettings
             {
@@ -43,23 +45,17 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public static T SerializeAndDeserialize<T>(this T value)
         {
-            var serializer = DefaultSerializer();
-
-            return serializer.Deserialize<Tuple<T>>(serializer.Serialize(Tuple.Create(value))).Item1;
+            return DefaultSerializer.Deserialize<Tuple<T>>(DefaultSerializer.Serialize(Tuple.Create(value))).Item1;
         }
 
         public static T Deserialize<T>(string value)
         {
-            var serializer = DefaultSerializer();
-
-            return serializer.Deserialize<Tuple<T>>($"{{ \"Item1\": \"{value}\" }}").Item1;
+            return DefaultSerializer.Deserialize<Tuple<T>>($"{{ \"Item1\": \"{value}\" }}").Item1;
         }
 
         public static T Deserialize<T>(object value)
         {
-            var serializer = DefaultSerializer();
-
-            return serializer.Deserialize<Tuple<T>>($"{{ \"Item1\": {value} }}").Item1;
+            return DefaultSerializer.Deserialize<Tuple<T>>($"{{ \"Item1\": {value} }}").Item1;
         }
     }
 }

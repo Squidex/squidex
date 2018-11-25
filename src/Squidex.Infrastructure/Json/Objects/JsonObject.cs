@@ -123,7 +123,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public override string ToString()
         {
-            return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\"={x.Value}\""))}}}";
+            return $"{{{string.Join(", ", this.Select(x => $"\"{x.Key}\":{x.Value.ToJsonString()}"))}}}";
         }
     }
 }

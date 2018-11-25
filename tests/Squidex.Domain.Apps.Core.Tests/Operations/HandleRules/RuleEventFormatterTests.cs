@@ -9,14 +9,12 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using FakeItEasy;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Xunit;
@@ -25,7 +23,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
     public class RuleEventFormatterTests
     {
-        private readonly IJsonSerializer serializer = TestData.DefaultSerializer();
         private readonly IUser user = A.Fake<IUser>();
         private readonly IRuleUrlGenerator urlGenerator = A.Fake<IRuleUrlGenerator>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
@@ -41,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => user.Claims)
                 .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "me") });
 
-            sut = new RuleEventFormatter(serializer, urlGenerator);
+            sut = new RuleEventFormatter(TestData.DefaultSerializer, urlGenerator);
         }
 
         [Fact]
@@ -198,7 +195,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new NamedContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", new JArray()))
+                                .AddValue("iv", JsonValue.Array()))
             };
 
             var result = sut.Format("$CONTENT_DATA.city.de.10", @event);
@@ -215,8 +212,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new NamedContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", new JObject(
-                                    new JProperty("name", "Berlin"))))
+                                .AddValue("iv", JsonValue.Object().Add("name", "Berlin")))
             };
 
             var result = sut.Format("$CONTENT_DATA.city.de.Name", @event);
@@ -267,24 +263,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new NamedContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", JValue.CreateNull()))
-            };
-
-            var result = sut.Format("$CONTENT_DATA.city.iv", @event);
-
-            Assert.Equal("UNDEFINED", result);
-        }
-
-        [Fact]
-        public void Should_return_undefined_when_undefined()
-        {
-            var @event = new EnrichedContentEvent
-            {
-                Data =
-                    new NamedContentData()
-                        .AddField("city",
-                            new ContentFieldData()
-                                .AddValue("iv", JValue.CreateUndefined()))
+                                .AddValue("iv", JsonValue.Null))
             };
 
             var result = sut.Format("$CONTENT_DATA.city.iv", @event);
@@ -301,13 +280,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new NamedContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", new JObject(
-                                    new JProperty("name", "Berlin"))))
+                                .AddValue("iv", JsonValue.Object().Add("name", "Berlin")))
             };
 
             var result = sut.Format("$CONTENT_DATA.city.iv", @event);
 
-            Assert.Equal(JObject.FromObject(new { name = "Berlin" }).ToString(Formatting.Indented), result);
+            Assert.Equal("{\"name\":\"Berlin\"}", result);
         }
 
         [Fact]
@@ -319,7 +297,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new NamedContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", new JArray(
+                                .AddValue("iv", JsonValue.Array(
                                     "Berlin")))
             };
 
@@ -337,8 +315,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                     new NamedContentData()
                         .AddField("city",
                             new ContentFieldData()
-                                .AddValue("iv", new JObject(
-                                    new JProperty("name", "Berlin"))))
+                                .AddValue("iv", JsonValue.Object().Add("name", "Berlin")))
             };
 
             var result = sut.Format("$CONTENT_DATA.city.iv.name", @event);

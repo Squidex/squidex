@@ -24,7 +24,9 @@ namespace Squidex.Domain.Apps.Core
 {
     public static class TestData
     {
-        public static IJsonSerializer DefaultSerializer()
+        public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
+
+        private static IJsonSerializer CreateSerializer()
         {
             var typeNameRegistry = new TypeNameRegistry();
 
@@ -38,6 +40,7 @@ namespace Squidex.Domain.Apps.Core
                     new AppPatternsConverter(),
                     new ClaimsPrincipalConverter(),
                     new InstantConverter(),
+                    new JsonValueConverter(),
                     new LanguageConverter(),
                     new LanguagesConfigConverter(),
                     new NamedGuidIdConverter(),
@@ -104,9 +107,7 @@ namespace Squidex.Domain.Apps.Core
 
         public static T SerializeAndDeserialize<T>(this T value)
         {
-            var serializer = DefaultSerializer();
-
-            return serializer.Deserialize<T>(serializer.Serialize(value));
+            return DefaultSerializer.Deserialize<T>(DefaultSerializer.Serialize(value));
         }
 
         public static void TestFreeze(IFreezable freezable)

@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.Orleans
     {
         public JsonExternalSerializerTests()
         {
-            J.DefaultSerializer = JsonHelper.DefaultSerializer();
+            J.DefaultSerializer = JsonHelper.DefaultSerializer;
         }
 
         [Fact]

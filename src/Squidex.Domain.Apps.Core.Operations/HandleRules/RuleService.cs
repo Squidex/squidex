@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             var actionName = typeNameRegistry.GetName(actionType);
             var actionData = await actionHandler.CreateJobAsync(enrichedEvent, rule.Action);
 
-            var json = jsonSerializer.Serialize(actionData);
+            var json = jsonSerializer.Serialize(actionData.Data);
 
             var job = new RuleJob
             {

@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -22,7 +21,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
     public class FieldConvertersTests
     {
         private readonly IAssetUrlGenerator assetUrlGenerator = A.Fake<IAssetUrlGenerator>();
-        private readonly IJsonSerializer serializer = TestData.DefaultSerializer();
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.EN, Language.DE);
         private readonly RootField<JsonFieldProperties> jsonField = Fields.Json(1, "1", Partitioning.Invariant);
         private readonly RootField<StringFieldProperties> stringLanguageField = Fields.String(1, "1", Partitioning.Language);
@@ -60,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Object());
 
-            var actual = FieldConverters.ForValues(ValueConverters.EncodeJson(serializer))(input, jsonField);
+            var actual = FieldConverters.ForValues(ValueConverters.EncodeJson(TestData.DefaultSerializer))(input, jsonField);
 
             var expected =
                 new ContentFieldData()

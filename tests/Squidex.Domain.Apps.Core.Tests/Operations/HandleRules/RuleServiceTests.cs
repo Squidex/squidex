@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json;
 using Xunit;
 
 #pragma warning disable xUnit2009 // Do not use boolean check to check for string equality
@@ -28,9 +27,12 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
     {
         private readonly IRuleTriggerHandler ruleTriggerHandler = A.Fake<IRuleTriggerHandler>();
         private readonly IRuleActionHandler ruleActionHandler = A.Fake<IRuleActionHandler>();
-        private readonly IJsonSerializer serializer = TestData.DefaultSerializer();
         private readonly IEventEnricher eventEnricher = A.Fake<IEventEnricher>();
         private readonly IClock clock = A.Fake<IClock>();
+        private readonly string actionData = "{\"value\":10}";
+        private readonly string actionDump = "MyDump";
+        private readonly string actionName = "ValidAction";
+        private readonly string actionDescription = "MyDescription";
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private readonly RuleService sut;
 
@@ -38,12 +40,18 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
         }
 
-        public sealed class ValidAction : RuleAction
+        public sealed class InvalidAction : RuleAction
         {
         }
 
-        public sealed class InvalidAction : RuleAction
+        public sealed class ValidAction : RuleAction
         {
+            public int Value { get; set; }
+        }
+
+        public sealed class ValidData
+        {
+            public int Value { get; set; }
         }
 
         public sealed class InvalidTrigger : RuleTrigger
@@ -57,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         public RuleServiceTests()
         {
             typeNameRegistry.Map(typeof(ContentCreated));
-            typeNameRegistry.Map(typeof(ValidAction), "ValidAction");
+            typeNameRegistry.Map(typeof(ValidAction), actionName);
 
             A.CallTo(() => eventEnricher.EnrichAsync(A<Envelope<AppEvent>>.Ignored))
                 .Returns(new EnrichedContentEvent());
@@ -65,16 +73,30 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleActionHandler.ActionType)
                 .Returns(typeof(ValidAction));
 
+            A.CallTo(() => ruleActionHandler.DataType)
+                .Returns(typeof(ValidData));
+
             A.CallTo(() => ruleTriggerHandler.TriggerType)
                 .Returns(typeof(ContentChangedTrigger));
 
-            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, serializer, clock, typeNameRegistry);
+            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, TestData.DefaultSerializer, clock, typeNameRegistry);
+        }
+
+        [Fact]
+        public async Task Should_not_create_if_rule_disabled()
+        {
+            var ruleConfig = ValidRule().Disable();
+            var ruleEnvelope = Envelope.Create(new ContentCreated());
+
+            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
+
+            Assert.Null(job);
         }
 
         [Fact]
         public async Task Should_not_create_job_for_invalid_event()
         {
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
+            var ruleConfig = ValidRule();
             var ruleEnvelope = Envelope.Create(new InvalidEvent());
 
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
@@ -107,7 +129,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_if_not_triggered()
         {
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
+            var ruleConfig = ValidRule();
             var ruleEnvelope = Envelope.Create(new ContentCreated());
 
             A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))
@@ -125,13 +147,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
+            var ruleConfig = ValidRule();
             var ruleEnvelope = Envelope.Create(@event);
 
             ruleEnvelope.SetTimestamp(now.Minus(Duration.FromDays(3)));
-
-            var actionData = "{}";
-            var actionDescription = "MyDescription";
 
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
@@ -154,14 +173,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
+            var ruleConfig = ValidRule();
             var ruleEnvelope = Envelope.Create(@event);
 
             ruleEnvelope.SetTimestamp(now);
-
-            var actionName = "ValidAction";
-            var actionData = "{}";
-            var actionDescription = "MyDescription";
 
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
@@ -170,7 +185,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 .Returns(true);
 
             A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))
-                .Returns((actionDescription, actionData));
+                .Returns((actionDescription, new ValidData { Value = 10 }));
 
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
@@ -189,14 +204,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_succeeded_job_with_full_dump_when_handler_returns_no_exception()
         {
-            var ruleJob = "{}";
-
-            var actionDump = "MyDump";
-
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10)))
                 .Returns((actionDump, null));
 
-            var result = await sut.InvokeAsync("ValidAction", ruleJob);
+            var result = await sut.InvokeAsync(actionName, actionData);
 
             Assert.Equal(RuleResult.Success, result.Result);
 
@@ -207,14 +218,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_failed_job_with_full_dump_when_handler_returns_exception()
         {
-            var ruleJob = "{}";
-
-            var actionDump = "MyDump";
-
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10)))
                 .Returns((actionDump, new InvalidOperationException()));
 
-            var result = await sut.InvokeAsync("ValidAction", ruleJob);
+            var result = await sut.InvokeAsync(actionName, actionData);
 
             Assert.Equal(RuleResult.Failed, result.Result);
 
@@ -225,47 +232,35 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_timedout_job_with_full_dump_when_exception_from_handler_indicates_timeout()
         {
-            var ruleJob = "{}";
-
-            var actionDump = "MyDump";
-
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10)))
                 .Returns((actionDump, new TimeoutException()));
 
-            var result = await sut.InvokeAsync("ValidAction", ruleJob);
+            var result = await sut.InvokeAsync(actionName, actionData);
 
             Assert.Equal(RuleResult.Timeout, result.Result);
 
             Assert.True(result.Elapsed >= TimeSpan.Zero);
             Assert.True(result.Dump.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
+
             Assert.True(result.Dump.IndexOf("Action timed out.", StringComparison.OrdinalIgnoreCase) >= 0);
         }
 
         [Fact]
         public async Task Should_create_exception_details_when_job_to_execute_failed()
         {
-            var ruleJob = "{}";
             var ruleError = new InvalidOperationException();
 
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(ruleJob))
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10)))
                 .Throws(ruleError);
 
-            var result = await sut.InvokeAsync("ValidAction", ruleJob);
+            var result = await sut.InvokeAsync(actionName, actionData);
 
             Assert.Equal((ruleError.ToString(), RuleResult.Failed, TimeSpan.Zero), result);
         }
 
-        [Fact]
-        public async Task Should_not_create_if_rule_disabled()
+        private static Rule ValidRule()
         {
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new ValidAction());
-            var ruleEnvelope = Envelope.Create(new ContentCreated());
-
-            ruleConfig = ruleConfig.Disable();
-
-            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
-
-            Assert.Null(job);
+            return new Rule(new ContentChangedTrigger(), new ValidAction());
         }
     }
 }
