@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly IStore<string> store = A.Fake<IStore<string>>();
         private readonly IEventDataFormatter formatter = A.Fake<IEventDataFormatter>();
-        private readonly EventData eventData = new EventData();
+        private readonly EventData eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
         private readonly Envelope<IEvent> envelope = new Envelope<IEvent>(new MyEvent());
         private readonly EventConsumerGrain sut;
         private readonly string consumerName;

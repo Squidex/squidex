@@ -12,9 +12,9 @@ using System.Linq;
 
 namespace Squidex.Infrastructure.Json.Objects
 {
-    public sealed class JsonObject : IReadOnlyDictionary<string, IJsonValue>, IJsonValue, IEquatable<JsonObject>
+    public class JsonObject : IReadOnlyDictionary<string, IJsonValue>, IJsonValue, IEquatable<JsonObject>
     {
-        private readonly Dictionary<string, IJsonValue> inner = new Dictionary<string, IJsonValue>();
+        private readonly Dictionary<string, IJsonValue> inner;
 
         public IJsonValue this[string key]
         {
@@ -51,6 +51,16 @@ namespace Squidex.Infrastructure.Json.Objects
             get { return JsonValueType.Array; }
         }
 
+        public JsonObject()
+        {
+            inner = new Dictionary<string, IJsonValue>();
+        }
+
+        public JsonObject(JsonObject obj)
+        {
+            inner = new Dictionary<string, IJsonValue>(obj.inner);
+        }
+
         public JsonObject Add(string key, object value)
         {
             return Add(key, JsonValue.Create(value));
@@ -61,7 +71,7 @@ namespace Squidex.Infrastructure.Json.Objects
             Guard.NotNullOrEmpty(key, nameof(key));
             Guard.NotNull(value, nameof(value));
 
-            inner.Add(key, value);
+            inner[key] = value;
 
             return this;
         }

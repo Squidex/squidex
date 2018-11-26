@@ -14,6 +14,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Config.Domain
@@ -50,7 +51,7 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs(c => new GetEventStoreHealthCheck(connection))
                         .As<IHealthCheck>();
 
-                    services.AddSingletonAs(c => new GetEventStore(connection, eventStorePrefix, eventStoreProjectionHost))
+                    services.AddSingletonAs(c => new GetEventStore(connection, c.GetRequiredService<IJsonSerializer>(), eventStorePrefix, eventStoreProjectionHost))
                         .As<IEventStore>();
                 }
             });

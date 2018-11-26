@@ -21,18 +21,19 @@ namespace Squidex.Infrastructure.EventSourcing
         [BsonRequired]
         public string Payload { get; set; }
 
-        [BsonElement]
+        [BsonElement("Metadata")]
         [BsonRequired]
-        public BsonDocument Metadata { get; set; }
+        [BsonJson]
+        public EnvelopeHeaders Headers { get; set; }
 
         public static MongoEvent FromEventData(EventData data)
         {
-            return new MongoEvent { Type = data.Type, Metadata = BsonDocument.Parse(data.Payload), Payload = data.Payload };
+            return new MongoEvent { Type = data.Type, Headers = data.Headers, Payload = data.Payload };
         }
 
         public EventData ToEventData()
         {
-            return new EventData { Type = Type, Metadata = Metadata.ToJson().ToString(), Payload = Payload };
+            return new EventData(Type, Headers, Payload);
         }
     }
 }

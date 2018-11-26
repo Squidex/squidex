@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Linq;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -17,21 +18,13 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var headers = new EnvelopeHeaders();
 
-            Assert.Equal(0, headers.Count);
-        }
-
-        [Fact]
-        public void Should_create_headers_with_null_properties()
-        {
-            var headers = new EnvelopeHeaders(null);
-
-            Assert.Equal(0, headers.Count);
+            Assert.Empty(headers);
         }
 
         [Fact]
         public void Should_create_headers_as_copy()
         {
-            var source = new PropertiesBag().Set("Key1", 123);
+            var source = new JsonObject().Add("Key1", 123);
             var headers = new EnvelopeHeaders(source);
 
             CompareHeaders(headers, source);
@@ -40,7 +33,7 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public void Should_clone_headers()
         {
-            var source = new PropertiesBag().Set("Key1", 123);
+            var source = new JsonObject().Add("Key1", 123);
             var headers = new EnvelopeHeaders(source);
 
             var clone = headers.Clone();
@@ -48,9 +41,9 @@ namespace Squidex.Infrastructure.EventSourcing
             CompareHeaders(headers, clone);
         }
 
-        private static void CompareHeaders(PropertiesBag lhs, PropertiesBag rhs)
+        private static void CompareHeaders(JsonObject lhs, JsonObject rhs)
         {
-            foreach (var key in lhs.PropertyNames.Concat(rhs.PropertyNames).Distinct())
+            foreach (var key in lhs.Keys.Concat(rhs.Keys).Distinct())
             {
                 Assert.Equal(lhs[key].ToString(), rhs[key].ToString());
             }

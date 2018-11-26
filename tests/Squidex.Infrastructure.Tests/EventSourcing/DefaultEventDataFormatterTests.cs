@@ -88,9 +88,9 @@ namespace Squidex.Infrastructure.EventSourcing
             Assert.Equal(inputEvent.Payload.MyProperty, outputEvent.Payload.MyProperty);
         }
 
-        private static void AssertHeaders(PropertiesBag lhs, PropertiesBag rhs)
+        private static void AssertHeaders(EnvelopeHeaders lhs, EnvelopeHeaders rhs)
         {
-            foreach (var key in lhs.PropertyNames.Concat(rhs.PropertyNames).Distinct())
+            foreach (var key in lhs.Keys.Concat(rhs.Keys).Distinct())
             {
                 Assert.Equal(lhs[key].ToString(), rhs[key].ToString());
             }

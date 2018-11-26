@@ -47,8 +47,6 @@ namespace Squidex.Domain.Apps.Core
                     new NamedGuidIdConverter(),
                     new NamedLongIdConverter(),
                     new NamedStringIdConverter(),
-                    new PropertiesBagConverter<EnvelopeHeaders>(),
-                    new PropertiesBagConverter<PropertiesBag>(),
                     new RefTokenConverter(),
                     new RolesConverter(),
                     new RuleConverter(),

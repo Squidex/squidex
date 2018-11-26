@@ -27,17 +27,15 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Envelope<IEvent> Parse(EventData eventData, bool migrate = true, Func<string, string> stringConverter = null)
         {
-            var eventType = typeNameRegistry.GetType(eventData.Type);
+            var payloadType = typeNameRegistry.GetType(eventData.Type);
+            var payload = serializer.Deserialize<IEvent>(eventData.Payload, payloadType, stringConverter);
 
-            var eventHeaders = serializer.Deserialize<EnvelopeHeaders>(eventData.Metadata, null, stringConverter);
-            var eventContent = serializer.Deserialize<IEvent>(eventData.Payload, eventType, stringConverter);
-
-            if (migrate && eventContent is IMigratedEvent migratedEvent)
+            if (migrate && payload is IMigratedEvent migratedEvent)
             {
-                eventContent = migratedEvent.Migrate();
+                payload = migratedEvent.Migrate();
             }
 
-            var envelope = new Envelope<IEvent>(eventContent, eventHeaders);
+            var envelope = new Envelope<IEvent>(payload, eventData.Headers);
 
             return envelope;
         }
@@ -51,14 +49,12 @@ namespace Squidex.Infrastructure.EventSourcing
                 eventPayload = migratedEvent.Migrate();
             }
 
-            var eventType = typeNameRegistry.GetName(eventPayload.GetType());
+            var payloadType = typeNameRegistry.GetName(eventPayload.GetType());
+            var payload = serializer.Serialize(envelope.Payload);
 
             envelope.SetCommitId(commitId);
 
-            var eventHeaders = serializer.Serialize(envelope.Headers);
-            var eventContent = serializer.Serialize(envelope.Payload);
-
-            return new EventData { Type = eventType, Payload = eventContent, Metadata = eventHeaders };
+            return new EventData(payloadType, envelope.Headers, payload);
         }
     }
 }

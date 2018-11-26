@@ -32,8 +32,6 @@ namespace Squidex.Infrastructure.TestHelpers
                     new NamedGuidIdConverter(),
                     new NamedLongIdConverter(),
                     new NamedStringIdConverter(),
-                    new PropertiesBagConverter<EnvelopeHeaders>(),
-                    new PropertiesBagConverter<PropertiesBag>(),
                     new RefTokenConverter(),
                     new StringEnumConverter()),
 

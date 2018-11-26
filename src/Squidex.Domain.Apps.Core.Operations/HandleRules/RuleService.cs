@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             var now = clock.GetCurrentInstant();
 
             var eventTime =
-                @event.Headers.Contains(CommonHeaders.Timestamp) ?
+                @event.Headers.ContainsKey(CommonHeaders.Timestamp) ?
                 @event.Headers.Timestamp() :
                 now;
 

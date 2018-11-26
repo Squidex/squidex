@@ -14,12 +14,12 @@ namespace Squidex.Domain.Apps.Events
     {
         public static Guid AppId(this EnvelopeHeaders headers)
         {
-            return headers[SquidexHeaders.AppId].ToGuid();
+            return headers.GetGuid(SquidexHeaders.AppId);
         }
 
         public static Envelope<T> SetAppId<T>(this Envelope<T> envelope, Guid value) where T : class
         {
-            envelope.Headers.Set(SquidexHeaders.AppId, value);
+            envelope.Headers.Add(SquidexHeaders.AppId, value);
 
             return envelope;
         }

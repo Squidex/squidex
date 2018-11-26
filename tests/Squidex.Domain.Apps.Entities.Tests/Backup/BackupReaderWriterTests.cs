@@ -82,9 +82,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 var envelope = Envelope.Create<IEvent>(@event);
 
-                envelope.Headers.Set(RandomGuid().ToString(), i);
-                envelope.Headers.Set("Id", RandomGuid());
-                envelope.Headers.Set("Index", i);
+                envelope.Headers.Add(RandomGuid().ToString(), i);
+                envelope.Headers.Add("Id", RandomGuid());
+                envelope.Headers.Add("Index", i);
 
                 sourceEvents.Add(($"My-{RandomGuid()}", envelope));
             }
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     var eventData = formatter.ToEventData(@event.Event, Guid.NewGuid(), true);
                     var eventStored = new StoredEvent("S", "1", 2, eventData);
 
-                    var index = @event.Event.Headers["Index"].ToInt32();
+                    var index = int.Parse(@event.Event.Headers["Index"].ToString());
 
                     if (index % 17 == 0)
                     {
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 await reader.ReadEventsAsync(streamNameResolver, formatter, async @event =>
                 {
-                    var index = @event.Event.Headers["Index"].ToInt32();
+                    var index = int.Parse(@event.Event.Headers["Index"].ToString());
 
                     if (index % 17 == 0)
                     {
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     Assert.Equal(rhs.Payload.GuidRaw, reader.OldGuid(lhs.Payload.GuidRaw));
                     Assert.Equal(rhs.Payload.GuidNamed.Id, reader.OldGuid(lhs.Payload.GuidNamed.Id));
 
-                    Assert.Equal(rhs.Headers["Id"].ToGuid(), reader.OldGuid(lhs.Headers["Id"].ToGuid()));
+                    Assert.Equal(rhs.Headers.GetGuid("Id"), reader.OldGuid(lhs.Headers.GetGuid("Id")));
                 }
             }
         }

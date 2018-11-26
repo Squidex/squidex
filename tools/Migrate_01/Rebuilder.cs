@@ -108,7 +108,7 @@ namespace Migrate_01
 
             await eventStore.QueryAsync(async storedEvent =>
             {
-                var headers = serializer.Deserialize<EnvelopeHeaders>(storedEvent.Data.Metadata);
+                var headers = storedEvent.Data.Headers;
 
                 var id = headers.AggregateId();
 

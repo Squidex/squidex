@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -20,14 +21,17 @@ namespace Squidex.Infrastructure.EventSourcing
         private const int WritePageSize = 500;
         private const int ReadPageSize = 500;
         private readonly IEventStoreConnection connection;
+        private readonly IJsonSerializer serializer;
         private readonly string prefix;
         private readonly ProjectionClient projectionClient;
 
-        public GetEventStore(IEventStoreConnection connection, string prefix, string projectionHost)
+        public GetEventStore(IEventStoreConnection connection, IJsonSerializer serializer, string prefix, string projectionHost)
         {
             Guard.NotNull(connection, nameof(connection));
+            Guard.NotNull(serializer, nameof(serializer));
 
             this.connection = connection;
+            this.serializer = serializer;
 
             this.prefix = prefix?.Trim(' ', '-').WithFallback("squidex");
 
@@ -50,7 +54,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
         {
-            return new GetEventStoreSubscription(connection, subscriber, projectionClient, position, streamFilter);
+            return new GetEventStoreSubscription(connection, subscriber, serializer, projectionClient, position, streamFilter);
         }
 
         public Task CreateIndexAsync(string property)
@@ -95,7 +99,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                     foreach (var resolved in currentSlice.Events)
                     {
-                        var storedEvent = Formatter.Read(resolved);
+                        var storedEvent = Formatter.Read(resolved, serializer);
 
                         await callback(storedEvent);
                     }
@@ -123,7 +127,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                         foreach (var resolved in currentSlice.Events)
                         {
-                            var storedEvent = Formatter.Read(resolved);
+                            var storedEvent = Formatter.Read(resolved, serializer);
 
                             result.Add(storedEvent);
                         }
@@ -164,7 +168,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     return;
                 }
 
-                var eventsToSave = events.Select(Formatter.Write).ToList();
+                var eventsToSave = events.Select(x => Formatter.Write(x, serializer)).ToList();
 
                 if (eventsToSave.Count < WritePageSize)
                 {
