@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Extensions.Actions;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Config.Domain
@@ -87,7 +88,7 @@ namespace Squidex.Config.Domain
             services.AddSingleton(DefaultJsonSerializer);
             services.AddSingleton(TypeNameRegistry);
 
-            services.AddSingleton(new NewtonsoftJsonSerializer(DefaultJsonSettings));
+            services.AddSingleton<IJsonSerializer>(new NewtonsoftJsonSerializer(DefaultJsonSettings));
 
             return services;
         }
