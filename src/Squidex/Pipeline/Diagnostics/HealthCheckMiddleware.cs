@@ -11,9 +11,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Pipeline.Diagnostics
 {
@@ -23,19 +23,19 @@ namespace Squidex.Pipeline.Diagnostics
         private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(2);
 
         private readonly Dictionary<string, IHealthCheck> healthChecks;
-        private readonly JsonSerializerSettings serializerSettings;
+        private readonly IJsonSerializer serializer;
         private readonly RequestDelegate next;
         private readonly List<string> scopes;
 
-        public HealthCheckMiddleware(IEnumerable<IHealthCheck> healthChecks, JsonSerializerSettings serializerSettings, RequestDelegate next, string scopes)
+        public HealthCheckMiddleware(IEnumerable<IHealthCheck> healthChecks, IJsonSerializer serializer, RequestDelegate next, string scopes)
         {
             Guard.NotNull(healthChecks, nameof(healthChecks));
-            Guard.NotNull(serializerSettings, nameof(serializerSettings));
+            Guard.NotNull(serializer, nameof(serializer));
 
             this.healthChecks = healthChecks.ToDictionary(GetName);
             this.next = next;
+            this.serializer = serializer;
             this.scopes = SplitScopes(scopes);
-            this.serializerSettings = serializerSettings;
         }
 
         public async Task Invoke(HttpContext context)
@@ -58,7 +58,9 @@ namespace Squidex.Pipeline.Diagnostics
 
                     var response = results.ToDictionary(x => x.Name, x => x.Result);
 
-                    await context.Response.WriteAsync(JsonConvert.SerializeObject(new { status = response }, Formatting.Indented, serializerSettings));
+                    var json = serializer.Serialize(new { status = response });
+
+                    await context.Response.WriteAsync(json);
                 }
             }
             else

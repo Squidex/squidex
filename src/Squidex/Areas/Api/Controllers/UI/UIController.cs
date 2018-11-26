@@ -14,6 +14,7 @@ using Squidex.Config;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Extensions.Actions.Twitter;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.UI
@@ -78,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> PutSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
-            await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).SetAsync(key, request.Value);
+            await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).SetAsync(key, request.Value.AsJ());
 
             return NoContent();
         }
