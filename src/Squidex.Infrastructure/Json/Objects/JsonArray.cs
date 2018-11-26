@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -23,28 +22,19 @@ namespace Squidex.Infrastructure.Json.Objects
         {
         }
 
-        public JsonArray(IList<IJsonValue> values)
-            : base(values)
-        {
-        }
-
-        public JsonArray(params object[] values)
+        internal JsonArray(params object[] values)
             : base(values?.Select(JsonValue.Create).ToList())
         {
         }
 
         protected override void InsertItem(int index, IJsonValue item)
         {
-            Guard.NotNull(item, nameof(item));
-
-            base.InsertItem(index, item);
+            base.InsertItem(index, item ?? JsonValue.Null);
         }
 
         protected override void SetItem(int index, IJsonValue item)
         {
-            Guard.NotNull(item, nameof(item));
-
-            base.SetItem(index, item);
+            base.SetItem(index, item ?? JsonValue.Null);
         }
 
         public override bool Equals(object obj)
@@ -77,7 +67,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public override int GetHashCode()
         {
-            var hashCode = 0;
+            var hashCode = 17;
 
             for (var i = 0; i < Count; i++)
             {
@@ -94,7 +84,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public override string ToString()
         {
-            return $"[{string.Join(", ", this)}]";
+            return $"[{string.Join(", ", this.Select(x => x.ToJsonString()))}]";
         }
     }
 }

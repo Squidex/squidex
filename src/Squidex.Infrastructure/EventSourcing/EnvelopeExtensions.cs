@@ -17,7 +17,7 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         public static string EventPosition(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.EventNumber].ToString();
+            return headers.GetString(CommonHeaders.EventNumber);
         }
 
         public static Envelope<T> SetEventPosition<T>(this Envelope<T> envelope, string value) where T : class
@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static long EventStreamNumber(this EnvelopeHeaders headers)
         {
-            return headers.GetInt64(CommonHeaders.EventStreamNumber);
+            return headers.GetLong(CommonHeaders.EventStreamNumber);
         }
 
         public static Envelope<T> SetEventStreamNumber<T>(this Envelope<T> envelope, long value) where T : class
@@ -46,7 +46,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetCommitId<T>(this Envelope<T> envelope, Guid value) where T : class
         {
-            envelope.Headers.Add(CommonHeaders.CommitId, value);
+            envelope.Headers.Add(CommonHeaders.CommitId, value.ToString());
 
             return envelope;
         }
@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, Guid value) where T : class
         {
-            envelope.Headers.Add(CommonHeaders.AggregateId, value);
+            envelope.Headers.Add(CommonHeaders.AggregateId, value.ToString());
 
             return envelope;
         }
@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetEventId<T>(this Envelope<T> envelope, Guid value) where T : class
         {
-            envelope.Headers.Add(CommonHeaders.EventId, value);
+            envelope.Headers.Add(CommonHeaders.EventId, value.ToString());
 
             return envelope;
         }
@@ -82,30 +82,62 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public static Envelope<T> SetTimestamp<T>(this Envelope<T> envelope, Instant value) where T : class
         {
-            envelope.Headers.Add(CommonHeaders.Timestamp, value);
+            envelope.Headers.Add(CommonHeaders.Timestamp, value.ToString());
 
             return envelope;
         }
 
-        public static long GetInt64(this JsonObject obj, string key)
+        public static long GetLong(this JsonObject obj, string key)
         {
-            var value = obj[key];
+            if (obj.TryGetValue(key, out var v))
+            {
+                if (v is JsonScalar<double> number)
+                {
+                    return (long)number.Value;
+                }
+                else if (v.Type == JsonValueType.String && double.TryParse(v.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+                {
+                    return (long)result;
+                }
+            }
 
-            return value is JsonScalar<double> s ? (long)s.Value : long.Parse(value.ToString(), CultureInfo.InvariantCulture);
+            return 0;
         }
 
         public static Guid GetGuid(this JsonObject obj, string key)
         {
-            var value = obj[key];
+            if (obj.TryGetValue(key, out var v))
+            {
+                if (v.Type == JsonValueType.String && Guid.TryParse(v.ToString(), out var guid))
+                {
+                    return guid;
+                }
+            }
 
-            return Guid.Parse(value.ToString());
+            return default(Guid);
         }
 
         public static Instant GetInstant(this JsonObject obj, string key)
         {
-            var value = obj[key];
+            if (obj.TryGetValue(key, out var v))
+            {
+                if (v.Type == JsonValueType.String && InstantPattern.General.Parse(v.ToString()).TryGetValue(default(Instant), out var instant))
+                {
+                    return instant;
+                }
+            }
 
-            return InstantPattern.General.Parse(value.ToString()).Value;
+            return default(Instant);
+        }
+
+        public static string GetString(this JsonObject obj, string key)
+        {
+            if (obj.TryGetValue(key, out var v))
+            {
+                return v.ToString();
+            }
+
+            return string.Empty;
         }
     }
 }

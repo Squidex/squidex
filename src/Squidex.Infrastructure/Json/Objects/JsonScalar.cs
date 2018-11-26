@@ -47,14 +47,24 @@ namespace Squidex.Infrastructure.Json.Objects
             return value.GetHashCode();
         }
 
-        public string ToJsonString()
-        {
-            return Type == JsonValueType.String ? $"\"{value}\"" : ToString();
-        }
-
         public override string ToString()
         {
-            return value.ToString();
+            if (Type == JsonValueType.Boolean)
+            {
+                return Equals(Value, true) ? "true" : "false";
+            }
+
+            return Value.ToString();
+        }
+
+        public string ToJsonString()
+        {
+            if (Type == JsonValueType.String)
+            {
+                return $"\"{value}\"";
+            }
+
+            return ToString();
         }
     }
 }

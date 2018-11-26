@@ -40,49 +40,23 @@ namespace Squidex.Infrastructure
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var token1a = NamedId.Of(id1, "my-name1");
-            var token1b = NamedId.Of(id1, "my-name1");
-            var token1c = NamedId.Of(id1, "my-name2");
-            var token2a = NamedId.Of(id2, "my-name1");
+            var named_id1_name1_a = NamedId.Of(id1, "name1");
+            var named_id1_name1_b = NamedId.Of(id1, "name1");
 
-            Assert.True(token1a.Equals(token1b));
+            var named_id2_name1 = NamedId.Of(id2, "name1");
+            var named_id1_name2 = NamedId.Of(id1, "name2");
 
-            Assert.False(token1a.Equals(token2a));
-            Assert.False(token1a.Equals(token1c));
-        }
+            Assert.Equal(named_id1_name1_a, named_id1_name1_b);
+            Assert.Equal(named_id1_name1_a.GetHashCode(), named_id1_name1_b.GetHashCode());
+            Assert.True(named_id1_name1_a.Equals((object)named_id1_name1_b));
 
-        [Fact]
-        public void Should_make_correct_object_equal_comparisons()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            Assert.NotEqual(named_id1_name1_a, named_id2_name1);
+            Assert.NotEqual(named_id1_name1_a.GetHashCode(), named_id2_name1.GetHashCode());
+            Assert.False(named_id1_name1_a.Equals((object)named_id2_name1));
 
-            object token1a = NamedId.Of(id1, "my-name1");
-            object token1b = NamedId.Of(id1, "my-name1");
-            object token1c = NamedId.Of(id1, "my-name2");
-            object token2a = NamedId.Of(id2, "my-name1");
-
-            Assert.True(token1a.Equals(token1b));
-
-            Assert.False(token1a.Equals(token2a));
-            Assert.False(token1a.Equals(token1c));
-        }
-
-        [Fact]
-        public void Should_provide_correct_hash_codes()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            object token1a = NamedId.Of(id1, "my-name1");
-            object token1b = NamedId.Of(id1, "my-name1");
-            object token1c = NamedId.Of(id1, "my-name2");
-            object token2a = NamedId.Of(id2, "my-name1");
-
-            Assert.Equal(token1a.GetHashCode(), token1b.GetHashCode());
-
-            Assert.NotEqual(token1a.GetHashCode(), token2a.GetHashCode());
-            Assert.NotEqual(token1a.GetHashCode(), token1c.GetHashCode());
+            Assert.NotEqual(named_id1_name1_a, named_id1_name2);
+            Assert.NotEqual(named_id1_name1_a.GetHashCode(), named_id1_name2.GetHashCode());
+            Assert.False(named_id1_name1_a.Equals((object)named_id1_name2));
         }
 
         [Fact]

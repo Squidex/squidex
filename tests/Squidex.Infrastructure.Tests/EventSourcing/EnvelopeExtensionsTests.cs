@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public void Should_set_and_get_timestamp()
         {
-            var timestamp = SystemClock.Instance.GetCurrentInstant();
+            var timestamp = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
 
             sut.SetTimestamp(timestamp);
 
@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.EventSourcing
             sut.SetEventStreamNumber(eventStreamNumber);
 
             Assert.Equal(eventStreamNumber, sut.Headers.EventStreamNumber());
-            Assert.Equal(eventStreamNumber, sut.Headers.GetInt64("EventStreamNumber"));
+            Assert.Equal(eventStreamNumber, sut.Headers.GetLong("EventStreamNumber"));
         }
     }
 }

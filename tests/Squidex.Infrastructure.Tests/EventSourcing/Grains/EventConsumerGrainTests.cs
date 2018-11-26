@@ -64,7 +64,10 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             consumerName = eventConsumer.GetType().Name;
 
             A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, consumerName, A<Func<EventConsumerState, Task>>.Ignored))
-                .Invokes(new Action<Type, string, Func<EventConsumerState, Task>>((t, key, a) => apply = a))
+                .Invokes(new Action<Type, string, Func<EventConsumerState, Task>>((t, key, a) =>
+                {
+                    apply = a;
+                }))
                 .Returns(persistence);
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -79,7 +82,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .Invokes(new Action<EventConsumerState>(s => state = s));
 
-            A.CallTo(() => formatter.Parse(eventData, true, null)).Returns(envelope);
+            A.CallTo(() => formatter.Parse(eventData, true, null))
+                .Returns(envelope);
 
             sut = new MyEventConsumerGrain(
                 x => eventConsumer,

@@ -8,13 +8,14 @@
 using System;
 using System.Globalization;
 using Newtonsoft.Json;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
 
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
 
 namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public sealed class JsonValueConverter : JsonConverter
+    public class JsonValueConverter : JsonConverter
     {
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
@@ -161,7 +162,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         public override bool CanConvert(Type objectType)
         {
-            return typeof(IJsonValue).IsAssignableFrom(objectType);
+            return objectType != typeof(EnvelopeHeaders) && typeof(IJsonValue).IsAssignableFrom(objectType);
         }
     }
 }

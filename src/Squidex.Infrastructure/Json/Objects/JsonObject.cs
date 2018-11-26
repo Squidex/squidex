@@ -25,9 +25,8 @@ namespace Squidex.Infrastructure.Json.Objects
             set
             {
                 Guard.NotNullOrEmpty(key, nameof(key));
-                Guard.NotNull(value, nameof(value));
 
-                inner[key] = value;
+                inner[key] = value ?? JsonValue.Null;
             }
         }
 
@@ -68,10 +67,7 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public JsonObject Add(string key, IJsonValue value)
         {
-            Guard.NotNullOrEmpty(key, nameof(key));
-            Guard.NotNull(value, nameof(value));
-
-            inner[key] = value;
+            inner[key] = value ?? JsonValue.Null;
 
             return this;
         }

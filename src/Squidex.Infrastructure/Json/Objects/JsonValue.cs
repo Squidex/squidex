@@ -8,16 +8,20 @@
 using System;
 using NodaTime;
 
+#pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
+
 namespace Squidex.Infrastructure.Json.Objects
 {
     public static class JsonValue
     {
-        public static readonly JsonScalar<string> Empty = new JsonScalar<string>(JsonValueType.String, string.Empty);
+        public static readonly IJsonValue Empty = new JsonScalar<string>(JsonValueType.String, string.Empty);
 
-        public static readonly JsonScalar<bool> True = new JsonScalar<bool>(JsonValueType.Boolean, true);
-        public static readonly JsonScalar<bool> False = new JsonScalar<bool>(JsonValueType.Boolean, false);
+        public static readonly IJsonValue True = new JsonScalar<bool>(JsonValueType.Boolean, true);
+        public static readonly IJsonValue False = new JsonScalar<bool>(JsonValueType.Boolean, false);
 
-        public static readonly JsonNull Null = JsonNull.Null;
+        public static readonly IJsonValue Null = JsonNull.Null;
+
+        public static readonly IJsonValue Zero = new JsonScalar<double>(JsonValueType.Number, 0);
 
         public static JsonArray Array()
         {
@@ -75,6 +79,11 @@ namespace Squidex.Infrastructure.Json.Objects
         public static IJsonValue Create(double value)
         {
             Guard.ValidNumber(value, nameof(value));
+
+            if (value == 0)
+            {
+                return Zero;
+            }
 
             return new JsonScalar<double>(JsonValueType.Number, value);
         }

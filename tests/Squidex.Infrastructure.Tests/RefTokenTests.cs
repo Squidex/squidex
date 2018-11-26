@@ -70,39 +70,23 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_make_correct_equal_comparisons()
         {
-            var token1a = RefToken.Parse("client:client1");
-            var token1b = RefToken.Parse("client:client1");
-            var token2a = RefToken.Parse("client:client2");
+            var token_type1_id1_a = RefToken.Parse("type1:client1");
+            var token_type1_id1_b = RefToken.Parse("type1:client1");
 
-            Assert.True(token1a.Equals(token1b));
+            var token_type2_id1 = RefToken.Parse("type2:client1");
+            var token_type1_id2 = RefToken.Parse("type1:client2");
 
-            Assert.False(token1a.Equals(token2a));
-        }
+            Assert.Equal(token_type1_id1_a, token_type1_id1_b);
+            Assert.Equal(token_type1_id1_a.GetHashCode(), token_type1_id1_b.GetHashCode());
+            Assert.True(token_type1_id1_a.Equals((object)token_type1_id1_b));
 
-        [Fact]
-        public void Should_make_correct_object_equal_comparisons()
-        {
-            object token1a = RefToken.Parse("client:client1");
-            object token1b = RefToken.Parse("client:client1");
-            object token2a = RefToken.Parse("client:client2");
+            Assert.NotEqual(token_type1_id1_a, token_type2_id1);
+            Assert.NotEqual(token_type1_id1_a.GetHashCode(), token_type2_id1.GetHashCode());
+            Assert.False(token_type1_id1_a.Equals((object)token_type2_id1));
 
-            Assert.True(token1a.Equals(token1b));
-
-            Assert.False(token1a.Equals(token2a));
-            Assert.False(token1b.Equals(token2a));
-        }
-
-        [Fact]
-        public void Should_provide_correct_hash_codes()
-        {
-            var token1a = RefToken.Parse("client:client1");
-            var token1b = RefToken.Parse("client:client1");
-            var token2a = RefToken.Parse("client:client2");
-
-            Assert.Equal(token1a.GetHashCode(), token1b.GetHashCode());
-
-            Assert.NotEqual(token1a.GetHashCode(), token2a.GetHashCode());
-            Assert.NotEqual(token1b.GetHashCode(), token2a.GetHashCode());
+            Assert.NotEqual(token_type1_id1_a, token_type1_id2);
+            Assert.NotEqual(token_type1_id1_a.GetHashCode(), token_type1_id2.GetHashCode());
+            Assert.False(token_type1_id1_a.Equals((object)token_type1_id2));
         }
 
         [Fact]

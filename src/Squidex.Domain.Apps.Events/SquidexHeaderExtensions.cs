@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Events
 
         public static Envelope<T> SetAppId<T>(this Envelope<T> envelope, Guid value) where T : class
         {
-            envelope.Headers.Add(SquidexHeaders.AppId, value);
+            envelope.Headers.Add(SquidexHeaders.AppId, value.ToString());
 
             return envelope;
         }

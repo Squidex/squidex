@@ -28,6 +28,7 @@ namespace Squidex.Infrastructure.TestHelpers
                     new ClaimsPrincipalConverter(),
                     new InstantConverter(),
                     new JsonValueConverter(),
+                    new EnvelopeHeadersConverter(),
                     new LanguageConverter(),
                     new NamedGuidIdConverter(),
                     new NamedLongIdConverter(),
