@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var input =
                 new ContentFieldData()
                     .AddValue("iv",
-                        new JsonArray(
+                        JsonValue.Array(
                             JsonValue.Object()
                                 .Add("field1", 100)
                                 .Add("field2", 200)
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var expected =
                new ContentFieldData()
                     .AddValue("iv",
-                        new JsonArray(
+                        JsonValue.Array(
                             JsonValue.Object()
                                 .Add("1", 100)));
 
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var input =
                 new ContentFieldData()
                     .AddValue("iv",
-                        new JsonArray(
+                        JsonValue.Array(
                             JsonValue.Object()
                                 .Add("field1", 100)
                                 .Add("field2", 200)
@@ -108,7 +108,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var expected =
                 new ContentFieldData()
                     .AddValue("iv",
-                        new JsonArray(
+                        JsonValue.Array(
                             JsonValue.Object()
                                 .Add("field1", 100)));
 
@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var input =
                new ContentFieldData()
                     .AddValue("iv",
-                        new JsonArray(
+                        JsonValue.Array(
                             JsonValue.Object()
                                 .Add("1", 100)
                                 .Add("2", 200)
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var expected =
                new ContentFieldData()
                     .AddValue("iv",
-                        new JsonArray(
+                        JsonValue.Array(
                             JsonValue.Object()
                                 .Add("1", 100)));
 
@@ -145,7 +145,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var input =
                new ContentFieldData()
                     .AddValue("iv",
-                        new JsonArray(
+                        JsonValue.Array(
                             JsonValue.Object()
                                 .Add("1", 100)
                                 .Add("2", 200)
@@ -156,7 +156,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
             var expected =
                new ContentFieldData()
                     .AddValue("iv",
-                        new JsonArray(
+                        JsonValue.Array(
                             JsonValue.Object()
                                 .Add("field1", 100)));
 
@@ -422,11 +422,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source =
                 new ContentFieldData()
-                    .AddValue("iv", new JsonArray("1", "2"));
+                    .AddValue("iv", JsonValue.Array("1", "2"));
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("iv", new JsonArray("url/to/1", "url/to/2"));
+                    .AddValue("iv", JsonValue.Array("url/to/1", "url/to/2"));
 
             var rtesult = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "1" }), assetUrlGenerator)(source, assetsField);
 
@@ -438,11 +438,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source =
                 new ContentFieldData()
-                    .AddValue("iv", new JsonArray("1", "2"));
+                    .AddValue("iv", JsonValue.Array("1", "2"));
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("iv", new JsonArray("url/to/1", "url/to/2"));
+                    .AddValue("iv", JsonValue.Array("url/to/1", "url/to/2"));
 
             var rtesult = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "*" }), assetUrlGenerator)(source, assetsField);
 
@@ -454,11 +454,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source =
                 new ContentFieldData()
-                    .AddValue("iv", new JsonArray("1", "2"));
+                    .AddValue("iv", JsonValue.Array("1", "2"));
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("iv", new JsonArray("1", "2"));
+                    .AddValue("iv", JsonValue.Array("1", "2"));
 
             var rtesult = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "2" }), assetUrlGenerator)(source, assetsField);
 
@@ -470,11 +470,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
         {
             var source =
                 new ContentFieldData()
-                    .AddValue("iv", new JsonArray("1", "2"));
+                    .AddValue("iv", JsonValue.Array("1", "2"));
 
             var expected =
                 new ContentFieldData()
-                    .AddValue("iv", new JsonArray("1", "2"));
+                    .AddValue("iv", JsonValue.Array("1", "2"));
 
             var rtesult = FieldConverters.ResolveAssetUrls(null, assetUrlGenerator)(source, assetsField);
 

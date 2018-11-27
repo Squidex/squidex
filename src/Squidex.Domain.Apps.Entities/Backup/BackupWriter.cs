@@ -10,6 +10,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
+using Squidex.Domain.Apps.Entities.Backup.Model;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
@@ -21,6 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
     {
         private readonly ZipArchive archive;
         private readonly IJsonSerializer serializer;
+        private readonly Func<StoredEvent, CompatibleStoredEvent> converter;
         private int writtenEvents;
         private int writtenAttachments;
 
@@ -34,11 +36,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
             get { return writtenAttachments; }
         }
 
-        public BackupWriter(IJsonSerializer serializer, Stream stream, bool keepOpen = false)
+        public BackupWriter(IJsonSerializer serializer, Stream stream, bool keepOpen = false, BackupVersion version = BackupVersion.V2)
         {
             Guard.NotNull(serializer, nameof(serializer));
 
             this.serializer = serializer;
+
+            converter =
+                version == BackupVersion.V1 ?
+                    new Func<StoredEvent, CompatibleStoredEvent>(CompatibleStoredEvent.V1) :
+                    new Func<StoredEvent, CompatibleStoredEvent>(CompatibleStoredEvent.V2);
 
             archive = new ZipArchive(stream, ZipArchiveMode.Create, keepOpen);
         }
@@ -90,7 +97,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             using (var stream = eventEntry.Open())
             {
-                serializer.Serialize(storedEvent, stream);
+                var @event = converter(storedEvent);
+
+                serializer.Serialize(@event, stream);
             }
 
             writtenEvents++;

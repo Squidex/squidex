@@ -8,13 +8,14 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
+using Squidex.Domain.Apps.Entities.Backup.Model;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.States;
 
 #pragma warning disable SA1401 // Fields must be private
@@ -28,36 +29,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IJsonSerializer serializer;
         private int readEvents;
         private int readAttachments;
-
-        private sealed class ComaptibleStoredEvent
-        {
-            [JsonProperty]
-            public string StreamName;
-
-            [JsonProperty]
-            public string EventPosition;
-
-            [JsonProperty]
-            public long EventStreamNumber;
-
-            [JsonProperty]
-            public CompatibleEventData Data;
-        }
-
-        private sealed class CompatibleEventData
-        {
-            [JsonProperty]
-            public string Type;
-
-            [JsonProperty]
-            public JRaw Payload;
-
-            [JsonProperty]
-            public EnvelopeHeaders Headers;
-
-            [JsonProperty]
-            public EnvelopeHeaders Metadata;
-        }
 
         public int ReadEvents
         {
@@ -151,19 +122,33 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 using (var stream = eventEntry.Open())
                 {
-                    var storedEvent = serializer.Deserialize<ComaptibleStoredEvent>(stream);
+                    var (streamName, data) = serializer.Deserialize<CompatibleStoredEvent>(stream).ToEvent();
 
-                    var src = storedEvent.Data;
+                    MapHeaders(data);
 
-                    var data = new EventData(src.Type, src.Headers ?? src.Metadata, src.Payload.ToString());
-
-                    var eventStream = streamNameResolver.WithNewId(storedEvent.StreamName, guidMapper.NewGuidOrNull);
+                    var eventStream = streamNameResolver.WithNewId(streamName, guidMapper.NewGuidOrNull);
                     var eventEnvelope = formatter.Parse(data, true, guidMapper.NewGuidOrValue);
 
-                    await handler((eventStream, eventEnvelope));
+                    await handler((streamName, eventEnvelope));
                 }
 
                 readEvents++;
+            }
+        }
+
+        private void MapHeaders(EventData data)
+        {
+            foreach (var kvp in data.Headers.ToList())
+            {
+                if (kvp.Value.Type == JsonValueType.String)
+                {
+                    var newGuid = guidMapper.NewGuidOrNull(kvp.Value.ToString());
+
+                    if (newGuid != null)
+                    {
+                        data.Headers.Add(kvp.Key, newGuid);
+                    }
+                }
             }
         }
     }

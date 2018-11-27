@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var @event = new ContentCreated { SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"), AppId = NamedId.Of(Guid.NewGuid(), "my-event") };
 
-            var now = SystemClock.Instance.GetCurrentInstant();
+            var now = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
 
             var ruleConfig = ValidRule();
             var ruleEnvelope = Envelope.Create(@event);

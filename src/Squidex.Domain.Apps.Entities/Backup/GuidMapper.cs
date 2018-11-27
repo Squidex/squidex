@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         public Guid OldGuid(Guid newGuid)
         {
-            return newToOldGuid.GetOrDefault(newGuid);
+            return newToOldGuid.GetOrCreate(newGuid, x => x);
         }
 
         public string NewGuidOrNull(string value)

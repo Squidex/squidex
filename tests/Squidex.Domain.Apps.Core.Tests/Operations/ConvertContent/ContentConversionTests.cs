@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("en", new JsonArray("hello", "loved")))
+                            .AddValue("en", JsonValue.Array("hello", "loved")))
                     .AddField("field2",
                         new ContentFieldData()
                             .AddValue("iv", "world"));
@@ -191,7 +191,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new NamedContentData()
                     .AddField("field1",
                         new ContentFieldData()
-                            .AddValue("en", new JsonArray(JsonValue.Object().Add("p1", "hello"))))
+                            .AddValue("en", JsonValue.Array(JsonValue.Object().Add("p1", "hello"))))
                     .AddField("field2",
                         new ContentFieldData()
                             .AddValue("iv", "world"));

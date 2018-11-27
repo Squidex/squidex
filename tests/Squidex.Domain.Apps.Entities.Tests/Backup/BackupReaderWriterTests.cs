@@ -47,8 +47,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 .ReturnsLazily(new Func<string, Func<string, string>, string>((stream, idGenerator) => stream + "^2"));
         }
 
-        [Fact]
-        public async Task Should_write_and_read_events()
+        [Theory]
+        [InlineData(BackupVersion.V1)]
+        [InlineData(BackupVersion.V2)]
+        public async Task Should_write_and_read_events_to_backup(BackupVersion version)
         {
             var stream = new MemoryStream();
 
@@ -83,13 +85,13 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 var envelope = Envelope.Create<IEvent>(@event);
 
                 envelope.Headers.Add(RandomGuid().ToString(), i);
-                envelope.Headers.Add("Id", RandomGuid());
+                envelope.Headers.Add("Id", RandomGuid().ToString());
                 envelope.Headers.Add("Index", i);
 
                 sourceEvents.Add(($"My-{RandomGuid()}", envelope));
             }
 
-            using (var writer = new BackupWriter(serializer, stream, true))
+            using (var writer = new BackupWriter(serializer, stream, true, version))
             {
                 foreach (var @event in sourceEvents)
                 {
@@ -149,13 +151,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                 for (var i = 0; i < targetEvents.Count; i++)
                 {
-                    var lhs = targetEvents[i].Event.To<MyEvent>();
-                    var rhs = sourceEvents[i].Event.To<MyEvent>();
+                    var tgt = targetEvents[i].Event.To<MyEvent>();
+                    var src = sourceEvents[i].Event.To<MyEvent>();
 
-                    Assert.Equal(rhs.Payload.GuidRaw, reader.OldGuid(lhs.Payload.GuidRaw));
-                    Assert.Equal(rhs.Payload.GuidNamed.Id, reader.OldGuid(lhs.Payload.GuidNamed.Id));
+                    Assert.Equal(src.Payload.GuidRaw, reader.OldGuid(tgt.Payload.GuidRaw));
+                    Assert.Equal(src.Payload.GuidNamed.Id, reader.OldGuid(tgt.Payload.GuidNamed.Id));
 
-                    Assert.Equal(rhs.Headers.GetGuid("Id"), reader.OldGuid(lhs.Headers.GetGuid("Id")));
+                    Assert.NotEqual(src.Payload.GuidRaw, tgt.Payload.GuidRaw);
+                    Assert.NotEqual(src.Payload.GuidNamed.Id, tgt.Payload.GuidNamed.Id);
+
+                    Assert.Equal(src.Headers.GetGuid("Id"), reader.OldGuid(tgt.Headers.GetGuid("Id")));
+
+                    Assert.NotEqual(src.Headers.GetGuid("Id"), tgt.Headers.GetGuid("Id"));
                 }
             }
         }

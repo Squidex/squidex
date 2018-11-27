@@ -10,7 +10,7 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public class DefaultEventDataFormatter : IEventDataFormatter
+    public sealed class DefaultEventDataFormatter : IEventDataFormatter
     {
         private readonly IJsonSerializer serializer;
         private readonly TypeNameRegistry typeNameRegistry;
@@ -28,14 +28,14 @@ namespace Squidex.Infrastructure.EventSourcing
         public Envelope<IEvent> Parse(EventData eventData, bool migrate = true, Func<string, string> stringConverter = null)
         {
             var payloadType = typeNameRegistry.GetType(eventData.Type);
-            var payload = serializer.Deserialize<IEvent>(eventData.Payload, payloadType, stringConverter);
+            var payloadObj = serializer.Deserialize<IEvent>(eventData.Payload, payloadType, stringConverter);
 
-            if (migrate && payload is IMigratedEvent migratedEvent)
+            if (migrate && payloadObj is IMigratedEvent migratedEvent)
             {
-                payload = migratedEvent.Migrate();
+                payloadObj = migratedEvent.Migrate();
             }
 
-            var envelope = new Envelope<IEvent>(payload, eventData.Headers);
+            var envelope = new Envelope<IEvent>(payloadObj, eventData.Headers);
 
             return envelope;
         }
@@ -50,11 +50,11 @@ namespace Squidex.Infrastructure.EventSourcing
             }
 
             var payloadType = typeNameRegistry.GetName(eventPayload.GetType());
-            var payload = serializer.Serialize(envelope.Payload);
+            var payloadJson = serializer.Serialize(envelope.Payload);
 
             envelope.SetCommitId(commitId);
 
-            return new EventData(payloadType, envelope.Headers, payload);
+            return new EventData(payloadType, envelope.Headers, payloadJson);
         }
     }
 }

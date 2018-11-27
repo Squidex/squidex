@@ -155,13 +155,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new NamedContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", new JsonArray(1.0, 2.0)));
+                            .AddValue("iv", JsonValue.Array(1.0, 2.0)));
 
             var expected =
                 new NamedContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", new JsonArray(1.0, 4.0, 5.0)));
+                            .AddValue("iv", JsonValue.Array(1.0, 4.0, 5.0)));
 
             var result = ExecuteScript(original, @"data.number.iv = [data.number.iv[0], data.number.iv[1] + 2, 5]");
 
@@ -278,7 +278,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new NamedContentData()
                     .AddField("obj",
                         new ContentFieldData()
-                            .AddValue("iv", new JsonArray()));
+                            .AddValue("iv", JsonValue.Array()));
 
             ExecuteScript(original, "data.obj.iv[0] = 1");
         }
