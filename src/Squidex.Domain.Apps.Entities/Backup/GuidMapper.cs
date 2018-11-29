@@ -16,6 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private static readonly int GuidLength = Guid.Empty.ToString().Length;
         private readonly Dictionary<Guid, Guid> oldToNewGuid = new Dictionary<Guid, Guid>();
         private readonly Dictionary<Guid, Guid> newToOldGuid = new Dictionary<Guid, Guid>();
+        private readonly Dictionary<string, string> strings = new Dictionary<string, string>();
 
         public Guid OldGuid(Guid newGuid)
         {
@@ -44,38 +45,48 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private bool TryGenerateNewGuidString(string value, out string result)
         {
-            result = null;
-
             if (value.Length == GuidLength)
             {
+                if (strings.TryGetValue(value, out result))
+                {
+                    return true;
+                }
+
                 if (Guid.TryParse(value, out var guid))
                 {
                     var newGuid = GenerateNewGuid(guid);
 
-                    result = newGuid.ToString();
+                    strings[value] = result = newGuid.ToString();
 
                     return true;
                 }
             }
+
+            result = null;
 
             return false;
         }
 
         private bool TryGenerateNewNamedId(string value, out string result)
         {
-            result = null;
-
-            if (value.Length > GuidLength && value[GuidLength] == ',')
+            if (value.Length > GuidLength)
             {
-                if (Guid.TryParse(value.Substring(0, GuidLength), out var guid))
+                if (strings.TryGetValue(value, out result))
                 {
-                    var newGuid = GenerateNewGuid(guid);
+                    return true;
+                }
 
-                    result = newGuid + value.Substring(GuidLength);
+                if (NamedId<Guid>.TryParse(value, Guid.TryParse, out var namedId))
+                {
+                    var newGuid = GenerateNewGuid(namedId.Id);
+
+                    strings[value] = result = new NamedId<Guid>(newGuid, namedId.Name).ToString();
 
                     return true;
                 }
             }
+
+            result = null;
 
             return false;
         }

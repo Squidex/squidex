@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.Json.Objects
             get { return JsonValueType.Array; }
         }
 
-        public JsonObject()
+        internal JsonObject()
         {
             inner = new Dictionary<string, IJsonValue>();
         }

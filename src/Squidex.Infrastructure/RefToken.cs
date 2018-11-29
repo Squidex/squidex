@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 
 namespace Squidex.Infrastructure
 {
@@ -24,20 +23,6 @@ namespace Squidex.Infrastructure
             Type = type.ToLowerInvariant();
 
             Identifier = identifier;
-        }
-
-        public static RefToken Parse(string input)
-        {
-            Guard.NotNullOrEmpty(input, nameof(input));
-
-            var parts = input.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (parts.Length < 2)
-            {
-                throw new ArgumentException("Input must have more than 2 parts divided by colon.", nameof(input));
-            }
-
-            return new RefToken(parts[0], string.Join(":", parts.Skip(1)));
         }
 
         public override string ToString()
@@ -58,6 +43,35 @@ namespace Squidex.Infrastructure
         public override int GetHashCode()
         {
             return (Type.GetHashCode() * 397) ^ Identifier.GetHashCode();
+        }
+
+        public static bool TryParse(string value, out RefToken result)
+        {
+            if (value != null)
+            {
+                var idx = value.IndexOf(':');
+
+                if (idx > 0 && idx < value.Length - 1)
+                {
+                    result = new RefToken(value.Substring(0, idx), value.Substring(idx + 1));
+
+                    return true;
+                }
+            }
+
+            result = null;
+
+            return false;
+        }
+
+        public static RefToken Parse(string value)
+        {
+            if (!TryParse(value, out var result))
+            {
+                throw new ArgumentException("Ref token must have more than 2 parts divided by colon.", nameof(value));
+            }
+
+            return result;
         }
     }
 }

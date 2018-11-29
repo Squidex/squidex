@@ -5,9 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NodaTime;
 using Xunit;
 
 namespace Squidex.Infrastructure.Json.Objects
@@ -119,6 +121,10 @@ namespace Squidex.Infrastructure.Json.Objects
         public void Should_cache_null()
         {
             Assert.Same(JsonValue.Null, JsonValue.Create((string)null));
+            Assert.Same(JsonValue.Null, JsonValue.Create((bool?)null));
+            Assert.Same(JsonValue.Null, JsonValue.Create((double?)null));
+            Assert.Same(JsonValue.Null, JsonValue.Create((object)null));
+            Assert.Same(JsonValue.Null, JsonValue.Create((Instant?)null));
         }
 
         [Fact]
@@ -143,6 +149,28 @@ namespace Squidex.Infrastructure.Json.Objects
         public void Should_cache_zero()
         {
             Assert.Same(JsonValue.Zero, JsonValue.Create(0));
+        }
+
+        [Fact]
+        public void Should_boolean_from_object()
+        {
+            Assert.Equal(JsonValue.True, JsonValue.Create((object)true));
+        }
+
+        [Fact]
+        public void Should_create_value_from_instant()
+        {
+            var instant = Instant.FromUnixTimeSeconds(4123125455);
+
+            Assert.Equal(instant.ToString(), JsonValue.Create(instant).ToString());
+        }
+
+        [Fact]
+        public void Should_create_value_from_instant_object()
+        {
+            var instant = Instant.FromUnixTimeSeconds(4123125455);
+
+            Assert.Equal(instant.ToString(), JsonValue.Create((object)instant).ToString());
         }
 
         [Fact]
@@ -226,10 +254,12 @@ namespace Squidex.Infrastructure.Json.Objects
         {
             var numbers = new[]
             {
-                JsonValue.Create(1.0f),
-                JsonValue.Create(1.0),
-                JsonValue.Create(1L),
-                JsonValue.Create(1)
+                JsonValue.Create(12.0f),
+                JsonValue.Create(12.0),
+                JsonValue.Create(12L),
+                JsonValue.Create(12),
+                JsonValue.Create((object)12.0d),
+                JsonValue.Create((double?)12.0d)
             };
 
             Assert.Single(numbers.Distinct());
@@ -316,6 +346,12 @@ namespace Squidex.Infrastructure.Json.Objects
 
             Assert.Equal(kvps, obj.ToArray());
             Assert.Equal(kvps, ((IEnumerable)obj).OfType<KeyValuePair<string, IJsonValue>>().ToArray());
+        }
+
+        [Fact]
+        public void Should_throw_exception_when_creation_value_from_invalid_type()
+        {
+            Assert.Throws<ArgumentException>(() => JsonValue.Create(Guid.Empty));
         }
     }
 }

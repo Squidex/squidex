@@ -6,7 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
+
+#pragma warning disable RECS0108 // Warns about static fields in generic types
 
 namespace Squidex.Infrastructure
 {
@@ -14,6 +15,8 @@ namespace Squidex.Infrastructure
 
     public sealed class NamedId<T> : IEquatable<NamedId<T>>
     {
+        private static readonly int GuidLength = Guid.Empty.ToString().Length;
+
         public T Id { get; }
 
         public string Name { get; }
@@ -48,23 +51,51 @@ namespace Squidex.Infrastructure
             return (Id.GetHashCode() * 397) ^ Name.GetHashCode();
         }
 
+        public static bool TryParse(string value, Parser<T> parser, out NamedId<T> result)
+        {
+            if (value != null)
+            {
+                if (typeof(T) == typeof(Guid))
+                {
+                    if (value.Length > GuidLength + 1 && value[GuidLength] == ',')
+                    {
+                        if (parser(value.Substring(0, GuidLength), out var id))
+                        {
+                            result = new NamedId<T>(id, value.Substring(GuidLength + 1));
+
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    var index = value.IndexOf(',');
+
+                    if (index > 0 && index < value.Length - 1)
+                    {
+                        if (parser(value.Substring(0, index), out var id))
+                        {
+                            result = new NamedId<T>(id, value.Substring(index + 1));
+
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            result = null;
+
+            return false;
+        }
+
         public static NamedId<T> Parse(string value, Parser<T> parser)
         {
-            Guard.NotNull(value, nameof(value));
-
-            var parts = value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (parts.Length < 2)
+            if (!TryParse(value, parser, out var result))
             {
-                throw new ArgumentException("Named id must have more than 2 parts divided by commata.");
+                throw new ArgumentException("Named id must have at least 2 parts divided by commata.", nameof(value));
             }
 
-            if (!parser(parts[0], out var id))
-            {
-                throw new ArgumentException("Named id must be a valid guid.");
-            }
-
-            return new NamedId<T>(id, string.Join(",", parts.Skip(1)));
+            return result;
         }
     }
 }

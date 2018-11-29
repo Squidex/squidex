@@ -7,11 +7,12 @@
 
 using System.Linq;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public class EnvelopeHeaderTests
+    public class EnvelopeHeadersTests
     {
         [Fact]
         public void Should_create_headers()
@@ -24,7 +25,8 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public void Should_create_headers_as_copy()
         {
-            var source = new JsonObject().Add("Key1", 123);
+            var source = JsonValue.Object().Add("Key1", 123);
+
             var headers = new EnvelopeHeaders(source);
 
             CompareHeaders(headers, source);
@@ -33,12 +35,21 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public void Should_clone_headers()
         {
-            var source = new JsonObject().Add("Key1", 123);
-            var headers = new EnvelopeHeaders(source);
+            var headers = new EnvelopeHeaders(JsonValue.Object().Add("Key1", 123));
 
             var clone = headers.Clone();
 
             CompareHeaders(headers, clone);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize()
+        {
+            var value = new EnvelopeHeaders(JsonValue.Object().Add("Key1", 123));
+
+            var deserialized = value.SerializeAndDeserialize();
+
+            CompareHeaders(deserialized, value);
         }
 
         private static void CompareHeaders(JsonObject lhs, JsonObject rhs)

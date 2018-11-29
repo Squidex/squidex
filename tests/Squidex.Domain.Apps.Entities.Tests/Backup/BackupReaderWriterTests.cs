@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core;
@@ -77,8 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     GuidRaw = RandomGuid(),
                     Values = new Dictionary<Guid, string>
                     {
-                        [RandomGuid()] = $"name{i}_1",
-                        [RandomGuid()] = $"name{i}_1",
+                        [RandomGuid()] = "Key"
                     }
                 };
 
@@ -149,20 +149,22 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     targetEvents.Add(@event);
                 });
 
+                void CompareGuid(Guid source, Guid target)
+                {
+                    Assert.Equal(source, reader.OldGuid(target));
+                    Assert.NotEqual(source, target);
+                }
+
                 for (var i = 0; i < targetEvents.Count; i++)
                 {
-                    var tgt = targetEvents[i].Event.To<MyEvent>();
-                    var src = sourceEvents[i].Event.To<MyEvent>();
+                    var source = targetEvents[i].Event.To<MyEvent>();
 
-                    Assert.Equal(src.Payload.GuidRaw, reader.OldGuid(tgt.Payload.GuidRaw));
-                    Assert.Equal(src.Payload.GuidNamed.Id, reader.OldGuid(tgt.Payload.GuidNamed.Id));
+                    var target = sourceEvents[i].Event.To<MyEvent>();
 
-                    Assert.NotEqual(src.Payload.GuidRaw, tgt.Payload.GuidRaw);
-                    Assert.NotEqual(src.Payload.GuidNamed.Id, tgt.Payload.GuidNamed.Id);
-
-                    Assert.Equal(src.Headers.GetGuid("Id"), reader.OldGuid(tgt.Headers.GetGuid("Id")));
-
-                    Assert.NotEqual(src.Headers.GetGuid("Id"), tgt.Headers.GetGuid("Id"));
+                    CompareGuid(target.Payload.Values.First().Key, source.Payload.Values.First().Key);
+                    CompareGuid(target.Payload.GuidRaw, source.Payload.GuidRaw);
+                    CompareGuid(target.Payload.GuidNamed.Id, source.Payload.GuidNamed.Id);
+                    CompareGuid(target.Headers.GetGuid("Id"), source.Headers.GetGuid("Id"));
                 }
             }
         }

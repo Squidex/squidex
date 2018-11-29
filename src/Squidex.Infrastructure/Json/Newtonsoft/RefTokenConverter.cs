@@ -24,7 +24,12 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 throw new JsonException($"Expected String, but got {reader.TokenType}.");
             }
 
-            return RefToken.Parse(reader.Value.ToString());
+            if (!RefToken.TryParse(reader.Value.ToString(), out var result))
+            {
+                throw new JsonException("Named id must have at least 2 parts divided by colon.");
+            }
+
+            return result;
         }
     }
 }

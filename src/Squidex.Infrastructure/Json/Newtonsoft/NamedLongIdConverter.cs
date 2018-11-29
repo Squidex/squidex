@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
     {
         protected override void WriteValue(JsonWriter writer, NamedId<long> value, JsonSerializer serializer)
         {
-            writer.WriteValue($"{value.Id},{value.Name}");
+            writer.WriteValue(value.ToString());
         }
 
         protected override NamedId<long> ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
@@ -24,14 +24,12 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 throw new JsonException($"Expected String, but got {reader.TokenType}.");
             }
 
-            try
+            if (!NamedId<long>.TryParse(reader.Value.ToString(), long.TryParse, out var result))
             {
-                return NamedId<long>.Parse(reader.Value.ToString(), long.TryParse);
+                throw new JsonException("Named id must have at least 2 parts divided by commata.");
             }
-            catch (ArgumentException ex)
-            {
-                throw new JsonException(ex.Message);
-            }
+
+            return result;
         }
     }
 }

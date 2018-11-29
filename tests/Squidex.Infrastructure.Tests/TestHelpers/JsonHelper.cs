@@ -8,7 +8,6 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 
@@ -27,8 +26,8 @@ namespace Squidex.Infrastructure.TestHelpers
                 ContractResolver = new ConverterContractResolver(
                     new ClaimsPrincipalConverter(),
                     new InstantConverter(),
-                    new JsonValueConverter(),
                     new EnvelopeHeadersConverter(),
+                    new JsonValueConverter(),
                     new LanguageConverter(),
                     new NamedGuidIdConverter(),
                     new NamedLongIdConverter(),
