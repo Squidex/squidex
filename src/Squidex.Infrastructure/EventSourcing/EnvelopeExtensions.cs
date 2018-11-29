@@ -91,7 +91,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             if (obj.TryGetValue(key, out var v))
             {
-                if (v is JsonScalar<double> number)
+                if (v is JsonNumber number)
                 {
                     return (long)number.Value;
                 }

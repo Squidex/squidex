@@ -9,22 +9,15 @@ using System;
 
 namespace Squidex.Infrastructure.Json.Objects
 {
-    public sealed class JsonScalar<T> : IJsonValue, IEquatable<JsonScalar<T>>
+    public abstract class JsonScalar<T> : IJsonValue, IEquatable<JsonScalar<T>>
     {
-        private readonly T value;
+        public abstract JsonValueType Type { get; }
 
-        public JsonValueType Type { get; }
+        public T Value { get; }
 
-        public T Value
+        protected JsonScalar(T value)
         {
-            get { return value; }
-        }
-
-        internal JsonScalar(JsonValueType type, T value)
-        {
-            Type = type;
-
-            this.value = value;
+            Value = value;
         }
 
         public override bool Equals(object obj)
@@ -39,31 +32,21 @@ namespace Squidex.Infrastructure.Json.Objects
 
         public bool Equals(JsonScalar<T> other)
         {
-            return other != null && other.Type == Type && Equals(other.value, value);
+            return other != null && other.Type == Type && Equals(other.Value, Value);
         }
 
         public override int GetHashCode()
         {
-            return value.GetHashCode();
+            return Value.GetHashCode();
         }
 
         public override string ToString()
         {
-            if (Type == JsonValueType.Boolean)
-            {
-                return Equals(Value, true) ? "true" : "false";
-            }
-
             return Value.ToString();
         }
 
-        public string ToJsonString()
+        public virtual string ToJsonString()
         {
-            if (Type == JsonValueType.String)
-            {
-                return $"\"{value}\"";
-            }
-
             return ToString();
         }
     }

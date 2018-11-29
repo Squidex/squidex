@@ -14,14 +14,14 @@ namespace Squidex.Infrastructure.Json.Objects
 {
     public static class JsonValue
     {
-        public static readonly IJsonValue Empty = new JsonScalar<string>(JsonValueType.String, string.Empty);
+        public static readonly IJsonValue Empty = new JsonString(string.Empty);
 
-        public static readonly IJsonValue True = new JsonScalar<bool>(JsonValueType.Boolean, true);
-        public static readonly IJsonValue False = new JsonScalar<bool>(JsonValueType.Boolean, false);
+        public static readonly IJsonValue True = JsonBoolean.True;
+        public static readonly IJsonValue False = JsonBoolean.False;
 
         public static readonly IJsonValue Null = JsonNull.Null;
 
-        public static readonly IJsonValue Zero = new JsonScalar<double>(JsonValueType.Number, 0);
+        public static readonly IJsonValue Zero = new JsonNumber(0);
 
         public static JsonArray Array()
         {
@@ -85,7 +85,7 @@ namespace Squidex.Infrastructure.Json.Objects
                 return Zero;
             }
 
-            return new JsonScalar<double>(JsonValueType.Number, value);
+            return new JsonNumber(value);
         }
 
         public static IJsonValue Create(Instant? value)
@@ -130,7 +130,7 @@ namespace Squidex.Infrastructure.Json.Objects
                 return Empty;
             }
 
-            return new JsonScalar<string>(JsonValueType.String, value);
+            return new JsonString(value);
         }
     }
 }

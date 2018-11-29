@@ -115,13 +115,13 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 case JsonNull n:
                     writer.WriteNull();
                     break;
-                case JsonScalar<bool> s:
+                case JsonBoolean s:
                     writer.WriteValue(s.Value);
                     break;
-                case JsonScalar<string> s:
+                case JsonString s:
                     writer.WriteValue(s.Value);
                     break;
-                case JsonScalar<double> s:
+                case JsonNumber s:
 
                     if (s.Value % 1 == 0)
                     {
@@ -136,9 +136,9 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 case JsonArray array:
                     writer.WriteStartArray();
 
-                    foreach (var item in array)
+                    for (var i = 0; i < array.Count; i++)
                     {
-                        WriteJson(writer, item);
+                        WriteJson(writer, array[i]);
                     }
 
                     writer.WriteEndArray();
