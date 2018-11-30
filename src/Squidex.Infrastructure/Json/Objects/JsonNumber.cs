@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
+
 namespace Squidex.Infrastructure.Json.Objects
 {
     public sealed class JsonNumber : JsonScalar<double>
@@ -19,9 +21,9 @@ namespace Squidex.Infrastructure.Json.Objects
         {
         }
 
-        public override string ToJsonString()
+        public override string ToString()
         {
-            return $"{Value}";
+            return Value.ToString(CultureInfo.InvariantCulture);
         }
     }
 }
