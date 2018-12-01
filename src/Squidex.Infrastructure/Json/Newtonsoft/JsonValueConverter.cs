@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json.Objects;
@@ -14,8 +15,24 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public class JsonValueConverter : JsonConverter
+    public class JsonValueConverter : JsonConverter, ISupportedTypes
     {
+        private readonly HashSet<Type> supportedTypes = new HashSet<Type>
+        {
+            typeof(IJsonValue),
+            typeof(JsonArray),
+            typeof(JsonBoolean),
+            typeof(JsonNull),
+            typeof(JsonNumber),
+            typeof(JsonObject),
+            typeof(JsonString)
+        };
+
+        public virtual IEnumerable<Type> SupportedTypes
+        {
+            get { return supportedTypes; }
+        }
+
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             return ReadJson(reader);
@@ -161,7 +178,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         public override bool CanConvert(Type objectType)
         {
-            return typeof(IJsonValue).IsAssignableFrom(objectType);
+            return supportedTypes.Contains(objectType);
         }
     }
 }

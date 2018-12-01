@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using NodaTime;
 using NodaTime.Text;
@@ -14,6 +15,15 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 {
     public sealed class InstantConverter : JsonConverter
     {
+        public IEnumerable<Type> SupportedTypes
+        {
+            get
+            {
+                yield return typeof(Instant);
+                yield return typeof(Instant?);
+            }
+        }
+
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (value != null)

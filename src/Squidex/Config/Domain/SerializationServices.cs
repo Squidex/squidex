@@ -9,8 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Migrate_01;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NodaTime;
-using NodaTime.Serialization.JsonNet;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps.Json;
 using Squidex.Domain.Apps.Core.Rules.Json;
@@ -68,8 +66,6 @@ namespace Squidex.Config.Domain
             settings.DateParseHandling = DateParseHandling.None;
 
             settings.TypeNameHandling = typeNameHandling;
-
-            settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         }
 
         static SerializationServices()

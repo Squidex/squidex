@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -14,10 +15,23 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
     public sealed class ConverterContractResolver : CamelCasePropertyNamesContractResolver
     {
         private readonly JsonConverter[] converters;
+        private readonly object lockObject = new object();
+        private Dictionary<Type, JsonConverter> converterCache = new Dictionary<Type, JsonConverter>();
 
         public ConverterContractResolver(params JsonConverter[] converters)
         {
             this.converters = converters;
+
+            foreach (var converter in converters)
+            {
+                if (converter is ISupportedTypes supportedTypes)
+                {
+                    foreach (var type in supportedTypes.SupportedTypes)
+                    {
+                        converterCache[type] = converter;
+                    }
+                }
+            }
         }
 
         protected override JsonDictionaryContract CreateDictionaryContract(Type objectType)
@@ -38,15 +52,32 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                 return result;
             }
 
-            foreach (var converter in converters)
+            var cache = converterCache;
+
+            if (cache == null || !cache.TryGetValue(objectType, out result))
             {
-                if (converter.CanConvert(objectType))
+                foreach (var converter in converters)
                 {
-                    return converter;
+                    if (converter.CanConvert(objectType))
+                    {
+                        result = converter;
+                    }
+                }
+
+                lock (lockObject)
+                {
+                    cache = converterCache;
+
+                    var updatedCache = (cache != null)
+                        ? new Dictionary<Type, JsonConverter>(cache)
+                        : new Dictionary<Type, JsonConverter>();
+                    updatedCache[objectType] = result;
+
+                    converterCache = updatedCache;
                 }
             }
 
-            return null;
+            return result;
         }
     }
 }
