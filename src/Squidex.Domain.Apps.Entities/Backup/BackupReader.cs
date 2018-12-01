@@ -127,9 +127,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     MapHeaders(data);
 
                     var eventStream = streamNameResolver.WithNewId(streamName, guidMapper.NewGuidOrNull);
-                    var eventEnvelope = formatter.Parse(data, true, guidMapper.NewGuidOrValue);
+                    var eventEnvelope = formatter.Parse(data, guidMapper.NewGuidOrValue);
 
-                    await handler((streamName, eventEnvelope));
+                    await handler((eventStream, eventEnvelope));
                 }
 
                 readEvents++;
