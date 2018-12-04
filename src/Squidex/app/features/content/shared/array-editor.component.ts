@@ -47,8 +47,8 @@ export class ArrayEditorComponent {
         this.form.removeArrayItem(this.field, this.language, index);
     }
 
-    public addItem() {
-        this.form.insertArrayItem(this.field, this.language);
+    public addItem(value: {}) {
+        this.form.insertArrayItem(this.field, this.language, value);
     }
 
     public sort(controls: AbstractControl[]) {

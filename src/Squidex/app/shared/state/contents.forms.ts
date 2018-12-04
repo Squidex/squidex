@@ -374,22 +374,22 @@ export class EditContentForm extends Form<FormGroup> {
         this.findArrayItemForm(field, language).removeAt(index);
     }
 
-    public insertArrayItem(field: RootFieldDto, language: AppLanguageDto) {
+    public insertArrayItem(field: RootFieldDto, language: AppLanguageDto, value?: {}) {
         if (field.nested.length > 0) {
             const formControl = this.findArrayItemForm(field, language);
 
-            this.addArrayItem(field, language, formControl);
+            this.addArrayItem(field, language, formControl, value);
         }
     }
 
-    private addArrayItem(field: RootFieldDto, language: AppLanguageDto | null, partitionForm: FormArray) {
+    private addArrayItem(field: RootFieldDto, language: AppLanguageDto | null, partitionForm: FormArray, value?: {}) {
         const itemForm = new FormGroup({});
 
         let isOptional = field.isLocalizable && !!language && language.isOptional;
 
         for (let nested of field.nested) {
             const nestedValidators = FieldValidatorsFactory.createValidators(nested, isOptional);
-            const nestedDefault = FieldDefaultValue.get(nested);
+            const nestedDefault = value ? value[nested.name] : FieldDefaultValue.get(nested);
 
             itemForm.setControl(nested.name, new FormControl(nestedDefault, nestedValidators));
         }

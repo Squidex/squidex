@@ -29,6 +29,9 @@ export class ArrayItemComponent implements OnChanges {
     public removing = new EventEmitter();
 
     @Output()
+    public cloning = new EventEmitter();
+
+    @Output()
     public toggle = new EventEmitter<boolean>();
 
     @Input()

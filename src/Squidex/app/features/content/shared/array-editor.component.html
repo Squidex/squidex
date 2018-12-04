@@ -11,6 +11,7 @@
             [language]="language"
             [languages]="languages"
             (toggle)="hide($event)"
+            (cloning)="addItem(itemForm.value)"
             (removing)="removeItem(i)">
         </sqx-array-item>
     </div>

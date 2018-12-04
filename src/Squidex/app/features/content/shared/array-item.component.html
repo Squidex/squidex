@@ -5,17 +5,24 @@
     
             <span class="header-text text-decent">Item #{{index + 1}}</span>
 
-            <a class="btn btn-secondary btn-link" [class.hidden]="!isHidden" (click)="toggle.emit(false)" title="Open all items">
+            <button class="btn btn-secondary btn-link" [class.hidden]="!isHidden" (click)="toggle.emit(false); $event.preventDefault()" title="Open all items">
                 <i class="icon-plus-square"></i>
-            </a>
-            <a class="btn btn-secondary btn-link" [class.hidden]="isHidden" (click)="toggle.emit(true)" title="Close all items">
+            </button>
+            <button class="btn btn-secondary btn-link" [class.hidden]="isHidden" (click)="toggle.emit(true); $event.preventDefault()" title="Close all items">
                 <i class="icon-minus-square"></i>
-            </a>
+            </button>
         </span>
 
-        <button type="button" class="btn btn-link btn-danger float-right" (click)="removing.emit(); $event.preventDefault()">
-            <i class="icon-bin2"></i>
-        </button>
+        <span class="float-right">
+            <button type="button" class="btn btn-link btn-secondary" (click)="cloning.emit(); $event.preventDefault()">
+                <i class="icon-clone"></i>
+            </button>
+    
+            <button type="button" class="btn btn-link btn-danger" (click)="removing.emit(); $event.preventDefault()">
+                <i class="icon-bin2"></i>
+            </button>
+
+        </span>
     </div>
     
     <div class="card-body" [class.hidden]="isHidden">
