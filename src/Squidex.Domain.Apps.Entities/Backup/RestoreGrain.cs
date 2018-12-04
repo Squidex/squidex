@@ -194,6 +194,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         }
                     }
 
+                    await AssignContributorAsync();
+
                     CurrentJob.Status = JobStatus.Completed;
 
                     Log("Completed, Yeah!");
@@ -252,6 +254,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 FromRestore = true,
                 Role = Role.Owner
             });
+
+            Log("Assigned current user.");
         }
 
         private async Task CleanupAsync()
@@ -283,7 +287,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 await HandleEventAsync(reader, storedEvent.Stream, storedEvent.Event);
             });
 
-            Log("Reading events completed.");
+            Log($"Reading {reader.ReadEvents} events and {reader.ReadAttachments} attachments completed.", true);
         }
 
         private async Task HandleEventAsync(BackupReader reader, string stream, Envelope<IEvent> @event)
