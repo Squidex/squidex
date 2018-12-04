@@ -11,12 +11,12 @@
             [language]="language"
             [languages]="languages"
             (toggle)="hide($event)"
-            (cloning)="addItem(itemForm.value)"
+            (cloning)="addItem(itemForm)"
             (removing)="removeItem(i)">
         </sqx-array-item>
     </div>
 </div>
 
-<button class="btn btn-success" (click)="addItem(); $event.preventDefault()">
+<button class="btn btn-success" (click)="addItem(undefined); $event.preventDefault()">
     Add Item
 </button>
