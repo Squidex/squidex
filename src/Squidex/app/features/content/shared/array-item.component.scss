@@ -10,6 +10,16 @@
     &-header {
         line-height: 2.2rem;
     }
+
+    .header-text {
+        display: inline-block;
+        min-width: 70px;
+        max-width: 100px;
+    }
+}
+
+.btn-link {
+    padding: .375rem;
 }
 
 .remove {

@@ -5,10 +5,12 @@
         <sqx-array-item
             [form]="form"
             [field]="field"
+            [isHidden]="isHidden"
             [index]="i"
             [itemForm]="itemForm"
             [language]="language"
             [languages]="languages"
+            (toggle)="hide($event)"
             (removing)="removeItem(i)">
         </sqx-array-item>
     </div>

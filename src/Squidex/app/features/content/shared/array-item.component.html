@@ -4,6 +4,13 @@
             <i class="icon-drag2 mr-1"></i>
     
             <span class="header-text text-decent">Item #{{index + 1}}</span>
+
+            <a class="btn btn-secondary btn-link" [class.hidden]="!isHidden" (click)="toggle.emit(false)" title="Open all items">
+                <i class="icon-plus-square"></i>
+            </a>
+            <a class="btn btn-secondary btn-link" [class.hidden]="isHidden" (click)="toggle.emit(true)" title="Close all items">
+                <i class="icon-minus-square"></i>
+            </a>
         </span>
 
         <button type="button" class="btn btn-link btn-danger float-right" (click)="removing.emit(); $event.preventDefault()">
@@ -11,7 +18,7 @@
         </button>
     </div>
     
-    <div class="card-body">
+    <div class="card-body" [class.hidden]="isHidden">
         <div class="form-group" *ngFor="let fieldControl of fieldControls">
             <sqx-field-editor
                 [form]="form"

@@ -28,11 +28,17 @@ export class ArrayItemComponent implements OnChanges {
     @Output()
     public removing = new EventEmitter();
 
+    @Output()
+    public toggle = new EventEmitter<boolean>();
+
     @Input()
     public form: EditContentForm;
 
     @Input()
     public field: RootFieldDto;
+
+    @Input()
+    public isHidden = false;
 
     @Input()
     public index: number;

@@ -37,6 +37,12 @@ export class ArrayEditorComponent {
     @Input()
     public arrayControl: FormArray;
 
+    public isHidden = false;
+
+    public hide(hide: boolean) {
+        this.isHidden = hide;
+    }
+
     public removeItem(index: number) {
         this.form.removeArrayItem(this.field, this.language, index);
     }
