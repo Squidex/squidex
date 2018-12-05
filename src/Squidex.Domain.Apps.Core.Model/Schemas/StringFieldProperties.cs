@@ -19,6 +19,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MaxLength { get; set; }
 
+        public bool IsUnique { get; set; }
+
         public bool InlineEditable { get; set; }
 
         public string DefaultValue { get; set; }

@@ -21,6 +21,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public double? DefaultValue { get; set; }
 
+        public bool IsUnique { get; set; }
+
         public bool InlineEditable { get; set; }
 
         public NumberFieldEditor Editor { get; set; }

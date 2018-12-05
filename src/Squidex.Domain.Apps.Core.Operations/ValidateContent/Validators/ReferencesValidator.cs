@@ -7,12 +7,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class ReferencesValidator : IValidator
     {
+        private static readonly IReadOnlyList<string> Path = new List<string> { "Id" };
+
         private readonly Guid schemaId;
 
         public ReferencesValidator(Guid schemaId)
@@ -24,11 +28,16 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (value is ICollection<Guid> contentIds)
             {
-                var invalidIds = await context.GetInvalidContentIdsAsync(contentIds, schemaId);
+                var filter = new FilterComparison(Path, FilterOperator.In, new FilterValue(contentIds.ToList()));
 
-                foreach (var invalidId in invalidIds)
+                var foundIds = await context.GetContentIdsAsync(schemaId, filter);
+
+                foreach (var id in contentIds)
                 {
-                    addError(context.Path, $"Contains invalid reference '{invalidId}'.");
+                    if (!foundIds.Contains(id))
+                    {
+                        addError(context.Path, $"Contains invalid reference '{id}'.");
+                    }
                 }
             }
         }

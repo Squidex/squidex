@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_datetime_is_required()
+        public async Task Should_add_error_if_datetime_is_required()
         {
             var sut = Field(new DateTimeFieldProperties { IsRequired = true });
 
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_datetime_is_less_than_min()
+        public async Task Should_add_error_if_datetime_is_less_than_min()
         {
             var sut = Field(new DateTimeFieldProperties { MinValue = FutureDays(10) });
 
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_datetime_is_greater_than_max()
+        public async Task Should_add_error_if_datetime_is_greater_than_max()
         {
             var sut = Field(new DateTimeFieldProperties { MaxValue = FutureDays(10) });
 
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_is_not_valid()
+        public async Task Should_add_error_if_value_is_not_valid()
         {
             var sut = Field(new DateTimeFieldProperties());
 
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_is_another_type()
+        public async Task Should_add_error_if_value_is_another_type()
         {
             var sut = Field(new DateTimeFieldProperties());
 

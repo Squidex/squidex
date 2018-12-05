@@ -48,6 +48,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public string[] AllowedValues { get; set; }
 
         /// <summary>
+        /// Indicates if the field value must be unique. Ignored for nested fields and localized fields.
+        /// </summary>
+        public bool IsUnique { get; set; }
+
+        /// <summary>
         /// Indicates that the inline editor is enabled for this field.
         /// </summary>
         public bool InlineEditable { get; set; }

@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_json_is_required()
+        public async Task Should_add_error_if_json_is_required()
         {
             var sut = Field(new JsonFieldProperties { IsRequired = true });
 

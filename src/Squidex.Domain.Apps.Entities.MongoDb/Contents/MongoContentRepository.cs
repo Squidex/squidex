@@ -91,11 +91,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> ids)
+        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId, Guid schemaId, FilterNode filterNode)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await contentsDraft.QueryNotFoundAsync(appId, schemaId, ids);
+                return await contentsDraft.QueryIdsAsync(appId, await appProvider.GetSchemaAsync(appId, schemaId), filterNode);
             }
         }
 

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_number_is_required()
+        public async Task Should_add_error_if_number_is_required()
         {
             var sut = Field(new NumberFieldProperties { IsRequired = true });
 
@@ -49,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_number_is_less_than_min()
+        public async Task Should_add_error_if_number_is_less_than_min()
         {
             var sut = Field(new NumberFieldProperties { MinValue = 10 });
 
@@ -60,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_number_is_greater_than_max()
+        public async Task Should_add_error_if_number_is_greater_than_max()
         {
             var sut = Field(new NumberFieldProperties { MaxValue = 10 });
 
@@ -71,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_number_is_not_allowed()
+        public async Task Should_add_error_if_number_is_not_allowed()
         {
             var sut = Field(new NumberFieldProperties { AllowedValues = ReadOnlyCollection.Create(10d) });
 
@@ -82,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_is_not_valid()
+        public async Task Should_add_error_if_value_is_not_valid()
         {
             var sut = Field(new NumberFieldProperties());
 
@@ -90,6 +91,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_unique_constraint_failed()
+        {
+            var sut = Field(new NumberFieldProperties { IsUnique = true });
+
+            await sut.ValidateAsync(CreateValue(12.5), errors, ValidationTestExtensions.References(Guid.NewGuid()));
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Another content with the same value exists." });
         }
 
         private static JValue CreateValue(object v)
