@@ -65,8 +65,11 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs<MongoMigrationStatus>()
                         .As<IMigrationStatus>();
 
-                    services.AddSingletonAs<MongoPersistedGrantStore>()
-                        .As<IPersistedGrantStore>();
+                    services.AddTransientAs<ConvertOldSnapshotStores>()
+                        .As<IMigration>();
+
+                    services.AddTransientAs(c => new DeleteContentCollections(mongoContentDatabase))
+                        .As<IMigration>();
 
                     services.AddSingletonAs<MongoUsageRepository>()
                         .As<IUsageRepository>();
@@ -74,11 +77,14 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs<MongoRuleEventRepository>()
                         .As<IRuleEventRepository>();
 
-                    services.AddSingletonAs<MongoRoleStore>()
-                        .As<IRoleStore<IdentityRole>>();
-
                     services.AddSingletonAs<MongoHistoryEventRepository>()
                         .As<IHistoryEventRepository>();
+
+                    services.AddSingletonAs<MongoPersistedGrantStore>()
+                        .As<IPersistedGrantStore>();
+
+                    services.AddSingletonAs<MongoRoleStore>()
+                        .As<IRoleStore<IdentityRole>>();
 
                     services.AddSingletonAs<MongoUserStore>()
                         .As<IUserStore<IdentityUser>>()
@@ -92,12 +98,6 @@ namespace Squidex.Config.Domain
                         .As<IContentRepository>()
                         .As<ISnapshotStore<ContentState, Guid>>()
                         .As<IEventConsumer>();
-
-                    services.AddTransientAs<ConvertOldSnapshotStores>()
-                        .As<IMigration>();
-
-                    services.AddTransientAs(c => new DeleteContentCollections(mongoContentDatabase))
-                        .As<IMigration>();
                 }
             });
 
