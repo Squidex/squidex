@@ -7,7 +7,7 @@
 
 using System;
 using System.Reactive.Subjects;
-using Newtonsoft.Json;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using StackExchange.Redis;
 
@@ -20,6 +20,7 @@ namespace Squidex.Infrastructure
         private readonly Guid selfId = Guid.NewGuid();
         private readonly Subject<T> subject = new Subject<T>();
         private readonly ISubscriber subscriber;
+        private readonly IJsonSerializer serializer;
         private readonly ISemanticLog log;
         private readonly string channelName;
 
@@ -30,10 +31,11 @@ namespace Squidex.Infrastructure
             public Guid Sender;
         }
 
-        public RedisSubscription(ISubscriber subscriber, string channelName, ISemanticLog log)
+        public RedisSubscription(ISubscriber subscriber, IJsonSerializer serializer, string channelName, ISemanticLog log)
         {
             this.log = log;
 
+            this.serializer = serializer;
             this.subscriber = subscriber;
             this.subscriber.Subscribe(channelName, (channel, value) => HandleMessage(value));
 
@@ -46,7 +48,7 @@ namespace Squidex.Infrastructure
             {
                 var senderId = notifySelf ? Guid.Empty : selfId;
 
-                var envelope = JsonConvert.SerializeObject(new Envelope { Sender = senderId, Payload = (T)value });
+                var envelope = serializer.Serialize(new Envelope { Sender = senderId, Payload = (T)value });
 
                 subscriber.Publish(channelName, envelope);
             }
@@ -68,7 +70,7 @@ namespace Squidex.Infrastructure
                     return;
                 }
 
-                var envelope = JsonConvert.DeserializeObject<Envelope>(value);
+                var envelope = serializer.Deserialize<Envelope>(value);
 
                 if (envelope.Sender != selfId)
                 {

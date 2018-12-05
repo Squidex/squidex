@@ -68,37 +68,18 @@ namespace Squidex.Domain.Apps.Core.Model
         [Fact]
         public void Should_make_correct_equal_comparisons()
         {
-            var partitioning1a = new Partitioning("partitioning1");
-            var partitioning1b = new Partitioning("partitioning1");
-            var partitioning2a = new Partitioning("partitioning2");
+            var partitioning1_a = new Partitioning("partitioning1");
+            var partitioning1_b = new Partitioning("partitioning1");
 
-            Assert.True(partitioning1a.Equals(partitioning1b));
+            var partitioning2 = new Partitioning("partitioning2");
 
-            Assert.False(partitioning1a.Equals(partitioning2a));
-        }
+            Assert.Equal(partitioning1_a, partitioning1_b);
+            Assert.Equal(partitioning1_a.GetHashCode(), partitioning1_b.GetHashCode());
+            Assert.True(partitioning1_a.Equals((object)partitioning1_b));
 
-        [Fact]
-        public void Should_make_correct_object_equal_comparisons()
-        {
-            object partitioning1a = new Partitioning("partitioning1");
-            object partitioning1b = new Partitioning("partitioning1");
-            object partitioning2a = new Partitioning("partitioning2");
-
-            Assert.True(partitioning1a.Equals(partitioning1b));
-
-            Assert.False(partitioning1a.Equals(partitioning2a));
-        }
-
-        [Fact]
-        public void Should_provide_correct_hash_codes()
-        {
-            var partitioning1a = new Partitioning("partitioning1");
-            var partitioning1b = new Partitioning("partitioning1");
-            var partitioning2a = new Partitioning("partitioning2");
-
-            Assert.Equal(partitioning1a.GetHashCode(), partitioning1b.GetHashCode());
-
-            Assert.NotEqual(partitioning1a.GetHashCode(), partitioning2a.GetHashCode());
+            Assert.NotEqual(partitioning1_a, partitioning2);
+            Assert.NotEqual(partitioning1_a.GetHashCode(), partitioning2.GetHashCode());
+            Assert.False(partitioning1_a.Equals((object)partitioning2));
         }
     }
 }

@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Xunit;
 
@@ -20,7 +18,6 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
 {
     public class SchemaTests
     {
-        private readonly JsonSerializer serializer = TestData.DefaultSerializer();
         private readonly Schema schema_0 = new Schema("my-schema");
 
         [Fact]
@@ -281,8 +278,8 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [Fact]
         public void Should_serialize_and_deserialize_schema()
         {
-            var schemaSource = TestData.MixedSchema();
-            var schemaTarget = JToken.FromObject(schemaSource, serializer).ToObject<Schema>(serializer);
+            var schemaSource = TestUtils.MixedSchema();
+            var schemaTarget = schemaSource.SerializeAndDeserialize();
 
             schemaTarget.Should().BeEquivalentTo(schemaSource);
         }

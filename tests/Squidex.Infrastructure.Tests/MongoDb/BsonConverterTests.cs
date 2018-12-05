@@ -118,44 +118,6 @@ namespace Squidex.Infrastructure.MongoDb
         private readonly JsonSerializer serializer = JsonSerializer.CreateDefault();
 
         [Fact]
-        public void Should_serialize_and_deserialize_to_bson_with_json()
-        {
-            var target = JObject.FromObject(source).ToBson().ToJson().ToObject<TestObject>();
-
-            target.Should().BeEquivalentTo(source);
-        }
-
-        [Fact]
-        public void Should_serialize_datetime_to_iso()
-        {
-            source.DateTime = new DateTime(2012, 12, 12, 12, 12, 12, DateTimeKind.Utc);
-
-            var target = JObject.FromObject(source).ToBson();
-
-            Assert.Equal("2012-12-12T12:12:12Z", target["DateTime"].ToString());
-        }
-
-        [Fact]
-        public void Should_serialize_datetimeoffset_to_iso_utc()
-        {
-            source.DateTimeOffset = new DateTime(2012, 12, 12, 12, 12, 12, DateTimeKind.Utc);
-
-            var target = JObject.FromObject(source).ToBson();
-
-            Assert.Equal("2012-12-12T12:12:12Z", target["DateTimeOffset"].ToString());
-        }
-
-        [Fact]
-        public void Should_serialize_datetimeoffset_to_iso_utc_with_offset()
-        {
-            source.DateTimeOffset = new DateTimeOffset(2012, 12, 12, 12, 12, 12, TimeSpan.FromHours(2));
-
-            var target = JObject.FromObject(source).ToBson();
-
-            Assert.Equal("2012-12-12T12:12:12+02:00", target["DateTimeOffset"].ToString());
-        }
-
-        [Fact]
         public void Should_write_problematic_object()
         {
             var buggy = new

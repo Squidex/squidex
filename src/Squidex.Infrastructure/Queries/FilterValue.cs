@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using NodaTime;
 
@@ -126,26 +127,23 @@ namespace Squidex.Infrastructure.Queries
             {
                 return $"[{string.Join(", ", list.OfType<object>().Select(ToString).ToArray())}]";
             }
-            else
-            {
-                return ToString(Value);
-            }
+
+            return ToString(Value);
         }
 
         private string ToString(object value)
         {
-            if (ValueType == FilterValueType.String)
-            {
-                return $"'{value.ToString().Replace("'", "\\'")}'";
-            }
-            else if (value == null)
+            if (value == null)
             {
                 return "null";
             }
-            else
+
+            if (value is string s)
             {
-                return value.ToString();
+                return $"'{s.Replace("'", "\\'")}'";
             }
+
+            return string.Format(CultureInfo.InvariantCulture, "{0}", value);
         }
     }
 }

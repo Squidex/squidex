@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
 
@@ -26,17 +27,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     {
         private readonly IMongoDatabase database;
         private readonly IAppProvider appProvider;
+        private readonly IJsonSerializer serializer;
         private readonly MongoContentDraftCollection contentsDraft;
         private readonly MongoContentPublishedCollection contentsPublished;
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(serializer, nameof(serializer));
 
             this.appProvider = appProvider;
 
-            contentsDraft = new MongoContentDraftCollection(database);
-            contentsPublished = new MongoContentPublishedCollection(database);
+            this.serializer = serializer;
+
+            contentsDraft = new MongoContentDraftCollection(database, serializer);
+            contentsPublished = new MongoContentPublishedCollection(database, serializer);
 
             this.database = database;
         }

@@ -11,8 +11,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
-using FluentAssertions;
+using Squidex.Domain.Apps.Core;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
@@ -22,89 +24,149 @@ namespace Squidex.Domain.Apps.Entities.Backup
     public class BackupReaderWriterTests
     {
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
+        private readonly IJsonSerializer serializer = TestUtils.DefaultSerializer;
+        private readonly IEventDataFormatter formatter;
+        private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
+
+        [TypeName(nameof(MyEvent))]
+        public sealed class MyEvent : IEvent
+        {
+            public Guid GuidRaw { get; set; }
+
+            public NamedId<Guid> GuidNamed { get; set; }
+
+            public Dictionary<Guid, string> Values { get; set; }
+        }
 
         public BackupReaderWriterTests()
         {
+            typeNameRegistry.Map(typeof(MyEvent));
+
+            formatter = new DefaultEventDataFormatter(typeNameRegistry, serializer);
+
             A.CallTo(() => streamNameResolver.WithNewId(A<string>.Ignored, A<Func<string, string>>.Ignored))
                 .ReturnsLazily(new Func<string, Func<string, string>, string>((stream, idGenerator) => stream + "^2"));
         }
 
-        [Fact]
-        public async Task Should_write_and_read_events()
+        [Theory]
+        [InlineData(BackupVersion.V1)]
+        [InlineData(BackupVersion.V2)]
+        public async Task Should_write_and_read_events_to_backup(BackupVersion version)
         {
             var stream = new MemoryStream();
 
-            var sourceEvents = new List<StoredEvent>();
+            var random = new Random();
+            var randomGuids = new List<Guid>();
 
-            using (var writer = new BackupWriter(stream, true))
+            for (var i = 0; i < 100; i++)
             {
-                for (var i = 0; i < 1000; i++)
+                randomGuids.Add(Guid.NewGuid());
+            }
+
+            Guid RandomGuid()
+            {
+                return randomGuids[random.Next(randomGuids.Count)];
+            }
+
+            var sourceEvents = new List<(string Stream, Envelope<IEvent> Event)>();
+
+            for (var i = 0; i < 200; i++)
+            {
+                var @event = new MyEvent
                 {
-                    var eventData = new EventData { Type = i.ToString(), Metadata = i, Payload = i };
+                    GuidNamed = new NamedId<Guid>(RandomGuid(), $"name{i}"),
+                    GuidRaw = RandomGuid(),
+                    Values = new Dictionary<Guid, string>
+                    {
+                        [RandomGuid()] = "Key"
+                    }
+                };
+
+                var envelope = Envelope.Create<IEvent>(@event);
+
+                envelope.Headers.Add(RandomGuid().ToString(), i);
+                envelope.Headers.Add("Id", RandomGuid().ToString());
+                envelope.Headers.Add("Index", i);
+
+                sourceEvents.Add(($"My-{RandomGuid()}", envelope));
+            }
+
+            using (var writer = new BackupWriter(serializer, stream, true, version))
+            {
+                foreach (var @event in sourceEvents)
+                {
+                    var eventData = formatter.ToEventData(@event.Event, Guid.NewGuid(), true);
                     var eventStored = new StoredEvent("S", "1", 2, eventData);
 
-                    if (i % 17 == 0)
-                    {
-                        var localI = i;
+                    var index = int.Parse(@event.Event.Headers["Index"].ToString());
 
-                        await writer.WriteBlobAsync(eventData.Type, innerStream =>
+                    if (index % 17 == 0)
+                    {
+                        await writer.WriteBlobAsync(index.ToString(), innerStream =>
                         {
-                            innerStream.WriteByte((byte)localI);
+                            innerStream.WriteByte((byte)index);
 
                             return TaskHelper.Done;
                         });
                     }
-                    else if (i % 37 == 0)
+                    else if (index % 37 == 0)
                     {
-                        await writer.WriteJsonAsync(eventData.Type, $"JSON_{i}");
+                        await writer.WriteJsonAsync(index.ToString(), $"JSON_{index}");
                     }
 
                     writer.WriteEvent(eventStored);
-
-                    sourceEvents.Add(eventStored);
                 }
             }
 
             stream.Position = 0;
 
-            var readEvents = new List<StoredEvent>();
+            var targetEvents = new List<(string Stream, Envelope<IEvent> Event)>();
 
-            using (var reader = new BackupReader(stream))
+            using (var reader = new BackupReader(serializer, stream))
             {
-                await reader.ReadEventsAsync(streamNameResolver, async @event =>
+                await reader.ReadEventsAsync(streamNameResolver, formatter, async @event =>
                 {
-                    var i = int.Parse(@event.Data.Type);
+                    var index = int.Parse(@event.Event.Headers["Index"].ToString());
 
-                    if (i % 17 == 0)
+                    if (index % 17 == 0)
                     {
-                        await reader.ReadBlobAsync(@event.Data.Type, innerStream =>
+                        await reader.ReadBlobAsync(index.ToString(), innerStream =>
                         {
-                            var b = innerStream.ReadByte();
+                            var byteRead = innerStream.ReadByte();
 
-                            Assert.Equal((byte)i, b);
+                            Assert.Equal((byte)index, byteRead);
 
                             return TaskHelper.Done;
                         });
                     }
-                    else if (i % 37 == 0)
+                    else if (index % 37 == 0)
                     {
-                        var j = await reader.ReadJsonAttachmentAsync(@event.Data.Type);
+                        var json = await reader.ReadJsonAttachmentAsync<string>(index.ToString());
 
-                        Assert.Equal($"JSON_{i}", j.ToString());
+                        Assert.Equal($"JSON_{index}", json);
                     }
 
-                    readEvents.Add(@event);
+                    targetEvents.Add(@event);
                 });
+
+                void CompareGuid(Guid source, Guid target)
+                {
+                    Assert.Equal(source, reader.OldGuid(target));
+                    Assert.NotEqual(source, target);
+                }
+
+                for (var i = 0; i < targetEvents.Count; i++)
+                {
+                    var source = targetEvents[i].Event.To<MyEvent>();
+
+                    var target = sourceEvents[i].Event.To<MyEvent>();
+
+                    CompareGuid(target.Payload.Values.First().Key, source.Payload.Values.First().Key);
+                    CompareGuid(target.Payload.GuidRaw, source.Payload.GuidRaw);
+                    CompareGuid(target.Payload.GuidNamed.Id, source.Payload.GuidNamed.Id);
+                    CompareGuid(target.Headers.GetGuid("Id"), source.Headers.GetGuid("Id"));
+                }
             }
-
-            var sourceEventsWithNewStreamName =
-                sourceEvents.Select(x =>
-                    new StoredEvent(streamNameResolver.WithNewId(x.StreamName, null),
-                        x.EventPosition,
-                        x.EventStreamNumber,
-                        x.Data)).ToList();
-
-            readEvents.Should().BeEquivalentTo(sourceEventsWithNewStreamName);
         }
     }
 }

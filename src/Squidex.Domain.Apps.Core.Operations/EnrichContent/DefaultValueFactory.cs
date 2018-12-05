@@ -6,14 +6,14 @@
 // ==========================================================================
 
 using System.Globalization;
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.EnrichContent
 {
-    public sealed class DefaultValueFactory : IFieldVisitor<JToken>
+    public sealed class DefaultValueFactory : IFieldVisitor<IJsonValue>
     {
         private readonly Instant now;
 
@@ -22,71 +22,71 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
             this.now = now;
         }
 
-        public static JToken CreateDefaultValue(IField field, Instant now)
+        public static IJsonValue CreateDefaultValue(IField field, Instant now)
         {
             Guard.NotNull(field, nameof(field));
 
             return field.Accept(new DefaultValueFactory(now));
         }
 
-        public JToken Visit(IArrayField field)
+        public IJsonValue Visit(IArrayField field)
         {
-            return new JArray();
+            return JsonValue.Array();
         }
 
-        public JToken Visit(IField<AssetsFieldProperties> field)
+        public IJsonValue Visit(IField<AssetsFieldProperties> field)
         {
-            return new JArray();
+            return JsonValue.Array();
         }
 
-        public JToken Visit(IField<BooleanFieldProperties> field)
+        public IJsonValue Visit(IField<BooleanFieldProperties> field)
         {
-            return field.Properties.DefaultValue;
+            return JsonValue.Create(field.Properties.DefaultValue);
         }
 
-        public JToken Visit(IField<GeolocationFieldProperties> field)
+        public IJsonValue Visit(IField<GeolocationFieldProperties> field)
         {
-            return JValue.CreateNull();
+            return JsonValue.Null;
         }
 
-        public JToken Visit(IField<JsonFieldProperties> field)
+        public IJsonValue Visit(IField<JsonFieldProperties> field)
         {
-            return JValue.CreateNull();
+            return JsonValue.Object();
         }
 
-        public JToken Visit(IField<NumberFieldProperties> field)
+        public IJsonValue Visit(IField<NumberFieldProperties> field)
         {
-            return field.Properties.DefaultValue;
+            return JsonValue.Create(field.Properties.DefaultValue);
         }
 
-        public JToken Visit(IField<ReferencesFieldProperties> field)
+        public IJsonValue Visit(IField<ReferencesFieldProperties> field)
         {
-            return new JArray();
+            return JsonValue.Array();
         }
 
-        public JToken Visit(IField<StringFieldProperties> field)
+        public IJsonValue Visit(IField<StringFieldProperties> field)
         {
-            return field.Properties.DefaultValue;
+            return JsonValue.Create(field.Properties.DefaultValue);
         }
 
-        public JToken Visit(IField<TagsFieldProperties> field)
+        public IJsonValue Visit(IField<TagsFieldProperties> field)
         {
-            return new JArray();
+            return JsonValue.Array();
         }
 
-        public JToken Visit(IField<DateTimeFieldProperties> field)
+        public IJsonValue Visit(IField<DateTimeFieldProperties> field)
         {
             if (field.Properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Now)
             {
-                return now.ToString();
+                return JsonValue.Create(now.ToString());
             }
 
             if (field.Properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Today)
             {
-                return now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                return JsonValue.Create(now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
             }
 
-            return field.Properties.DefaultValue?.ToString();
+            return JsonValue.Create(field.Properties.DefaultValue?.ToString());
         }
     }
 }

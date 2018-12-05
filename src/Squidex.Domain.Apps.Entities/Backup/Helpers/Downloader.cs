@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Backup.Helpers
 {
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
             }
         }
 
-        public static async Task<BackupReader> OpenArchiveAsync(this IBackupArchiveLocation backupArchiveLocation, Guid id)
+        public static async Task<BackupReader> OpenArchiveAsync(this IBackupArchiveLocation backupArchiveLocation, Guid id, IJsonSerializer serializer)
         {
             Stream stream = null;
 
@@ -47,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
             {
                 stream = await backupArchiveLocation.OpenStreamAsync(id);
 
-                return new BackupReader(stream);
+                return new BackupReader(serializer, stream);
             }
             catch (IOException)
             {

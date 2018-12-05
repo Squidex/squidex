@@ -11,12 +11,18 @@ using System.Collections.Generic;
 using System.IO;
 using FakeItEasy;
 using Orleans.Serialization;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.Orleans
 {
     public class JsonExternalSerializerTests
     {
+        public JsonExternalSerializerTests()
+        {
+            J.DefaultSerializer = JsonHelper.DefaultSerializer;
+        }
+
         [Fact]
         public void Should_not_copy_null()
         {

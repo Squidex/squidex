@@ -101,10 +101,7 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 var update = updater(Builders<T>.Update.Set(x => x.Version, newVersion));
 
-                await collection.UpdateOneAsync(x => x.Id.Equals(key) && x.Version == oldVersion,
-                    update
-                        .Set(x => x.Version, newVersion),
-                    Upsert);
+                await collection.UpdateOneAsync(x => x.Id.Equals(key) && x.Version == oldVersion, update, Upsert);
             }
             catch (MongoWriteException ex)
             {

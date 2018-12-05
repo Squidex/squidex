@@ -19,7 +19,9 @@ namespace Squidex.Infrastructure.Json
         {
             var value = Instant.FromDateTimeUtc(DateTime.UtcNow.Date);
 
-            value.SerializeAndDeserialize(new InstantConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -27,7 +29,9 @@ namespace Squidex.Infrastructure.Json
         {
             Instant? value = Instant.FromDateTimeUtc(DateTime.UtcNow.Date);
 
-            value.SerializeAndDeserialize(new InstantConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -35,7 +39,9 @@ namespace Squidex.Infrastructure.Json
         {
             Instant? value = null;
 
-            value.SerializeAndDeserialize(new InstantConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
     }
 }

@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.ConvertContent;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             return (value, field) =>
             {
-                if (value.IsNull())
+                if (value.Type == JsonValueType.Null)
                 {
                     return value;
                 }

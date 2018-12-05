@@ -9,16 +9,16 @@ using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.CQRS.Events
 {
     public sealed class RabbitMqEventConsumer : DisposableObjectBase, IInitializable, IEventConsumer
     {
-        private readonly JsonSerializerSettings serializerSettings;
+        private readonly IJsonSerializer jsonSerializer;
         private readonly string eventPublisherName;
         private readonly string exchange;
         private readonly string eventsFilter;
@@ -36,12 +36,12 @@ namespace Squidex.Infrastructure.CQRS.Events
             get { return eventsFilter; }
         }
 
-        public RabbitMqEventConsumer(JsonSerializerSettings serializerSettings, string eventPublisherName, string uri, string exchange, string eventsFilter)
+        public RabbitMqEventConsumer(IJsonSerializer jsonSerializer, string eventPublisherName, string uri, string exchange, string eventsFilter)
         {
             Guard.NotNullOrEmpty(uri, nameof(uri));
             Guard.NotNullOrEmpty(eventPublisherName, nameof(eventPublisherName));
             Guard.NotNullOrEmpty(exchange, nameof(exchange));
-            Guard.NotNull(serializerSettings, nameof(serializerSettings));
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
 
             connectionFactory = new ConnectionFactory { Uri = new Uri(uri, UriKind.Absolute) };
             connection = new Lazy<IConnection>(connectionFactory.CreateConnection);
@@ -49,8 +49,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             this.exchange = exchange;
             this.eventsFilter = eventsFilter;
+            this.jsonSerializer = jsonSerializer;
             this.eventPublisherName = eventPublisherName;
-            this.serializerSettings = serializerSettings;
         }
 
         protected override void DisposeObject(bool disposing)
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.CQRS.Events
 
         public Task On(Envelope<IEvent> @event)
         {
-            var jsonString = JsonConvert.SerializeObject(@event, serializerSettings);
+            var jsonString = jsonSerializer.Serialize(@event);
             var jsonBytes = Encoding.UTF8.GetBytes(jsonString);
 
             channel.Value.BasicPublish(exchange, string.Empty, null, jsonBytes);

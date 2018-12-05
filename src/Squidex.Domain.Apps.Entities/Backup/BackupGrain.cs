@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
@@ -34,6 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
         private readonly IEnumerable<BackupHandler> handlers;
+        private readonly IJsonSerializer serializer;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
@@ -51,6 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             IEnumerable<BackupHandler> handlers,
+            IJsonSerializer serializer,
             ISemanticLog log,
             IStore<Guid> store)
         {
@@ -60,6 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
             Guard.NotNull(handlers, nameof(handlers));
+            Guard.NotNull(serializer, nameof(serializer));
             Guard.NotNull(store, nameof(store));
             Guard.NotNull(log, nameof(log));
 
@@ -69,6 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
             this.handlers = handlers;
+            this.serializer = serializer;
             this.store = store;
             this.log = log;
         }
@@ -139,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 using (var stream = await backupArchiveLocation.OpenStreamAsync(job.Id))
                 {
-                    using (var writer = new BackupWriter(stream, true))
+                    using (var writer = new BackupWriter(serializer, stream, true))
                     {
                         await eventStore.QueryAsync(async storedEvent =>
                         {

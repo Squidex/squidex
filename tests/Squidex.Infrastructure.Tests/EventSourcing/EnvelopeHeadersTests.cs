@@ -6,32 +6,27 @@
 // ==========================================================================
 
 using System.Linq;
+using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public class EnvelopeHeaderTests
+    public class EnvelopeHeadersTests
     {
         [Fact]
         public void Should_create_headers()
         {
             var headers = new EnvelopeHeaders();
 
-            Assert.Equal(0, headers.Count);
-        }
-
-        [Fact]
-        public void Should_create_headers_with_null_properties()
-        {
-            var headers = new EnvelopeHeaders(null);
-
-            Assert.Equal(0, headers.Count);
+            Assert.Empty(headers);
         }
 
         [Fact]
         public void Should_create_headers_as_copy()
         {
-            var source = new PropertiesBag().Set("Key1", 123);
+            var source = JsonValue.Object().Add("Key1", 123);
+
             var headers = new EnvelopeHeaders(source);
 
             CompareHeaders(headers, source);
@@ -40,17 +35,26 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public void Should_clone_headers()
         {
-            var source = new PropertiesBag().Set("Key1", 123);
-            var headers = new EnvelopeHeaders(source);
+            var headers = new EnvelopeHeaders(JsonValue.Object().Add("Key1", 123));
 
             var clone = headers.Clone();
 
             CompareHeaders(headers, clone);
         }
 
-        private static void CompareHeaders(PropertiesBag lhs, PropertiesBag rhs)
+        [Fact]
+        public void Should_serialize_and_deserialize()
         {
-            foreach (var key in lhs.PropertyNames.Concat(rhs.PropertyNames).Distinct())
+            var value = new EnvelopeHeaders(JsonValue.Object().Add("Key1", 123));
+
+            var deserialized = value.SerializeAndDeserialize();
+
+            CompareHeaders(deserialized, value);
+        }
+
+        private static void CompareHeaders(JsonObject lhs, JsonObject rhs)
+        {
+            foreach (var key in lhs.Keys.Concat(rhs.Keys).Distinct())
             {
                 Assert.Equal(lhs[key].ToString(), rhs[key].ToString());
             }

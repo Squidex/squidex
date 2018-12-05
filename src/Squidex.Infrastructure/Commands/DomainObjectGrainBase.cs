@@ -221,7 +221,7 @@ namespace Squidex.Infrastructure.Commands
         {
             var result = await ExecuteAsync(command.Value);
 
-            return result.AsJ();
+            return result;
         }
 
         protected abstract Task<object> ExecuteAsync(IAggregateCommand command);

@@ -5,16 +5,27 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json.Linq;
-
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public class EventData
+    public sealed class EventData
     {
-        public JToken Payload { get; set; }
+        public EnvelopeHeaders Headers { get; }
 
-        public JToken Metadata { get; set; }
+        public string Payload { get; }
 
         public string Type { get; set; }
+
+        public EventData(string type, EnvelopeHeaders headers, string payload)
+        {
+            Guard.NotNull(type, nameof(type));
+            Guard.NotNull(headers, nameof(headers));
+            Guard.NotNull(payload, nameof(payload));
+
+            Headers = headers;
+
+            Payload = payload;
+
+            Type = type;
+        }
     }
 }

@@ -6,13 +6,13 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
     public sealed class BackupState
     {
-        [JsonProperty]
+        [DataMember]
         public List<BackupStateJob> Jobs { get; } = new List<BackupStateJob>();
     }
 }

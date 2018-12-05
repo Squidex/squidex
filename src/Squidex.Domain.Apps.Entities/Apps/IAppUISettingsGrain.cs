@@ -6,19 +6,19 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Orleans;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
     public interface IAppUISettingsGrain : IGrainWithGuidKey
     {
-        Task<J<JObject>> GetAsync();
+        Task<J<JsonObject>> GetAsync();
 
-        Task SetAsync(string path, J<JToken> value);
+        Task SetAsync(string path, J<IJsonValue> value);
 
-        Task SetAsync(J<JObject> settings);
+        Task SetAsync(J<JsonObject> settings);
 
         Task RemoveAsync(string path);
     }

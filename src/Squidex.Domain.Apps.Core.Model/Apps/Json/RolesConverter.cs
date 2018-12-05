@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Newtonsoft.Json;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Security;
 using System;
 using System.Collections.Generic;

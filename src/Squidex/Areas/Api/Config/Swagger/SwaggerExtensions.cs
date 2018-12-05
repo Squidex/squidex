@@ -17,7 +17,7 @@ namespace Squidex.Areas.Api.Config.Swagger
     {
         public static void UseMySwagger(this IApplicationBuilder app)
         {
-            var urlOptions = app.ApplicationServices.GetService<IOptions<MyUrlsOptions>>().Value;
+            var urlOptions = app.ApplicationServices.GetRequiredService<IOptions<MyUrlsOptions>>().Value;
 
             app.UseSwaggerWithApiExplorer(settings =>
             {

@@ -8,10 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Tags
 {
@@ -24,10 +24,10 @@ namespace Squidex.Domain.Apps.Core.Tags
             Guard.NotNull(newData, nameof(newData));
 
             var newValues = new HashSet<string>();
-            var newArrays = new List<JArray>();
+            var newArrays = new List<JsonArray>();
 
             var oldValues = new HashSet<string>();
-            var oldArrays = new List<JArray>();
+            var oldArrays = new List<JsonArray>();
 
             GetValues(schema, newValues, newArrays, newData);
 
@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Tags
                     {
                         if (normalized.TryGetValue(array[i].ToString(), out var result))
                         {
-                            array[i] = result;
+                            array[i] = JsonValue.Create(result);
                         }
                     }
                 }
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Tags
             Guard.NotNull(schema, nameof(schema));
 
             var tagsValues = new HashSet<string>();
-            var tagsArrays = new List<JArray>();
+            var tagsArrays = new List<JsonArray>();
 
             GetValues(schema, tagsValues, tagsArrays, datas);
 
@@ -73,14 +73,14 @@ namespace Squidex.Domain.Apps.Core.Tags
                     {
                         if (denormalized.TryGetValue(array[i].ToString(), out var result))
                         {
-                            array[i] = result;
+                            array[i] = JsonValue.Create(result);
                         }
                     }
                 }
             }
         }
 
-        private static void GetValues(Schema schema, HashSet<string> values, List<JArray> arrays, params NamedContentData[] datas)
+        private static void GetValues(Schema schema, HashSet<string> values, List<JsonArray> arrays, params NamedContentData[] datas)
         {
             foreach (var field in schema.Fields)
             {
@@ -109,14 +109,12 @@ namespace Squidex.Domain.Apps.Core.Tags
                                 {
                                     foreach (var partition in fieldData)
                                     {
-                                        if (partition.Value is JArray jArray)
+                                        if (partition.Value is JsonArray array)
                                         {
-                                            foreach (var value in jArray)
+                                            foreach (var value in array)
                                             {
-                                                if (value.Type == JTokenType.Object)
+                                                if (value is JsonObject nestedObject)
                                                 {
-                                                    var nestedObject = (JObject)value;
-
                                                     if (nestedObject.TryGetValue(nestedField.Name, out var nestedValue))
                                                     {
                                                         ExtractTags(nestedValue, values, arrays);
@@ -133,19 +131,19 @@ namespace Squidex.Domain.Apps.Core.Tags
             }
         }
 
-        private static void ExtractTags(JToken token, ISet<string> values, ICollection<JArray> arrays)
+        private static void ExtractTags(IJsonValue value, ISet<string> values, ICollection<JsonArray> arrays)
         {
-            if (token is JArray jArray)
+            if (value is JsonArray array)
             {
-                foreach (var value in jArray)
+                foreach (var item in array)
                 {
-                    if (value.Type == JTokenType.String)
+                    if (item.Type == JsonValueType.String)
                     {
-                        values.Add(value.ToString());
+                        values.Add(item.ToString());
                     }
                 }
 
-                arrays.Add(jArray);
+                arrays.Add(array);
             }
         }
     }

@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -21,18 +21,19 @@ namespace Squidex.Infrastructure.EventSourcing
         [BsonRequired]
         public string Payload { get; set; }
 
-        [BsonElement]
+        [BsonElement("Metadata")]
         [BsonRequired]
-        public JToken Metadata { get; set; }
+        [BsonJson]
+        public EnvelopeHeaders Headers { get; set; }
 
         public static MongoEvent FromEventData(EventData data)
         {
-            return new MongoEvent { Type = data.Type, Metadata = data.Metadata, Payload = data.Payload.ToString() };
+            return new MongoEvent { Type = data.Type, Headers = data.Headers, Payload = data.Payload };
         }
 
         public EventData ToEventData()
         {
-            return new EventData { Type = Type, Metadata = Metadata, Payload = JObject.Parse(Payload) };
+            return new EventData(Type, Headers, Payload);
         }
     }
 }

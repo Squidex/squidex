@@ -7,22 +7,21 @@
 
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ReferencesExtensions
     {
-        public static IEnumerable<Guid> ExtractReferences(this IField field, JToken value)
+        public static IEnumerable<Guid> ExtractReferences(this IField field, IJsonValue value)
         {
             return ReferencesExtractor.ExtractReferences(field, value);
         }
 
-        public static JToken CleanReferences(this IField field, JToken value, ICollection<Guid> oldReferences)
+        public static IJsonValue CleanReferences(this IField field, IJsonValue value, ICollection<Guid> oldReferences)
         {
-            if (value.IsNull())
+            if (value.Type == JsonValueType.Null)
             {
                 return value;
             }
@@ -30,31 +29,27 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return ReferencesCleaner.CleanReferences(field, value, oldReferences);
         }
 
-        public static JToken ToJToken(this HashSet<Guid> ids)
+        public static JsonArray ToJsonArray(this HashSet<Guid> ids)
         {
-            var result = new JArray();
+            var result = JsonValue.Array();
 
             foreach (var id in ids)
             {
-                result.Add(new JValue(id));
+                result.Add(JsonValue.Create(id.ToString()));
             }
 
             return result;
         }
 
-        public static HashSet<Guid> ToGuidSet(this JToken value)
+        public static HashSet<Guid> ToGuidSet(this IJsonValue value)
         {
-            if (value is JArray ids)
+            if (value is JsonArray array)
             {
                 var result = new HashSet<Guid>();
 
-                foreach (var id in ids)
+                foreach (var id in array)
                 {
-                    if (id.Type == JTokenType.Guid)
-                    {
-                        result.Add((Guid)id);
-                    }
-                    else if (id.Type == JTokenType.String && Guid.TryParse((string)id, out var guid))
+                    if (id.Type == JsonValueType.String && Guid.TryParse(id.ToString(), out var guid))
                     {
                         result.Add(guid);
                     }

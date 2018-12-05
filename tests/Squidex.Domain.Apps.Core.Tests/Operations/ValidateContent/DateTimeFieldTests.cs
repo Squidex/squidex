@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new DateTimeFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(JsonValue.Null, errors);
 
             Assert.Empty(errors);
         }
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new DateTimeFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(null), errors);
+            await sut.ValidateAsync(JsonValue.Null, errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new DateTimeFieldProperties());
 
-            await sut.ValidateAsync(CreateValue("Invalid"), errors);
+            await sut.ValidateAsync(JsonValue.Create("Invalid"), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new DateTimeFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(123), errors);
+            await sut.ValidateAsync(JsonValue.Create(123), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
@@ -98,9 +98,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             return Instant.FromDateTimeUtc(DateTime.UtcNow.Date.AddDays(days));
         }
 
-        private static JValue CreateValue(object v)
+        private static IJsonValue CreateValue(Instant v)
         {
-            return v is Instant ? new JValue(v.ToString()) : new JValue(v);
+            return JsonValue.Create(v.ToString());
         }
 
         private static RootField<DateTimeFieldProperties> Field(DateTimeFieldProperties properties)

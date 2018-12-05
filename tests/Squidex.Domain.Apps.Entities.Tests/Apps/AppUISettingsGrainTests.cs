@@ -8,7 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Newtonsoft.Json.Linq;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Xunit;
@@ -33,13 +33,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_set_setting()
         {
-            await sut.SetAsync(new JObject(new JProperty("key", 15)).AsJ());
+            await sut.SetAsync(JsonValue.Object().Add("key", 15).AsJ());
 
             var actual = await sut.GetAsync();
 
             var expected =
-                new JObject(
-                    new JProperty("key", 15));
+                JsonValue.Object().Add("key", 15);
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
         }
@@ -47,13 +46,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_set_root_value()
         {
-            await sut.SetAsync("key", ((JToken)123).AsJ());
+            await sut.SetAsync("key", JsonValue.Create(123).AsJ());
 
             var actual = await sut.GetAsync();
 
             var expected =
-                new JObject(
-                    new JProperty("key", 123));
+                JsonValue.Object().Add("key", 123);
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
         }
@@ -61,12 +59,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_remove_root_value()
         {
-            await sut.SetAsync("key", ((JToken)123).AsJ());
+            await sut.SetAsync("key", JsonValue.Create(123).AsJ());
             await sut.RemoveAsync("key");
 
             var actual = await sut.GetAsync();
 
-            var expected = new JObject();
+            var expected = JsonValue.Object();
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
         }
@@ -74,15 +72,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_set_nested_value()
         {
-            await sut.SetAsync("root.nested", ((JToken)123).AsJ());
+            await sut.SetAsync("root.nested", JsonValue.Create(123).AsJ());
 
             var actual = await sut.GetAsync();
 
             var expected =
-                new JObject(
-                    new JProperty("root",
-                        new JObject(
-                            new JProperty("nested", 123))));
+                JsonValue.Object().Add("root",
+                    JsonValue.Object().Add("nested", 123));
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
         }
@@ -90,14 +86,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_remove_nested_value()
         {
-            await sut.SetAsync("root.nested", ((JToken)123).AsJ());
+            await sut.SetAsync("root.nested", JsonValue.Create(123).AsJ());
             await sut.RemoveAsync("root.nested");
 
             var actual = await sut.GetAsync();
 
             var expected =
-                new JObject(
-                    new JProperty("root", new JObject()));
+                JsonValue.Object().Add("root",
+                    JsonValue.Object());
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
         }
@@ -105,9 +101,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Should_throw_exception_if_nested_not_an_object()
         {
-            await sut.SetAsync("root.nested", ((JToken)123).AsJ());
+            await sut.SetAsync("root.nested", JsonValue.Create(123).AsJ());
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.SetAsync("root.nested.value", ((JToken)123).AsJ()));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.SetAsync("root.nested.value", JsonValue.Create(123).AsJ()));
         }
 
         [Fact]

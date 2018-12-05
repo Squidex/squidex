@@ -29,6 +29,7 @@ using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
@@ -94,7 +95,7 @@ namespace Squidex.Config.Domain
                         .As<IAssetRepository>()
                         .As<ISnapshotStore<AssetState, Guid>>();
 
-                    services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetService<IAppProvider>()))
+                    services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetRequiredService<IAppProvider>(), c.GetRequiredService<IJsonSerializer>()))
                         .As<IContentRepository>()
                         .As<ISnapshotStore<ContentState, Guid>>()
                         .As<IEventConsumer>();

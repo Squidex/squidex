@@ -28,7 +28,7 @@ namespace Squidex.Areas.Api.Config.Swagger
         {
             services.AddSingleton(typeof(SwaggerSettings<SwaggerGeneratorSettings>), s =>
             {
-                var urlOptions = s.GetService<IOptions<MyUrlsOptions>>().Value;
+                var urlOptions = s.GetRequiredService<IOptions<MyUrlsOptions>>().Value;
 
                 var settings = new SwaggerSettings<SwaggerGeneratorSettings>()
                         .AddAssetODataParams()

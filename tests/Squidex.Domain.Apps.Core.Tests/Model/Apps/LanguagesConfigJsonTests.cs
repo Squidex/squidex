@@ -7,8 +7,6 @@
 
 using System.Linq;
 using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Xunit;
@@ -17,20 +15,18 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 {
     public class LanguagesConfigJsonTests
     {
-        private readonly JsonSerializer serializer = TestData.DefaultSerializer();
-
         [Fact]
         public void Should_serialize_and_deserialize()
         {
-            var sut = LanguagesConfig.Build(
+            var languages = LanguagesConfig.Build(
                 new LanguageConfig(Language.EN),
                 new LanguageConfig(Language.DE, true, Language.EN),
                 new LanguageConfig(Language.IT, false, Language.DE))
                 .MakeMaster(Language.IT);
 
-            var serialized = JToken.FromObject(sut, serializer).ToObject<LanguagesConfig>(serializer);
+            var serialized = languages.SerializeAndDeserialize();
 
-            serialized.Should().BeEquivalentTo(sut);
+            serialized.Should().BeEquivalentTo(languages);
 
             Assert.Same(serialized.FirstOrDefault(x => x.Key == "it"), serialized.Master);
         }

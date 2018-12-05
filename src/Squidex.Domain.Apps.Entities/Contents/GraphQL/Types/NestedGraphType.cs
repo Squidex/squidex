@@ -8,14 +8,14 @@
 using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class NestedGraphType : ObjectGraphType<JObject>
+    public sealed class NestedGraphType : ObjectGraphType<JsonObject>
     {
         public NestedGraphType(IGraphModel model, ISchemaEntity schema, IArrayField field)
         {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 {
                     var resolver = new FuncFieldResolver<object>(c =>
                     {
-                        if (((JObject)c.Source).TryGetValue(nestedField.Name, out var value))
+                        if (((JsonObject)c.Source).TryGetValue(nestedField.Name, out var value))
                         {
                             return fieldInfo.Resolver(value, c);
                         }

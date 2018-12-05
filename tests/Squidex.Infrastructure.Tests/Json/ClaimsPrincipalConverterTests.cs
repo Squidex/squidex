@@ -36,10 +36,10 @@ namespace Squidex.Infrastructure.Json
                         "Google")
                 });
 
-            var result = value.SerializeAndDeserializeAndReturn(new ClaimsPrincipalConverter());
+            var serialized = value.SerializeAndDeserialize();
 
-            Assert.Equal(value.Identities.ElementAt(0).AuthenticationType, result.Identities.ElementAt(0).AuthenticationType);
-            Assert.Equal(value.Identities.ElementAt(1).AuthenticationType, result.Identities.ElementAt(1).AuthenticationType);
+            Assert.Equal(value.Identities.ElementAt(0).AuthenticationType, serialized.Identities.ElementAt(0).AuthenticationType);
+            Assert.Equal(value.Identities.ElementAt(1).AuthenticationType, serialized.Identities.ElementAt(1).AuthenticationType);
         }
 
         [Fact]
@@ -47,7 +47,9 @@ namespace Squidex.Infrastructure.Json
         {
             ClaimsPrincipal value = null;
 
-            value.SerializeAndDeserialize(new ClaimsPrincipalConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Null(value);
         }
     }
 }

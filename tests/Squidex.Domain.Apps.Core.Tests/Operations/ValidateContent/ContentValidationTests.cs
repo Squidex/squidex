@@ -8,12 +8,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NamedContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue(1000));
+                            .AddValue("iv", 1000));
 
             await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
 
@@ -214,7 +214,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NamedContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue(1000));
+                            .AddValue("iv", 1000));
 
             await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 
@@ -329,10 +329,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 new NamedContentData()
                     .AddField("my-field",
                         new ContentFieldData()
-                            .AddValue("iv", new JArray(
-                                new JObject(),
-                                new JObject(new JProperty("my-nested", 1)),
-                                new JObject())));
+                            .AddValue("iv",
+                                JsonValue.Array(
+                                    JsonValue.Object(),
+                                    JsonValue.Object().Add("my-nested", 1),
+                                    JsonValue.Object())));
 
             await data.ValidatePartialAsync(context, schema, languagesConfig.ToResolver(), errors);
 

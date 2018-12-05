@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (value is IDictionary<string, TValue> values)
+            if (value is IReadOnlyDictionary<string, TValue> values)
             {
                 foreach (var fieldData in values)
                 {

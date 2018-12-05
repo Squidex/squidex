@@ -7,7 +7,6 @@
 
 using System;
 using System.Linq;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -125,7 +124,9 @@ namespace Squidex.Infrastructure
         {
             Language value = null;
 
-            value.SerializeAndDeserialize(new LanguageConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -133,7 +134,9 @@ namespace Squidex.Infrastructure
         {
             var value = Language.DE;
 
-            value.SerializeAndDeserialize(new LanguageConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
     }
 }

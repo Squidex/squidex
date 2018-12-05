@@ -11,7 +11,7 @@ using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                     continue;
                 }
 
-                foreach (var partitionValue in fieldData.Where(x => !x.Value.IsNull()))
+                foreach (var partitionValue in fieldData.Where(x => x.Value.Type != JsonValueType.Null))
                 {
                     var ids = field.ExtractReferences(partitionValue.Value);
 

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -41,49 +40,23 @@ namespace Squidex.Infrastructure
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
 
-            var token1a = NamedId.Of(id1, "my-name1");
-            var token1b = NamedId.Of(id1, "my-name1");
-            var token1c = NamedId.Of(id1, "my-name2");
-            var token2a = NamedId.Of(id2, "my-name1");
+            var named_id1_name1_a = NamedId.Of(id1, "name1");
+            var named_id1_name1_b = NamedId.Of(id1, "name1");
 
-            Assert.True(token1a.Equals(token1b));
+            var named_id2_name1 = NamedId.Of(id2, "name1");
+            var named_id1_name2 = NamedId.Of(id1, "name2");
 
-            Assert.False(token1a.Equals(token2a));
-            Assert.False(token1a.Equals(token1c));
-        }
+            Assert.Equal(named_id1_name1_a, named_id1_name1_b);
+            Assert.Equal(named_id1_name1_a.GetHashCode(), named_id1_name1_b.GetHashCode());
+            Assert.True(named_id1_name1_a.Equals((object)named_id1_name1_b));
 
-        [Fact]
-        public void Should_make_correct_object_equal_comparisons()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            Assert.NotEqual(named_id1_name1_a, named_id2_name1);
+            Assert.NotEqual(named_id1_name1_a.GetHashCode(), named_id2_name1.GetHashCode());
+            Assert.False(named_id1_name1_a.Equals((object)named_id2_name1));
 
-            object token1a = NamedId.Of(id1, "my-name1");
-            object token1b = NamedId.Of(id1, "my-name1");
-            object token1c = NamedId.Of(id1, "my-name2");
-            object token2a = NamedId.Of(id2, "my-name1");
-
-            Assert.True(token1a.Equals(token1b));
-
-            Assert.False(token1a.Equals(token2a));
-            Assert.False(token1a.Equals(token1c));
-        }
-
-        [Fact]
-        public void Should_provide_correct_hash_codes()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            object token1a = NamedId.Of(id1, "my-name1");
-            object token1b = NamedId.Of(id1, "my-name1");
-            object token1c = NamedId.Of(id1, "my-name2");
-            object token2a = NamedId.Of(id2, "my-name1");
-
-            Assert.Equal(token1a.GetHashCode(), token1b.GetHashCode());
-
-            Assert.NotEqual(token1a.GetHashCode(), token2a.GetHashCode());
-            Assert.NotEqual(token1a.GetHashCode(), token1c.GetHashCode());
+            Assert.NotEqual(named_id1_name1_a, named_id1_name2);
+            Assert.NotEqual(named_id1_name1_a.GetHashCode(), named_id1_name2.GetHashCode());
+            Assert.False(named_id1_name1_a.Equals((object)named_id1_name2));
         }
 
         [Fact]
@@ -91,7 +64,9 @@ namespace Squidex.Infrastructure
         {
             NamedId<Guid> value = null;
 
-            value.SerializeAndDeserialize(new NamedGuidIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -99,7 +74,9 @@ namespace Squidex.Infrastructure
         {
             var value = NamedId.Of(Guid.NewGuid(), "my-name");
 
-            value.SerializeAndDeserialize(new NamedGuidIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -107,7 +84,9 @@ namespace Squidex.Infrastructure
         {
             NamedId<long> value = null;
 
-            value.SerializeAndDeserialize(new NamedLongIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -115,7 +94,9 @@ namespace Squidex.Infrastructure
         {
             var value = NamedId.Of(123L, "my-name");
 
-            value.SerializeAndDeserialize(new NamedLongIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -123,7 +104,9 @@ namespace Squidex.Infrastructure
         {
             NamedId<string> value = null;
 
-            value.SerializeAndDeserialize(new NamedStringIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
@@ -131,27 +114,27 @@ namespace Squidex.Infrastructure
         {
             var value = NamedId.Of(Guid.NewGuid().ToString(), "my-name");
 
-            value.SerializeAndDeserialize(new NamedStringIdConverter());
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
         }
 
         [Fact]
         public void Should_throw_exception_if_string_id_is_not_valid()
         {
-            JsonHelper.DoesNotDeserialize<NamedId<string>>("123", new NamedStringIdConverter());
+            Assert.ThrowsAny<Exception>(() => JsonHelper.Deserialize<NamedId<string>>("123"));
         }
 
         [Fact]
         public void Should_throw_exception_if_long_id_is_not_valid()
         {
-            JsonHelper.DoesNotDeserialize<NamedId<long>>("123", new NamedLongIdConverter());
-            JsonHelper.DoesNotDeserialize<NamedId<long>>("invalid-long,name", new NamedLongIdConverter());
+            Assert.ThrowsAny<Exception>(() => JsonHelper.Deserialize<NamedId<long>>("invalid-long,name"));
         }
 
         [Fact]
         public void Should_throw_exception_if_guid_id_is_not_valid()
         {
-            JsonHelper.DoesNotDeserialize<NamedId<Guid>>("123", new NamedGuidIdConverter());
-            JsonHelper.DoesNotDeserialize<NamedId<Guid>>("invalid-guid,name", new NamedGuidIdConverter());
+            Assert.ThrowsAny<Exception>(() => JsonHelper.Deserialize<NamedId<Guid>>("invalid-guid,name"));
         }
     }
 }

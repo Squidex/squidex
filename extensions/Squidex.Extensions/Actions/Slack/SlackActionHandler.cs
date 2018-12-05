@@ -9,8 +9,6 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure;
@@ -33,14 +31,12 @@ namespace Squidex.Extensions.Actions.Slack
 
         protected override (string Description, SlackJob Data) CreateJob(EnrichedEvent @event, SlackAction action)
         {
-            var body =
-                new JObject(
-                    new JProperty("text", Format(action.Text, @event)));
+            var body = new { text = Format(action.Text, @event) };
 
             var ruleJob = new SlackJob
             {
                 RequestUrl = action.WebhookUrl.ToString(),
-                RequestBody = body.ToString(Formatting.Indented)
+                RequestBody = ToJson(body)
             };
 
             return (Description, ruleJob);

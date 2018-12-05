@@ -7,38 +7,39 @@
 
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 using NodaTime;
 
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
+    [DataContract]
     public sealed class RestoreStateJob : IRestoreJob
     {
-        [JsonProperty]
+        [DataMember]
         public string AppName { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public Guid Id { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public Guid AppId { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public Uri Url { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public string NewAppName { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public Instant Started { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public Instant? Stopped { get; set; }
 
-        [JsonProperty]
+        [DataMember]
         public List<string> Log { get; set; } = new List<string>();
 
-        [JsonProperty]
+        [DataMember]
         public JobStatus Status { get; set; }
     }
 }

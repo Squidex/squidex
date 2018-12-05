@@ -8,30 +8,28 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public sealed class NamedLongIdConverter : JsonClassConverter<NamedId<long>>
+    public sealed class NamedGuidIdConverter : JsonClassConverter<NamedId<Guid>>
     {
-        protected override void WriteValue(JsonWriter writer, NamedId<long> value, JsonSerializer serializer)
+        protected override void WriteValue(JsonWriter writer, NamedId<Guid> value, JsonSerializer serializer)
         {
-            writer.WriteValue($"{value.Id},{value.Name}");
+            writer.WriteValue(value.ToString());
         }
 
-        protected override NamedId<long> ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
+        protected override NamedId<Guid> ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.String)
             {
                 throw new JsonException($"Expected String, but got {reader.TokenType}.");
             }
 
-            try
+            if (!NamedId<Guid>.TryParse(reader.Value.ToString(), Guid.TryParse, out var result))
             {
-                return NamedId<long>.Parse(reader.Value.ToString(), long.TryParse);
+                throw new JsonException("Named id must have more than 2 parts divided by commata.");
             }
-            catch (ArgumentException ex)
-            {
-                throw new JsonException(ex.Message);
-            }
+
+            return result;
         }
     }
 }

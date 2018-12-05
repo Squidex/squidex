@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection;
@@ -28,8 +29,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     internal sealed class MongoContentDraftCollection : MongoContentCollection
     {
-        public MongoContentDraftCollection(IMongoDatabase database)
-            : base(database, "State_Content_Draft")
+        public MongoContentDraftCollection(IMongoDatabase database, IJsonSerializer serializer)
+            : base(database, serializer, "State_Content_Draft")
         {
         }
 
@@ -92,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 await Collection.Find(x => x.IndexedSchemaId == schema.Id && x.Id == id && x.IsDeleted != true).Not(x => x.DataText)
                     .FirstOrDefaultAsync();
 
-            contentEntity?.ParseData(schema.SchemaDef);
+            contentEntity?.ParseData(schema.SchemaDef, Serializer);
 
             return contentEntity;
         }
@@ -107,7 +108,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 var schema = await getSchema(contentEntity.IndexedAppId, contentEntity.IndexedSchemaId);
 
-                contentEntity.ParseData(schema.SchemaDef);
+                contentEntity.ParseData(schema.SchemaDef, Serializer);
 
                 return (SimpleMapper.Map(contentEntity, new ContentState()), contentEntity.Version);
             }

@@ -7,10 +7,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 languagePreferences = languagePreferences.Union(languageConfig.LanguageFallbacks).ToList();
             }
 
-            var result = new Dictionary<string, JToken>();
+            var result = new Dictionary<string, IJsonValue>();
 
             foreach (var fieldValue in content)
             {
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                 foreach (var language in languagePreferences)
                 {
-                    if (fieldData.TryGetValue(language, out var value) && value != null)
+                    if (fieldData.TryGetValue(language, out var value) && value.Type != JsonValueType.Null)
                     {
                         result[fieldValue.Key] = value;
 

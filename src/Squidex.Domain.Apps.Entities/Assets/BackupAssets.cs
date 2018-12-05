@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
@@ -89,16 +88,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private async Task RestoreTagsAsync(Guid appId, BackupReader reader)
         {
-            var tags = await reader.ReadJsonAttachmentAsync(TagsFile);
+            var tags = await reader.ReadJsonAttachmentAsync<TagSet>(TagsFile);
 
-            await tagService.RebuildTagsAsync(appId, TagGroups.Assets, tags.ToObject<TagSet>());
+            await tagService.RebuildTagsAsync(appId, TagGroups.Assets, tags);
         }
 
         private async Task BackupTagsAsync(Guid appId, BackupWriter writer)
         {
             var tags = await tagService.GetExportableTagsAsync(appId, TagGroups.Assets);
 
-            await writer.WriteJsonAsync(TagsFile, JObject.FromObject(tags));
+            await writer.WriteJsonAsync(TagsFile, tags);
         }
 
         private Task WriteAssetAsync(Guid assetId, long fileVersion, BackupWriter writer)

@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 
@@ -60,8 +59,9 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                 {
                     ruleDescription = $"Upsert to index: {action.IndexName}";
 
-                    ruleJob.Content = ToPayload(contentEvent);
-                    ruleJob.Content["objectID"] = contentId;
+                    var json = ToJson(contentEvent);
+
+                    ruleJob.Content = $"{{ \"objectId\": \"{contentId}\", {json.Substring(1)}";
                 }
 
                 ruleJob.Username = action.Username;
@@ -86,9 +86,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
             {
                 if (job.Content != null)
                 {
-                    var doc = job.Content.ToString();
-
-                    var response = await client.IndexAsync<StringResponse>(job.IndexName, job.IndexType, job.ContentId, doc);
+                    var response = await client.IndexAsync<StringResponse>(job.IndexName, job.IndexType, job.ContentId, job.Content);
 
                     return (response.Body, response.OriginalException);
                 }
@@ -116,10 +114,10 @@ namespace Squidex.Extensions.Actions.ElasticSearch
 
         public string ContentId { get; set; }
 
+        public string Content { get; set; }
+
         public string IndexName { get; set; }
 
         public string IndexType { get; set; }
-
-        public JObject Content { get; set; }
     }
 }

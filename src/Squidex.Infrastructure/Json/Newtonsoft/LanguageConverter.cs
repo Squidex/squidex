@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -8,23 +8,23 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Squidex.Infrastructure.Json
+namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public sealed class RefTokenConverter : JsonClassConverter<RefToken>
+    public sealed class LanguageConverter : JsonClassConverter<Language>
     {
-        protected override void WriteValue(JsonWriter writer, RefToken value, JsonSerializer serializer)
+        protected override void WriteValue(JsonWriter writer, Language value, JsonSerializer serializer)
         {
-            writer.WriteValue(value.ToString());
+            writer.WriteValue(value.Iso2Code);
         }
 
-        protected override RefToken ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
+        protected override Language ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.String)
             {
                 throw new JsonException($"Expected String, but got {reader.TokenType}.");
             }
 
-            return RefToken.Parse(reader.Value.ToString());
+            return Language.GetLanguage(reader.Value.ToString());
         }
     }
 }

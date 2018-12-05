@@ -7,9 +7,9 @@
 
 using Jint;
 using Jint.Runtime;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting
@@ -155,13 +155,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new NamedContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", new JArray(1.0, 2.0)));
+                            .AddValue("iv", JsonValue.Array(1.0, 2.0)));
 
             var expected =
                 new NamedContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", new JArray(1.0, 4.0, 5.0)));
+                            .AddValue("iv", JsonValue.Array(1.0, 4.0, 5.0)));
 
             var result = ExecuteScript(original, @"data.number.iv = [data.number.iv[0], data.number.iv[1] + 2, 5]");
 
@@ -175,13 +175,13 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new NamedContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", new JObject(new JProperty("lat", 1.0))));
+                            .AddValue("iv", JsonValue.Object().Add("lat", 1.0)));
 
             var expected =
                 new NamedContentData()
                     .AddField("number",
                         new ContentFieldData()
-                            .AddValue("iv", new JObject(new JProperty("lat", 1.0), new JProperty("lon", 4.0))));
+                            .AddValue("iv", JsonValue.Object().Add("lat", 1.0).Add("lon", 4.0)));
 
             var result = ExecuteScript(original, @"data.number.iv = { lat: data.number.iv.lat, lon: data.number.iv.lat + 3 }");
 
@@ -265,7 +265,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new NamedContentData()
                     .AddField("obj",
                         new ContentFieldData()
-                            .AddValue("iv", new JObject(new JProperty("readonly", 1))));
+                            .AddValue("iv", JsonValue.Object().Add("readonly", 1)));
 
             Assert.Throws<JavaScriptException>(() => ExecuteScript(original, "data.obj.iv.invalid = 1"));
             Assert.Throws<JavaScriptException>(() => ExecuteScript(original, "data.obj.iv.readonly = 2"));
@@ -278,7 +278,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
                 new NamedContentData()
                     .AddField("obj",
                         new ContentFieldData()
-                            .AddValue("iv", new JArray()));
+                            .AddValue("iv", JsonValue.Array()));
 
             ExecuteScript(original, "data.obj.iv[0] = 1");
         }

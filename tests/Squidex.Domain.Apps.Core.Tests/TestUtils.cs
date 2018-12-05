@@ -17,13 +17,16 @@ using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core
 {
-    public static class TestData
+    public static class TestUtils
     {
-        public static JsonSerializer DefaultSerializer()
+        public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
+
+        public static IJsonSerializer CreateSerializer(TypeNameHandling typeNameHandling = TypeNameHandling.Auto)
         {
             var typeNameRegistry = new TypeNameRegistry();
 
@@ -35,7 +38,10 @@ namespace Squidex.Domain.Apps.Core
                     new AppClientsConverter(),
                     new AppContributorsConverter(),
                     new AppPatternsConverter(),
+                    new ClaimsPrincipalConverter(),
+                    new EnvelopeHeadersConverter(),
                     new InstantConverter(),
+                    new JsonValueConverter(),
                     new LanguageConverter(),
                     new LanguagesConfigConverter(),
                     new NamedGuidIdConverter(),
@@ -47,10 +53,10 @@ namespace Squidex.Domain.Apps.Core
                     new SchemaConverter(),
                     new StringEnumConverter()),
 
-                TypeNameHandling = TypeNameHandling.Auto
+                TypeNameHandling = typeNameHandling
             };
 
-            return JsonSerializer.Create(serializerSettings);
+            return new NewtonsoftJsonSerializer(serializerSettings);
         }
 
         public static Schema MixedSchema()
@@ -98,6 +104,11 @@ namespace Squidex.Domain.Apps.Core
                 .LockField(105);
 
             return schema;
+        }
+
+        public static T SerializeAndDeserialize<T>(this T value)
+        {
+            return DefaultSerializer.Deserialize<T>(DefaultSerializer.Serialize(value));
         }
 
         public static void TestFreeze(IFreezable freezable)

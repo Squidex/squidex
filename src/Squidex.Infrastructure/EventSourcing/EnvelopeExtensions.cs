@@ -8,6 +8,8 @@
 using System;
 using System.Globalization;
 using NodaTime;
+using NodaTime.Text;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -15,74 +17,127 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         public static string EventPosition(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.EventNumber].ToString();
+            return headers.GetString(CommonHeaders.EventNumber);
         }
 
         public static Envelope<T> SetEventPosition<T>(this Envelope<T> envelope, string value) where T : class
         {
-            envelope.Headers.Set(CommonHeaders.EventNumber, value);
+            envelope.Headers.Add(CommonHeaders.EventNumber, value);
 
             return envelope;
         }
 
         public static long EventStreamNumber(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.EventStreamNumber].ToInt64(CultureInfo.InvariantCulture);
+            return headers.GetLong(CommonHeaders.EventStreamNumber);
         }
 
         public static Envelope<T> SetEventStreamNumber<T>(this Envelope<T> envelope, long value) where T : class
         {
-            envelope.Headers.Set(CommonHeaders.EventStreamNumber, value);
+            envelope.Headers.Add(CommonHeaders.EventStreamNumber, value);
 
             return envelope;
         }
 
         public static Guid CommitId(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.CommitId].ToGuid(CultureInfo.InvariantCulture);
+            return headers.GetGuid(CommonHeaders.CommitId);
         }
 
         public static Envelope<T> SetCommitId<T>(this Envelope<T> envelope, Guid value) where T : class
         {
-            envelope.Headers.Set(CommonHeaders.CommitId, value);
+            envelope.Headers.Add(CommonHeaders.CommitId, value.ToString());
 
             return envelope;
         }
 
         public static Guid AggregateId(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.AggregateId].ToGuid(CultureInfo.InvariantCulture);
+            return headers.GetGuid(CommonHeaders.AggregateId);
         }
 
         public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, Guid value) where T : class
         {
-            envelope.Headers.Set(CommonHeaders.AggregateId, value);
+            envelope.Headers.Add(CommonHeaders.AggregateId, value.ToString());
 
             return envelope;
         }
 
         public static Guid EventId(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.EventId].ToGuid(CultureInfo.InvariantCulture);
+            return headers.GetGuid(CommonHeaders.EventId);
         }
 
         public static Envelope<T> SetEventId<T>(this Envelope<T> envelope, Guid value) where T : class
         {
-            envelope.Headers.Set(CommonHeaders.EventId, value);
+            envelope.Headers.Add(CommonHeaders.EventId, value.ToString());
 
             return envelope;
         }
 
         public static Instant Timestamp(this EnvelopeHeaders headers)
         {
-            return headers[CommonHeaders.Timestamp].ToInstant(CultureInfo.InvariantCulture);
+            return headers.GetInstant(CommonHeaders.Timestamp);
         }
 
         public static Envelope<T> SetTimestamp<T>(this Envelope<T> envelope, Instant value) where T : class
         {
-            envelope.Headers.Set(CommonHeaders.Timestamp, value);
+            envelope.Headers.Add(CommonHeaders.Timestamp, value.ToString());
 
             return envelope;
+        }
+
+        public static long GetLong(this JsonObject obj, string key)
+        {
+            if (obj.TryGetValue(key, out var v))
+            {
+                if (v is JsonNumber number)
+                {
+                    return (long)number.Value;
+                }
+                else if (v.Type == JsonValueType.String && double.TryParse(v.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+                {
+                    return (long)result;
+                }
+            }
+
+            return 0;
+        }
+
+        public static Guid GetGuid(this JsonObject obj, string key)
+        {
+            if (obj.TryGetValue(key, out var v))
+            {
+                if (v.Type == JsonValueType.String && Guid.TryParse(v.ToString(), out var guid))
+                {
+                    return guid;
+                }
+            }
+
+            return default(Guid);
+        }
+
+        public static Instant GetInstant(this JsonObject obj, string key)
+        {
+            if (obj.TryGetValue(key, out var v))
+            {
+                if (v.Type == JsonValueType.String && InstantPattern.General.Parse(v.ToString()).TryGetValue(default(Instant), out var instant))
+                {
+                    return instant;
+                }
+            }
+
+            return default(Instant);
+        }
+
+        public static string GetString(this JsonObject obj, string key)
+        {
+            if (obj.TryGetValue(key, out var v))
+            {
+                return v.ToString();
+            }
+
+            return string.Empty;
         }
     }
 }

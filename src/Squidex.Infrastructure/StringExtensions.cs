@@ -331,7 +331,7 @@ namespace Squidex.Infrastructure
                 return string.Empty;
             }
 
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(value.Length);
 
             var last = NullChar;
             var length = 0;
@@ -387,7 +387,7 @@ namespace Squidex.Infrastructure
                 return string.Empty;
             }
 
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(value.Length);
 
             var length = 0;
 
@@ -429,7 +429,7 @@ namespace Squidex.Infrastructure
                 return string.Empty;
             }
 
-            var sb = new StringBuilder();
+            var sb = new StringBuilder(value.Length);
 
             var last = NullChar;
             var length = 0;
