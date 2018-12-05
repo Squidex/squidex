@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_boolean_is_required()
+        public async Task Should_add_error_if_boolean_is_required()
         {
             var sut = Field(new BooleanFieldProperties { IsRequired = true });
 
@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_is_not_valid()
+        public async Task Should_add_error_if_value_is_not_valid()
         {
             var sut = Field(new BooleanFieldProperties());
 

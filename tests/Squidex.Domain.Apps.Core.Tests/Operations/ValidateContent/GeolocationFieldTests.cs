@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_geolocation_has_invalid_latitude()
+        public async Task Should_add_error_if_geolocation_has_invalid_latitude()
         {
             var sut = Field(new GeolocationFieldProperties { IsRequired = true });
 
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_geolocation_has_invalid_longitude()
+        public async Task Should_add_error_if_geolocation_has_invalid_longitude()
         {
             var sut = Field(new GeolocationFieldProperties { IsRequired = true });
 
@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_geolocation_has_too_many_properties()
+        public async Task Should_add_error_if_geolocation_has_too_many_properties()
         {
             var sut = Field(new GeolocationFieldProperties { IsRequired = true });
 
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_geolocation_is_required()
+        public async Task Should_add_error_if_geolocation_is_required()
         {
             var sut = Field(new GeolocationFieldProperties { IsRequired = true });
 

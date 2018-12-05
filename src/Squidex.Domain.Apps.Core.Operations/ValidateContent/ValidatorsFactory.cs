@@ -111,6 +111,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             {
                 yield return new AllowedValuesValidator<double>(field.Properties.AllowedValues);
             }
+
+            if (field.Properties.IsUnique)
+            {
+                yield return new UniqueValidator();
+            }
         }
 
         public IEnumerable<IValidator> Visit(IField<ReferencesFieldProperties> field)
@@ -146,6 +151,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             if (field.Properties.AllowedValues != null)
             {
                 yield return new AllowedValuesValidator<string>(field.Properties.AllowedValues);
+            }
+
+            if (field.Properties.IsUnique)
+            {
+                yield return new UniqueValidator();
             }
         }
 

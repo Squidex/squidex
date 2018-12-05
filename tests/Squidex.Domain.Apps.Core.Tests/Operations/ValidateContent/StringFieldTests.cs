@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -38,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_string_is_required()
+        public async Task Should_add_error_if_string_is_required()
         {
             var sut = Field(new StringFieldProperties { IsRequired = true });
 
@@ -49,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_string_is_shorter_than_min_length()
+        public async Task Should_add_error_if_string_is_shorter_than_min_length()
         {
             var sut = Field(new StringFieldProperties { MinLength = 10 });
 
@@ -60,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_string_is_longer_than_max_length()
+        public async Task Should_add_error_if_string_is_longer_than_max_length()
         {
             var sut = Field(new StringFieldProperties { MaxLength = 5 });
 
@@ -71,7 +72,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_string_not_allowed()
+        public async Task Should_add_error_if_string_not_allowed()
         {
             var sut = Field(new StringFieldProperties { AllowedValues = ReadOnlyCollection.Create("Foo") });
 
@@ -82,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_number_is_not_valid_pattern()
+        public async Task Should_add_error_if_number_is_not_valid_pattern()
         {
             var sut = Field(new StringFieldProperties { Pattern = "[0-9]{3}" });
 
@@ -93,7 +94,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_number_is_not_valid_pattern_with_message()
+        public async Task Should_add_error_if_number_is_not_valid_pattern_with_message()
         {
             var sut = Field(new StringFieldProperties { Pattern = "[0-9]{3}", PatternMessage = "Custom Error Message." });
 
@@ -101,6 +102,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             errors.Should().BeEquivalentTo(
                 new[] { "Custom Error Message." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_unique_constraint_failed()
+        {
+            var sut = Field(new StringFieldProperties { IsUnique = true });
+
+            await sut.ValidateAsync(CreateValue("abc"), errors, ValidationTestExtensions.References(Guid.NewGuid()));
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Another content with the same value exists." });
         }
 
         private static IJsonValue CreateValue(string v)

@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.EnrichContent;
@@ -18,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -29,6 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private IScriptEngine scriptEngine;
         private ISchemaEntity schemaEntity;
         private IAppEntity appEntity;
+        private Guid contentId;
+        private Guid schemaId;
         private Func<string> message;
 
         public ISchemaEntity Schema
@@ -39,6 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public static async Task<ContentOperationContext> CreateAsync(
             Guid appId,
             Guid schemaId,
+            Guid contentId,
             IAppProvider appProvider,
             IAssetRepository assetRepository,
             IContentRepository contentRepository,
@@ -51,8 +54,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 appEntity = appEntity,
                 assetRepository = assetRepository,
+                contentId = contentId,
                 contentRepository = contentRepository,
                 message = message,
+                schemaId = schemaId,
                 schemaEntity = schemaEntity,
                 scriptEngine = scriptEngine
             };
@@ -106,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private ValidationContext CreateValidationContext()
         {
-            return new ValidationContext((contentIds, schemaId) => QueryContentsAsync(schemaId, contentIds), QueryAssetsAsync);
+            return new ValidationContext(contentId, schemaId, (sid, filterNode) => QueryContentsAsync(sid, filterNode), QueryAssetsAsync);
         }
 
         private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(IEnumerable<Guid> assetIds)
@@ -114,9 +119,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return await assetRepository.QueryAsync(appEntity.Id, new HashSet<Guid>(assetIds));
         }
 
-        private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid schemaId, IEnumerable<Guid> contentIds)
+        private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid filterSchemaId, FilterNode filterNode)
         {
-            return await contentRepository.QueryNotFoundAsync(appEntity.Id, schemaId, contentIds.ToList());
+            return await contentRepository.QueryIdsAsync(appEntity.Id, filterSchemaId, filterNode);
         }
     }
 }

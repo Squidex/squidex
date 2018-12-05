@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_assets_are_required_and_null()
+        public async Task Should_add_error_if_assets_are_required_and_null()
         {
             var sut = Field(new AssetsFieldProperties { IsRequired = true });
 
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_assets_are_required_and_empty()
+        public async Task Should_add_error_if_assets_are_required_and_empty()
         {
             var sut = Field(new AssetsFieldProperties { IsRequired = true });
 
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_is_not_valid()
+        public async Task Should_add_error_if_value_is_not_valid()
         {
             var sut = Field(new AssetsFieldProperties());
 
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_has_not_enough_items()
+        public async Task Should_add_error_if_value_has_not_enough_items()
         {
             var sut = Field(new AssetsFieldProperties { MinItems = 3 });
 
@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_has_too_much_items()
+        public async Task Should_add_error_if_value_has_too_much_items()
         {
             var sut = Field(new AssetsFieldProperties { MaxItems = 1 });
 
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_asset_are_not_valid()
+        public async Task Should_add_error_if_asset_are_not_valid()
         {
             var assetId = Guid.NewGuid();
 

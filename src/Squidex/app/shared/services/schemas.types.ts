@@ -241,6 +241,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Number';
 
     public readonly inlineEditable: boolean = false;
+    public readonly isUnique: boolean = false;
     public readonly defaultValue?: number;
     public readonly maxValue?: number;
     public readonly minValue?: number;
@@ -279,6 +280,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'String';
 
     public readonly inlineEditable = false;
+    public readonly isUnique: boolean = false;
     public readonly defaultValue?: string;
     public readonly pattern?: string;
     public readonly patternMessage?: string;

@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 query = query.AdjustToModel(schema.SchemaDef, useDraft);
 
-                var filter = FindExtensions.BuildQuery(query, schema.Id, status);
+                var filter = query.ToFilter(schema.Id, status);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems =

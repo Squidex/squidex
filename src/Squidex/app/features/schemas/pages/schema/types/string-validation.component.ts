@@ -15,7 +15,9 @@ import {
     FieldDto,
     ImmutableArray,
     ModalModel,
-    StringFieldPropertiesDto
+    RootFieldDto,
+    StringFieldPropertiesDto,
+    Types
 } from '@app/shared';
 
 @Component({
@@ -45,11 +47,20 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     public patternName: string;
     public patternsModal = new ModalModel();
 
+    public showUnique: boolean;
+
     public ngOnDestroy() {
         this.patternSubscription.unsubscribe();
     }
 
     public ngOnInit() {
+        this.showUnique = Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
+
+        if (this.showUnique) {
+            this.editForm.setControl('isUnique',
+                new FormControl(this.properties.isUnique));
+        }
+
         this.editForm.setControl('maxLength',
             new FormControl(this.properties.maxLength));
 

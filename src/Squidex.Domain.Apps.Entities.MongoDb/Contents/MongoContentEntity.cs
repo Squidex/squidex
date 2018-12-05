@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private NamedContentData dataDraft;
 
         [BsonId]
-        [BsonElement]
+        [BsonElement("_id")]
         [BsonRepresentation(BsonType.String)]
         public Guid Id { get; set; }
 

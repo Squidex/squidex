@@ -16,10 +16,12 @@ using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -53,13 +55,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await base.SetupCollectionAsync(collection, ct);
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryNotFoundAsync(Guid appId, Guid schemaId, IList<Guid> ids)
+        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId, ISchemaEntity schema, FilterNode filterNode)
         {
+            var filter = filterNode.AdjustToModel(schema.SchemaDef, true).ToFilter(schema.Id);
+
             var contentEntities =
-                await Collection.Find(x => x.IndexedSchemaId == schemaId && ids.Contains(x.Id) && x.IsDeleted != true).Only(x => x.Id)
+                await Collection.Find(filter).Only(x => x.Id)
                     .ToListAsync();
 
-            return ids.Except(contentEntities.Select(x => Guid.Parse(x["_id"].AsString))).ToList();
+            return contentEntities.Select(x => Guid.Parse(x["_id"].AsString)).ToList();
         }
 
         public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId)
