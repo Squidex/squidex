@@ -6,11 +6,14 @@
             [form]="form"
             [field]="field"
             [isHidden]="isHidden"
+            [isFirst]="i === 0"
+            [isLast]="i === arrayControl.controls.length - 1"
             [index]="i"
             [itemForm]="itemForm"
             [language]="language"
             [languages]="languages"
             (toggle)="hide($event)"
+            (moving)="move(itemForm, $event)"
             (cloning)="addItem(itemForm)"
             (removing)="removeItem(i)">
         </sqx-array-item>

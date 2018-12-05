@@ -5,6 +5,18 @@
     
             <span class="header-text text-decent">Item #{{index + 1}}</span>
 
+            <button class="btn btn-secondary btn-link" [disabled]="isFirst" (click)="moveTop(); $event.preventDefault()">
+                <i class="icon-caret-top"></i>
+            </button>
+            <button class="btn btn-secondary btn-link" [disabled]="isFirst" (click)="moveUp(); $event.preventDefault()">
+                <i class="icon-caret-up"></i>
+            </button>
+            <button class="btn btn-secondary btn-link" [disabled]="isLast" (click)="moveDown(); $event.preventDefault()">
+                <i class="icon-caret-down"></i>
+            </button>
+            <button class="btn btn-secondary btn-link" [disabled]="isLast" (click)="moveBottom(); $event.preventDefault()">
+                <i class="icon-caret-bottom"></i>
+            </button>
             <button class="btn btn-secondary btn-link" [class.hidden]="!isHidden" (click)="toggle.emit(false); $event.preventDefault()" title="Open all items">
                 <i class="icon-plus-square"></i>
             </button>

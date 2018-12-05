@@ -56,4 +56,13 @@ export class ArrayEditorComponent {
             this.arrayControl.setControl(i, controls[i]);
         }
     }
+
+    public move(control: AbstractControl, index: number) {
+        let controls = [...this.arrayControl.controls];
+
+        controls.splice(controls.indexOf(control), 1);
+        controls.splice(index, 0, control);
+
+        this.sort(controls);
+    }
 }

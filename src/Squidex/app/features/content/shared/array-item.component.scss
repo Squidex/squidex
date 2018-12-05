@@ -19,7 +19,14 @@
 }
 
 .btn-link {
-    padding: .375rem;
+    & {
+        padding: .375rem;
+    }
+
+    &:disabled,
+    &.disabled {
+        background: transparent;
+    }
 }
 
 .remove {
