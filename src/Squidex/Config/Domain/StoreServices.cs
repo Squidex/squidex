@@ -69,6 +69,9 @@ namespace Squidex.Config.Domain
                     services.AddTransientAs<ConvertOldSnapshotStores>()
                         .As<IMigration>();
 
+                    services.AddTransientAs<ConvertRuleEventsJson>()
+                        .As<IMigration>();
+
                     services.AddTransientAs(c => new DeleteContentCollections(mongoContentDatabase))
                         .As<IMigration>();
 

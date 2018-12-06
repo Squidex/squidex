@@ -24,6 +24,7 @@ namespace Migrate_01.Migrations
         public AddPatterns(InitialPatterns initialPatterns, IGrainFactory grainFactory)
         {
             this.initialPatterns = initialPatterns;
+
             this.grainFactory = grainFactory;
         }
 
