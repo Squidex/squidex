@@ -27,7 +27,9 @@ namespace Migrate_01.Migrations
             {
                 document["Job"]["actionData"] = document["Job"]["actionData"].ToBsonDocument().ToJson();
 
-                await collection.ReplaceOneAsync(Builders<BsonDocument>.Filter.Eq("_id", document["_id"].ToString()), document);
+                var filter = Builders<BsonDocument>.Filter.Eq("_id", document["_id"].ToString());
+
+                await collection.ReplaceOneAsync(filter, document);
             }
         }
     }
