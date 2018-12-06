@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Caching
 {
     public class LRUCacheTests
     {
-        private readonly LRUCache sut = new LRUCache(10);
+        private readonly LRUCache<string, int> sut = new LRUCache<string, int>(10);
         private readonly string key = "Key";
 
         [Fact]

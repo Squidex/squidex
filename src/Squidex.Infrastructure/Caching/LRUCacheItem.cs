@@ -9,9 +9,10 @@
 
 namespace Squidex.Infrastructure.Caching
 {
-    internal class LRUCacheItem
+    internal class LRUCacheItem<TKey, TValue>
     {
-        public object Key;
-        public object Value;
+        public TKey Key;
+
+        public TValue Value;
     }
 }
