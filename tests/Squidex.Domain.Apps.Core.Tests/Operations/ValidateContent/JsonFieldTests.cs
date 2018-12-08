@@ -8,8 +8,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -31,23 +31,23 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new JsonFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(new JValue(1)), errors);
+            await sut.ValidateAsync(CreateValue(JsonValue.Create(1)), errors);
 
             Assert.Empty(errors);
         }
 
         [Fact]
-        public async Task Should_add_errors_if_json_is_required()
+        public async Task Should_add_error_if_json_is_required()
         {
             var sut = Field(new JsonFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
+            await sut.ValidateAsync(CreateValue(JsonValue.Null), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
         }
 
-        private static JValue CreateValue(JValue v)
+        private static IJsonValue CreateValue(IJsonValue v)
         {
             return v;
         }

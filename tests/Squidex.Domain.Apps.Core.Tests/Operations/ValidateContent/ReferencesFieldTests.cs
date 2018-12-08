@@ -10,8 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -20,6 +20,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
     {
         private readonly List<string> errors = new List<string>();
         private readonly Guid schemaId = Guid.NewGuid();
+        private readonly Guid ref1 = Guid.NewGuid();
+        private readonly Guid ref2 = Guid.NewGuid();
 
         [Fact]
         public void Should_instantiate_field()
@@ -34,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ReferencesFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(Guid.NewGuid()), errors, ValidationTestExtensions.ValidContext);
+            await sut.ValidateAsync(CreateValue(ref1), errors, ValidationTestExtensions.References(ref1));
 
             Assert.Empty(errors);
         }
@@ -50,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_references_are_required_and_null()
+        public async Task Should_add_error_if_references_are_required_and_null()
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId, IsRequired = true });
 
@@ -61,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_references_are_required_and_empty()
+        public async Task Should_add_error_if_references_are_required_and_empty()
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId, IsRequired = true });
 
@@ -72,54 +74,52 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_is_not_valid()
+        public async Task Should_add_error_if_value_is_not_valid()
         {
             var sut = Field(new ReferencesFieldProperties());
 
-            await sut.ValidateAsync("invalid", errors);
+            await sut.ValidateAsync(JsonValue.Create("invalid"), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_has_not_enough_items()
+        public async Task Should_add_error_if_value_has_not_enough_items()
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId, MinItems = 3 });
 
-            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
+            await sut.ValidateAsync(CreateValue(ref1, ref2), errors, ValidationTestExtensions.References(ref1, ref2));
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must have at least 3 item(s)." });
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_has_too_much_items()
+        public async Task Should_add_error_if_value_has_too_much_items()
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId, MaxItems = 1 });
 
-            await sut.ValidateAsync(CreateValue(Guid.NewGuid(), Guid.NewGuid()), errors);
+            await sut.ValidateAsync(CreateValue(ref1, ref2), errors, ValidationTestExtensions.References(ref1, ref2));
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must have not more than 1 item(s)." });
         }
 
         [Fact]
-        public async Task Should_add_errors_if_reference_are_not_valid()
+        public async Task Should_add_error_if_reference_are_not_valid()
         {
-            var referenceId = Guid.NewGuid();
-
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId });
 
-            await sut.ValidateAsync(CreateValue(referenceId), errors, ValidationTestExtensions.InvalidReferences(referenceId));
+            await sut.ValidateAsync(CreateValue(ref1), errors, ValidationTestExtensions.References());
 
             errors.Should().BeEquivalentTo(
-                new[] { $"Contains invalid reference '{referenceId}'." });
+                new[] { $"Contains invalid reference '{ref1}'." });
         }
 
-        private static JToken CreateValue(params Guid[] ids)
+        private static IJsonValue CreateValue(params Guid[] ids)
         {
-            return ids == null ? JValue.CreateNull() : (JToken)new JArray(ids.OfType<object>().ToArray());
+            return ids == null ? (IJsonValue)JsonValue.Null : JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
         }
 
         private static RootField<ReferencesFieldProperties> Field(ReferencesFieldProperties properties)

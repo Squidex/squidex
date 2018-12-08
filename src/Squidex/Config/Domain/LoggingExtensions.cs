@@ -28,11 +28,13 @@ namespace Squidex.Config.Domain
 
                     var logged = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                    foreach (var kvp in config.AsEnumerable().Where(kvp => kvp.Value != null).Select(x => new { Key = x.Key.ToLowerInvariant(), x.Value }).OrderBy(x => x.Key))
+                    var orderedConfigs = config.AsEnumerable().Where(kvp => kvp.Value != null).OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase);
+
+                    foreach (var kvp in orderedConfigs)
                     {
                         if (logged.Add(kvp.Key))
                         {
-                            c.WriteProperty(kvp.Key, kvp.Value);
+                            c.WriteProperty(kvp.Key.ToLowerInvariant(), kvp.Value);
                         }
                     }
                 }));

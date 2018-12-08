@@ -34,7 +34,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public async Task<long> GetTotalSizeAsync(Guid appId)
         {
-            var entries = await usageStore.QueryAsync(appId.ToString(), SummaryDate, SummaryDate);
+            var key = GetKey(appId);
+
+            var entries = await usageStore.QueryAsync(key, SummaryDate, SummaryDate);
 
             return (long)entries.Select(x => x.Counters.Get(CounterTotalSize)).FirstOrDefault();
         }
@@ -43,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var enriched = new List<AssetStats>();
 
-            var usagesFlat = await usageStore.QueryAsync(appId.ToString(), fromDate, toDate);
+            var usagesFlat = await usageStore.QueryAsync(GetKey(appId), fromDate, toDate);
 
             for (var date = fromDate; date <= toDate; date = date.AddDays(1))
             {

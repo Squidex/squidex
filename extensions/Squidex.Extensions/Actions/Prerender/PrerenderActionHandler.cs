@@ -9,7 +9,6 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 
@@ -29,12 +28,10 @@ namespace Squidex.Extensions.Actions.Prerender
         {
             var url = Format(action.Url, @event);
 
-            var request =
-                new JObject(
-                    new JProperty("prerenderToken", action.Token),
-                    new JProperty("url", url));
+            var request = new { prerenderToken = action.Token, url };
+            var requestBody = ToJson(request);
 
-            return ($"Recache {url}", new PrerenderJob { RequestBody = request.ToString() });
+            return ($"Recache {url}", new PrerenderJob { RequestBody = requestBody });
         }
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(PrerenderJob job)

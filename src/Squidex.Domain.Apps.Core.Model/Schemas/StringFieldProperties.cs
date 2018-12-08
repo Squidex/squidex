@@ -5,19 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
 using Squidex.Infrastructure;
+using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("StringField")]
     public sealed class StringFieldProperties : FieldProperties
     {
-        public ImmutableList<string> AllowedValues { get; set; }
+        public ReadOnlyCollection<string> AllowedValues { get; set; }
 
         public int? MinLength { get; set; }
 
         public int? MaxLength { get; set; }
+
+        public bool IsUnique { get; set; }
 
         public bool InlineEditable { get; set; }
 
@@ -39,14 +41,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit((IField<StringFieldProperties>)field);
         }
 
-        public override RootField CreateRootField(long id, string name, Partitioning partitioning)
+        public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings settings = null)
         {
-            return Fields.String(id, name, partitioning, this);
+            return Fields.String(id, name, partitioning, this, settings);
         }
 
-        public override NestedField CreateNestedField(long id, string name)
+        public override NestedField CreateNestedField(long id, string name, IFieldSettings settings = null)
         {
-            return Fields.String(id, name, this);
+            return Fields.String(id, name, this, settings);
         }
     }
 }

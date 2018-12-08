@@ -7,7 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
 
@@ -17,8 +16,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     {
         Type ActionType { get; }
 
-        Task<(string Description, JObject Data)> CreateJobAsync(EnrichedEvent @event, RuleAction action);
+        Type DataType { get; }
 
-        Task<(string Dump, Exception Exception)> ExecuteJobAsync(JObject data);
+        Task<(string Description, object Data)> CreateJobAsync(EnrichedEvent @event, RuleAction action);
+
+        Task<(string Dump, Exception Exception)> ExecuteJobAsync(object data);
     }
 }

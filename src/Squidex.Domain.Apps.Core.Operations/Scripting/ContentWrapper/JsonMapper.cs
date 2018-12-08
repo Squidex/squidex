@@ -9,61 +9,52 @@ using System;
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
-using Newtonsoft.Json.Linq;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
     public static class JsonMapper
     {
-        public static JsValue Map(JToken value, Engine engine)
+        public static JsValue Map(IJsonValue value, Engine engine)
         {
             if (value == null)
             {
                 return JsValue.Null;
             }
 
-            switch (value.Type)
+            switch (value)
             {
-                case JTokenType.Date:
-                case JTokenType.Guid:
-                case JTokenType.String:
-                case JTokenType.Uri:
-                case JTokenType.TimeSpan:
-                    return new JsValue((string)value);
-                case JTokenType.Null:
+                case JsonNull n:
                     return JsValue.Null;
-                case JTokenType.Undefined:
-                    return JsValue.Undefined;
-                case JTokenType.Integer:
-                    return new JsValue((long)value);
-                case JTokenType.Float:
-                    return new JsValue((double)value);
-                case JTokenType.Boolean:
-                    return new JsValue((bool)value);
-                case JTokenType.Object:
-                    return FromObject(value, engine);
-                case JTokenType.Array:
-                    {
-                        var arr = (JArray)value;
-
-                        var target = new JsValue[arr.Count];
-
-                        for (var i = 0; i < arr.Count; i++)
-                        {
-                            target[i] = Map(arr[i], engine);
-                        }
-
-                        return engine.Array.Construct(target);
-                    }
+                case JsonScalar<string> s:
+                    return new JsValue(s.Value);
+                case JsonScalar<bool> b:
+                    return new JsValue(b.Value);
+                case JsonScalar<double> b:
+                    return new JsValue(b.Value);
+                case JsonObject obj:
+                    return FromObject(obj, engine);
+                case JsonArray arr:
+                    return FromArray(arr, engine);
             }
 
             throw new ArgumentException("Invalid json type.", nameof(value));
         }
 
-        private static JsValue FromObject(JToken value, Engine engine)
+        private static JsValue FromArray(JsonArray arr, Engine engine)
         {
-            var obj = (JObject)value;
+            var target = new JsValue[arr.Count];
 
+            for (var i = 0; i < arr.Count; i++)
+            {
+                target[i] = Map(arr[i], engine);
+            }
+
+            return engine.Array.Construct(target);
+        }
+
+        private static JsValue FromObject(JsonObject obj, Engine engine)
+        {
             var target = new ObjectInstance(engine);
 
             foreach (var property in obj)
@@ -74,69 +65,64 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
             return target;
         }
 
-        public static JToken Map(JsValue value)
+        public static IJsonValue Map(JsValue value)
         {
-            if (value == null || value.IsNull())
+            if (value == null || value.IsNull() || value.IsUndefined())
             {
-                return JValue.CreateNull();
-            }
-
-            if (value.IsUndefined())
-            {
-                return JValue.CreateUndefined();
+                return JsonValue.Null;
             }
 
             if (value.IsString())
             {
-                return new JValue(value.AsString());
+                return JsonValue.Create(value.AsString());
             }
 
             if (value.IsBoolean())
             {
-                return new JValue(value.AsBoolean());
+                return JsonValue.Create(value.AsBoolean());
             }
 
             if (value.IsNumber())
             {
-                return new JValue(value.AsNumber());
+                return JsonValue.Create(value.AsNumber());
             }
 
             if (value.IsDate())
             {
-                return new JValue(value.AsDate().ToDateTime());
+                return JsonValue.Create(value.AsDate().ToString());
             }
 
             if (value.IsRegExp())
             {
-                return JValue.CreateString(value.AsRegExp().Value?.ToString());
+                return JsonValue.Create(value.AsRegExp().Value?.ToString());
             }
 
             if (value.IsArray())
             {
                 var arr = value.AsArray();
 
-                var target = new JArray();
+                var result = JsonValue.Array();
 
                 for (var i = 0; i < arr.GetLength(); i++)
                 {
-                    target.Add(Map(arr.Get(i.ToString())));
+                    result.Add(Map(arr.Get(i.ToString())));
                 }
 
-                return target;
+                return result;
             }
 
             if (value.IsObject())
             {
                 var obj = value.AsObject();
 
-                var target = new JObject();
+                var result = JsonValue.Object();
 
                 foreach (var kvp in obj.GetOwnProperties())
                 {
-                    target[kvp.Key] = Map(kvp.Value.Value);
+                    result[kvp.Key] = Map(kvp.Value.Value);
                 }
 
-                return target;
+                return result;
             }
 
             throw new ArgumentException("Invalid json type.", nameof(value));

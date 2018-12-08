@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
         private readonly IStore<string> store = A.Fake<IStore<string>>();
         private readonly IEventDataFormatter formatter = A.Fake<IEventDataFormatter>();
-        private readonly EventData eventData = new EventData();
+        private readonly EventData eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
         private readonly Envelope<IEvent> envelope = new Envelope<IEvent>(new MyEvent());
         private readonly EventConsumerGrain sut;
         private readonly string consumerName;
@@ -64,7 +64,10 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             consumerName = eventConsumer.GetType().Name;
 
             A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, consumerName, A<Func<EventConsumerState, Task>>.Ignored))
-                .Invokes(new Action<Type, string, Func<EventConsumerState, Task>>((t, key, a) => apply = a))
+                .Invokes(new Action<Type, string, Func<EventConsumerState, Task>>((t, key, a) =>
+                {
+                    apply = a;
+                }))
                 .Returns(persistence);
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored))
@@ -79,7 +82,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
                 .Invokes(new Action<EventConsumerState>(s => state = s));
 
-            A.CallTo(() => formatter.Parse(eventData, true)).Returns(envelope);
+            A.CallTo(() => formatter.Parse(eventData, null))
+                .Returns(envelope);
 
             sut = new MyEventConsumerGrain(
                 x => eventConsumer,
@@ -192,7 +196,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_ignore_old_events()
         {
-            A.CallTo(() => formatter.Parse(eventData, true))
+            A.CallTo(() => formatter.Parse(eventData, null))
                 .Throws(new TypeNameNotFoundException());
 
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
@@ -326,7 +330,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             var ex = new InvalidOperationException();
 
-            A.CallTo(() => formatter.Parse(eventData, true))
+            A.CallTo(() => formatter.Parse(eventData, null))
                 .Throws(ex);
 
             var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);

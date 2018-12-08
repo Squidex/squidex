@@ -25,6 +25,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 
 namespace Migrate_01
@@ -33,18 +34,21 @@ namespace Migrate_01
     {
         private readonly FieldRegistry fieldRegistry;
         private readonly ILocalCache localCache;
+        private readonly IJsonSerializer serializer;
         private readonly IStore<Guid> store;
         private readonly IEventStore eventStore;
 
         public Rebuilder(
             FieldRegistry fieldRegistry,
             ILocalCache localCache,
+            IJsonSerializer serializer,
             IStore<Guid> store,
             IEventStore eventStore)
         {
             this.fieldRegistry = fieldRegistry;
             this.eventStore = eventStore;
             this.localCache = localCache;
+            this.serializer = serializer;
             this.store = store;
         }
 
@@ -104,7 +108,9 @@ namespace Migrate_01
 
             await eventStore.QueryAsync(async storedEvent =>
             {
-                var id = Guid.Parse(storedEvent.Data.Metadata.Value<string>(CommonHeaders.AggregateId));
+                var headers = storedEvent.Data.Headers;
+
+                var id = headers.AggregateId();
 
                 if (handledIds.Add(id))
                 {

@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup;
@@ -16,6 +15,8 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Shared.Users;
 
@@ -27,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private const string SettingsFile = "Settings.json";
         private readonly IGrainFactory grainFactory;
         private readonly IUserResolver userResolver;
+        private readonly IJsonSerializer serializer;
         private readonly IAppsByNameIndex appsByNameIndex;
         private readonly HashSet<string> contributors = new HashSet<string>();
         private Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
@@ -36,13 +38,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override string Name { get; } = "Apps";
 
-        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver)
+        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver, IJsonSerializer serializer)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(serializer, nameof(serializer));
             Guard.NotNull(userResolver, nameof(userResolver));
 
             this.grainFactory = grainFactory;
-
+            this.serializer = serializer;
             this.userResolver = userResolver;
 
             appsByNameIndex = grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id);
@@ -162,14 +165,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private async Task ReadUsersAsync(BackupReader reader)
         {
-            var json = await reader.ReadJsonAttachmentAsync(UsersFile);
+            var json = await reader.ReadJsonAttachmentAsync<Dictionary<string, string>>(UsersFile);
 
-            usersWithEmail = json.ToObject<Dictionary<string, string>>();
+            usersWithEmail = json;
         }
 
         private async Task WriteUsersAsync(BackupWriter writer)
         {
-            var json = JObject.FromObject(usersWithEmail);
+            var json = usersWithEmail;
 
             await writer.WriteJsonAsync(UsersFile, json);
         }
@@ -183,9 +186,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private async Task ReadSettingsAsync(BackupReader reader, Guid appId)
         {
-            var json = await reader.ReadJsonAttachmentAsync(SettingsFile);
+            var json = await reader.ReadJsonAttachmentAsync<JsonObject>(SettingsFile);
 
-            await grainFactory.GetGrain<IAppUISettingsGrain>(appId).SetAsync((JObject)json);
+            await grainFactory.GetGrain<IAppUISettingsGrain>(appId).SetAsync(json);
         }
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using Squidex.Infrastructure.Security;
 using Xunit;
@@ -16,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public void Should_add_common_permission()
         {
-            var source = new string[0];
+            var source = Array.Empty<string>();
             var result = source.Prefix("my-app");
 
             Assert.Equal(new[] { "squidex.apps.my-app.common" }, result);

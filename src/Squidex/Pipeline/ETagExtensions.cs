@@ -5,8 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
@@ -14,17 +15,59 @@ namespace Squidex.Pipeline
 {
     public static class ETagExtensions
     {
-        public static string ToManyEtag<T>(this IEnumerable<T> items, long total = 0) where T : IGenerateEtag
+        private static readonly int GuidLength = Guid.Empty.ToString().Length;
+
+        public static string ToManyEtag<T>(this IReadOnlyList<T> items, long total = 0) where T : IGenerateEtag
         {
             using (Profiler.Trace("CalculateEtag"))
             {
-                return $"{total}_{string.Join(";", items.Select(x => $"{x.Id}{x.Version}"))}".Sha256Base64();
+                var unhashed = Unhashed(items, total);
+
+                return unhashed.Sha256Base64();
             }
         }
 
-        public static string ToSurrogateKeys<T>(this IEnumerable<T> items) where T : IGenerateEtag
+        private static string Unhashed<T>(IReadOnlyList<T> items, long total) where T : IGenerateEtag
         {
-            return string.Join(" ", items.Select(x => x.Id));
+            var sb = new StringBuilder((items.Count * (GuidLength + 4)) + 10);
+
+            sb.Append(total);
+            sb.Append("_");
+
+            if (items.Count > 0)
+            {
+                sb.Append(items[0].Id.ToString());
+                sb.Append(items[0].Version);
+
+                for (var i = 1; i < items.Count; i++)
+                {
+                    sb.Append(";");
+                    sb.Append(items[i].Id.ToString());
+                    sb.Append(items[i].Version);
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        public static string ToSurrogateKeys<T>(this IReadOnlyList<T> items) where T : IGenerateEtag
+        {
+            if (items.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            var sb = new StringBuilder(items.Count * (GuidLength + 1));
+
+            sb.Append(items[0].Id.ToString());
+
+            for (var i = 1; i < items.Count; i++)
+            {
+                sb.Append(" ");
+                sb.Append(items[i].Id.ToString());
+            }
+
+            return sb.ToString();
         }
 
         public static string ToEtag<T>(this T item) where T : IGenerateEtag

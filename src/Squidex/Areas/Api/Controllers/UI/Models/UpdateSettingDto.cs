@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json.Linq;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Areas.Api.Controllers.UI.Models
 {
@@ -14,6 +14,6 @@ namespace Squidex.Areas.Api.Controllers.UI.Models
         /// <summary>
         /// The value for the setting.
         /// </summary>
-        public JToken Value { get; set; }
+        public IJsonValue Value { get; set; }
     }
 }

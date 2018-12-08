@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 {
     public class JsonSchemaTests
     {
-        private readonly Schema schema = TestData.MixedSchema();
+        private readonly Schema schema = TestUtils.MixedSchema();
 
         [Fact]
         public void Should_build_json_schema()

@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 #pragma warning disable xUnit2013 // Do not use equality check to check for collection size.
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .AddValue("en", 2))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("de", null)
+                            .AddValue("de", JsonValue.Null)
                             .AddValue("en", 4))
                     .AddField("field3",
                         new ContentFieldData()
@@ -57,10 +57,20 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
 
             var expected = new Dictionary<string, object>
             {
-                { "field1", new ContentFieldData().AddValue("de", 1).AddValue("en", 2) },
-                { "field2", new ContentFieldData().AddValue("de", null).AddValue("en", 4) },
-                { "field3", (JValue)6 },
-                { "field4", (JValue)7 }
+                {
+                    "field1",
+                    new ContentFieldData()
+                        .AddValue("de", 1)
+                        .AddValue("en", 2)
+                },
+                {
+                    "field2",
+                    new ContentFieldData()
+                        .AddValue("de", JsonValue.Null)
+                        .AddValue("en", 4)
+                },
+                { "field3", JsonValue.Create(6) },
+                { "field4", JsonValue.Create(7) }
             };
 
             Assert.True(expected.EqualsDictionary(output));
@@ -77,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .AddValue("en", 2))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("de", null)
+                            .AddValue("de", JsonValue.Null)
                             .AddValue("en", 4))
                     .AddField("field3",
                         new ContentFieldData()
@@ -91,13 +101,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                     new LanguageConfig(Language.EN),
                     new LanguageConfig(Language.DE, false, Language.EN));
 
-            var output = (Dictionary<string, JToken>)data.ToFlatLanguageModel(fallbackConfig, new List<Language> { Language.DE });
+            var output = (Dictionary<string, IJsonValue>)data.ToFlatLanguageModel(fallbackConfig, new List<Language> { Language.DE });
 
-            var expected = new Dictionary<string, JToken>
+            var expected = new Dictionary<string, IJsonValue>
             {
-                { "field1", 1 },
-                { "field2", 4 },
-                { "field3", 6 }
+                { "field1", JsonValue.Create(1) },
+                { "field2", JsonValue.Create(4) },
+                { "field3", JsonValue.Create(6) }
             };
 
             Assert.True(expected.EqualsDictionary(output));
@@ -114,7 +124,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                             .AddValue("en", 2))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddValue("de", null)
+                            .AddValue("de", JsonValue.Null)
                             .AddValue("en", 4))
                     .AddField("field3",
                         new ContentFieldData()
@@ -123,13 +133,13 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                         new ContentFieldData()
                             .AddValue("it", 7));
 
-            var output = (Dictionary<string, JToken>)data.ToFlatLanguageModel(languagesConfig, new List<Language> { Language.DE, Language.EN });
+            var output = (Dictionary<string, IJsonValue>)data.ToFlatLanguageModel(languagesConfig, new List<Language> { Language.DE, Language.EN });
 
-            var expected = new Dictionary<string, JToken>
+            var expected = new Dictionary<string, IJsonValue>
             {
-                { "field1", 1 },
-                { "field2", 4 },
-                { "field3", 6 }
+                { "field1", JsonValue.Create(1) },
+                { "field2", JsonValue.Create(4) },
+                { "field3", JsonValue.Create(6) }
             };
 
             Assert.True(expected.EqualsDictionary(output));

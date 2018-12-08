@@ -22,7 +22,8 @@ const DEFAULT_ERRORS: { [key: string]: string } = {
     match: '{message}',
     validdatetime: '{field} is not a valid date time',
     validnumber: '{field} is not a valid number.',
-    validvalues: '{field} is not a valid value.'
+    validvalues: '{field} is not a valid value.',
+    validarrayvalues: '{field} contains an invalid value.'
 };
 
 @Component({

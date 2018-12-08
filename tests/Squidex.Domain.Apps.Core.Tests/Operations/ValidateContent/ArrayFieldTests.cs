@@ -9,8 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new ArrayFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(new JObject()), errors, ValidationTestExtensions.ValidContext);
+            await sut.ValidateAsync(CreateValue(JsonValue.Object()), errors, ValidationTestExtensions.ValidContext);
 
             Assert.Empty(errors);
         }
@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_tags_are_required_and_null()
+        public async Task Should_add_error_if_tags_are_required_and_null()
         {
             var sut = Field(new ArrayFieldProperties { IsRequired = true });
 
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_tags_are_required_and_empty()
+        public async Task Should_add_error_if_tags_are_required_and_empty()
         {
             var sut = Field(new ArrayFieldProperties { IsRequired = true });
 
@@ -70,41 +70,41 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_is_not_valid()
+        public async Task Should_add_error_if_value_is_not_valid()
         {
             var sut = Field(new ArrayFieldProperties());
 
-            await sut.ValidateAsync("invalid", errors);
+            await sut.ValidateAsync(JsonValue.Create("invalid"), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_has_not_enough_items()
+        public async Task Should_add_error_if_value_has_not_enough_items()
         {
             var sut = Field(new ArrayFieldProperties { MinItems = 3 });
 
-            await sut.ValidateAsync(CreateValue(new JObject(), new JObject()), errors);
+            await sut.ValidateAsync(CreateValue(JsonValue.Object(), JsonValue.Object()), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must have at least 3 item(s)." });
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_has_too_much_items()
+        public async Task Should_add_error_if_value_has_too_much_items()
         {
             var sut = Field(new ArrayFieldProperties { MaxItems = 1 });
 
-            await sut.ValidateAsync(CreateValue(new JObject(), new JObject()), errors);
+            await sut.ValidateAsync(CreateValue(JsonValue.Object(), JsonValue.Object()), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must have not more than 1 item(s)." });
         }
 
-        private static JToken CreateValue(params JObject[] ids)
+        private static IJsonValue CreateValue(params JsonObject[] ids)
         {
-            return ids == null ? JValue.CreateNull() : (JToken)new JArray(ids.OfType<object>().ToArray());
+            return ids == null ? (IJsonValue)JsonValue.Null : JsonValue.Array(ids.OfType<object>().ToArray());
         }
 
         private static RootField<ArrayFieldProperties> Field(ArrayFieldProperties properties)

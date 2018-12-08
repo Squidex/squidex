@@ -1,3 +1,58 @@
 <div [formGroup]="editForm">
-    <span>Nothing to setup</span>    
-<div>
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_editorUrl">Editor Url</label>
+
+        <div class="col-6">
+            <input type="text" class="form-control" id="{{field.fieldId}}_editorUrl" formControlName="editorUrl" />
+
+            <small class="form-text text-muted">
+                Url to your plugin if you use a custom editor.
+            </small>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPlaceholder">Placeholder</label>
+
+        <div class="col-6">
+            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPlaceholder" maxlength="100" formControlName="placeholder" />
+
+            <small class="form-text text-muted">
+                Define the placeholder for the input control.
+            </small>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-3 col-form-label">Editor</label>
+
+        <div class="col-9">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Tags'">
+                <input type="radio" class="radio-input" formControlName="editor" value="Tags" />
+
+                <i class="icon-control-Tags"></i>
+
+                <span class="radio-label">Tags</span>
+            </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Dropdown'">
+                <input type="radio" class="radio-input" formControlName="editor" value="Dropdown" />
+
+                <i class="icon-control-Dropdown"></i>
+
+                <span class="radio-label" clas>Dropdown</span>
+            </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Checkboxes'">
+                <input type="radio" class="radio-input" formControlName="editor" value="Checkboxes" />
+
+                <i class="icon-control-Checkboxes"></i>
+
+                <span class="radio-label">Checkboxes</span>
+            </label>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-3 col-form-label">Allowed Values</label>
+
+        <div class="col-6">
+            <sqx-tag-editor formControlName="allowedValues"></sqx-tag-editor>
+        </div>
+    </div>
+</div>

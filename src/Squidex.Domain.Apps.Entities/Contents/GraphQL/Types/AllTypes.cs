@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType Guid = new GuidGraphType2();
 
-        public static readonly IGraphType Date = new DateTimeGraphType();
+        public static readonly IGraphType Date = new InstantGraphType();
 
         public static readonly IGraphType Json = new JsonGraphType();
 

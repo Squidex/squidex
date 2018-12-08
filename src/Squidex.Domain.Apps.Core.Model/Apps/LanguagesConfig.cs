@@ -8,10 +8,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.Apps
     {
         public static readonly LanguagesConfig English = Build(Language.EN);
 
-        private readonly ImmutableDictionary<Language, LanguageConfig> languages;
+        private readonly ArrayDictionary<Language, LanguageConfig> languages;
         private readonly LanguageConfig master;
 
         public LanguageConfig Master
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             get { return languages.Count; }
         }
 
-        private LanguagesConfig(ImmutableDictionary<Language, LanguageConfig> languages, LanguageConfig master, bool checkMaster = true)
+        private LanguagesConfig(ArrayDictionary<Language, LanguageConfig> languages, LanguageConfig master, bool checkMaster = true)
         {
             if (checkMaster)
             {
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNull(configs, nameof(configs));
 
-            return new LanguagesConfig(configs.ToImmutableDictionary(x => x.Language), configs.FirstOrDefault());
+            return new LanguagesConfig(configs.ToArrayDictionary(x => x.Language), configs.FirstOrDefault());
         }
 
         public static LanguagesConfig Build(params LanguageConfig[] configs)
@@ -100,7 +100,12 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNull(config, nameof(config));
 
-            return new LanguagesConfig(languages.SetItem(config.Language, config), Master?.Language == config.Language ? config : Master);
+            var newLanguages =
+                new ArrayDictionary<Language, LanguageConfig>(languages.With(config.Language, config));
+
+            var newMaster = Master?.Language == config.Language ? config : Master;
+
+            return new LanguagesConfig(newLanguages, newMaster);
         }
 
         [Pure]
@@ -114,7 +119,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                         config.Language,
                         config.IsOptional,
                         config.LanguageFallbacks.Except(new[] { language })))
-                    .ToImmutableDictionary(x => x.Language);
+                    .ToArrayDictionary(x => x.Language);
 
             var newMaster =
                 newLanguages.Values.FirstOrDefault(x => x.Language == Master.Language) ??

@@ -18,12 +18,15 @@ pipeline:
     image: docker
     commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker build -t squidex/squidex:dev .
+      - docker build -t squidex/squidex:dev -t squidex/squidex:dev-$BUILD_NUMBER .
       - docker push squidex/squidex:dev
+      - docker push squidex/squidex:dev-$BUILD_NUMBER
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker:/var/lib/docker
     secrets: [ docker_username, docker_password ]
+    environment:
+      - BUILD_NUMBER=${DRONE_BUILD_NUMBER}
     when:
       event: push
       branch: [ master ]

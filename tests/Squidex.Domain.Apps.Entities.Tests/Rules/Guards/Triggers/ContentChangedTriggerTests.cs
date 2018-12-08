@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Immutable;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure.Collections;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
 
             var trigger = new ContentChangedTrigger
             {
-                Schemas = ImmutableList.Create(
+                Schemas = ReadOnlyCollection.Create(
                     new ContentChangedTriggerSchema()
                 )
             };
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
         {
             var trigger = new ContentChangedTrigger
             {
-                Schemas = ImmutableList<ContentChangedTriggerSchema>.Empty
+                Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchema>()
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appId, trigger, appProvider);
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
 
             var trigger = new ContentChangedTrigger
             {
-                Schemas = ImmutableList.Create(
+                Schemas = ReadOnlyCollection.Create(
                     new ContentChangedTriggerSchema()
                 )
             };

@@ -13,6 +13,7 @@ using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
@@ -62,7 +63,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var entities = await appProvider.GetUserApps(userId, userPermissions);
 
-            var response = entities.Select(a => AppDto.FromApp(a, userId, userPermissions, appPlansProvider)).ToList();
+            var response = entities.ToArray(a => AppDto.FromApp(a, userId, userPermissions, appPlansProvider));
 
             Response.Headers["ETag"] = response.ToManyEtag();
 

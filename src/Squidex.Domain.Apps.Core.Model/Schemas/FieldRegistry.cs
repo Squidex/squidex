@@ -42,18 +42,18 @@ namespace Squidex.Domain.Apps.Core.Schemas
             }
         }
 
-        public RootField CreateRootField(long id, string name, Partitioning partitioning, FieldProperties properties)
+        public RootField CreateRootField(long id, string name, Partitioning partitioning, FieldProperties properties, IFieldSettings settings = null)
         {
             CheckProperties(properties);
 
-            return properties.CreateRootField(id, name, partitioning);
+            return properties.CreateRootField(id, name, partitioning, settings);
         }
 
-        public NestedField CreateNestedField(long id, string name, FieldProperties properties)
+        public NestedField CreateNestedField(long id, string name, FieldProperties properties, IFieldSettings settings = null)
         {
             CheckProperties(properties);
 
-            return properties.CreateNestedField(id, name);
+            return properties.CreateNestedField(id, name, settings);
         }
 
         private void CheckProperties(FieldProperties properties)

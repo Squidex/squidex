@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Shared.Users;
@@ -25,10 +25,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 
         public long Version { get; set; }
 
-        [JsonIgnore]
+        [IgnoreDataMember]
         public abstract Guid AggregateId { get; }
 
-        [JsonIgnore]
+        [IgnoreDataMember]
         public IUser User { get; set; }
     }
 }

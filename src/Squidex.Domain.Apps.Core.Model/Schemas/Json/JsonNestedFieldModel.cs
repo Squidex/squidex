@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
-    public sealed class JsonNestedFieldModel
+    public sealed class JsonNestedFieldModel : IFieldSettings
     {
         [JsonProperty]
         public long Id { get; set; }
@@ -25,5 +25,15 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         [JsonProperty]
         public FieldProperties Properties { get; set; }
+
+        public bool IsLocked
+        {
+            get { return false; }
+        }
+
+        public NestedField ToNestedField()
+        {
+            return Properties.CreateNestedField(Id, Name, this);
+        }
     }
 }

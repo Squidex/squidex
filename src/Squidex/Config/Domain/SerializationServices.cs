@@ -9,8 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Migrate_01;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using NodaTime;
-using NodaTime.Serialization.JsonNet;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps.Json;
 using Squidex.Domain.Apps.Core.Rules.Json;
@@ -19,8 +17,8 @@ using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Extensions.Actions;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Config.Domain
 {
@@ -48,18 +46,18 @@ namespace Squidex.Config.Domain
                 new AppContributorsConverter(),
                 new AppPatternsConverter(),
                 new ClaimsPrincipalConverter(),
+                new EnvelopeHeadersConverter(),
                 new InstantConverter(),
+                new JsonValueConverter(),
                 new LanguageConverter(),
                 new LanguagesConfigConverter(),
                 new NamedGuidIdConverter(),
                 new NamedLongIdConverter(),
                 new NamedStringIdConverter(),
-                new PropertiesBagConverter<EnvelopeHeaders>(),
-                new PropertiesBagConverter<PropertiesBag>(),
                 new RefTokenConverter(),
                 new RolesConverter(),
                 new RuleConverter(),
-                new SchemaConverter(FieldRegistry),
+                new SchemaConverter(),
                 new StringEnumConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;
@@ -68,8 +66,6 @@ namespace Squidex.Config.Domain
             settings.DateParseHandling = DateParseHandling.None;
 
             settings.TypeNameHandling = typeNameHandling;
-
-            settings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         }
 
         static SerializationServices()
@@ -85,6 +81,8 @@ namespace Squidex.Config.Domain
             services.AddSingleton(DefaultJsonSettings);
             services.AddSingleton(DefaultJsonSerializer);
             services.AddSingleton(TypeNameRegistry);
+
+            services.AddSingleton<IJsonSerializer>(new NewtonsoftJsonSerializer(DefaultJsonSettings));
 
             return services;
         }

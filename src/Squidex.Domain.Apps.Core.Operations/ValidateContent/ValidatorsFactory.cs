@@ -8,11 +8,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 nestedSchema[nestedField.Name] = (false, new FieldValidator(nestedField.Accept(this).ToArray(), nestedField));
             }
 
-            yield return new CollectionItemValidator(new ObjectValidator<JToken>(nestedSchema, false, "field", JValue.CreateNull()));
+            yield return new CollectionItemValidator(new ObjectValidator<IJsonValue>(nestedSchema, false, "field", JsonValue.Null));
         }
 
         public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field)
@@ -109,7 +109,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             if (field.Properties.AllowedValues != null)
             {
-                yield return new AllowedValuesValidator<double>(field.Properties.AllowedValues.ToArray());
+                yield return new AllowedValuesValidator<double>(field.Properties.AllowedValues);
+            }
+
+            if (field.Properties.IsUnique)
+            {
+                yield return new UniqueValidator();
             }
         }
 
@@ -145,7 +150,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             if (field.Properties.AllowedValues != null)
             {
-                yield return new AllowedValuesValidator<string>(field.Properties.AllowedValues.ToArray());
+                yield return new AllowedValuesValidator<string>(field.Properties.AllowedValues);
+            }
+
+            if (field.Properties.IsUnique)
+            {
+                yield return new UniqueValidator();
             }
         }
 
@@ -154,6 +164,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             if (field.Properties.IsRequired || field.Properties.MinItems.HasValue || field.Properties.MaxItems.HasValue)
             {
                 yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
+            }
+
+            if (field.Properties.AllowedValues != null)
+            {
+                yield return new CollectionItemValidator(new AllowedValuesValidator<string>(field.Properties.AllowedValues));
             }
 
             yield return new CollectionItemValidator(new RequiredStringValidator());

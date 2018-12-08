@@ -8,8 +8,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new GeolocationFieldProperties());
 
-            await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
+            await sut.ValidateAsync(JsonValue.Null, errors);
 
             Assert.Empty(errors);
         }
@@ -41,75 +41,70 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new GeolocationFieldProperties());
 
-            var geolocation = new JObject(
-                new JProperty("latitude", 0),
-                new JProperty("longitude", 0));
+            var geolocation = JsonValue.Object()
+                .Add("latitude", 0)
+                .Add("longitude", 0);
 
-            await sut.ValidateAsync(CreateValue(geolocation), errors);
+            await sut.ValidateAsync(geolocation, errors);
 
             Assert.Empty(errors);
         }
 
         [Fact]
-        public async Task Should_add_errors_if_geolocation_has_invalid_latitude()
+        public async Task Should_add_error_if_geolocation_has_invalid_latitude()
         {
             var sut = Field(new GeolocationFieldProperties { IsRequired = true });
 
-            var geolocation = new JObject(
-                new JProperty("latitude", 200),
-                new JProperty("longitude", 0));
+            var geolocation = JsonValue.Object()
+                .Add("latitude", 200)
+                .Add("longitude", 0);
 
-            await sut.ValidateAsync(CreateValue(geolocation), errors);
+            await sut.ValidateAsync(geolocation, errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
         }
 
         [Fact]
-        public async Task Should_add_errors_if_geolocation_has_invalid_longitude()
+        public async Task Should_add_error_if_geolocation_has_invalid_longitude()
         {
             var sut = Field(new GeolocationFieldProperties { IsRequired = true });
 
-            var geolocation = new JObject(
-                new JProperty("latitude", 0),
-                new JProperty("longitude", 200));
+            var geolocation = JsonValue.Object()
+                .Add("latitude", 0)
+                .Add("longitude", 200);
 
-            await sut.ValidateAsync(CreateValue(geolocation), errors);
+            await sut.ValidateAsync(geolocation, errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
         }
 
         [Fact]
-        public async Task Should_add_errors_if_geolocation_has_too_many_properties()
+        public async Task Should_add_error_if_geolocation_has_too_many_properties()
         {
             var sut = Field(new GeolocationFieldProperties { IsRequired = true });
 
-            var geolocation = new JObject(
-                new JProperty("invalid", 0),
-                new JProperty("latitude", 0),
-                new JProperty("longitude", 0));
+            var geolocation = JsonValue.Object()
+                .Add("invalid", 0)
+                .Add("latitude", 0)
+                .Add("longitude", 0);
 
-            await sut.ValidateAsync(CreateValue(geolocation), errors);
+            await sut.ValidateAsync(geolocation, errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
         }
 
         [Fact]
-        public async Task Should_add_errors_if_geolocation_is_required()
+        public async Task Should_add_error_if_geolocation_is_required()
         {
             var sut = Field(new GeolocationFieldProperties { IsRequired = true });
 
-            await sut.ValidateAsync(CreateValue(JValue.CreateNull()), errors);
+            await sut.ValidateAsync(JsonValue.Null, errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
-        }
-
-        private static JToken CreateValue(JToken v)
-        {
-            return v;
         }
 
         private static RootField<GeolocationFieldProperties> Field(GeolocationFieldProperties properties)

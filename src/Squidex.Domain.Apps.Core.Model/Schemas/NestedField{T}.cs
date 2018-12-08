@@ -25,12 +25,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return properties; }
         }
 
-        public NestedField(long id, string name, T properties)
-            : base(id, name)
+        public NestedField(long id, string name, T properties = null, IFieldSettings settings = null)
+            : base(id, name, settings)
         {
-            Guard.NotNull(properties, nameof(properties));
-
-            SetProperties(properties);
+            SetProperties(properties ?? new T());
         }
 
         [Pure]

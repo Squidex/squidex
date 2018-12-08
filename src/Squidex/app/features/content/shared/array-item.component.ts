@@ -28,11 +28,29 @@ export class ArrayItemComponent implements OnChanges {
     @Output()
     public removing = new EventEmitter();
 
+    @Output()
+    public moving = new EventEmitter<number>();
+
+    @Output()
+    public cloning = new EventEmitter();
+
+    @Output()
+    public toggle = new EventEmitter<boolean>();
+
     @Input()
     public form: EditContentForm;
 
     @Input()
     public field: RootFieldDto;
+
+    @Input()
+    public isHidden = false;
+
+    @Input()
+    public isFirst = false;
+
+    @Input()
+    public isLast = false;
 
     @Input()
     public index: number;
@@ -58,5 +76,21 @@ export class ArrayItemComponent implements OnChanges {
         if (changes['itemForm'] || changes['field']) {
             this.fieldControls = this.field.nested.map(field => ({ field, control: this.itemForm.get(field.name)! })).filter(x => !!x.control);
         }
+    }
+
+    public moveTop() {
+        this.moving.emit(0);
+    }
+
+    public moveUp() {
+        this.moving.emit(this.index - 1);
+    }
+
+    public moveDown() {
+        this.moving.emit(this.index + 1);
+    }
+
+    public moveBottom() {
+        this.moving.emit(99999);
     }
 }

@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Triggers;
@@ -17,6 +16,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         {
             var trigger = new ContentChangedTrigger
             {
-                Schemas = ImmutableList.Create(
+                Schemas = ReadOnlyCollection.Create(
                     new ContentChangedTriggerSchema
                     {
                         SendCreate = sendCreate == 1,

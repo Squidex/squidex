@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
@@ -14,6 +15,11 @@ namespace Squidex.Infrastructure.Diagnostics
     public sealed class MongoDBHealthCheck : IHealthCheck
     {
         private readonly IMongoDatabase mongoDatabase;
+
+        public IEnumerable<string> Scopes
+        {
+            get { yield return HealthCheckScopes.Node; }
+        }
 
         public MongoDBHealthCheck(IMongoDatabase mongoDatabase)
         {

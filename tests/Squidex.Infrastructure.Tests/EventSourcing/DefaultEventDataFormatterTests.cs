@@ -7,9 +7,7 @@
 
 using System;
 using System.Linq;
-using Newtonsoft.Json;
 using NodaTime;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -27,18 +25,16 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings();
-        private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private readonly DefaultEventDataFormatter sut;
 
         public DefaultEventDataFormatterTests()
         {
-            serializerSettings.Converters.Add(new PropertiesBagConverter<EnvelopeHeaders>());
+            var typeNameRegistry =
+                new TypeNameRegistry()
+                    .Map(typeof(MyEvent), "Event")
+                    .Map(typeof(MyOldEvent), "OldEvent");
 
-            typeNameRegistry.Map(typeof(MyEvent), "Event");
-            typeNameRegistry.Map(typeof(MyOldEvent), "OldEvent");
-
-            sut = new DefaultEventDataFormatter(typeNameRegistry, JsonSerializer.Create(serializerSettings));
+            sut = new DefaultEventDataFormatter(typeNameRegistry, JsonHelper.CreateSerializer(typeNameRegistry));
         }
 
         [Fact]
@@ -92,9 +88,9 @@ namespace Squidex.Infrastructure.EventSourcing
             Assert.Equal(inputEvent.Payload.MyProperty, outputEvent.Payload.MyProperty);
         }
 
-        private static void AssertHeaders(PropertiesBag lhs, PropertiesBag rhs)
+        private static void AssertHeaders(EnvelopeHeaders lhs, EnvelopeHeaders rhs)
         {
-            foreach (var key in lhs.PropertyNames.Concat(rhs.PropertyNames).Distinct())
+            foreach (var key in lhs.Keys.Concat(rhs.Keys).Distinct())
             {
                 Assert.Equal(lhs[key].ToString(), rhs[key].ToString());
             }

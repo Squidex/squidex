@@ -10,11 +10,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
@@ -27,15 +27,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private static readonly Regex ContentDataPlaceholderOld = new Regex(@"^CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}", RegexOptions.Compiled);
         private static readonly Regex ContentDataPlaceholderNew = new Regex(@"^\{CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}\}", RegexOptions.Compiled);
         private readonly List<(char[] Pattern, Func<EnrichedEvent, string> Replacer)> patterns = new List<(char[] Pattern, Func<EnrichedEvent, string> Replacer)>();
-        private readonly JsonSerializer serializer;
+        private readonly IJsonSerializer jsonSerializer;
         private readonly IRuleUrlGenerator urlGenerator;
 
-        public RuleEventFormatter(JsonSerializer serializer, IRuleUrlGenerator urlGenerator)
+        public RuleEventFormatter(IJsonSerializer jsonSerializer, IRuleUrlGenerator urlGenerator)
         {
-            Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
 
-            this.serializer = serializer;
+            this.jsonSerializer = jsonSerializer;
             this.urlGenerator = urlGenerator;
 
             AddPattern("APP_ID", AppId);
@@ -55,17 +55,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             patterns.Add((placeholder.ToCharArray(), generator));
         }
 
-        public virtual JObject ToPayload<T>(T @event)
+        public virtual string ToPayload<T>(T @event)
         {
-            return JObject.FromObject(@event, serializer);
+            return jsonSerializer.Serialize(@event);
         }
 
-        public virtual JObject ToEnvelope(EnrichedEvent @event)
+        public virtual string ToEnvelope(EnrichedEvent @event)
         {
-            return new JObject(
-                new JProperty("type", @event.Name),
-                new JProperty("payload", ToPayload(@event)),
-                new JProperty("timestamp", @event.Timestamp.ToString()));
+            return jsonSerializer.Serialize(new { type = @event.Name, payload = @event, timestamp = @event.Timestamp });
         }
 
         public string Format(string text, EnrichedEvent @event)
@@ -264,14 +261,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             for (var j = 2; j < path.Length; j++)
             {
-                if (value is JObject obj && obj.TryGetValue(path[j], out value))
+                if (value is JsonObject obj && obj.TryGetValue(path[j], out value))
                 {
                     continue;
                 }
 
-                if (value is JArray arr && int.TryParse(path[j], out var idx) && idx >= 0 && idx < arr.Count)
+                if (value is JsonArray array && int.TryParse(path[j], out var idx) && idx >= 0 && idx < array.Count)
                 {
-                    value = arr[idx];
+                    value = array[idx];
                 }
                 else
                 {
@@ -279,17 +276,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
             }
 
-            if (value == null || value.Type == JTokenType.Null || value.Type == JTokenType.Undefined)
+            if (value == null || value.Type == JsonValueType.Null)
             {
                 return Undefined;
             }
 
-            if (value is JValue jValue)
-            {
-                return jValue.Value.ToString();
-            }
-
-            return value.ToString(Formatting.Indented) ?? Undefined;
+            return value.ToString() ?? Undefined;
         }
     }
 }

@@ -27,11 +27,15 @@ namespace Squidex.Infrastructure.UsageTracking
 
         public Task<IReadOnlyDictionary<string, IReadOnlyList<DateUsage>>> QueryAsync(string key, DateTime fromDate, DateTime toDate)
         {
+            Guard.NotNull(key, nameof(key));
+
             return inner.QueryAsync(key, fromDate, toDate);
         }
 
         public Task TrackAsync(string key, string category, double weight, double elapsedMs)
         {
+            Guard.NotNull(key, nameof(key));
+
             return inner.TrackAsync(key, category, weight, elapsedMs);
         }
 

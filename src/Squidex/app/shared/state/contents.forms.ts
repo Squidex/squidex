@@ -250,6 +250,12 @@ export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorF
             validators.push(Validators.maxLength(properties.maxItems));
         }
 
+        if (properties.allowedValues && properties.allowedValues.length > 0) {
+            const values: (string | null)[] = properties.allowedValues;
+
+            validators.push(ValidatorsEx.validArrayValues(values));
+        }
+
         return validators;
     }
 
@@ -368,24 +374,33 @@ export class EditContentForm extends Form<FormGroup> {
         this.findArrayItemForm(field, language).removeAt(index);
     }
 
-    public insertArrayItem(field: RootFieldDto, language: AppLanguageDto) {
+    public insertArrayItem(field: RootFieldDto, language: AppLanguageDto, source?: FormGroup) {
         if (field.nested.length > 0) {
             const formControl = this.findArrayItemForm(field, language);
 
-            this.addArrayItem(field, language, formControl);
+            this.addArrayItem(field, language, formControl, source);
         }
     }
 
-    private addArrayItem(field: RootFieldDto, language: AppLanguageDto | null, partitionForm: FormArray) {
+    private addArrayItem(field: RootFieldDto, language: AppLanguageDto | null, partitionForm: FormArray, source?: FormGroup) {
         const itemForm = new FormGroup({});
 
         let isOptional = field.isLocalizable && !!language && language.isOptional;
 
         for (let nested of field.nested) {
             const nestedValidators = FieldValidatorsFactory.createValidators(nested, isOptional);
-            const nestedDefault = FieldDefaultValue.get(nested);
 
-            itemForm.setControl(nested.name, new FormControl(nestedDefault, nestedValidators));
+            let value = FieldDefaultValue.get(nested);
+
+            if (source) {
+                const sourceField = source.get(nested.name);
+
+                if (sourceField) {
+                    value = sourceField.value;
+                }
+            }
+
+            itemForm.setControl(nested.name, new FormControl(value, nestedValidators));
         }
 
         partitionForm.push(itemForm);

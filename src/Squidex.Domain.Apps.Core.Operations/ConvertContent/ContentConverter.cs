@@ -7,13 +7,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent
 {
@@ -41,11 +40,11 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             return result;
         }
 
-        private static void AppendText(JToken value, StringBuilder stringBuilder, int maxFieldLength, string separator, bool allowObjects)
+        private static void AppendText(IJsonValue value, StringBuilder stringBuilder, int maxFieldLength, string separator, bool allowObjects)
         {
-            if (value?.Type == JTokenType.String)
+            if (value.Type == JsonValueType.String)
             {
-                var text = ((JValue)value).ToString(CultureInfo.InvariantCulture);
+                var text = value.ToString();
 
                 if (text.Length <= maxFieldLength)
                 {
@@ -57,18 +56,18 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                     stringBuilder.Append(text);
                 }
             }
-            else if (value?.Type == JTokenType.Array)
+            else if (value is JsonArray array)
             {
-                foreach (var item in value)
+                foreach (var item in array)
                 {
                     AppendText(item, stringBuilder, maxFieldLength, separator, true);
                 }
             }
-            else if (value?.Type == JTokenType.Object && allowObjects)
+            else if (value is JsonObject obj && allowObjects)
             {
-                foreach (JProperty property in value)
+                foreach (var item in obj.Values)
                 {
-                    AppendText(property.Value, stringBuilder, maxFieldLength, separator, true);
+                    AppendText(item, stringBuilder, maxFieldLength, separator, true);
                 }
             }
         }

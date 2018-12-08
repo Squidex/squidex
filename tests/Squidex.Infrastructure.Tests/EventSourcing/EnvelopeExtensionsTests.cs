@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Globalization;
 using NodaTime;
 using Xunit;
 
@@ -15,17 +14,16 @@ namespace Squidex.Infrastructure.EventSourcing
     public class EnvelopeExtensionsTests
     {
         private readonly Envelope<string> sut = new Envelope<string>(string.Empty);
-        private readonly CultureInfo culture = CultureInfo.InvariantCulture;
 
         [Fact]
         public void Should_set_and_get_timestamp()
         {
-            var timestamp = SystemClock.Instance.GetCurrentInstant();
+            var timestamp = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
 
             sut.SetTimestamp(timestamp);
 
             Assert.Equal(timestamp, sut.Headers.Timestamp());
-            Assert.Equal(timestamp, sut.Headers["Timestamp"].ToInstant(culture));
+            Assert.Equal(timestamp, sut.Headers.GetInstant("Timestamp"));
         }
 
         [Fact]
@@ -36,7 +34,7 @@ namespace Squidex.Infrastructure.EventSourcing
             sut.SetCommitId(commitId);
 
             Assert.Equal(commitId, sut.Headers.CommitId());
-            Assert.Equal(commitId, sut.Headers["CommitId"].ToGuid(culture));
+            Assert.Equal(commitId, sut.Headers.GetGuid("CommitId"));
         }
 
         [Fact]
@@ -47,7 +45,7 @@ namespace Squidex.Infrastructure.EventSourcing
             sut.SetEventId(commitId);
 
             Assert.Equal(commitId, sut.Headers.EventId());
-            Assert.Equal(commitId, sut.Headers["EventId"].ToGuid(culture));
+            Assert.Equal(commitId, sut.Headers.GetGuid("EventId"));
         }
 
         [Fact]
@@ -58,7 +56,7 @@ namespace Squidex.Infrastructure.EventSourcing
             sut.SetAggregateId(commitId);
 
             Assert.Equal(commitId, sut.Headers.AggregateId());
-            Assert.Equal(commitId, sut.Headers["AggregateId"].ToGuid(culture));
+            Assert.Equal(commitId, sut.Headers.GetGuid("AggregateId"));
         }
 
         [Fact]
@@ -80,7 +78,7 @@ namespace Squidex.Infrastructure.EventSourcing
             sut.SetEventStreamNumber(eventStreamNumber);
 
             Assert.Equal(eventStreamNumber, sut.Headers.EventStreamNumber());
-            Assert.Equal(eventStreamNumber, sut.Headers["EventStreamNumber"].ToInt64(culture));
+            Assert.Equal(eventStreamNumber, sut.Headers.GetLong("EventStreamNumber"));
         }
     }
 }

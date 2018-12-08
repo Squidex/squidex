@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public abstract FieldProperties RawProperties { get; }
 
-        protected RootField(long id, string name, Partitioning partitioning)
+        protected RootField(long id, string name, Partitioning partitioning, IFieldSettings settings = null)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
             Guard.GreaterThan(id, 0, nameof(id));
@@ -61,6 +61,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
             fieldName = name;
 
             this.partitioning = partitioning;
+
+            if (settings != null)
+            {
+                isLocked = settings.IsLocked;
+                isHidden = settings.IsHidden;
+                isDisabled = settings.IsDisabled;
+            }
         }
 
         [Pure]

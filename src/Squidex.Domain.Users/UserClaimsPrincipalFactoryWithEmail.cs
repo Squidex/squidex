@@ -11,11 +11,15 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Security;
+using Squidex.Shared;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Users
 {
     public sealed class UserClaimsPrincipalFactoryWithEmail : UserClaimsPrincipalFactory<IdentityUser, IdentityRole>
     {
+        private const string AdministratorRole = "ADMINISTRATOR";
+
         public UserClaimsPrincipalFactoryWithEmail(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<IdentityOptions> optionsAccessor)
             : base(userManager, roleManager, optionsAccessor)
         {
@@ -25,7 +29,14 @@ namespace Squidex.Domain.Users
         {
             var principal = await base.CreateAsync(user);
 
-            principal.Identities.First().AddClaim(new Claim(OpenIdClaims.Email, await UserManager.GetEmailAsync(user)));
+            var identity = principal.Identities.First();
+
+            identity.AddClaim(new Claim(OpenIdClaims.Email, await UserManager.GetEmailAsync(user)));
+
+            if (await UserManager.IsInRoleAsync(user, AdministratorRole))
+            {
+                identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.Admin));
+            }
 
             return principal;
         }

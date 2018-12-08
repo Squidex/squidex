@@ -26,10 +26,15 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 
             if (query.Filter != null)
             {
-                return (FilterVisitor<T>.Visit(query.Filter), true);
+                return (query.Filter.BuildFilter<T>(), true);
             }
 
             return (null, false);
+        }
+
+        public static FilterDefinition<T> BuildFilter<T>(this FilterNode filterNode)
+        {
+            return FilterVisitor<T>.Visit(filterNode);
         }
     }
 }

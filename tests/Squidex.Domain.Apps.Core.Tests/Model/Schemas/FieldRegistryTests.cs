@@ -28,12 +28,12 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                 return default(T);
             }
 
-            public override RootField CreateRootField(long id, string name, Partitioning partitioning)
+            public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings settings = null)
             {
                 return null;
             }
 
-            public override NestedField CreateNestedField(long id, string name)
+            public override NestedField CreateNestedField(long id, string name, IFieldSettings settings = null)
             {
                 return null;
             }

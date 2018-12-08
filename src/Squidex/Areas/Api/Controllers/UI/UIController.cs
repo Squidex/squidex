@@ -14,6 +14,7 @@ using Squidex.Config;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Extensions.Actions.Twitter;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.UI
@@ -55,9 +56,10 @@ namespace Squidex.Areas.Api.Controllers.UI
         {
             var result = await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).GetAsync();
 
-            result.Value["mapType"] = uiOptions.Map?.Type ?? "OSM";
-            result.Value["mapKey"] = uiOptions.Map?.GoogleMaps?.Key;
-            result.Value["supportTwitterAction"] = twitterOptions.IsConfigured();
+            result.Value.Add("mapType", uiOptions.Map?.Type ?? "OSM");
+            result.Value.Add("mapKey", uiOptions.Map?.GoogleMaps?.Key);
+
+            result.Value.Add("supportTwitterAction", twitterOptions.IsConfigured());
 
             return Ok(result.Value);
         }
@@ -77,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> PutSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
-            await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).SetAsync(key, request.Value);
+            await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).SetAsync(key, request.Value.AsJ());
 
             return NoContent();
         }

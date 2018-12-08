@@ -9,23 +9,19 @@ using System.Collections.Generic;
 
 namespace Squidex.Infrastructure.Caching
 {
-    public sealed class LRUCache
+    public sealed class LRUCache<TKey, TValue>
     {
-        private readonly Dictionary<object, LinkedListNode<LRUCacheItem>> cacheMap = new Dictionary<object, LinkedListNode<LRUCacheItem>>();
-        private readonly LinkedList<LRUCacheItem> cacheHistory = new LinkedList<LRUCacheItem>();
+        private readonly Dictionary<TKey, LinkedListNode<LRUCacheItem<TKey, TValue>>> cacheMap = new Dictionary<TKey, LinkedListNode<LRUCacheItem<TKey, TValue>>>();
+        private readonly LinkedList<LRUCacheItem<TKey, TValue>> cacheHistory = new LinkedList<LRUCacheItem<TKey, TValue>>();
         private readonly int capacity;
 
         public LRUCache(int capacity)
         {
-            Guard.GreaterThan(capacity, 0, nameof(capacity));
-
             this.capacity = capacity;
         }
 
-        public bool Set(object key, object value)
+        public bool Set(TKey key, TValue value)
         {
-            Guard.NotNull(key, nameof(key));
-
             if (cacheMap.TryGetValue(key, out var node))
             {
                 node.Value.Value = value;
@@ -37,28 +33,24 @@ namespace Squidex.Infrastructure.Caching
 
                 return true;
             }
-            else
+
+            if (cacheMap.Count >= capacity)
             {
-                if (cacheMap.Count >= capacity)
-                {
-                    RemoveFirst();
-                }
-
-                var cacheItem = new LRUCacheItem { Key = key, Value = value };
-
-                node = new LinkedListNode<LRUCacheItem>(cacheItem);
-
-                cacheMap.Add(key, node);
-                cacheHistory.AddLast(node);
-
-                return false;
+                RemoveFirst();
             }
+
+            var cacheItem = new LRUCacheItem<TKey, TValue> { Key = key, Value = value };
+
+            node = new LinkedListNode<LRUCacheItem<TKey, TValue>>(cacheItem);
+
+            cacheMap.Add(key, node);
+            cacheHistory.AddLast(node);
+
+            return false;
         }
 
-        public bool Remove(object key)
+        public bool Remove(TKey key)
         {
-            Guard.NotNull(key, nameof(key));
-
             if (cacheMap.TryGetValue(key, out var node))
             {
                 cacheMap.Remove(key);
@@ -70,10 +62,8 @@ namespace Squidex.Infrastructure.Caching
             return false;
         }
 
-        public bool TryGetValue(object key, out object value)
+        public bool TryGetValue(TKey key, out object value)
         {
-            Guard.NotNull(key, nameof(key));
-
             value = null;
 
             if (cacheMap.TryGetValue(key, out var node))
@@ -89,10 +79,8 @@ namespace Squidex.Infrastructure.Caching
             return false;
         }
 
-        public bool Contains(object key)
+        public bool Contains(TKey key)
         {
-            Guard.NotNull(key, nameof(key));
-
             return cacheMap.ContainsKey(key);
         }
 

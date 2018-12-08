@@ -8,8 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Infrastructure.Json.Objects;
+
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLExecutionContext : QueryExecutionContext
@@ -25,29 +26,29 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             UrlGenerator = urlGenerator;
         }
 
-        public Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(JToken value)
+        public Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(IJsonValue value)
         {
             var ids = ParseIds(value);
 
             return GetReferencedAssetsAsync(ids);
         }
 
-        public Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, JToken value)
+        public Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, IJsonValue value)
         {
             var ids = ParseIds(value);
 
             return GetReferencedContentsAsync(schemaId, ids);
         }
 
-        private static ICollection<Guid> ParseIds(JToken value)
+        private static ICollection<Guid> ParseIds(IJsonValue value)
         {
             try
             {
                 var result = new List<Guid>();
 
-                if (value is JArray)
+                if (value is JsonArray array)
                 {
-                    foreach (var id in value)
+                    foreach (var id in array)
                     {
                         result.Add(Guid.Parse(id.ToString()));
                     }

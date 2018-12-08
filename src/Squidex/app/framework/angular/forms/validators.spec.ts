@@ -101,6 +101,30 @@ describe('ValidatorsEx.validValues', () => {
     });
 });
 
+describe('ValidatorsEx.validArrayValues', () => {
+    it('should return null validator if values not defined', () => {
+        const validator = ValidatorsEx.validArrayValues(null!);
+
+        expect(validator).toBe(Validators.nullValidator);
+    });
+
+    it('should return null if value is in allowed values', () => {
+        const input = new FormControl([10, 20]);
+
+        const error = ValidatorsEx.validArrayValues([10, 20, 30])(input);
+
+        expect(error).toBeNull();
+    });
+
+    it('should return error if value is not in allowed values', () => {
+        const input = new FormControl([50]);
+
+        const error = <any>ValidatorsEx.validArrayValues([10, 20, 30])(input);
+
+        expect(error.validarrayvalues).toBeDefined();
+    });
+});
+
 describe('ValidatorsEx.match', () => {
     it('should revalidate if other control changes', () => {
         const validator = ValidatorsEx.match('password', 'Passwords are not the same.');

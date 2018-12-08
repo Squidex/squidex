@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         [MemberData(nameof(FieldProperties))]
         public void Should_freeze_field_properties(FieldProperties action)
         {
-            TestData.TestFreeze(action);
+            TestUtils.TestFreeze(action);
         }
     }
 }

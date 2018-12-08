@@ -54,11 +54,11 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DefaultUserResolver>()
                 .As<IUserResolver>();
 
-            services.AddSingletonAs<DefaultXmlRepository>()
-                .As<IXmlRepository>();
-
             services.AddSingletonAs<AssetUserPictureStore>()
                 .As<IUserPictureStore>();
+
+            services.AddSingletonAs<DefaultXmlRepository>()
+                .As<IXmlRepository>();
 
             services.AddTransient(typeof(Lazy<>), typeof(Lazier<>));
         }

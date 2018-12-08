@@ -32,6 +32,7 @@ namespace Squidex.Domain.Users.MongoDb
         IUserLoginStore<IdentityUser>,
         IUserPasswordStore<IdentityUser>,
         IUserPhoneNumberStore<IdentityUser>,
+        IUserRoleStore<IdentityUser>,
         IUserSecurityStampStore<IdentityUser>,
         IUserTwoFactorStore<IdentityUser>,
         IUserTwoFactorRecoveryCodeStore<IdentityUser>,

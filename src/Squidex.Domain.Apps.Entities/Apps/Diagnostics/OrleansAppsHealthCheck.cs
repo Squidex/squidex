@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Orleans;
@@ -18,6 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
     public sealed class OrleansAppsHealthCheck : IHealthCheck
     {
         private readonly IAppsByNameIndex index;
+
+        public IEnumerable<string> Scopes
+        {
+            get { yield return HealthCheckScopes.Cluster; }
+        }
 
         public OrleansAppsHealthCheck(IGrainFactory grainFactory)
         {

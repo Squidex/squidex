@@ -31,16 +31,23 @@ namespace Squidex.Areas.OrleansDashboard.Middlewares
         {
             var authentication = await context.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            if (!authentication.Succeeded || !authentication.Principal.Permissions().Allows(OrleansPermissions))
+            if (authentication.Succeeded)
+            {
+                if (authentication.Principal.Permissions().Allows(OrleansPermissions))
+                {
+                    await next(context);
+                }
+                else
+                {
+                    context.Response.StatusCode = 403;
+                }
+            }
+            else
             {
                 await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
                 {
                     RedirectUri = context.Request.PathBase + context.Request.Path
                 });
-            }
-            else
-            {
-                await next(context);
             }
         }
     }

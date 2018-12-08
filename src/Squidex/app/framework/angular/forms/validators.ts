@@ -125,6 +125,26 @@ export module ValidatorsEx {
         };
     }
 
+    export function validArrayValues<T>(values: T[]): ValidatorFn {
+        if (!values) {
+            return Validators.nullValidator;
+        }
+
+        return (control: AbstractControl) => {
+            const ns: T[] = control.value;
+
+            if (ns) {
+                for (let n of ns) {
+                    if (values.indexOf(n) < 0) {
+                        return { validarrayvalues: false };
+                    }
+                }
+            }
+
+            return null;
+        };
+    }
+
     export function noop(): ValidatorFn {
         return () => {
             return null;

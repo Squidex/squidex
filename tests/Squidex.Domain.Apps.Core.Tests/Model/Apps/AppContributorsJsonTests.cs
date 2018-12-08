@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using FluentAssertions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Xunit;
 
@@ -15,8 +13,6 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
 {
     public class AppContributorsJsonTests
     {
-        private readonly JsonSerializer serializer = TestData.DefaultSerializer();
-
         [Fact]
         public void Should_serialize_and_deserialize()
         {
@@ -26,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             contributors = contributors.Assign("2", Role.Editor);
             contributors = contributors.Assign("3", Role.Owner);
 
-            var serialized = JToken.FromObject(contributors, serializer).ToObject<AppContributors>(serializer);
+            var serialized = contributors.SerializeAndDeserialize();
 
             serialized.Should().BeEquivalentTo(contributors);
         }

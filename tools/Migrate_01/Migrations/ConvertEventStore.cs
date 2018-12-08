@@ -12,7 +12,6 @@ using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Migrate_01.Migrations
 {

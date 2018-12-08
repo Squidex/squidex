@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -19,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
         /// The available plans.
         /// </summary>
         [Required]
-        public List<PlanDto> Plans { get; set; }
+        public PlanDto[] Plans { get; set; }
 
         /// <summary>
         /// The current plan id.
@@ -43,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Plans.Models
             var response = new AppPlansDto
             {
                 CurrentPlanId = planId,
-                Plans = plans.GetAvailablePlans().Select(PlanDto.FromPlan).ToList(),
+                Plans = plans.GetAvailablePlans().Select(PlanDto.FromPlan).ToArray(),
                 PlanOwner = app.Plan?.Owner.Identifier,
                 HasPortal = hasPortal
             };

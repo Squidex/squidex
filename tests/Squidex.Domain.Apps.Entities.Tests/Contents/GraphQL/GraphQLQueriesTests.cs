@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Xunit;
@@ -77,9 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         {
                             id = asset.Id,
                             version = 1,
-                            created = asset.Created.ToDateTimeUtc(),
+                            created = asset.Created,
                             createdBy = "subject:user1",
-                            lastModified = asset.LastModified.ToDateTimeUtc(),
+                            lastModified = asset.LastModified,
                             lastModifiedBy = "subject:user2",
                             url = $"assets/{asset.Id}",
                             thumbnailUrl = $"assets/{asset.Id}?width=100",
@@ -147,9 +146,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             {
                                 id = asset.Id,
                                 version = 1,
-                                created = asset.Created.ToDateTimeUtc(),
+                                created = asset.Created,
                                 createdBy = "subject:user1",
-                                lastModified = asset.LastModified.ToDateTimeUtc(),
+                                lastModified = asset.LastModified,
                                 lastModifiedBy = "subject:user2",
                                 url = $"assets/{asset.Id}",
                                 thumbnailUrl = $"assets/{asset.Id}?width=100",
@@ -211,9 +210,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         id = asset.Id,
                         version = 1,
-                        created = asset.Created.ToDateTimeUtc(),
+                        created = asset.Created,
                         createdBy = "subject:user1",
-                        lastModified = asset.LastModified.ToDateTimeUtc(),
+                        lastModified = asset.LastModified,
                         lastModifiedBy = "subject:user2",
                         url = $"assets/{asset.Id}",
                         thumbnailUrl = $"assets/{asset.Id}?width=100",
@@ -298,9 +297,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         {
                             id = content.Id,
                             version = 1,
-                            created = content.Created.ToDateTimeUtc(),
+                            created = content.Created,
                             createdBy = "subject:user1",
-                            lastModified = content.LastModified.ToDateTimeUtc(),
+                            lastModified = content.LastModified,
                             lastModifiedBy = "subject:user2",
                             status = "DRAFT",
                             url = $"contents/my-schema/{content.Id}",
@@ -320,7 +319,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 },
                                 myDatetime = new
                                 {
-                                    iv = content.LastModified.ToDateTimeUtc()
+                                    iv = content.LastModified
                                 },
                                 myJson = new
                                 {
@@ -440,9 +439,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             {
                                 id = content.Id,
                                 version = 1,
-                                created = content.Created.ToDateTimeUtc(),
+                                created = content.Created,
                                 createdBy = "subject:user1",
-                                lastModified = content.LastModified.ToDateTimeUtc(),
+                                lastModified = content.LastModified,
                                 lastModifiedBy = "subject:user2",
                                 status = "DRAFT",
                                 url = $"contents/my-schema/{content.Id}",
@@ -462,7 +461,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                     },
                                     myDatetime = new
                                     {
-                                        iv = content.LastModified.ToDateTimeUtc()
+                                        iv = content.LastModified
                                     },
                                     myJson = new
                                     {
@@ -560,9 +559,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     {
                         id = content.Id,
                         version = 1,
-                        created = content.Created.ToDateTimeUtc(),
+                        created = content.Created,
                         createdBy = "subject:user1",
-                        lastModified = content.LastModified.ToDateTimeUtc(),
+                        lastModified = content.LastModified,
                         lastModifiedBy = "subject:user2",
                         status = "DRAFT",
                         url = $"contents/my-schema/{content.Id}",
@@ -582,7 +581,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             },
                             myDatetime = new
                             {
-                                iv = content.LastModified.ToDateTimeUtc()
+                                iv = content.LastModified
                             },
                             myJson = new
                             {
@@ -819,9 +818,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
-            var json = JToken.FromObject(result);
+            var json = serializer.Serialize(result);
 
-            Assert.Null(json["data"]);
+            Assert.Contains("\"data\":null", json);
         }
 
         private QueryContext MatchsAssetContext()

@@ -243,6 +243,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public IEnumerable<ValidationError> Visit(TagsFieldProperties properties)
         {
+            if (!properties.Editor.IsEnumValue())
+            {
+                yield return new ValidationError("Editor is not a valid value.",
+                    nameof(properties.Editor));
+            }
+
+            if ((properties.Editor == TagsFieldEditor.Checkboxes || properties.Editor == TagsFieldEditor.Dropdown) && (properties.AllowedValues == null || properties.AllowedValues.Count == 0))
+            {
+                yield return new ValidationError("Checkboxes or dropdown list need allowed values.",
+                    nameof(properties.AllowedValues));
+            }
+
             if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value >= properties.MaxItems.Value)
             {
                 yield return new ValidationError("Max items must be greater than min items.",

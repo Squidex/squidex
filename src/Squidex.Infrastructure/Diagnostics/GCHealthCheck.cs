@@ -17,6 +17,11 @@ namespace Squidex.Infrastructure.Diagnostics
     {
         private readonly long threshold;
 
+        public IEnumerable<string> Scopes
+        {
+            get { yield return HealthCheckScopes.Node; }
+        }
+
         public GCHealthCheck(IOptions<GCHealthCheckOptions> options)
         {
             Guard.NotNull(options, nameof(options));

@@ -12,7 +12,6 @@ using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NodaTime.Extensions;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
@@ -23,6 +22,8 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 #pragma warning disable SA1311 // Static readonly fields must begin with upper-case letter
@@ -39,6 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         protected readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
+        protected readonly IJsonSerializer serializer = TestUtils.CreateSerializer(TypeNameHandling.None);
         protected readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         protected readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         protected readonly IAppEntity app = A.Dummy<IAppEntity>();
@@ -106,40 +108,40 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             .AddValue("de", "value"))
                     .AddField("my-assets",
                         new ContentFieldData()
-                            .AddValue("iv", JToken.FromObject(new[] { assetId })))
+                            .AddValue("iv", JsonValue.Array(assetId.ToString())))
                     .AddField("my-number",
                         new ContentFieldData()
-                            .AddValue("iv", 1))
+                            .AddValue("iv", 1.0))
                     .AddField("my-boolean",
                         new ContentFieldData()
                             .AddValue("iv", true))
                     .AddField("my-datetime",
                         new ContentFieldData()
-                            .AddValue("iv", now.ToDateTimeUtc()))
+                            .AddValue("iv", now))
                     .AddField("my-tags",
                         new ContentFieldData()
-                            .AddValue("iv", JToken.FromObject(new[] { "tag1", "tag2" })))
+                            .AddValue("iv", JsonValue.Array("tag1", "tag2")))
                     .AddField("my-references",
                         new ContentFieldData()
-                            .AddValue("iv", JToken.FromObject(new[] { refId })))
+                            .AddValue("iv", JsonValue.Array(refId.ToString())))
                     .AddField("my-geolocation",
                         new ContentFieldData()
-                            .AddValue("iv", JToken.FromObject(new { latitude = 10, longitude = 20 })))
+                            .AddValue("iv", JsonValue.Object().Add("latitude", 10).Add("longitude", 20)))
                     .AddField("my-json",
                         new ContentFieldData()
-                            .AddValue("iv", JToken.FromObject(new { value = 1 })))
+                            .AddValue("iv", JsonValue.Object().Add("value", 1)))
                     .AddField("my-localized",
                         new ContentFieldData()
                             .AddValue("de-DE", "de-DE"))
                     .AddField("my-array",
                         new ContentFieldData()
-                            .AddValue("iv", new JArray(
-                                new JObject(
-                                    new JProperty("nested-boolean", true),
-                                    new JProperty("nested-number", 1)),
-                                new JObject(
-                                    new JProperty("nested-boolean", false),
-                                    new JProperty("nested-number", 2)))));
+                            .AddValue("iv", JsonValue.Array(
+                                JsonValue.Object()
+                                    .Add("nested-boolean", true)
+                                    .Add("nested-number", 1),
+                                JsonValue.Object()
+                                    .Add("nested-boolean", false)
+                                    .Add("nested-number", 2))));
 
             var content = new ContentEntity
             {
@@ -179,22 +181,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return asset;
         }
 
-        protected static void AssertResult(object expected, (bool HasErrors, object Response) result, bool checkErrors = true)
+        protected void AssertResult(object expected, (bool HasErrors, object Response) result, bool checkErrors = true)
         {
             if (checkErrors && result.HasErrors)
             {
                 throw new InvalidOperationException(Serialize(result));
             }
 
-            var resultJson = JsonConvert.SerializeObject(result.Response, Formatting.Indented);
-            var expectJson = JsonConvert.SerializeObject(expected, Formatting.Indented);
+            var resultJson = serializer.Serialize(result.Response, true);
+            var expectJson = serializer.Serialize(expected, true);
 
             Assert.Equal(expectJson, resultJson);
         }
 
-        private static string Serialize((bool HasErrors, object Response) result)
+        private string Serialize((bool HasErrors, object Response) result)
         {
-            return JsonConvert.SerializeObject(result);
+            return serializer.Serialize(result);
         }
     }
 }

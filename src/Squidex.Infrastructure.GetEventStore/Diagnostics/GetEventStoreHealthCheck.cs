@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
@@ -14,6 +15,11 @@ namespace Squidex.Infrastructure.Diagnostics
     public sealed class GetEventStoreHealthCheck : IHealthCheck
     {
         private readonly IEventStoreConnection connection;
+
+        public IEnumerable<string> Scopes
+        {
+            get { yield return HealthCheckScopes.Node; }
+        }
 
         public GetEventStoreHealthCheck(IEventStoreConnection connection)
         {

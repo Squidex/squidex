@@ -56,12 +56,12 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_ignore_old_events()
         {
-            var storedEvent = new StoredEvent("1", "1", 0, new EventData());
+            var storedEvent = new StoredEvent("1", "1", 0, new EventData("Type", new EnvelopeHeaders(), "Payload"));
 
             A.CallTo(() => eventStore.QueryAsync(key, 0))
                 .Returns(new List<StoredEvent> { storedEvent });
 
-            A.CallTo(() => eventDataFormatter.Parse(storedEvent.Data, true))
+            A.CallTo(() => eventDataFormatter.Parse(storedEvent.Data, null))
                 .Throws(new TypeNameNotFoundException());
 
             var persistedEvents = new List<IEvent>();
@@ -251,12 +251,12 @@ namespace Squidex.Infrastructure.States
 
             foreach (var @event in events)
             {
-                var eventData = new EventData();
+                var eventData = new EventData("Type", new EnvelopeHeaders(), "Payload");
                 var eventStored = new StoredEvent(i.ToString(), i.ToString(), i, eventData);
 
                 eventsStored.Add(eventStored);
 
-                A.CallTo(() => eventDataFormatter.Parse(eventData, true))
+                A.CallTo(() => eventDataFormatter.Parse(eventData, null))
                     .Returns(new Envelope<IEvent>(@event));
 
                 i++;

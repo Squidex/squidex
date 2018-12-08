@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
+using Squidex.Infrastructure.Diagnostics;
 using Squidex.Pipeline;
 using Squidex.Pipeline.Diagnostics;
 using Squidex.Pipeline.Robots;
@@ -31,7 +32,20 @@ namespace Squidex.Config.Web
 
         public static IApplicationBuilder UseMyHealthCheck(this IApplicationBuilder app)
         {
-            app.Map("/healthz", builder => builder.UseMiddleware<HealthCheckMiddleware>());
+            app.Map("/readiness", builder =>
+            {
+                builder.UseMiddleware<HealthCheckMiddleware>(HealthCheckScopes.Any);
+            });
+
+            app.Map("/healthz", builder =>
+            {
+                builder.UseMiddleware<HealthCheckMiddleware>(HealthCheckScopes.Node);
+            });
+
+            app.Map("/cluster-healthz", builder =>
+            {
+                builder.UseMiddleware<HealthCheckMiddleware>(HealthCheckScopes.Cluster);
+            });
 
             return app;
         }

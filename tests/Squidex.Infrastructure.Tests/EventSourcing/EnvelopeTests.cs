@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -23,7 +22,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var value = new Envelope<IEvent>(new MyEvent { Value = 1 });
 
-            var deserialized = value.SerializeAndDeserializeAndReturn(new PropertiesBagConverter<EnvelopeHeaders>());
+            var deserialized = value.SerializeAndDeserialize();
 
             Assert.Equal(1, deserialized.To<MyEvent>().Payload.Value);
         }

@@ -60,11 +60,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 [CounterTotalCount] = count
             };
 
-            var key = appId.ToString();
+            var key = GetKey(appId);
 
             return Task.WhenAll(
                 usageStore.TrackUsagesAsync(new UsageUpdate(date, key, Category, counters)),
                 usageStore.TrackUsagesAsync(new UsageUpdate(SummaryDate, key, Category, counters)));
+        }
+
+        private static string GetKey(Guid appId)
+        {
+            return $"{appId}_Assets";
         }
     }
 }

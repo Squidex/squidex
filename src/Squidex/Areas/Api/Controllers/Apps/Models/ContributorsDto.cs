@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -29,7 +30,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var plan = plans.GetPlanForApp(app);
 
-            var contributors = app.Contributors.Select(x => new ContributorDto { ContributorId = x.Key, Role = x.Value }).ToArray();
+            var contributors = app.Contributors.ToArray(x => new ContributorDto { ContributorId = x.Key, Role = x.Value });
 
             return new ContributorsDto { Contributors = contributors, MaxContributors = plan.MaxContributors };
         }

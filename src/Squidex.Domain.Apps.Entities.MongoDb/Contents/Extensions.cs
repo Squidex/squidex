@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
@@ -22,24 +23,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return data.GetReferencedIds(schema).ToList();
         }
 
-        public static NamedContentData FromMongoModel(this IdContentData result, Schema schema, List<Guid> deletedIds)
+        public static NamedContentData FromMongoModel(this IdContentData result, Schema schema, List<Guid> deletedIds, IJsonSerializer serializer)
         {
             return result.ConvertId2Name(schema,
                 FieldConverters.ForValues(
-                    ValueConverters.DecodeJson(),
+                    ValueConverters.DecodeJson(serializer),
                     ValueReferencesConverter.CleanReferences(deletedIds)),
                 FieldConverters.ForNestedId2Name(
-                    ValueConverters.DecodeJson(),
+                    ValueConverters.DecodeJson(serializer),
                     ValueReferencesConverter.CleanReferences(deletedIds)));
         }
 
-        public static IdContentData ToMongoModel(this NamedContentData result, Schema schema)
+        public static IdContentData ToMongoModel(this NamedContentData result, Schema schema, IJsonSerializer serializer)
         {
             return result.ConvertName2Id(schema,
                 FieldConverters.ForValues(
-                    ValueConverters.EncodeJson()),
+                    ValueConverters.EncodeJson(serializer)),
                 FieldConverters.ForNestedName2Id(
-                    ValueConverters.EncodeJson()));
+                    ValueConverters.EncodeJson(serializer)));
         }
     }
 }

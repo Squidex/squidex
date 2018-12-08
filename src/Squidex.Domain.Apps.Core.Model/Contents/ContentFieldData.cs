@@ -7,32 +7,30 @@
 
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class ContentFieldData : Dictionary<string, JToken>, IEquatable<ContentFieldData>
+    public sealed class ContentFieldData : Dictionary<string, IJsonValue>, IEquatable<ContentFieldData>
     {
-        private static readonly JTokenEqualityComparer JTokenEqualityComparer = new JTokenEqualityComparer();
-
         public ContentFieldData()
             : base(StringComparer.OrdinalIgnoreCase)
         {
         }
 
-        public ContentFieldData AddValue(string key, JToken value)
+        public ContentFieldData AddValue(string key, object value)
+        {
+            return AddJsonValue(key, JsonValue.Create(value));
+        }
+
+        public ContentFieldData AddJsonValue(string key, IJsonValue value)
         {
             Guard.NotNullOrEmpty(key, nameof(key));
 
             this[key] = value;
 
             return this;
-        }
-
-        public ContentFieldData AddValue(JToken value)
-        {
-            return AddValue(InvariantPartitioning.Instance.Master.Key, value);
         }
 
         public override bool Equals(object obj)
@@ -42,12 +40,12 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public bool Equals(ContentFieldData other)
         {
-            return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other, EqualityComparer<string>.Default, JTokenEqualityComparer));
+            return other != null && (ReferenceEquals(this, other) || this.EqualsDictionary(other));
         }
 
         public override int GetHashCode()
         {
-            return this.DictionaryHashCode(EqualityComparer<string>.Default, JTokenEqualityComparer);
+            return this.DictionaryHashCode();
         }
     }
 }

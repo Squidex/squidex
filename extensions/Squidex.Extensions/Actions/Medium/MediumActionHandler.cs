@@ -9,11 +9,10 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Infrastructure.Http;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Extensions.Actions.Medium
 {
@@ -22,53 +21,61 @@ namespace Squidex.Extensions.Actions.Medium
         private const string Description = "Post to medium";
 
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly IJsonSerializer serializer;
 
-        public MediumActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
+        private sealed class UserResponse
+        {
+            public UserResponseData Data { get; set; }
+        }
+
+        private sealed class UserResponseData
+        {
+            public string Id { get; set; }
+        }
+
+        public MediumActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory, IJsonSerializer serializer)
             : base(formatter)
         {
             this.httpClientFactory = httpClientFactory;
+
+            this.serializer = serializer;
         }
 
         protected override (string Description, MediumJob Data) CreateJob(EnrichedEvent @event, MediumAction action)
         {
-            var requestBody =
-                new JObject(
-                    new JProperty("title", Format(action.Title, @event)),
-                    new JProperty("contentFormat", action.IsHtml ? "html" : "markdown"),
-                    new JProperty("content", Format(action.Content, @event)),
-                    new JProperty("canonicalUrl", Format(action.CanonicalUrl, @event)),
-                    new JProperty("tags", ParseTags(@event, action)));
+            var ruleJob = new MediumJob { AccessToken = action.AccessToken, PublicationId = action.PublicationId };
 
-            var ruleJob = new MediumJob
+            var requestBody = new
             {
-                AccessToken = action.AccessToken,
-                PublicationId = action.PublicationId,
-                RequestBody = requestBody.ToString(Formatting.Indented)
+                title = Format(action.Title, @event),
+                contentFormat = action.IsHtml ? "html" : "markdown",
+                content = Format(action.Content, @event),
+                canonicalUrl = Format(action.CanonicalUrl, @event),
+                tags = ParseTags(@event, action)
             };
+
+            ruleJob.RequestBody = ToJson(requestBody);
 
             return (Description, ruleJob);
         }
 
-        private JArray ParseTags(EnrichedEvent @event, MediumAction action)
+        private string[] ParseTags(EnrichedEvent @event, MediumAction action)
         {
             if (string.IsNullOrWhiteSpace(action.Tags))
             {
                 return null;
             }
 
-            string[] tags;
             try
             {
                 var jsonTags = Format(action.Tags, @event);
 
-                tags = JsonConvert.DeserializeObject<string[]>(jsonTags);
+                return serializer.Deserialize<string[]>(jsonTags);
             }
             catch
             {
-                tags = action.Tags.Split(',');
+                return action.Tags.Split(',');
             }
-
-            return new JArray(tags);
         }
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(MediumJob job)
@@ -96,9 +103,9 @@ namespace Squidex.Extensions.Actions.Medium
                         response = await httpClient.SendAsync(meRequest);
 
                         var responseString = await response.Content.ReadAsStringAsync();
-                        var responseJson = JToken.Parse(responseString);
+                        var responseJson = serializer.Deserialize<UserResponse>(responseString);
 
-                        var id = responseJson["data"]["id"].ToString();
+                        var id = responseJson.Data?.Id;
 
                         path = $"v1/users/{id}/posts";
                     }

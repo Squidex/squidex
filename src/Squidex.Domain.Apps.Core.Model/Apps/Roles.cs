@@ -6,24 +6,31 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Collections;
+using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace Squidex.Domain.Apps.Core.Apps
 {
-    public sealed class Roles : DictionaryWrapper<string, Role>
+    public sealed class Roles : ArrayDictionary<string, Role>
     {
         public static readonly Roles Empty = new Roles();
 
         private Roles()
-            : base(ImmutableDictionary<string, Role>.Empty)
         {
         }
 
-        public Roles(ImmutableDictionary<string, Role> inner)
-            : base(inner)
+        public Roles(KeyValuePair<string, Role>[] items)
+            : base(items)
         {
+        }
+
+        [Pure]
+        public Roles Remove(string name)
+        {
+            return new Roles(Without(name));
         }
 
         [Pure]
@@ -31,13 +38,12 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             var newRole = new Role(name);
 
-            return new Roles(Inner.Add(name, newRole));
-        }
+            if (ContainsKey(name))
+            {
+                throw new ArgumentException("Name already exists.", nameof(name));
+            }
 
-        [Pure]
-        public Roles Remove(string name)
-        {
-            return new Roles(Inner.Remove(name));
+            return new Roles(With(name, newRole));
         }
 
         [Pure]
@@ -51,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 return this;
             }
 
-            return new Roles(Inner.SetItem(name, role.Update(permissions)));
+            return new Roles(With(name, role.Update(permissions)));
         }
 
         public static Roles CreateDefaults(string app)
@@ -63,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                     [Role.Editor] = Role.CreateEditor(app),
                     [Role.Owner] = Role.CreateOwner(app),
                     [Role.Reader] = Role.CreateReader(app)
-                }.ToImmutableDictionary());
+                }.ToArray());
         }
     }
 }

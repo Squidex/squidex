@@ -7,17 +7,11 @@
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public interface IField
+    public interface IField : IFieldSettings
     {
         long Id { get; }
 
         string Name { get; }
-
-        bool IsLocked { get; }
-
-        bool IsDisabled { get; }
-
-        bool IsHidden { get; }
 
         FieldProperties RawProperties { get; }
 

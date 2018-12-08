@@ -6,13 +6,15 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using Squidex.Infrastructure.Json;
+
+#pragma warning disable SA1401 // Fields must be private
 
 namespace Squidex.Infrastructure.Orleans
 {
     public static class J
     {
-        internal static readonly JsonSerializer DefaultSerializer = JsonSerializer.CreateDefault();
+        public static IJsonSerializer DefaultSerializer;
 
         public static J<T> AsJ<T>(this T value)
         {

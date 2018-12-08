@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using Xunit;
 
 namespace Squidex.Infrastructure
@@ -274,36 +273,6 @@ namespace Squidex.Infrastructure
             source.Foreach(target.Add);
 
             Assert.Equal(source, target);
-        }
-
-        [Fact]
-        public void Should_return_same_dictionary_if_item_to_replace_not_found()
-        {
-            var dict_0 = ImmutableDictionary<int, int>.Empty;
-            var dict_1 = dict_0.SetItem(1, x => x);
-
-            Assert.Same(dict_0, dict_1);
-        }
-
-        [Fact]
-        public void Should_return_same_dictionary_if_replaced_item_is_same()
-        {
-            var dict_0 = ImmutableDictionary<int, int>.Empty;
-            var dict_1 = dict_0.SetItem(1, 1);
-            var dict_2 = dict_1.SetItem(1, x => x);
-
-            Assert.Same(dict_1, dict_2);
-        }
-
-        [Fact]
-        public void Should_return_new_dictionary_if_updated_item_is_different()
-        {
-            var dict_0 = ImmutableDictionary<int, int>.Empty;
-            var dict_1 = dict_0.SetItem(2, 2);
-            var dict_2 = dict_1.SetItem(2, x => 2 * x);
-
-            Assert.NotSame(dict_1, dict_2);
-            Assert.Equal(4, dict_2[2]);
         }
     }
 }

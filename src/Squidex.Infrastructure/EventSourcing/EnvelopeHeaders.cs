@@ -5,37 +5,24 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure.Json.Objects;
+
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class EnvelopeHeaders : PropertiesBag
+    public sealed class EnvelopeHeaders : JsonObject
     {
         public EnvelopeHeaders()
         {
         }
 
-        public EnvelopeHeaders(PropertiesBag bag)
+        public EnvelopeHeaders(JsonObject headers)
+            : base(headers)
         {
-            if (bag == null)
-            {
-                return;
-            }
-
-            foreach (var property in bag.Properties)
-            {
-                Set(property.Key, property.Value.RawValue);
-            }
         }
 
         public EnvelopeHeaders Clone()
         {
-            var clone = new EnvelopeHeaders();
-
-            foreach (var property in Properties)
-            {
-                clone.Set(property.Key, property.Value.RawValue);
-            }
-
-            return clone;
+            return new EnvelopeHeaders(this);
         }
     }
 }

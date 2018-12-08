@@ -166,7 +166,7 @@ describe('AssetsField', () => {
 });
 
 describe('TagsField', () => {
-    const field = createField(new TagsFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }));
+    const field = createField(new TagsFieldPropertiesDto('Tags', { isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
         expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);

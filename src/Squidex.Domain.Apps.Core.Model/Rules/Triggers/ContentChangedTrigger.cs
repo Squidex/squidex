@@ -5,15 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
 using Squidex.Infrastructure;
+using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
     [TypeName(nameof(ContentChangedTrigger))]
     public sealed class ContentChangedTrigger : RuleTrigger
     {
-        public ImmutableList<ContentChangedTriggerSchema> Schemas { get; set; }
+        public ReadOnlyCollection<ContentChangedTriggerSchema> Schemas { get; set; }
 
         public bool HandleAll { get; set; }
 

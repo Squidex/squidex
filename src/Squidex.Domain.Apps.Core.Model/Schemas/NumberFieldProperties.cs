@@ -5,21 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
 using Squidex.Infrastructure;
+using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     [TypeName("NumberField")]
     public sealed class NumberFieldProperties : FieldProperties
     {
-        public ImmutableList<double> AllowedValues { get; set; }
+        public ReadOnlyCollection<double> AllowedValues { get; set; }
 
         public double? MaxValue { get; set; }
 
         public double? MinValue { get; set; }
 
         public double? DefaultValue { get; set; }
+
+        public bool IsUnique { get; set; }
 
         public bool InlineEditable { get; set; }
 
@@ -35,14 +37,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit((IField<NumberFieldProperties>)field);
         }
 
-        public override RootField CreateRootField(long id, string name, Partitioning partitioning)
+        public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings settings = null)
         {
-            return Fields.Number(id, name, partitioning, this);
+            return Fields.Number(id, name, partitioning, this, settings);
         }
 
-        public override NestedField CreateNestedField(long id, string name)
+        public override NestedField CreateNestedField(long id, string name, IFieldSettings settings = null)
         {
-            return Fields.Number(id, name, this);
+            return Fields.Number(id, name, this, settings);
         }
     }
 }

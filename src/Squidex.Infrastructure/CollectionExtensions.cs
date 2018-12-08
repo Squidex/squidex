@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace Squidex.Infrastructure
@@ -21,37 +20,6 @@ namespace Squidex.Infrastructure
             return enumerable.OrderBy(x => random.Next()).ToList();
         }
 
-        public static ImmutableDictionary<TKey, TValue> SetItem<TKey, TValue>(this ImmutableDictionary<TKey, TValue> dictionary, TKey key, Func<TValue, TValue> updater)
-        {
-            if (dictionary.TryGetValue(key, out var value))
-            {
-                var newValue = updater(value);
-
-                if (!Equals(newValue, value))
-                {
-                    return dictionary.SetItem(key, newValue);
-                }
-            }
-
-            return dictionary;
-        }
-
-        public static bool TryGetValue<TKey, TValue, TBase>(this IReadOnlyDictionary<TKey, TValue> values, TKey key, out TBase item) where TValue : TBase
-        {
-            if (values.TryGetValue(key, out var value))
-            {
-                item = value;
-
-                return true;
-            }
-            else
-            {
-                item = default(TBase);
-
-                return false;
-            }
-        }
-
         public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T> source)
         {
             return source ?? Enumerable.Empty<T>();
@@ -60,6 +28,32 @@ namespace Squidex.Infrastructure
         public static IEnumerable<T> Concat<T>(this IEnumerable<T> source, T value)
         {
             return source.Concat(Enumerable.Repeat(value, 1));
+        }
+
+        public static TResult[] ToArray<TResult, T>(this T[] value, Func<T, TResult> convert)
+        {
+            var result = new TResult[value.Length];
+
+            for (var i = 0; i < value.Length; i++)
+            {
+                result[i] = convert(value[i]);
+            }
+
+            return result;
+        }
+
+        public static TResult[] ToArray<TResult, T>(this IReadOnlyCollection<T> value, Func<T, TResult> convert)
+        {
+            var result = new TResult[value.Count];
+            var i = 0;
+
+            foreach (var v in value)
+            {
+                result[i] = convert(v);
+                i++;
+            }
+
+            return result;
         }
 
         public static int SequentialHashCode<T>(this IEnumerable<T> collection)

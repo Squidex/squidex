@@ -5,13 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
     public class RestoreState
     {
-        [JsonProperty]
+        [DataMember]
         public RestoreStateJob Job { get; set; }
     }
 }

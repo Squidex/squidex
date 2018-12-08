@@ -8,7 +8,6 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Pipeline;
 
@@ -25,11 +24,13 @@ namespace Squidex.Config.Domain
         {
             if (config.GetValue<bool>("logging:human"))
             {
-                services.AddSingletonAs(c => new Func<IObjectWriter>(() => new JsonLogWriter(Formatting.Indented, true)));
+                services.AddSingletonAs(JsonLogWriterFactory.Readable())
+                    .As<IObjectWriterFactory>();
             }
             else
             {
-                services.AddSingletonAs(c => new Func<IObjectWriter>(() => new JsonLogWriter()));
+                services.AddSingletonAs(JsonLogWriterFactory.Default())
+                    .As<IObjectWriterFactory>();
             }
 
             var loggingFile = config.GetValue<string>("logging:file");

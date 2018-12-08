@@ -29,6 +29,7 @@ using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
@@ -65,8 +66,14 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs<MongoMigrationStatus>()
                         .As<IMigrationStatus>();
 
-                    services.AddSingletonAs<MongoPersistedGrantStore>()
-                        .As<IPersistedGrantStore>();
+                    services.AddTransientAs<ConvertOldSnapshotStores>()
+                        .As<IMigration>();
+
+                    services.AddTransientAs<ConvertRuleEventsJson>()
+                        .As<IMigration>();
+
+                    services.AddTransientAs(c => new DeleteContentCollections(mongoContentDatabase))
+                        .As<IMigration>();
 
                     services.AddSingletonAs<MongoUsageRepository>()
                         .As<IUsageRepository>();
@@ -74,11 +81,14 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs<MongoRuleEventRepository>()
                         .As<IRuleEventRepository>();
 
-                    services.AddSingletonAs<MongoRoleStore>()
-                        .As<IRoleStore<IdentityRole>>();
-
                     services.AddSingletonAs<MongoHistoryEventRepository>()
                         .As<IHistoryEventRepository>();
+
+                    services.AddSingletonAs<MongoPersistedGrantStore>()
+                        .As<IPersistedGrantStore>();
+
+                    services.AddSingletonAs<MongoRoleStore>()
+                        .As<IRoleStore<IdentityRole>>();
 
                     services.AddSingletonAs<MongoUserStore>()
                         .As<IUserStore<IdentityUser>>()
@@ -88,16 +98,10 @@ namespace Squidex.Config.Domain
                         .As<IAssetRepository>()
                         .As<ISnapshotStore<AssetState, Guid>>();
 
-                    services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetService<IAppProvider>()))
+                    services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetRequiredService<IAppProvider>(), c.GetRequiredService<IJsonSerializer>()))
                         .As<IContentRepository>()
                         .As<ISnapshotStore<ContentState, Guid>>()
                         .As<IEventConsumer>();
-
-                    services.AddTransientAs<ConvertOldSnapshotStores>()
-                        .As<IMigration>();
-
-                    services.AddTransientAs(c => new DeleteContentCollections(mongoContentDatabase))
-                        .As<IMigration>();
                 }
             });
 

@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var result = await Task.WhenAll(queries.Select(q => QueryInternalAsync(model, ctx, q)));
 
-            return (result.Any(x => x.HasError), result.Select(x => x.Response).ToArray());
+            return (result.Any(x => x.HasError), result.ToArray(x => x.Response));
         }
 
         public async Task<(bool HasError, object Response)> QueryAsync(QueryContext context, GraphQLQuery query)

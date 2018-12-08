@@ -7,9 +7,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Linq;
 using Newtonsoft.Json;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Domain.Apps.Core.Apps.Json
 {
@@ -31,7 +31,12 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         {
             var json = serializer.Deserialize<Dictionary<string, JsonAppClient>>(reader);
 
-            return new AppClients(json.ToImmutableDictionary(x => x.Key, x => x.Value.ToClient()));
+            return new AppClients(json.Select(Convert).ToArray());
+        }
+
+        private static KeyValuePair<string, AppClient> Convert(KeyValuePair<string, JsonAppClient> kvp)
+        {
+            return new KeyValuePair<string, AppClient>(kvp.Key, kvp.Value.ToClient());
         }
     }
 }

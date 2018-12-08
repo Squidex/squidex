@@ -8,13 +8,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Objects;
 
 #pragma warning disable RECS0002 // Convert anonymous method to method group
 
@@ -44,7 +43,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
             {
                 foreach (var value in data.Values)
                 {
-                    if (value.IsNull())
+                    if (value.Type == JsonValueType.Null)
                     {
                         continue;
                     }
@@ -78,13 +77,13 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
                 {
                     foreach (var partition in data)
                     {
-                        if (partition.Value is JArray array)
+                        if (partition.Value is JsonArray array)
                         {
                             for (var i = 0; i < array.Count; i++)
                             {
                                 var id = array[i].ToString();
 
-                                array[i] = urlGenerator.GenerateUrl(id);
+                                array[i] = JsonValue.Create(urlGenerator.GenerateUrl(id));
                             }
                         }
                     }
@@ -273,16 +272,16 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
                     foreach (var partition in data)
                     {
-                        if (!(partition.Value is JArray jArray))
+                        if (!(partition.Value is JsonArray array))
                         {
                             continue;
                         }
 
-                        var newArray = new JArray();
+                        var newArray = JsonValue.Array();
 
-                        foreach (var item in jArray.OfType<JObject>())
+                        foreach (var item in array.OfType<JsonObject>())
                         {
-                            var newItem = new JObject();
+                            var newItem = JsonValue.Object();
 
                             foreach (var kvp in item)
                             {

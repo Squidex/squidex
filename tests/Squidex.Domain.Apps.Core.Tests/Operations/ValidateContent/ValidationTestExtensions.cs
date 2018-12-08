@@ -9,19 +9,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 {
     public static class ValidationTestExtensions
     {
-        private static readonly Task<IReadOnlyList<Guid>> ValidReferences = Task.FromResult<IReadOnlyList<Guid>>(new List<Guid>());
-        private static readonly Task<IReadOnlyList<IAssetInfo>> ValidAssets = Task.FromResult<IReadOnlyList<IAssetInfo>>(new List<IAssetInfo>());
+        private static readonly Task<IReadOnlyList<Guid>> EmptyReferences = Task.FromResult<IReadOnlyList<Guid>>(new List<Guid>());
+        private static readonly Task<IReadOnlyList<IAssetInfo>> EmptyAssets = Task.FromResult<IReadOnlyList<IAssetInfo>>(new List<IAssetInfo>());
 
-        public static readonly ValidationContext ValidContext = new ValidationContext((x, y) => ValidReferences, x => ValidAssets);
+        public static readonly ValidationContext ValidContext = new ValidationContext(Guid.NewGuid(), Guid.NewGuid(), (x, y) => EmptyReferences, x => EmptyAssets);
 
         public static Task ValidateAsync(this IValidator validator, object value, IList<string> errors, ValidationContext context = null)
         {
@@ -37,14 +37,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 CreateFormatter(errors));
         }
 
-        public static Task ValidateAsync(this IField field, JToken value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateAsync(this IField field, IJsonValue value, IList<string> errors, ValidationContext context = null)
         {
             return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field).ValidateAsync(value,
                 CreateContext(context),
                 CreateFormatter(errors));
         }
 
-        public static Task ValidateOptionalAsync(this IField field, JToken value, IList<string> errors, ValidationContext context = null)
+        public static Task ValidateOptionalAsync(this IField field, IJsonValue value, IList<string> errors, ValidationContext context = null)
         {
             return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field).ValidateAsync(value,
                 CreateContext(context).Optional(true),
@@ -75,14 +75,14 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var actual = Task.FromResult<IReadOnlyList<IAssetInfo>>(assets.ToList());
 
-            return new ValidationContext((x, y) => ValidReferences, x => actual);
+            return new ValidationContext(Guid.NewGuid(), Guid.NewGuid(), (x, y) => EmptyReferences, x => actual);
         }
 
-        public static ValidationContext InvalidReferences(Guid referencesIds)
+        public static ValidationContext References(params Guid[] referencesIds)
         {
-            var actual = Task.FromResult<IReadOnlyList<Guid>>(new List<Guid> { referencesIds });
+            var actual = Task.FromResult<IReadOnlyList<Guid>>(referencesIds.ToList());
 
-            return new ValidationContext((x, y) => actual, x => ValidAssets);
+            return new ValidationContext(Guid.NewGuid(), Guid.NewGuid(), (x, y) => actual, x => EmptyAssets);
         }
     }
 }

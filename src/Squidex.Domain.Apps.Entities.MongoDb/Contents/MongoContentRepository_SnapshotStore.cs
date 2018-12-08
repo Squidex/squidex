@@ -38,12 +38,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 var schema = await GetSchemaAsync(value.AppId.Id, value.SchemaId.Id);
 
-                var idData = value.Data.ToMongoModel(schema.SchemaDef);
+                var idData = value.Data.ToMongoModel(schema.SchemaDef, serializer);
                 var idDraftData = idData;
 
                 if (!ReferenceEquals(value.Data, value.DataDraft))
                 {
-                    idDraftData = value.DataDraft?.ToMongoModel(schema.SchemaDef);
+                    idDraftData = value.DataDraft?.ToMongoModel(schema.SchemaDef, serializer);
                 }
 
                 var content = SimpleMapper.Map(value, new MongoContentEntity

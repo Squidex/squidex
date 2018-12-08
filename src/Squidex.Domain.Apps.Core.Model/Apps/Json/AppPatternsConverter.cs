@@ -4,11 +4,12 @@
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
+
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Linq;
 using Newtonsoft.Json;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Domain.Apps.Core.Apps.Json
 {
@@ -30,7 +31,12 @@ namespace Squidex.Domain.Apps.Core.Apps.Json
         {
             var json = serializer.Deserialize<Dictionary<Guid, JsonAppPattern>>(reader);
 
-            return new AppPatterns(json.ToImmutableDictionary(x => x.Key, x => x.Value.ToPattern()));
+            return new AppPatterns(json.Select(Convert).ToArray());
+        }
+
+        private static KeyValuePair<Guid, AppPattern> Convert(KeyValuePair<Guid, JsonAppPattern> kvp)
+        {
+            return new KeyValuePair<Guid, AppPattern>(kvp.Key, kvp.Value.ToPattern());
         }
     }
 }

@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Newtonsoft.Json;
+using Squidex.Infrastructure;
+using System;
+using System.Linq;
+using P = Squidex.Domain.Apps.Core.Partitioning;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
-    public sealed class JsonFieldModel
+    public sealed class JsonFieldModel : IFieldSettings
     {
         [JsonProperty]
         public long Id { get; set; }
@@ -34,6 +37,22 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         public FieldProperties Properties { get; set; }
 
         [JsonProperty]
-        public List<JsonNestedFieldModel> Children { get; set; }
+        public JsonNestedFieldModel[] Children { get; set; }
+
+        public RootField ToField()
+        {
+            var partitioning = P.FromString(Partitioning);
+
+            if (Properties is ArrayFieldProperties arrayProperties)
+            {
+                var nested = Children?.ToArray(n => n.ToNestedField()) ?? Array.Empty<NestedField>();
+
+                return new ArrayField(Id, Name, partitioning, nested, arrayProperties, this);
+            }
+            else
+            {
+                return Properties.CreateRootField(Id, Name, partitioning, this);
+            }
+        }
     }
 }

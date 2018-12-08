@@ -1,0 +1,12 @@
+@import '_mixins';
+@import '_vars';
+
+.form-check {
+    display: inline-block;
+    margin-left: 0;
+    margin-right: 1rem;
+}
+
+.form-check-input {
+    margin-top: .4rem;
+}

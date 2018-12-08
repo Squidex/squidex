@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Infrastructure;
@@ -13,7 +14,6 @@ namespace Squidex.Domain.Apps.Core.Apps
 {
     public sealed class LanguageConfig : IFieldPartitionItem
     {
-        private static readonly Language[] DefaultFallback = new Language[0];
         private readonly Language language;
         private readonly Language[] languageFallbacks;
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.Apps
             IsOptional = isOptional;
 
             this.language = language;
-            this.languageFallbacks = fallback ?? DefaultFallback;
+            this.languageFallbacks = fallback ?? Array.Empty<Language>();
         }
     }
 }

@@ -7,13 +7,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
+using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_assets_are_required_and_null()
+        public async Task Should_add_error_if_assets_are_required_and_null()
         {
             var sut = Field(new AssetsFieldProperties { IsRequired = true });
 
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_assets_are_required_and_empty()
+        public async Task Should_add_error_if_assets_are_required_and_empty()
         {
             var sut = Field(new AssetsFieldProperties { IsRequired = true });
 
@@ -115,18 +115,18 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_is_not_valid()
+        public async Task Should_add_error_if_value_is_not_valid()
         {
             var sut = Field(new AssetsFieldProperties());
 
-            await sut.ValidateAsync("invalid", errors);
+            await sut.ValidateAsync(JsonValue.Create("invalid"), errors);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Not a valid value." });
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_has_not_enough_items()
+        public async Task Should_add_error_if_value_has_not_enough_items()
         {
             var sut = Field(new AssetsFieldProperties { MinItems = 3 });
 
@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_value_has_too_much_items()
+        public async Task Should_add_error_if_value_has_too_much_items()
         {
             var sut = Field(new AssetsFieldProperties { MaxItems = 1 });
 
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_errors_if_asset_are_not_valid()
+        public async Task Should_add_error_if_asset_are_not_valid()
         {
             var assetId = Guid.NewGuid();
 
@@ -251,7 +251,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_image_has_invalid_extension()
         {
-            var sut = Field(new AssetsFieldProperties { AllowedExtensions = ImmutableList.Create("mp4") });
+            var sut = Field(new AssetsFieldProperties { AllowedExtensions = ReadOnlyCollection.Create("mp4") });
 
             await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
 
@@ -263,9 +263,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                 });
         }
 
-        private static JToken CreateValue(params Guid[] ids)
+        private static IJsonValue CreateValue(params Guid[] ids)
         {
-            return ids == null ? JValue.CreateNull() : (JToken)new JArray(ids.OfType<object>().ToArray());
+            return ids == null ? (IJsonValue)JsonValue.Null : JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
         }
 
         private static RootField<AssetsFieldProperties> Field(AssetsFieldProperties properties)

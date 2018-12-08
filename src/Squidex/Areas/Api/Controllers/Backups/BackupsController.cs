@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Pipeline;
@@ -53,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
 
             var jobs = await backupGrain.GetStateAsync();
 
-            var response = jobs.Value.Select(BackupJobDto.FromBackup).ToList();
+            var response = jobs.Value.ToArray(BackupJobDto.FromBackup);
 
             return Ok(response);
         }

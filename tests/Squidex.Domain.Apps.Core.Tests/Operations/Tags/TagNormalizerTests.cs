@@ -9,17 +9,16 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Tags
 {
     public class TagNormalizerTests
     {
-        private static readonly JTokenEqualityComparer JTokenEqualityComparer = new JTokenEqualityComparer();
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly Guid appId = Guid.NewGuid();
         private readonly Guid schemaId = Guid.NewGuid();
@@ -56,8 +55,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
 
             await tagService.NormalizeAsync(appId, schemaId, schema, newData, oldData);
 
-            Assert.Equal(new JArray("id2_1", "id2_2"), newData["tags2"]["iv"], JTokenEqualityComparer);
-            Assert.Equal(new JArray("id4"), newData["array"]["iv"][0]["nestedTags2"], JTokenEqualityComparer);
+            Assert.Equal(JsonValue.Array("id2_1", "id2_2"), newData["tags2"]["iv"]);
+            Assert.Equal(JsonValue.Array("id4"), GetNestedTags(newData));
         }
 
         [Fact]
@@ -77,8 +76,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
 
             await tagService.NormalizeAsync(appId, schemaId, schema, newData, null);
 
-            Assert.Equal(new JArray("id2_1", "id2_2"), newData["tags2"]["iv"], JTokenEqualityComparer);
-            Assert.Equal(new JArray("id4"), newData["array"]["iv"][0]["nestedTags2"], JTokenEqualityComparer);
+            Assert.Equal(JsonValue.Array("id2_1", "id2_2"), newData["tags2"]["iv"]);
+            Assert.Equal(JsonValue.Array("id4"), GetNestedTags(newData));
         }
 
         [Fact]
@@ -98,8 +97,16 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
 
             await tagService.NormalizeAsync(appId, schemaId, schema, newData, null);
 
-            Assert.Equal(new JArray("name2_1", "name2_2"), newData["tags2"]["iv"], JTokenEqualityComparer);
-            Assert.Equal(new JArray("name4"), newData["array"]["iv"][0]["nestedTags2"], JTokenEqualityComparer);
+            Assert.Equal(JsonValue.Array("name2_1", "name2_2"), newData["tags2"]["iv"]);
+            Assert.Equal(JsonValue.Array("name4"), GetNestedTags(newData));
+        }
+
+        private IJsonValue GetNestedTags(NamedContentData newData)
+        {
+            var array = (JsonArray)newData["array"]["iv"];
+            var arrayItem = (JsonObject)array[0];
+
+            return arrayItem["nestedTags2"];
         }
 
         private static NamedContentData GenerateData(string prefix)
@@ -107,21 +114,21 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
             return new NamedContentData()
                 .AddField("tags1",
                     new ContentFieldData()
-                        .AddValue("iv", new JArray($"{prefix}1")))
+                        .AddValue("iv", JsonValue.Array($"{prefix}1")))
                 .AddField("tags2",
                     new ContentFieldData()
-                        .AddValue("iv", new JArray($"{prefix}2_1", $"{prefix}2_2")))
+                        .AddValue("iv", JsonValue.Array($"{prefix}2_1", $"{prefix}2_2")))
                 .AddField("string",
                     new ContentFieldData()
                         .AddValue("iv", $"{prefix}stringValue"))
                 .AddField("array",
                     new ContentFieldData()
                         .AddValue("iv",
-                            new JArray(
-                                new JObject(
-                                    new JProperty("nestedTags1", new JArray($"{prefix}3")),
-                                    new JProperty("nestedTags2", new JArray($"{prefix}4")),
-                                    new JProperty("string", $"{prefix}nestedStringValue")))));
+                            JsonValue.Array(
+                                JsonValue.Object()
+                                    .Add("nestedTags1", JsonValue.Array($"{prefix}3"))
+                                    .Add("nestedTags2", JsonValue.Array($"{prefix}4"))
+                                    .Add("string", $"{prefix}nestedStringValue"))));
         }
     }
 }

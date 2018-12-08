@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { AbstractControl, FormArray } from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 
 import {
     AppLanguageDto,
@@ -37,17 +37,32 @@ export class ArrayEditorComponent {
     @Input()
     public arrayControl: FormArray;
 
+    public isHidden = false;
+
+    public hide(hide: boolean) {
+        this.isHidden = hide;
+    }
+
     public removeItem(index: number) {
         this.form.removeArrayItem(this.field, this.language, index);
     }
 
-    public addItem() {
-        this.form.insertArrayItem(this.field, this.language);
+    public addItem(value?: FormGroup) {
+        this.form.insertArrayItem(this.field, this.language, value);
     }
 
     public sort(controls: AbstractControl[]) {
         for (let i = 0; i < controls.length; i++) {
             this.arrayControl.setControl(i, controls[i]);
         }
+    }
+
+    public move(control: AbstractControl, index: number) {
+        let controls = [...this.arrayControl.controls];
+
+        controls.splice(controls.indexOf(control), 1);
+        controls.splice(index, 0, control);
+
+        this.sort(controls);
     }
 }

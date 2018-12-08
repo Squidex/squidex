@@ -6,13 +6,12 @@
 // ==========================================================================
 
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Orleans.CodeGeneration;
 using Orleans.Concurrency;
 using Orleans.Serialization;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.Orleans
@@ -22,7 +21,6 @@ namespace Squidex.Infrastructure.Orleans
     {
         public T Value { get; }
 
-        [JsonConstructor]
         public J(T value)
         {
             Value = value;
@@ -63,12 +61,7 @@ namespace Squidex.Infrastructure.Orleans
 
                 var stream = new StreamWriterWrapper(context.StreamWriter);
 
-                using (var writer = new JsonTextWriter(new StreamWriter(stream)))
-                {
-                    jsonSerializer.Serialize(writer, input);
-
-                    writer.Flush();
-                }
+                jsonSerializer.Serialize(input, stream);
             }
         }
 
@@ -81,18 +74,15 @@ namespace Squidex.Infrastructure.Orleans
 
                 var stream = new StreamReaderWrapper(context.StreamReader);
 
-                using (var reader = new JsonTextReader(new StreamReader(stream)))
-                {
-                    return jsonSerializer.Deserialize(reader, expected);
-                }
+                return jsonSerializer.Deserialize<object>(stream, expected);
             }
         }
 
-        private static JsonSerializer GetSerializer(ISerializerContext context)
+        private static IJsonSerializer GetSerializer(ISerializerContext context)
         {
             try
             {
-                return context?.ServiceProvider?.GetService<JsonSerializer>() ?? J.DefaultSerializer;
+                return context?.ServiceProvider?.GetRequiredService<IJsonSerializer>() ?? J.DefaultSerializer;
             }
             catch
             {

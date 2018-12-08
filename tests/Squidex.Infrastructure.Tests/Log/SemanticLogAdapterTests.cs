@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Log
                     output = message;
                 });
 
-            log = new Lazy<SemanticLog>(() => new SemanticLog(channels, new List<ILogAppender>(), () => new JsonLogWriter()));
+            log = new Lazy<SemanticLog>(() => new SemanticLog(channels, new List<ILogAppender>(), JsonLogWriterFactory.Default()));
 
             sut = SemanticLogLoggerProvider.ForTesting(log.Value);
         }
@@ -197,7 +197,7 @@ namespace Squidex.Infrastructure.Log
 
         private static string MakeTestCall(Action<IObjectWriter> writer)
         {
-            IObjectWriter sut = new JsonLogWriter();
+            var sut = JsonLogWriterFactory.Default().Create();
 
             writer(sut);
 

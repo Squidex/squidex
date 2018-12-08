@@ -37,16 +37,6 @@ namespace Squidex.Infrastructure.MongoDb
             {
                 SetToken(NewtonsoftJsonToken.PropertyName, bsonReader.ReadName().UnescapeBson());
             }
-            else if (bsonReader.State == BsonReaderState.EndOfDocument)
-            {
-                SetToken(NewtonsoftJsonToken.EndObject);
-                bsonReader.ReadEndDocument();
-            }
-            else if (bsonReader.State == BsonReaderState.EndOfArray)
-            {
-                SetToken(NewtonsoftJsonToken.EndArray);
-                bsonReader.ReadEndArray();
-            }
             else if (bsonReader.State == BsonReaderState.Value)
             {
                 switch (bsonReader.CurrentBsonType)
@@ -94,6 +84,16 @@ namespace Squidex.Infrastructure.MongoDb
                     default:
                         throw new NotSupportedException();
                 }
+            }
+            else if (bsonReader.State == BsonReaderState.EndOfDocument)
+            {
+                SetToken(NewtonsoftJsonToken.EndObject);
+                bsonReader.ReadEndDocument();
+            }
+            else if (bsonReader.State == BsonReaderState.EndOfArray)
+            {
+                SetToken(NewtonsoftJsonToken.EndArray);
+                bsonReader.ReadEndArray();
             }
 
             if (bsonReader.State == BsonReaderState.Initial)

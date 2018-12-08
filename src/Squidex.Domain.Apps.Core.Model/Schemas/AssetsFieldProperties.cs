@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
 using Squidex.Infrastructure;
+using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? AspectHeight { get; set; }
 
-        public ImmutableList<string> AllowedExtensions { get; set; }
+        public ReadOnlyCollection<string> AllowedExtensions { get; set; }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
         {
@@ -47,14 +47,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return visitor.Visit((IField<AssetsFieldProperties>)field);
         }
 
-        public override RootField CreateRootField(long id, string name, Partitioning partitioning)
+        public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings settings = null)
         {
-            return Fields.Assets(id, name, partitioning, this);
+            return Fields.Assets(id, name, partitioning, this, settings);
         }
 
-        public override NestedField CreateNestedField(long id, string name)
+        public override NestedField CreateNestedField(long id, string name, IFieldSettings settings = null)
         {
-            return Fields.Assets(id, name, this);
+            return Fields.Assets(id, name, this, settings);
         }
     }
 }

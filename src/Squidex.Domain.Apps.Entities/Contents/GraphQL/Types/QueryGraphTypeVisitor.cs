@@ -7,13 +7,13 @@
 
 using System;
 using GraphQL.Types;
-using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public delegate object ValueResolver(JToken value, ResolveFieldContext context);
+    public delegate object ValueResolver(IJsonValue value, ResolveFieldContext context);
 
     public sealed class QueryGraphTypeVisitor : IFieldVisitor<(IGraphType ResolveType, ValueResolver Resolver)>
     {

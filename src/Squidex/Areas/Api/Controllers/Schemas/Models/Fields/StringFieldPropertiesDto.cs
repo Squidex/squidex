@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Immutable;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
@@ -48,6 +46,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public string[] AllowedValues { get; set; }
 
         /// <summary>
+        /// Indicates if the field value must be unique. Ignored for nested fields and localized fields.
+        /// </summary>
+        public bool IsUnique { get; set; }
+
+        /// <summary>
         /// Indicates that the inline editor is enabled for this field.
         /// </summary>
         public bool InlineEditable { get; set; }
@@ -55,7 +58,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// <summary>
         /// The editor that is used to manage this field.
         /// </summary>
-        [JsonConverter(typeof(StringEnumConverter))]
         public StringFieldEditor Editor { get; set; }
 
         public override FieldProperties ToProperties()
@@ -64,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
 
             if (AllowedValues != null)
             {
-                result.AllowedValues = ImmutableList.Create(AllowedValues);
+                result.AllowedValues = ReadOnlyCollection.Create(AllowedValues);
             }
 
             return result;

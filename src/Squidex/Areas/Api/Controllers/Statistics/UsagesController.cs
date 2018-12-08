@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Pipeline;
@@ -92,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var entities = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date);
 
-            var response = entities.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsageDto.FromUsage).ToList());
+            var response = entities.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsageDto.FromUsage).ToArray());
 
             return Ok(response);
         }
@@ -146,7 +147,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
 
             var entities = await assetStatsRepository.QueryAsync(AppId, fromDate.Date, toDate.Date);
 
-            var models = entities.Select(StorageUsageDto.FromStats).ToList();
+            var models = entities.Select(StorageUsageDto.FromStats).ToArray();
 
             return Ok(models);
         }

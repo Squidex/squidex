@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
@@ -24,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private NamedContentData dataDraft;
 
         [BsonId]
-        [BsonElement]
+        [BsonElement("_id")]
         [BsonRepresentation(BsonType.String)]
         public Guid Id { get; set; }
 
@@ -124,13 +125,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             get { return dataDraft; }
         }
 
-        public void ParseData(Schema schema)
+        public void ParseData(Schema schema, IJsonSerializer serializer)
         {
-            data = DataByIds.FromMongoModel(schema, ReferencedIdsDeleted);
+            data = DataByIds.FromMongoModel(schema, ReferencedIdsDeleted, serializer);
 
             if (DataDraftByIds != null)
             {
-                dataDraft = DataDraftByIds.FromMongoModel(schema, ReferencedIdsDeleted);
+                dataDraft = DataDraftByIds.FromMongoModel(schema, ReferencedIdsDeleted, serializer);
             }
         }
     }

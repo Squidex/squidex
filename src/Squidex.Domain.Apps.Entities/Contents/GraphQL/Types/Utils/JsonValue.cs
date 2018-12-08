@@ -6,18 +6,18 @@
 // ==========================================================================
 
 using GraphQL.Language.AST;
-using Newtonsoft.Json.Linq;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils
 {
-    public sealed class JsonValue : ValueNode<JObject>
+    public sealed class JsonValue : ValueNode<IJsonValue>
     {
-        public JsonValue(JObject value)
+        public JsonValue(IJsonValue value)
         {
             Value = value;
         }
 
-        protected override bool Equals(ValueNode<JObject> node)
+        protected override bool Equals(ValueNode<IJsonValue> node)
         {
             return false;
         }

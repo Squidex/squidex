@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 
@@ -26,10 +27,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     {
         private readonly string collectionName;
 
-        public MongoContentCollection(IMongoDatabase database, string collectionName)
+        protected IJsonSerializer Serializer { get; }
+
+        public MongoContentCollection(IMongoDatabase database, IJsonSerializer serializer, string collectionName)
             : base(database)
         {
             this.collectionName = collectionName;
+
+            Serializer = serializer;
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default(CancellationToken))
@@ -49,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 query = query.AdjustToModel(schema.SchemaDef, useDraft);
 
-                var filter = FindExtensions.BuildQuery(query, schema.Id, status);
+                var filter = query.ToFilter(schema.Id, status);
 
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems =
@@ -64,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 foreach (var entity in contentItems.Result)
                 {
-                    entity.ParseData(schema.SchemaDef);
+                    entity.ParseData(schema.SchemaDef, Serializer);
                 }
 
                 return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
@@ -96,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             foreach (var entity in contentItems.Result)
             {
-                entity.ParseData(schema.SchemaDef);
+                entity.ParseData(schema.SchemaDef, Serializer);
             }
 
             return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);

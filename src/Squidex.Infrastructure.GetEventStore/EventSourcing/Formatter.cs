@@ -8,20 +8,23 @@
 using System;
 using System.Text;
 using EventStore.ClientAPI;
+using Squidex.Infrastructure.Json;
 using EventStoreData = EventStore.ClientAPI.EventData;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
     public static class Formatter
     {
-        public static StoredEvent Read(ResolvedEvent resolvedEvent)
+        public static StoredEvent Read(ResolvedEvent resolvedEvent, IJsonSerializer serializer)
         {
             var @event = resolvedEvent.Event;
 
-            var body = Encoding.UTF8.GetString(@event.Data);
-            var meta = Encoding.UTF8.GetString(@event.Metadata);
+            var metadata = Encoding.UTF8.GetString(@event.Data);
 
-            var eventData = new EventData { Type = @event.EventType, Payload = body, Metadata = meta };
+            var headersJson = Encoding.UTF8.GetString(@event.Metadata);
+            var headers = serializer.Deserialize<EnvelopeHeaders>(headersJson);
+
+            var eventData = new EventData(@event.EventType, headers, metadata);
 
             return new StoredEvent(
                 @event.EventStreamId,
@@ -30,12 +33,14 @@ namespace Squidex.Infrastructure.EventSourcing
                 eventData);
         }
 
-        public static EventStoreData Write(EventData eventData)
+        public static EventStoreData Write(EventData eventData, IJsonSerializer serializer)
         {
-            var body = Encoding.UTF8.GetBytes(eventData.Payload.ToString());
-            var meta = Encoding.UTF8.GetBytes(eventData.Metadata.ToString());
+            var payload = Encoding.UTF8.GetBytes(eventData.Payload);
 
-            return new EventStoreData(Guid.NewGuid(), eventData.Type, true, body, meta);
+            var headersJson = serializer.Serialize(eventData.Headers);
+            var headersBytes = Encoding.UTF8.GetBytes(headersJson);
+
+            return new EventStoreData(Guid.NewGuid(), eventData.Type, true, payload, headersBytes);
         }
     }
 }
