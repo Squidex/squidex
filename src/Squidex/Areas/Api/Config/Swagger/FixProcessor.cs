@@ -5,32 +5,29 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using NJsonSchema;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
-    public sealed class TagByGroupNameProcessor : IOperationProcessor
+    public class FixProcessor : IOperationProcessor
     {
+        private static readonly JsonSchema4 StringSchema = new JsonSchema4 { Type = JsonObjectType.String };
+
         public Task<bool> ProcessAsync(OperationProcessorContext context)
         {
-            var groupName = context.ControllerType.GetCustomAttribute<ApiExplorerSettingsAttribute>()?.GroupName;
-
-            if (!string.IsNullOrWhiteSpace(groupName))
+            foreach (var parameter in context.Parameters.Values)
             {
-                context.OperationDescription.Operation.Tags = new List<string> { groupName };
+                if (parameter.IsRequired && parameter.Schema != null && parameter.Schema.Type == JsonObjectType.String)
+                {
+                    parameter.Schema = StringSchema;
+                }
+            }
 
-                return TaskHelper.True;
-            }
-            else
-            {
-                return TaskHelper.False;
-            }
+            return TaskHelper.True;
         }
     }
 }

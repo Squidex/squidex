@@ -16,30 +16,33 @@ namespace Squidex.Areas.Api.Config.Swagger
 {
     public sealed class ODataQueryParamsProcessor : IOperationProcessor
     {
-        private readonly string path;
+        private readonly string supportedPath;
         private readonly string entity;
         private readonly bool supportSearch;
 
-        public ODataQueryParamsProcessor(string path, string entity, bool supportSearch)
+        public ODataQueryParamsProcessor(string supportedPath, string entity, bool supportSearch)
         {
-            this.path = path;
             this.entity = entity;
+
             this.supportSearch = supportSearch;
+            this.supportedPath = supportedPath;
         }
 
         public Task<bool> ProcessAsync(OperationProcessorContext context)
         {
-            if (context.OperationDescription.Path == path)
+            if (context.OperationDescription.Path == supportedPath)
             {
+                var operation = context.OperationDescription.Operation;
+
                 if (supportSearch)
                 {
-                    context.OperationDescription.Operation.AddQueryParameter("$search", JsonObjectType.String, "Optional OData full text search.");
+                    operation.AddQueryParameter("$search", JsonObjectType.String, "Optional OData full text search.");
                 }
 
-                context.OperationDescription.Operation.AddQueryParameter("$top", JsonObjectType.Number, $"Optional number of {entity} to take.");
-                context.OperationDescription.Operation.AddQueryParameter("$skip", JsonObjectType.Number, $"Optional number of {entity} to skip.");
-                context.OperationDescription.Operation.AddQueryParameter("$orderby", JsonObjectType.String, "Optional OData order definition.");
-                context.OperationDescription.Operation.AddQueryParameter("$filter", JsonObjectType.String, "Optional OData filter definition.");
+                operation.AddQueryParameter("$top", JsonObjectType.Number, $"Optional number of {entity} to take.");
+                operation.AddQueryParameter("$skip", JsonObjectType.Number, $"Optional number of {entity} to skip.");
+                operation.AddQueryParameter("$orderby", JsonObjectType.String, "Optional OData order definition.");
+                operation.AddQueryParameter("$filter", JsonObjectType.String, "Optional OData filter definition.");
             }
 
             return TaskHelper.True;

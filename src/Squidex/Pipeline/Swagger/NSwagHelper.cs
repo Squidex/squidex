@@ -19,11 +19,11 @@ using Squidex.Config;
 
 namespace Squidex.Pipeline.Swagger
 {
-    public static class SwaggerHelper
+    public static class NSwagHelper
     {
         public static string LoadDocs(string name)
         {
-            var assembly = typeof(SwaggerHelper).GetTypeInfo().Assembly;
+            var assembly = typeof(NSwagHelper).GetTypeInfo().Assembly;
 
             using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Docs.{name}.md"))
             {
@@ -43,7 +43,6 @@ namespace Squidex.Pipeline.Swagger
 
             var document = new SwaggerDocument
             {
-                Tags = new List<SwaggerTag>(),
                 Schemes = new List<SwaggerSchema>
                 {
                     scheme
@@ -58,13 +57,9 @@ namespace Squidex.Pipeline.Swagger
                 },
                 Info = new SwaggerInfo
                 {
-                    ExtensionData = new Dictionary<string, object>
-                    {
-                        ["x-logo"] = new { url = urlOptions.BuildUrl("images/logo-white.png", false), backgroundColor = "#3f83df" }
-                    },
-                    Title = $"Squidex API for {appName} App", Version = "1.0"
+                    Title = $"Squidex API for {appName} App"
                 },
-                BasePath = "/api"
+                BasePath = Constants.ApiPrefix
             };
 
             if (!string.IsNullOrWhiteSpace(context.Request.Host.Value))
@@ -72,32 +67,7 @@ namespace Squidex.Pipeline.Swagger
                 document.Host = context.Request.Host.Value;
             }
 
-            document.SecurityDefinitions.Add(Constants.SecurityDefinition, CreateOAuthSchema(urlOptions));
-
             return document;
-        }
-
-        public static SwaggerSecurityScheme CreateOAuthSchema(MyUrlsOptions urlOptions)
-        {
-            var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token", false);
-
-            var securityDocs = LoadDocs("security");
-            var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
-
-            var result =
-                new SwaggerSecurityScheme
-                {
-                    TokenUrl = tokenUrl,
-                    Type = SwaggerSecuritySchemeType.OAuth2,
-                    Flow = SwaggerOAuth2Flow.Application,
-                    Scopes = new Dictionary<string, string>
-                    {
-                        { Constants.ApiScope, "Read and write access to the API" }
-                    },
-                    Description = securityText
-                };
-
-            return result;
         }
 
         public static async Task<JsonSchema4> GetErrorDtoSchemaAsync(this JsonSchemaGenerator schemaGenerator, JsonSchemaResolver resolver)

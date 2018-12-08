@@ -48,11 +48,14 @@ namespace Squidex.Config.Domain
 
                     var connection = EventStoreConnection.Create(eventStoreConfiguration);
 
-                    services.AddSingletonAs(c => new GetEventStoreHealthCheck(connection))
-                        .As<IHealthCheck>();
+                    services.AddSingletonAs(connection)
+                        .As<IEventStoreConnection>();
 
                     services.AddSingletonAs(c => new GetEventStore(connection, c.GetRequiredService<IJsonSerializer>(), eventStorePrefix, eventStoreProjectionHost))
                         .As<IEventStore>();
+
+                    services.AddHealthChecks()
+                        .AddCheck<GetEventStoreHealthCheck>("EventStore", tags: new[] { "node" });
                 }
             });
 

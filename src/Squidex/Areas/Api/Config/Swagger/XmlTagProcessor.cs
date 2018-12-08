@@ -8,8 +8,8 @@
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using NJsonSchema.Infrastructure;
-using NSwag.Annotations;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Infrastructure.Tasks;
@@ -22,11 +22,11 @@ namespace Squidex.Areas.Api.Config.Swagger
         {
             foreach (var controllerType in context.ControllerTypes)
             {
-                var tagAttribute = controllerType.GetTypeInfo().GetCustomAttribute<SwaggerTagAttribute>();
+                var attribute = controllerType.GetTypeInfo().GetCustomAttribute<ApiExplorerSettingsAttribute>();
 
-                if (tagAttribute != null)
+                if (attribute != null)
                 {
-                    var tag = context.Document.Tags.FirstOrDefault(x => x.Name == tagAttribute.Name);
+                    var tag = context.Document.Tags.FirstOrDefault(x => x.Name == attribute.GroupName);
 
                     if (tag != null)
                     {

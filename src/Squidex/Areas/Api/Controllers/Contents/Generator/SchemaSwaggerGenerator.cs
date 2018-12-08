@@ -10,12 +10,14 @@ using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema;
 using NSwag;
+using Squidex.Config;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
+using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
@@ -31,18 +33,20 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         private readonly string schemaName;
         private readonly string schemaType;
         private readonly string appPath;
+        private readonly string appName;
 
         static SchemaSwaggerGenerator()
         {
-            SchemaBodyDescription = SwaggerHelper.LoadDocs("schemabody");
-            SchemaQueryDescription = SwaggerHelper.LoadDocs("schemaquery");
+            SchemaBodyDescription = NSwagHelper.LoadDocs("schemabody");
+            SchemaQueryDescription = NSwagHelper.LoadDocs("schemaquery");
         }
 
-        public SchemaSwaggerGenerator(SwaggerDocument document, string path, Schema schema, Func<string, JsonSchema4, JsonSchema4> schemaResolver, PartitionResolver partitionResolver)
+        public SchemaSwaggerGenerator(SwaggerDocument document, string appName, string appPath, Schema schema, Func<string, JsonSchema4, JsonSchema4> schemaResolver, PartitionResolver partitionResolver)
         {
             this.document = document;
 
-            appPath = path;
+            this.appName = appName;
+            this.appPath = appPath;
 
             schemaPath = schema.Name;
             schemaName = schema.DisplayName();
@@ -97,6 +101,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.AddQueryParameter("orderby", JsonObjectType.String, "Optional OData order definition.");
 
                 operation.AddResponse("200", $"{schemaName} content retrieved.", CreateContentsSchema(schemaName, contentSchema));
+
+                AddSecurity(operation, Permissions.AppContentsRead);
             });
         }
 
@@ -108,6 +114,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Get a {schemaName} content.";
 
                 operation.AddResponse("200", $"{schemaName} content found.", contentSchema);
+
+                AddSecurity(operation, Permissions.AppContentsRead);
             });
         }
 
@@ -122,6 +130,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.AddQueryParameter("publish", JsonObjectType.Boolean, "Set to true to autopublish content.");
 
                 operation.AddResponse("201", $"{schemaName} content created.", contentSchema);
+
+                AddSecurity(operation, Permissions.AppContentsCreate);
             });
         }
 
@@ -135,6 +145,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
                 operation.AddResponse("200", $"{schemaName} content updated.", dataSchema);
+
+                AddSecurity(operation, Permissions.AppContentsUpdate);
             });
         }
 
@@ -148,6 +160,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
                 operation.AddResponse("200", $"{schemaName} content patched.", dataSchema);
+
+                AddSecurity(operation, Permissions.AppContentsUpdate);
             });
         }
 
@@ -159,6 +173,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Publish a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content published.");
+
+                AddSecurity(operation, Permissions.AppContentsPublish);
             });
         }
 
@@ -170,6 +186,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Unpublish a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content unpublished.");
+
+                AddSecurity(operation, Permissions.AppContentsUnpublish);
             });
         }
 
@@ -181,6 +199,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Archive a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content restored.");
+
+                AddSecurity(operation, Permissions.AppContentsRead);
             });
         }
 
@@ -192,6 +212,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Restore a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content restored.");
+
+                AddSecurity(operation, Permissions.AppContentsRestore);
             });
         }
 
@@ -203,6 +225,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Delete a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content deleted.");
+
+                AddSecurity(operation, Permissions.AppContentsDelete);
             });
         }
 
@@ -244,6 +268,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             };
 
             return schema;
+        }
+
+        private void AddSecurity(SwaggerOperation operation, string permission)
+        {
+            operation.Security.Add(new SwaggerSecurityRequirement
+            {
+                [Constants.SecurityDefinition] = new[] { Permissions.ForApp(permission, appName, schemaPath).Id }
+            });
         }
     }
 }

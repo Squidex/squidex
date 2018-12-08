@@ -5,13 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
@@ -20,11 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
     {
         private readonly IAppsByNameIndex index;
 
-        public IEnumerable<string> Scopes
-        {
-            get { yield return HealthCheckScopes.Cluster; }
-        }
-
         public OrleansAppsHealthCheck(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
@@ -32,11 +26,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
             index = grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id);
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
             await index.CountAsync();
 
-            return new HealthCheckResult(true);
+            return HealthCheckResult.Healthy("Orleans must establish communication.");
         }
     }
 }

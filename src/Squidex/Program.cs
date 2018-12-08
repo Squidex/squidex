@@ -25,7 +25,7 @@ namespace Squidex
             new WebHostBuilder()
                 .UseKestrel(k => { k.AddServerHeader = false; })
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
+                .UseIIS()
                 .UseStartup<WebStartup>()
                 .ConfigureLogging((hostingContext, builder) =>
                 {

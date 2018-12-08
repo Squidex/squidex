@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +15,9 @@ using NJsonSchema;
 using NSwag;
 using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration;
+using NSwag.SwaggerGeneration.Processors;
+using NSwag.SwaggerGeneration.Processors.Contexts;
+using Squidex.Areas.Api.Config.Swagger;
 using Squidex.Config;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -24,30 +28,47 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemasSwaggerGenerator
     {
-        private readonly HttpContext context;
-        private readonly SwaggerSettings<SwaggerGeneratorSettings> settings;
         private readonly MyUrlsOptions urlOptions;
+        private readonly SwaggerDocumentSettings settings = new SwaggerDocumentSettings();
         private SwaggerJsonSchemaGenerator schemaGenerator;
-        private JsonSchemaResolver schemaResolver;
         private SwaggerDocument document;
+        private JsonSchemaResolver schemaResolver;
 
-        public SchemasSwaggerGenerator(IHttpContextAccessor context, SwaggerSettings<SwaggerGeneratorSettings> settings, IOptions<MyUrlsOptions> urlOptions)
+        public SchemasSwaggerGenerator(IOptions<MyUrlsOptions> urlOptions, IEnumerable<IDocumentProcessor> documentProcessors)
         {
-            this.context = context.HttpContext;
-            this.settings = settings;
             this.urlOptions = urlOptions.Value;
+
+            settings.ConfigureSchemaSettings();
+
+            foreach (var processor in documentProcessors)
+            {
+                settings.DocumentProcessors.Add(processor);
+            }
         }
 
-        public async Task<SwaggerDocument> Generate(IAppEntity app, IEnumerable<ISchemaEntity> schemas)
+        public async Task<SwaggerDocument> Generate(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas)
         {
-            document = SwaggerHelper.CreateApiDocument(context, urlOptions, app.Name);
+            document = NSwagHelper.CreateApiDocument(httpContext, urlOptions, app.Name);
 
-            schemaGenerator = new SwaggerJsonSchemaGenerator(settings.GeneratorSettings);
-            schemaResolver = new SwaggerSchemaResolver(document, settings.GeneratorSettings);
+            schemaGenerator = new SwaggerJsonSchemaGenerator(settings);
+            schemaResolver = new SwaggerSchemaResolver(document, settings);
 
             GenerateSchemasOperations(schemas, app);
 
             await GenerateDefaultErrorsAsync();
+
+            var context =
+                new DocumentProcessorContext(document,
+                    Enumerable.Empty<Type>(),
+                    Enumerable.Empty<Type>(),
+                    schemaResolver,
+                    schemaGenerator,
+                    settings);
+
+            foreach (var processor in settings.DocumentProcessors)
+            {
+                await processor.ProcessAsync(context);
+            }
 
             return document;
         }
@@ -58,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.SchemaDef))
             {
-                new SchemaSwaggerGenerator(document, appBasePath, schema, AppendSchema, app.PartitionResolver()).GenerateSchemaOperations();
+                new SchemaSwaggerGenerator(document, app.Name, appBasePath, schema, AppendSchema, app.PartitionResolver()).GenerateSchemaOperations();
             }
         }
 

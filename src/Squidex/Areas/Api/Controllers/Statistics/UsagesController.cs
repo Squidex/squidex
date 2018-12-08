@@ -123,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         }
 
         /// <summary>
-        /// Get storage usage in date range.
+        /// Get asset usage by date.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="fromDate">The from date.</param>
