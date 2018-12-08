@@ -18,7 +18,6 @@ using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.EventConsumers
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
     public sealed class EventConsumersController : ApiController
     {
         private readonly IGrainFactory grainFactory;

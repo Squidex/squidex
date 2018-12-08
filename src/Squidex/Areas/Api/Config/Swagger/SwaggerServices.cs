@@ -38,6 +38,9 @@ namespace Squidex.Areas.Api.Config.Swagger
             services.AddSingletonAs<ScopesProcessor>()
                 .As<IOperationProcessor>();
 
+            services.AddSingletonAs<FixProcessor>()
+                .As<IOperationProcessor>();
+
             services.AddSingletonAs<TagByGroupNameProcessor>()
                 .As<IOperationProcessor>();
 

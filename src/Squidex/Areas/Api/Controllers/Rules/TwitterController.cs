@@ -6,14 +6,13 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using CoreTweet;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Extensions.Actions.Twitter;
-using static CoreTweet.OAuth;
 
 namespace Squidex.Areas.Api.Controllers.Rules
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
     public sealed class TwitterController : Controller
     {
         private readonly TwitterOptions twitterOptions;
@@ -36,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [Route("rules/twitter/auth")]
         public async Task<IActionResult> Auth()
         {
-            var session = await AuthorizeAsync(twitterOptions.ClientId, twitterOptions.ClientSecret);
+            var session = await OAuth.AuthorizeAsync(twitterOptions.ClientId, twitterOptions.ClientSecret);
 
             return Ok(new
             {
@@ -50,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [Route("rules/twitter/token")]
         public async Task<IActionResult> AuthComplete([FromBody] TokenRequest request)
         {
-            var session = new OAuthSession
+            var session = new OAuth.OAuthSession
             {
                 ConsumerKey = twitterOptions.ClientId,
                 ConsumerSecret = twitterOptions.ClientSecret,

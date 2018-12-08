@@ -25,6 +25,7 @@ using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {
+    [ApiExplorerSettings(GroupName = nameof(Contents))]
     public sealed class ContentsController : ApiController
     {
         private readonly IOptions<MyContentsControllerOptions> controllerOptions;
@@ -180,7 +181,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
-        /// Get a content item with a specific version.
+        /// Get a content by version.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
@@ -435,7 +436,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
-        /// Discard changes of a content item.
+        /// Discard changes.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>

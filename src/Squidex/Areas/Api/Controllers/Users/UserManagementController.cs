@@ -21,7 +21,6 @@ using Squidex.Shared;
 namespace Squidex.Areas.Api.Controllers.Users
 {
     [ApiModelValidation(true)]
-    [ApiExplorerSettings(IgnoreApi = true)]
     public sealed class UserManagementController : ApiController
     {
         private readonly UserManager<IdentityUser> userManager;
