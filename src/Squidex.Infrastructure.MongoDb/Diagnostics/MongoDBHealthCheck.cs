@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.Diagnostics
@@ -16,11 +16,6 @@ namespace Squidex.Infrastructure.Diagnostics
     {
         private readonly IMongoDatabase mongoDatabase;
 
-        public IEnumerable<string> Scopes
-        {
-            get { yield return HealthCheckScopes.Node; }
-        }
-
         public MongoDBHealthCheck(IMongoDatabase mongoDatabase)
         {
             Guard.NotNull(mongoDatabase, nameof(mongoDatabase));
@@ -28,13 +23,15 @@ namespace Squidex.Infrastructure.Diagnostics
             this.mongoDatabase = mongoDatabase;
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
             var collectionNames = await mongoDatabase.ListCollectionNamesAsync(cancellationToken: cancellationToken);
 
             var result = await collectionNames.AnyAsync(cancellationToken);
 
-            return new HealthCheckResult(result);
+            var status = result ? HealthStatus.Healthy : HealthStatus.Unhealthy;
+
+            return new HealthCheckResult(status, "Application must query data from MongoDB");
         }
     }
 }

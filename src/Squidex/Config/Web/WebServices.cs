@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Config.Domain;
 using Squidex.Pipeline;
-using Squidex.Pipeline.Diagnostics;
 using Squidex.Pipeline.Robots;
 
 namespace Squidex.Config.Web
@@ -25,9 +24,6 @@ namespace Squidex.Config.Web
                 .AsSelf();
 
             services.AddSingletonAs<AppResolver>()
-                .AsSelf();
-
-            services.AddSingletonAs<HealthCheckMiddleware>()
                 .AsSelf();
 
             services.AddSingletonAs<RobotsTxtMiddleware>()

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
+using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
@@ -27,6 +28,11 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyInfrastructureServices(this IServiceCollection services)
         {
+            services.AddHealthChecks()
+                .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" })
+                .AddCheck<OrleansHealthCheck>("Orleans", tags: new[] { "cluster" })
+                .AddCheck<OrleansAppsHealthCheck>("Orleans App", tags: new[] { "cluster" });
+
             services.AddSingletonAs(SystemClock.Instance)
                 .As<IClock>();
 
@@ -38,12 +44,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<AsyncLocalCache>()
                 .As<ILocalCache>();
-
-            services.AddSingletonAs<GCHealthCheck>()
-                .As<IHealthCheck>();
-
-            services.AddSingletonAs<OrleansHealthCheck>()
-                .As<IHealthCheck>();
 
             services.AddSingletonAs<HttpContextAccessor>()
                 .As<IHttpContextAccessor>();

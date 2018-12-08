@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Orleans;
 using Orleans.Runtime;
 
@@ -17,11 +17,6 @@ namespace Squidex.Infrastructure.Diagnostics
     {
         private readonly IManagementGrain managementGrain;
 
-        public IEnumerable<string> Scopes
-        {
-            get { yield return HealthCheckScopes.Cluster; }
-        }
-
         public OrleansHealthCheck(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
@@ -29,11 +24,13 @@ namespace Squidex.Infrastructure.Diagnostics
             managementGrain = grainFactory.GetGrain<IManagementGrain>(0);
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
             var activationCount = await managementGrain.GetTotalActivationCount();
 
-            return new HealthCheckResult(activationCount > 0, "Orleans must have at least one activation.");
+            var status = activationCount > 0 ? HealthStatus.Healthy : HealthStatus.Unhealthy;
+
+            return new HealthCheckResult(status, "Orleans must have at least one activation.");
         }
     }
 }

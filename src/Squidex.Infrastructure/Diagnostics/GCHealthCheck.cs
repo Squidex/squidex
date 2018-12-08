@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 
 namespace Squidex.Infrastructure.Diagnostics
@@ -17,11 +18,6 @@ namespace Squidex.Infrastructure.Diagnostics
     {
         private readonly long threshold;
 
-        public IEnumerable<string> Scopes
-        {
-            get { yield return HealthCheckScopes.Node; }
-        }
-
         public GCHealthCheck(IOptions<GCHealthCheckOptions> options)
         {
             Guard.NotNull(options, nameof(options));
@@ -29,19 +25,21 @@ namespace Squidex.Infrastructure.Diagnostics
             threshold = 1024 * 1024 * options.Value.Threshold;
         }
 
-        public Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
             var allocated = GC.GetTotalMemory(false);
 
-            var data = new Dictionary<string, object>()
+            var data = new Dictionary<string, object>
             {
-                { "Allocated", allocated },
+                { "Allocated", allocated.ToReadableSize() },
                 { "Gen0Collections", GC.CollectionCount(0) },
                 { "Gen1Collections", GC.CollectionCount(1) },
                 { "Gen2Collections", GC.CollectionCount(2) },
             };
 
-            return Task.FromResult(new HealthCheckResult(allocated < threshold, $"Reports degraded status if allocated bytes >= {threshold.ToReadableSize()}", data));
+            var status = allocated < threshold ? HealthStatus.Healthy : HealthStatus.Unhealthy;
+
+            return Task.FromResult(new HealthCheckResult(status, $"Application must consum less than {threshold.ToReadableSize()} memory.", data: data));
         }
     }
 }
