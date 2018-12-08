@@ -1,7 +1,7 @@
 #
 # Stage 1, Prebuild
 #
-FROM squidex/dotnet:2.1-sdk-chromium-phantomjs-node as builder
+FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as builder
 
 COPY src/Squidex/package.json /tmp/package.json
 
@@ -33,7 +33,7 @@ RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configurati
 #
 # Stage 2, Build runtime
 #
-FROM microsoft/dotnet:2.1-runtime-deps-alpine
+FROM microsoft/dotnet:2.2-runtime-deps-alpine
 
 # Default AspNetCore directory
 WORKDIR /app

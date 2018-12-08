@@ -59,9 +59,6 @@ namespace Squidex.Areas.Api.Config.Swagger
 
         public static void ConfigureSchemaSettings<T>(this T settings) where T : SwaggerGeneratorSettings
         {
-            settings.DefaultEnumHandling = EnumHandling.String;
-            settings.DefaultPropertyNameHandling = PropertyNameHandling.CamelCase;
-
             settings.TypeMappers = new List<ITypeMapper>
             {
                 new PrimitiveTypeMapper(typeof(Instant), schema =>

@@ -6,12 +6,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using Microsoft.Extensions.Options;
 using NSwag;
 using NSwag.SwaggerGeneration.Processors.Security;
 using Squidex.Config;
+using Squidex.Pipeline.Swagger;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
@@ -30,7 +29,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 
             securityScheme.TokenUrl = tokenUrl;
 
-            var securityDocs = LoadDocs("security");
+            var securityDocs = SwaggerHelper.LoadDocs("security");
             var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
 
             securityScheme.Description = securityText;
@@ -44,19 +43,6 @@ namespace Squidex.Areas.Api.Config.Swagger
             };
 
             return securityScheme;
-        }
-
-        private static string LoadDocs(string name)
-        {
-            var assembly = typeof(SecurityProcessor).GetTypeInfo().Assembly;
-
-            using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Docs.{name}.md"))
-            {
-                using (var streamReader = new StreamReader(resourceStream))
-                {
-                    return streamReader.ReadToEnd();
-                }
-            }
         }
     }
 }
