@@ -26,6 +26,7 @@ using Squidex.Shared.Users;
 namespace Squidex.Areas.IdentityServer.Controllers.Profile
 {
     [Authorize]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public sealed class ProfileController : IdentityServerController
     {
         private readonly SignInManager<IdentityUser> signInManager;

@@ -15,6 +15,7 @@ using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Config;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
@@ -27,19 +28,31 @@ namespace Squidex.Areas.Api.Config.Swagger
                 context.OperationDescription.Operation.Security = new List<SwaggerSecurityRequirement>();
             }
 
-            var authorizeAttributes =
-                context.MethodInfo.GetCustomAttributes<AuthorizeAttribute>(true).Union(
-                context.MethodInfo.DeclaringType.GetCustomAttributes<AuthorizeAttribute>(true))
-                    .ToArray();
+            var permissionAttribute = context.MethodInfo.GetCustomAttribute<ApiPermissionAttribute>();
 
-            if (authorizeAttributes.Any())
+            if (permissionAttribute != null)
             {
-                var scopes = authorizeAttributes.Where(a => a.Roles != null).SelectMany(a => a.Roles.Split(',')).Distinct().ToList();
-
                 context.OperationDescription.Operation.Security.Add(new SwaggerSecurityRequirement
                 {
-                    { Constants.SecurityDefinition, scopes }
+                    [Constants.SecurityDefinition] = permissionAttribute.PermissionIds
                 });
+            }
+            else
+            {
+                var authorizeAttributes =
+                    context.MethodInfo.GetCustomAttributes<AuthorizeAttribute>(true).Union(
+                    context.MethodInfo.DeclaringType.GetCustomAttributes<AuthorizeAttribute>(true))
+                        .ToArray();
+
+                if (authorizeAttributes.Any())
+                {
+                    var scopes = authorizeAttributes.Where(a => a.Roles != null).SelectMany(a => a.Roles.Split(',')).Distinct().ToList();
+
+                    context.OperationDescription.Operation.Security.Add(new SwaggerSecurityRequirement
+                    {
+                        [Constants.SecurityDefinition] = scopes
+                    });
+                }
             }
 
             return TaskHelper.True;

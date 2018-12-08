@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         public async Task<SwaggerDocument> Generate(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas)
         {
-            document = SwaggerHelper.CreateApiDocument(httpContext, urlOptions, app.Name);
+            document = NSwagHelper.CreateApiDocument(httpContext, urlOptions, app.Name);
 
             schemaGenerator = new SwaggerJsonSchemaGenerator(settings);
             schemaResolver = new SwaggerSchemaResolver(document, settings);
@@ -79,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             foreach (var schema in schemas.Where(x => x.IsPublished).Select(x => x.SchemaDef))
             {
-                new SchemaSwaggerGenerator(document, appBasePath, schema, AppendSchema, app.PartitionResolver()).GenerateSchemaOperations();
+                new SchemaSwaggerGenerator(document, app.Name, appBasePath, schema, AppendSchema, app.PartitionResolver()).GenerateSchemaOperations();
             }
         }
 

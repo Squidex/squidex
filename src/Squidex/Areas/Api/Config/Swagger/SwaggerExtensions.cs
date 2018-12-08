@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Builder;
-using Squidex.Config;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
@@ -14,10 +13,7 @@ namespace Squidex.Areas.Api.Config.Swagger
     {
         public static void UseMySwagger(this IApplicationBuilder app)
         {
-            app.UseSwagger(settings =>
-            {
-                settings.Path = $"{Constants.ApiPrefix}/swagger/{{documentName}}/swagger.json";
-            });
+            app.UseSwagger();
         }
     }
 }

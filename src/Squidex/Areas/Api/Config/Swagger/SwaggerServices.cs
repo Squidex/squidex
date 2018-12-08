@@ -32,6 +32,9 @@ namespace Squidex.Areas.Api.Config.Swagger
             services.AddSingletonAs<XmlTagProcessor>()
                 .As<IDocumentProcessor>();
 
+            services.AddSingletonAs<SecurityProcessor>()
+                .As<IDocumentProcessor>();
+
             services.AddSingletonAs<ScopesProcessor>()
                 .As<IOperationProcessor>();
 

@@ -13,6 +13,7 @@ using static CoreTweet.OAuth;
 
 namespace Squidex.Areas.Api.Controllers.Rules
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public sealed class TwitterController : Controller
     {
         private readonly TwitterOptions twitterOptions;

@@ -10,6 +10,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Docs
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public sealed class DocsController : ApiController
     {
         public DocsController(ICommandBus commandBus)

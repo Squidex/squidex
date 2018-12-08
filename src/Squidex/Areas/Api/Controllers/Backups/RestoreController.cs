@@ -20,6 +20,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
     /// <summary>
     /// Restores backups.
     /// </summary>
+    [ApiExplorerSettings(GroupName = nameof(Backups))]
     [ApiModelValidation(true)]
     public class RestoreController : ApiController
     {
@@ -31,6 +32,12 @@ namespace Squidex.Areas.Api.Controllers.Backups
             this.grainFactory = grainFactory;
         }
 
+        /// <summary>
+        /// Get current status.
+        /// </summary>
+        /// <returns>
+        /// 200 => Status returned.
+        /// </returns>
         [HttpGet]
         [Route("apps/restore/")]
         [ApiPermission(Permissions.AdminRestoreRead)]
@@ -50,6 +57,13 @@ namespace Squidex.Areas.Api.Controllers.Backups
             return Ok(response);
         }
 
+        /// <summary>
+        /// Restore a backup.
+        /// </summary>
+        /// <param name="request">The backup to restore.</param>
+        /// <returns>
+        /// 204 => Restore operation started.
+        /// </returns>
         [HttpPost]
         [Route("apps/restore/")]
         [ApiPermission(Permissions.AdminRestoreCreate)]

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 namespace Squidex.Areas.IdentityServer.Controllers
 {
     [Area("IdentityServer")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public abstract class IdentityServerController : Controller
     {
         public override void OnActionExecuting(ActionExecutingContext context)

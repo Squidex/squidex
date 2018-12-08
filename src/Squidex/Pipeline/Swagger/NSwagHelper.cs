@@ -19,11 +19,11 @@ using Squidex.Config;
 
 namespace Squidex.Pipeline.Swagger
 {
-    public static class SwaggerHelper
+    public static class NSwagHelper
     {
         public static string LoadDocs(string name)
         {
-            var assembly = typeof(SwaggerHelper).GetTypeInfo().Assembly;
+            var assembly = typeof(NSwagHelper).GetTypeInfo().Assembly;
 
             using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Docs.{name}.md"))
             {

@@ -250,7 +250,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         }
 
         /// <summary>
-        /// Enqueue the event to retry it immediate
+        /// Retry the event immediately.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The event to enqueue.</param>
@@ -277,7 +277,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         }
 
         /// <summary>
-        /// Cancels the event to not retry it again.
+        /// Cancels the event and retries.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The event to enqueue.</param>

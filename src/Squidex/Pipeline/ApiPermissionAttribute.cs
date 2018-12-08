@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer4.AccessTokenValidation;
@@ -20,6 +21,11 @@ namespace Squidex.Pipeline
     public sealed class ApiPermissionAttribute : AuthorizeAttribute, IAsyncActionFilter
     {
         private readonly string[] permissionIds;
+
+        public IEnumerable<string> PermissionIds
+        {
+            get { return permissionIds; }
+        }
 
         public ApiPermissionAttribute(params string[] ids)
         {

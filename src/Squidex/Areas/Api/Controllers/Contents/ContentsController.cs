@@ -75,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         }
 
         /// <summary>
-        /// GraphQL endpoint with batch support.
+        /// GraphQL endpoint (Batch).
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="batch">The graphql queries.</param>

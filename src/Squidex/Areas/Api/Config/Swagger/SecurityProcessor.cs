@@ -29,7 +29,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 
             securityScheme.TokenUrl = tokenUrl;
 
-            var securityDocs = SwaggerHelper.LoadDocs("security");
+            var securityDocs = NSwagHelper.LoadDocs("security");
             var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
 
             securityScheme.Description = securityText;
@@ -39,7 +39,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 
             securityScheme.Scopes = new Dictionary<string, string>
             {
-                { Constants.ApiScope, "Read and write access to the API" }
+                [Constants.ApiScope] = "Read and write access to the API"
             };
 
             return securityScheme;
