@@ -2,7 +2,9 @@
   <PropertyGroup>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <PreserveCompilationContext>true</PreserveCompilationContext>
-    <TargetFramework>netcoreapp2.2</TargetFramework>    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+    <RuntimeFrameworkVersion>2.2.0</RuntimeFrameworkVersion>
+    <TargetFramework>netcoreapp2.2</TargetFramework>    
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
@@ -12,15 +14,17 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\*.*;Docs\*.md" />
+    <EmbeddedResource Include="Docs\*.md" />
+    <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\*.*" />
     <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
-    <EmbeddedResource Remove="Assets\**" />
 
     <Compile Remove="Assets\**" />
+    
     <Content Remove="Assets\**" />
     <Content Remove="package-lock.json" />
-
-    <None Remove="Assets\**" />
+    <Content Remove="package.json" />
+    <Content Remove="tsconfig.json" />
+    <Content Remove="tslint.json" />
   </ItemGroup>
 
   <ItemGroup>
