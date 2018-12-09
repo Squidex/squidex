@@ -1,13 +1,44 @@
 # Changelog
 
+## v1.13.0 - 2018-12-08
+
+### Features
+
+* **Contents**: Uniqueness validator.
+* **Swagger**: Show needed permission in swagger definition.
+* **UI**: Array fields: Clone items.
+* **UI**: Array fields: Collapsed all items to make sorting measier.
+* **UI**: Array fields: Buttons for sorting.
+* **UI**: Drag indicators for drag and drop lists.
+* **General**: New fine grained permission system.
+* **General**: Custom roles.
+* **Rules**: Cancel queued events.
+* **Rules**: Publication id for medium action.
+
+### Bugfixes
+
+* **Backup**: Always make  the user, who restored an backup an owner.
+* **Contents**: Implemented $search for Array fields.
+* **UI**: Fixed for Edge browser.
+
+### Refactorings
+
+* Migration to .NET Core 2.2
+* Migration to ASP.NET Core 2.2
+* Migration to ASP.NET Core Health System
+* Performance improvements in logging system.
+* Performance improvements for json serialization.
+* Unificiation of storage implementations.
+* Custom JSON structures to replace JSON.NET with faster serializer at later point of time.
+
 ## v1.12.0 - 2018-11-06
 
 ### Features
 
 * **Contents**: Comments for content items.
-* **Contents**: Specify limits for max number of assets via options
+* **Contents**: Specify limits for max number of assets via options.
 * **Assets**: Specify limits for max number of assets via options
-* **UI**: List view for assets
+* **UI**: List view for assets.
 * **UI**: Reorder contents in references fields.
 
 ### Bugfixes
