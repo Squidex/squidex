@@ -190,7 +190,7 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
 }
 
 function label(category: string) {
-    return category === '*' ? 'All Clients' : category;
+    return category === '*' ? 'anonymous' : category;
 }
 
 function createLabels(dtos: { date: DateTime }[]): string[] {
