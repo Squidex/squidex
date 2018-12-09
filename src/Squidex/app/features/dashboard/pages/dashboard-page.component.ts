@@ -150,7 +150,7 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                                 backgroundColor: `rgba(${COLORS[0]}, 0.6)`,
                                 borderColor: `rgba(${COLORS[0]}, 1)`,
                                 borderWidth: 1,
-                                data: dtos.map(x => Math.round(10 * (x.size / (1024 * 1024))) / 10)
+                                data: dtos.map(x => Math.round(100 * (x.size / (1024 * 1024))) / 100)
                             }
                         ]
                     };

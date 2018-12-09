@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.UsageTracking
             {
                 var (filter, updateStatement) = CreateOperation(update);
 
-                await Collection.UpdateOneAsync(filter, updateStatement);
+                await Collection.UpdateOneAsync(filter, updateStatement, Upsert);
             }
         }
 
