@@ -22,6 +22,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
 using Squidex.Shared;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {
@@ -238,6 +239,13 @@ namespace Squidex.Areas.Api.Controllers.Contents
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
             await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
+
+            var publishPermission = Permissions.ForApp(Permissions.AppContentsPublish, app, name);
+
+            if (publish && !User.Permissions().Includes(publishPermission))
+            {
+                return new StatusCodeResult(123);
+            }
 
             var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
 

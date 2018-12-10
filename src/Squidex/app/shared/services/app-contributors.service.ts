@@ -30,6 +30,16 @@ export class AppContributorsDto extends Model {
     }
 }
 
+export class AssignContributorDto extends Model {
+    constructor(
+        public readonly contributorId: string,
+        public readonly role: string,
+        public readonly invite = false
+    ) {
+        super();
+    }
+}
+
 export class AppContributorDto extends Model {
     constructor(
         public readonly contributorId: string,
@@ -41,7 +51,8 @@ export class AppContributorDto extends Model {
 
 export class ContributorAssignedDto {
     constructor(
-        public readonly contributorId: string
+        public readonly contributorId: string,
+        public readonly wasInvited: boolean
     ) {
     }
 }
@@ -75,14 +86,14 @@ export class AppContributorsService {
                 pretifyError('Failed to load contributors. Please reload.'));
     }
 
-    public postContributor(appName: string, dto: AppContributorDto, version: Version): Observable<Versioned<ContributorAssignedDto>> {
+    public postContributor(appName: string, dto: AssignContributorDto, version: Version): Observable<Versioned<ContributorAssignedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
                 map(response => {
                     const body: any = response.payload.body;
 
-                    const result = new ContributorAssignedDto(body.contributorId);
+                    const result = new ContributorAssignedDto(body.contributorId, body.wasInvited);
 
                     return new Versioned(response.version, result);
                 }),

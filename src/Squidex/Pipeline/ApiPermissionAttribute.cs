@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -38,10 +37,7 @@ namespace Squidex.Pipeline
         {
             if (permissionIds.Length > 0)
             {
-                var set = new PermissionSet(
-                    context.HttpContext.User.FindAll(SquidexClaimTypes.Permissions)
-                        .Select(x => x.Value)
-                        .Select(x => new Permission(x)));
+                var set = context.HttpContext.User.Permissions();
 
                 var hasPermission = false;
 

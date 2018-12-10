@@ -20,14 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
     public sealed class CreateBlogCommandMiddleware : ICommandMiddleware
     {
         private const string TemplateName = "Blog";
-        private const string SlugScript = @"
-var data = ctx.data;
-    
-if (data.title && data.title.iv) {
-    data.slug = { iv: slugify(data.title.iv) };
-}
-
-replace(data);";
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
@@ -129,8 +121,8 @@ replace(data);";
             await publish(new ConfigureScripts
             {
                 SchemaId = schemaId.Id,
-                ScriptCreate = SlugScript,
-                ScriptUpdate = SlugScript
+                ScriptCreate = Scripts.Slug,
+                ScriptUpdate = Scripts.Slug
             });
 
             return schemaId;
@@ -163,8 +155,8 @@ replace(data);";
             await publish(new ConfigureScripts
             {
                 SchemaId = schemaId.Id,
-                ScriptCreate = SlugScript,
-                ScriptUpdate = SlugScript
+                ScriptCreate = Scripts.Slug,
+                ScriptUpdate = Scripts.Slug
             });
 
             return schemaId;

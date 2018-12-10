@@ -24,9 +24,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string Role { get; set; }
 
+        /// <summary>
+        /// Set to true to invite the user if he does not exist.
+        /// </summary>
+        public bool Invite { get; set; }
+
         public AssignContributor ToCommand()
         {
-            return SimpleMapper.Map(this, new AssignContributor());
+            return SimpleMapper.Map(this, new AssignContributor { IsInviting = Invite });
         }
     }
 }

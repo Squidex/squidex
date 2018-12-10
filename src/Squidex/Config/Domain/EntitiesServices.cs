@@ -160,6 +160,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<EnrichWithSchemaIdCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<InviteCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 

@@ -8,6 +8,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Commands;
@@ -73,8 +74,17 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var command = request.ToCommand();
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<EntityCreatedResult<string>>();
-            var response = ContributorAssignedDto.FromId(result.IdOrValue);
+            var result = context.Result<object>();
+            var response = (ContributorAssignedDto)null;
+
+            if (result is EntityCreatedResult<string> idOrValue)
+            {
+                response = ContributorAssignedDto.FromId(idOrValue.IdOrValue, false);
+            }
+            else if (result is InvitedResult invited)
+            {
+                response = ContributorAssignedDto.FromId(invited.Id.IdOrValue, true);
+            }
 
             return Ok(response);
         }

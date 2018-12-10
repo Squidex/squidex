@@ -13,9 +13,11 @@ import { filter, onErrorResumeNext, withLatestFrom } from 'rxjs/operators';
 import {
     AppContributorDto,
     AppsState,
+    AssignContributorDto,
     AssignContributorForm,
     AutocompleteSource,
     ContributorsState,
+    DialogService,
     RolesState,
     Types,
     UserDto,
@@ -61,6 +63,7 @@ export class ContributorsPageComponent implements OnInit {
         public readonly contributorsState: ContributorsState,
         public readonly rolesState: RolesState,
         public readonly usersDataSource: UsersDataSource,
+        private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder
     ) {
     }
@@ -80,7 +83,7 @@ export class ContributorsPageComponent implements OnInit {
     }
 
     public changeRole(contributor: AppContributorDto, role: string) {
-        this.contributorsState.assign(new AppContributorDto(contributor.contributorId, role)).pipe(onErrorResumeNext()).subscribe();
+        this.contributorsState.assign(new AssignContributorDto(contributor.contributorId, role)).pipe(onErrorResumeNext()).subscribe();
     }
 
     public assignContributor() {
@@ -93,11 +96,15 @@ export class ContributorsPageComponent implements OnInit {
                 user = user.id;
             }
 
-            const requestDto = new AppContributorDto(user, 'Editor');
+            const requestDto = new AssignContributorDto(user, 'Editor', true);
 
             this.contributorsState.assign(requestDto)
-                .subscribe(() => {
-                    this.assignContributorForm.submitCompleted();
+                .subscribe(wasInvited => {
+                    this.assignContributorForm.submitCompleted({});
+
+                    if (wasInvited) {
+                        this.dialogs.notifyInfo('A new user with the entered email address has been created and assigned as contributor.');
+                    }
                 }, error => {
                     this.assignContributorForm.submitFailed(error);
                 });

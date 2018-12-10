@@ -12,6 +12,8 @@ namespace Squidex.Shared.Users
 {
     public interface IUserResolver
     {
+        Task<bool> CreateUserIfNotExists(string email);
+
         Task<IUser> FindByIdOrEmailAsync(string idOrEmail);
 
         Task<List<IUser>> QueryByEmailAsync(string email);

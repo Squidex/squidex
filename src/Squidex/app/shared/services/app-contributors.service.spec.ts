@@ -14,6 +14,7 @@ import {
     AppContributorDto,
     AppContributorsDto,
     AppContributorsService,
+    AssignContributorDto,
     ContributorAssignedDto,
     Version
 } from './../';
@@ -80,7 +81,7 @@ describe('AppContributorsService', () => {
     it('should make post request to assign contributor',
         inject([AppContributorsService, HttpTestingController], (appContributorsService: AppContributorsService, httpMock: HttpTestingController) => {
 
-        const dto = new AppContributorDto('123', 'Owner');
+        const dto = new AssignContributorDto('123', 'Owner');
 
         let contributorAssignedDto: ContributorAssignedDto;
 
@@ -93,7 +94,7 @@ describe('AppContributorsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({ contributorId: '123' });
+        req.flush({ contributorId: '123', wasInvited: true });
 
         expect(contributorAssignedDto!.contributorId).toEqual('123');
     }));

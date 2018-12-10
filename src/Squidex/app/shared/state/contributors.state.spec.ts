@@ -13,12 +13,14 @@ import {
     AppContributorsDto,
     AppContributorsService,
     AppsState,
+    AssignContributorDto,
     AuthService,
     ContributorsState,
     DialogService,
     Version,
     Versioned
 } from '@app/shared';
+import { ContributorAssignedDto } from '../services/app-contributors.service';
 
 describe('ContributorsState', () => {
     const app = 'my-app';
@@ -82,10 +84,10 @@ describe('ContributorsState', () => {
     it('should add contributor to snapshot when assigned', () => {
         const newContributor = new AppContributorDto('id3', 'Developer');
 
-        const request = new AppContributorDto('mail2stehle@gmail.com', 'Developer');
+        const request = new AssignContributorDto('mail2stehle@gmail.com', 'Developer');
 
         contributorsService.setup(x => x.postContributor(app, request, version))
-            .returns(() => of(new Versioned<AppContributorDto>(newVersion, newContributor)));
+            .returns(() => of(new Versioned<ContributorAssignedDto>(newVersion, new ContributorAssignedDto('id3', true))));
 
         contributorsState.assign(request).subscribe();
 
@@ -102,10 +104,10 @@ describe('ContributorsState', () => {
     it('should update contributor in snapshot when assigned and already added', () => {
         const newContributor = new AppContributorDto('id2', 'Owner');
 
-        const request = new AppContributorDto('mail2stehle@gmail.com', 'Owner');
+        const request = new AssignContributorDto('mail2stehle@gmail.com', 'Owner');
 
         contributorsService.setup(x => x.postContributor(app, request, version))
-            .returns(() => of(new Versioned<AppContributorDto>(newVersion, newContributor)));
+            .returns(() => of(new Versioned<ContributorAssignedDto>(newVersion, new ContributorAssignedDto('id2', true))));
 
         contributorsState.assign(request).subscribe();
 

@@ -28,6 +28,27 @@ namespace Squidex.Domain.Users
             this.userFactory = userFactory;
         }
 
+        public async Task<bool> CreateUserIfNotExists(string email)
+        {
+            var user = userFactory.Create(email);
+
+            try
+            {
+                var result = await userManager.CreateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    await userManager.UpdateAsync(user, new UserValues { DisplayName = email });
+                }
+
+                return result.Succeeded;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task<IUser> FindByIdOrEmailAsync(string idOrEmail)
         {
             if (userFactory.IsId(idOrEmail))

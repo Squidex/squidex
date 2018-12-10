@@ -17,9 +17,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [Required]
         public string ContributorId { get; set; }
 
-        public static ContributorAssignedDto FromId(string id)
+        /// <summary>
+        /// Indicates if the user was created.
+        /// </summary>
+        public bool WasInvited { get; set; }
+
+        public static ContributorAssignedDto FromId(string id, bool wasInvited)
         {
-            return new ContributorAssignedDto { ContributorId = id };
+            return new ContributorAssignedDto { ContributorId = id, WasInvited = wasInvited };
         }
     }
 }
