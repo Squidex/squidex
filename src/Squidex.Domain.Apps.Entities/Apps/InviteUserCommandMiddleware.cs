@@ -14,11 +14,11 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class InviteCommandMiddleware : ICommandMiddleware
+    public sealed class InviteUserCommandMiddleware : ICommandMiddleware
     {
         private readonly IUserResolver userResolver;
 
-        public InviteCommandMiddleware(IUserResolver userResolver)
+        public InviteUserCommandMiddleware(IUserResolver userResolver)
         {
             Guard.NotNull(userResolver, nameof(userResolver));
 

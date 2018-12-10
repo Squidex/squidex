@@ -15,9 +15,9 @@ namespace Squidex.Infrastructure
         [Theory]
         [InlineData(null, false)]
         [InlineData("", false)]
-        [InlineData("name", false)]
-        [InlineData("name@@web.de", false)]
-        [InlineData("name@web.de", true)]
+        [InlineData("me", false)]
+        [InlineData("me@@web.com", false)]
+        [InlineData("me@web.com", true)]
         public void Should_check_email(string email, bool isEmail)
         {
             Assert.Equal(isEmail, email.IsEmail());

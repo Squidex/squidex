@@ -23,8 +23,8 @@ namespace Squidex.Infrastructure.Json
                     new ClaimsIdentity(
                         new[]
                         {
-                            new Claim("email", "me@email.de"),
-                            new Claim("username", "me@email.de")
+                            new Claim("email", "me@email.com"),
+                            new Claim("username", "me@email.com")
                         },
                         "Cookie"),
                     new ClaimsIdentity(

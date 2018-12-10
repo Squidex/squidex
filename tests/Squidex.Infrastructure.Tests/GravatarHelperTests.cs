@@ -12,25 +12,25 @@ namespace Squidex.Infrastructure
     public class GravatarHelperTests
     {
         [Theory]
-        [InlineData("MyEmailAddress@example.com ")]
-        [InlineData("MyEmailAddress@example.com")]
-        [InlineData("myemailaddress@example.com")]
+        [InlineData("me@email.com ")]
+        [InlineData("me@email.com")]
+        [InlineData("ME@email.com")]
         public void Should_generate_picture_url(string email)
         {
             var url = GravatarHelper.CreatePictureUrl(email);
 
-            Assert.Equal("https://www.gravatar.com/avatar/0bc83cb571cd1c50ba6f3e8a78ef1346", url);
+            Assert.Equal("https://www.gravatar.com/avatar/8f9dc04e6abdcc9fea53e81945c7294b", url);
         }
 
         [Theory]
-        [InlineData("MyEmailAddress@example.com ")]
-        [InlineData("MyEmailAddress@example.com")]
-        [InlineData("myemailaddress@example.com")]
+        [InlineData("me@email.com ")]
+        [InlineData("me@email.com")]
+        [InlineData("ME@email.com")]
         public void Should_generate_profile_url(string email)
         {
             var url = GravatarHelper.CreateProfileUrl(email);
 
-            Assert.Equal("https://www.gravatar.com/0bc83cb571cd1c50ba6f3e8a78ef1346", url);
+            Assert.Equal("https://www.gravatar.com/8f9dc04e6abdcc9fea53e81945c7294b", url);
         }
     }
 }
