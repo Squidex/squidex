@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
 
         public string Role { get; set; } = Roles.Developer;
 
-        public bool FromRestore { get; set; }
+        public bool IsRestore { get; set; }
+
+        public bool IsInviting { get; set; }
     }
 }

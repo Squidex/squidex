@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 command.ContributorId = user.Id;
 
-                if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase) && !command.FromRestore)
+                if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase) && !command.IsRestore)
                 {
                     throw new DomainForbiddenException("You cannot change your own role.");
                 }
