@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
@@ -17,13 +16,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The new name of the asset.
         /// </summary>
-        [Required]
         public string FileName { get; set; }
 
         /// <summary>
         /// The new asset tags.
         /// </summary>
-        [Required]
         public HashSet<string> Tags { get; set; }
 
         public AssetCommand ToCommand(Guid id)

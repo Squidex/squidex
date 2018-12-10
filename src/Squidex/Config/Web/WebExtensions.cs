@@ -101,8 +101,7 @@ namespace Squidex.Config.Web
             app.UseCors(builder => builder
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials());
+                .AllowAnyHeader());
         }
 
         public static void UseMyForwardingRules(this IApplicationBuilder app)

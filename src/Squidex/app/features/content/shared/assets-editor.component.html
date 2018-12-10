@@ -25,8 +25,8 @@
                 <sqx-asset *ngFor="let file of newAssets" [initFile]="file" 
                     (failed)="removeLoadingAsset(file)" (loaded)="addAsset(file, $event)">
                 </sqx-asset>
-                <sqx-asset *ngFor="let asset of oldAssets" [asset]="asset" removeMode="true" isDisabled="true"
-                    (removing)="removeLoadedAsset($event)">
+                <sqx-asset *ngFor="let asset of oldAssets; trackBy: trackByAsset" [asset]="asset" removeMode="true"
+                    (updated)="notifyOthers($event)" (removing)="removeLoadedAsset($event)">
                 </sqx-asset>
             </div>
         </ng-container>
@@ -40,9 +40,9 @@
                 <div
                     [sqxSortModel]="oldAssets.values"
                     (sqxSorted)="sortAssets($event)">
-                    <div *ngFor="let asset of oldAssets">
-                        <sqx-asset [asset]="asset" removeMode="true" isDisabled="true"
-                            [isListView]="true" (removing)="removeLoadedAsset($event)">
+                    <div *ngFor="let asset of oldAssets; trackBy: trackByAsset">
+                        <sqx-asset [asset]="asset" removeMode="true" [isListView]="true"
+                            (updated)="notifyOthers($event)" (removing)="removeLoadedAsset($event)">
                         </sqx-asset>
                     </div>
                 </div>

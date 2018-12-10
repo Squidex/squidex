@@ -7,8 +7,9 @@
 
 // tslint:disable:prefer-for-of
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnDestroy, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 import {
     AppsState,
@@ -17,12 +18,21 @@ import {
     DialogModel,
     ImmutableArray,
     LocalStoreService,
+    MessageBus,
     Types
 } from '@app/shared';
 
 export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true
 };
+
+class AssetUpdated {
+    constructor(
+        public readonly asset: AssetDto,
+        public readonly source: any
+    ) {
+    }
+}
 
 @Component({
     selector: 'sqx-assets-editor',
@@ -31,9 +41,10 @@ export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetsEditorComponent implements ControlValueAccessor {
+export class AssetsEditorComponent implements ControlValueAccessor, OnInit, OnDestroy {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
+    private subscription: Subscription;
 
     public assetsDialog = new DialogModel();
 
@@ -47,7 +58,8 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
         private readonly changeDetector: ChangeDetectorRef,
-        private readonly localStore: LocalStoreService
+        private readonly localStore: LocalStoreService,
+        private readonly messageBus: MessageBus
     ) {
         this.isListView = this.localStore.get('assetView') === 'List';
     }
@@ -71,6 +83,24 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         } else {
             this.setAssets(ImmutableArray.empty());
         }
+    }
+
+    public notifyOthers(asset: AssetDto) {
+        this.messageBus.emit(new AssetUpdated(asset, this));
+    }
+
+    public ngOnDestroy() {
+        this.subscription.unsubscribe();
+    }
+
+    public ngOnInit() {
+        this.subscription =
+            this.messageBus.of(AssetUpdated)
+                .subscribe(event => {
+                    if (event.source !== this) {
+                        this.setAssets(this.oldAssets.replaceBy('id', event.asset));
+                    }
+                });
     }
 
     public setAssets(asset: ImmutableArray<AssetDto>) {
@@ -120,6 +150,14 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         }
     }
 
+    public sortAssets(assets: AssetDto[]) {
+        if (assets) {
+            this.oldAssets = ImmutableArray.of(assets);
+
+            this.updateValue();
+        }
+    }
+
     public removeLoadedAsset(asset: AssetDto) {
         if (asset) {
             this.oldAssets = this.oldAssets.remove(asset);
@@ -138,14 +176,6 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         this.isListView = isListView;
     }
 
-    public sortAssets(assets: AssetDto[]) {
-        if (assets) {
-            this.oldAssets = ImmutableArray.of(assets);
-
-            this.updateValue();
-        }
-    }
-
     private updateValue() {
         let ids: string[] | null = this.oldAssets.values.map(x => x.id);
 
@@ -157,5 +187,9 @@ export class AssetsEditorComponent implements ControlValueAccessor {
         this.callChange(ids);
 
         this.changeDetector.markForCheck();
+    }
+
+    public trackByAsset(index: number, asset: AssetDto) {
+        return asset.id;
     }
 }

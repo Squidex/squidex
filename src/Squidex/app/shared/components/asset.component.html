@@ -63,7 +63,7 @@
                         <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">                   
                             <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
 
-                            <input type="text" class="form-control form-underlined editable" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit (blur)="renameCancel()" />
+                            <input type="text" class="form-control form-underlined editable" id="assetName" formControlName="name" autocomplete="off" spellcheck="false" sqxFocusOnInit (blur)="renameCancel()" />
                         </form>
                     </div>
                 </div>
@@ -104,7 +104,7 @@
                     <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">                   
                         <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
 
-                        <input type="text" class="form-control editable form-underlined" id="assetName" formControlName="name" autocomplete="off" sqxFocusOnInit (blur)="renameCancel()" />
+                        <input type="text" class="form-control editable form-underlined" id="assetName" formControlName="name" autocomplete="off" spellcheck="false" sqxFocusOnInit (blur)="renameCancel()" />
                     </form>
                 </div>
             </div>

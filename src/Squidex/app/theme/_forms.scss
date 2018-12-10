@@ -185,7 +185,7 @@ input {
             @include border-radius(0);
             padding-left: 0;
             padding-right: 0;
-            border-color: transparent;
+            border: 0;
             border-bottom: 1px solid $color-input-border;
         }
 

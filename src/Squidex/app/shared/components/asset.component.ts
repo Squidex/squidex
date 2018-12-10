@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -34,7 +34,7 @@ import {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetComponent implements OnDestroy, OnInit {
+export class AssetComponent implements OnChanges, OnDestroy, OnInit {
     private tagSubscription: Subscription;
 
     @Input()
@@ -98,6 +98,10 @@ export class AssetComponent implements OnDestroy, OnInit {
     ) {
     }
 
+    public ngOnDestroy() {
+        this.tagSubscription.unsubscribe();
+    }
+
     public ngOnInit() {
         const initFile = this.initFile;
 
@@ -116,12 +120,6 @@ export class AssetComponent implements OnDestroy, OnInit {
 
                     this.emitFailed(error);
                 });
-        } else {
-            this.updateAsset(this.asset, false);
-        }
-
-        if (this.isDisabled) {
-            this.tagInput.disable();
         }
 
         this.tagSubscription =
@@ -133,8 +131,10 @@ export class AssetComponent implements OnDestroy, OnInit {
             });
     }
 
-    public ngOnDestroy() {
-        this.tagSubscription.unsubscribe();
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['asset'] && this.asset) {
+            this.tagInput.setValue(this.asset.tags, { emitEvent: false });
+        }
     }
 
     public updateFile(files: FileList) {
@@ -220,7 +220,7 @@ export class AssetComponent implements OnDestroy, OnInit {
         this.asset = asset;
         this.progress = 0;
 
-        this.tagInput.setValue(asset.tags);
+        this.tagInput.setValue(asset.tags, { emitEvent: false });
 
         if (emitEvent) {
             this.emitUpdated(asset);

@@ -66,10 +66,6 @@ export class AssetsListComponent {
         this.state.update(asset);
     }
 
-    public trackByAsset(index: number, asset: AssetDto) {
-        return asset.id;
-    }
-
     public select(asset: AssetDto) {
         this.selected.emit(asset);
     }
@@ -86,6 +82,10 @@ export class AssetsListComponent {
         for (let i = 0; i < files.length; i++) {
             this.newFiles = this.newFiles.pushFront(files[i]);
         }
+    }
+
+    public trackByAsset(index: number, asset: AssetDto) {
+        return asset.id;
     }
 }
 
