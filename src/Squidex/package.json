@@ -85,6 +85,7 @@
     "node-sass": "4.9.4",
     "noop-loader": "1.0.0",
     "null-loader": "0.1.1",
+    "optimize-css-assets-webpack-plugin": "^5.0.1",
     "raw-loader": "0.5.1",
     "rimraf": "2.6.2",
     "rxjs-tslint": "0.1.5",

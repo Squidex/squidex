@@ -10,7 +10,9 @@ const plugins = {
     // https://www.npmjs.com/package/@ngtools/webpack
     NgToolsWebpack: require('@ngtools/webpack'),
     // https://github.com/webpack-contrib/mini-css-extract-plugin
-    MiniCssExtractPlugin: require('mini-css-extract-plugin')
+    MiniCssExtractPlugin: require('mini-css-extract-plugin'),
+    // https://github.com/NMFR/optimize-css-assets-webpack-plugin
+    OptimizeCSSAssetsPlugin: require("optimize-css-assets-webpack-plugin")
 };
             
 helpers.removeLoaders(runConfig, ['scss', 'ts']);
@@ -105,9 +107,15 @@ module.exports = webpackMerge(runConfig, {
                 uglifyOptions: {
                     compress: false,
                     ecma: 6,
-                    mangle: true
-                }
-            })
+                    mangle: true,
+                    output: {
+                        comments: false
+                    }
+                },
+                extractComments: true
+            }),
+
+            new plugins.OptimizeCSSAssetsPlugin({})
         ]
     },
 
