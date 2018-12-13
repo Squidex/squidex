@@ -19,10 +19,6 @@ using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.UI
 {
-    /// <summary>
-    /// Manages ui settings and configs.
-    /// </summary>
-    [ApiExplorerSettings(GroupName = nameof(UI))]
     public sealed class UIController : ApiController
     {
         private readonly MyUIOptions uiOptions;

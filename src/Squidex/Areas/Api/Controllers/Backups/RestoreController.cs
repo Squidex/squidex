@@ -17,11 +17,6 @@ using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Backups
 {
-    /// <summary>
-    /// Restores backups.
-    /// </summary>
-    [ApiExplorerSettings(GroupName = nameof(Backups))]
-    [ApiModelValidation(true)]
     public class RestoreController : ApiController
     {
         private readonly IGrainFactory grainFactory;

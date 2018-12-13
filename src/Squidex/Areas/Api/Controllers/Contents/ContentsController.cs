@@ -26,7 +26,6 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {
-    [ApiExplorerSettings(GroupName = nameof(Contents))]
     public sealed class ContentsController : ApiController
     {
         private readonly IOptions<MyContentsControllerOptions> controllerOptions;

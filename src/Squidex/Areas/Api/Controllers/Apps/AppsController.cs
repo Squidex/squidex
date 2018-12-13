@@ -102,7 +102,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         /// <summary>
         /// Archive the app.
-        /// /// </summary>
+        /// </summary>
         /// <param name="app">The name of the app to archive.</param>
         /// <returns>
         /// 204 => App archived.
