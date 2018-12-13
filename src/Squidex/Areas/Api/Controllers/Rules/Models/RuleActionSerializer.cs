@@ -11,7 +11,7 @@ using Squidex.Extensions.Actions;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
-    public sealed class RuleActionSerializer : JsonInheritanceConverter
+    public sealed class RuleActionSerializer : MyJsonInheritanceConverter
     {
         public RuleActionSerializer()
             : base("actionType", typeof(RuleAction), RuleElementRegistry.Actions.ToDictionary(x => x.Key, x => x.Value.Type))

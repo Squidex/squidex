@@ -7,7 +7,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure.Collections;
@@ -15,14 +14,13 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 {
-    [JsonSchema("ContentChanged")]
-    public sealed class ContentChangedTriggerDto : RuleTriggerDto
+    public sealed class ContentChangedRuleTriggerDto : RuleTriggerDto
     {
         /// <summary>
         /// The schema settings.
         /// </summary>
         [Required]
-        public ContentChangedTriggerSchemaDto[] Schemas { get; set; }
+        public ContentChangedRuleTriggerSchemaDto[] Schemas { get; set; }
 
         /// <summary>
         /// Determines whether the trigger should handle all content changes events.

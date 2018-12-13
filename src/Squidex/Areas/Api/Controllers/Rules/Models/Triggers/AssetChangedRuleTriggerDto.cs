@@ -5,15 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NJsonSchema.Annotations;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 {
-    [JsonSchema("AssetChanged")]
-    public sealed class AssetChangedTriggerDto : RuleTriggerDto
+    public sealed class AssetChangedRuleTriggerDto : RuleTriggerDto
     {
         /// <summary>
         /// Determines whether to handle the event when an asset is created.

@@ -69,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/schemas/{name}/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto[]), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchema(string app, string name)

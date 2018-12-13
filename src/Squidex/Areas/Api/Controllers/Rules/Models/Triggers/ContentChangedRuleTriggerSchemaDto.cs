@@ -9,7 +9,7 @@ using System;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 {
-    public sealed class ContentChangedTriggerSchemaDto
+    public sealed class ContentChangedRuleTriggerSchemaDto
     {
         /// <summary>
         /// The id of the schema.
