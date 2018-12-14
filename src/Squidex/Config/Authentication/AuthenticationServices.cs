@@ -17,6 +17,7 @@ namespace Squidex.Config.Authentication
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
 
             services.AddAuthentication()
+                .AddMyExternalGithubAuthentication(identityOptions)
                 .AddMyExternalGoogleAuthentication(identityOptions)
                 .AddMyExternalMicrosoftAuthentication(identityOptions)
                 .AddMyExternalOdic(identityOptions)
