@@ -8,42 +8,85 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using Newtonsoft.Json.Linq;
 using NJsonSchema.Converters;
+using Squidex.Infrastructure;
+
+#pragma warning disable RECS0108 // Warns about static fields in generic types
 
 namespace Squidex.Areas.Api.Controllers
 {
-    public class MyJsonInheritanceConverter : JsonInheritanceConverter
+    public class MyJsonInheritanceConverter<T> : JsonInheritanceConverter
     {
-        private readonly IDictionary<string, Type> mapping;
-        private readonly Type baseType;
+        private static readonly Dictionary<string, Type> DefaultMapping = new Dictionary<string, Type>();
+        private readonly IReadOnlyDictionary<string, Type> maping;
 
-        public MyJsonInheritanceConverter(string discriminator, Type baseType)
-            : base(baseType, discriminator)
+        static MyJsonInheritanceConverter()
         {
-            this.baseType = baseType;
+            var baseName = typeof(T).Name;
+
+            void AddType(Type type)
+            {
+                var discriminator = type.Name;
+
+                if (discriminator.EndsWith(baseName, StringComparison.CurrentCulture))
+                {
+                    discriminator = discriminator.Substring(0, discriminator.Length - baseName.Length);
+                }
+
+                DefaultMapping[discriminator] = type;
+            }
+
+            foreach (var attribute in typeof(T).GetCustomAttributes<KnownTypeAttribute>())
+            {
+                if (attribute.Type != null)
+                {
+                    if (!attribute.Type.IsAbstract)
+                    {
+                        AddType(attribute.Type);
+                    }
+                }
+                else if (!string.IsNullOrWhiteSpace(attribute.MethodName))
+                {
+                    var method = typeof(T).GetMethod(attribute.MethodName);
+
+                    if (method != null && method.IsStatic)
+                    {
+                        var types = (IEnumerable<Type>)method.Invoke(null, new object[0]);
+
+                        foreach (var type in types)
+                        {
+                            if (!type.IsAbstract)
+                            {
+                                AddType(type);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        public MyJsonInheritanceConverter(string discriminator, Type baseType, IDictionary<string, Type> mapping)
-            : this(discriminator, baseType)
+        public MyJsonInheritanceConverter(string discriminator)
+            : this(discriminator, DefaultMapping)
         {
-            this.mapping = mapping;
+        }
+
+        public MyJsonInheritanceConverter(string discriminator, IReadOnlyDictionary<string, Type> mapping)
+            : base(typeof(T), discriminator)
+        {
+            maping = mapping;
+        }
+
+        protected override Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)
+        {
+            return maping.GetOrDefault(discriminatorValue) ?? throw new InvalidOperationException($"Could not find subtype of '{objectType.Name}' with discriminator '{discriminatorValue}'.");
         }
 
         public override string GetDiscriminatorValue(Type type)
         {
-            var result = type.Name;
-
-            if (baseType != null)
-            {
-                var baseName = baseType.Name;
-
-                if (result.EndsWith(baseName, StringComparison.CurrentCulture))
-                {
-                    return result.Substring(0, result.Length - baseName.Length);
-                }
-            }
-
-            return mapping?.FirstOrDefault(x => x.Value == type).Key ?? result;
+            return maping.FirstOrDefault(x => x.Value == type).Key ?? type.Name;
         }
     }
 }

@@ -67,7 +67,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// The action properties.
         /// </summary>
         [Required]
-        [JsonConverter(typeof(RuleActionSerializer))]
+        [JsonConverter(typeof(RuleActionConverter))]
         public RuleAction Action { get; set; }
 
         public static RuleDto FromRule(IRuleEntity rule)

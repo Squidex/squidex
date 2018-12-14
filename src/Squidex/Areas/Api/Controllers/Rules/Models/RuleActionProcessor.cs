@@ -26,17 +26,14 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
                 if (schema != null)
                 {
-                    var discriminator = new OpenApiDiscriminator
+                    schema.DiscriminatorObject = new OpenApiDiscriminator
                     {
-                        JsonInheritanceConverter = new MyJsonInheritanceConverter("actionType", typeof(RuleAction)),
-                        PropertyName = "actionType"
+                        JsonInheritanceConverter = new RuleActionConverter(), PropertyName = "actionType"
                     };
 
-                    schema.DiscriminatorObject = discriminator;
                     schema.Properties["actionType"] = new JsonProperty
                     {
-                        Type = JsonObjectType.String,
-                        IsRequired = true
+                        Type = JsonObjectType.String, IsRequired = true
                     };
 
                     foreach (var derived in RuleElementRegistry.Actions)
