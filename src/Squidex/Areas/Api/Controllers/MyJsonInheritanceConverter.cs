@@ -76,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers
         public MyJsonInheritanceConverter(string discriminator, IReadOnlyDictionary<string, Type> mapping)
             : base(typeof(T), discriminator)
         {
-            maping = mapping;
+            maping = mapping ?? DefaultMapping;
         }
 
         protected override Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)
