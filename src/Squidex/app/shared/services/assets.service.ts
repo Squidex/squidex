@@ -33,6 +33,10 @@ export class AssetsDto extends Model {
 }
 
 export class AssetDto extends Model {
+    public get canPreview() {
+        return this.isImage || (this.mimeType === 'image/svg+xml' && this.fileSize < 100 * 1024);
+    }
+
     constructor(
         public readonly id: string,
         public readonly createdBy: string,

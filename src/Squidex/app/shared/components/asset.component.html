@@ -6,10 +6,10 @@
                     {{asset.fileType}}
                 </span>
                 
-                <div *ngIf="asset.isImage" class="file-image">
+                <div *ngIf="asset.canPreview" class="file-image">
                     <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg" layoutKey="asset-large">
                 </div>
-                <div *ngIf="!asset.isImage" class="file-icon">
+                <div *ngIf="!asset.canPreview" class="file-icon">
                     <img [attr.src]="asset | sqxFileIcon">
                 </div>
 
@@ -88,10 +88,10 @@
     <div class="table-items-row" [class.selectable]="isSelectable" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)">
         <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected" ></div>
 
-        <div *ngIf="asset && asset.isImage && progress === 0" class="image drag-handle" [class.image-left]="!isSelectable" @fade>
+        <div *ngIf="asset && asset.canPreview && progress === 0" class="image drag-handle" [class.image-left]="!isSelectable" @fade>
             <img [sqxImageSource]="asset | sqxAssetPreviewUrl" class="bg2" layoutKey="asset-small">
         </div>
-        <div *ngIf="asset && !asset.isImage && progress === 0" class="image drag-handle image-padded" [class.image-left]="!isSelectable" @fade>
+        <div *ngIf="asset && !asset.canPreview && progress === 0" class="image drag-handle image-padded" [class.image-left]="!isSelectable" @fade>
             <img class="icon" [attr.src]="asset | sqxFileIcon">
         </div>
 

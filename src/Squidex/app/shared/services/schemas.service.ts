@@ -54,7 +54,15 @@ export class SchemaDetailsDto extends SchemaDto {
     public listFields: RootFieldDto[];
     public listFieldsEditable: RootFieldDto[];
 
-    constructor(id: string, name: string, category: string, properties: SchemaPropertiesDto, isSingleton: boolean, isPublished: boolean, created: DateTime, createdBy: string, lastModified: DateTime, lastModifiedBy: string, version: Version,
+    constructor(id: string, name: string, category: string,
+            properties: SchemaPropertiesDto,
+            isSingleton: boolean,
+            isPublished: boolean,
+            created: DateTime,
+            createdBy: string,
+            lastModified: DateTime,
+            lastModifiedBy: string,
+            version: Version,
         public readonly fields: RootFieldDto[],
         public readonly scriptQuery?: string,
         public readonly scriptCreate?: string,
