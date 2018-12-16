@@ -1,8 +1,25 @@
 @import '_mixins';
 @import '_vars';
 
-.editor {
-    background: $color-dark-foreground;
-    border: 1px solid $color-input;
-    height: 20rem;
+// sass-lint:disable class-name-format
+
+:host /deep/ {
+    .ace_editor {
+        background: $color-dark-foreground;
+        border: 1px solid $color-input;
+        height: 20rem;
+    }
+
+    .ace_active-line,
+    .ace_gutter-active-line {
+        background: none !important;
+    }
+
+    .ace_gutter-active-line {
+        background: darken($color-border, 5%) !important;
+    }
+
+    .ace_gutter {
+        background: $color-border !important;
+    }
 }

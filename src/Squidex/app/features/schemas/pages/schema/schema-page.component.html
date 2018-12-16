@@ -6,7 +6,7 @@
     </ng-container>
 
     <ng-container menu>
-        <button type="button" class="btn btn-link btn-export mr-1" (click)="exportSchemaDialog.show()">
+        <button type="button" class="btn btn-link mr-1" (click)="exportSchemaDialog.show()">
             JSON Preview
         </button>
 
@@ -102,13 +102,15 @@
 </ng-container>
 
 <ng-container *sqxModalView="exportSchemaDialog;onRoot:true">
-    <sqx-modal-dialog (closed)="exportSchemaDialog.hide()">
+    <sqx-modal-dialog (closed)="exportSchemaDialog.hide()" large="true">
         <ng-container title>
             Export Schema
         </ng-container>
 
         <ng-container content>
-            <sqx-json-editor disabled [ngModel]="schemaExport"></sqx-json-editor>
+            <div class="json-preview">
+                <sqx-json-editor disabled [ngModel]="schemaExport"></sqx-json-editor>
+            </div>
         </ng-container>
     </sqx-modal-dialog>
 </ng-container>
