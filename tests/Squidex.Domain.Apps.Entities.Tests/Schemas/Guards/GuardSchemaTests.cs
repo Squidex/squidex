@@ -467,6 +467,23 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanConfigurePreviewUrls_should_throw_exception_if_preview_urls_null()
+        {
+            var command = new ConfigurePreviewUrls { PreviewUrls = null };
+
+            ValidationAssert.Throws(() => GuardSchema.CanConfigurePreviewUrls(command),
+                new ValidationError("Preview Urls is required.", "PreviewUrls"));
+        }
+
+        [Fact]
+        public void CanConfigurePreviewUrls_should_not_throw_exception_if_valid()
+        {
+            var command = new ConfigurePreviewUrls { PreviewUrls = new Dictionary<string, string>() };
+
+            GuardSchema.CanConfigurePreviewUrls(command);
+        }
+
+        [Fact]
         public void CanChangeCategory_should_not_throw_exception()
         {
             var command = new ChangeCategory();

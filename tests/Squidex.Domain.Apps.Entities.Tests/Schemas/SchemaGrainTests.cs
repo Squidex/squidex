@@ -226,6 +226,31 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         }
 
         [Fact]
+        public async Task ConfigurePreviewUrls_should_create_events_and_update_state()
+        {
+            var command = new ConfigurePreviewUrls
+            {
+                PreviewUrls = new Dictionary<string, string>
+                {
+                    ["Web"] = "web-url"
+                }
+            };
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(1));
+
+            Assert.Equal(command.PreviewUrls, sut.Snapshot.PreviewUrls);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new SchemaPreviewUrlsConfigured { PreviewUrls = command.PreviewUrls })
+                );
+        }
+
+        [Fact]
         public async Task Delete_should_create_events_and_update_state()
         {
             var command = new DeleteSchema();

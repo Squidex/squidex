@@ -72,6 +72,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public string ScriptChange { get; set; }
 
         /// <summary>
+        /// The preview Urls.
+        /// </summary>
+        public Dictionary<string, string> PreviewUrls { get; set; }
+
+        /// <summary>
         /// The list of fields.
         /// </summary>
         [Required]

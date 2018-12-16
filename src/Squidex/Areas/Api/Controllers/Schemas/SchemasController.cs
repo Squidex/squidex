@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -155,7 +156,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="request">The schema object that needs to updated.</param>
         /// <returns>
         /// 204 => Schema has been updated.
-        /// 400 => Schema properties are not valid.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -165,6 +165,27 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         public async Task<IActionResult> PutCategory(string app, string name, [FromBody] ChangeCategoryDto request)
         {
             await CommandBus.PublishAsync(request.ToCommand());
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Update the preview urls.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="request">The preview urls for the schema.</param>
+        /// <returns>
+        /// 204 => Schema has been updated.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/schemas/{name}/preview-urls")]
+        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutPreviewUrls(string app, string name, [FromBody] Dictionary<string, string> request)
+        {
+            await CommandBus.PublishAsync(new ConfigurePreviewUrls { PreviewUrls = request ?? new Dictionary<string, string>() });
 
             return NoContent();
         }

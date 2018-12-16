@@ -48,7 +48,7 @@ export class CommentsState extends State<Snapshot> {
         private readonly commentsService: CommentsService,
         private readonly dialogs: DialogService
     ) {
-        super({ comments: ImmutableArray.empty(), version: new Version('') });
+        super({ comments: ImmutableArray.empty(), version: new Version('-1') });
     }
 
     public load(): Observable<any> {

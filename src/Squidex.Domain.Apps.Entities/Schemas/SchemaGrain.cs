@@ -179,6 +179,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                         ChangeCategory(c);
                     });
 
+                case ConfigurePreviewUrls configurePreviewUrls:
+                    return UpdateAsync(configurePreviewUrls, c =>
+                    {
+                        GuardSchema.CanConfigurePreviewUrls(c);
+
+                        ConfigurePreviewUrls(c);
+                    });
+
                 case DeleteSchema deleteSchema:
                     return UpdateAsync(deleteSchema, c =>
                     {
@@ -286,6 +294,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public void ChangeCategory(ChangeCategory command)
         {
             RaiseEvent(SimpleMapper.Map(command, new SchemaCategoryChanged()));
+        }
+
+        public void ConfigurePreviewUrls(ConfigurePreviewUrls command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new SchemaPreviewUrlsConfigured()));
         }
 
         public void Delete(DeleteSchema command)

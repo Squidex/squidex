@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -114,6 +115,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 else
                 {
                     ValidateFieldIds(error, command, arrayField.FieldsById);
+                }
+            });
+        }
+
+        public static void CanConfigurePreviewUrls(ConfigurePreviewUrls command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            Validate.It(() => "Cannot configure preview urls.", error =>
+            {
+                if (command.PreviewUrls == null)
+                {
+                    error("Preview Urls is required.", nameof(command.PreviewUrls));
                 }
             });
         }

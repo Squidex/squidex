@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -54,6 +55,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
 
         [DataMember]
         public string ScriptChange { get; set; }
+
+        [DataMember]
+        public Dictionary<string, string> PreviewUrls { get; set; }
 
         [DataMember]
         public Schema SchemaDef { get; set; }
@@ -164,6 +168,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
         protected void On(SchemaCategoryChanged @event, FieldRegistry registry)
         {
             Category = @event.Name;
+        }
+
+        protected void On(SchemaPreviewUrlsConfigured @event, FieldRegistry registry)
+        {
+            PreviewUrls = @event.PreviewUrls;
         }
 
         protected void On(SchemaPublished @event, FieldRegistry registry)

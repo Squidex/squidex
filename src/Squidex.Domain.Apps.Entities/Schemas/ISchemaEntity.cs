@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
@@ -40,5 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         string ScriptChange { get; }
 
         Schema SchemaDef { get; }
+
+        Dictionary<string, string> PreviewUrls { get; }
     }
 }
