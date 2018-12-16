@@ -47,7 +47,7 @@ describe('CommentsState', () => {
 
         commentsService = Mock.ofType<CommentsService>();
 
-        commentsService.setup(x => x.getComments(app, commentsId, new Version('')))
+        commentsService.setup(x => x.getComments(app, commentsId, new Version('-1')))
             .returns(() => of(oldComments));
 
         commentsState = new CommentsState(appsState.object, commentsId, commentsService.object, dialogs.object);

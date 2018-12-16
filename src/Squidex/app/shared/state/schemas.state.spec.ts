@@ -56,7 +56,8 @@ describe('SchemasState', () => {
             creation, creator,
             creation, creator,
             version,
-            [field1, field2]);
+            [field1, field2],
+            {});
 
     let dialogs: IMock<DialogService>;
     let appsState: IMock<AppsState>;
@@ -263,6 +264,22 @@ describe('SchemasState', () => {
             expectToBeModified(schema_1);
         });
 
+        it('should update script properties and update user info when preview urls configured', () => {
+            const request = {
+                'Default': 'url'
+            };
+
+            schemasService.setup(x => x.putPreviewUrls(app, schema.name, It.isAny(), version))
+                .returns(() => of(new Versioned<any>(newVersion, {})));
+
+            schemasState.configurePreviewUrls(schema, request, modified).subscribe();
+
+            const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+
+            expect(schema_1.previewUrls).toEqual(request);
+            expectToBeModified(schema_1);
+        });
+
         it('should update script properties and update user info when scripts configured', () => {
             const request = new UpdateSchemaScriptsDto('query', 'create', 'update', 'delete', 'change');
 
@@ -284,7 +301,7 @@ describe('SchemasState', () => {
         it('should add schema to snapshot when created', () => {
             const request = new CreateSchemaDto('newName');
 
-            const result = new SchemaDetailsDto('id4', 'newName', '', {}, false, false, modified, modifier, modified, modifier, version, []);
+            const result = new SchemaDetailsDto('id4', 'newName', '', {}, false, false, modified, modifier, modified, modifier, version, [], {});
 
             schemasService.setup(x => x.postSchema(app, request, modifier, modified))
                 .returns(() => of(result));

@@ -64,6 +64,7 @@ export class SchemaDetailsDto extends SchemaDto {
             lastModifiedBy: string,
             version: Version,
         public readonly fields: RootFieldDto[],
+        public readonly previewUrls: { [name: string]: string },
         public readonly scriptQuery?: string,
         public readonly scriptCreate?: string,
         public readonly scriptUpdate?: string,
@@ -317,6 +318,7 @@ export class SchemasService {
                     DateTime.parseISO_UTC(body.lastModified), body.lastModifiedBy,
                     response.version,
                     fields,
+                    body.previewUrls || {},
                     body.scriptQuery,
                     body.scriptCreate,
                     body.scriptUpdate,
@@ -346,6 +348,7 @@ export class SchemasService {
                     now, user,
                     response.version,
                     dto.fields || [],
+                    {},
                     body.scriptQuery,
                     body.scriptCreate,
                     body.scriptUpdate,
@@ -416,6 +419,16 @@ export class SchemasService {
                 this.analytics.trackEvent('Schema', 'CategoryChanged', appName);
             }),
             pretifyError('Failed to change category. Please reload.'));
+    }
+
+    public putPreviewUrls(appName: string, schemaName: string, dto: { [name: string]: string }, version: Version): Observable<Versioned<any>> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/preview-urls`);
+
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+            tap(() => {
+                this.analytics.trackEvent('Schema', 'PreviewUrlsConfigured', appName);
+            }),
+            pretifyError('Failed to configure preview urls. Please reload.'));
     }
 
     public postField(appName: string, schemaName: string, dto: AddFieldDto, parentId: number | undefined, version: Version): Observable<Versioned<RootFieldDto | NestedFieldDto>> {
