@@ -35,6 +35,7 @@ import {
     ContentStatusComponent,
     DueTimeSelectorComponent,
     FieldEditorComponent,
+    PreviewButtonComponent,
     ReferencesEditorComponent,
     SchemasPageComponent
 } from './declarations';
@@ -110,6 +111,7 @@ const routes: Routes = [
         ContentsSelectorComponent,
         DueTimeSelectorComponent,
         FieldEditorComponent,
+        PreviewButtonComponent,
         ReferencesEditorComponent,
         SchemasPageComponent
     ]

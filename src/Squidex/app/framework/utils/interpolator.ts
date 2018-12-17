@@ -17,12 +17,14 @@ export function interpolate(pattern: string, value?: any, shortcut?: string, fal
         const path = match.substr(2, match.length - 3).split('.');
 
         for (let segment of path) {
-            if (Types.isObject(replaced)) {
-                replaced = replaced[segment];
-            } else if (Types.isArray(replaced)) {
+            if (!replaced) {
+                return false;
+            }
+
+            if (Types.isArray(replaced)) {
                 replaced = replaced[Number.parseInt(segment, 10)];
             } else {
-                break;
+                replaced = replaced[segment];
             }
         }
 

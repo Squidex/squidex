@@ -10,7 +10,7 @@
             JSON Preview
         </button>
 
-        <div class="btn-group mr-1" data-toggle="buttons" #buttonPublish>
+        <div class="btn-group mr-1" #buttonPublish>
             <button type="button" class="btn btn-publishing btn-toggle" [class.btn-success]="schema.isPublished" [disabled]="schema.isPublished" (click)="publish()">
                 Published
             </button>

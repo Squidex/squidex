@@ -20,4 +20,5 @@ export * from './shared/content-status.component';
 export * from './shared/contents-selector.component';
 export * from './shared/due-time-selector.component';
 export * from './shared/field-editor.component';
+export * from './shared/preview-button.component';
 export * from './shared/references-editor.component';

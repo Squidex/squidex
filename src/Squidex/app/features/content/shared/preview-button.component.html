@@ -1,0 +1,17 @@
+<ng-container *ngIf="selectedName">
+    <span>Preview: </span>
+
+    <div class="btn-group ml-1" #buttonGroup>
+        <button type="button" class="btn btn-secondary" (click)="follow(selectedName)">
+            <i class="icon-external-link"></i> {{selectedName}}
+        </button>
+
+        <div class="btn-group" *ngIf="alternativeNames.length > 0">
+            <button type="button" class="btn btn-secondary dropdown-toggle" (click)="dropdown.toggle()"></button>
+            
+            <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="buttonGroup" @fade>
+                <a *ngFor="let name of alternativeNames" class="dropdown-item" (click)="follow(name)">{{name}}</a>
+            </div>
+        </div>
+    </div>
+</ng-container>
