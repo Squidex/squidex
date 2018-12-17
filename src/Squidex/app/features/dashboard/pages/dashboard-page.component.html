@@ -76,9 +76,18 @@
                 </div>
 
                 <div class="card card-lg">
-                    <div class="card-header">API Performance (ms)</div>
+                    <div class="card-header">API Performance (ms)
+                        <div class="float-right">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="stacked" [(ngModel)]="isPerformanceStacked" />
+                                <label class="form-check-label" for="stacked">
+                                    Stacked
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-body">
-                        <chart type="bar" [data]="chartCallsPerformance" [options]="chartOptions"></chart>
+                        <chart type="bar" [data]="chartCallsPerformance" [options]="isPerformanceStacked ? stackedChartOptions : chartOptions"></chart>
                     </div>
                 </div>
 

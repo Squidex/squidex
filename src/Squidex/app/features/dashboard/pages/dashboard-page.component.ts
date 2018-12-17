@@ -52,6 +52,8 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
     public chartCallsCount: any;
     public chartCallsPerformance: any;
 
+    public isPerformanceStacked = false;
+
     public app = this.appsState.selectedApp.pipe(filter(x => !!x), map(x => <AppDto>x));
 
     public chartOptions = {
