@@ -59,6 +59,23 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
         scales: {
             xAxes: [{
                 display: true,
+                stacked: false
+            }],
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                },
+                stacked: false
+            }]
+        },
+        maintainAspectRatio: false
+    };
+
+    public stackedChartOptions = {
+        responsive: true,
+        scales: {
+            xAxes: [{
+                display: true,
                 stacked: true
             }],
             yAxes: [{
