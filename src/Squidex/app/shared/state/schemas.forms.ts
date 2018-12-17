@@ -5,10 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 
-import { Form, ValidatorsEx } from '@app/framework';
+import {
+    Form,
+    Types,
+    ValidatorsEx
+} from '@app/framework';
 
 import { createProperties } from './../services/schemas.types';
 
@@ -39,6 +43,93 @@ export class CreateSchemaForm extends Form<FormGroup> {
             singleton: false,
             import: {}
         }));
+    }
+}
+
+export class AddPreviewUrlForm extends Form<FormGroup> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            name: ['',
+                [
+                    Validators.required
+                ]
+            ],
+            url: ['',
+                [
+                    Validators.required
+                ]
+            ]
+        }));
+    }
+}
+
+export class ConfigurePreviewUrlsForm extends Form<FormArray> {
+    constructor(
+        private readonly formBuilder: FormBuilder
+    ) {
+        super(formBuilder.array([]));
+    }
+
+    public add(value: any) {
+        this.form.push(
+            this.formBuilder.group({
+                name: [value.name,
+                    [
+                        Validators.required
+                    ]
+                ],
+                url: [value.url,
+                    [
+                        Validators.required
+                    ]
+                ]
+            }));
+    }
+
+    public remove(index: number) {
+        this.form.removeAt(index);
+    }
+
+    public load(value?: any) {
+        if (Types.isObject(value)) {
+            const length = Object.keys(value).length;
+
+            while (this.form.controls.length < length) {
+                this.add({});
+            }
+
+            while (this.form.controls.length > length) {
+                this.remove(this.form.controls.length - 1);
+            }
+
+            const array: any[] = [];
+
+            for (let key in value) {
+                if (value.hasOwnProperty(key)) {
+                    array.push({ name: key, url: value[key] });
+                }
+            }
+
+            value = array;
+        }
+
+        super.load(value);
+    }
+
+    public submit() {
+        let result = super.submit();
+
+        if (result) {
+            const hash: { [name: string]: string } = {};
+
+            for (let item of result) {
+                hash[item.name] = item.url;
+            }
+
+            result = hash;
+        }
+
+        return result;
     }
 }
 

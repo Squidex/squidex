@@ -25,12 +25,19 @@
             </button>
             <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" [sqxModalTarget]="buttonOptions" @fade>
                 <a class="dropdown-item" (click)="configureScriptsDialog.show()">
-                    Scripts
+                    Edit Scripts
                 </a>
+                <a class="dropdown-item" (click)="configurePreviewUrlsDialog.show()">
+                    Edit Preview Urls
+                </a>
+                
+                <div class="dropdown-divider"></div>
 
                 <a class="dropdown-item" (click)="cloneSchema()">
                     Clone
                 </a>
+                
+                <div class="dropdown-divider"></div>
 
                 <a class="dropdown-item dropdown-item-delete" 
                     (sqxConfirmClick)="deleteSchema()" 
@@ -99,6 +106,12 @@
     <sqx-schema-scripts-form [schema]="schema"
         (completed)="configureScriptsDialog.hide()">
     </sqx-schema-scripts-form>
+</ng-container>
+
+<ng-container *sqxModalView="configurePreviewUrlsDialog;onRoot:true">
+    <sqx-schema-preview-urls-form [schema]="schema"
+        (completed)="configurePreviewUrlsDialog.hide()">
+    </sqx-schema-preview-urls-form>
 </ng-container>
 
 <ng-container *sqxModalView="exportSchemaDialog;onRoot:true">

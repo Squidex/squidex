@@ -49,6 +49,7 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     public exportSchemaDialog = new DialogModel();
 
     public configureScriptsDialog = new DialogModel();
+    public configurePreviewUrlsDialog = new DialogModel();
 
     public editOptionsDropdown = new ModalModel();
     public editSchemaDialog = new DialogModel();

@@ -1,0 +1,23 @@
+@import '_vars';
+@import '_mixins';
+
+.content {
+    min-height: 200px;
+}
+
+.col-options {
+    min-width: 6rem;
+}
+
+.btn-delete {
+    margin-left: 42px;
+}
+
+.wizard-title {
+    background: $color-border;
+    margin: -1rem;
+    margin-bottom: 1rem;
+    font-weight: 400;
+    font-size: 1.05rem;
+    padding: 1rem;
+}

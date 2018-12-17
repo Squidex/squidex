@@ -63,7 +63,7 @@
     
         <ng-container *ngIf="step === 4">
             <form [formGroup]="actionForm.form" (ngSubmit)="saveAction()">
-                    <h3 class="wizard-title">{{ruleActions[actionType].display}}</h3>
+                <h3 class="wizard-title">{{ruleActions[actionType].display}}</h3>
 
                 <ng-container [ngSwitch]="actionType">
                     <ng-container *ngSwitchCase="'Algolia'">
