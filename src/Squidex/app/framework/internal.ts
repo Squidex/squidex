@@ -23,6 +23,7 @@ export * from './utils/date-helper';
 export * from './utils/date-time';
 export * from './utils/duration';
 export * from './utils/error';
+export * from './utils/interpolator';
 export * from './utils/immutable-array';
 export * from './utils/lazy';
 export * from './utils/math-helper';
