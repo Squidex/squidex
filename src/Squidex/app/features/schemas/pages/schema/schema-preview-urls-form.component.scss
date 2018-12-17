@@ -5,15 +5,20 @@
     min-height: 200px;
 }
 
-.col-options {
-    min-width: 6rem;
-}
-
 .btn-delete {
     margin-left: 42px;
 }
 
-.wizard-title {
+.col-options {
+    min-width: 6rem;
+}
+
+.col-name {
+    min-width: 14rem;
+    max-width: 14rem;
+}
+
+.title {
     background: $color-border;
     margin: -1rem;
     margin-bottom: 1rem;

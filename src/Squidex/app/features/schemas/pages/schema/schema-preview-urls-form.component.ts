@@ -30,6 +30,7 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
     public addForm = new AddPreviewUrlForm(this.formBuilder);
 
     public editForm = new ConfigurePreviewUrlsForm(this.formBuilder);
+    public editHelp = 'Use placeholders like ${id}, ${data.slug} or ${data.title.en}.';
 
     constructor(
         private readonly formBuilder: FormBuilder,

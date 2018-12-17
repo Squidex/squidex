@@ -5,14 +5,14 @@
         </ng-container>
 
         <ng-container content>
-            <h3 class="wizard-title">Preview Urls define where the content is used</h3>
+            <h3 class="title">Preview Urls define where the content is used</h3>
 
             <div class="content">
                 <div class="form-group row no-gutters" *ngFor="let form of editForm.form.controls; let i = index">
-                    <div class="col pr-1">
+                    <div class="col col-name pr-1">
                         <sqx-control-errors [for]="form.get('name')" fieldName="Name" [submitted]="editForm.submitted | async"></sqx-control-errors>
     
-                        <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('name')" placeholder="Name, e.g. Web, Mobile" />
+                        <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('name')" placeholder="Name, e.g. Web or Mobile" />
                     </div>
     
                     <div class="col pr-1">
@@ -32,16 +32,20 @@
                 </div>
 
                 <div class="form-group row no-gutters" [formGroup]="addForm.form">
-                    <div class="col pr-1">
+                    <div class="col col-name pr-1">
                         <sqx-control-errors for="name" fieldName="Name" [submitted]="addForm.submitted | async"></sqx-control-errors>
 
-                        <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="Name, e.g. Web, Mobile" />
+                        <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="Name, e.g. Web or Mobile" />
                     </div>
 
                     <div class="col pr-1">
                         <sqx-control-errors for="url" fieldName="Url" [submitted]="addForm.submitted | async"></sqx-control-errors>
 
                         <input type="text" class="form-control" maxlength="1000" formControlName="url" placeholder="Url" />
+
+                        <small class="form-text text-muted">
+                            {{editHelp}}
+                        </small>
                     </div>
 
                     <div class="col-auto col-options">
