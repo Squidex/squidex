@@ -22,7 +22,7 @@ steps:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - docker build -t squidex/squidex:dev -t squidex/squidex:dev-$${DRONE_BUILD_NUMBER} .
       - docker push squidex/squidex:dev
-      - docker push squidex/squidex:dev-$BUILD_NUMBER
+      - docker push squidex/squidex:dev-$${DRONE_BUILD_NUMBER}
     volumes:
       - name: docker1
         path: /var/run/docker.sock
