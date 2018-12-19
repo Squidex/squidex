@@ -62,12 +62,6 @@ steps:
 
   - name: slack
     image: plugins/slack
-    template: >
-      {{#success build.status}}
-        Squidex Identity build {{build.number}} succeeded. Good job.
-      {{else}}
-        Squidex Identity build {{build.number}} failed. Fix me please.
-      {{/success}}
     settings:
       webhook:
         from_secret: slack_webhook
