@@ -1,70 +1,98 @@
-clone:
-  git:
-    image: plugins/git:next
-    pull: true
+---
+kind: pipeline
+name: default
 
-pipeline:
-  test_pull_request:
+steps:  
+  - name: test_pull_request
     image: docker
     commands:
       - docker build -t squidex/squidex:test_pull_request .
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker:/var/lib/docker
+      - name: docker1
+        path: /var/run/docker.sock
+      - name: docker2
+        path: /var/lib/docker
     when:
-      event: pull_request
+      event:
+        - pull_request
 
-  build_dev:
+  - name: build_dev
     image: docker
     commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker build -t squidex/squidex:dev -t squidex/squidex:dev-$BUILD_NUMBER .
+      - docker build -t squidex/squidex:dev -t squidex/squidex:dev-$${DRONE_BUILD_NUMBER} .
       - docker push squidex/squidex:dev
       - docker push squidex/squidex:dev-$BUILD_NUMBER
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker:/var/lib/docker
-    secrets: [ docker_username, docker_password ]
+      - name: docker1
+        path: /var/run/docker.sock
+      - name: docker2
+        path: /var/lib/docker
     environment:
-      - BUILD_NUMBER=${DRONE_BUILD_NUMBER}
+      DOCKER_USERNAME:
+        from_secret: DOCKER_USERNAME
+      DOCKER_PASSWORD:
+        from_secret: DOCKER_PASSWORD
     when:
-      event: push
-      branch: [ master ]
+      event:
+        - push
+      branch:
+        - master
 
-  build_release:
+  - name: build_release
     image: docker
     commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker build -t squidex/squidex:latest -t squidex/squidex:$TAG .
+      - docker build -t squidex/squidex:latest -t squidex/squidex:$${DRONE_TAG} .
       - docker push squidex/squidex:latest
       - docker push squidex/squidex:$TAG
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker:/var/lib/docker
+      - name: docker1
+        path: /var/run/docker.sock
+      - name: docker2
+        path: /var/lib/docker
     environment:
-      - TAG=${DRONE_TAG}
-    secrets: [ docker_username, docker_password ]
+      DOCKER_USERNAME:
+        from_secret: DOCKER_USERNAME
+      DOCKER_PASSWORD:
+        from_secret: DOCKER_PASSWORD
     when:
-      event: tag
+      event:
+        - tag
 
-  slack:
+  - name: slack
     image: plugins/slack
     template: >
       {{#success build.status}}
-        Squidex build {{build.number}} succeeded. Good job.
+        Squidex Identity build {{build.number}} succeeded. Good job.
       {{else}}
-        Squidex build {{build.number}} failed. Fix me please.
+        Squidex Identity build {{build.number}} failed. Fix me please.
       {{/success}}
-    secrets: [ slack_webhook ]
+    settings:
+      webhook:
+        from_secret: slack_webhook
     when:
-      status: [ failure, success ]
+      status:
+        - failure
+        - success
 
-  cleanup:
+  - name: cleanup
     image: docker
     commands:
       - docker system prune -f
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker:/var/lib/docker
+      - name: docker1
+        path: /var/run/docker.sock
+      - name: docker2
+        path: /var/lib/docker
     when:
-      status: failure
+      status:
+        - failure
+      
+volumes:
+  - name: docker1
+    host:
+      path: /var/run/docker.sock
+  - name: docker2
+    host:
+      path: /var/lib/docker
