@@ -8,21 +8,26 @@
 .git
 
 # Build results
-**/bin/
-**/build/
-**/obj/
-**/publish/
+bin/
+build/
+obj/
+out/
+publish/
 
 # Test Output
-**/_test-output/
+_test-output/
 
 # NodeJS 
-**/node_modules/
+node_modules/
 
-**/src/Squidex/Assets/*.*
+src/Squidex/Assets/*.*
 
-**/src/Squidex/appsettings.Development.json
-**/src/Squidex/appsettings.Production.json
-**/src/Squidex/Properties/launchSettings.json
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/launchSettings.json
 
+# Build
+.drone.yml
+
+# Documentation
 CHANGELOG.md

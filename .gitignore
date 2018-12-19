@@ -24,11 +24,8 @@ node_modules/
 # Scripts (should be copied from node_modules on build)
 **/wwwroot/scripts/**/*.*
 
-/src/Squidex/Assets
-/src/Squidex/appsettings.Development.json
-/src/Squidex/appsettings.Production.json
-/src/Squidex/package-lock.json
+/src/Squidex/Assets/
 
-/global.json
-
+appsettings.Development.json
+appsettings.Production.json
 launchSettings.json
