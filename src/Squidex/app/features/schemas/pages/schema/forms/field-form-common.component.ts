@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 
 import { FieldDto } from '@app/shared';
@@ -15,15 +15,12 @@ import { FieldDto } from '@app/shared';
     styleUrls: ['field-form-common.component.scss'],
     templateUrl: 'field-form-common.component.html'
 })
-export class FieldFormCommonComponent implements OnChanges, OnInit {
+export class FieldFormCommonComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
 
     @Input()
     public editFormSubmitted = false;
-
-    @Input()
-    public showName = true;
 
     @Input()
     public field: FieldDto;
@@ -46,11 +43,5 @@ export class FieldFormCommonComponent implements OnChanges, OnInit {
 
         this.editForm.setControl('label',
             new FormControl(this.field.properties.label));
-    }
-
-    public ngOnChanges(changes: SimpleChanges) {
-        if (changes['field']) {
-            this.editForm.reset(this.field.properties);
-        }
     }
 }

@@ -68,7 +68,7 @@ module.exports = webpackMerge(runConfig, {
             use: [
                 plugins.MiniCssExtractPlugin.loader,
             {
-                loader: 'css-loader', options: { minimize: true },
+                loader: 'css-loader'
             }, {
                 loader: 'sass-loader'
             }],

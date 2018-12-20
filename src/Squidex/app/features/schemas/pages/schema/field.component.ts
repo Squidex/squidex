@@ -82,12 +82,6 @@ export class FieldComponent implements OnChanges {
         this.selectedTab = tab;
     }
 
-    public cancel() {
-        this.isEditing = false;
-
-        this.editForm.load(this.field);
-    }
-
     public deleteField() {
         this.schemasState.deleteField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
     }
@@ -117,7 +111,7 @@ export class FieldComponent implements OnChanges {
     }
 
     public trackByField(index: number, field: NestedFieldDto) {
-        return field.fieldId;
+        return field.fieldId + this.schema.id;
     }
 
     public save() {

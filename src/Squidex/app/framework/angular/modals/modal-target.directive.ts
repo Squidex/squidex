@@ -106,88 +106,80 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
 
         switch (this.position) {
             case POSITION_LEFTTOP:
-            case POSITION_RIGHTTOP:
-                {
-                    t = targetRect.top;
-                    break;
-                }
+            case POSITION_RIGHTTOP: {
+                t = targetRect.top;
+                break;
+            }
             case POSITION_LEFTBOTTOM:
-            case POSITION_RIGHTBOTTOM:
-                {
-                    t = targetRect.bottom - modalRect.height;
-                    break;
-                }
+            case POSITION_RIGHTBOTTOM: {
+                t = targetRect.bottom - modalRect.height;
+                break;
+            }
             case POSITION_BOTTOMLEFT:
-            case POSITION_BOTTOMRIGHT:
-                {
-                    t = targetRect.bottom + this.offset;
+            case POSITION_BOTTOMRIGHT: {
+                t = targetRect.bottom + this.offset;
 
-                    if (fix && t + modalRect.height > viewportHeight) {
-                        const candidate = targetRect.top - modalRect.height - this.offset;
+                if (fix && t + modalRect.height > viewportHeight) {
+                    const candidate = targetRect.top - modalRect.height - this.offset;
 
-                        if (candidate > 0) {
-                            t = candidate;
-                        }
+                    if (candidate > 0) {
+                        t = candidate;
                     }
-                    break;
                 }
+                break;
+            }
             case POSITION_TOPLEFT:
-            case POSITION_TOPRIGHT:
-                {
-                    t = targetRect.top - modalRect.height - this.offset;
+            case POSITION_TOPRIGHT: {
+                t = targetRect.top - modalRect.height - this.offset;
 
-                    if (fix && t < 0) {
-                        const candidate = targetRect.bottom + this.offset;
+                if (fix && t < 0) {
+                    const candidate = targetRect.bottom + this.offset;
 
-                        if (candidate + modalRect.height > viewportHeight) {
-                            t = candidate;
-                        }
+                    if (candidate + modalRect.height > viewportHeight) {
+                        t = candidate;
                     }
-                    break;
                 }
+                break;
+            }
         }
 
         switch (this.position) {
             case POSITION_TOPLEFT:
-            case POSITION_BOTTOMLEFT:
-                {
-                    l = targetRect.left;
-                    break;
-                }
+            case POSITION_BOTTOMLEFT: {
+                l = targetRect.left;
+                break;
+            }
             case POSITION_TOPRIGHT:
-            case POSITION_BOTTOMRIGHT:
-                {
-                    l = targetRect.right - modalRect.width;
-                    break;
-                }
+            case POSITION_BOTTOMRIGHT: {
+                l = targetRect.right - modalRect.width;
+                break;
+            }
             case POSITION_RIGHTTOP:
-            case POSITION_RIGHTBOTTOM:
-                {
-                    l = targetRect.right + this.offset;
+            case POSITION_RIGHTBOTTOM: {
+                l = targetRect.right + this.offset;
 
-                    if (fix && l + modalRect.width > viewportWidth) {
-                        const candidate = targetRect.right - modalRect.width - this.offset;
+                if (fix && l + modalRect.width > viewportWidth) {
+                    const candidate = targetRect.right - modalRect.width - this.offset;
 
-                        if (candidate > 0) {
-                            l = candidate;
-                        }
+                    if (candidate > 0) {
+                        l = candidate;
                     }
-                    break;
                 }
+                break;
+            }
             case POSITION_LEFTTOP:
-            case POSITION_LEFTBOTTOM:
-                {
-                    l = targetRect.left - modalRect.width - this.offset;
+            case POSITION_LEFTBOTTOM: {
+                l = targetRect.left - modalRect.width - this.offset;
 
-                    if (this.autoPosition && l < 0) {
-                        const candidate = targetRect.right + this.offset;
+                if (this.autoPosition && l < 0) {
+                    const candidate = targetRect.right + this.offset;
 
-                        if (candidate + modalRect.width > viewportWidth) {
-                            l = candidate;
-                        }
+                    if (candidate + modalRect.width > viewportWidth) {
+                        l = candidate;
                     }
-                    break;
                 }
+                break;
+            }
         }
 
         if (this.position === POSITION_FULL) {

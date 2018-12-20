@@ -84,7 +84,7 @@
                 </ul>
 
                 <div class="float-right">
-                    <button [disabled]="field.isLocked" type="reset" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+                    <button [disabled]="field.isLocked" type="reset" class="btn btn-secondary" (click)="toggleEditing()">Cancel</button>
                     <button [disabled]="field.isLocked" type="submit" class="btn btn-primary ml-1">Save</button>
                 </div>
             </div>
@@ -108,7 +108,7 @@
             <span class="nested-field-line-v"></span>
 
             <div [sqxSortModel]="nested" (sqxSorted)="sortFields($event)">
-                <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByField">
+                <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByField.bind(this)">
                     <span class="nested-field-line-h"></span>
     
                     <sqx-field [field]="nested" [schema]="schema" [parent]="field" [patterns]="patterns"></sqx-field>

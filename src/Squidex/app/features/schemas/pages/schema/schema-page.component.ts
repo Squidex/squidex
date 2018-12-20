@@ -95,7 +95,8 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
     }
 
     public trackByField(index: number, field: FieldDto) {
-        return field.fieldId;
+        const a = this;
+        return field.fieldId + a.schema.id;
     }
 
     public deleteSchema() {
