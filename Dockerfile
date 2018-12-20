@@ -3,7 +3,7 @@
 #
 FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as builder
 
-COPY src/Squidex/package.json /tmp/package.json
+COPY src/Squidex/package*.json /tmp/
 
 # Install Node packages 
 RUN cd /tmp && npm install
