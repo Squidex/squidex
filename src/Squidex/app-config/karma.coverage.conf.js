@@ -36,7 +36,7 @@ module.exports = function (config) {
         /*
          * Use a mocha style console reporter, html reporter and the code coverage reporter
          */
-        reporters: ['mocha', 'html', 'coverage'],
+        reporters: ['mocha', 'html', 'coverage-istanbul'],
 
         // HtmlReporter configuration
         htmlReporter: {
@@ -52,13 +52,16 @@ module.exports = function (config) {
             groupSuites: true
         },
 
-        coverageReporter: {
-            type: 'html',
-            /** 
-             * Use the same folder like the html report for coverage reports
-             */
-            dir: '_test-output/coverage'
-        },
+        coverageIstanbulReporter: {
+            dir: require('path').join(__dirname, '../_test-output/coverage'),
+
+            reports: [
+              'html',
+              'lcovonly'
+            ],
+
+            fixWebpackSourcePaths: true
+          },
 
         /**
          * Disable continuous Integration mode, run only one time
@@ -71,7 +74,7 @@ module.exports = function (config) {
                 // We must disable the Chrome sandbox (Chrome's sandbox needs more permissions than Docker allows by default)
                 flags: ['--no-sandbox']
             }
-          },
+        },
 
         /**
          * Run with chrome because phantom js does not provide all types, e.g. DragEvent

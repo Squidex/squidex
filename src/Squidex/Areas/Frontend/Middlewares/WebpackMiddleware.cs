@@ -17,7 +17,7 @@ namespace Squidex.Areas.Frontend.Middlewares
     {
         private const string Host = "localhost";
         private const string Port = "3000";
-        private static readonly string[] Scripts = { "shims.js", "app.js" };
+        private static readonly string[] Scripts = { "shims", "app" };
         private static readonly string[] Styles = Array.Empty<string>();
         private readonly RequestDelegate next;
 
@@ -81,7 +81,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 
             foreach (var file in Styles)
             {
-                sb.AppendLine($"<link href=\"http://{Host}:{Port}/{file}\" rel=\"stylesheet\">");
+                sb.AppendLine($"<link href=\"http://{Host}:{Port}/{file}.css\" rel=\"stylesheet\">");
             }
 
             response = response.Replace("</head>", $"{sb}</head>");
@@ -100,7 +100,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 
             foreach (var file in Scripts)
             {
-                sb.AppendLine($"<script type=\"text/javascript\" src=\"http://{Host}:{Port}/{file}\"></script>");
+                sb.AppendLine($"<script type=\"text/javascript\" src=\"http://{Host}:{Port}/{file}.js\"></script>");
             }
 
             response = response.Replace("</body>", $"{sb}</body>");

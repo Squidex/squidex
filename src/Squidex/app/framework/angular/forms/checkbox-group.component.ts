@@ -9,7 +9,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Inpu
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
-import { MathHelper } from '@app/shared';
+
+import { MathHelper } from '../../utils/math-helper';
 
 export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CheckboxGroupComponent), multi: true

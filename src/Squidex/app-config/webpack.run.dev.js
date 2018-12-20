@@ -40,6 +40,10 @@ module.exports = webpackMerge(runConfig, {
         }]
     },
 
+    plugins: [        
+        new webpack.ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)fesm5/, helpers.root('./src'), {})
+    ],
+
     devServer: {
         headers: {
             'Access-Control-Allow-Origin': '*'

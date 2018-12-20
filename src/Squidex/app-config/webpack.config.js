@@ -50,6 +50,11 @@ module.exports = {
             test: /\.mjs$/,
             type: "javascript/auto",
             include: [/node_modules/],
+            
+          }, {
+            test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
+            parser: { system: true },
+            include: [/node_modules/]
           }, {
             test: /\.ts$/,
             use: [{
@@ -135,16 +140,6 @@ module.exports = {
              * Path to a configuration file.
              */
             config: helpers.root('tslint.json')
-        }),
-
-        /**
-         * Shim additional libraries
-         * 
-         * See: https://webpack.js.org/plugins/provide-plugin/
-         */
-        new webpack.ProvidePlugin({
-            // Mouse trap handles shortcut management
-            'Mousetrap': 'mousetrap/mousetrap'
         })
     ]
 };

@@ -12,7 +12,7 @@ import { catchError } from 'rxjs/operators';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-const GraphiQL = require('graphiql');
+import * as GraphiQL from 'graphiql';
 
 import { AppsState, GraphQlService } from '@app/shared';
 

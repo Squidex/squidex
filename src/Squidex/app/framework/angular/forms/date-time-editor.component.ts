@@ -12,7 +12,9 @@ import { Subscription } from 'rxjs';
 
 import { Types } from '@app/framework/internal';
 
-let Pikaday = require('pikaday/pikaday');
+declare module 'pikaday/pikaday';
+
+import * as Pikaday from 'pikaday/pikaday';
 
 export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true

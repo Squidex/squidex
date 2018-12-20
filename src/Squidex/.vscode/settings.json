@@ -23,6 +23,8 @@
         "**/*.user": true,
         "**/*.xproj": true,
         "**/*.gitattributes": true,
+		"appsetttings.Development.json",
+		"appsetttings.Production.json",
         ".awcache": true,
         ".vs:": true,
         ".vscode:": true

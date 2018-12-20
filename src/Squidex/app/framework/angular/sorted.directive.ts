@@ -7,7 +7,7 @@
 
 import { Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 
-import Sortable = require('sortablejs');
+import Sortable from 'sortablejs';
 
 @Directive({
     selector: '[sqxSortModel]'

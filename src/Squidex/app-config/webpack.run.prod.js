@@ -98,7 +98,7 @@ module.exports = webpackMerge(runConfig, {
             sourceMap: false,
             skipSourceGeneration: false,
             tsConfigPath: './tsconfig.json'
-        }),  
+        }),
     ],
 
     optimization: {
