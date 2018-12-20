@@ -16,23 +16,22 @@ namespace Squidex.Domain.Apps.Core.Scripting
 {
     public sealed class JintUser : ObjectInstance
     {
+        private static readonly char[] ClaimSeparators = { '/', '.', ':' };
+
         public JintUser(Engine engine, ClaimsPrincipal principal)
             : base(engine)
         {
-            var subjectId = principal.OpenIdSubject();
+            var id = principal.OpenIdSubject();
 
-            var isClient = string.IsNullOrWhiteSpace(subjectId);
+            var isClient = string.IsNullOrWhiteSpace(id);
 
-            if (!isClient)
+            if (isClient)
             {
-                FastAddProperty("id", subjectId, false, true, false);
-                FastAddProperty("isClient", false, false, true, false);
+                id = principal.OpenIdClientId();
             }
-            else
-            {
-                FastAddProperty("id", principal.OpenIdClientId(), false, true, false);
-                FastAddProperty("isClient", true, false, true, false);
-            }
+
+            FastAddProperty("id", id, false, true, false);
+            FastAddProperty("isClient", isClient, false, true, false);
 
             FastAddProperty("email", principal.OpenIdEmail(), false, true, false);
 
@@ -40,7 +39,10 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             foreach (var group in principal.Claims.GroupBy(x => x.Type))
             {
-                claimsInstance.FastAddProperty(group.Key, engine.Array.Construct(group.Select(x => new JsValue(x.Value)).ToArray()), false, true, false);
+                var propertyName = group.Key.Split(ClaimSeparators).Last();
+                var propertyValue = engine.Array.Construct(group.Select(x => new JsValue(x.Value)).ToArray());
+
+                claimsInstance.FastAddProperty(propertyName, propertyValue, false, true, false);
             }
 
             FastAddProperty("claims", claimsInstance, false, true, false);

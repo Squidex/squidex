@@ -6,7 +6,9 @@ const plugins = {
     // https://github.com/webpack-contrib/mini-css-extract-plugin
     MiniCssExtractPlugin: require('mini-css-extract-plugin'),
     // https://github.com/dividab/tsconfig-paths-webpack-plugin
-    TsconfigPathsPlugin: require('tsconfig-paths-webpack-plugin')
+    TsconfigPathsPlugin: require('tsconfig-paths-webpack-plugin'),
+    // https://github.com/jrparish/tslint-webpack-plugin
+    TsLintPlugin: require('tslint-webpack-plugin')
 };
 
 module.exports = {
@@ -56,8 +58,6 @@ module.exports = {
                 loader: 'angular-router-loader'
             }, {
                 loader: 'angular2-template-loader'
-            }, {
-                loader: 'tslint-loader'
             }],
             exclude: [/node_modules/]
         }, {
@@ -115,18 +115,6 @@ module.exports = {
 
         new webpack.LoaderOptionsPlugin({
             options: {
-                tslint: {
-                    /**
-                    * Run tslint in production build and fail if there is one warning.
-                    * 
-                    * See: https://github.com/wbuchwalter/tslint-loader
-                    */
-                    emitErrors: true,
-                    /**
-                    * Share the configuration file with the IDE
-                    */
-                    configuration: require('./../tslint.json')
-                },
                 htmlLoader: {
                     /**
                      * Define the root for images, so that we can use absolute url's
@@ -140,6 +128,14 @@ module.exports = {
         }),
         
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
+
+        new plugins.TsLintPlugin({
+            files: ['./app/**/*.ts'],
+            /**
+             * Path to a configuration file.
+             */
+            config: helpers.root('tslint.json')
+        }),
 
         /**
          * Shim additional libraries

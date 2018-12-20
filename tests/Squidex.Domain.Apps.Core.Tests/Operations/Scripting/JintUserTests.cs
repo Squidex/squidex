@@ -9,6 +9,7 @@ using System.Security.Claims;
 using Jint;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure.Security;
+using Squidex.Shared.Identity;
 using Xunit;
 
 #pragma warning disable xUnit2004 // Do not use equality check to test for boolean conditions
@@ -47,6 +48,26 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             identity.AddClaim(new Claim(OpenIdClaims.Email, "hello@squidex.io"));
 
             Assert.Equal("hello@squidex.io", GetValue(identity, "user.email"));
+        }
+
+        [Fact]
+        public void Should_simplify_squidex_claims()
+        {
+            var identity = new ClaimsIdentity();
+
+            identity.AddClaim(new Claim(SquidexClaimTypes.PictureUrl, "my-picture"));
+
+            Assert.Equal(new[] { "my-picture" }, GetValue(identity, "user.claims.picture"));
+        }
+
+        [Fact]
+        public void Should_simplify_default_claims()
+        {
+            var identity = new ClaimsIdentity();
+
+            identity.AddClaim(new Claim(ClaimTypes.Role, "my-role"));
+
+            Assert.Equal(new[] { "my-role" }, GetValue(identity, "user.claims.role"));
         }
 
         [Fact]

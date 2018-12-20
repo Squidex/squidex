@@ -55,9 +55,12 @@ namespace Squidex.Pipeline
                     return;
                 }
 
-                var permissions =
-                    FindByOpenIdSubject(app, user) ??
-                    FindByOpenIdClient(app, user);
+                var (role, permissions) = FindByOpenIdSubject(app, user);
+
+                if (permissions == null)
+                {
+                    (role, permissions) = FindByOpenIdClient(app, user);
+                }
 
                 if (permissions == null || permissions.Count == 0)
                 {
@@ -73,6 +76,8 @@ namespace Squidex.Pipeline
                 if (permissions != null)
                 {
                     var identity = user.Identities.First();
+
+                    identity.AddClaim(new Claim(ClaimTypes.Role, role));
 
                     foreach (var permission in permissions)
                     {
@@ -91,28 +96,28 @@ namespace Squidex.Pipeline
             return context.ActionDescriptor.FilterDescriptors.Any(x => x.Filter is AllowAnonymousFilter);
         }
 
-        private static PermissionSet FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)
+        private static (string, PermissionSet) FindByOpenIdClient(IAppEntity app, ClaimsPrincipal user)
         {
             var clientId = user.GetClientId();
 
             if (clientId != null && app.Clients.TryGetValue(clientId, out var client) && app.Roles.TryGetValue(client.Role, out var role))
             {
-                return role.Permissions;
+                return (client.Role, role.Permissions);
             }
 
-            return null;
+            return (null, null);
         }
 
-        private static PermissionSet FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)
+        private static (string, PermissionSet) FindByOpenIdSubject(IAppEntity app, ClaimsPrincipal user)
         {
             var subjectId = user.OpenIdSubject();
 
             if (subjectId != null && app.Contributors.TryGetValue(subjectId, out var roleName) && app.Roles.TryGetValue(roleName, out var role))
             {
-                return role.Permissions;
+                return (roleName, role.Permissions);
             }
 
-            return null;
+            return (null, null);
         }
     }
 }
