@@ -13,7 +13,7 @@ export const LocalStoreServiceFactory = () => {
 
 @Injectable()
 export class LocalStoreService {
-    private readonly fallback = {};
+    private readonly fallback: { [key: string]: string } = {};
     private store: any = localStorage;
 
     public configureStore(store: any) {
@@ -28,11 +28,23 @@ export class LocalStoreService {
         }
     }
 
+    public getBoolean(key: string): boolean {
+        const value = this.get(key);
+
+        return value === 'true';
+    }
+
     public set(key: string, value: string) {
         try {
             this.store.setItem(key, value);
         } catch (e) {
             this.fallback[key] = value;
         }
+    }
+
+    public setBoolean(key: string, value: boolean) {
+        const converted = value ? 'true' : 'false';
+
+        this.store.setItem(key, converted);
     }
 }

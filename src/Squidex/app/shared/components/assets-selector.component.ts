@@ -39,7 +39,7 @@ export class AssetsSelectorComponent implements OnInit {
         public readonly state: AssetsDialogState,
         private readonly localStore: LocalStoreService
     ) {
-        this.isListView = this.localStore.get('assetView') === 'List';
+        this.isListView = this.localStore.getBoolean('squidex.assets.list-view');
     }
 
     public ngOnInit() {
@@ -77,9 +77,9 @@ export class AssetsSelectorComponent implements OnInit {
     }
 
     public changeView(isListView: boolean) {
-        this.localStore.set('assetView', isListView ? 'List' : 'Grid');
-
         this.isListView = isListView;
+
+        this.localStore.setBoolean('squidex.assets.list-view', isListView);
     }
 }
 

@@ -115,9 +115,10 @@
                 <sqx-content-field 
                     [form]="contentForm"
                     [field]="field"
-                    [fieldForm]="contentForm.form.get(field.name)" 
-                    [(language)]="language"
-                    [languages]="languages">
+                    [fieldForm]="contentForm.form.get(field.name)"
+                    [schema]="schema"
+                    [languages]="languages"
+                    [(language)]="language">
                 </sqx-content-field>
             </div>
         </ng-container>

@@ -64,13 +64,13 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
     }
 
     public ngOnInit() {
-        this.isOpen = this.localStore.get(`schema-category.${this.name}`) !== 'false';
+        this.isOpen = !this.localStore.getBoolean(this.configKey());
     }
 
     public toggle() {
         this.isOpen = !this.isOpen;
 
-        this.localStore.set(`schema-category.${this.name}`, this.isOpen + '');
+        this.localStore.setBoolean(this.configKey(), !this.isOpen);
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
@@ -114,5 +114,9 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
 
     public trackBySchema(index: number, schema: SchemaDto) {
         return schema.id;
+    }
+
+    private configKey(): string {
+        return `squidex.schema.category.${this.name}.closed`;
     }
 }

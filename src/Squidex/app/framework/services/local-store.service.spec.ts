@@ -73,4 +73,16 @@ describe('LocalStore', () => {
 
         expect(localStoreService.get('mykey')).toBe('myval');
     });
+
+    it('should get boolean from local store', () => {
+        const localStoreService = new LocalStoreService();
+
+        localStoreService.setBoolean('key1', true);
+        localStoreService.setBoolean('key2', false);
+
+        expect(localStoreService.getBoolean('key1')).toBe(true);
+        expect(localStoreService.getBoolean('key2')).toBe(false);
+
+        expect(localStoreService.getBoolean('not_set')).toBe(false);
+    });
 });

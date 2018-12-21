@@ -83,7 +83,7 @@ export class ContentsService {
             if (query.indexOf('$filter') < 0 &&
                 query.indexOf('$search') < 0 &&
                 query.indexOf('$orderby') < 0) {
-                queryParts.push(`$search="${query.trim()}"`);
+                queryParts.push(`$search="${encodeURIComponent(query.trim())}"`);
             } else {
                 queryParts.push(`${query.trim()}`);
             }

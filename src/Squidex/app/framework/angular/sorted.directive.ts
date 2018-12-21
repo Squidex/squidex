@@ -7,13 +7,13 @@
 
 import { Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 
-import Sortable from 'sortablejs';
+import * as Sortable from 'sortablejs';
 
 @Directive({
     selector: '[sqxSortModel]'
 })
 export class SortedDirective implements OnDestroy, OnInit {
-    private sortable: Sortable;
+    private sortable: Sortable.Ref;
 
     @Input()
     public dragHandle = '.drag-handle';

@@ -35,4 +35,7 @@ export class FieldEditorComponent {
 
     @Input()
     public languages: ImmutableArray<AppLanguageDto>;
+
+    @Input()
+    public displaySuffix: string;
 }

@@ -61,7 +61,7 @@ export class AssetsEditorComponent implements ControlValueAccessor, OnInit, OnDe
         private readonly localStore: LocalStoreService,
         private readonly messageBus: MessageBus
     ) {
-        this.isListView = this.localStore.get('assetView') === 'List';
+        this.isListView = this.localStore.getBoolean('squidex.assets.list-view');
     }
 
     public writeValue(obj: any) {
@@ -171,9 +171,9 @@ export class AssetsEditorComponent implements ControlValueAccessor, OnInit, OnDe
     }
 
     public changeView(isListView: boolean) {
-        this.localStore.set('assetView', isListView ? 'List' : 'Grid');
-
         this.isListView = isListView;
+
+        this.localStore.setBoolean('squidex.assets.list-view', isListView);
     }
 
     private updateValue() {

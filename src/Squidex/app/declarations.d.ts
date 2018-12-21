@@ -10,9 +10,9 @@ declare module 'pikaday/pikaday';
 declare module 'progressbar.js';
 
 declare module 'sortablejs' {
-    export default class Sortable {
+    export class Ref {
         public destroy(): any;
-
-        public static create(element: any, options: any): Sortable;
     }
+
+    export function create(element: any, options: any): Ref;
 }

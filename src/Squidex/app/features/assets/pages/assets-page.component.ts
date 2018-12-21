@@ -37,7 +37,7 @@ export class AssetsPageComponent implements OnInit {
         private readonly localStore: LocalStoreService,
         private readonly uiState: UIState
     ) {
-        this.isListView = this.localStore.get('assetView') === 'List';
+        this.isListView = this.localStore.getBoolean('squidex.assets.list-view');
     }
 
     public ngOnInit() {
@@ -77,9 +77,9 @@ export class AssetsPageComponent implements OnInit {
     }
 
     public changeView(isListView: boolean) {
-        this.localStore.set('assetView', isListView ? 'List' : 'Grid');
-
         this.isListView = isListView;
+
+        this.localStore.setBoolean('squidex.assets.list-view', isListView);
     }
 }
 

@@ -15,7 +15,9 @@ import {
     EditContentForm,
     fieldInvariant,
     ImmutableArray,
+    LocalStoreService,
     RootFieldDto,
+    SchemaDto,
     Types
 } from '@app/shared';
 
@@ -35,6 +37,9 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
     public fieldForm: FormGroup;
 
     @Input()
+    public schema: SchemaDto;
+
+    @Input()
     public language: AppLanguageDto;
 
     @Input()
@@ -44,13 +49,29 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
     public languageChange = new EventEmitter<AppLanguageDto>();
 
     public selectedFormControl: AbstractControl;
+    public showAllControls = false;
 
     public isInvalid: Observable<boolean>;
+
+    constructor(
+        private readonly localStore: LocalStoreService
+    ) {
+    }
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['fieldForm']) {
             this.isInvalid = this.fieldForm.statusChanges.pipe(startWith(this.fieldForm.invalid), map(x => this.fieldForm.invalid));
         }
+
+        if (changes['field']) {
+            this.showAllControls = this.localStore.getBoolean(this.configKey());
+        }
+    }
+
+    public toggleShowAll() {
+        this.showAllControls = !this.showAllControls;
+
+        this.localStore.setBoolean(this.configKey(), this.showAllControls);
     }
 
     public ngDoCheck() {
@@ -69,6 +90,10 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
 
             this.selectedFormControl = control;
         }
+    }
+
+    private configKey() {
+        return `squidex.schemas.${this.schema.id}.fields.${this.field.fieldId}.show-all`;
     }
 }
 

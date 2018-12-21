@@ -1,23 +1,42 @@
 <div class="table-items-row" [class.invalid]="isInvalid | async">
-    <ng-container *ngIf="field.isLocalizable && languages.length > 1">
-        <div class="languages-buttons" #buttonLanguages>
-            <sqx-language-selector size="sm"
+    <div class="languages-buttons" *ngIf="field.isLocalizable && languages.length > 1">
+        <button *ngIf="!field.properties.isComplexUI" type="button" class="btn btn-secondary btn-sm btn-link mr-1" (click)="toggleShowAll()">
+            {{showAllControls ? 'Single Language' : 'All Languages'}}
+        </button>
+    
+        <ng-container *ngIf="field.properties.isComplexUI || !showAllControls">
+            <sqx-language-selector size="sm" #buttonLanguages
                 [selectedLanguage]="language"
                 (selectedLanguageChange)="languageChange.emit($event)"
                 [languages]="languages.values">
             </sqx-language-selector>
-        </div>
+    
+            <sqx-onboarding-tooltip helpId="languages" [for]="buttonLanguages" position="topRight" after="120000">
+                Please remember to check all languages when you see validation errors.
+            </sqx-onboarding-tooltip>
+        </ng-container> 
+    </div>
 
-        <sqx-onboarding-tooltip helpId="languages" [for]="buttonLanguages" position="topRight" after="120000">
-            Please remember to check all languages when you see validation errors.
-        </sqx-onboarding-tooltip>
+    <ng-container *ngIf="showAllControls; else singleControl">
+        <div class="form-group" *ngFor="let language of languages">
+            <sqx-field-editor
+                [displaySuffix]="'(' + language.iso2Code + ')'"
+                [form]="form"
+                [field]="field"
+                [language]="language"
+                [languages]="languages"
+                [control]="fieldForm.controls[language.iso2Code]">
+            </sqx-field-editor>
+        </div>
     </ng-container>
 
-    <sqx-field-editor
-        [form]="form"
-        [field]="field"
-        [language]="language"
-        [languages]="languages"
-        [control]="selectedFormControl">
-    </sqx-field-editor>
+    <ng-template #singleControl>
+        <sqx-field-editor
+            [form]="form"
+            [field]="field"
+            [language]="language"
+            [languages]="languages"
+            [control]="selectedFormControl">
+        </sqx-field-editor>
+    </ng-template>
 </div>

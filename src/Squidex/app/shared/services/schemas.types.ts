@@ -126,6 +126,10 @@ export abstract class FieldPropertiesDto {
         }
     }
 
+    public get isComplexUI() {
+        return true;
+    }
+
     public abstract accept<T>(visitor: FieldPropertiesVisitor<T>): T;
 }
 
@@ -179,6 +183,10 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto {
     public readonly inlineEditable: boolean = false;
     public readonly defaultValue?: boolean;
 
+    public get isComplexUI() {
+        return false;
+    }
+
     constructor(editor: string,
         props?: Partial<BooleanFieldPropertiesDto>
     ) {
@@ -197,6 +205,10 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
     public readonly maxValue?: string;
     public readonly minValue?: string;
     public readonly calculatedDefaultValue?: string;
+
+    public get isComplexUI() {
+        return false;
+    }
 
     constructor(editor: string,
         props?: Partial<DateTimeFieldPropertiesDto>
@@ -247,6 +259,10 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto {
     public readonly minValue?: number;
     public readonly allowedValues?: number[];
 
+    public get isComplexUI() {
+        return false;
+    }
+
     constructor(editor: string,
         props?: Partial<NumberFieldPropertiesDto>
     ) {
@@ -288,6 +304,10 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto {
     public readonly maxLength?: number;
     public readonly allowedValues?: string[];
 
+    public get isComplexUI() {
+        return this.editor !== 'Input' && this.editor !== 'Color' && this.editor !== 'Radio' && this.editor !== 'Slug' && this.editor !== 'TextArea';
+    }
+
     constructor(editor: string,
         props?: Partial<StringFieldPropertiesDto>
     ) {
@@ -305,6 +325,10 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly minItems?: number;
     public readonly maxItems?: number;
     public readonly allowedValues?: string[];
+
+    public get isComplexUI() {
+        return false;
+    }
 
     constructor(editor: string,
         props?: Partial<TagsFieldPropertiesDto>

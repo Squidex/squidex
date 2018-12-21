@@ -1,6 +1,6 @@
 <ng-container *ngIf="field">
 	<label>
-		{{field.displayName}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+		{{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
 	</label> 
 
 	<span class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</span>

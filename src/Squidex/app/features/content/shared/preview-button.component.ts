@@ -44,7 +44,7 @@ export class PreviewButtonComponent implements OnInit {
     }
 
     public ngOnInit() {
-        let selectedName = this.localStore.get(`preview-button-${this.schema.id}`);
+        let selectedName = this.localStore.get(this.configKey());
 
         if (!selectedName || !this.schema.previewUrls[selectedName]) {
             selectedName = Object.keys(this.schema.previewUrls)[0];
@@ -69,6 +69,12 @@ export class PreviewButtonComponent implements OnInit {
 
             this.alternativeNames = keys.filter(x => x !== this.selectedName);
             this.alternativeNames.sort();
+
+            this.localStore.set(this.configKey(), selectedName);
         }
+    }
+
+    private configKey() {
+        return `squidex.schemas.${this.schema.id}.preview-button`;
     }
 }
