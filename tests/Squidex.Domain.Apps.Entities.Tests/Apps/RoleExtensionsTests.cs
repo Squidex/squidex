@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public class RoleExtensionsRests
+    public class RoleExtensionsTests
     {
         [Fact]
         public void Should_add_common_permission()
