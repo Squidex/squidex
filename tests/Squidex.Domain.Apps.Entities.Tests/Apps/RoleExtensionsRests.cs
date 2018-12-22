@@ -24,6 +24,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
+        public void Should_not_have_duplicate_permission()
+        {
+            var source = new[] { "common", "common", "common" };
+            var result = source.Prefix("my-app");
+            Assert.Single(result);
+        }
+
+        [Fact]
         public void Should_prefix_permission()
         {
             var source = new[] { "clients.read" };
