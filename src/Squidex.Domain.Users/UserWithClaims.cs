@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -28,6 +29,11 @@ namespace Squidex.Domain.Users
         public string Email
         {
             get { return Identity.Email; }
+        }
+
+        public bool IsLocked
+        {
+            get { return Identity.LockoutEnd > DateTime.Now.ToUniversalTime(); }
         }
 
         IReadOnlyList<Claim> IUser.Claims

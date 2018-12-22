@@ -16,6 +16,8 @@ namespace Squidex.Shared.Users
 
         string Email { get; }
 
+        bool IsLocked { get; }
+
         IReadOnlyList<Claim> Claims { get; }
     }
 }
