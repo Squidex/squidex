@@ -28,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var source = new[] { "common", "common", "common" };
             var result = source.Prefix("my-app");
+
             Assert.Single(result);
         }
 
