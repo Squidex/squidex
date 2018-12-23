@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 }
             }
 
-            permissions = result;
+            permissions = result.Distinct().ToArray();
 
             return permissions;
         }

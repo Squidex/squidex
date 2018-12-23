@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public class RoleExtensionsRests
+    public class RoleExtensionsTests
     {
         [Fact]
         public void Should_add_common_permission()
@@ -21,6 +21,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var result = source.Prefix("my-app");
 
             Assert.Equal(new[] { "squidex.apps.my-app.common" }, result);
+        }
+
+        [Fact]
+        public void Should_not_have_duplicate_permission()
+        {
+            var source = new[] { "common", "common", "common" };
+            var result = source.Prefix("my-app");
+
+            Assert.Single(result);
         }
 
         [Fact]
