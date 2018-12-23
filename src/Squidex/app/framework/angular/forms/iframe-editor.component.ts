@@ -65,7 +65,7 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
                         this.isInitialized = true;
 
                         if (this.plugin.contentWindow && Types.isFunction(this.plugin.contentWindow.postMessage)) {
-                            this.plugin.contentWindow.postMessage({ type: 'disabled', disabled: this.isDisabled }, '*');
+                            this.plugin.contentWindow.postMessage({ type: 'disabled', isDisabled: this.isDisabled }, '*');
                             this.plugin.contentWindow.postMessage({ type: 'valueChanged', value: this.value }, '*');
                         }
                     } else if (type === 'resize') {
@@ -99,7 +99,7 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
         this.isDisabled = isDisabled;
 
         if (this.isInitialized && this.plugin.contentWindow && Types.isFunction(this.plugin.contentWindow.postMessage)) {
-            this.plugin.contentWindow.postMessage({ type: 'disabled', disabled: this.isDisabled }, '*');
+            this.plugin.contentWindow.postMessage({ type: 'disabled', isDisabled: this.isDisabled }, '*');
         }
     }
 
