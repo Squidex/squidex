@@ -45,7 +45,7 @@ steps:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - docker build -t squidex/squidex:latest -t squidex/squidex:$${DRONE_TAG} .
       - docker push squidex/squidex:latest
-      - docker push squidex/squidex:$TAG
+      - docker push squidex/squidex:$${DRONE_TAG}
     volumes:
       - name: docker1
         path: /var/run/docker.sock
