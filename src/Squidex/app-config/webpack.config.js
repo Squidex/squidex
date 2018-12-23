@@ -6,9 +6,7 @@ const plugins = {
     // https://github.com/webpack-contrib/mini-css-extract-plugin
     MiniCssExtractPlugin: require('mini-css-extract-plugin'),
     // https://github.com/dividab/tsconfig-paths-webpack-plugin
-    TsconfigPathsPlugin: require('tsconfig-paths-webpack-plugin'),
-    // https://github.com/jrparish/tslint-webpack-plugin
-    TsLintPlugin: require('tslint-webpack-plugin')
+    TsconfigPathsPlugin: require('tsconfig-paths-webpack-plugin')
 };
 
 module.exports = {
@@ -132,14 +130,6 @@ module.exports = {
             }
         }),
         
-        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
-
-        new plugins.TsLintPlugin({
-            files: ['./app/**/*.ts'],
-            /**
-             * Path to a configuration file.
-             */
-            config: helpers.root('tslint.json')
-        })
+        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/)
     ]
 };

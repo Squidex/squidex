@@ -4,6 +4,11 @@
       helpers = require('./helpers'),
     runConfig = require('./webpack.run.base.js');
 
+const plugins = {
+    // https://github.com/jrparish/tslint-webpack-plugin
+    TsLintPlugin: require('./tslint/plugin')
+};
+
 module.exports = webpackMerge(runConfig, {
     mode: 'development',
     
@@ -41,7 +46,15 @@ module.exports = webpackMerge(runConfig, {
     },
 
     plugins: [        
-        new webpack.ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)fesm5/, helpers.root('./src'), {})
+        new webpack.ContextReplacementPlugin(/\@angular(\\|\/)core(\\|\/)fesm5/, helpers.root('./src'), {}),
+
+        new plugins.TsLintPlugin({
+            files: ['./app/**/*.ts'],
+            /**
+             * Path to a configuration file.
+             */
+            config: helpers.root('tslint.json')
+        })
     ],
 
     devServer: {
