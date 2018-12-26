@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure.Commands;
 using Xunit;
@@ -67,7 +68,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext.Response.Headers["ETag"]);
+            Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext.Response.Headers[HeaderNames.ETag]);
         }
     }
 }

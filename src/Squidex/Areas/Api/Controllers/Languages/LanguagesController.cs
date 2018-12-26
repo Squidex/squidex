@@ -7,6 +7,7 @@
 
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Pipeline;
@@ -41,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Languages
         {
             var response = Language.AllLanguages.Select(LanguageDto.FromLanguage).ToArray();
 
-            Response.Headers["Etag"] = "1";
+            Response.Headers[HeaderNames.ETag] = "1";
 
             return Ok(response);
         }

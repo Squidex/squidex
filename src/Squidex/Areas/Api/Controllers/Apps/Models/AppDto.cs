@@ -20,7 +20,7 @@ using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class AppDto : IGenerateEtag
+    public sealed class AppDto : IGenerateETag
     {
         /// <summary>
         /// The name of the app.

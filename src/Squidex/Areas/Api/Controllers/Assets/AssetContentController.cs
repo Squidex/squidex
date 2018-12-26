@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
@@ -67,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return NotFound();
             }
 
-            Response.Headers["ETag"] = entity.FileVersion.ToString();
+            Response.Headers[HeaderNames.ETag] = entity.FileVersion.ToString();
 
             return new FileCallbackResult(entity.MimeType, entity.FileName, async bodyStream =>
             {

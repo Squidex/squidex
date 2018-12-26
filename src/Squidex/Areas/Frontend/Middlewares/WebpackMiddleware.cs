@@ -10,6 +10,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 
 namespace Squidex.Areas.Frontend.Middlewares
 {
@@ -55,7 +56,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                             memoryStream.Seek(0, SeekOrigin.Begin);
 
-                            context.Response.Headers["Content-Length"] = memoryStream.Length.ToString();
+                            context.Response.Headers[HeaderNames.ContentLength] = memoryStream.Length.ToString();
 
                             await memoryStream.CopyToAsync(responseBody);
                         }

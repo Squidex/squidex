@@ -9,7 +9,7 @@ using System;
 
 namespace Squidex.Pipeline
 {
-    public interface IGenerateEtag
+    public interface IGenerateETag
     {
         Guid Id { get; }
 

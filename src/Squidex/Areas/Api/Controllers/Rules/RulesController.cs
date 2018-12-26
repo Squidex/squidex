@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Entities;
@@ -59,7 +60,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var response = RuleElementRegistry.Actions.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
 
-            Response.Headers["Etag"] = RuleActionsEtag;
+            Response.Headers[HeaderNames.ETag] = RuleActionsEtag;
 
             return Ok(response);
         }
@@ -79,7 +80,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var response = RuleElementRegistry.Triggers.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
 
-            Response.Headers["Etag"] = RuleTriggersEtag;
+            Response.Headers[HeaderNames.ETag] = RuleTriggersEtag;
 
             return Ok(response);
         }
@@ -103,7 +104,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
 
             var response = entities.Select(RuleDto.FromRule).ToArray();
 
-            Response.Headers["ETag"] = response.ToManyEtag(0);
+            Response.Headers[HeaderNames.ETag] = response.ToManyEtag(0);
 
             return Ok(response);
         }

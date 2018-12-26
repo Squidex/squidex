@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using NodaTime;
 using NodaTime.Text;
 using Squidex.Areas.Api.Controllers.Contents.Models;
@@ -141,7 +142,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = response.Items.ToSurrogateKeys();
             }
 
-            Response.Headers["ETag"] = response.Items.ToManyEtag(response.Total);
+            Response.Headers[HeaderNames.ETag] = response.Items.ToManyEtag(response.Total);
 
             return Ok(response);
         }
@@ -175,7 +176,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = content.Id.ToString();
             }
 
-            Response.Headers["ETag"] = content.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = content.Version.ToString();
 
             return Ok(response);
         }
@@ -211,7 +212,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = content.Id.ToString();
             }
 
-            Response.Headers["ETag"] = content.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = content.Version.ToString();
 
             return Ok(response.Data);
         }

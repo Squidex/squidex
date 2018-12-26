@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -54,7 +55,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = schemas.ToArray(SchemaDto.FromSchema);
 
-            Response.Headers["ETag"] = response.ToManyEtag();
+            Response.Headers[HeaderNames.ETag] = response.ToManyEtag();
 
             return Ok(response);
         }
@@ -93,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = SchemaDetailsDto.FromSchema(entity);
 
-            Response.Headers["ETag"] = entity.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = entity.Version.ToString();
 
             return Ok(response);
         }

@@ -9,6 +9,7 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -33,7 +34,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
             }
 
             var headers = httpContextAccessor.HttpContext.Request.Headers;
-            var headerMatch = headers["If-Match"].ToString();
+            var headerMatch = headers[HeaderNames.IfMatch].ToString();
 
             if (!string.IsNullOrWhiteSpace(headerMatch) && long.TryParse(headerMatch, NumberStyles.Any, CultureInfo.InvariantCulture, out var expectedVersion))
             {
@@ -48,7 +49,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             if (context.Result<object>() is EntitySavedResult result)
             {
-                httpContextAccessor.HttpContext.Response.Headers["ETag"] = result.Version.ToString();
+                httpContextAccessor.HttpContext.Response.Headers[HeaderNames.ETag] = result.Version.ToString();
             }
         }
     }

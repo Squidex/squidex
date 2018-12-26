@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Net.Http.Headers;
 
 namespace Squidex.Pipeline
 {
@@ -21,9 +22,9 @@ namespace Squidex.Pipeline
             var httpContext = context.HttpContext;
 
             if (HttpMethods.IsGet(httpContext.Request.Method) &&
-                httpContext.Request.Headers.TryGetValue("If-None-Match", out var noneMatch) &&
+                httpContext.Request.Headers.TryGetValue(HeaderNames.IfNoneMatch, out var noneMatch) &&
                 httpContext.Response.StatusCode == 200 &&
-                httpContext.Response.Headers.TryGetValue("ETag", out var etag) &&
+                httpContext.Response.Headers.TryGetValue(HeaderNames.ETag, out var etag) &&
                 !string.IsNullOrWhiteSpace(noneMatch) &&
                 !string.IsNullOrWhiteSpace(etag) &&
                 string.Equals(etag, noneMatch, System.StringComparison.Ordinal))

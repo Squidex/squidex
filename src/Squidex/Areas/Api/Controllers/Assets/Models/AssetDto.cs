@@ -16,7 +16,7 @@ using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public sealed class AssetDto : IGenerateEtag
+    public sealed class AssetDto : IGenerateETag
     {
         /// <summary>
         /// The id of the asset.

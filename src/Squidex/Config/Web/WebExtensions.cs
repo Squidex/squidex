@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure.Json;
 using Squidex.Pipeline;
 using Squidex.Pipeline.Robots;
@@ -63,7 +64,7 @@ namespace Squidex.Config.Web
 
                 var json = serializer.Serialize(response);
 
-                httpContext.Response.Headers["Content-Types"] = "text/json";
+                httpContext.Response.Headers[HeaderNames.ContentType] = "text/json";
 
                 return httpContext.Response.WriteAsync(json);
             });

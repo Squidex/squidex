@@ -15,7 +15,7 @@ using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public sealed class SchemaDto : IGenerateEtag
+    public sealed class SchemaDto : IGenerateETag
     {
         /// <summary>
         /// The id of the schema.

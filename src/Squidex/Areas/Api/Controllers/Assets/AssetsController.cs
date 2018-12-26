@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Assets.Models;
 using Squidex.Areas.Api.Controllers.Contents;
@@ -111,7 +112,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 Response.Headers["Surrogate-Key"] = response.Items.ToSurrogateKeys();
             }
 
-            Response.Headers["ETag"] = response.Items.ToManyEtag(response.Total);
+            Response.Headers[HeaderNames.ETag] = response.Items.ToManyEtag(response.Total);
 
             return Ok(response);
         }
@@ -148,7 +149,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 Response.Headers["Surrogate-Key"] = entity.Id.ToString();
             }
 
-            Response.Headers["ETag"] = entity.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = entity.Version.ToString();
 
             return Ok(response);
         }
