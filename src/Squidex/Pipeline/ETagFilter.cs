@@ -29,21 +29,23 @@ namespace Squidex.Pipeline
 
             var httpContext = context.HttpContext;
 
-            if (HttpMethods.IsGet(httpContext.Request.Method) &&
-                httpContext.Response.StatusCode == 200 &&
-                httpContext.Response.Headers.TryGetValue(HeaderNames.ETag, out var etag) && !string.IsNullOrWhiteSpace(etag))
+            if (httpContext.Response.Headers.TryGetValue(HeaderNames.ETag, out var etag) && !string.IsNullOrWhiteSpace(etag))
             {
+                string etagValue = etag;
+
                 if (!options.Strong)
                 {
-                    httpContext.Response.Headers[HeaderNames.ETag] = "W/" + etag;
+                    etagValue = "W/" + etag;
+
+                    httpContext.Response.Headers[HeaderNames.ETag] = etagValue;
                 }
 
-                if (httpContext.Request.Headers.TryGetValue(HeaderNames.IfNoneMatch, out var noneMatch) && !string.IsNullOrWhiteSpace(noneMatch))
+                if (HttpMethods.IsGet(httpContext.Request.Method) &&
+                    httpContext.Response.StatusCode == 200 &&
+                    httpContext.Request.Headers.TryGetValue(HeaderNames.IfNoneMatch, out var noneMatch) && !string.IsNullOrWhiteSpace(noneMatch) &&
+                    string.Equals(etagValue, noneMatch, System.StringComparison.Ordinal))
                 {
-                    if (string.Equals(etag, noneMatch, System.StringComparison.Ordinal))
-                    {
-                        resultContext.Result = new StatusCodeResult(304);
-                    }
+                    resultContext.Result = new StatusCodeResult(304);
                 }
             }
         }

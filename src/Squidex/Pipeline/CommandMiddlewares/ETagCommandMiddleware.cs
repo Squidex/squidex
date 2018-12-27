@@ -37,7 +37,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             var headers = httpContextAccessor.HttpContext.Request.Headers;
 
-            if (headers.TryGetValue(HeaderNames.ETag, out var etag) && !string.IsNullOrWhiteSpace(etag))
+            if (headers.TryGetValue(HeaderNames.IfMatch, out var etag) && !string.IsNullOrWhiteSpace(etag))
             {
                 var etagValue = etag.ToString();
 
