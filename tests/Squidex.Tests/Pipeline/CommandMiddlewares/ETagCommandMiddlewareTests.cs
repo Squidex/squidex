@@ -48,7 +48,20 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_add_expected_version_to_command()
         {
-            requestHeaders["If-Match"] = "13";
+            requestHeaders[HeaderNames.ETag] = "13";
+
+            var command = new CreateContent();
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(13, context.Command.ExpectedVersion);
+        }
+
+        [Fact]
+        public async Task Should_add_weak_etag_as_expected_version_to_command()
+        {
+            requestHeaders[HeaderNames.ETag] = "W/13";
 
             var command = new CreateContent();
             var context = new CommandContext(command, commandBus);
