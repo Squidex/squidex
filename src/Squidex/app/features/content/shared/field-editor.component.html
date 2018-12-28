@@ -84,7 +84,7 @@
 				<ng-container *ngSwitchCase="'Boolean'">
 					<ng-container [ngSwitch]="field.properties['editor']">
 						<ng-container *ngSwitchCase="'Toggle'">
-							<sqx-toggle [formControl]="control"></sqx-toggle>
+							<sqx-toggle [formControl]="control" [threeStates]="!field.properties.isRequired"></sqx-toggle>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Checkbox'">
 							<input type="checkbox" [formControl]="control" class="form-check" sqxIndeterminateValue />
