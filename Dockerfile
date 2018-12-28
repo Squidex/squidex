@@ -13,8 +13,8 @@ RUN cd /tmp && npm install
 COPY . .
 
 # Build Frontend
-RUN cp -a /tmp/node_modules /src/Squidex/ \
- && cd /src/Squidex \
+RUN cp -a /tmp/node_modules src/Squidex/ \
+ && cd src/Squidex \
  && npm run test:coverage \
  && npm run build:copy \
  && npm run build
