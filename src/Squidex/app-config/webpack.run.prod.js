@@ -34,15 +34,13 @@ module.exports = webpackMerge(runConfig, {
 
         /**
          * Specifies the name of each output file on disk.
-         * IMPORTANT: You must not specify an absolute path here!
          *
          * See: https://webpack.js.org/configuration/output/#output-filename
          */
         filename: '[name].js',
 
         /**
-         * The filename of non-entry chunks as relative path
-         * inside the output.path directory.
+         * The filename of non-entry chunks as relative path inside the output.path directory.
          *
          * See: https://webpack.js.org/configuration/output/#output-chunkfilename
          */
@@ -63,7 +61,7 @@ module.exports = webpackMerge(runConfig, {
         rules: [{
             test: /\.scss$/,
             /*
-             * Extract the content from a bundle to a file
+             * Extract the content from a bundle to a file.
              * 
              * See: https://github.com/webpack-contrib/extract-text-webpack-plugin
              */
@@ -75,7 +73,7 @@ module.exports = webpackMerge(runConfig, {
                 loader: 'sass-loader'
             }],
             /*
-             * Do not include component styles
+             * Do not include component styles.
              */
             include: helpers.root('app', 'theme'),
         }, {
