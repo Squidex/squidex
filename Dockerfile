@@ -10,8 +10,6 @@ RUN cd /tmp && npm install
 
 COPY . .
 
-WORKDIR /
-
 # Build Frontend
 RUN cp -a /tmp/node_modules /src/Squidex/ \
  && cd /src/Squidex \

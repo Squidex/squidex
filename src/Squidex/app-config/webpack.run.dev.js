@@ -6,7 +6,7 @@
 
 const plugins = {
     // https://github.com/jrparish/tslint-webpack-plugin
-    TsLintPlugin: require('./tslint/plugin')
+    TsLintPlugin: require('tslint-webpack-plugin')
 };
 
 module.exports = webpackMerge(runConfig, {

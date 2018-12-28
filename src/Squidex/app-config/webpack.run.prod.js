@@ -14,7 +14,7 @@ const plugins = {
     // https://github.com/NMFR/optimize-css-assets-webpack-plugin
     OptimizeCSSAssetsPlugin: require("optimize-css-assets-webpack-plugin"),
     // https://github.com/jrparish/tslint-webpack-plugin
-    TsLintPlugin: require('./tslint/plugin')
+    TsLintPlugin: require('tslint-webpack-plugin')
 };
             
 helpers.removeLoaders(runConfig, ['scss', 'ts']);
