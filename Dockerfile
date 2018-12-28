@@ -8,7 +8,7 @@ WORKDIR /src
 COPY src/Squidex/package*.json /tmp/
 
 # Install Node packages 
-RUN cd /tmp && npm install
+RUN cd /tmp && npm install --loglevel=error
 
 COPY . .
 
@@ -16,7 +16,6 @@ COPY . .
 RUN cp -a /tmp/node_modules src/Squidex/ \
  && cd src/Squidex \
  && npm run test:coverage \
- && npm run build:copy \
  && npm run build
  
 # Test Backend
