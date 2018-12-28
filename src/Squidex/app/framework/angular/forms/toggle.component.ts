@@ -53,12 +53,22 @@ export class ToggleComponent implements ControlValueAccessor {
         this.callTouched = fn;
     }
 
-    public changeState() {
+    public changeState(event: MouseEvent) {
         if (this.isDisabled) {
             return;
         }
 
-        this.isChecked = !(this.isChecked === true);
+        if (event.ctrlKey || event.shiftKey) {
+            if (this.isChecked) {
+                this.isChecked = null;
+            } else if (this.isChecked === null) {
+                this.isChecked = false;
+            } else {
+                this.isChecked = true;
+            }
+        } else {
+            this.isChecked = !(this.isChecked === true);
+        }
 
         this.callChange(this.isChecked);
         this.callTouched();

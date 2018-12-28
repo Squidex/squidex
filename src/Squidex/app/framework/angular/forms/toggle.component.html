@@ -1,4 +1,4 @@
-<div class="toggle-container" (click)="changeState()"
+<div class="toggle-container" (click)="changeState($event)"
     [class.disabled]="isDisabled"
     [class.checked]="isChecked === true" 
     [class.unchecked]="isChecked === false">
