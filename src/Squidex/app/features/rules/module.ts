@@ -32,7 +32,7 @@ import {
     RuleWizardComponent,
     SlackActionComponent,
     TweetActionComponent,
-    WebhookActionComponent,
+    WebhookActionComponent
 } from './declarations';
 
 const routes: Routes = [
