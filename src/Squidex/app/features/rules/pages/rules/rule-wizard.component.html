@@ -94,6 +94,13 @@
                             [actionFormSubmitted]="actionForm.submitted | async">
                         </sqx-elastic-search-action>
                     </ng-container>
+                    <ng-container *ngSwitchCase="'Email'">
+                        <sqx-email-action
+                            [action]="action"
+                            [actionForm]="actionForm.form"
+                            [actionFormSubmitted]="actionForm.submitted | async">
+                        </sqx-email-action>
+                    </ng-container>
                     <ng-container *ngSwitchCase="'Fastly'">
                         <sqx-fastly-action
                             [action]="action"

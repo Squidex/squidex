@@ -1,0 +1,58 @@
+<div [formGroup]="actionForm" class="form-horizontal">
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="from">From</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="from" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="from" formControlName="from" />
+
+            <small class="form-text text-muted">
+                The mail is sent from?
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="to">To</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="to" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="to" formControlName="to" />
+
+            <small class="form-text text-muted">
+                The email will be sent to?
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="subject">Subject</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="subject" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="subject" formControlName="subject" />
+
+            <small class="form-text text-muted">
+                The Email Subject.
+            </small>
+        </div>
+    </div>
+
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="body">Body</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="body" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <textarea class="form-control" id="body" formControlName="body"></textarea>
+
+            <small class="form-text text-muted">
+                The Email body
+            </small>
+        </div>
+    </div>
+</div>

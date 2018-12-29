@@ -21,6 +21,7 @@ import {
     ContentChangedTriggerComponent,
     DiscourseActionComponent,
     ElasticSearchActionComponent,
+    EmailActionComponent,
     FastlyActionComponent,
     MediumActionComponent,
     PrerenderActionComponent,
@@ -31,7 +32,7 @@ import {
     RuleWizardComponent,
     SlackActionComponent,
     TweetActionComponent,
-    WebhookActionComponent
+    WebhookActionComponent,
 } from './declarations';
 
 const routes: Routes = [
@@ -66,6 +67,7 @@ const routes: Routes = [
         AzureQueueActionComponent,
         ContentChangedTriggerComponent,
         DiscourseActionComponent,
+        EmailActionComponent,
         ElasticSearchActionComponent,
         FastlyActionComponent,
         MediumActionComponent,
