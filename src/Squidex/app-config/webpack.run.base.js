@@ -10,8 +10,7 @@ const plugins = {
 
 module.exports = webpackMerge(commonConfig, {
     /**
-     * The entry point for the bundle
-     * Our Angular.js app
+     * The entry point for the bundle. Our Angular app.
      *
      * See: https://webpack.js.org/configuration/entry-context/
      */

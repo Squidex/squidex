@@ -33,16 +33,23 @@ namespace Squidex.Pipeline.CommandMiddlewares
                 return;
             }
 
-            var headers = httpContextAccessor.HttpContext.Request.Headers;
-            var headerMatch = headers[HeaderNames.IfMatch].ToString();
+            context.Command.ExpectedVersion = EtagVersion.Any;
 
-            if (!string.IsNullOrWhiteSpace(headerMatch) && long.TryParse(headerMatch, NumberStyles.Any, CultureInfo.InvariantCulture, out var expectedVersion))
+            var headers = httpContextAccessor.HttpContext.Request.Headers;
+
+            if (headers.TryGetValue(HeaderNames.IfMatch, out var etag) && !string.IsNullOrWhiteSpace(etag))
             {
-                context.Command.ExpectedVersion = expectedVersion;
-            }
-            else
-            {
-                context.Command.ExpectedVersion = EtagVersion.Any;
+                var etagValue = etag.ToString();
+
+                if (etagValue.StartsWith("W/", StringComparison.OrdinalIgnoreCase))
+                {
+                    etagValue = etagValue.Substring(2);
+                }
+
+                if (long.TryParse(etagValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var expectedVersion))
+                {
+                    context.Command.ExpectedVersion = expectedVersion;
+                }
             }
 
             await next();

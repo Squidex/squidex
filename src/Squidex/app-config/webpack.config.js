@@ -33,7 +33,7 @@ module.exports = {
         ]
     },
 
-    /*
+    /**
      * Options affecting the normal modules.
      *
      * See: https://webpack.js.org/configuration/module/
@@ -109,7 +109,7 @@ module.exports = {
     },
 
     plugins: [
-        /*
+        /**
          * Puts each bundle into a file and appends the hash of the file to the path.
          * 
          * See: https://github.com/webpack-contrib/mini-css-extract-plugin
@@ -120,7 +120,7 @@ module.exports = {
             options: {
                 htmlLoader: {
                     /**
-                     * Define the root for images, so that we can use absolute url's
+                     * Define the root for images, so that we can use absolute urls.
                      * 
                      * See: https://github.com/webpack/html-loader#Advanced_Options
                      */

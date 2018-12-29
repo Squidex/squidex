@@ -3,14 +3,14 @@
 module.exports = function (config) {
     var _config = {
         /** 
-         * Base path that will be used to resolve all patterns (e.g. files, exclude)
+         * Base path that will be used to resolve all patterns (e.g. files, exclude).
          */
         basePath: '',
 
         frameworks: ['jasmine'],
 
         /**
-         * Load additional test shim to setup angular2 for testing
+         * Load additional test shim to setup angular2 for testing.
          */
         files: [
             { pattern: './app-config/karma-test-shim.js', watched: false }
@@ -33,21 +33,20 @@ module.exports = function (config) {
             noInfo: true
         },
 
-        /*
-         * Use a mocha style console reporter, html reporter and the code coverage reporter
+        /**
+         * Use a mocha style console reporter, html reporter and the code coverage reporter.
          */
         reporters: ['mocha', 'html', 'coverage-istanbul'],
 
-        // HtmlReporter configuration
         htmlReporter: {
             useCompactStyle: true,
             /** 
-             * Use the same folder like the html report for coverage reports
+             * Use the same folder like the html report for coverage reports.
              */
             outputFile: '_test-output/tests.html',
 
             /**
-             * Group the output by test suite (describe), equivalent to mocha reporter
+             * Group the output by test suite (describe), equivalent to mocha reporter.
              */
             groupSuites: true
         },
@@ -64,22 +63,24 @@ module.exports = function (config) {
           },
 
         /**
-         * Disable continuous Integration mode, run only one time
+         * Disable continuous Integration mode, run only one time.
          */
         singleRun: true,
 
         customLaunchers: {
             ChromeCustom: {
 			    base: 'ChromeHeadless',
-                // We must disable the Chrome sandbox (Chrome's sandbox needs more permissions than Docker allows by default)
+                /**
+                 * We must disable the Chrome sandbox (Chrome's sandbox needs more permissions than Docker allows by default).
+                 */
                 flags: ['--no-sandbox']
             }
         },
 
         /**
-         * Run with chrome because phantom js does not provide all types, e.g. DragEvent
+         * Run with chrome because phantom js does not provide all types.
          * 
-         * available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+         * Available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
          */
         browsers: ['ChromeCustom']
     };

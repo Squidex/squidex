@@ -3,20 +3,19 @@
 #
 FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as builder
 
+WORKDIR /src
+
 COPY src/Squidex/package*.json /tmp/
 
 # Install Node packages 
-RUN cd /tmp && npm install
+RUN cd /tmp && npm install --loglevel=error
 
 COPY . .
 
-WORKDIR /
-
 # Build Frontend
-RUN cp -a /tmp/node_modules /src/Squidex/ \
- && cd /src/Squidex \
+RUN cp -a /tmp/node_modules src/Squidex/ \
+ && cd src/Squidex \
  && npm run test:coverage \
- && npm run build:copy \
  && npm run build
  
 # Test Backend
