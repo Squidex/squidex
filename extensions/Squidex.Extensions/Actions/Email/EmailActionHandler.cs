@@ -22,33 +22,36 @@ namespace Squidex.Extensions.Actions.Email
     {
         private const string Description = "Send an Email";
 
-        private readonly EmailOptions emailOptions;
-
-        public EmailActionHandler(RuleEventFormatter formatter, IOptions<EmailOptions> emailOptions)
+        public EmailActionHandler(RuleEventFormatter formatter)
             : base(formatter)
         {
-            Guard.NotNull(emailOptions, nameof(emailOptions));
-            this.emailOptions = emailOptions.Value;
         }
 
         protected override (string Description, EmailJob Data) CreateJob(EnrichedEvent @event, EmailAction action)
         {
             var ruleJob = new EmailJob
             {
-                From = action.From,
-                To = action.To,
+                Host = action.Host,
+                EnableSsl = action.EnableSsl,
+                Password = action.Password,
+                Port = action.Port,
+                Username = Format(action.Username, @event),
+                From = Format(action.From, @event),
+                To = Format(action.To, @event),
                 Subject = Format(action.Subject, @event),
                 Body = Format(action.Body, @event)
             };
+
             return (Description, ruleJob);
         }
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(EmailJob job)
         {
-            using (SmtpClient client = new SmtpClient(emailOptions.Host, emailOptions.Port))
+            using (var client = new SmtpClient(job.Host, job.Port))
             {
-                client.EnableSsl = emailOptions.EnableSsl;
-                client.Credentials = new NetworkCredential(emailOptions.Username, emailOptions.Password);
+                client.EnableSsl = job.EnableSsl;
+                client.Credentials = new NetworkCredential(job.Username, job.Password);
+
                 using (var message = new MailMessage(job.From, job.To))
                 {
                     message.Subject = job.Subject;
@@ -63,6 +66,16 @@ namespace Squidex.Extensions.Actions.Email
 
     public class EmailJob
     {
+        public string Host { get; set; }
+
+        public int Port { get; set; }
+
+        public string Username { get; set; }
+
+        public string Password { get; set; }
+
+        public bool EnableSsl { get; set; }
+
         public string From { get; set; }
 
         public string To { get; set; }

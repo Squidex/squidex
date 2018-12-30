@@ -24,10 +24,33 @@ export class EmailActionComponent implements OnInit {
     public actionFormSubmitted = false;
 
     public ngOnInit() {
+        this.actionForm.setControl('host',
+            new FormControl(this.action.host || 'smtp.gmail.com', [
+                Validators.required
+            ]));
+
+        this.actionForm.setControl('port',
+            new FormControl(this.action.port || 465, [
+                Validators.required,
+                Validators.pattern(/\d{2,6}/)
+            ]));
+
+        this.actionForm.setControl('enableSsl',
+            new FormControl(this.action.enableSsl || true));
+
+        this.actionForm.setControl('username',
+            new FormControl(this.action.username || '', [
+                Validators.required
+            ]));
+
+        this.actionForm.setControl('password',
+            new FormControl(this.action.password || '', [
+                Validators.required
+            ]));
+
         this.actionForm.setControl('from',
             new FormControl(this.action.from || '', [
-                Validators.required,
-                Validators.email
+                Validators.required
             ]));
 
         this.actionForm.setControl('to',

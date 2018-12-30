@@ -58,8 +58,6 @@ namespace Squidex
                 config.GetSection("mode"));
             services.Configure<TwitterOptions>(
                 config.GetSection("twitter"));
-            services.Configure<EmailOptions>(
-                config.GetSection("smtpServer"));
             services.Configure<RobotsTxtOptions>(
                 config.GetSection("robots"));
             services.Configure<GCHealthCheckOptions>(

@@ -1,5 +1,75 @@
 <div [formGroup]="actionForm" class="form-horizontal">
     <div class="form-group row">
+        <label class="col-3 col-form-label" for="host">Host</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="from" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="host" formControlName="host" />
+
+            <small class="form-text text-muted">
+                The Name or IP address of the host used for SMTP transactions.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="port">Port</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="port" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="port" formControlName="port" />
+
+            <small class="form-text text-muted">
+                The port to be used on host.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-9 offset-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="enableSsl" formControlName="enableSsl" />
+                <label class="form-check-label" for="enableSsl">
+                    EnableSsl
+                </label>
+            </div>
+            <small class="form-text text-muted">
+                Specify whether the smtp client uses Secure Sockets Layer (SSL) to encrypt the connection.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="username">Username</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="port" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="text" class="form-control" id="username" formControlName="username" />
+
+            <small class="form-text text-muted">
+                The username used to authenticate the sender.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="password">Password</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="password" [submitted]="actionFormSubmitted"></sqx-control-errors>
+
+            <input type="password" class="form-control" id="password" formControlName="password" />
+
+            <small class="form-text text-muted">
+                The password used to authenticate the sender.
+            </small>
+        </div>
+    </div>
+
+    <div class="form-group row">
         <label class="col-3 col-form-label" for="from">From</label>
 
         <div class="col-9">
@@ -8,7 +78,7 @@
             <input type="text" class="form-control" id="from" formControlName="from" />
 
             <small class="form-text text-muted">
-                The mail is sent from?
+                The email is sent from?
             </small>
         </div>
     </div>
@@ -36,7 +106,7 @@
             <input type="text" class="form-control" id="subject" formControlName="subject" />
 
             <small class="form-text text-muted">
-                The Email Subject.
+                The subject line for this e-mail message.
             </small>
         </div>
     </div>
@@ -51,7 +121,7 @@
             <textarea class="form-control" id="body" formControlName="body"></textarea>
 
             <small class="form-text text-muted">
-                The Email body
+                The message body
             </small>
         </div>
     </div>
