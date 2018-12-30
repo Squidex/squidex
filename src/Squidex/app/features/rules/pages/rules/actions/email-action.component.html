@@ -3,7 +3,7 @@
         <label class="col-3 col-form-label" for="serverHost">ServerHost</label>
 
         <div class="col-9">
-            <sqx-control-errors for="from" [submitted]="actionFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="serverHost" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <input type="text" class="form-control" id="serverHost" formControlName="serverHost" />
 
@@ -59,7 +59,7 @@
         <label class="col-3 col-form-label" for="serverPassword">ServerPassword</label>
 
         <div class="col-9">
-            <sqx-control-errors for="password" [submitted]="actionFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="serverPassword" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <input type="password" class="form-control" id="serverPassword" formControlName="serverPassword" />
 
@@ -101,7 +101,7 @@
         <label class="col-3 col-form-label" for="messageSubject">MessageSubject</label>
 
         <div class="col-9">
-            <sqx-control-errors for="subject" [submitted]="actionFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="messageSubject" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <input type="text" class="form-control" id="messageSubject" formControlName="messageSubject" />
 
@@ -116,7 +116,7 @@
         <label class="col-3 col-form-label" for="messageBody">MessageBody</label>
 
         <div class="col-9">
-            <sqx-control-errors for="body" [submitted]="actionFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="messageBody" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
             <textarea class="form-control" id="messageBody" formControlName="messageBody"></textarea>
 
