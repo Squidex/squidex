@@ -9,6 +9,7 @@ export * from './pages/rules/actions/algolia-action.component';
 export * from './pages/rules/actions/azure-queue-action.component';
 export * from './pages/rules/actions/discourse-action.component';
 export * from './pages/rules/actions/elastic-search-action.component';
+export * from './pages/rules/actions/email-action.component';
 export * from './pages/rules/actions/fastly-action.component';
 export * from './pages/rules/actions/medium-action.component';
 export * from './pages/rules/actions/prerender-action.component';
