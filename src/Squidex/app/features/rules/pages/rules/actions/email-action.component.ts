@@ -31,8 +31,7 @@ export class EmailActionComponent implements OnInit {
 
         this.actionForm.setControl('serverPort',
             new FormControl(this.action.serverPort || 465, [
-                Validators.required,
-                Validators.pattern(/\d{2,6}/)
+                Validators.required
             ]));
 
         this.actionForm.setControl('serverUseSsl',

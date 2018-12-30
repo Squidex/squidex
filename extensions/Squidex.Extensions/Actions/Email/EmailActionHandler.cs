@@ -6,22 +6,16 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Infrastructure;
 
 namespace Squidex.Extensions.Actions.Email
 {
     public sealed class EmailActionHandler : RuleActionHandler<EmailAction, EmailJob>
     {
-        private const string Description = "Send an Email";
-
         public EmailActionHandler(RuleEventFormatter formatter)
             : base(formatter)
         {
@@ -42,7 +36,9 @@ namespace Squidex.Extensions.Actions.Email
                 MessageBody = Format(action.MessageBody, @event)
             };
 
-            return (Description, ruleJob);
+            var description = $"Send an email to {action.MessageTo}";
+
+            return (description, ruleJob);
         }
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(EmailJob job)
@@ -56,6 +52,7 @@ namespace Squidex.Extensions.Actions.Email
                 {
                     message.Subject = job.MessageSubject;
                     message.Body = job.MessageBody;
+
                     await client.SendMailAsync(message);
                 }
             }
@@ -64,11 +61,11 @@ namespace Squidex.Extensions.Actions.Email
         }
     }
 
-    public class EmailJob
+    public sealed class EmailJob
     {
-        public string ServerHost { get; set; }
-
         public int ServerPort { get; set; }
+
+        public string ServerHost { get; set; }
 
         public string ServerUsername { get; set; }
 

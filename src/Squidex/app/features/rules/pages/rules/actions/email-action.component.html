@@ -8,7 +8,7 @@
             <input type="text" class="form-control" id="serverHost" formControlName="serverHost" />
 
             <small class="form-text text-muted">
-                The Name or IP address of the host used for SMTP transactions.
+                The IP address or host to the SMTP server.
             </small>
         </div>
     </div>
@@ -19,10 +19,10 @@
         <div class="col-9">
             <sqx-control-errors for="serverPort" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="serverPort" formControlName="serverPort" />
+            <input type="number" class="form-control" id="serverPort" formControlName="serverPort" />
 
             <small class="form-text text-muted">
-                The port to be used on host.
+                The port to the SMTP server.
             </small>
         </div>
     </div>
@@ -36,7 +36,7 @@
                 </label>
             </div>
             <small class="form-text text-muted">
-                Specify whether the smtp client uses Secure Sockets Layer (SSL) to encrypt the connection.
+                Specify whether the SMTP client uses Secure Sockets Layer (SSL) to encrypt the connection.
             </small>
         </div>
     </div>
@@ -50,7 +50,7 @@
             <input type="text" class="form-control" id="serverUsername" formControlName="serverUsername" />
 
             <small class="form-text text-muted">
-                The username used to authenticate the sender.  Read the <a routerLink="help">help</a> section for information about advanced formatting.
+                The username for the SMTP server.
             </small>
         </div>
     </div>
@@ -64,7 +64,7 @@
             <input type="password" class="form-control" id="serverPassword" formControlName="serverPassword" />
 
             <small class="form-text text-muted">
-                The password used to authenticate the sender.
+                The password for the SMTP server.
             </small>
         </div>
     </div>
@@ -78,7 +78,7 @@
             <input type="text" class="form-control" id="messageFrom" formControlName="messageFrom" />
 
             <small class="form-text text-muted">
-                The email sending address.  Read the <a routerLink="help">help</a> section for information about advanced formatting.
+                The email sending address. Read the <a routerLink="help">help</a> section for information about advanced formatting.
             </small>
         </div>
     </div>
@@ -92,7 +92,7 @@
             <input type="text" class="form-control" id="messageTo" formControlName="messageTo" />
 
             <small class="form-text text-muted">
-                The email message will be sent to.  Read the <a routerLink="help">help</a> section for information about advanced formatting.
+                The email message will be sent to. Read the <a routerLink="help">help</a> section for information about advanced formatting.
             </small>
         </div>
     </div>
