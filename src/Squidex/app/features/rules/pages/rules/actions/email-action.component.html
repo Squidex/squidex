@@ -1,11 +1,11 @@
 <div [formGroup]="actionForm" class="form-horizontal">
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="host">Host</label>
+        <label class="col-3 col-form-label" for="serverHost">ServerHost</label>
 
         <div class="col-9">
             <sqx-control-errors for="from" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="host" formControlName="host" />
+            <input type="text" class="form-control" id="serverHost" formControlName="serverHost" />
 
             <small class="form-text text-muted">
                 The Name or IP address of the host used for SMTP transactions.
@@ -14,12 +14,12 @@
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="port">Port</label>
+        <label class="col-3 col-form-label" for="serverPort">ServerPort</label>
 
         <div class="col-9">
-            <sqx-control-errors for="port" [submitted]="actionFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="serverPort" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="port" formControlName="port" />
+            <input type="text" class="form-control" id="serverPort" formControlName="serverPort" />
 
             <small class="form-text text-muted">
                 The port to be used on host.
@@ -30,9 +30,9 @@
     <div class="form-group row">
         <div class="col-9 offset-3">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="enableSsl" formControlName="enableSsl" />
-                <label class="form-check-label" for="enableSsl">
-                    EnableSsl
+                <input class="form-check-input" type="checkbox" id="serverUseSsl" formControlName="serverUseSsl" />
+                <label class="form-check-label" for="serverUseSsl">
+                    ServerUseSsl
                 </label>
             </div>
             <small class="form-text text-muted">
@@ -42,26 +42,26 @@
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="username">Username</label>
+        <label class="col-3 col-form-label" for="serverUsername">ServerUsername</label>
 
         <div class="col-9">
-            <sqx-control-errors for="port" [submitted]="actionFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="serverUsername" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="username" formControlName="username" />
+            <input type="text" class="form-control" id="serverUsername" formControlName="serverUsername" />
 
             <small class="form-text text-muted">
-                The username used to authenticate the sender.
+                The username used to authenticate the sender.  Read the <a routerLink="help">help</a> section for information about advanced formatting.
             </small>
         </div>
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="password">Password</label>
+        <label class="col-3 col-form-label" for="serverPassword">ServerPassword</label>
 
         <div class="col-9">
             <sqx-control-errors for="password" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="password" class="form-control" id="password" formControlName="password" />
+            <input type="password" class="form-control" id="serverPassword" formControlName="serverPassword" />
 
             <small class="form-text text-muted">
                 The password used to authenticate the sender.
@@ -70,58 +70,58 @@
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="from">From</label>
+        <label class="col-3 col-form-label" for="messageFrom">MessageFrom</label>
 
         <div class="col-9">
-            <sqx-control-errors for="from" [submitted]="actionFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="messageFrom" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="from" formControlName="from" />
+            <input type="text" class="form-control" id="messageFrom" formControlName="messageFrom" />
 
             <small class="form-text text-muted">
-                The email is sent from?
+                The email sending address.  Read the <a routerLink="help">help</a> section for information about advanced formatting.
             </small>
         </div>
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="to">To</label>
+        <label class="col-3 col-form-label" for="messageTo">MessageTo</label>
 
         <div class="col-9">
-            <sqx-control-errors for="to" [submitted]="actionFormSubmitted"></sqx-control-errors>
+            <sqx-control-errors for="messageTo" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="to" formControlName="to" />
+            <input type="text" class="form-control" id="messageTo" formControlName="messageTo" />
 
             <small class="form-text text-muted">
-                The email will be sent to?
+                The email message will be sent to.  Read the <a routerLink="help">help</a> section for information about advanced formatting.
             </small>
         </div>
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="subject">Subject</label>
+        <label class="col-3 col-form-label" for="messageSubject">MessageSubject</label>
 
         <div class="col-9">
             <sqx-control-errors for="subject" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <input type="text" class="form-control" id="subject" formControlName="subject" />
+            <input type="text" class="form-control" id="messageSubject" formControlName="messageSubject" />
 
             <small class="form-text text-muted">
-                The subject line for this e-mail message.
+                The subject line for this email message. Read the <a routerLink="help">help</a> section for information about advanced formatting.
             </small>
         </div>
     </div>
 
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="body">Body</label>
+        <label class="col-3 col-form-label" for="messageBody">MessageBody</label>
 
         <div class="col-9">
             <sqx-control-errors for="body" [submitted]="actionFormSubmitted"></sqx-control-errors>
 
-            <textarea class="form-control" id="body" formControlName="body"></textarea>
+            <textarea class="form-control" id="messageBody" formControlName="messageBody"></textarea>
 
             <small class="form-text text-muted">
-                The message body
+                The message body. Read the <a routerLink="help">help</a> section for information about advanced formatting.
             </small>
         </div>
     </div>

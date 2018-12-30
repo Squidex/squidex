@@ -20,39 +20,39 @@ namespace Squidex.Extensions.Actions.Email
     public class EmailAction : RuleAction
     {
         [Required]
-        [Display(Name = "Host", Description = "The Name or IP address of the host used for SMTP transactions.")]
-        public string Host { get; set; }
+        [Display(Name = "ServerHost", Description = "The Name or IP address of the host used for SMTP transactions.")]
+        public string ServerHost { get; set; }
 
         [Required]
-        [Display(Name = "Port", Description = "The port to be used on host.")]
-        public int Port { get; set; }
+        [Display(Name = "ServerPort", Description = "The port to be used on host.")]
+        public int ServerPort { get; set; }
 
         [Required]
-        [Display(Name = "EnableSsl", Description = "Specify whether the smtp client uses Secure Sockets Layer (SSL) to encrypt the connection.")]
-        public bool EnableSsl { get; set; }
+        [Display(Name = "ServerUseSsl", Description = "Specify whether the smtp client uses Secure Sockets Layer (SSL) to encrypt the connection.")]
+        public bool ServerUseSsl { get; set; }
 
         [Required]
-        [Display(Name = "Username", Description = "The username used to authenticate the sender.")]
-        public string Username { get; set; }
+        [Display(Name = "ServerUsername", Description = "The username used to authenticate the sender.")]
+        public string ServerUsername { get; set; }
 
         [Required]
-        [Display(Name = "Password", Description = "The password used to authenticate the sender.")]
-        public string Password { get; set; }
+        [Display(Name = "ServerPassword", Description = "The password used to authenticate the sender.")]
+        public string ServerPassword { get; set; }
 
         [Required]
-        [Display(Name = "From", Description = "The email is sent from?")]
-        public string From { get; set; }
+        [Display(Name = "MessageFrom", Description = "The email sending address.")]
+        public string MessageFrom { get; set; }
 
         [Required]
-        [Display(Name = "To", Description = "The email will be sent to?")]
-        public string To { get; set; }
+        [Display(Name = "MessageTo", Description = "The email message will be sent to.")]
+        public string MessageTo { get; set; }
 
         [Required]
-        [Display(Name = "Subject", Description = "The subject line for this e-mail message.")]
-        public string Subject { get; set; }
+        [Display(Name = "MessageSubject", Description = "The subject line for this email message.")]
+        public string MessageSubject { get; set; }
 
         [Required]
-        [Display(Name = "Body", Description = "The message body.")]
-        public string Body { get; set; }
+        [Display(Name = "MessageBody", Description = "The message body.")]
+        public string MessageBody { get; set; }
     }
 }

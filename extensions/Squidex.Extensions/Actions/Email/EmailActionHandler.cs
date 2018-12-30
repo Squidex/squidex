@@ -31,15 +31,15 @@ namespace Squidex.Extensions.Actions.Email
         {
             var ruleJob = new EmailJob
             {
-                Host = action.Host,
-                EnableSsl = action.EnableSsl,
-                Password = action.Password,
-                Port = action.Port,
-                Username = Format(action.Username, @event),
-                From = Format(action.From, @event),
-                To = Format(action.To, @event),
-                Subject = Format(action.Subject, @event),
-                Body = Format(action.Body, @event)
+                ServerHost = action.ServerHost,
+                ServerUseSsl = action.ServerUseSsl,
+                ServerPassword = action.ServerPassword,
+                ServerPort = action.ServerPort,
+                ServerUsername = Format(action.ServerUsername, @event),
+                MessageFrom = Format(action.MessageFrom, @event),
+                MessageTo = Format(action.MessageTo, @event),
+                MessageSubject = Format(action.MessageSubject, @event),
+                MessageBody = Format(action.MessageBody, @event)
             };
 
             return (Description, ruleJob);
@@ -47,15 +47,15 @@ namespace Squidex.Extensions.Actions.Email
 
         protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(EmailJob job)
         {
-            using (var client = new SmtpClient(job.Host, job.Port))
+            using (var client = new SmtpClient(job.ServerHost, job.ServerPort))
             {
-                client.EnableSsl = job.EnableSsl;
-                client.Credentials = new NetworkCredential(job.Username, job.Password);
+                client.EnableSsl = job.ServerUseSsl;
+                client.Credentials = new NetworkCredential(job.ServerUsername, job.ServerPassword);
 
-                using (var message = new MailMessage(job.From, job.To))
+                using (var message = new MailMessage(job.MessageFrom, job.MessageTo))
                 {
-                    message.Subject = job.Subject;
-                    message.Body = job.Body;
+                    message.Subject = job.MessageSubject;
+                    message.Body = job.MessageBody;
                     await client.SendMailAsync(message);
                 }
             }
@@ -66,22 +66,22 @@ namespace Squidex.Extensions.Actions.Email
 
     public class EmailJob
     {
-        public string Host { get; set; }
+        public string ServerHost { get; set; }
 
-        public int Port { get; set; }
+        public int ServerPort { get; set; }
 
-        public string Username { get; set; }
+        public string ServerUsername { get; set; }
 
-        public string Password { get; set; }
+        public string ServerPassword { get; set; }
 
-        public bool EnableSsl { get; set; }
+        public bool ServerUseSsl { get; set; }
 
-        public string From { get; set; }
+        public string MessageFrom { get; set; }
 
-        public string To { get; set; }
+        public string MessageTo { get; set; }
 
-        public string Subject { get; set; }
+        public string MessageSubject { get; set; }
 
-        public string Body { get; set; }
+        public string MessageBody { get; set; }
     }
 }

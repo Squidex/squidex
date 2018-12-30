@@ -16,7 +16,6 @@ using Squidex.Config.Domain;
 using Squidex.Config.Web;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Extensions.Actions.Email;
 using Squidex.Extensions.Actions.Twitter;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
