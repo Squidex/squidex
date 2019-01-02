@@ -9,16 +9,10 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
-    [TypeName(nameof(AssetChangedTrigger))]
-    public sealed class AssetChangedTrigger : RuleTrigger
+    [TypeName(nameof(AssetChangedTriggerV2))]
+    public sealed class AssetChangedTriggerV2 : RuleTrigger
     {
-        public bool SendCreate { get; set; }
-
-        public bool SendUpdate { get; set; }
-
-        public bool SendRename { get; set; }
-
-        public bool SendDelete { get; set; }
+        public string Condition { get; set; }
 
         public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
         {

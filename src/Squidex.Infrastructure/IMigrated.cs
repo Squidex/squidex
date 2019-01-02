@@ -5,14 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules.Triggers;
-
-namespace Squidex.Domain.Apps.Core.Rules
+namespace Squidex.Infrastructure
 {
-    public interface IRuleTriggerVisitor<out T>
+    public interface IMigrated<T>
     {
-        T Visit(AssetChangedTriggerV2 trigger);
-
-        T Visit(ContentChangedTriggerV2 trigger);
+        T Migrate();
     }
 }

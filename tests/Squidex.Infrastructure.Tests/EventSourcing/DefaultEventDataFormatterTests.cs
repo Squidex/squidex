@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public class DefaultEventDataFormatterTests
     {
-        public sealed class MyOldEvent : IEvent, IMigratedEvent
+        public sealed class MyOldEvent : IEvent, IMigrated<IEvent>
         {
             public string MyProperty { get; set; }
 

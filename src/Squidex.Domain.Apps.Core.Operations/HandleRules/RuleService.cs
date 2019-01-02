@@ -85,7 +85,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             var appEventEnvelope = @event.To<AppEvent>();
 
-            if (!triggerHandler.Triggers(appEventEnvelope, rule.Trigger))
+            var enrichedEvent = await eventEnricher.EnrichAsync(appEventEnvelope);
+
+            if (!triggerHandler.Triggers(enrichedEvent, rule.Trigger))
             {
                 return null;
             }
@@ -104,22 +106,22 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return null;
             }
 
-            var enrichedEvent = await eventEnricher.EnrichAsync(appEventEnvelope);
-
             var actionName = typeNameRegistry.GetName(actionType);
             var actionData = await actionHandler.CreateJobAsync(enrichedEvent, rule.Action);
 
             var json = jsonSerializer.Serialize(actionData.Data);
+
+            enrichedEvent.CalculatePartition();
 
             var job = new RuleJob
             {
                 JobId = Guid.NewGuid(),
                 ActionName = actionName,
                 ActionData = json,
-                AggregateId = enrichedEvent.AggregateId,
                 AppId = appEvent.AppId.Id,
                 Created = now,
                 EventName = enrichedEvent.Name,
+                ExecutionPartition = enrichedEvent.Partition,
                 Expires = expires,
                 Description = actionData.Description
             };

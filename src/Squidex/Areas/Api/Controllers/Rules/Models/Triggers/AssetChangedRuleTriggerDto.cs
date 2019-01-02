@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 
         public override RuleTrigger ToTrigger()
         {
-            return SimpleMapper.Map(this, new AssetChangedTrigger());
+            return SimpleMapper.Map(this, new AssetChangedTriggerV2());
         }
     }
 }

@@ -29,9 +29,9 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 
         public override RuleTrigger ToTrigger()
         {
-            var schemas = Schemas.Select(x => SimpleMapper.Map(x, new ContentChangedTriggerSchema())).ToReadOnlyCollection();
+            var schemas = Schemas.Select(x => SimpleMapper.Map(x, new ContentChangedTriggerSchemaV2())).ToReadOnlyCollection();
 
-            return new ContentChangedTrigger { HandleAll = HandleAll, Schemas = schemas };
+            return new ContentChangedTriggerV2 { HandleAll = HandleAll, Schemas = schemas };
         }
     }
 }

@@ -6,6 +6,9 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Security.Claims;
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
@@ -21,6 +24,14 @@ namespace Squidex.Domain.Apps.Core.Scripting
     public sealed class JintScriptEngine : IScriptEngine
     {
         public TimeSpan Timeout { get; set; } = TimeSpan.FromMilliseconds(200);
+
+        static JintScriptEngine()
+        {
+            var typeMappers = (Dictionary<Type, Func<Engine, object, JsValue>>)typeof(Engine).GetField("TypeMappers", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+
+            typeMappers.Add(typeof(NamedContentData), (engine, data) => new ContentDataObject(engine, (NamedContentData)data));
+            typeMappers.Add(typeof(ClaimsPrincipal), (engine, data) => JintUser.Create(engine, (ClaimsPrincipal)data));
+        }
 
         public void Execute(ScriptContext context, string script)
         {
@@ -143,7 +154,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             if (context.User != null)
             {
-                contextInstance.FastAddProperty("user", new JintUser(engine, context.User), false, true, false);
+                contextInstance.FastAddProperty("user", JintUser.Create(engine, context.User), false, true, false);
             }
 
             if (!string.IsNullOrWhiteSpace(context.Operation))
@@ -152,7 +163,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
 
             engine.SetValue("ctx", contextInstance);
-
+            engine.SetValue("context", contextInstance);
             engine.SetValue("slugify", new ClrFunctionInstance(engine, Slugify));
 
             return engine;
@@ -196,6 +207,44 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
                 throw new ValidationException("Script rejected the operation.", errors);
             }));
+        }
+
+        public bool Evaluate(string name, object context, string script)
+        {
+            try
+            {
+                var result =
+                    new Engine(options => options.TimeoutInterval(Timeout).Strict())
+                        .SetValue(name, context)
+                        .Execute(script)
+                        .GetCompletionValue()
+                        .ToObject();
+
+                return (bool)result;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public string Interpolate(string name, object context, string script)
+        {
+            try
+            {
+                var result =
+                    new Engine(options => options.TimeoutInterval(Timeout).Strict())
+                        .SetValue(name, context)
+                        .Execute(script)
+                        .GetCompletionValue()
+                        .ToObject();
+
+                return (string)result;
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }

@@ -5,56 +5,80 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.HandleRules.Triggers;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Domain.Apps.Events.Rules;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Domain.Apps.Core.Scripting;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
 {
     public class AssetChangedTriggerTests
     {
-        private readonly IRuleTriggerHandler sut = new AssetChangedTriggerHandler();
+        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+        private readonly IRuleTriggerHandler sut;
 
-        public static IEnumerable<object[]> TestData
+        public AssetChangedTriggerTests()
         {
-            get
-            {
-                return new[]
-                {
-                    new object[] { 0, 1, 1, 1, 1, new RuleCreated() },
-                    new object[] { 1, 1, 0, 0, 0, new AssetCreated() },
-                    new object[] { 0, 0, 0, 0, 0, new AssetCreated() },
-                    new object[] { 1, 0, 1, 0, 0, new AssetUpdated() },
-                    new object[] { 0, 0, 0, 0, 0, new AssetUpdated() },
-                    new object[] { 1, 0, 0, 1, 0, new AssetRenamed() },
-                    new object[] { 0, 0, 0, 0, 0, new AssetRenamed() },
-                    new object[] { 1, 0, 0, 0, 1, new AssetDeleted() },
-                    new object[] { 0, 0, 0, 0, 0, new AssetDeleted() }
-                };
-            }
+            sut = new AssetChangedTriggerHandler(scriptEngine);
         }
 
-        [Theory]
-        [MemberData(nameof(TestData))]
-        public void Should_return_result_depending_on_event(int expected, int sendCreate, int sendUpdate, int sendRename, int sendDelete, AppEvent @event)
+        [Fact]
+        public void Should_trigger_when_condition_is_null()
         {
-            var trigger = new AssetChangedTrigger
-            {
-                SendCreate = sendCreate == 1,
-                SendUpdate = sendUpdate == 1,
-                SendRename = sendRename == 1,
-                SendDelete = sendDelete == 1
-            };
+            var trigger = new AssetChangedTriggerV2();
 
-            var result = sut.Triggers(new Envelope<AppEvent>(@event), trigger);
+            var result = sut.Triggers(new EnrichedAssetEvent(), trigger);
 
-            Assert.Equal(expected == 1, result);
+            Assert.True(result);
+
+            A.CallTo(() => scriptEngine.Evaluate(A<string>.Ignored, A<object>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Should_trigger_when_condition_is_empty()
+        {
+            var trigger = new AssetChangedTriggerV2 { Condition = string.Empty };
+
+            var result = sut.Triggers(new EnrichedAssetEvent(), trigger);
+
+            Assert.True(result);
+
+            A.CallTo(() => scriptEngine.Evaluate(A<string>.Ignored, A<object>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Should_trigger_when_condition_matchs()
+        {
+            var trigger = new AssetChangedTriggerV2 { Condition = "true" };
+
+            var @event = new EnrichedAssetEvent();
+
+            A.CallTo(() => scriptEngine.Evaluate("event", @event, trigger.Condition))
+                .Returns(true);
+
+            var result = sut.Triggers(@event, trigger);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void Should_not_trigger_when_condition_does_not_matchs()
+        {
+            var trigger = new AssetChangedTriggerV2 { Condition = "false" };
+
+            var @event = new EnrichedAssetEvent();
+
+            A.CallTo(() => scriptEngine.Evaluate("event", @event, trigger.Condition))
+                .Returns(false);
+
+            var result = sut.Triggers(@event, trigger);
+
+            Assert.False(result);
         }
     }
 }

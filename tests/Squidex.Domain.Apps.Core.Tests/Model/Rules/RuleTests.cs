@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
                 .Select(x => new[] { x })
                 .ToList();
 
-        private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new TestAction1());
+        private readonly Rule rule_0 = new Rule(new ContentChangedTriggerV2(), new TestAction1());
 
         public sealed class OtherTrigger : RuleTrigger
         {
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         [Fact]
         public void Should_create_with_trigger_and_action()
         {
-            var ruleTrigger = new ContentChangedTrigger();
+            var ruleTrigger = new ContentChangedTriggerV2();
             var ruleAction = new TestAction1();
 
             var newRule = new Rule(ruleTrigger, ruleAction);
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
         [Fact]
         public void Should_replace_trigger_when_updating()
         {
-            var newTrigger = new ContentChangedTrigger();
+            var newTrigger = new ContentChangedTriggerV2();
 
             var rule_1 = rule_0.Update(newTrigger);
 

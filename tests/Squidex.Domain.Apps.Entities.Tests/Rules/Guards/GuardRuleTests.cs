@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
     public class GuardRuleTests
     {
         private readonly Uri validUrl = new Uri("https://squidex.io");
-        private readonly Rule rule_0 = new Rule(new ContentChangedTrigger(), new TestAction());
+        private readonly Rule rule_0 = new Rule(new ContentChangedTriggerV2(), new TestAction());
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
 
@@ -60,9 +60,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             var command = CreateCommand(new CreateRule
             {
-                Trigger = new ContentChangedTrigger
+                Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchema>()
+                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = null
             });
@@ -76,9 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             var command = CreateCommand(new CreateRule
             {
-                Trigger = new ContentChangedTrigger
+                Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchema>()
+                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = new TestAction
                 {
@@ -103,9 +103,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         {
             var command = new UpdateRule
             {
-                Trigger = new ContentChangedTrigger
+                Trigger = new ContentChangedTriggerV2
                 {
-                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchema>()
+                    Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
                 },
                 Action = new TestAction
                 {

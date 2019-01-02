@@ -8,18 +8,16 @@
 using System.Linq;
 using System.Security.Claims;
 using Jint;
-using Jint.Native;
-using Jint.Native.Object;
+using Jint.Runtime.Interop;
 using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
-    public sealed class JintUser : ObjectInstance
+    public static class JintUser
     {
         private static readonly char[] ClaimSeparators = { '/', '.', ':' };
 
-        public JintUser(Engine engine, ClaimsPrincipal principal)
-            : base(engine)
+        public static ObjectWrapper Create(Engine engine, ClaimsPrincipal principal)
         {
             var id = principal.OpenIdSubject();
 
@@ -30,22 +28,19 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 id = principal.OpenIdClientId();
             }
 
-            FastAddProperty("id", id, false, true, false);
-            FastAddProperty("isClient", isClient, false, true, false);
+            var claims =
+                principal.Claims.GroupBy(x => x.Type)
+                    .ToDictionary(
+                        x => x.Key.Split(ClaimSeparators).Last(),
+                        x => x.Select(y => y.Value).ToArray());
 
-            FastAddProperty("email", principal.OpenIdEmail(), false, true, false);
-
-            var claimsInstance = new ObjectInstance(engine);
-
-            foreach (var group in principal.Claims.GroupBy(x => x.Type))
+            return new ObjectWrapper(engine, new
             {
-                var propertyName = group.Key.Split(ClaimSeparators).Last();
-                var propertyValue = engine.Array.Construct(group.Select(x => new JsValue(x.Value)).ToArray());
-
-                claimsInstance.FastAddProperty(propertyName, propertyValue, false, true, false);
-            }
-
-            FastAddProperty("claims", claimsInstance, false, true, false);
+                Id = id,
+                IsClient = isClient,
+                Email = principal.OpenIdEmail(),
+                Claims = claims,
+            });
         }
     }
 }

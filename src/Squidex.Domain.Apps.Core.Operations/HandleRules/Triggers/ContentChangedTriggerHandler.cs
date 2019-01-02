@@ -5,32 +5,36 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
 {
-    public sealed class ContentChangedTriggerHandler : RuleTriggerHandler<ContentChangedTrigger>
+    public sealed class ContentChangedTriggerHandler : RuleTriggerHandler<ContentChangedTriggerV2>
     {
-        protected override bool Triggers(Envelope<AppEvent> @event, ContentChangedTrigger trigger)
+        private readonly IScriptEngine scriptEngine;
+
+        public ContentChangedTriggerHandler(IScriptEngine scriptEngine)
         {
-            if (trigger.HandleAll &&
-                @event.Payload is ContentEvent &&
-              !(@event.Payload is ContentChangesPublished) &&
-              !(@event.Payload is ContentChangesDiscarded) &&
-              !(@event.Payload is ContentUpdateProposed))
+            Guard.NotNull(scriptEngine, nameof(scriptEngine));
+
+            this.scriptEngine = scriptEngine;
+        }
+
+        protected override bool Triggers(EnrichedEvent @event, ContentChangedTriggerV2 trigger)
+        {
+            if (trigger.HandleAll)
             {
                 return true;
             }
 
-            if (trigger.Schemas != null && @event.Payload is SchemaEvent schemaEvent)
+            if (trigger.Schemas != null && @event is EnrichedSchemaEvent schemaEvent)
             {
                 foreach (var schema in trigger.Schemas)
                 {
-                    if (MatchsSchema(schema, schemaEvent) && MatchsType(schema, schemaEvent))
+                    if (MatchsSchema(schema, schemaEvent) && MatchsCondition(schema, schemaEvent))
                     {
                         return true;
                     }
@@ -40,56 +44,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
             return false;
         }
 
-        private static bool MatchsSchema(ContentChangedTriggerSchema schema, SchemaEvent @event)
+        private bool MatchsSchema(ContentChangedTriggerSchemaV2 schema, EnrichedSchemaEvent @event)
         {
             return @event.SchemaId.Id == schema.SchemaId;
         }
 
-        private static bool MatchsType(ContentChangedTriggerSchema schema, SchemaEvent @event)
+        private bool MatchsCondition(ContentChangedTriggerSchemaV2 schema, EnrichedSchemaEvent @event)
         {
-            return
-                IsArchived(schema, @event) ||
-                IsCreate(schema, @event) ||
-                IsDelete(schema, @event) ||
-                IsPublished(schema, @event) ||
-                IsRestored(schema, @event) ||
-                IsUpdate(schema, @event) ||
-                IsUnpublished(schema, @event);
-        }
-
-        private static bool IsPublished(ContentChangedTriggerSchema schema, SchemaEvent @event)
-        {
-            return schema.SendPublish && @event is ContentStatusChanged statusChanged && statusChanged.Change == StatusChange.Published;
-        }
-
-        private static bool IsRestored(ContentChangedTriggerSchema schema, SchemaEvent @event)
-        {
-            return schema.SendRestore && @event is ContentStatusChanged statusChanged && statusChanged.Change == StatusChange.Restored;
-        }
-
-        private static bool IsArchived(ContentChangedTriggerSchema schema, SchemaEvent @event)
-        {
-            return schema.SendArchived && @event is ContentStatusChanged statusChanged && statusChanged.Change == StatusChange.Archived;
-        }
-
-        private static bool IsUnpublished(ContentChangedTriggerSchema schema, SchemaEvent @event)
-        {
-            return schema.SendUnpublish && @event is ContentStatusChanged statusChanged && statusChanged.Change == StatusChange.Unpublished;
-        }
-
-        private static bool IsCreate(ContentChangedTriggerSchema schema, SchemaEvent @event)
-        {
-            return schema.SendCreate && @event is ContentCreated;
-        }
-
-        private static bool IsUpdate(ContentChangedTriggerSchema schema, SchemaEvent @event)
-        {
-            return schema.SendUpdate && @event is ContentUpdated || schema.SendUpdate && @event is ContentChangesPublished;
-        }
-
-        private static bool IsDelete(ContentChangedTriggerSchema schema, SchemaEvent @event)
-        {
-            return schema.SendDelete && @event is ContentDeleted;
+            return string.IsNullOrWhiteSpace(schema.Condition) || scriptEngine.Evaluate("event", @event, schema.Condition);
         }
     }
 }

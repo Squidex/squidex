@@ -16,5 +16,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
         NamedContentData ExecuteAndTransform(ScriptContext context, string script);
 
         NamedContentData Transform(ScriptContext context, string script);
+
+        bool Evaluate(string name, object context, string script);
+
+        string Interpolate(string name, object context, string script);
     }
 }

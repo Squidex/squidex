@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.EventSourcing
             var payloadType = typeNameRegistry.GetType(eventData.Type);
             var payloadObj = serializer.Deserialize<IEvent>(eventData.Payload, payloadType, stringConverter);
 
-            if (payloadObj is IMigratedEvent migratedEvent)
+            if (payloadObj is IMigrated<IEvent> migratedEvent)
             {
                 payloadObj = migratedEvent.Migrate();
             }
@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var eventPayload = envelope.Payload;
 
-            if (migrate && eventPayload is IMigratedEvent migratedEvent)
+            if (migrate && eventPayload is IMigrated<IEvent> migratedEvent)
             {
                 eventPayload = migratedEvent.Migrate();
             }

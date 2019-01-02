@@ -189,9 +189,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private static CreateRule MakeCreateCommand()
         {
-            var newTrigger = new ContentChangedTrigger
+            var newTrigger = new ContentChangedTriggerV2
             {
-                Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchema>()
+                Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
             };
 
             var newAction = new TestAction
@@ -204,9 +204,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
         private static UpdateRule MakeUpdateCommand()
         {
-            var newTrigger = new ContentChangedTrigger
+            var newTrigger = new ContentChangedTriggerV2
             {
-                Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchema>()
+                Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
             };
 
             var newAction = new TestAction

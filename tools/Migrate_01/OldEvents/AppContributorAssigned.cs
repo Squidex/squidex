@@ -8,6 +8,7 @@
 using System;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using AppContributorAssignedV2 = Squidex.Domain.Apps.Events.Apps.AppContributorAssigned;
@@ -16,7 +17,7 @@ namespace Migrate_01.OldEvents
 {
     [EventType(nameof(AppContributorAssigned))]
     [Obsolete]
-    public sealed class AppContributorAssigned : AppEvent, IMigratedEvent
+    public sealed class AppContributorAssigned : AppEvent, IMigrated<IEvent>
     {
         public string ContributorId { get; set; }
 
