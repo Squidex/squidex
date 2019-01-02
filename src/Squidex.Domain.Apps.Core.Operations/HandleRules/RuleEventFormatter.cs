@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public class RuleEventFormatter
     {
-        private const string Undefined = "null";
+        private const string Fallback = "null";
         private const string ScriptSuffix = ")";
         private const string ScriptPrefix = "Script(";
         private static readonly char[] ContentPlaceholderStartOld = "CONTENT_DATA".ToCharArray();
@@ -84,7 +84,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 var customFunctions = new Dictionary<string, Func<string>>
                 {
-                    ["contentUrl"] = () => ContentUrl(@event)
+                    ["contentUrl"] = () => ContentUrl(@event),
+                    ["contentAction"] = () => ContentAction(@event)
                 };
 
                 return scriptEngine.Interpolate("event", @event, script, customFunctions);
@@ -145,7 +146,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                             }
                             else
                             {
-                                sb.Append(Undefined);
+                                sb.Append(Fallback);
                             }
 
                             current = current.Slice(match.Length + 1);
@@ -187,7 +188,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return schemaEvent.SchemaId.Id.ToString();
             }
 
-            return Undefined;
+            return Fallback;
         }
 
         private static string SchemaName(EnrichedEvent @event)
@@ -197,7 +198,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return schemaEvent.SchemaId.Name;
             }
 
-            return Undefined;
+            return Fallback;
         }
 
         private static string ContentAction(EnrichedEvent @event)
@@ -207,7 +208,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return contentEvent.Type.ToString();
             }
 
-            return Undefined;
+            return Fallback;
         }
 
         private string ContentUrl(EnrichedEvent @event)
@@ -217,43 +218,17 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return urlGenerator.GenerateContentUIUrl(contentEvent.AppId, contentEvent.SchemaId, contentEvent.Id);
             }
 
-            return Undefined;
+            return Fallback;
         }
 
         private static string UserName(EnrichedEvent @event)
         {
-            if (@event.Actor != null)
-            {
-                if (@event.Actor.Type.Equals(RefTokenType.Client, StringComparison.OrdinalIgnoreCase))
-                {
-                    return @event.Actor.ToString();
-                }
-
-                if (@event.User != null)
-                {
-                    return @event.User.DisplayName();
-                }
-            }
-
-            return Undefined;
+            return @event.User?.DisplayName() ?? Fallback;
         }
 
         private static string UserEmail(EnrichedEvent @event)
         {
-            if (@event.Actor != null)
-            {
-                if (@event.Actor.Type.Equals(RefTokenType.Client, StringComparison.OrdinalIgnoreCase))
-                {
-                    return @event.Actor.ToString();
-                }
-
-                if (@event.User != null)
-                {
-                    return @event.User.Email;
-                }
-            }
-
-            return Undefined;
+            return @event.User?.Email ?? Fallback;
         }
 
         private static string CalculateData(NamedContentData data, Match match)
@@ -269,12 +244,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             if (!data.TryGetValue(path[0], out var field))
             {
-                return Undefined;
+                return Fallback;
             }
 
             if (!field.TryGetValue(path[1], out var value))
             {
-                return Undefined;
+                return Fallback;
             }
 
             for (var j = 2; j < path.Length; j++)
@@ -290,16 +265,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 }
                 else
                 {
-                    return Undefined;
+                    return Fallback;
                 }
             }
 
             if (value == null || value.Type == JsonValueType.Null)
             {
-                return Undefined;
+                return Fallback;
             }
 
-            return value.ToString() ?? Undefined;
+            return value.ToString() ?? Fallback;
         }
     }
 }

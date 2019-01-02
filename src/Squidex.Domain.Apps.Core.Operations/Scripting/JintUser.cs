@@ -22,7 +22,11 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         public static ObjectWrapper Create(Engine engine, IUser user)
         {
-            return CreateUser(engine, user.Id, false, user.Email, user.DisplayName(), user.Claims);
+            var clientId = user.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.ClientId)?.Value;
+
+            var isClient = !string.IsNullOrWhiteSpace(clientId);
+
+            return CreateUser(engine, user.Id, isClient, user.Email, user.DisplayName(), user.Claims);
         }
 
         public static ObjectWrapper Create(Engine engine, ClaimsPrincipal principal)

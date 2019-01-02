@@ -170,14 +170,22 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 x.AbsoluteExpirationRelativeToNow = UserCacheDuration;
 
+                IUser user = null;
                 try
                 {
-                    return await userResolver.FindByIdOrEmailAsync(actor.Identifier);
+                     user = await userResolver.FindByIdOrEmailAsync(actor.Identifier);
                 }
                 catch
                 {
-                    return null;
+                    user = null;
                 }
+
+                if (user == null && actor.Type.Equals(RefTokenType.Client, StringComparison.OrdinalIgnoreCase))
+                {
+                    user = new ClientUser(actor);
+                }
+
+                return user;
             });
         }
     }

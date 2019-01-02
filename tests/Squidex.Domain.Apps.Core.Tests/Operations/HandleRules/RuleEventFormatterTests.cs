@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
         [Theory]
         [InlineData("From $USER_NAME ($USER_EMAIL)")]
-        [InlineData("Script(`From ${event.user.name} (${event.user.email})`)", Skip = "Not Supported")]
+        [InlineData("Script(`From ${event.user.name} (${event.user.email})`)")]
         public void Should_return_null_if_user_is_not_found_with_scripting(string script)
         {
             var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Subject, "123") };
@@ -145,6 +145,18 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var result = sut.Format(script, @event);
 
             Assert.Equal("From null (null)", result);
+        }
+
+        [Theory]
+        [InlineData("From $USER_NAME ($USER_EMAIL)")]
+        [InlineData("Script(`From ${event.user.name} (${event.user.email})`)")]
+        public void Should_format_email_and_display_name_from_client(string script)
+        {
+            var @event = new EnrichedContentEvent { User = new ClientUser(new RefToken(RefTokenType.Client, "android")) };
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("From client:android (client:android)", result);
         }
 
         [Theory]
@@ -173,6 +185,14 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         public void Should_format_content_actions_when_found(string script)
         {
             Assert.Equal("Created", sut.Format(script, new EnrichedContentEvent { Type = EnrichedContentEventType.Created }));
+        }
+
+        [Theory]
+        [InlineData("$CONTENT_ACTION")]
+        [InlineData("Script(contentAction())")]
+        public void Should_null_when_content_action_not_found(string script)
+        {
+            Assert.Equal("null", sut.Format(script, new EnrichedAssetEvent()));
         }
 
         [Theory]
@@ -311,7 +331,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
         [Theory]
         [InlineData("$CONTENT_DATA.city.iv")]
-        [InlineData("Script(`${event.data.city.iv}`)", Skip = "Not Supported")]
+        [InlineData("Script(`${JSON.stringify(event.data.city.iv)}`)")]
         public void Should_return_json_string_when_object(string script)
         {
             var @event = new EnrichedContentEvent
@@ -326,24 +346,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var result = sut.Format(script, @event);
 
             Assert.Equal("{\"name\":\"Berlin\"}", result);
-        }
-
-        [Theory]
-        [InlineData("$CONTENT_ACTION")]
-        public void Should_null_when_content_action_not_found(string script)
-        {
-            Assert.Equal("null", sut.Format(script, new EnrichedAssetEvent()));
-        }
-
-        [Theory]
-        [InlineData("From $USER_NAME ($USER_EMAIL)")]
-        public void Should_format_email_and_display_name_from_client(string script)
-        {
-            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
-
-            var result = sut.Format(script, @event);
-
-            Assert.Equal("From client:android (client:android)", result);
         }
     }
 }
