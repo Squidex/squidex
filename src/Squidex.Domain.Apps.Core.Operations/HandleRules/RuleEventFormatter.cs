@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
@@ -21,7 +22,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public class RuleEventFormatter
     {
-        private const string Undefined = "UNDEFINED";
+        private const string Undefined = "null";
+        private const string ScriptSuffix = ")";
+        private const string ScriptPrefix = "Script(";
         private static readonly char[] ContentPlaceholderStartOld = "CONTENT_DATA".ToCharArray();
         private static readonly char[] ContentPlaceholderStartNew = "{CONTENT_DATA".ToCharArray();
         private static readonly Regex ContentDataPlaceholderOld = new Regex(@"^CONTENT_DATA(\.([0-9A-Za-z\-_]*)){2,}", RegexOptions.Compiled);
@@ -29,13 +32,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private readonly List<(char[] Pattern, Func<EnrichedEvent, string> Replacer)> patterns = new List<(char[] Pattern, Func<EnrichedEvent, string> Replacer)>();
         private readonly IJsonSerializer jsonSerializer;
         private readonly IRuleUrlGenerator urlGenerator;
+        private readonly IScriptEngine scriptEngine;
 
-        public RuleEventFormatter(IJsonSerializer jsonSerializer, IRuleUrlGenerator urlGenerator)
+        public RuleEventFormatter(IJsonSerializer jsonSerializer, IRuleUrlGenerator urlGenerator, IScriptEngine scriptEngine)
         {
             Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+            Guard.NotNull(scriptEngine, nameof(scriptEngine));
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
 
             this.jsonSerializer = jsonSerializer;
+            this.scriptEngine = scriptEngine;
             this.urlGenerator = urlGenerator;
 
             AddPattern("APP_ID", AppId);
@@ -70,6 +76,18 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             if (string.IsNullOrWhiteSpace(text))
             {
                 return text;
+            }
+
+            if (text.StartsWith(ScriptPrefix, StringComparison.OrdinalIgnoreCase) && text.EndsWith(ScriptSuffix, StringComparison.OrdinalIgnoreCase))
+            {
+                var script = text.Substring(ScriptPrefix.Length, text.Length - ScriptPrefix.Length - ScriptSuffix.Length);
+
+                var customFunctions = new Dictionary<string, Func<string>>
+                {
+                    ["contentUrl"] = () => ContentUrl(@event)
+                };
+
+                return scriptEngine.Interpolate("event", @event, script, customFunctions);
             }
 
             var current = text.AsSpan();
@@ -186,7 +204,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             if (@event is EnrichedContentEvent contentEvent)
             {
-                return contentEvent.Type.ToString().ToLowerInvariant();
+                return contentEvent.Type.ToString();
             }
 
             return Undefined;

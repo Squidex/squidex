@@ -7,17 +7,19 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Globalization;
 using System.Security.Claims;
 using Jint;
 using Jint.Native;
+using Jint.Native.Date;
 using Jint.Native.Object;
-using Jint.Parser;
 using Jint.Runtime;
 using Jint.Runtime.Interop;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Infrastructure;
+using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
@@ -25,12 +27,38 @@ namespace Squidex.Domain.Apps.Core.Scripting
     {
         public TimeSpan Timeout { get; set; } = TimeSpan.FromMilliseconds(200);
 
-        static JintScriptEngine()
+        public sealed class Converter : IObjectConverter
         {
-            var typeMappers = (Dictionary<Type, Func<Engine, object, JsValue>>)typeof(Engine).GetField("TypeMappers", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+            public Engine Engine { get; set; }
 
-            typeMappers.Add(typeof(NamedContentData), (engine, data) => new ContentDataObject(engine, (NamedContentData)data));
-            typeMappers.Add(typeof(ClaimsPrincipal), (engine, data) => JintUser.Create(engine, (ClaimsPrincipal)data));
+            public bool TryConvert(object value, out JsValue result)
+            {
+                result = null;
+
+                if (value is Enum)
+                {
+                    result = value.ToString();
+                    return true;
+                }
+
+                switch (value)
+                {
+                    case IUser user:
+                        result = JintUser.Create(Engine, user);
+                        return true;
+                    case ClaimsPrincipal principal:
+                        result = JintUser.Create(Engine, principal);
+                        return true;
+                    case Instant instant:
+                        result = JsValue.FromObject(Engine, instant.ToDateTimeUtc());
+                        return true;
+                    case NamedContentData content:
+                        result = new ContentDataObject(Engine, content);
+                        return true;
+                }
+
+                return false;
+            }
         }
 
         public void Execute(ScriptContext context, string script)
@@ -126,7 +154,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 engine.Execute(script);
             }
-            catch (ParserException ex)
+            catch (ArgumentException ex)
             {
                 throw new ValidationException($"Failed to execute script with javascript syntax error: {ex.Message}", new ValidationError(ex.Message));
             }
@@ -138,7 +166,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         private Engine CreateScriptEngine(ScriptContext context)
         {
-            var engine = new Engine(options => options.TimeoutInterval(Timeout).Strict());
+            var engine = CreateScriptEngine();
 
             var contextInstance = new ObjectInstance(engine);
 
@@ -164,9 +192,54 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             engine.SetValue("ctx", contextInstance);
             engine.SetValue("context", contextInstance);
-            engine.SetValue("slugify", new ClrFunctionInstance(engine, Slugify));
 
             return engine;
+        }
+
+        private Engine CreateScriptEngine(IReferenceResolver resolver = null, Dictionary<string, Func<string>> customFormatters = null)
+        {
+            var converter = new Converter();
+
+            var engine = new Engine(options =>
+            {
+                if (resolver != null)
+                {
+                    options.SetReferencesResolver(resolver);
+                }
+
+                options.TimeoutInterval(Timeout).Strict().AddObjectConverter(converter);
+            });
+
+            if (customFormatters != null)
+            {
+                foreach (var kvp in customFormatters)
+                {
+                    engine.SetValue(kvp.Key, Safe(kvp.Value));
+                }
+            }
+
+            converter.Engine = engine;
+
+            engine.SetValue("slugify", new ClrFunctionInstance(engine, "slugify", Slugify));
+            engine.SetValue("formatTime", new ClrFunctionInstance(engine, "formatTime", FormatDate));
+            engine.SetValue("formatDate", new ClrFunctionInstance(engine, "formatDate", FormatDate));
+
+            return engine;
+        }
+
+        private static Func<string> Safe(Func<string> func)
+        {
+            return new Func<string>(() =>
+            {
+                try
+                {
+                    return func();
+                }
+                catch
+                {
+                    return "null";
+                }
+            });
         }
 
         private static JsValue Slugify(JsValue thisObject, JsValue[] arguments)
@@ -182,6 +255,21 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 }
 
                 return stringInput.Slugify(null, single);
+            }
+            catch
+            {
+                return JsValue.Undefined;
+            }
+        }
+
+        private static JsValue FormatDate(JsValue thisObject, JsValue[] arguments)
+        {
+            try
+            {
+                var dateValue = ((DateInstance)arguments.At(0)).ToDateTime();
+                var dateFormat = TypeConverter.ToString(arguments.At(1));
+
+                return dateValue.ToString(dateFormat, CultureInfo.InvariantCulture);
             }
             catch
             {
@@ -214,7 +302,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             try
             {
                 var result =
-                    new Engine(options => options.TimeoutInterval(Timeout).Strict())
+                    CreateScriptEngine(NullPropagation.Instance)
                         .SetValue(name, context)
                         .Execute(script)
                         .GetCompletionValue()
@@ -228,22 +316,24 @@ namespace Squidex.Domain.Apps.Core.Scripting
             }
         }
 
-        public string Interpolate(string name, object context, string script)
+        public string Interpolate(string name, object context, string script, Dictionary<string, Func<string>> customFormatters = null)
         {
             try
             {
                 var result =
-                    new Engine(options => options.TimeoutInterval(Timeout).Strict())
+                    CreateScriptEngine(NullPropagation.Instance, customFormatters)
                         .SetValue(name, context)
                         .Execute(script)
                         .GetCompletionValue()
                         .ToObject();
 
-                return (string)result;
+                var converted = result.ToString();
+
+                return converted == "undefined" ? "null" : converted;
             }
-            catch
+            catch (Exception ex)
             {
-                return string.Empty;
+                return ex.Message;
             }
         }
     }

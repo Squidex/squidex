@@ -7,18 +7,17 @@
 
 using Jint.Native;
 using Jint.Runtime;
-using Jint.Runtime.Descriptors;
 using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
-    public sealed class ContentDataProperty : PropertyDescriptor
+    public sealed class ContentDataProperty : CustomProperty
     {
         private readonly ContentDataObject contentData;
         private ContentFieldObject contentField;
         private JsValue value;
 
-        public override JsValue Value
+        protected override JsValue CustomValue
         {
             get
             {
@@ -42,7 +41,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                         contentField.Put(kvp.Key, kvp.Value.Value, true);
                     }
 
-                    this.value = new JsValue(contentField);
+                    this.value = contentField;
                 }
             }
         }
@@ -53,14 +52,13 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
         }
 
         public ContentDataProperty(ContentDataObject contentData, ContentFieldObject contentField = null)
-            : base(null, true, true, true)
         {
             this.contentData = contentData;
             this.contentField = contentField;
 
             if (contentField != null)
             {
-                value = new JsValue(contentField);
+                value = contentField;
             }
         }
     }

@@ -54,7 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Algolia.Search" Version="5.2.1" />
+    <PackageReference Include="Algolia.Search" Version="5.3.1" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="2.0.0" />
     <PackageReference Include="Ben.BlockingDetector" Version="0.0.3" />
     <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.1.0.23" />
@@ -74,14 +74,14 @@
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.4" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.5.2" />
-    <PackageReference Include="Microsoft.Orleans.Client" Version="2.1.2" />
-    <PackageReference Include="Microsoft.Orleans.Core" Version="2.1.2" />
-    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.1.2" />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.1.2" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.5.3" />
+    <PackageReference Include="Microsoft.Orleans.Client" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.2.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
-    <PackageReference Include="NJsonSchema" Version="9.13.2" />
-    <PackageReference Include="NSwag.AspNetCore" Version="12.0.5" />
+    <PackageReference Include="NJsonSchema" Version="9.13.11" />
+    <PackageReference Include="NSwag.AspNetCore" Version="12.0.9" />
     <PackageReference Include="OpenCover" Version="4.6.519" />
     <PackageReference Include="Orleans.Providers.MongoDB" Version="2.0.1" />
     <PackageReference Include="OrleansDashboard" Version="2.1.3" />

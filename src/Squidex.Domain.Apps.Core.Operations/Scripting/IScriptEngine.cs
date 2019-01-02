@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Core.Scripting
@@ -19,6 +21,6 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         bool Evaluate(string name, object context, string script);
 
-        string Interpolate(string name, object context, string script);
+        string Interpolate(string name, object context, string script, Dictionary<string, Func<string>> customFormatters = null);
     }
 }

@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
     {
         private readonly NamedContentData contentData;
         private HashSet<string> fieldsToDelete;
-        private Dictionary<string, ContentDataProperty> fieldProperties;
+        private Dictionary<string, PropertyDescriptor> fieldProperties;
         private bool isChanged;
 
         public ContentDataObject(Engine engine, NamedContentData contentData)
@@ -55,7 +55,9 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 {
                     foreach (var kvp in fieldProperties)
                     {
-                        if (kvp.Value.ContentField.TryUpdate(out var fieldData))
+                        var value = (ContentDataProperty)kvp.Value;
+
+                        if (value.ContentField.TryUpdate(out var fieldData))
                         {
                             contentData[kvp.Key] = fieldData;
                         }
@@ -109,17 +111,14 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
         {
             EnsurePropertiesInitialized();
 
-            foreach (var property in fieldProperties)
-            {
-                yield return new KeyValuePair<string, PropertyDescriptor>(property.Key, property.Value);
-            }
+            return fieldProperties;
         }
 
         private void EnsurePropertiesInitialized()
         {
             if (fieldProperties == null)
             {
-                fieldProperties = new Dictionary<string, ContentDataProperty>(contentData.Count);
+                fieldProperties = new Dictionary<string, PropertyDescriptor>(contentData.Count);
 
                 foreach (var kvp in contentData)
                 {
