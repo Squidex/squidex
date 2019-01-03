@@ -70,9 +70,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             var @event = Envelope.Create(new ContentCreated { AppId = appId });
 
-            var rule1 = new Rule(new ContentChangedTrigger(), new TestAction { Url = new Uri("https://squidex.io") });
-            var rule2 = new Rule(new ContentChangedTrigger(), new TestAction { Url = new Uri("https://squidex.io") });
-            var rule3 = new Rule(new ContentChangedTrigger(), new TestAction { Url = new Uri("https://squidex.io") });
+            var rule1 = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
+            var rule2 = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
+            var rule3 = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
 
             var job1 = new RuleJob { Created = now };
             var job2 = new RuleJob { Created = now };

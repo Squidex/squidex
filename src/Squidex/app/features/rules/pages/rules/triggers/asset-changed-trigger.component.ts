@@ -24,16 +24,7 @@ export class AssetChangedTriggerComponent implements OnInit {
     public triggerFormSubmitted = false;
 
     public ngOnInit() {
-        this.triggerForm.setControl('sendCreate',
-            new FormControl(this.trigger.sendCreate || false));
-
-        this.triggerForm.setControl('sendUpdate',
-            new FormControl(this.trigger.sendUpdate || false));
-
-        this.triggerForm.setControl('sendRename',
-            new FormControl(this.trigger.sendRename || false));
-
-        this.triggerForm.setControl('sendDelete',
-            new FormControl(this.trigger.sendDelete || false));
+        this.triggerForm.setControl('condition',
+            new FormControl(this.trigger.condition || ''));
     }
 }

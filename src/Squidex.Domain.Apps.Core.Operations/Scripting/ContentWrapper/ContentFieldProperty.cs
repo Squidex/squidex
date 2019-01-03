@@ -6,19 +6,18 @@
 // ==========================================================================
 
 using Jint.Native;
-using Jint.Runtime.Descriptors;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
-    public sealed class ContentFieldProperty : PropertyDescriptor
+    public sealed class ContentFieldProperty : CustomProperty
     {
         private readonly ContentFieldObject contentField;
         private IJsonValue contentValue;
         private JsValue value;
         private bool isChanged;
 
-        public override JsValue Value
+        protected override JsValue CustomValue
         {
             get
             {
@@ -49,7 +48,6 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
         }
 
         public ContentFieldProperty(ContentFieldObject contentField, IJsonValue contentValue = null)
-            : base(null, true, true, true)
         {
             this.contentField = contentField;
             this.contentValue = contentValue;

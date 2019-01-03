@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 .Returns(typeof(ValidData));
 
             A.CallTo(() => ruleTriggerHandler.TriggerType)
-                .Returns(typeof(ContentChangedTrigger));
+                .Returns(typeof(ContentChangedTriggerV2));
 
             sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, TestUtils.DefaultSerializer, clock, typeNameRegistry);
         }
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_if_no_action_handler_registered()
         {
-            var ruleConfig = new Rule(new ContentChangedTrigger(), new InvalidAction());
+            var ruleConfig = new Rule(new ContentChangedTriggerV2(), new InvalidAction());
             var ruleEnvelope = Envelope.Create(new ContentCreated());
 
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var ruleConfig = ValidRule();
             var ruleEnvelope = Envelope.Create(new ContentCreated());
 
-            A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.Triggers(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
                 .Returns(false);
 
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
@@ -155,7 +155,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
 
-            A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.Triggers(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
                 .Returns(true);
 
             A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))
@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
 
-            A.CallTo(() => ruleTriggerHandler.Triggers(A<Envelope<AppEvent>>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.Triggers(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
                 .Returns(true);
 
             A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))
@@ -260,7 +260,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
         private static Rule ValidRule()
         {
-            return new Rule(new ContentChangedTrigger(), new ValidAction());
+            return new Rule(new ContentChangedTriggerV2(), new ValidAction());
         }
     }
 }

@@ -5,10 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.EventSourcing
+using System;
+
+namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
-    public interface IMigratedEvent
+    public sealed class ContentChangedTriggerSchemaV2 : Freezable
     {
-        IEvent Migrate();
+        public Guid SchemaId { get; set; }
+
+        public string Condition { get; set; }
     }
 }

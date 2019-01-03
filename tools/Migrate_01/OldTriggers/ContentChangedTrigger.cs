@@ -5,13 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using System;
 using System.Collections.ObjectModel;
+using System.Linq;
+using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Rules.Triggers
+namespace Migrate_01.OldTriggers
 {
     [TypeName(nameof(ContentChangedTrigger))]
-    public sealed class ContentChangedTrigger : RuleTrigger
+    public sealed class ContentChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
     {
         public ReadOnlyCollection<ContentChangedTriggerSchema> Schemas { get; set; }
 
@@ -19,7 +23,7 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers
 
         public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
         {
-            return visitor.Visit(this);
+            throw new NotSupportedException();
         }
 
         public override void Freeze()
@@ -33,6 +37,13 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers
                     schema.Freeze();
                 }
             }
+        }
+
+        public RuleTrigger Migrate()
+        {
+            var schemas = new ReadOnlyCollection<ContentChangedTriggerSchemaV2>(Schemas.Select(x => x.Migrate()).ToList());
+
+            return new ContentChangedTriggerV2 { HandleAll = HandleAll, Schemas = schemas };
         }
     }
 }

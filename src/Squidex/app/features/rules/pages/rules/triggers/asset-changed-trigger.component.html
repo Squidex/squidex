@@ -1,34 +1,33 @@
 <div [formGroup]="triggerForm" class="form-horizontal">
     <div class="form-group">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="sendCreate" formControlName="sendCreate" />
-            <label class="form-check-label" for="sendCreate">
-                created
-            </label>
-        </div>
+        <label for="condition">Condition</label>
+
+        <sqx-control-errors for="condition" [submitted]="triggerFormSubmitted"></sqx-control-errors>
+
+        <textarea class="form-control code" id="condition" formControlName="condition"></textarea>
     </div>
-    <div class="form-group">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="sendUpdate" formControlName="sendUpdate" />
-            <label class="form-check-label" for="sendUpdate">
-                updated
-            </label>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="sendRename" formControlName="sendRename" />
-            <label class="form-check-label" for="sendRename">
-                renamed
-            </label>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="sendDelete" formControlName="sendDelete" />
-            <label class="form-check-label" for="sendDelete">
-                deleted
-            </label>
-        </div>
+
+    <div class="help">
+        <h4>Conditions</h4>
+    
+        <p>Conditions are javascript expressions that define when to trigger, for example:</p>
+    
+        <ul class="help-examples">
+            <li class="help-example">
+                Specific events: 
+
+                <pre>event.type == 'Created' || event.type == 'Updated'</pre>
+            </li>
+            <li class="help-example">
+                Large assets:
+
+                <pre>event.fileSize > 100000000</pre>
+            </li>
+            <li class="help-example">
+                Images only:
+
+                <pre>event.isImage</pre>
+            </li>
+        </ul>
     </div>
 </div>

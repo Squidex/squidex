@@ -26,10 +26,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
             A.CallTo(() => appProvider.GetSchemaAsync(appId, A<Guid>.Ignored, false))
                 .Returns(Task.FromResult<ISchemaEntity>(null));
 
-            var trigger = new ContentChangedTrigger
+            var trigger = new ContentChangedTriggerV2
             {
                 Schemas = ReadOnlyCollection.Create(
-                    new ContentChangedTriggerSchema()
+                    new ContentChangedTriggerSchemaV2()
                 )
             };
 
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
         [Fact]
         public async Task Should_not_add_error_if_schemas_is_null()
         {
-            var trigger = new ContentChangedTrigger();
+            var trigger = new ContentChangedTriggerV2();
 
             var errors = await RuleTriggerValidator.ValidateAsync(appId, trigger, appProvider);
 
@@ -51,9 +51,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
         [Fact]
         public async Task Should_not_add_error_if_schemas_is_empty()
         {
-            var trigger = new ContentChangedTrigger
+            var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchema>()
+                Schemas = ReadOnlyCollection.Empty<ContentChangedTriggerSchemaV2>()
             };
 
             var errors = await RuleTriggerValidator.ValidateAsync(appId, trigger, appProvider);
@@ -67,10 +67,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers
             A.CallTo(() => appProvider.GetSchemaAsync(appId, A<Guid>.Ignored, false))
                 .Returns(A.Fake<ISchemaEntity>());
 
-            var trigger = new ContentChangedTrigger
+            var trigger = new ContentChangedTriggerV2
             {
                 Schemas = ReadOnlyCollection.Create(
-                    new ContentChangedTriggerSchema()
+                    new ContentChangedTriggerSchemaV2()
                 )
             };
 

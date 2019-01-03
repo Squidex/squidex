@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Newtonsoft.Json;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Rules.Json
@@ -32,7 +33,14 @@ namespace Squidex.Domain.Apps.Core.Rules.Json
 
         public Rule ToRule()
         {
-            var rule = new Rule(Trigger, Action);
+            var trigger = Trigger;
+
+            if (trigger is IMigrated<RuleTrigger> migrated)
+            {
+                trigger = migrated.Migrate();
+            }
+
+            var rule = new Rule(trigger, Action);
 
             if (!IsEnabled)
             {

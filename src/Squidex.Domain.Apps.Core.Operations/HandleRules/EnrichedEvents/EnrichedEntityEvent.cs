@@ -6,30 +6,26 @@
 // ==========================================================================
 
 using System;
-using System.Runtime.Serialization;
 using NodaTime;
 using Squidex.Infrastructure;
-using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 {
-    public abstract class EnrichedEvent
+    public abstract class EnrichedEntityEvent : EnrichedEvent
     {
-        public NamedId<Guid> AppId { get; set; }
+        public Guid Id { get; set; }
 
-        public RefToken Actor { get; set; }
+        public Instant Created { get; set; }
 
-        public Instant Timestamp { get; set; }
+        public Instant LastModified { get; set; }
 
-        public string Name { get; set; }
+        public RefToken CreatedBy { get; set; }
 
-        public long Version { get; set; }
+        public RefToken LastModifiedBy { get; set; }
 
-        public long Partition { get; set; }
-
-        [IgnoreDataMember]
-        public IUser User { get; set; }
-
-        public abstract void CalculatePartition();
+        public override void CalculatePartition()
+        {
+            Partition = Id.GetHashCode();
+        }
     }
 }

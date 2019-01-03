@@ -8,6 +8,7 @@
 using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
@@ -15,7 +16,7 @@ namespace Migrate_01.OldEvents
 {
     [EventType(nameof(ContentArchived))]
     [Obsolete]
-    public sealed class ContentArchived : ContentEvent, IMigratedEvent
+    public sealed class ContentArchived : ContentEvent, IMigrated<IEvent>
     {
         public IEvent Migrate()
         {

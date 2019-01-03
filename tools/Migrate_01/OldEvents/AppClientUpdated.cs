@@ -8,6 +8,7 @@
 using System;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using AppClientUpdatedV2 = Squidex.Domain.Apps.Events.Apps.AppClientUpdated;
@@ -16,7 +17,7 @@ namespace Migrate_01.OldEvents
 {
     [EventType(nameof(AppClientUpdated))]
     [Obsolete]
-    public sealed class AppClientUpdated : AppEvent, IMigratedEvent
+    public sealed class AppClientUpdated : AppEvent, IMigrated<IEvent>
     {
         public string Id { get; set; }
 

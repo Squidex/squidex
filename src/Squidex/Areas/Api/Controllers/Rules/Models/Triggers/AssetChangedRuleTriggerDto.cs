@@ -14,28 +14,13 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
     public sealed class AssetChangedRuleTriggerDto : RuleTriggerDto
     {
         /// <summary>
-        /// Determines whether to handle the event when an asset is created.
+        /// Javascript condition when to trigger.
         /// </summary>
-        public bool SendCreate { get; set; }
-
-        /// <summary>
-        /// Determines whether to handle the event when an asset is updated.
-        /// </summary>
-        public bool SendUpdate { get; set; }
-
-        /// <summary>
-        /// Determines whether to handle the event when an asset is renamed.
-        /// </summary>
-        public bool SendRename { get; set; }
-
-        /// <summary>
-        /// Determines whether to handle the event when an asset is deleted.
-        /// </summary>
-        public bool SendDelete { get; set; }
+        public string Condition { get; set; }
 
         public override RuleTrigger ToTrigger()
         {
-            return SimpleMapper.Map(this, new AssetChangedTrigger());
+            return SimpleMapper.Map(this, new AssetChangedTriggerV2());
         }
     }
 }

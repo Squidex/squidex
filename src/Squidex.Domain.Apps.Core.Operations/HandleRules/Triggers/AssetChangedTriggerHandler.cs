@@ -5,27 +5,32 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
 {
-    public sealed class AssetChangedTriggerHandler : RuleTriggerHandler<AssetChangedTrigger>
+    public sealed class AssetChangedTriggerHandler : RuleTriggerHandler<AssetChangedTriggerV2>
     {
-        protected override bool Triggers(Envelope<AppEvent> @event, AssetChangedTrigger trigger)
+        private readonly IScriptEngine scriptEngine;
+
+        public AssetChangedTriggerHandler(IScriptEngine scriptEngine)
         {
-            return @event.Payload is AssetEvent assetEvent && MatchsType(trigger, assetEvent);
+            Guard.NotNull(scriptEngine, nameof(scriptEngine));
+
+            this.scriptEngine = scriptEngine;
         }
 
-        private static bool MatchsType(AssetChangedTrigger trigger, AssetEvent @event)
+        protected override bool Triggers(EnrichedEvent @event, AssetChangedTriggerV2 trigger)
         {
-            return
-                trigger.SendCreate && @event is AssetCreated ||
-                trigger.SendUpdate && @event is AssetUpdated ||
-                trigger.SendDelete && @event is AssetDeleted ||
-                trigger.SendRename && @event is AssetRenamed;
+            return @event is EnrichedAssetEvent assetEvent && MatchsType(trigger, assetEvent);
+        }
+
+        private bool MatchsType(AssetChangedTriggerV2 trigger, EnrichedAssetEvent assetEvent)
+        {
+            return string.IsNullOrWhiteSpace(trigger.Condition) || scriptEngine.Evaluate("event", assetEvent, trigger.Condition);
         }
     }
 }

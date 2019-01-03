@@ -7,17 +7,14 @@
 
 using System;
 using System.Collections.Generic;
-using Squidex.Domain.Apps.Core.Contents;
+using System.Collections.ObjectModel;
+using FakeItEasy;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.HandleRules.Triggers;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Domain.Apps.Events;
-using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Domain.Apps.Events.Rules;
-using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
-using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
 #pragma warning disable SA1401 // Fields must be private
@@ -26,82 +23,164 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
 {
     public class ContentChangedTriggerTests
     {
-        private readonly IRuleTriggerHandler sut = new ContentChangedTriggerHandler();
+        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+        private readonly IRuleTriggerHandler sut;
         private static readonly NamedId<Guid> SchemaMatch = NamedId.Of(Guid.NewGuid(), "my-schema1");
         private static readonly NamedId<Guid> SchemaNonMatch = NamedId.Of(Guid.NewGuid(), "my-schema2");
 
-        public static IEnumerable<object[]> TestData = new[]
+        public ContentChangedTriggerTests()
         {
-            new object[] { 0, 1, 1, 1, 1, 0, 0, 0, new RuleCreated() },
-            new object[] { 0, 1, 1, 1, 1, 0, 0, 0, new ContentCreated { SchemaId = SchemaNonMatch } },
-            new object[] { 1, 1, 0, 0, 0, 0, 0, 0, new ContentCreated { SchemaId = SchemaMatch } },
-            new object[] { 0, 0, 0, 0, 0, 0, 0, 0, new ContentCreated { SchemaId = SchemaMatch } },
-            new object[] { 1, 0, 1, 0, 0, 0, 0, 0, new ContentUpdated { SchemaId = SchemaMatch } },
-            new object[] { 0, 0, 0, 0, 0, 0, 0, 0, new ContentUpdated { SchemaId = SchemaMatch } },
-            new object[] { 1, 0, 0, 1, 0, 0, 0, 0, new ContentDeleted { SchemaId = SchemaMatch } },
-            new object[] { 0, 0, 0, 0, 0, 0, 0, 0, new ContentDeleted { SchemaId = SchemaMatch } },
-            new object[] { 1, 1, 1, 1, 0, 0, 1, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Archived } },
-            new object[] { 0, 1, 1, 1, 0, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Archived } },
-            new object[] { 1, 0, 0, 0, 0, 0, 0, 1, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Restored } },
-            new object[] { 0, 0, 0, 0, 0, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Restored } },
-            new object[] { 1, 0, 0, 0, 1, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Published } },
-            new object[] { 0, 0, 0, 0, 0, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Published } },
-            new object[] { 1, 1, 1, 1, 0, 1, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Unpublished } },
-            new object[] { 0, 1, 1, 1, 0, 0, 0, 0, new ContentStatusChanged { SchemaId = SchemaMatch, Change = StatusChange.Unpublished } },
-            new object[] { 0, 1, 1, 1, 1, 0, 0, 0, new SchemaCreated { SchemaId = SchemaNonMatch } }
-        };
-
-        [Fact]
-        public void Should_return_false_when_trigger_contains_no_schemas()
-        {
-            var trigger = new ContentChangedTrigger();
-
-            var result = sut.Triggers(new Envelope<AppEvent>(new ContentCreated()), trigger);
-
-            Assert.False(result);
+            sut = new ContentChangedTriggerHandler(scriptEngine);
         }
 
         [Fact]
-        public void Should_return_true_when_cathing_all_events()
+        public void Should_not_trigger_when_o_contains_no_schemas()
         {
-            var trigger = new ContentChangedTrigger { HandleAll = true };
+            var trigger = new ContentChangedTriggerV2();
 
-            var result = sut.Triggers(new Envelope<AppEvent>(new ContentCreated()), trigger);
+            var @event = new EnrichedContentEvent { SchemaId = SchemaMatch };
+
+            var result = sut.Triggers(@event, trigger);
+
+            Assert.False(result);
+
+            A.CallTo(() => scriptEngine.Evaluate(A<string>.Ignored, A<object>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Should_trigger_when_cathing_all_events()
+        {
+            var trigger = new ContentChangedTriggerV2 { HandleAll = true };
+
+            var @event = new EnrichedContentEvent { SchemaId = SchemaMatch };
+
+            var result = sut.Triggers(@event, trigger);
+
+            Assert.True(result);
+
+            A.CallTo(() => scriptEngine.Evaluate(A<string>.Ignored, A<object>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Should_trigger_when_condition_is_null()
+        {
+            var trigger = new ContentChangedTriggerV2
+            {
+                Schemas = new ReadOnlyCollection<ContentChangedTriggerSchemaV2>(new List<ContentChangedTriggerSchemaV2>
+                {
+                    new ContentChangedTriggerSchemaV2
+                    {
+                        SchemaId = SchemaMatch.Id
+                    }
+                })
+            };
+
+            var @event = new EnrichedContentEvent { SchemaId = SchemaMatch };
+
+            var result = sut.Triggers(@event, trigger);
+
+            Assert.True(result);
+
+            A.CallTo(() => scriptEngine.Evaluate(A<string>.Ignored, A<object>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Should_not_trigger_when_schema_id_does_not_match()
+        {
+            var trigger = new ContentChangedTriggerV2
+            {
+                Schemas = new ReadOnlyCollection<ContentChangedTriggerSchemaV2>(new List<ContentChangedTriggerSchemaV2>
+                {
+                    new ContentChangedTriggerSchemaV2
+                    {
+                        SchemaId = SchemaNonMatch.Id
+                    }
+                })
+            };
+
+            var @event = new EnrichedContentEvent { SchemaId = SchemaMatch };
+
+            var result = sut.Triggers(@event, trigger);
+
+            Assert.False(result);
+
+            A.CallTo(() => scriptEngine.Evaluate(A<string>.Ignored, A<object>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Should_trigger_when_condition_is_empty()
+        {
+            var trigger = new ContentChangedTriggerV2
+            {
+                Schemas = new ReadOnlyCollection<ContentChangedTriggerSchemaV2>(new List<ContentChangedTriggerSchemaV2>
+                {
+                    new ContentChangedTriggerSchemaV2
+                    {
+                        SchemaId = SchemaMatch.Id, Condition = string.Empty
+                    }
+                })
+            };
+
+            var @event = new EnrichedContentEvent { SchemaId = SchemaMatch };
+
+            var result = sut.Triggers(@event, trigger);
+
+            Assert.True(result);
+
+            A.CallTo(() => scriptEngine.Evaluate(A<string>.Ignored, A<object>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void Should_trigger_when_condition_matchs()
+        {
+            var trigger = new ContentChangedTriggerV2
+            {
+                Schemas = new ReadOnlyCollection<ContentChangedTriggerSchemaV2>(new List<ContentChangedTriggerSchemaV2>
+                {
+                    new ContentChangedTriggerSchemaV2
+                    {
+                        SchemaId = SchemaMatch.Id, Condition = "true"
+                    }
+                })
+            };
+
+            var @event = new EnrichedContentEvent { SchemaId = SchemaMatch };
+
+            A.CallTo(() => scriptEngine.Evaluate("event", @event, "true"))
+                .Returns(true);
+
+            var result = sut.Triggers(@event, trigger);
 
             Assert.True(result);
         }
 
-        [Theory]
-        [MemberData(nameof(TestData))]
-        public void Should_return_result_depending_on_event(int expected,
-            int sendCreate,
-            int sendUpdate,
-            int sendDelete,
-            int sendPublish,
-            int sendUnpublish,
-            int sendArchive,
-            int sendRestore,
-            AppEvent @event)
+        [Fact]
+        public void Should_not_trigger_when_condition_does_not_matchs()
         {
-            var trigger = new ContentChangedTrigger
+            var trigger = new ContentChangedTriggerV2
             {
-                Schemas = ReadOnlyCollection.Create(
-                    new ContentChangedTriggerSchema
+                Schemas = new ReadOnlyCollection<ContentChangedTriggerSchemaV2>(new List<ContentChangedTriggerSchemaV2>
+                {
+                    new ContentChangedTriggerSchemaV2
                     {
-                        SendCreate = sendCreate == 1,
-                        SendUpdate = sendUpdate == 1,
-                        SendDelete = sendDelete == 1,
-                        SendPublish = sendPublish == 1,
-                        SendUnpublish = sendUnpublish == 1,
-                        SendArchived = sendArchive == 1,
-                        SendRestore = sendRestore == 1,
-                        SchemaId = SchemaMatch.Id
-                    })
+                        SchemaId = SchemaMatch.Id, Condition = "false"
+                    }
+                })
             };
 
-            var result = sut.Triggers(new Envelope<AppEvent>(@event), trigger);
+            var @event = new EnrichedContentEvent { SchemaId = SchemaMatch };
 
-            Assert.Equal(expected == 1, result);
+            A.CallTo(() => scriptEngine.Evaluate("event", @event, "false"))
+                .Returns(false);
+
+            var result = sut.Triggers(@event, trigger);
+
+            Assert.False(result);
         }
     }
 }

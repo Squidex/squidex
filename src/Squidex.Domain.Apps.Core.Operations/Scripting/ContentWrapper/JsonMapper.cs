@@ -27,11 +27,11 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
                 case JsonNull n:
                     return JsValue.Null;
                 case JsonScalar<string> s:
-                    return new JsValue(s.Value);
+                    return new JsString(s.Value);
                 case JsonScalar<bool> b:
-                    return new JsValue(b.Value);
+                    return new JsBoolean(b.Value);
                 case JsonScalar<double> b:
-                    return new JsValue(b.Value);
+                    return new JsNumber(b.Value);
                 case JsonObject obj:
                     return FromObject(obj, engine);
                 case JsonArray arr:

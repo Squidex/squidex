@@ -5,13 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Infrastructure;
+using Jint.Runtime.Descriptors;
 
-namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
-    public abstract class EnrichedSchemaEvent : EnrichedEntityEvent
+    public abstract class CustomProperty : PropertyDescriptor
     {
-        public NamedId<Guid> SchemaId { get; set; }
+        public CustomProperty()
+            : base(PropertyFlag.CustomJsValue)
+        {
+            Enumerable = true;
+
+            Writable = true;
+
+            Configurable = true;
+        }
     }
 }
