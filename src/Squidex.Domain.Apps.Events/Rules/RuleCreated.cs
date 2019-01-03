@@ -6,15 +6,26 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Rules
 {
     [EventType(nameof(RuleCreated))]
-    public sealed class RuleCreated : RuleEvent
+    public sealed class RuleCreated : RuleEvent, IMigrated<IEvent>
     {
         public RuleTrigger Trigger { get; set; }
 
         public RuleAction Action { get; set; }
+
+        public IEvent Migrate()
+        {
+            if (Trigger is IMigrated<RuleTrigger> migrated)
+            {
+                Trigger = migrated.Migrate();
+            }
+
+            return this;
+        }
     }
 }

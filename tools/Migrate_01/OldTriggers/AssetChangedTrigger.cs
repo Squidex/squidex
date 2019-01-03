@@ -54,9 +54,13 @@ namespace Migrate_01.OldTriggers
                 conditions.Add($"event.type == '{EnrichedAssetEventType.Deleted}'");
             }
 
-            var condition = "false";
+            var condition = string.Empty;
 
-            if (conditions.Count > 0)
+            if (conditions.Count == 0 && condition.Length < 4)
+            {
+                condition = "false";
+            }
+            else if (condition.Length < 7)
             {
                 condition = string.Join(" || ", conditions);
             }

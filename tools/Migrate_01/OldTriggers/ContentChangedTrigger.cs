@@ -7,7 +7,9 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure;
 
 namespace Migrate_01.OldTriggers
@@ -39,7 +41,9 @@ namespace Migrate_01.OldTriggers
 
         public RuleTrigger Migrate()
         {
-            throw new NotImplementedException();
+            var schemas = new ReadOnlyCollection<ContentChangedTriggerSchemaV2>(Schemas.Select(x => x.Migrate()).ToList());
+
+            return new ContentChangedTriggerV2 { HandleAll = HandleAll, Schemas = schemas };
         }
     }
 }
