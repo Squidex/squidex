@@ -56,11 +56,11 @@ namespace Migrate_01.OldTriggers
 
             var condition = string.Empty;
 
-            if (conditions.Count == 0 && condition.Length < 4)
+            if (conditions.Count == 0)
             {
                 condition = "false";
             }
-            else if (condition.Length < 7)
+            else if (condition.Length < 4)
             {
                 condition = string.Join(" || ", conditions);
             }
