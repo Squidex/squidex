@@ -8,21 +8,35 @@
 using System;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public abstract class RuleTriggerHandler<T> : IRuleTriggerHandler where T : RuleTrigger
+    public abstract class RuleTriggerHandler<TTrigger, TEvent, TEnrichedEvent> : IRuleTriggerHandler
+        where TTrigger : RuleTrigger
+        where TEvent : IEvent
+        where TEnrichedEvent : EnrichedEvent
     {
         public Type TriggerType
         {
-            get { return typeof(T); }
+            get { return typeof(TTrigger); }
         }
 
         bool IRuleTriggerHandler.Triggers(EnrichedEvent @event, RuleTrigger trigger)
         {
-            return Triggers(@event, (T)trigger);
+            return @event is TEnrichedEvent e && Triggers(e, (TTrigger)trigger);
         }
 
-        protected abstract bool Triggers(EnrichedEvent @event, T trigger);
+        bool IRuleTriggerHandler.Triggers(IEvent @event, RuleTrigger trigger)
+        {
+            return @event is TEvent e && Triggers(e, (TTrigger)trigger);
+        }
+
+        protected abstract bool Triggers(TEnrichedEvent @event, TTrigger trigger);
+
+        protected virtual bool Triggers(TEvent @event, TTrigger trigger)
+        {
+            return true;
+        }
     }
 }

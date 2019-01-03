@@ -91,6 +91,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
             Assert.Null(job);
+
+            A.CallTo(() => eventEnricher.EnrichAsync(A<Envelope<AppEvent>>.Ignored))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -102,6 +105,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
             Assert.Null(job);
+
+            A.CallTo(() => eventEnricher.EnrichAsync(A<Envelope<AppEvent>>.Ignored))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -113,6 +119,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
             Assert.Null(job);
+
+            A.CallTo(() => eventEnricher.EnrichAsync(A<Envelope<AppEvent>>.Ignored))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -124,13 +133,36 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
             Assert.Null(job);
+
+            A.CallTo(() => eventEnricher.EnrichAsync(A<Envelope<AppEvent>>.Ignored))
+                .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_not_create_if_not_triggered()
+        public async Task Should_not_create_job_if_not_triggered_with_precheck()
         {
             var ruleConfig = ValidRule();
             var ruleEnvelope = Envelope.Create(new ContentCreated());
+
+            A.CallTo(() => ruleTriggerHandler.Triggers(A<IEvent>.Ignored, ruleConfig.Trigger))
+                .Returns(false);
+
+            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
+
+            Assert.Null(job);
+
+            A.CallTo(() => eventEnricher.EnrichAsync(A<Envelope<AppEvent>>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_create_job_if_not_triggered()
+        {
+            var ruleConfig = ValidRule();
+            var ruleEnvelope = Envelope.Create(new ContentCreated());
+
+            A.CallTo(() => ruleTriggerHandler.Triggers(A<IEvent>.Ignored, ruleConfig.Trigger))
+                .Returns(true);
 
             A.CallTo(() => ruleTriggerHandler.Triggers(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
                 .Returns(false);
@@ -155,15 +187,15 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
 
-            A.CallTo(() => ruleTriggerHandler.Triggers(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
-                .Returns(true);
-
             A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))
                 .Returns((actionDescription, actionData));
 
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
 
             Assert.Null(job);
+
+            A.CallTo(() => eventEnricher.EnrichAsync(A<Envelope<AppEvent>>.Ignored))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -182,6 +214,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 .Returns(now);
 
             A.CallTo(() => ruleTriggerHandler.Triggers(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
+                .Returns(true);
+
+            A.CallTo(() => ruleTriggerHandler.Triggers(A<IEvent>.Ignored, ruleConfig.Trigger))
                 .Returns(true);
 
             A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))
