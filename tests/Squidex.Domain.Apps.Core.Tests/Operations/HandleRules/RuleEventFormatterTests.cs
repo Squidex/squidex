@@ -33,6 +33,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
         public RuleEventFormatterTests()
         {
+            A.CallTo(() => user.Id)
+                .Returns("123");
+
             A.CallTo(() => user.Email)
                 .Returns("me@email.com");
 
@@ -112,51 +115,39 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         }
 
         [Theory]
-        [InlineData("From $USER_NAME ($USER_EMAIL)")]
-        [InlineData("Script(`From ${event.user.name} (${event.user.email})`)")]
+        [InlineData("From $USER_NAME ($USER_EMAIL, $USER_ID)")]
+        [InlineData("Script(`From ${event.user.name} (${event.user.email}, ${event.user.id})`)")]
         public void Should_format_email_and_display_name_from_user(string script)
         {
-            var @event = new EnrichedContentEvent { User = user, Actor = new RefToken(RefTokenType.Subject, "123") };
+            var @event = new EnrichedContentEvent { User = user };
 
             var result = sut.Format(script, @event);
 
-            Assert.Equal("From me (me@email.com)", result);
+            Assert.Equal("From me (me@email.com, 123)", result);
         }
 
         [Theory]
-        [InlineData("From $USER_NAME ($USER_EMAIL)")]
-        [InlineData("Script(`From ${event.user.name} (${event.user.email})`)")]
+        [InlineData("From $USER_NAME ($USER_EMAIL, $USER_ID)")]
+        [InlineData("Script(`From ${event.user.name} (${event.user.email}, ${event.user.id})`)")]
         public void Should_return_null_if_user_is_not_found(string script)
         {
-            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Subject, "123") };
+            var @event = new EnrichedContentEvent();
 
             var result = sut.Format(script, @event);
 
-            Assert.Equal("From null (null)", result);
+            Assert.Equal("From null (null, null)", result);
         }
 
         [Theory]
-        [InlineData("From $USER_NAME ($USER_EMAIL)")]
-        [InlineData("Script(`From ${event.user.name} (${event.user.email})`)")]
-        public void Should_return_null_if_user_is_not_found_with_scripting(string script)
-        {
-            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Subject, "123") };
-
-            var result = sut.Format(script, @event);
-
-            Assert.Equal("From null (null)", result);
-        }
-
-        [Theory]
-        [InlineData("From $USER_NAME ($USER_EMAIL)")]
-        [InlineData("Script(`From ${event.user.name} (${event.user.email})`)")]
+        [InlineData("From $USER_NAME ($USER_EMAIL, $USER_ID)")]
+        [InlineData("Script(`From ${event.user.name} (${event.user.email}, ${event.user.id})`)")]
         public void Should_format_email_and_display_name_from_client(string script)
         {
             var @event = new EnrichedContentEvent { User = new ClientUser(new RefToken(RefTokenType.Client, "android")) };
 
             var result = sut.Format(script, @event);
 
-            Assert.Equal("From client:android (client:android)", result);
+            Assert.Equal("From client:android (client:android, android)", result);
         }
 
         [Theory]
@@ -346,6 +337,17 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var result = sut.Format(script, @event);
 
             Assert.Equal("{\"name\":\"Berlin\"}", result);
+        }
+
+        [Theory]
+        [InlineData("Script(`From ${event.actor}`)")]
+        public void Should_format_actor(string script)
+        {
+            var @event = new EnrichedContentEvent { Actor = new RefToken(RefTokenType.Client, "android") };
+
+            var result = sut.Format(script, @event);
+
+            Assert.Equal("From client:android", result);
         }
     }
 }

@@ -52,6 +52,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             AddPattern("SCHEMA_NAME", SchemaName);
             AddPattern("TIMESTAMP_DATETIME", TimestampTime);
             AddPattern("TIMESTAMP_DATE", TimestampDate);
+            AddPattern("USER_ID", UserId);
             AddPattern("USER_NAME", UserName);
             AddPattern("USER_EMAIL", UserEmail);
         }
@@ -224,6 +225,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         private static string UserName(EnrichedEvent @event)
         {
             return @event.User?.DisplayName() ?? Fallback;
+        }
+
+        private static string UserId(EnrichedEvent @event)
+        {
+            return @event.User?.Id ?? Fallback;
         }
 
         private static string UserEmail(EnrichedEvent @event)
