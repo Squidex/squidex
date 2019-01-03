@@ -71,12 +71,12 @@
             </div>
 
             <div class="form-group">
-                <a class="btn btn-sm btn-text force" (click)="toggleImport()" [class.hidden]="showImport">
+                <button type="button" class="btn btn-sm btn-text" (click)="toggleImport()" [class.hidden]="showImport">
                     Import schema
-                </a>
-                <a class="btn btn-sm btn-text force" (click)="toggleImport()" [class.hidden]="!showImport">
+                </button>
+                <button type="button" class="btn btn-sm btn-text force" (click)="toggleImport()" [class.hidden]="!showImport">
                     Hide
-                </a>
+                </button>
         
                 <sqx-json-editor *ngIf="showImport" formControlName="import"></sqx-json-editor>
             </div>
