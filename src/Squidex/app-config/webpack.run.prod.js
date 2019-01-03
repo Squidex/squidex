@@ -125,9 +125,7 @@ module.exports = webpackMerge(runConfig, {
                     }
                 },
                 extractComments: true
-            }),
-
-            new plugins.OptimizeCSSAssetsPlugin({})
+            })
         ]
     },
 
