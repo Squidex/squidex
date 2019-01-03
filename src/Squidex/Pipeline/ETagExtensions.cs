@@ -17,7 +17,7 @@ namespace Squidex.Pipeline
     {
         private static readonly int GuidLength = Guid.Empty.ToString().Length;
 
-        public static string ToManyEtag<T>(this IReadOnlyList<T> items, long total = 0) where T : IGenerateEtag
+        public static string ToManyEtag<T>(this IReadOnlyList<T> items, long total = 0) where T : IGenerateETag
         {
             using (Profiler.Trace("CalculateEtag"))
             {
@@ -27,7 +27,7 @@ namespace Squidex.Pipeline
             }
         }
 
-        private static string Unhashed<T>(IReadOnlyList<T> items, long total) where T : IGenerateEtag
+        private static string Unhashed<T>(IReadOnlyList<T> items, long total) where T : IGenerateETag
         {
             var sb = new StringBuilder((items.Count * (GuidLength + 4)) + 10);
 
@@ -47,10 +47,10 @@ namespace Squidex.Pipeline
                 }
             }
 
-            return sb.ToString();
+            return sb.ToString().Sha256Base64();
         }
 
-        public static string ToSurrogateKeys<T>(this IReadOnlyList<T> items) where T : IGenerateEtag
+        public static string ToSurrogateKeys<T>(this IReadOnlyList<T> items) where T : IGenerateETag
         {
             if (items.Count == 0)
             {
@@ -70,7 +70,7 @@ namespace Squidex.Pipeline
             return sb.ToString();
         }
 
-        public static string ToEtag<T>(this T item) where T : IGenerateEtag
+        public static string ToEtag<T>(this T item) where T : IGenerateETag
         {
             return item.Version.ToString();
         }

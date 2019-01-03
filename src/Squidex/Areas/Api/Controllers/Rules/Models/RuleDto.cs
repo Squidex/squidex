@@ -18,7 +18,7 @@ using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
-    public sealed class RuleDto : IGenerateEtag
+    public sealed class RuleDto : IGenerateETag
     {
         /// <summary>
         /// The id of the rule.

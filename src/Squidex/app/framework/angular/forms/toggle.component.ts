@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
@@ -24,6 +24,9 @@ export const SQX_TOGGLE_CONTROL_VALUE_ACCESSOR: any = {
 export class ToggleComponent implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
+
+    @Input()
+    public threeStates = false;
 
     public isChecked: boolean | null = null;
     public isDisabled = false;
@@ -53,12 +56,22 @@ export class ToggleComponent implements ControlValueAccessor {
         this.callTouched = fn;
     }
 
-    public changeState() {
+    public changeState(event: MouseEvent) {
         if (this.isDisabled) {
             return;
         }
 
-        this.isChecked = !(this.isChecked === true);
+        if (this.threeStates && (event.ctrlKey || event.shiftKey)) {
+            if (this.isChecked) {
+                this.isChecked = null;
+            } else if (this.isChecked === null) {
+                this.isChecked = false;
+            } else {
+                this.isChecked = true;
+            }
+        } else {
+            this.isChecked = !(this.isChecked === true);
+        }
 
         this.callChange(this.isChecked);
         this.callTouched();

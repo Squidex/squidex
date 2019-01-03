@@ -6,7 +6,7 @@
 
 const plugins = {
     // https://github.com/jrparish/tslint-webpack-plugin
-    TsLintPlugin: require('./tslint/plugin')
+    TsLintPlugin: require('tslint-webpack-plugin')
 };
 
 module.exports = webpackMerge(runConfig, {
@@ -17,7 +17,9 @@ module.exports = webpackMerge(runConfig, {
     output: {
         filename: '[name].js',
 
-        // Set the public path, because we are running the website from another port (5000)
+        /**
+         * Set the public path, because we are running the website from another port (5000).
+         */
         publicPath: 'http://localhost:3000/'
     },
     

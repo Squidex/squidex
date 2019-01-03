@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -48,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var response = ContributorsDto.FromApp(App, appPlansProvider);
 
-            Response.Headers["ETag"] = App.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = App.Version.ToString();
 
             return Ok(response);
         }

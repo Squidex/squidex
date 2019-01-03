@@ -21,13 +21,13 @@ export class CachingInterceptor implements HttpInterceptor {
             const cacheEntry = this.cache[req.url];
 
             if (cacheEntry) {
-                req = req.clone({ headers: req.headers.set('If-None-Match', cacheEntry.headers.get('Etag')!) });
+                req = req.clone({ headers: req.headers.set('If-None-Match', cacheEntry.headers.get('ETag')!) });
             }
 
             return next.handle(req).pipe(
                 tap(response => {
                     if (Types.is(response, HttpResponse)) {
-                        if (response.headers.get('Etag')) {
+                        if (response.headers.get('ETag')) {
                             this.cache[req.url] = response;
                         }
                     }

@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -65,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var response = entities.ToArray(a => AppDto.FromApp(a, userId, userPermissions, appPlansProvider));
 
-            Response.Headers["ETag"] = response.ToManyEtag();
+            Response.Headers[HeaderNames.ETag] = response.ToManyEtag();
 
             return Ok(response);
         }

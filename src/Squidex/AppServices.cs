@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Extensions.Actions.Twitter;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
+using Squidex.Pipeline;
 using Squidex.Pipeline.Robots;
 
 namespace Squidex
@@ -60,6 +61,8 @@ namespace Squidex
                 config.GetSection("robots"));
             services.Configure<GCHealthCheckOptions>(
                 config.GetSection("healthz:gc"));
+            services.Configure<ETagOptions>(
+                config.GetSection("etags"));
 
             services.Configure<MyContentsControllerOptions>(
                 config.GetSection("contentsController"));

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure.Commands;
 using Xunit;
@@ -19,13 +20,13 @@ namespace Squidex.Pipeline.CommandMiddlewares
     {
         private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
-        private readonly IHeaderDictionary requestHeaders = new HeaderDictionary();
+        private readonly HttpContext httpContext = new DefaultHttpContext();
         private readonly ETagCommandMiddleware sut;
 
         public ETagCommandMiddlewareTests()
         {
-            A.CallTo(() => httpContextAccessor.HttpContext.Request.Headers)
-                .Returns(requestHeaders);
+            A.CallTo(() => httpContextAccessor.HttpContext)
+                .Returns(httpContext);
 
             sut = new ETagCommandMiddleware(httpContextAccessor);
         }
@@ -47,7 +48,20 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_add_expected_version_to_command()
         {
-            requestHeaders["If-Match"] = "13";
+            httpContext.Request.Headers[HeaderNames.IfMatch] = "13";
+
+            var command = new CreateContent();
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(13, context.Command.ExpectedVersion);
+        }
+
+        [Fact]
+        public async Task Should_add_weak_etag_as_expected_version_to_command()
+        {
+            httpContext.Request.Headers[HeaderNames.IfMatch] = "W/13";
 
             var command = new CreateContent();
             var context = new CommandContext(command, commandBus);
@@ -67,7 +81,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             await sut.HandleAsync(context);
 
-            Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext.Response.Headers["ETag"]);
+            Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext.Response.Headers[HeaderNames.ETag]);
         }
     }
 }

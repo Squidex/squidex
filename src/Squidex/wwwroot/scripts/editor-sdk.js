@@ -44,7 +44,7 @@ function SquidexFormField() {
     }, 500);
 
     var editor = {
-        /*
+        /**
          * Notifies the control container that the editor has been touched.
          */
         touched: function () {
@@ -53,7 +53,7 @@ function SquidexFormField() {
             }
         },
 
-        /*
+        /**
          * Notifies the control container that the value has been changed.
          */
         valueChanged: function (value) {
@@ -62,7 +62,7 @@ function SquidexFormField() {
             }
         },
 
-        /*
+        /**
          * Register the disabled handler.
          */
         onDisabled: function (callback) {
@@ -73,7 +73,7 @@ function SquidexFormField() {
             }
         },
 
-        /*
+        /**
          * Register the disabled handler.
          */
         onValueChanged: function (callback) {
@@ -84,7 +84,7 @@ function SquidexFormField() {
             }
         },
 
-        /*
+        /**
          * Clean the editor SDK.
          */
         clean: function () {

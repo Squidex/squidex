@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using Orleans;
 using Squidex.Areas.Api.Controllers.Comments.Models;
 using Squidex.Domain.Apps.Entities.Comments;
@@ -56,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
             var result = await grainFactory.GetGrain<ICommentGrain>(commentsId).GetCommentsAsync(version);
             var response = CommentsDto.FromResult(result);
 
-            Response.Headers["ETag"] = response.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = response.Version.ToString();
 
             return Ok(response);
         }

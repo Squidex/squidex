@@ -20,7 +20,7 @@ using Squidex.Pipeline;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public sealed class ContentDto : IGenerateEtag
+    public sealed class ContentDto : IGenerateETag
     {
         /// <summary>
         /// The if of the content item.
