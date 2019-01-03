@@ -24,11 +24,16 @@
         color: $color;
     }
 
-    &:disabled {
+    &:disabled
+    &.disabled {
         @include opacity(.4);
-    }
-
+    }  
+    
     &:focus,
+    &.focus {
+        @include box-shadow-raw(0 0 0 $btn-focus-width rgba($color, .5));
+    }
+    
     &:active,
     &:hover {
         color: darken($color, 8%);
