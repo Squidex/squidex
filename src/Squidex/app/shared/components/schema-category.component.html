@@ -2,14 +2,14 @@
     <div class="drop-indicator"></div>
 
     <div class="header clearfix">
-        <a class="btn btn-sm btn-link" (click)="toggle()">
+        <a class="btn btn-sm btn-text" (click)="toggle()">
             <i [class.icon-caret-right]="!isOpen" [class.icon-caret-down]="isOpen"></i> 
         </a>
 
         <h3>{{displayName}} ({{schemasFiltered.length}})</h3>
         
         
-        <a class="btn btn-sm btn-link float-right" *ngIf="schemasForCategory.length === 0 && !isReadonly" (click)="removing.emit()">
+        <a class="btn btn-sm btn-text float-right" *ngIf="schemasForCategory.length === 0 && !isReadonly" (click)="removing.emit()">
             <i class="icon-bin2"></i> 
         </a>
     </div>

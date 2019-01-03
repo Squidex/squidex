@@ -5,32 +5,32 @@
     
             <span class="header-text text-decent">Item #{{index + 1}}</span>
 
-            <button class="btn btn-secondary btn-link" [disabled]="isFirst" (click)="moveTop(); $event.preventDefault()">
+            <button class="btn btn-text-secondary" [disabled]="isFirst" (click)="moveTop(); $event.preventDefault()">
                 <i class="icon-caret-top"></i>
             </button>
-            <button class="btn btn-secondary btn-link" [disabled]="isFirst" (click)="moveUp(); $event.preventDefault()">
+            <button class="btn btn-text-secondary" [disabled]="isFirst" (click)="moveUp(); $event.preventDefault()">
                 <i class="icon-caret-up"></i>
             </button>
-            <button class="btn btn-secondary btn-link" [disabled]="isLast" (click)="moveDown(); $event.preventDefault()">
+            <button class="btn btn-text-secondary" [disabled]="isLast" (click)="moveDown(); $event.preventDefault()">
                 <i class="icon-caret-down"></i>
             </button>
-            <button class="btn btn-secondary btn-link" [disabled]="isLast" (click)="moveBottom(); $event.preventDefault()">
+            <button class="btn btn-text-secondary" [disabled]="isLast" (click)="moveBottom(); $event.preventDefault()">
                 <i class="icon-caret-bottom"></i>
             </button>
-            <button class="btn btn-secondary btn-link" [class.hidden]="!isHidden" (click)="toggle.emit(false); $event.preventDefault()" title="Open all items">
+            <button class="btn btn-text-secondary" [class.hidden]="!isHidden" (click)="toggle.emit(false); $event.preventDefault()" title="Open all items">
                 <i class="icon-plus-square"></i>
             </button>
-            <button class="btn btn-secondary btn-link" [class.hidden]="isHidden" (click)="toggle.emit(true); $event.preventDefault()" title="Close all items">
+            <button class="btn btn-text-secondary" [class.hidden]="isHidden" (click)="toggle.emit(true); $event.preventDefault()" title="Close all items">
                 <i class="icon-minus-square"></i>
             </button>
         </span>
 
         <span class="float-right">
-            <button type="button" class="btn btn-link btn-secondary" (click)="cloning.emit(); $event.preventDefault()">
+            <button type="button" class="btn btn-text-secondary" (click)="cloning.emit(); $event.preventDefault()">
                 <i class="icon-clone"></i>
             </button>
     
-            <button type="button" class="btn btn-link btn-danger" (click)="removing.emit(); $event.preventDefault()">
+            <button type="button" class="btn btn-text-danger" (click)="removing.emit(); $event.preventDefault()">
                 <i class="icon-bin2"></i>
             </button>
 

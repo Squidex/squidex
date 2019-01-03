@@ -1,6 +1,6 @@
 <div class="table-items-row" [class.invalid]="isInvalid | async">
     <div class="languages-buttons" *ngIf="field.isLocalizable && languages.length > 1">
-        <button *ngIf="!field.properties.isComplexUI" type="button" class="btn btn-secondary btn-sm btn-link mr-1" (click)="toggleShowAll()">
+        <button *ngIf="!field.properties.isComplexUI" type="button" class="btn btn-secondary btn-sm btn-text mr-1" (click)="toggleShowAll()">
             {{showAllControls ? 'Single Language' : 'All Languages'}}
         </button>
     

@@ -20,8 +20,11 @@
                 <input type="text" class="form-control" id="schemaName" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit />
                 
                 <small class="form-text text-muted">
-                    The schema name becomes part of the api url,<br /> e.g {{apiUrl.buildUrl("api/content/")}}{{appsState.appName}}/<b>{{createForm.schemaName | async}}</b>/.
+                    The schema name becomes part of the api url:
                 </small>
+
+                <pre class="code">{{apiUrl.buildUrl("api/content/")}}{{appsState.appName}}/<b>{{createForm.schemaName | async}}</b></pre>
+
                 <small class="form-text text-muted">
                     It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.
                 </small>
@@ -68,10 +71,10 @@
             </div>
 
             <div class="form-group">
-                <a class="btn btn-sm btn-link force" (click)="toggleImport()" [class.hidden]="showImport">
+                <a class="btn btn-sm btn-text force" (click)="toggleImport()" [class.hidden]="showImport">
                     Import schema
                 </a>
-                <a class="btn btn-sm btn-link force" (click)="toggleImport()" [class.hidden]="!showImport">
+                <a class="btn btn-sm btn-text force" (click)="toggleImport()" [class.hidden]="!showImport">
                     Hide
                 </a>
         

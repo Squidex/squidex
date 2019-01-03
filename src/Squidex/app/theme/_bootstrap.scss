@@ -404,29 +404,29 @@ a {
     }
 
     // Link buttons only exists with blue text color in bootstrap. Provide them for all colors.
-    &-link {
+    &-text {
         & {
-            @include build-link-button($color-theme-blue);
+            @include build-text-button($color-theme-blue);
         }
 
-        &.btn-secondary {
-            @include build-link-button($color-text-decent);
+        &-secondary {
+            @include build-text-button($color-text-decent);
         }
 
-        &.btn-danger {
-            @include build-link-button($color-theme-error);
+        &-danger {
+            @include build-text-button($color-theme-error);
         }
 
-        &.btn-success {
-            @include build-link-button($color-theme-green);
+        &-success {
+            @include build-text-button($color-theme-green);
         }
 
-        &.btn-info {
-            @include build-link-button($color-theme-info);
+        &-info {
+            @include build-text-button($color-theme-info);
         }
 
-        &.btn-warning {
-            @include build-link-button($color-theme-orange);
+        &-warning {
+            @include build-text-button($color-theme-orange);
         }
     }
 }

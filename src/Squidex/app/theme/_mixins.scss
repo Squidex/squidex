@@ -19,34 +19,19 @@
     }
 }
 
-@mixin build-link-button($color) {
+@mixin build-text-button($color) {
     & {
         color: $color;
-        cursor: pointer;
-        border: 1px solid transparent;
-    }
-
-    &:focus {
-        outline-color: transparent;
     }
 
     &:disabled {
         @include opacity(.4);
     }
 
-    &:disabled,
-    &.disabled {
-        cursor: not-allowed;
-        border-color: transparent;
-    }
-
     &:focus,
     &:active,
     &:hover {
         color: darken($color, 8%);
-        border-color: transparent;
-        background: transparent;
-        text-decoration: none;
     }
 }
 

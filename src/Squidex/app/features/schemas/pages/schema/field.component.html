@@ -25,7 +25,7 @@
                     </button>
 
                     <div class="dropdown dropdown-options">
-                        <button type="button" class="btn btn-link btn-secondary ml-1" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
+                        <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
                             <i class="icon-dots"></i>
                         </button>
                         <div class="dropdown-menu" *sqxModalView="dropdown" [sqxModalTarget]="optionsButton" @fade>

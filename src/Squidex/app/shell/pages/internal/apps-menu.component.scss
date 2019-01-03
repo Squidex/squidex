@@ -45,8 +45,18 @@ $color-apps-border: #65a6ff;
     @include absolute(2.65rem, auto, auto, auto);
 }
 
+.btn-block {
+    white-space: nowrap;
+}
+
 .icon-plus {
     font-size: .8rem;
+}
+
+.apps-list {
+    max-height: 600px;
+    margin: -.5rem 0;
+    overflow-y: auto;
 }
 
 .all-apps {

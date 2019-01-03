@@ -76,7 +76,7 @@
     </button>
 </td>
 <td class="cell-actions" *ngIf="patchForm.form.dirty" (click)="shouldStop($event)">
-    <button type="button" class="btn btn-link btn-secondary btn-cancel" (click)="cancel(); $event.stopPropagation()">
+    <button type="button" class="btn btn-text-secondary btn-cancel" (click)="cancel(); $event.stopPropagation()">
         <i class="icon-close"></i>
     </button>
 </td>
@@ -87,7 +87,7 @@
 
 <td class="cell-actions" *ngIf="!isReadOnly && patchForm.form.pristine" (click)="shouldStop($event)">
     <div class="dropdown dropdown-options" *ngIf="content">
-        <button type="button" class="btn btn-link btn-secondary" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async" #optionsButton>
+        <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async" #optionsButton>
             <i class="icon-dots"></i>
         </button>
         <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
@@ -119,7 +119,7 @@
     </div>
 </td>
 <td class="cell-actions" *ngIf="isReference" (click)="shouldStop($event)">
-    <button type="button" class="btn btn-link btn-secondary" (click)="deleting.emit(); $event.stopPropagation()">
+    <button type="button" class="btn btn-text-secondary" (click)="deleting.emit(); $event.stopPropagation()">
         <i class="icon-close"></i>
     </button>
 </td>

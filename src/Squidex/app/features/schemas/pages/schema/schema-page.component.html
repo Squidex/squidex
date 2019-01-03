@@ -6,7 +6,7 @@
     </ng-container>
 
     <ng-container menu>
-        <button type="button" class="btn btn-link mr-1" (click)="exportSchemaDialog.show()">
+        <button type="button" class="btn btn-text mr-1" (click)="exportSchemaDialog.show()">
             JSON Preview
         </button>
 
@@ -20,7 +20,7 @@
         </div>
 
         <div class="dropdown dropdown-options">
-            <button type="button" class="btn btn-link btn-secondary ml-1" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #buttonOptions>
+            <button type="button" class="btn btn-text-secondary ml-1" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #buttonOptions>
                 <i class="icon-dots"></i>
             </button>
             <div class="dropdown-menu" *sqxModalView="editOptionsDropdown" [sqxModalTarget]="buttonOptions" @fade>

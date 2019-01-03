@@ -7,7 +7,7 @@
             <div class="user-row">
                 <div class="user-ref">{{comment.user | sqxUserNameRef:null}}</div>
 
-                <button *ngIf="comment.user === userId" type="button" class="btn btn-sm btn-link btn-danger item-remove" (click)="deleting.emit()!">
+                <button *ngIf="comment.user === userId" type="button" class="btn btn-sm btn-text-danger item-remove" (click)="deleting.emit()!">
                     <i class="icon-bin2"></i>
                 </button>
             </div>

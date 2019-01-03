@@ -3,7 +3,7 @@
 <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
     <sqx-panel desiredWidth="*" [showSidebar]="content">
         <ng-container title>
-            <a class="btn btn-link" (click)="back()" *ngIf="!schema.isSingleton">
+            <a class="btn btn-text" (click)="back()" *ngIf="!schema.isSingleton">
                 <i class="icon-angle-left"></i>
             </a>
 

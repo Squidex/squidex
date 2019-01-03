@@ -6,7 +6,7 @@
     </ng-container>
 
     <ng-container menu>
-        <button class="btn btn-link btn-secondary mr-1" (click)="reload()" title="Refresh Assets (CTRL + SHIFT + R)">
+        <button class="btn btn-text-secondary mr-1" (click)="reload()" title="Refresh Assets (CTRL + SHIFT + R)">
             <i class="icon-reset"></i> Refresh
         </button>
 
@@ -52,7 +52,7 @@
                                 <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="toggle(rule)"></sqx-toggle>
                             </td>
                             <td class="cell-actions">
-                                <button type="button" class="btn btn-link btn-danger"
+                                <button type="button" class="btn btn-text-danger"
                                     (sqxConfirmClick)="delete(rule)"
                                     confirmTitle="Delete rule" 
                                     confirmText="Do you really want to delete the rule?">

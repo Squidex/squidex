@@ -11,7 +11,7 @@
 
                     <button type="submit" class="btn btn-primary" [disabled]="!renameForm.form.valid || !renameForm.form.dirty">Save</button>
 
-                    <button class="btn btn-link btn-secondary btn-cancel" (click)="toggleRename()">
+                    <button class="btn btn-text-secondary btn-cancel" (click)="toggleRename()">
                         <i class="icon-close"></i>
                     </button>
                 </form>
@@ -31,7 +31,7 @@
             <button class="btn btn-secondary" (click)="createToken(client)">Create Token</button>
         </div>
         <div class="col-auto cell-actions">
-            <button type="button" class="btn btn-link btn-danger"
+            <button type="button" class="btn btn-text-danger"
                 (sqxConfirmClick)="revoke()"
                 confirmTitle="Revoke client" 
                 confirmText="Do you really want to revoke the client?">
@@ -47,7 +47,7 @@
             <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName />
         </div>
         <div class="col-auto cell-actions">
-            <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputName">
+            <button type="button" class="btn btn-primary btn-text" [sqxCopy]="inputName">
                 <i class="icon-copy"></i>
             </button>
         </div>
@@ -60,7 +60,7 @@
             <input readonly class="form-control" [attr.value]="client.secret" #inputSecret />
         </div>
         <div class="col-auto cell-actions">
-            <button type="button" class="btn btn-primary btn-link" [sqxCopy]="inputSecret">
+            <button type="button" class="btn btn-primary btn-text" [sqxCopy]="inputSecret">
                 <i class="icon-copy"></i>
             </button>
         </div>

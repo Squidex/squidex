@@ -115,15 +115,15 @@
                 <img class="user-picture" [attr.title]="asset.lastModifiedBy | sqxUserNameRef" [attr.src]="asset.lastModifiedBy | sqxUserPictureRef" />
             </div>
             <div class="col col-actions text-right">
-                <a class="btn btn-link btn-secondary" [attr.href]="asset | sqxAssetUrl" target="_blank" rel="noopener" (click)="$event.stopPropagation()">
+                <a class="btn btn-text-secondary" [attr.href]="asset | sqxAssetUrl" target="_blank" rel="noopener" (click)="$event.stopPropagation()">
                     <i class="icon-download"></i>
                 </a>
             </div>
             <div class="col col-actions text-right" *ngIf="!isDisabled || removeMode">
-                <button class="btn btn-link btn-danger" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
+                <button class="btn btn-text-danger" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
                     <i class="icon-bin2"></i>
                 </button>
-                <button class="btn btn-link btn-secondary" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
+                <button class="btn btn-text-secondary" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
                     <i class="icon-close"></i>
                 </button>
             </div>

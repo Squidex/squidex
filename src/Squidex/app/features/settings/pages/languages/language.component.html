@@ -13,7 +13,7 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-link btn-danger" [class.invisible]="language.isMaster"
+                    <button type="button" class="btn btn-text-danger" [class.invisible]="language.isMaster"
                         (sqxConfirmClick)="remove()"
                         confirmTitle="Remove language" 
                         confirmText="Do you really want to remove the language?">
@@ -28,7 +28,7 @@
         <form [formGroup]="editForm.form" (ngSubmit)="save()">
             <div class="table-items-row-details-tabs clearfix">
                 <div class="float-right">
-                    <button type="reset" class="btn btn-link" (click)="toggleEditing()">Cancel</button>
+                    <button type="reset" class="btn btn-text" (click)="toggleEditing()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                                         {{language.englishName}}
                                     </div>
                                     <div class="col-auto">
-                                        <button type="button" class="btn btn-link btn-secondary btn-sm" (click)="removeFallbackLanguage(language)">
+                                        <button type="button" class="btn btn-text-secondary btn-sm" (click)="removeFallbackLanguage(language)">
                                             <i class="icon-close"></i>
                                         </button>
                                     </div>

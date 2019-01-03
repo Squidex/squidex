@@ -24,7 +24,7 @@
                 <input type="text" class="form-control code" [(ngModel)]="schema.condition" (blur)="updateValue()" />
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-link btn-secondary" (click)="removeSchema(schema)">
+                <button type="button" class="btn btn-text-secondary" (click)="removeSchema(schema)">
                     <i class="icon-close"></i>
                 </button>
             </td>
@@ -51,19 +51,19 @@
     
         <ul class="help-examples">
             <li class="help-example">
-                Specific events: 
+                Specific events:<br/>
 
-                <pre>event.type == 'Created' || event.type == 'Published'</pre>
+                <pre class="code">event.type == 'Created' || event.type == 'Published'</pre>
             </li>
             <li class="help-example">
-                Content has value:
+                Content has value:<br/>
 
-                <pre>event.data.important.iv === true</pre>
+                <pre class="code">event.data.important.iv === true</pre>
             </li>
             <li class="help-example">
-                Updated by user:
+                Updated by user:<br/>
                 
-                <pre>user.email === 'user@squidex.io'</pre>
+                <pre class="code">user.email === 'user@squidex.io'</pre>
             </li>
         </ul>
     </div>

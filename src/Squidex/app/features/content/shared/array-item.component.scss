@@ -18,21 +18,14 @@
     }
 }
 
-.btn-link {
-    & {
-        padding: .375rem;
-    }
-
-    &:disabled,
-    &.disabled {
-        background: transparent;
-    }
-}
-
-.remove {
-    @include absolute(.5rem, .5rem, auto, auto);
+.btn-text-secondary {
+    padding: .375rem;
 }
 
 .invalid {
     border-left-color: $color-theme-error;
+}
+
+.remove {
+    @include absolute(.5rem, .5rem, auto, auto);
 }
