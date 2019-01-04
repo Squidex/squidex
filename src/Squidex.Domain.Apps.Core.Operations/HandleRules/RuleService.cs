@@ -83,11 +83,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return null;
             }
 
-            var appEventEnvelope = @event.To<AppEvent>();
-
-            var enrichedEvent = await eventEnricher.EnrichAsync(appEventEnvelope);
-
-            if (!triggerHandler.Triggers(enrichedEvent, rule.Trigger))
+            if (!triggerHandler.Triggers(@event.Payload, rule.Trigger))
             {
                 return null;
             }
@@ -102,6 +98,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             var expires = eventTime.Plus(Constants.ExpirationTime);
 
             if (expires < now)
+            {
+                return null;
+            }
+
+            var appEventEnvelope = @event.To<AppEvent>();
+
+            var enrichedEvent = await eventEnricher.EnrichAsync(appEventEnvelope);
+
+            if (!triggerHandler.Triggers(enrichedEvent, rule.Trigger))
             {
                 return null;
             }

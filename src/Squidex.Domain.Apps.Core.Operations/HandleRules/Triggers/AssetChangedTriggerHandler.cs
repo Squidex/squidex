@@ -8,11 +8,12 @@
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
 {
-    public sealed class AssetChangedTriggerHandler : RuleTriggerHandler<AssetChangedTriggerV2>
+    public sealed class AssetChangedTriggerHandler : RuleTriggerHandler<AssetChangedTriggerV2, AssetEvent, EnrichedAssetEvent>
     {
         private readonly IScriptEngine scriptEngine;
 
@@ -23,14 +24,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
             this.scriptEngine = scriptEngine;
         }
 
-        protected override bool Triggers(EnrichedEvent @event, AssetChangedTriggerV2 trigger)
+        protected override bool Triggers(EnrichedAssetEvent @event, AssetChangedTriggerV2 trigger)
         {
-            return @event is EnrichedAssetEvent assetEvent && MatchsType(trigger, assetEvent);
-        }
-
-        private bool MatchsType(AssetChangedTriggerV2 trigger, EnrichedAssetEvent assetEvent)
-        {
-            return string.IsNullOrWhiteSpace(trigger.Condition) || scriptEngine.Evaluate("event", assetEvent, trigger.Condition);
+            return string.IsNullOrWhiteSpace(trigger.Condition) || scriptEngine.Evaluate("event", @event, trigger.Condition);
         }
     }
 }
