@@ -11,6 +11,7 @@ import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AccessTokenDto,
+    ApiUrlConfig,
     AppClientDto,
     AppClientsService,
     AppRoleDto,
@@ -23,6 +24,36 @@ import {
 } from '@app/shared';
 
 const ESCAPE_KEY = 27;
+
+function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {
+    const url = apiUrl.buildUrl('identity-server/connect/token');
+
+    return `$ curl
+    -X POST '${url}'
+    -H 'Content-Type: application/x-www-form-urlencoded'
+    -d 'grant_type=client_credentials&
+        client_id=${app}:${client.id}&
+        client_secret=${client.secret}&
+        scope=squidex-api`;
+}
+
+function connectLibrary(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {
+    const url = apiUrl.value;
+
+    return `var clientManager = new SquidexClientManager(
+    "${url}",
+    "${app}",
+    "${app}:${client.id}",
+    "${client.secret}")`;
+}
+
+function connectCLIWinText(app: string, client: { id: string, secret: string }) {
+    return `.\\sq.exe config add ${app} ${app}:${client.id} ${client.secret};.\\sq.exe config use ${app}`;
+}
+
+function connectCLINixText(app: string, client: { id: string, secret: string }) {
+    return `sq config add ${app} ${app}:${client.id} ${client.secret} && sq config use ${app}`;
+}
 
 @Component({
     selector: 'sqx-client',
@@ -38,13 +69,19 @@ export class ClientComponent implements OnChanges {
 
     public isRenaming = false;
 
-    public token: AccessTokenDto;
-    public tokenDialog = new DialogModel();
+    public connectToken: AccessTokenDto;
+    public connectDialog = new DialogModel();
 
     public renameForm = new RenameClientForm(this.formBuilder);
 
+    public connectHttpText: string;
+    public connectCLINixText: string;
+    public connectCLIWinText: string;
+    public connectLibrary: string;
+
     constructor(
         public readonly appsState: AppsState,
+        private readonly apiUrl: ApiUrlConfig,
         private readonly appClientsService: AppClientsService,
         private readonly clientsState: ClientsState,
         private readonly dialogs: DialogService,
@@ -54,6 +91,13 @@ export class ClientComponent implements OnChanges {
 
     public ngOnChanges() {
         this.renameForm.load(this.client);
+
+        const app = this.appsState.appName;
+
+        this.connectHttpText = connectHttpText(this.apiUrl, app, this.client);
+        this.connectCLINixText = connectCLINixText(app, this.client);
+        this.connectCLIWinText = connectCLIWinText(app, this.client);
+        this.connectLibrary = connectLibrary(this.apiUrl, app, this.client);
     }
 
     public revoke() {
@@ -92,10 +136,11 @@ export class ClientComponent implements OnChanges {
     }
 
     public createToken(client: AppClientDto) {
+        this.connectDialog.show();
+
         this.appClientsService.createToken(this.appsState.appName, client)
             .subscribe(dto => {
-                this.token = dto;
-                this.tokenDialog.show();
+                this.connectToken = dto;
             }, error => {
                 this.dialogs.notifyError(error);
             });

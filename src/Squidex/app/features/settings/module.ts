@@ -66,7 +66,7 @@ const routes: Routes = [
                         path: 'history',
                         component: HistoryComponent,
                         data: {
-                            channel: 'settings.plans'
+                            channel: 'settings.plan'
                         }
                     }
                 ]

@@ -24,11 +24,9 @@
                     <i class="client-edit icon-pencil" (click)="toggleRename()"></i>
                 </ng-container>
             </div>
-                
-            <div class="client-expires">Access tokens expire after 30 days</div>
         </div>
         <div class="col-auto">
-            <button class="btn btn-secondary" (click)="createToken(client)">Create Token</button>
+            <button class="btn btn-secondary" (click)="createToken(client)">Connect</button>
         </div>
         <div class="col-auto cell-actions">
             <button type="button" class="btn btn-text-danger"
@@ -47,7 +45,7 @@
             <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName />
         </div>
         <div class="col-auto cell-actions">
-            <button type="button" class="btn btn-primary btn-text" [sqxCopy]="inputName">
+            <button type="button" class="btn btn-text" [sqxCopy]="inputName">
                 <i class="icon-copy"></i>
             </button>
         </div>
@@ -60,7 +58,7 @@
             <input readonly class="form-control" [attr.value]="client.secret" #inputSecret />
         </div>
         <div class="col-auto cell-actions">
-            <button type="button" class="btn btn-primary btn-text" [sqxCopy]="inputSecret">
+            <button type="button" class="btn btn-text" [sqxCopy]="inputSecret">
                 <i class="icon-copy"></i>
             </button>
         </div>
@@ -79,12 +77,66 @@
     </div>
 </div>
 
-<sqx-modal-dialog *sqxModalView="tokenDialog;onRoot:true" (closed)="tokenDialog.hide()">
+<sqx-modal-dialog *sqxModalView="connectDialog;onRoot:true" large="true" (closed)="connectDialog.hide()">
     <ng-container title>
-        Access token
+        Connect
     </ng-container>
 
     <ng-container content>
-        <textarea readonly class="form-control access-token">{{token.tokenType}} {{token.accessToken}}</textarea>
+        <div class="help">
+            <h2>How to connect to this client</h2>
+    
+            <h3>Using HTTP</h3>
+    
+            <div class="help-section">
+                1. Make the following request to get an access token. It will be valid for 30 days.
+        
+                <pre class="code code-block">{{connectHttpText}}</pre>
+            </div>
+    
+            <div class="help-section">
+                2. Add the bearer token as authorization header to all requests:
+    
+                <pre class="code code-block">Authorization: Bearer [YOUR_TOKEN]</pre>
+            </div>
+
+            <div class="help-section">
+                Use the following token for testing
+
+                <ng-container *ngIf="connectToken">
+                    <textarea class="form-control access-token" readonly>{{connectToken.tokenType}} {{connectToken.accessToken}}</textarea>
+                </ng-container>
+            </div>
+    
+            <h3>Using the command line interface (CLI)</h3>
+    
+            <div class="help-section">
+                Download the CLI here: <a href="https://github.com/Squidex/squidex-samples/releases" target="_blank">CLI Releases (Linux, OS X, Windows)</a>
+            </div>
+    
+            <div class="help-section">
+                Connect with windows:
+    
+                <pre class="code code-block">{{connectCLIWinText}}</pre>
+            </div>
+    
+            <div class="help-section">
+                Connect with Linux / OS X
+    
+                <pre class="code code-block">{{connectCLINixText}}</pre>
+            </div>
+    
+            <h3>Using the C# Client Library</h3>
+
+            <div class="help-section">
+                Get the nuget library from <a href="https://www.nuget.org/packages/Squidex.ClientLibrary/" target="_blank">nuget.org</a>
+            </div>
+    
+            <div class="help-section">
+                Create a client manager
+    
+                <pre class="code code-block">{{connectLibrary}}</pre>
+            </div>
+        </div>
     </ng-container>
 </sqx-modal-dialog>

@@ -12,12 +12,6 @@ $color-editor: #eceeef;
         vertical-align: top;
     }
 
-    &-expires {
-        font-size: .8rem;
-        font-weight: normal;
-        margin-bottom: .75rem;
-    }
-
     &-edit {
         color: $color-border-dark;
         display: none;
@@ -35,23 +29,22 @@ $color-editor: #eceeef;
         font-size: 1.2rem;
         font-weight: normal;
         line-height: 1.5rem;
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
         display: inline-block;
         margin: 0;
     }
 
     &-header {
+        & {
+            margin-bottom: .5rem;
+        }
+
         &:hover {
             .client-edit {
                 display: inline-block;
             }
         }
-    }
-}
-
-h3 {
-    &.client-name {
-        border-top: 1px solid transparent;
-        border-bottom: 1px solid transparent;
     }
 }
 
@@ -68,8 +61,9 @@ h3 {
 }
 
 .access-token {
-    height: 18rem;
+    height: 10rem;
     font-size: 1rem;
     font-weight: normal;
     font-family: monospace;
+    resize: none;
 }

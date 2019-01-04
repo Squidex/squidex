@@ -4,19 +4,3 @@
 textarea {
     height: 100px;
 }
-
-.help {
-    & {
-        font-size: .9rem;
-    }
-
-    &-example {
-        margin-top: .375rem;
-    }
-
-    &-examples {
-        margin-top: 0;
-        margin-bottom: 0;
-        padding-left: 1.5rem;
-    }
-}

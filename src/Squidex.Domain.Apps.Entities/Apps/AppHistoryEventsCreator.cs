@@ -43,6 +43,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             AddEventMessage<AppClientRenamed>(
                 "renamed client {[Id]} to {[Name]}");
 
+            AddEventMessage<AppPlanChanged>(
+                "changed plan to {[Plan]}");
+
             AddEventMessage<AppLanguageAdded>(
                 "added language {[Language]}");
 
@@ -198,6 +201,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return Task.FromResult(
                 ForEvent(@event, channel)
                     .AddParameter("Name", @event.Name));
+        }
+
+        protected Task<HistoryEvent> On(AppPlanChanged @event)
+        {
+            const string channel = "settings.plan";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Plan", @event.PlanId));
         }
 
         protected Task<HistoryEvent> On(AppRoleDeleted @event)
