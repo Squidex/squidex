@@ -117,7 +117,7 @@ steps:
 
   - name: cleanup-build
     image: docker
-    commands
+    commands:
       - docker rm squidex-build-container
       - docker rmi squidex-build-image
     volumes:
