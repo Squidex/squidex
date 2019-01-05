@@ -66,7 +66,6 @@ steps:
       - docker build . -t squidex-build-image -f Dockerfile.build
       - docker create --name squidex-build-container squidex-build-image
       - docker cp squidex-build-container:/out /build
-      - docker rm squidex-build-container
     volumes:
       - name: build
         path: /build
@@ -81,7 +80,7 @@ steps:
   - name: binaries_zip
     image: kramos/alpine-zip
     commands:
-      -  cd /build && zip -r /release/binaries.zip .
+      -  cd /build/out && zip -r /release/binaries.zip .
     volumes:
       - name: build
         path: /build
