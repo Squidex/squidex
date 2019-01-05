@@ -130,6 +130,19 @@ steps:
         - success
       event:
         - tag
+
+  - name: cleanup
+    image: docker
+    commands:
+      - docker system prune -f
+    volumes:
+      - name: docker1
+        path: /var/run/docker.sock
+      - name: docker2
+        path: /var/lib/docker
+    when:
+      status:
+        - failure
       
 volumes:
   - name: build
