@@ -82,8 +82,8 @@ steps:
     settings:
       api_key:
         from_secret: github_apikey
-    files:
-      - /release/binaries.zip
+      files:
+        - /release/binaries.zip
     when:
       event:
         - tag
