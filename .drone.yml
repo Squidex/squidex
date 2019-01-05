@@ -65,7 +65,7 @@ steps:
         - tag
 
   - name: binaries_zip
-    image: alpine
+    image: kramos/alpine-zip
     commands:
       - zip -r /release/binaries.zip /build
     volumes:
@@ -77,7 +77,7 @@ steps:
       event:
         - tag
 
-  - name: publish  
+  - name: binaries_publish  
     image: plugins/github-release
     settings:
       api_key:
