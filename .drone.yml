@@ -64,13 +64,26 @@ steps:
       event:
         - tag
 
-  - name: zip_release
+  - name: binaries_zip
     image: alpine
     commands:
-      - zip -r binaries.zip ./build
+      - zip -r /release/binaries.zip /build
     volumes:
       - name: build
         path: /build
+      - name: release
+        path: /release
+    when:
+      event:
+        - tag
+
+  - name: publish  
+    image: plugins/github-release
+    settings:
+      api_key:
+        from_secret: github_apikey
+    files:
+      - /release/binaries.zip
     when:
       event:
         - tag
@@ -100,22 +113,11 @@ steps:
         - success
       event:
         - tag
-
-  - name: cleanup
-    image: docker
-    commands:
-      - docker system prune -f
-    volumes:
-      - name: docker1
-        path: /var/run/docker.sock
-      - name: docker2
-        path: /var/lib/docker
-    when:
-      status:
-        - failure
       
 volumes:
   - name: build
+    temp: {}
+  - name: release
     temp: {}
   - name: docker1
     host:
