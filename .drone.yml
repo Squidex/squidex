@@ -67,7 +67,6 @@ steps:
   - name: binaries_zip
     image: kramos/alpine-zip
     commands:
-      - cd /release && dir
       - zip -r /release/binaries.zip /build
     volumes:
       - name: build
@@ -85,6 +84,9 @@ steps:
         from_secret: github_apikey
       files:
         - /release/binaries.zip
+    volumes:
+      - name: release
+        path: /release
     when:
       event:
         - tag
