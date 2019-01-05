@@ -63,7 +63,7 @@ steps:
   - name: build_binaries
     image: docker
     commands:
-      - docker build . -t squidex-build-image -f dockerfile.build
+      - docker build . -t squidex-build-image -f Dockerfile.build
       - docker create --name squidex-build-container squidex-build-image
       - docker cp squidex-build-container:/out /build
       - docker rm squidex-build-container
