@@ -67,6 +67,7 @@ steps:
   - name: binaries_zip
     image: kramos/alpine-zip
     commands:
+      - cd /release && dir
       - zip -r /release/binaries.zip /build
     volumes:
       - name: build
