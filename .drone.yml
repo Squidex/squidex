@@ -46,11 +46,7 @@ steps:
       - docker build -t squidex/squidex:latest -t squidex/squidex:$${DRONE_TAG} .
       - docker push squidex/squidex:latest
       - docker push squidex/squidex:$${DRONE_TAG}
-      - docker create --name build-container squidex/squidex:$${DRONE_TAG}
-      - docker cp build-container:/app /build
     volumes:
-      - name: build
-        path: /build
       - name: docker1
         path: /var/run/docker.sock
       - name: docker2
@@ -64,10 +60,28 @@ steps:
       event:
         - tag
 
+  - name: build_binaries
+    image: docker
+    commands:
+      - docker build . -t squidex-build-image -f dockerfile.build
+      - docker create --name squidex-build-container squidex-build-image
+      - docker cp squidex-build-container:/out /build
+      - docker rm squidex-build-container
+    volumes:
+      - name: build
+        path: /build
+      - name: docker1
+        path: /var/run/docker.sock
+      - name: docker2
+        path: /var/lib/docker
+    when:
+      event:
+        - tag
+
   - name: binaries_zip
     image: kramos/alpine-zip
     commands:
-      - zip -r /release/binaries.zip /build
+      -  cd /build/app && zip -r /release/binaries.zip .
     volumes:
       - name: build
         path: /build
@@ -103,8 +117,9 @@ steps:
 
   - name: cleanup-build
     image: docker
-    commands:
-      - docker rm build-container
+    commands
+      - docker rm squidex-build-container
+      - docker rmi squidex-build-image
     volumes:
       - name: docker1
         path: /var/run/docker.sock
