@@ -47,7 +47,7 @@ steps:
       - docker push squidex/squidex:latest
       - docker push squidex/squidex:$${DRONE_TAG}
       - docker create --name build-container squidex/squidex:$${DRONE_TAG}
-      - docker cp build-container:/src/build /build
+      - docker cp build-container:/app /build
     volumes:
       - name: build
         path: /build
