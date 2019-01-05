@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.15.0 - 2019-01-05
+
+### Features
+
+* **Rules**: Javascript conditions for rule triggers.
+* **Rules**: Javascript formatting for rule actions.
+
 ## v1.14.0 - 2018-12-23
 
 ### Features
