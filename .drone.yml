@@ -46,7 +46,11 @@ steps:
       - docker build -t squidex/squidex:latest -t squidex/squidex:$${DRONE_TAG} .
       - docker push squidex/squidex:latest
       - docker push squidex/squidex:$${DRONE_TAG}
+      - docker create --name build-container squidex/squidex:$${DRONE_TAG}
+      - docker cp build-container:/src/build /build
     volumes:
+      - name: build
+        path: /build
       - name: docker1
         path: /var/run/docker.sock
       - name: docker2
@@ -60,6 +64,17 @@ steps:
       event:
         - tag
 
+  - name: zip_release
+    image: alpine
+    commands:
+      - zip -r binaries.zip ./build
+    volumes:
+      - name: build
+        path: /build
+    when:
+      event:
+        - tag
+
   - name: slack
     image: plugins/slack
     settings:
@@ -69,6 +84,22 @@ steps:
       status:
         - failure
         - success
+
+  - name: cleanup-build
+    image: docker
+    commands:
+      - docker rm build-container
+    volumes:
+      - name: docker1
+        path: /var/run/docker.sock
+      - name: docker2
+        path: /var/lib/docker
+    when:
+      status:
+        - failure
+        - success
+      event:
+        - tag
 
   - name: cleanup
     image: docker
@@ -84,6 +115,8 @@ steps:
         - failure
       
 volumes:
+  - name: build
+    temp: {}
   - name: docker1
     host:
       path: /var/run/docker.sock
