@@ -196,6 +196,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<SingletonCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<AlwaysCreateClientCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<CreateBlogCommandMiddleware>()
                 .As<ICommandMiddleware>();
 

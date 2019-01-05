@@ -39,8 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
                 await Task.WhenAll(
                     CreatePagesAsync(publish),
-                    CreatePostsAsync(publish),
-                    CreateClientAsync(publish, appId.Id));
+                    CreatePostsAsync(publish));
             }
 
             await next();
@@ -49,11 +48,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         private static bool IsRightTemplate(CreateApp createApp)
         {
             return string.Equals(createApp.Template, TemplateName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static async Task CreateClientAsync(Func<ICommand, Task> publish, Guid appId)
-        {
-            await publish(new AttachClient { Id = "sample-client", AppId = appId });
         }
 
         private static async Task CreatePostsAsync(Func<ICommand, Task> publish)

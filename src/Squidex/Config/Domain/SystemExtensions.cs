@@ -20,22 +20,31 @@ namespace Squidex.Config.Domain
         public sealed class InitializeHostedService : IHostedService
         {
             private readonly IEnumerable<IInitializable> targets;
+            private readonly IApplicationLifetime lifetime;
             private readonly ISemanticLog log;
 
-            public InitializeHostedService(IEnumerable<IInitializable> targets, ISemanticLog log)
+            public InitializeHostedService(IEnumerable<IInitializable> targets, IApplicationLifetime lifetime, ISemanticLog log)
             {
                 this.targets = targets;
-
+                this.lifetime = lifetime;
                 this.log = log;
             }
 
             public async Task StartAsync(CancellationToken cancellationToken)
             {
-                foreach (var target in targets)
+                try
                 {
-                    await target.InitializeAsync(cancellationToken);
+                    foreach (var target in targets)
+                    {
+                        await target.InitializeAsync(cancellationToken);
 
-                    log.LogInformation(w => w.WriteProperty("initializedSystem", target.GetType().Name));
+                        log.LogInformation(w => w.WriteProperty("initializedSystem", target.GetType().Name));
+                    }
+                }
+                catch
+                {
+                    lifetime.StopApplication();
+                    throw;
                 }
             }
 
@@ -47,16 +56,26 @@ namespace Squidex.Config.Domain
 
         public sealed class MigratorHostedService : IHostedService
         {
+            private readonly IApplicationLifetime lifetime;
             private readonly Migrator migrator;
 
-            public MigratorHostedService(Migrator migrator)
+            public MigratorHostedService(IApplicationLifetime lifetime, Migrator migrator)
             {
+                this.lifetime = lifetime;
                 this.migrator = migrator;
             }
 
-            public Task StartAsync(CancellationToken cancellationToken)
+            public async Task StartAsync(CancellationToken cancellationToken)
             {
-                return migrator.MigrateAsync();
+                try
+                {
+                    await migrator.MigrateAsync();
+                }
+                catch
+                {
+                    lifetime.StopApplication();
+                    throw;
+                }
             }
 
             public Task StopAsync(CancellationToken cancellationToken)

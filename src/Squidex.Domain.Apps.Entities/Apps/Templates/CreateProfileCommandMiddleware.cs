@@ -42,8 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     CreateExperienceSchemaAsync(publish),
                     CreateProjectsSchemaAsync(publish),
                     CreatePublicationsSchemaAsync(publish),
-                    CreateSkillsSchemaAsync(publish),
-                    CreateClientAsync(publish, appId.Id));
+                    CreateSkillsSchemaAsync(publish));
             }
 
             await next();
@@ -52,11 +51,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         private static bool IsRightTemplate(CreateApp createApp)
         {
             return string.Equals(createApp.Template, TemplateName, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static async Task CreateClientAsync(Func<ICommand, Task> publish, Guid appId)
-        {
-            await publish(new AttachClient { Id = "sample-client", AppId = appId });
         }
 
         private static async Task CreateBasicsAsync(Func<ICommand, Task> publish)

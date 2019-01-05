@@ -30,6 +30,7 @@ namespace Squidex.Config.Orleans
     {
         private readonly Lazy<ISiloHost> lazySilo;
         private readonly ISemanticLog log;
+        private readonly IApplicationLifetime lifetime;
         private bool isStopping;
 
         internal sealed class Source : IConfigurationSource
@@ -54,6 +55,7 @@ namespace Squidex.Config.Orleans
 
         public SiloWrapper(IConfiguration config, ISemanticLog log, IApplicationLifetime lifetime)
         {
+            this.lifetime = lifetime;
             this.log = log;
 
             lazySilo = new Lazy<ISiloHost>(() =>
@@ -157,6 +159,11 @@ namespace Squidex.Config.Orleans
             try
             {
                 await lazySilo.Value.StartAsync(cancellationToken);
+            }
+            catch
+            {
+                lifetime.StopApplication();
+                throw;
             }
             finally
             {
