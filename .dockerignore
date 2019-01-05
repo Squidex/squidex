@@ -29,5 +29,8 @@ src/Squidex/Assets/*.*
 # Build
 .drone.yml
 
+build.ps1
+build.sh
+
 # Documentation
 CHANGELOG.md
