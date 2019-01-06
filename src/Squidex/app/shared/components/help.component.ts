@@ -7,6 +7,7 @@
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { NgxMdService } from 'ngx-md';
 
 import { HelpService } from '@app/shared/internal';
 
@@ -17,11 +18,15 @@ import { HelpService } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HelpComponent {
-    public helpSections = this.helpService.getHelp(this.route.snapshot.data['helpPage']);
+    public helpMarkdown = this.helpService.getHelp(this.route.snapshot.data['helpPage']);
 
     constructor(
         private readonly helpService: HelpService,
+        private readonly markdownService: NgxMdService,
         private readonly route: ActivatedRoute
     ) {
+        this.markdownService.renderer.link = (href, title, text) => {
+            return `<a href="${href}" title="${title}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
+        };
     }
 }

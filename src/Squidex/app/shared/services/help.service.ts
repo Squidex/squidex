@@ -17,21 +17,13 @@ export class HelpService {
     ) {
     }
 
-    public getHelp(helpPage: string): Observable<string[]> {
-        const url = `https://api.gitbook.com/book/squidex/squidex/contents/${helpPage}.json`;
+    public getHelp(helpPage: string): Observable<string> {
+        const url = `https://raw.githubusercontent.com/Squidex/squidex-docs/master/${helpPage}.md`;
 
-        return this.http.get(url).pipe(
+        return this.http.get(url, { responseType: 'text' }).pipe(
             map((response: any) => {
-                const result: string[] = [];
-
-                for (let section of response.sections) {
-                    const content = section.content.replace(/href="\.\.\/GLOSSARY\.html/g, 'target="_blank" rel="noopener" href="https://docs.squidex.io/GLOSSARY.html');
-
-                    result.push(content);
-                }
-
-                return result;
+                return <string>response;
             }),
-            catchError(error => of([])));
+            catchError(error => of('')));
     }
 }

@@ -13,6 +13,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
+import { NgxMdModule } from 'ngx-md';
 
 import { AppComponent } from './app.component';
 
@@ -63,6 +64,7 @@ export function configUserReport() {
         HttpClientModule,
         FormsModule,
         CommonModule,
+        NgxMdModule.forRoot(),
         RouterModule,
         ReactiveFormsModule,
         SqxFrameworkModule.forRoot(),

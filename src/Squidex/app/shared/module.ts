@@ -9,6 +9,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
+import { NgxMdModule } from 'ngx-md';
 
 import { SqxFrameworkModule } from '@app/framework';
 
@@ -93,6 +94,7 @@ import {
 @NgModule({
     imports: [
         DndModule,
+        NgxMdModule,
         RouterModule,
         SqxFrameworkModule
     ],
