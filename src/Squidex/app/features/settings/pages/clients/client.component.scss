@@ -3,6 +3,26 @@
 
 $color-editor: #eceeef;
 
+.card {
+    & {
+        @include border-radius(0);
+        border-bottom-width: 2px;
+        border-top-width: 1px;
+    }
+
+    &-header {
+        & {
+            margin-bottom: .5rem;
+        }
+
+        &:hover {
+            .client-edit {
+                display: inline-block;
+            }
+        }
+    }
+}
+
 .client {
     &-info {
         margin: 0;
@@ -34,30 +54,15 @@ $color-editor: #eceeef;
         display: inline-block;
         margin: 0;
     }
-
-    &-header {
-        & {
-            margin-bottom: .5rem;
-        }
-
-        &:hover {
-            .client-edit {
-                display: inline-block;
-            }
-        }
-    }
 }
 
-.col-form-label {
-    text-align: left;
-}
-
-.form-check {
-    padding: .5rem 0 0;
-}
-
-.form-check-label {
+.cell-actions {
+    width: 3.2rem;
     padding: 0;
+}
+
+.cell-input {
+    padding-right: 0;
 }
 
 .access-token {

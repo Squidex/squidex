@@ -1,7 +1,7 @@
-<div class="table-items-row">
-    <div class="row no-gutters">
-        <div class="col">
-            <div class="client-header">
+<div class="card">
+    <div class="card-header">
+        <div class="row no-gutters">
+            <div class="col">
                 <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm.form" (ngSubmit)="rename()">
                     <div class="form-group mr-1">
                         <sqx-control-errors for="name"></sqx-control-errors>
@@ -24,58 +24,63 @@
                     <i class="client-edit icon-pencil" (click)="toggleRename()"></i>
                 </ng-container>
             </div>
-        </div>
-        <div class="col-auto">
-            <button class="btn btn-primary" (click)="createToken(client)">Connect</button>
-        </div>
-        <div class="col-auto cell-actions">
-            <button type="button" class="btn btn-text-danger"
-                (sqxConfirmClick)="revoke()"
-                confirmTitle="Revoke client" 
-                confirmText="Do you really want to revoke the client?">
-                <i class="icon-bin2"></i>
-            </button>
-        </div>
-    </div>
-    <div class="row no-gutters form-group">
-        <div class="col-4 col-form-label">
-            Client Id:
-        </div>
-        <div class="col">
-            <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName />
-        </div>
-        <div class="col-auto cell-actions">
-            <button type="button" class="btn btn-text" [sqxCopy]="inputName">
-                <i class="icon-copy"></i>
-            </button>
+            <div class="col-auto">
+                <button class="btn btn-primary" (click)="createToken(client)">Connect</button>
+            </div>
+            <div class="col-auto cell-actions">
+                <button type="button" class="btn btn-text-danger"
+                    (sqxConfirmClick)="revoke()"
+                    confirmTitle="Revoke client" 
+                    confirmText="Do you really want to revoke the client?">
+                    <i class="icon-bin2"></i>
+                </button>
+            </div>
         </div>
     </div>
-    <div class="row no-gutters form-group">
-        <div class="col-4 col-form-label">
-            Client Secret:
-        </div>
-        <div class="col">
-            <input readonly class="form-control" [attr.value]="client.secret" #inputSecret />
-        </div>
-        <div class="col-auto cell-actions">
-            <button type="button" class="btn btn-text" [sqxCopy]="inputSecret">
-                <i class="icon-copy"></i>
-            </button>
-        </div>
-    </div>
-    <div class="row no-gutters">
-        <div class="col-4 col-form-label">
-            Role:
-        </div>
-        <div class="col">
-            <select class="form-control" [ngModel]="client.role" (ngModelChange)="update($event)">
-                <option *ngFor="let role of clientRoles" [ngValue]="role.name">{{role.name}}</option>
-            </select>
-        </div>
-        <div class="col-auto cell-actions">
+    <div class="card-body">
+        <div class="container">
+            <div class="form-group row">
+                <label class="col-3 col-form-label">
+                    Client Id
+                </label>
+                <div class="col cell-input">
+                    <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName />
+                </div>
+                <div class="col-auto cell-actions">
+                    <button type="button" class="btn btn-text" [sqxCopy]="inputName">
+                        <i class="icon-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-3 col-form-label">
+                    Client Secret
+                </label>
+                <div class="col cell-input">
+                    <input readonly class="form-control" [attr.value]="client.secret" #inputSecret />
+                </div>
+                <div class="col-auto cell-actions">
+                    <button type="button" class="btn btn-text" [sqxCopy]="inputSecret">
+                        <i class="icon-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-3 col-form-label">
+                    Role
+                </label>
+                <div class="col cell-input">
+                    <select class="form-control" [ngModel]="client.role" (ngModelChange)="update($event)">
+                        <option *ngFor="let role of clientRoles" [ngValue]="role.name">{{role.name}}</option>
+                    </select>
+                </div>
+                <div class="col-auto cell-actions"></div>
+            </div>
         </div>
     </div>
 </div>
+
+        
 
 <sqx-modal-dialog *sqxModalView="connectDialog;onRoot:true" large="true" (closed)="connectDialog.hide()">
     <ng-container title>

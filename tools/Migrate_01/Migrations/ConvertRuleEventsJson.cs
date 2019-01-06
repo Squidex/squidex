@@ -25,11 +25,18 @@ namespace Migrate_01.Migrations
         {
             foreach (var document in collection.Find(new BsonDocument()).ToEnumerable())
             {
-                document["Job"]["actionData"] = document["Job"]["actionData"].ToBsonDocument().ToJson();
+                try
+                {
+                    document["Job"]["actionData"] = document["Job"]["actionData"].ToBsonDocument().ToJson();
 
-                var filter = Builders<BsonDocument>.Filter.Eq("_id", document["_id"].ToString());
+                    var filter = Builders<BsonDocument>.Filter.Eq("_id", document["_id"].ToString());
 
-                await collection.ReplaceOneAsync(filter, document);
+                    await collection.ReplaceOneAsync(filter, document);
+                }
+                catch
+                {
+                    continue;
+                }
             }
         }
     }
