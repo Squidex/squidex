@@ -186,6 +186,14 @@
                     background: $panel-light-background;
                 }
             }
+
+            &-gray {
+                &.active {
+                    &::before {
+                        background: transparent;
+                    }
+                }
+            }
         }
     }
 
