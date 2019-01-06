@@ -11,13 +11,20 @@ import { RouterModule, Routes } from '@angular/router';
 import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 
 import {
+    AssetsFiltersPageComponent,
     AssetsPageComponent
 } from './declarations';
 
 const routes: Routes = [
     {
         path: '',
-        component: AssetsPageComponent
+        component: AssetsPageComponent,
+        children: [
+            {
+                path: 'filters',
+                component: AssetsFiltersPageComponent
+            }
+        ]
     }
 ];
 
@@ -28,6 +35,7 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
+        AssetsFiltersPageComponent,
         AssetsPageComponent
     ]
 })

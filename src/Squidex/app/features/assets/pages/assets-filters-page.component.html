@@ -1,0 +1,38 @@
+<sqx-panel desiredWidth="20rem" isBlank="true" [isLazyLoaded]="false">
+    <ng-container title>
+        Filters
+    </ng-container>
+
+    <ng-container content>
+        <h3>Tags</h3>
+
+        <a class="sidebar-item" (click)="resetTags()" [class.active]="assetsState.isTagSelectionEmpty()">
+            <div class="row">
+                <div class="col">
+                    All tags
+                </div>
+            </div>
+        </a>
+
+        <a class="sidebar-item" *ngFor="let tag of assetsState.tags | async" (click)="toggleTag(tag.name)" [class.active]="assetsState.isTagSelected(tag.name)">
+            <div class="row">
+                <div class="col">
+                    {{tag.name}}
+                </div>
+                <div class="col-auto">
+                    {{tag.count}}
+                </div>
+            </div>
+        </a>
+
+        <hr />
+
+        <h3>Saved queries</h3>
+
+        <a class="sidebar-item" *ngFor="let query of queries.queries | async" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">                
+            <a class="sidebar-item-remove float-right" (click)="queries.remove(query.name)">
+                <i class="icon-close"></i>
+            </a>
+        </a>
+    </ng-container>
+</sqx-panel>

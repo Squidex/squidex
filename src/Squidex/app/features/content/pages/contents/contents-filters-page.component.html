@@ -1,0 +1,25 @@
+<sqx-panel desiredWidth="20rem" isBlank="true" [isLazyLoaded]="false">
+    <ng-container title>
+        Filters
+    </ng-container>
+
+    <ng-container content>
+        <a class="sidebar-item" *ngFor="let query of schemaQueries.defaultQueries" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
+            {{query.name}}
+        </a>
+
+        <hr />
+
+        <div class="sidebar-section">
+            <h3>Saved queries</h3>
+
+            <a class="sidebar-item" *ngFor="let query of schemaQueries.queries | async" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
+                {{query.name}}
+                
+                <a class="sidebar-item-remove float-right" (click)="schemaQueries.remove(query.name)">
+                    <i class="icon-close"></i>
+                </a>
+            </a>
+        </div>
+    </ng-container>
+</sqx-panel>

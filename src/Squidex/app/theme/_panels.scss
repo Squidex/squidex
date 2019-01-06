@@ -292,17 +292,14 @@
         }
     }
 
-    &-section {
-        border-top: 1px solid $color-border;
-        padding: 15px;
-        padding-bottom: 30px;
-    }
-
     &-item {
         & {
-            padding: .25rem 0;
+            @include border-radius;
+            padding: .25rem 1rem;
+            display: block;
             font-size: .9rem;
             font-weight: normal;
+            margin-bottom: .25rem;
         }
 
         &-remove {

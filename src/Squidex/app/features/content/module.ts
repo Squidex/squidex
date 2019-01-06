@@ -27,9 +27,10 @@ import {
     AssetsEditorComponent,
     CommentsPageComponent,
     ContentFieldComponent,
-    ContentHistoryComponent,
+    ContentHistoryPageComponent,
     ContentItemComponent,
     ContentPageComponent,
+    ContentsFiltersPageComponent,
     ContentsPageComponent,
     ContentsSelectorComponent,
     ContentStatusComponent,
@@ -57,7 +58,13 @@ const routes: Routes = [
                         path: '',
                         component: ContentsPageComponent,
                         canActivate: [SchemaMustNotBeSingletonGuard],
-                        canDeactivate: [CanDeactivateGuard]
+                        canDeactivate: [CanDeactivateGuard],
+                        children: [
+                            {
+                                path: 'filters',
+                                component: ContentsFiltersPageComponent
+                            }
+                        ]
                     },
                     {
                         path: 'new',
@@ -73,7 +80,7 @@ const routes: Routes = [
                         children: [
                              {
                                 path: 'history',
-                                component: ContentHistoryComponent,
+                                component: ContentHistoryPageComponent,
                                 data: {
                                     channel: 'contents.{contentId}'
                                 }
@@ -103,9 +110,10 @@ const routes: Routes = [
         AssetsEditorComponent,
         CommentsPageComponent,
         ContentFieldComponent,
-        ContentHistoryComponent,
+        ContentHistoryPageComponent,
         ContentItemComponent,
         ContentPageComponent,
+        ContentsFiltersPageComponent,
         ContentStatusComponent,
         ContentsPageComponent,
         ContentsSelectorComponent,

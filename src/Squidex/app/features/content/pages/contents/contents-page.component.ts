@@ -148,10 +148,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         this.contentsState.create(content.dataDraft, false).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public isSelectedQuery(query: string) {
-        return query === this.contentsState.snapshot.contentsQuery || (!query && !this.contentsState.snapshot.contentsQuery);
-    }
-
     private changeContentItems(contents: ContentDto[], action: string) {
         if (contents.length === 0) {
             return;
@@ -167,26 +163,18 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public goArchive(isArchive: boolean) {
-        this.resetSelection();
-
         this.contentsState.goArchive(isArchive).pipe(onErrorResumeNext()).subscribe();
     }
 
     public goPrev() {
-        this.resetSelection();
-
         this.contentsState.goPrev().pipe(onErrorResumeNext()).subscribe();
     }
 
     public goNext() {
-        this.resetSelection();
-
         this.contentsState.goNext().pipe(onErrorResumeNext()).subscribe();
     }
 
     public search(query: string) {
-        this.resetSelection();
-
         this.contentsState.search(query).pipe(onErrorResumeNext()).subscribe();
     }
 

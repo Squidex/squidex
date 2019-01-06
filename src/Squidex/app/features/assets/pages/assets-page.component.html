@@ -1,6 +1,6 @@
 <sqx-title message="{app} | Assets" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
-<sqx-panel desiredWidth="*" showSidebar="true" sidebarClass="wide">
+<sqx-panel desiredWidth="*" showSidebar="true">
     <ng-container title>
         Assets
     </ng-container>
@@ -51,45 +51,13 @@
         <sqx-assets-list [state]="assetsState" [isListView]="isListView"></sqx-assets-list>
     </ng-container>
 
-    <ng-container sidebar>            
-        <div class="sidebar-section">
-            <h3>Tags</h3>
+    <ng-container sidebar>   
+        <sqx-tooltip position="leftTop" [target]="filtersLink">Filters</sqx-tooltip>
 
-            <a class="sidebar-item" (click)="resetTags()" [class.active]="assetsState.isTagSelectionEmpty()">
-                <div class="row">
-                    <div class="col">
-                        All tags
-                    </div>
-                </div>
-            </a>
-    
-            <a class="sidebar-item" *ngFor="let tag of assetsState.tags | async" (click)="toggleTag(tag.name)" [class.active]="assetsState.isTagSelected(tag.name)">
-                <div class="row">
-                    <div class="col">
-                        {{tag.name}}
-                    </div>
-                    <div class="col-auto">
-                        {{tag.count}}
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <div class="sidebar-section">
-            <h3>Saved queries</h3>
-
-            <a class="sidebar-item" *ngFor="let query of queries.queries | async" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
-                <div class="row">
-                    <div class="col truncate">
-                        {{query.name}}
-                    </div>
-                    <div class="col-auto">
-                        <a class="sidebar-item-remove" (click)="queries.remove(query.name)">
-                            <i class="icon-close"></i>
-                        </a>
-                    </div>
-                </div>
-            </a>
-        </div>
+        <a class="panel-link" routerLink="filters" routerLinkActive="active" #filtersLink>
+            <i class="icon-filter"></i>
+        </a>         
     </ng-container>
 </sqx-panel>
+
+<router-outlet></router-outlet>

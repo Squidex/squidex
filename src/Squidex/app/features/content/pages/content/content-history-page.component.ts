@@ -24,10 +24,10 @@ import { ContentVersionSelected } from './../messages';
 
 @Component({
     selector: 'sqx-history',
-    styleUrls: ['./content-history.component.scss'],
-    templateUrl: './content-history.component.html'
+    styleUrls: ['./content-history-page.component.scss'],
+    templateUrl: './content-history-page.component.html'
 })
-export class ContentHistoryComponent {
+export class ContentHistoryPageComponent {
     public get channel(): string {
         let channelPath = this.route.snapshot.data['channel'];
 

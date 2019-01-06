@@ -46,6 +46,9 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
     @Input()
     public schemas: ImmutableArray<SchemaDto>;
 
+    @Input()
+    public suffix: string;
+
     public displayName: string;
 
     public schemasFiltered: ImmutableArray<SchemaDto>;
@@ -75,9 +78,13 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes['schemas'] || changes['schemasFilter']) {
+            const isSameCategory = (schema: SchemaDto) => {
+                return (!this.name && !schema.category) || schema.category === this.name;
+            };
+
             const query = this.schemasFilter;
 
-            this.schemasForCategory = this.schemas.filter(x => this.isSameCategory(x));
+            this.schemasForCategory = this.schemas.filter(x => isSameCategory(x));
             this.schemasFiltered = this.schemasForCategory.filter(x => !query || x.name.indexOf(query) >= 0);
 
             if (query) {
@@ -96,6 +103,16 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
         }
     }
 
+    public schemaRoute(schema: SchemaDto) {
+        if (schema.isSingleton && this.routeSingletonToContent) {
+            return [schema.name, schema.id];
+        } else if (this.suffix) {
+            return [schema.name, this.suffix];
+        } else {
+            return [schema.name];
+        }
+    }
+
     private isSameCategory(schema: SchemaDto): boolean {
         return (!this.name && !schema.category) || schema.category === this.name;
     }
@@ -106,10 +123,6 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
 
     public schemaPermission(schema: SchemaDto) {
         return `?squidex.apps.{app}.schemas.${schema.name}.*;squidex.apps.{app}.contents.${schema.name}.*`;
-    }
-
-    public schemaRoute(schema: SchemaDto) {
-        return schema.isSingleton && this.routeSingletonToContent ? [schema.name, schema.id] : [schema.name];
     }
 
     public trackBySchema(index: number, schema: SchemaDto) {

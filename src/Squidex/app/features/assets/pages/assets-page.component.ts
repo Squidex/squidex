@@ -52,16 +52,12 @@ export class AssetsPageComponent implements OnInit {
         this.assetsState.search(query).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public toggleTag(tag: string) {
-        this.assetsState.toggleTag(tag).pipe(onErrorResumeNext()).subscribe();
-    }
-
     public selectTags(tags: string[]) {
         this.assetsState.selectTags(tags).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public resetTags() {
-        this.assetsState.resetTags().pipe(onErrorResumeNext()).subscribe();
+    public toggleTag(tag: string) {
+        this.assetsState.toggleTag(tag).pipe(onErrorResumeNext()).subscribe();
     }
 
     public goNext() {
@@ -70,10 +66,6 @@ export class AssetsPageComponent implements OnInit {
 
     public goPrev() {
         this.assetsState.goPrev().pipe(onErrorResumeNext()).subscribe();
-    }
-
-    public isSelectedQuery(query: string) {
-        return query === this.assetsState.snapshot.assetsQuery || (!query && !this.assetsState.assetsQuery);
     }
 
     public changeView(isListView: boolean) {

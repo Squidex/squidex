@@ -1,6 +1,6 @@
 <sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="appsState.appName" [value2]="schema.displayName"></sqx-title>
 
-<sqx-panel desiredWidth="*" contentClass="grid" showSidebar="true" sidebarClass="wide">
+<sqx-panel desiredWidth="*" contentClass="grid" showSidebar="true">
     <ng-container title>
         <ng-container *ngIf="contentsState.isArchive | async; else noArchive">
             Archive
@@ -125,29 +125,14 @@
     </ng-container>    
 
     <ng-container sidebar>
-        <div class="sidebar-section">
-            <a class="row sidebar-item" *ngFor="let query of schemaQueries.defaultQueries" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
-                <div class="col truncate">
-                    {{query.name}}
-                </div>
-            </a>
-        </div>
+        <sqx-tooltip position="leftTop" [target]="filtersLink">Filters</sqx-tooltip>
 
-        <div class="sidebar-section">
-            <h3>Saved queries</h3>
-
-            <a class="row sidebar-item" *ngFor="let query of schemaQueries.queries | async" (click)="search(query.filter)" [class.active]="isSelectedQuery(query.filter)">
-                <div class="col truncate">
-                    {{query.name}}
-                </div>
-                <div class="col-auto">
-                    <a class="sidebar-item-remove" (click)="schemaQueries.remove(query.name)">
-                        <i class="icon-close"></i>
-                    </a>
-                </div>
-            </a>
-        </div>
+        <a class="panel-link" routerLink="filters" routerLinkActive="active" #filtersLink>
+            <i class="icon-filter"></i>
+        </a>
     </ng-container>
 </sqx-panel>
+
+<router-outlet></router-outlet>
 
 <sqx-due-time-selector #dueTimeSelector></sqx-due-time-selector>
