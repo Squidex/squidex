@@ -26,7 +26,7 @@ export class HelpComponent {
         private readonly route: ActivatedRoute
     ) {
         this.markdownService.renderer.link = (href, title, text) => {
-            return `<a href="${href}" title="${title}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
+            return `<a href="https://docs.squidex.io/${href}" title="${title}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
         };
     }
 }
