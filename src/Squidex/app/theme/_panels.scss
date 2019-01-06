@@ -74,7 +74,6 @@
         @include flex-box;
         @include flex-flow(row);
         @include flex-grow(1);
-        overflow: hidden;
     }
 
     // First column of the main row (second row) with the main content.
@@ -85,6 +84,7 @@
             border-top: 1px solid $color-border;
             background: $color-background;
             padding: $panel-padding;
+            overflow-x: hidden;
             overflow-y: auto;
         }
 
@@ -164,6 +164,9 @@
                 display: block;
                 padding-top: .6rem;
                 padding-bottom: .6rem;
+                position: relative;
+                border-top: 1px solid transparent;
+                border-bottom: 1px solid transparent;
             }
 
             &:hover {
@@ -171,9 +174,17 @@
             }
 
             &.active {
-                color: $color-dark-foreground;
-                border: 0;
-                background: $color-theme-blue;
+                & {
+                    border-color: $color-border;
+                }
+
+                &::before {
+                    @include absolute(0, -1px, 0, auto);
+                    width: 2px;
+                    color: transparent;
+                    content: '';
+                    background: $panel-light-background;
+                }
             }
         }
     }

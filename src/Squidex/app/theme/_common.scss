@@ -90,8 +90,17 @@ pre {
         font-size: 1.1rem;
     }
 
+    h4 {
+        margin: 0;
+        font-size: 1rem;
+    }
+
     .code-block {
         margin: .25rem 0;
+    }
+
+    &-header {
+        margin-bottom: 1rem;
     }
 
     &-section {

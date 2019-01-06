@@ -1,13 +1,13 @@
 <div class="table-items-row table-items-row-expandable language"> 
     <div class="table-items-row-summary">        
-        <div class="row">
+        <div class="row no-gutters">
             <div class="col-2" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
                 {{language.iso2Code}}
             </div>
-            <div class="col-8" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
+            <div class="col" [class.language-optional]="language.isOptional" [class.language-master]="language.isMaster">
                 {{language.englishName}}
             </div>
-            <div class="col-auto">
+            <div class="col-options">
                 <div class="float-right">
                     <button type="button" class="btn btn-secondary table-items-edit-button mr-1" [class.active]="isEditing" (click)="toggleEditing()" *ngIf="!language.isMaster">
                         <i class="icon-settings"></i>

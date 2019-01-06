@@ -55,7 +55,7 @@
                         </div>
                         <div class="col-auto">
                             <div>
-                                {{backup.started | sqxISODate}}
+                                {{backup.started | sqxFromNow}}
                             </div>
                             <div *ngIf="backup.stopped">
                                 {{backup | sqxBackupDuration}}
@@ -93,7 +93,9 @@
     </ng-container>
 
     <ng-container sidebar>
-        <a class="panel-link" routerLink="help" routerLinkActive="active">
+        <sqx-tooltip position="leftTop" [target]="helpLink">Help</sqx-tooltip>
+
+        <a class="panel-link" routerLink="help" routerLinkActive="active" #helpLink>
             <i class="icon-help"></i>
         </a>
     </ng-container>

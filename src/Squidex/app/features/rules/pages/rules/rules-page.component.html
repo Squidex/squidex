@@ -76,15 +76,19 @@
     </ng-container>
 
     <ng-container sidebar>
-        <a class="panel-link" routerLink="events" routerLinkActive="active" #linkHistory>
+        <sqx-tooltip position="leftTop" [target]="historyLink">History</sqx-tooltip>
+
+        <a class="panel-link" routerLink="events" routerLinkActive="active" #historyLink>
             <i class="icon-time"></i>
         </a>
 
-        <a class="panel-link" routerLink="help" routerLinkActive="active" #linkHelp>
+        <sqx-tooltip position="leftTop" [target]="helpLink">Help</sqx-tooltip>
+
+        <a class="panel-link" routerLink="help" routerLinkActive="active" #helpLink>
             <i class="icon-help"></i>
         </a>
 
-        <sqx-onboarding-tooltip helpId="help" [for]="linkHelp" position="leftTop" after="180000">
+        <sqx-onboarding-tooltip helpId="help" [for]="helpLink" position="leftTop" after="180000">
             Click the help icon to show a context specific help page. Go to <a href="https://docs.squidex.io" target="_blank" rel="noopener">https://docs.squidex.io</a> for the full documentation.
         </sqx-onboarding-tooltip>
     </ng-container>
