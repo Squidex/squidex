@@ -17,7 +17,7 @@
                     <div class="overlay-background"></div>
                     
                     <div class="overlay-menu">
-                        <a class="file-download" [attr.href]="asset | sqxAssetUrl" target="_blank" rel="noopener" (click)="$event.stopPropagation()">
+                        <a class="file-download" [href]="asset | sqxAssetUrl" sqxExternalLink="noicon" (click)="$event.stopPropagation()">
                             <i class="icon-download"></i>
                         </a>
         
@@ -115,7 +115,7 @@
                 <img class="user-picture" [attr.title]="asset.lastModifiedBy | sqxUserNameRef" [attr.src]="asset.lastModifiedBy | sqxUserPictureRef" />
             </div>
             <div class="col col-actions text-right">
-                <a class="btn btn-text-secondary" [attr.href]="asset | sqxAssetUrl" target="_blank" rel="noopener" (click)="$event.stopPropagation()">
+                <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl" sqxExternalLink="noicon" (click)="$event.stopPropagation()">
                     <i class="icon-download"></i>
                 </a>
             </div>

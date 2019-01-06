@@ -73,8 +73,8 @@
                             <div *ngIf="backup.stopped && !backup.isFailed">
                                 Download:
 
-                                <a href="{{backup | sqxBackupDownloadUrl}}" target="_blank" rel="noopener">
-                                    Ready
+                                <a href="{{backup | sqxBackupDownloadUrl}}" sqxExternalLink="noicon">
+                                    Ready <i class="icon-external-link"></i>
                                 </a>
                             </div>
                         </div>
