@@ -35,7 +35,7 @@ describe('AppClientsService', () => {
             helpSections = result;
         });
 
-        const req = httpMock.expectOne('https://api.gitbook.com/book/squidex/squidex/contents/01-chapter/02-article.json');
+        const req = httpMock.expectOne('https://raw.githubusercontent.com/Squidex/squidex-docs/master/01-chapter/02-article.md');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -54,7 +54,7 @@ describe('AppClientsService', () => {
             helpSections = result;
         });
 
-        const req = httpMock.expectOne('https://api.gitbook.com/book/squidex/squidex/contents/01-chapter/02-article.json');
+        const req = httpMock.expectOne('https://raw.githubusercontent.com/Squidex/squidex-docs/master/01-chapter/02-article.md');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
