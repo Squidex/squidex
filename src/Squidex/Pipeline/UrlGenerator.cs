@@ -67,7 +67,7 @@ namespace Squidex.Pipeline
 
         public string GenerateAssetSourceUrl(IAppEntity app, IAssetEntity asset)
         {
-            return assetStore.GenerateSourceUrl(asset.Id.ToString(), asset.FileVersion, null);
+            return assetStore.GeneratePublicUrl(asset.Id.ToString(), asset.FileVersion, null);
         }
     }
 }

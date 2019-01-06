@@ -44,11 +44,9 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public string GenerateSourceUrl(string id, long version, string suffix)
+        public string GeneratePublicUrl(string id, long version, string suffix)
         {
-            var objectName = GetObjectName(id, version, suffix);
-
-            return $"https://storage.cloud.google.com/{bucketName}/{objectName}";
+            return null;
         }
 
         public async Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))

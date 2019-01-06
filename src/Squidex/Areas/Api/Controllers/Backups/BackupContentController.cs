@@ -39,6 +39,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/backups/{id}")]
+        [ResponseCache(Duration = 3600 * 24 * 30)]
         [ProducesResponseType(200)]
         [ApiCosts(0)]
         [AllowAnonymous]

@@ -25,9 +25,9 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public void Should_calculate_source_url()
         {
-            var url = Sut.GenerateSourceUrl(AssetId, 1, null);
+            var url = Sut.GeneratePublicUrl(AssetId, 1, null);
 
-            Assert.Equal($"https://storage.cloud.google.com/squidex-test/{AssetId}_1", url);
+            Assert.Null(url);
         }
     }
 }

@@ -39,9 +39,9 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public string GenerateSourceUrl(string id, long version, string suffix)
+        public string GeneratePublicUrl(string id, long version, string suffix)
         {
-            return "UNSUPPORTED";
+            return null;
         }
 
         public async Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))

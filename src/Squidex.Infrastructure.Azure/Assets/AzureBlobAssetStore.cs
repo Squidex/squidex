@@ -48,11 +48,17 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public string GenerateSourceUrl(string id, long version, string suffix)
+        public string GeneratePublicUrl(string id, long version, string suffix)
         {
-            var blobName = GetObjectName(id, version, suffix);
+            if (blobContainer.Properties.PublicAccess != BlobContainerPublicAccessType.Blob)
+            {
+                var sourceName = GetObjectName(id, version, suffix);
+                var sourceBlob = blobContainer.GetBlockBlobReference(sourceName);
 
-            return new Uri(blobContainer.StorageUri.PrimaryUri, $"/{containerName}/{blobName}").ToString();
+                return sourceBlob.Uri.ToString();
+            }
+
+            return null;
         }
 
         public async Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))
@@ -91,11 +97,12 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
         {
-            var blob = blobContainer.GetBlockBlobReference(GetObjectName(id, version, suffix));
+            var sourceName = GetObjectName(id, version, suffix);
+            var sourceBlob = blobContainer.GetBlockBlobReference(sourceName);
 
             try
             {
-                await blob.DownloadToStreamAsync(stream, null, null, null, ct);
+                await sourceBlob.DownloadToStreamAsync(stream, null, null, null, ct);
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404)
             {

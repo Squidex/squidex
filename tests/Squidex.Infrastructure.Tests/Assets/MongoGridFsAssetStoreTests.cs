@@ -40,7 +40,9 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public void Should_not_calculate_source_url()
         {
-            Assert.Equal("UNSUPPORTED", Sut.GenerateSourceUrl(AssetId, 1, null));
+            var url = Sut.GeneratePublicUrl(AssetId, 1, null);
+
+            Assert.Null(url);
         }
     }
 }
