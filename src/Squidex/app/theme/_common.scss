@@ -119,6 +119,29 @@ pre {
 }
 
 //
+// Copy buttons
+//
+.copy-container {
+    & {
+        position: relative;
+    }
+
+    .btn-copy {
+        & {
+            @include absolute(0, 0, auto, auto);
+            border: 0;
+            background: darken($color-border-dark, 30%);
+            padding: 2px 6px;
+            color: $color-dark-foreground;
+        }
+
+        &:focus {
+            background: darken($color-border-dark, 40%);
+        }
+    }
+}
+
+//
 // Profile picture in circle
 //
 .user-picture {

@@ -25,7 +25,7 @@
                 </ng-container>
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" (click)="createToken(client)">Connect</button>
+                <button class="btn btn-primary" (click)="connect()">Connect</button>
             </div>
             <div class="col-auto cell-actions">
                 <button type="button" class="btn btn-text-danger"
@@ -80,8 +80,6 @@
     </div>
 </div>
 
-        
-
 <sqx-modal-dialog *sqxModalView="connectDialog;onRoot:true" large="true" (closed)="connectDialog.hide()">
     <ng-container title>
         Connect
@@ -96,21 +94,37 @@
             <div class="help-section">
                 1. Make the following request to get an access token. It will be valid for 30 days.
         
-                <pre class="code code-block">{{connectHttpText}}</pre>
+                <div class="copy-container">
+                    <button type="button" class="btn-copy" [sqxCopy]="connectHttpBlock">
+                        <i class="icon-copy"></i>
+                    </button>
+
+                    <pre class="code code-block" #connectHttpBlock>{{connectHttpText}}</pre>
+                </div>
             </div>
     
             <div class="help-section">
                 2. Add the bearer token as authorization header to all requests:
     
-                <pre class="code code-block">Authorization: Bearer [YOUR_TOKEN]</pre>
+                <div class="copy-container">
+                    <button type="button" class="btn-copy" [sqxCopy]="headerBlock">
+                        <i class="icon-copy"></i>
+                    </button>
+
+                    <pre class="code code-block" #headerBlock>Authorization: Bearer [YOUR_TOKEN]</pre>
+                </div>
             </div>
 
             <div class="help-section">
                 Use the following token for testing
 
-                <ng-container *ngIf="connectToken">
-                    <textarea class="form-control access-token" readonly>{{connectToken.accessToken}}</textarea>
-                </ng-container>
+                <div class="copy-container">
+                    <button type="button" class="btn-copy" [sqxCopy]="connectTokenInput">
+                        <i class="icon-copy"></i>
+                    </button>
+
+                    <textarea class="form-control access-token" #connectTokenInput readonly>{{connectToken?.accessToken}}</textarea>
+                </div>
             </div>
     
             <h3>Using the command line interface (CLI)</h3>
@@ -121,14 +135,26 @@
     
             <div class="help-section">
                 Connect with windows:
-    
-                <pre class="code code-block">{{connectCLIWinText}}</pre>
+
+                <div class="copy-container">
+                    <button type="button" class="btn-copy" [sqxCopy]="connectCLIWinBlock">
+                        <i class="icon-copy"></i>
+                    </button>
+
+                    <pre class="code code-block" #connectCLIWinBlock>{{connectCLIWinText}}</pre>
+                </div>
             </div>
     
             <div class="help-section">
                 Connect with Linux / OS X
-    
-                <pre class="code code-block">{{connectCLINixText}}</pre>
+
+                <div class="copy-container">
+                    <button type="button" class="btn-copy" [sqxCopy]="connectCLINixBlock">
+                        <i class="icon-copy"></i>
+                    </button>
+
+                    <pre class="code code-block" #connectCLINixBlock>{{connectCLINixText}}</pre>
+                </div>
             </div>
     
             <h3>Using the C# Client Library</h3>
@@ -139,8 +165,14 @@
     
             <div class="help-section">
                 Create a client manager
-    
-                <pre class="code code-block">{{connectLibrary}}</pre>
+
+                <div class="copy-container">
+                    <button type="button" class="btn-copy" [sqxCopy]="connectLibraryBlock">
+                        <i class="icon-copy"></i>
+                    </button>
+
+                    <pre class="code code-block" #connectLibraryBlock>{{connectLibraryText}}</pre>
+                </div>
             </div>
         </div>
     </ng-container>

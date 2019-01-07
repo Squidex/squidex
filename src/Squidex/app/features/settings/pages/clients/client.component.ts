@@ -37,6 +37,14 @@ function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string
         scope=squidex-api`;
 }
 
+function connectCLIWinText(app: string, client: { id: string, secret: string }) {
+    return `.\\sq.exe config add ${app} ${app}:${client.id} ${client.secret};.\\sq.exe config use ${app}`;
+}
+
+function connectCLINixText(app: string, client: { id: string, secret: string }) {
+    return `sq config add ${app} ${app}:${client.id} ${client.secret} && sq config use ${app}`;
+}
+
 function connectLibrary(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {
     const url = apiUrl.value;
 
@@ -45,14 +53,6 @@ function connectLibrary(apiUrl: ApiUrlConfig, app: string, client: { id: string,
     "${app}",
     "${app}:${client.id}",
     "${client.secret}")`;
-}
-
-function connectCLIWinText(app: string, client: { id: string, secret: string }) {
-    return `.\\sq.exe config add ${app} ${app}:${client.id} ${client.secret};.\\sq.exe config use ${app}`;
-}
-
-function connectCLINixText(app: string, client: { id: string, secret: string }) {
-    return `sq config add ${app} ${app}:${client.id} ${client.secret} && sq config use ${app}`;
 }
 
 @Component({
@@ -77,7 +77,7 @@ export class ClientComponent implements OnChanges {
     public connectHttpText: string;
     public connectCLINixText: string;
     public connectCLIWinText: string;
-    public connectLibrary: string;
+    public connectLibraryText: string;
 
     constructor(
         public readonly appsState: AppsState,
@@ -97,7 +97,7 @@ export class ClientComponent implements OnChanges {
         this.connectHttpText = connectHttpText(this.apiUrl, app, this.client);
         this.connectCLINixText = connectCLINixText(app, this.client);
         this.connectCLIWinText = connectCLIWinText(app, this.client);
-        this.connectLibrary = connectLibrary(this.apiUrl, app, this.client);
+        this.connectLibraryText = connectLibrary(this.apiUrl, app, this.client);
     }
 
     public revoke() {
@@ -135,10 +135,10 @@ export class ClientComponent implements OnChanges {
         }
     }
 
-    public createToken(client: AppClientDto) {
+    public connect() {
         this.connectDialog.show();
 
-        this.appClientsService.createToken(this.appsState.appName, client)
+        this.appClientsService.createToken(this.appsState.appName, this.client)
             .subscribe(dto => {
                 this.connectToken = dto;
             }, error => {
