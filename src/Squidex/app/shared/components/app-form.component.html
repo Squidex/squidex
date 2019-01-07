@@ -24,7 +24,7 @@
                     The app name becomes part of the api url:
                 </small>
 
-                <pre class="code">{{apiUrl.buildUrl("api/content/")}}<b>{{createForm.appName | async}}</b></pre>
+                <sqx-code>{{apiUrl.buildUrl("api/content/")}}{{createForm.appName | async}}</sqx-code>
                     
                 <small class="form-text text-muted">
                     It must contain lower case letters (a-z), numbers and dashes only, and cannot be longer than 40 characters. The name cannot be changed later.

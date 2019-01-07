@@ -49,6 +49,7 @@ export * from './angular/pipes/numbers.pipes';
 export * from './angular/routers/can-deactivate.guard';
 export * from './angular/routers/parent-link.directive';
 
+export * from './angular/code.component';
 export * from './angular/external-link.directive';
 export * from './angular/hover-background.directive';
 export * from './angular/ignore-scrollbar.directive';

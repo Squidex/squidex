@@ -1,0 +1,36 @@
+@import '_mixins';
+@import '_vars';
+
+.code {
+    background: $color-code-background;
+    padding-left: .5rem;
+    padding-right: .5rem;
+    margin: .25rem 0;
+}
+
+.code,
+.copy-button {
+    font-size: .8rem;
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+    min-height: 27px;
+}
+
+.copy-container {
+    position: relative;
+}
+
+.copy-button {
+    & {
+        @include absolute(0, 0, auto, auto);
+        border: 0;
+        background: darken($color-border-dark, 30%);
+        padding-left: .375rem;
+        padding-right: .375rem;
+        color: $color-dark-foreground;
+    }
+
+    &:focus {
+        background: darken($color-border-dark, 40%);
+    }
+}

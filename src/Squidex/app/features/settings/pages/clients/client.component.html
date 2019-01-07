@@ -91,89 +91,53 @@
     
             <h3>Using HTTP</h3>
     
-            <div class="help-section">
+            <p>
                 1. Make the following request to get an access token. It will be valid for 30 days.
         
-                <div class="copy-container">
-                    <button type="button" class="btn-copy" [sqxCopy]="connectHttpBlock">
-                        <i class="icon-copy"></i>
-                    </button>
-
-                    <pre class="code code-block" #connectHttpBlock>{{connectHttpText}}</pre>
-                </div>
-            </div>
+                <sqx-code>{{connectHttpText}}</sqx-code>
+            </p>
     
-            <div class="help-section">
+            <p>
                 2. Add the bearer token as authorization header to all requests:
     
-                <div class="copy-container">
-                    <button type="button" class="btn-copy" [sqxCopy]="headerBlock">
-                        <i class="icon-copy"></i>
-                    </button>
+                <sqx-code>Authorization: Bearer [YOUR_TOKEN]</sqx-code>
+            </p>
 
-                    <pre class="code code-block" #headerBlock>Authorization: Bearer [YOUR_TOKEN]</pre>
-                </div>
-            </div>
-
-            <div class="help-section">
+            <p>
                 Use the following token for testing
 
-                <div class="copy-container">
-                    <button type="button" class="btn-copy" [sqxCopy]="connectTokenInput">
-                        <i class="icon-copy"></i>
-                    </button>
-
-                    <textarea class="form-control access-token" #connectTokenInput readonly>{{connectToken?.accessToken}}</textarea>
-                </div>
-            </div>
+                <sqx-code>{{connectToken?.accessToken}}</sqx-code>
+            </p>
     
             <h3>Using the command line interface (CLI)</h3>
     
-            <div class="help-section">
+            <p>
                 Download the CLI here: <a href="https://github.com/Squidex/squidex-samples/releases" sqxExternalLink>CLI Releases (Linux, OS X, Windows)</a>
-            </div>
+            </p>
     
-            <div class="help-section">
+            <p>
                 Connect with windows:
 
-                <div class="copy-container">
-                    <button type="button" class="btn-copy" [sqxCopy]="connectCLIWinBlock">
-                        <i class="icon-copy"></i>
-                    </button>
-
-                    <pre class="code code-block" #connectCLIWinBlock>{{connectCLIWinText}}</pre>
-                </div>
-            </div>
+                <sqx-code>{{connectCLIWinText}}</sqx-code>
+            </p>
     
-            <div class="help-section">
+            <p>
                 Connect with Linux / OS X
 
-                <div class="copy-container">
-                    <button type="button" class="btn-copy" [sqxCopy]="connectCLINixBlock">
-                        <i class="icon-copy"></i>
-                    </button>
-
-                    <pre class="code code-block" #connectCLINixBlock>{{connectCLINixText}}</pre>
-                </div>
-            </div>
+                <sqx-code>{{connectCLINixText}}</sqx-code>
+            </p>
     
             <h3>Using the C# Client Library</h3>
 
-            <div class="help-section">
+            <p>
                 Get the nuget library from <a href="https://www.nuget.org/packages/Squidex.ClientLibrary/" sqxExternalLink>nuget.org</a>
-            </div>
+            </p>
     
-            <div class="help-section">
+            <p>
                 Create a client manager
 
-                <div class="copy-container">
-                    <button type="button" class="btn-copy" [sqxCopy]="connectLibraryBlock">
-                        <i class="icon-copy"></i>
-                    </button>
-
-                    <pre class="code code-block" #connectLibraryBlock>{{connectLibraryText}}</pre>
-                </div>
-            </div>
+                <sqx-code>{{connectLibraryText}}</sqx-code>
+            </p>
         </div>
     </ng-container>
 </sqx-modal-dialog>

@@ -48,27 +48,6 @@ body {
 }
 
 //
-// Code blocks
-//
-.code {
-    font-family: monospace;
-}
-
-pre {
-    &.code {
-        display: inline-block;
-        background: $color-border;
-        border: 0;
-        padding: .25rem .5rem;
-        margin: 0;
-    }
-
-    &.code-block {
-        display: block;
-    }
-}
-
-//
 // Help texts
 //
 .help {
@@ -76,68 +55,10 @@ pre {
         font-size: .9rem;
     }
 
-    pre {
-        font-size: 100%;
-    }
-
-    h2 {
-        margin-top: 1rem;
-    }
-
-    h3 {
-        margin-top: 1.5rem;
-        margin-bottom: .25rem;
-        font-size: 1.1rem;
-    }
-
+    h2,
+    h3,
     h4 {
-        margin: 0;
-        font-size: 1rem;
-    }
-
-    .code-block {
-        margin: .25rem 0;
-    }
-
-    &-header {
-        margin-bottom: 1rem;
-    }
-
-    &-section {
-        padding-top: .5rem;
-    }
-
-    &-example {
-        margin-top: .375rem;
-    }
-
-    &-examples {
-        margin-top: 0;
-        margin-bottom: 0;
-        padding-left: 1.5rem;
-    }
-}
-
-//
-// Copy buttons
-//
-.copy-container {
-    & {
-        position: relative;
-    }
-
-    .btn-copy {
-        & {
-            @include absolute(0, 0, auto, auto);
-            border: 0;
-            background: darken($color-border-dark, 30%);
-            padding: 2px 6px;
-            color: $color-dark-foreground;
-        }
-
-        &:focus {
-            background: darken($color-border-dark, 40%);
-        }
+        margin-top: 1rem;
     }
 }
 

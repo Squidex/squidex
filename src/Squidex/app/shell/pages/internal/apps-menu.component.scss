@@ -45,6 +45,10 @@ $color-apps-border: #65a6ff;
     @include absolute(2.65rem, auto, auto, auto);
 }
 
+.dropdown-item {
+    @include border-radius(0);
+}
+
 .btn-block {
     white-space: nowrap;
 }
