@@ -4,12 +4,12 @@
 .code {
     background: $color-code-background;
     padding-left: .5rem;
-    padding-right: .5rem;
+    padding-right: 3rem;
     margin: .25rem 0;
 }
 
 .code,
-.copy-button {
+.code-copy {
     font-size: .8rem;
     padding-top: .25rem;
     padding-bottom: .25rem;
@@ -20,7 +20,7 @@
     position: relative;
 }
 
-.copy-button {
+.code-copy {
     & {
         @include absolute(0, 0, auto, auto);
         border: 0;
