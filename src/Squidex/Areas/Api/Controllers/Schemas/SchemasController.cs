@@ -184,9 +184,9 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [Route("apps/{app}/schemas/{name}/preview-urls")]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutPreviewUrls(string app, string name, [FromBody] Dictionary<string, string> request)
+        public async Task<IActionResult> PutPreviewUrls(string app, string name, [FromBody] PreviewUrlsDto request)
         {
-            await CommandBus.PublishAsync(new ConfigurePreviewUrls { PreviewUrls = request ?? new Dictionary<string, string>() });
+            await CommandBus.PublishAsync(new ConfigurePreviewUrls { PreviewUrls = request ?? new PreviewUrlsDto() });
 
             return NoContent();
         }

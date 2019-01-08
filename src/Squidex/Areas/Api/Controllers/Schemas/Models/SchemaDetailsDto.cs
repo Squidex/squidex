@@ -128,13 +128,14 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             foreach (var field in schema.SchemaDef.Fields)
             {
                 var fieldPropertiesDto = FieldPropertiesDtoFactory.Create(field.RawProperties);
-                var fieldDto = SimpleMapper.Map(field,
-                    new FieldDto
-                    {
-                        FieldId = field.Id,
-                        Properties = fieldPropertiesDto,
-                        Partitioning = field.Partitioning.Key
-                    });
+                var fieldDto =
+                    SimpleMapper.Map(field,
+                        new FieldDto
+                        {
+                            FieldId = field.Id,
+                            Properties = fieldPropertiesDto,
+                            Partitioning = field.Partitioning.Key
+                        });
 
                 if (field is IArrayField arrayField)
                 {
@@ -143,12 +144,13 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                     foreach (var nestedField in arrayField.Fields)
                     {
                         var nestedFieldPropertiesDto = FieldPropertiesDtoFactory.Create(nestedField.RawProperties);
-                        var nestedFieldDto = SimpleMapper.Map(nestedField,
-                            new NestedFieldDto
-                            {
-                                FieldId = nestedField.Id,
-                                Properties = nestedFieldPropertiesDto
-                            });
+                        var nestedFieldDto =
+                            SimpleMapper.Map(nestedField,
+                                new NestedFieldDto
+                                {
+                                    FieldId = nestedField.Id,
+                                    Properties = nestedFieldPropertiesDto
+                                });
 
                         fieldDto.Nested.Add(nestedFieldDto);
                     }
