@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Tags;
-using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Events.Assets;
@@ -26,23 +25,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private const string TagsFile = "AssetTags.json";
         private readonly HashSet<Guid> assetIds = new HashSet<Guid>();
         private readonly IAssetStore assetStore;
-        private readonly IAssetRepository assetRepository;
         private readonly ITagService tagService;
 
         public override string Name { get; } = "Assets";
 
-        public BackupAssets(IStore<Guid> store,
-            IAssetStore assetStore,
-            IAssetRepository assetRepository,
-            ITagService tagService)
+        public BackupAssets(IStore<Guid> store, IAssetStore assetStore, ITagService tagService)
             : base(store)
         {
             Guard.NotNull(assetStore, nameof(assetStore));
-            Guard.NotNull(assetRepository, nameof(assetRepository));
             Guard.NotNull(tagService, nameof(tagService));
 
             this.assetStore = assetStore;
-            this.assetRepository = assetRepository;
+
             this.tagService = tagService;
         }
 

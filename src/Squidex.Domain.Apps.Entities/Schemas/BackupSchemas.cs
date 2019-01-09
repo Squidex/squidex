@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Domain.Apps.Events.Schemas;
@@ -22,17 +21,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas
     public sealed class BackupSchemas : BackupHandler
     {
         private readonly Dictionary<string, Guid> schemasByName = new Dictionary<string, Guid>();
-        private readonly FieldRegistry fieldRegistry;
         private readonly IGrainFactory grainFactory;
 
         public override string Name { get; } = "Schemas";
 
-        public BackupSchemas(FieldRegistry fieldRegistry, IGrainFactory grainFactory)
+        public BackupSchemas(IGrainFactory grainFactory)
         {
-            Guard.NotNull(fieldRegistry, nameof(fieldRegistry));
             Guard.NotNull(grainFactory, nameof(grainFactory));
-
-            this.fieldRegistry = fieldRegistry;
 
             this.grainFactory = grainFactory;
         }

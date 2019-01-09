@@ -141,7 +141,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         public bool IsId(string id)
         {
-            return ObjectId.TryParse(id, out var _);
+            return ObjectId.TryParse(id, out _);
         }
 
         public IdentityUser Create(string email)
@@ -279,7 +279,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         public Task<DateTimeOffset?> GetLockoutEndDateAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult<DateTimeOffset?>(((MongoUser)user).LockoutEnd);
+            return Task.FromResult(((MongoUser)user).LockoutEnd);
         }
 
         public Task<int> GetAccessFailedCountAsync(IdentityUser user, CancellationToken cancellationToken)
@@ -309,7 +309,7 @@ namespace Squidex.Domain.Users.MongoDb
 
         public Task<int> CountCodesAsync(IdentityUser user, CancellationToken cancellationToken)
         {
-            return Task.FromResult(((MongoUser)user).GetToken(InternalLoginProvider, RecoveryCodeTokenName)?.Split(';')?.Length ?? 0);
+            return Task.FromResult(((MongoUser)user).GetToken(InternalLoginProvider, RecoveryCodeTokenName)?.Split(';').Length ?? 0);
         }
 
         public Task SetUserNameAsync(IdentityUser user, string userName, CancellationToken cancellationToken)

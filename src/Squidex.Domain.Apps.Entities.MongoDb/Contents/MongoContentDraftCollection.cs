@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                             .Text(x => x.DataText)
                             .Ascending(x => x.IndexedSchemaId)
                             .Ascending(x => x.IsDeleted)
-                            .Ascending(x => x.Status)),
+                            .Ascending(x => x.Status))
                 }, ct);
 
             await base.SetupCollectionAsync(collection, ct);

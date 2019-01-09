@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetGrainTests : HandlerTestBase<AssetGrain, AssetState>
+    public class AssetGrainTests : HandlerTestBase<AssetState>
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly ImageInfo image = new ImageInfo(2048, 2048);

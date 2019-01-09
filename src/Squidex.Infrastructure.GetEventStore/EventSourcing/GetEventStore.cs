@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 throw new ConfigurationException("Cannot connect to event store.", ex);
             }
 
-            await projectionClient.ConnectAsync();
+            await projectionClient.ConnectAsync(ct);
         }
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)

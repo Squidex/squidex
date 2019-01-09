@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 x.AbsoluteExpirationRelativeToNow = UserCacheDuration;
 
-                IUser user = null;
+                IUser user;
                 try
                 {
                      user = await userResolver.FindByIdOrEmailAsync(actor.Identifier);

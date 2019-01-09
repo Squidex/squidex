@@ -8,7 +8,6 @@
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using System;
-using System.Linq;
 using P = Squidex.Domain.Apps.Core.Partitioning;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json

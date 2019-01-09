@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.Infrastructure.EventSourcing;
@@ -79,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Model
 
         public EventData ToData()
         {
-            return new EventData(Type, Metadata, Payload.ToString());
+            return new EventData(Type, Metadata, Payload.ToString(CultureInfo.InvariantCulture));
         }
     }
 

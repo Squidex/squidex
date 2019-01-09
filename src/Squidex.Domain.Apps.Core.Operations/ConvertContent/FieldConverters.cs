@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
             return (data, field) =>
             {
-                if (field is IField<AssetsFieldProperties> assetField && (isAll || fields.Contains(field.Name)))
+                if (field is IField<AssetsFieldProperties> && (isAll || fields.Contains(field.Name)))
                 {
                     foreach (var partition in data)
                     {

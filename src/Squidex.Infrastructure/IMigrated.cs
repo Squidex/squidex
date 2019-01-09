@@ -7,7 +7,7 @@
 
 namespace Squidex.Infrastructure
 {
-    public interface IMigrated<T>
+    public interface IMigrated<out T>
     {
         T Migrate();
     }

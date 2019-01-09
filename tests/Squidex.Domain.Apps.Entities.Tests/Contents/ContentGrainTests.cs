@@ -29,7 +29,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class ContentGrainTests : HandlerTestBase<ContentGrain, ContentState>
+    public class ContentGrainTests : HandlerTestBase<ContentState>
     {
         private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();

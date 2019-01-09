@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
-using Squidex.Shared.Users;
 
 namespace Squidex.Pipeline
 {

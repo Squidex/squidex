@@ -148,7 +148,7 @@ namespace Squidex.Infrastructure.Queries.OData
             throw new NotSupportedException();
         }
 
-        private Instant ParseInstant(object value)
+        private static Instant ParseInstant(object value)
         {
             if (value is DateTimeOffset dateTimeOffset)
             {

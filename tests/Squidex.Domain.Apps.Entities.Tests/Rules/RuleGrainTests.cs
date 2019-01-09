@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public class RuleGrainTests : HandlerTestBase<RuleGrain, RuleState>
+    public class RuleGrainTests : HandlerTestBase<RuleState>
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly Guid ruleId = Guid.NewGuid();

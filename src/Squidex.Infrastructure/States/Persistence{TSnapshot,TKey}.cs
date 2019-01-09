@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 #pragma warning disable RECS0012 // 'if' statement can be re-written as 'switch' statement

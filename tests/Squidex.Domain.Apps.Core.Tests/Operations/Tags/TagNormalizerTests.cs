@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Tags
             Assert.Equal(JsonValue.Array("name4"), GetNestedTags(newData));
         }
 
-        private IJsonValue GetNestedTags(NamedContentData newData)
+        private static IJsonValue GetNestedTags(NamedContentData newData)
         {
             var array = (JsonArray)newData["array"]["iv"];
             var arrayItem = (JsonObject)array[0];

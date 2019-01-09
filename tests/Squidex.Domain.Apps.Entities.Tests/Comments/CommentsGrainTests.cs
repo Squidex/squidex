@@ -23,9 +23,8 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Comments
 {
-    public class CommentsGrainTests : HandlerTestBase<CommentsGrain, CommentsState>
+    public class CommentsGrainTests : HandlerTestBase<CommentsState>
     {
-        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly Guid commentsId = Guid.NewGuid();
         private readonly CommentsGrain sut;
 
@@ -137,11 +136,6 @@ namespace Squidex.Domain.Apps.Entities.Comments
                 .ShouldHaveSameEvents(
                     CreateCommentsEvent(new CommentDeleted { CommentId = createCommand.CommentId })
                 );
-        }
-
-        private Task ExecuteDeleteAsync()
-        {
-            return sut.ExecuteAsync(CreateCommentsCommand(new DeleteComment()));
         }
 
         protected T CreateCommentsEvent<T>(T @event) where T : CommentsEvent

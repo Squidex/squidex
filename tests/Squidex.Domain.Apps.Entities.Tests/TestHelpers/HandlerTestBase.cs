@@ -21,7 +21,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
-    public abstract class HandlerTestBase<T, TState> where T : IDomainObjectGrain
+    public abstract class HandlerTestBase<TState>
     {
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly IPersistence<TState> persistence1 = A.Fake<IPersistence<TState>>();

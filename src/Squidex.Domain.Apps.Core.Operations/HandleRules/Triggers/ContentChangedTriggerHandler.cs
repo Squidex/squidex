@@ -67,9 +67,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
             return false;
         }
 
-        private bool MatchsSchema(ContentChangedTriggerSchemaV2 schema, NamedId<Guid> @eventId)
+        private static bool MatchsSchema(ContentChangedTriggerSchemaV2 schema, NamedId<Guid> eventId)
         {
-            return @eventId.Id == schema.SchemaId;
+            return eventId.Id == schema.SchemaId;
         }
 
         private bool MatchsCondition(ContentChangedTriggerSchemaV2 schema, EnrichedSchemaEvent @event)

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -20,7 +19,6 @@ using Squidex.Infrastructure.Security;
 using Squidex.Pipeline;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
-using Squidex.Shared.Users;
 
 namespace Squidex.Areas.Api.Controllers.Apps
 {

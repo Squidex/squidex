@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public static RootField<ArrayFieldProperties> Array(long id, string name, Partitioning partitioning, params NestedField[] fields)
         {
-            return new ArrayField(id, name, partitioning, fields: fields);
+            return new ArrayField(id, name, partitioning, fields);
         }
 
         public static ArrayField Array(long id, string name, Partitioning partitioning, ArrayFieldProperties properties = null, IFieldSettings settings = null)

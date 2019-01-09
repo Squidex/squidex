@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 {
     public abstract class CustomProperty : PropertyDescriptor
     {
-        public CustomProperty()
+        protected CustomProperty()
             : base(PropertyFlag.CustomJsValue)
         {
             Enumerable = true;

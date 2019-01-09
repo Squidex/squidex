@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             Assert.True(result.Contains("schemas.schema2.read"));
         }
 
-        private ISchemaEntity CreateSchema(string name)
+        private static ISchemaEntity CreateSchema(string name)
         {
             var schema = A.Fake<ISchemaEntity>();
 
