@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.Json
 
             var serialized = value.SerializeAndDeserialize();
 
-            Assert.Null(value);
+            Assert.Null(serialized);
         }
     }
 }

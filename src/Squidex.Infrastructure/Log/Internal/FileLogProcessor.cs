@@ -65,8 +65,10 @@ namespace Squidex.Infrastructure.Log.Internal
 
                 var fs = new FileStream(fileInfo.FullName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
 
-                writer = new StreamWriter(fs, Encoding.UTF8);
-                writer.AutoFlush = true;
+                writer = new StreamWriter(fs, Encoding.UTF8)
+                {
+                    AutoFlush = true
+                };
 
                 writer.WriteLine($"--- Started Logging {DateTime.UtcNow} ---", 1);
             }

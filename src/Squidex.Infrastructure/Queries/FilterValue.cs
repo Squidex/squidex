@@ -131,7 +131,7 @@ namespace Squidex.Infrastructure.Queries
             return ToString(Value);
         }
 
-        private string ToString(object value)
+        private static string ToString(object value)
         {
             if (value == null)
             {

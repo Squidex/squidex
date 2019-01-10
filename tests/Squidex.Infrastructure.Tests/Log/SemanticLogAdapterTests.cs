@@ -137,8 +137,6 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_log_additional_values()
         {
-            var exception = new InvalidOperationException();
-
             var logger = sut.CreateLogger("my-category");
 
             logger.LogDebug("My numbers are {number1} and {Number2}", 123, 456);
@@ -157,8 +155,6 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_not_log_numbers()
         {
-            var exception = new InvalidOperationException();
-
             var logger = sut.CreateLogger("my-category");
 
             logger.LogDebug("My numbers are {0} and {1}", 123, 456);

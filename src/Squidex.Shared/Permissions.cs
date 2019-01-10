@@ -166,7 +166,7 @@ namespace Squidex.Shared
 
         public static string[] ToAppNames(this PermissionSet permissions)
         {
-            var matching = permissions.Where(x => x.StartsWith($"squidex.apps."));
+            var matching = permissions.Where(x => x.StartsWith("squidex.apps."));
 
             var result =
                 matching

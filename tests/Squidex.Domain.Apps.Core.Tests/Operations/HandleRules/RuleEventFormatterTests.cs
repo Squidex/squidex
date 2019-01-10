@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             var result = sut.ToPayload(new { Value = 1 });
 
-            Assert.True(result is string);
+            Assert.NotNull(result);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var result = sut.ToPayload(@event);
 
-            Assert.True(result is string);
+            Assert.NotNull(result);
         }
 
         [Fact]

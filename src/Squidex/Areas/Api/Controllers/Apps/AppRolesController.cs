@@ -93,8 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PostRole(string app, [FromBody] AddRoleDto request)
         {
-            var command = request.ToCommand();
-            var context = await CommandBus.PublishAsync(command);
+            await CommandBus.PublishAsync(request.ToCommand());
 
             return NoContent();
         }

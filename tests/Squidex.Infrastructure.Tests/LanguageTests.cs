@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 
@@ -37,7 +36,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_provide_all_languages()
         {
-            Assert.True(Language.AllLanguages.Count() > 100);
+            Assert.True(Language.AllLanguages.Count > 100);
         }
 
         [Fact]

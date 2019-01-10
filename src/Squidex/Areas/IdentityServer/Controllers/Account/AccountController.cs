@@ -35,9 +35,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserFactory userFactory;
         private readonly IUserEvents userEvents;
-        private readonly IUserResolver userResolver;
         private readonly IOptions<MyIdentityOptions> identityOptions;
-        private readonly IOptions<MyUrlsOptions> urlOptions;
         private readonly ISemanticLog log;
         private readonly IIdentityServerInteractionService interactions;
 
@@ -46,16 +44,12 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             UserManager<IdentityUser> userManager,
             IUserFactory userFactory,
             IUserEvents userEvents,
-            IUserResolver userResolver,
             IOptions<MyIdentityOptions> identityOptions,
-            IOptions<MyUrlsOptions> urlOptions,
             ISemanticLog log,
             IIdentityServerInteractionService interactions)
         {
             this.log = log;
-            this.urlOptions = urlOptions;
             this.userEvents = userEvents;
-            this.userResolver = userResolver;
             this.userManager = userManager;
             this.userFactory = userFactory;
             this.interactions = interactions;

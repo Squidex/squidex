@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         [Pure]
         public FieldCollection<T> Remove(long fieldId)
         {
-            if (!ById.TryGetValue(fieldId, out var field))
+            if (!ById.TryGetValue(fieldId, out _))
             {
                 return this;
             }
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                 return this;
             }
 
-            if (!(newField is T typedField))
+            if (!(newField is T))
             {
                 throw new InvalidOperationException($"Field must be of type {typeof(T)}");
             }

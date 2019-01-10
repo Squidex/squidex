@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public class SchemaGrainTests : HandlerTestBase<SchemaGrain, SchemaState>
+    public class SchemaGrainTests : HandlerTestBase<SchemaState>
     {
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly FieldRegistry registry = new FieldRegistry(new TypeNameRegistry());

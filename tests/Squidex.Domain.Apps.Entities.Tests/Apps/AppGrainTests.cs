@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public class AppGrainTests : HandlerTestBase<AppGrain, AppState>
+    public class AppGrainTests : HandlerTestBase<AppState>
     {
         private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IAppPlanBillingManager appPlansBillingManager = A.Fake<IAppPlanBillingManager>();

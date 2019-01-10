@@ -82,7 +82,8 @@ namespace Squidex.Areas.Api.Controllers.Comments
         public async Task<IActionResult> PostComment(string app, Guid commentsId, [FromBody] UpsertCommentDto request)
         {
             var command = request.ToCreateCommand(commentsId);
-            var context = await CommandBus.PublishAsync(command);
+
+            await CommandBus.PublishAsync(command);
 
             var response = CommentDto.FromCommand(command);
 

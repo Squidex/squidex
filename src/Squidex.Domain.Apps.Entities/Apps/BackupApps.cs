@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Shared.Users;
@@ -28,7 +27,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private const string SettingsFile = "Settings.json";
         private readonly IGrainFactory grainFactory;
         private readonly IUserResolver userResolver;
-        private readonly IJsonSerializer serializer;
         private readonly IAppsByNameIndex appsByNameIndex;
         private readonly HashSet<string> contributors = new HashSet<string>();
         private Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
@@ -38,14 +36,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override string Name { get; } = "Apps";
 
-        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver, IJsonSerializer serializer)
+        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
-            Guard.NotNull(serializer, nameof(serializer));
             Guard.NotNull(userResolver, nameof(userResolver));
 
             this.grainFactory = grainFactory;
-            this.serializer = serializer;
             this.userResolver = userResolver;
 
             appsByNameIndex = grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id);
@@ -83,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     {
                         appName = appCreated.Name;
 
-                        await ResolveUsersAsync(reader, actor);
+                        await ResolveUsersAsync(reader);
                         await ReserveAppAsync(appId);
 
                         break;
@@ -148,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return userMapping.GetOrAdd(userId, fallback);
         }
 
-        private async Task ResolveUsersAsync(BackupReader reader, RefToken actor)
+        private async Task ResolveUsersAsync(BackupReader reader)
         {
             await ReadUsersAsync(reader);
 

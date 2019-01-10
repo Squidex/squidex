@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 
         private static Func<IReadOnlyList<string>, IReadOnlyList<string>> PathConverter(Schema schema, bool useDraft)
         {
-            return new Func<IReadOnlyList<string>, IReadOnlyList<string>>(propertyNames =>
+            return propertyNames =>
             {
                 var result = new List<string>(propertyNames);
 
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                 }
 
                 return result;
-            });
+            };
         }
 
         public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSort(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, Query query)

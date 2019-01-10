@@ -89,7 +89,7 @@ namespace Squidex.Infrastructure.MongoDb
         {
             try
             {
-                await mongoDatabase.DropCollectionAsync(CollectionName());
+                await mongoDatabase.DropCollectionAsync(CollectionName(), ct);
 
                 mongoCollection = CreateCollection();
 

@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             return ReadJson(reader);
         }
 
-        private IJsonValue ReadJson(JsonReader reader)
+        private static IJsonValue ReadJson(JsonReader reader)
         {
             switch (reader.TokenType)
             {
@@ -125,11 +125,11 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             WriteJson(writer, (IJsonValue)value);
         }
 
-        private void WriteJson(JsonWriter writer, IJsonValue value)
+        private static void WriteJson(JsonWriter writer, IJsonValue value)
         {
             switch (value)
             {
-                case JsonNull n:
+                case JsonNull _:
                     writer.WriteNull();
                     break;
                 case JsonBoolean s:

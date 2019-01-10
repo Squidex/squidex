@@ -229,7 +229,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         private static Func<string> Safe(Func<string> func)
         {
-            return new Func<string>(() =>
+            return () =>
             {
                 try
                 {
@@ -239,7 +239,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 {
                     return "null";
                 }
-            });
+            };
         }
 
         private static JsValue Slugify(JsValue thisObject, JsValue[] arguments)

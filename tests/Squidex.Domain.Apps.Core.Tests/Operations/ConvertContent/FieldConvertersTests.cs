@@ -428,9 +428,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("url/to/1", "url/to/2"));
 
-            var rtesult = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "1" }), assetUrlGenerator)(source, assetsField);
+            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "1" }), assetUrlGenerator)(source, assetsField);
 
-            Assert.Equal(expected, source);
+            Assert.Equal(expected, result);
         }
 
         [Fact]
@@ -444,9 +444,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("url/to/1", "url/to/2"));
 
-            var rtesult = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "*" }), assetUrlGenerator)(source, assetsField);
+            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "*" }), assetUrlGenerator)(source, assetsField);
 
-            Assert.Equal(expected, source);
+            Assert.Equal(expected, result);
         }
 
         [Fact]
@@ -460,9 +460,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("1", "2"));
 
-            var rtesult = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "2" }), assetUrlGenerator)(source, assetsField);
+            var result = FieldConverters.ResolveAssetUrls(new HashSet<string>(new[] { "2" }), assetUrlGenerator)(source, assetsField);
 
-            Assert.Equal(expected, source);
+            Assert.Equal(expected, result);
         }
 
         [Fact]
@@ -476,9 +476,9 @@ namespace Squidex.Domain.Apps.Core.Operations.ConvertContent
                 new ContentFieldData()
                     .AddValue("iv", JsonValue.Array("1", "2"));
 
-            var rtesult = FieldConverters.ResolveAssetUrls(null, assetUrlGenerator)(source, assetsField);
+            var result = FieldConverters.ResolveAssetUrls(null, assetUrlGenerator)(source, assetsField);
 
-            Assert.Equal(expected, source);
+            Assert.Equal(expected, result);
         }
     }
 }

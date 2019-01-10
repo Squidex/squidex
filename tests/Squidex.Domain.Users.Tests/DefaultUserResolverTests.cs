@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -104,7 +103,7 @@ namespace Squidex.Domain.Users
             var claims = new List<Claim>
             {
                 new Claim($"{id}_a", "1"),
-                new Claim($"{id}_b", "2"),
+                new Claim($"{id}_b", "2")
             };
 
             return (user, claims);

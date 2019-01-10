@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Diagnostics
                 { "Allocated", allocated.ToReadableSize() },
                 { "Gen0Collections", GC.CollectionCount(0) },
                 { "Gen1Collections", GC.CollectionCount(1) },
-                { "Gen2Collections", GC.CollectionCount(2) },
+                { "Gen2Collections", GC.CollectionCount(2) }
             };
 
             var status = allocated < threshold ? HealthStatus.Healthy : HealthStatus.Unhealthy;

@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private ValidationContext CreateValidationContext()
         {
-            return new ValidationContext(contentId, schemaId, (sid, filterNode) => QueryContentsAsync(sid, filterNode), QueryAssetsAsync);
+            return new ValidationContext(contentId, schemaId, QueryContentsAsync, QueryAssetsAsync);
         }
 
         private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(IEnumerable<Guid> assetIds)

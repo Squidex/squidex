@@ -25,7 +25,6 @@ using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
-using Squidex.Shared.Users;
 
 #pragma warning disable RECS0147
 
@@ -275,7 +274,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return schema;
         }
 
-        private void CheckPermission(ISchemaEntity schema, ClaimsPrincipal user)
+        private static void CheckPermission(ISchemaEntity schema, ClaimsPrincipal user)
         {
             var permissions = user.Permissions();
             var permission = Permissions.ForApp(Permissions.AppContentsRead, schema.AppId.Name, schema.Name);

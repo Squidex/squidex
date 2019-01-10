@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static IJsonValue CreateValue(params string[] ids)
         {
-            return ids == null ? (IJsonValue)JsonValue.Null : JsonValue.Array(ids.OfType<object>().ToArray());
+            return ids == null ? JsonValue.Null : JsonValue.Array(ids.OfType<object>().ToArray());
         }
 
         private static RootField<TagsFieldProperties> Field(TagsFieldProperties properties)

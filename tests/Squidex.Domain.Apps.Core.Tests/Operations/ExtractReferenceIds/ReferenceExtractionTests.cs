@@ -269,7 +269,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
         private static IJsonValue CreateValue(params Guid[] ids)
         {
-            return ids == null ? (IJsonValue)JsonValue.Null : JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
+            return ids == null ? JsonValue.Null : JsonValue.Array(ids.Select(x => (object)x.ToString()).ToArray());
         }
     }
 }

@@ -24,7 +24,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetCommandMiddlewareTests : HandlerTestBase<AssetGrain, AssetState>
+    public class AssetCommandMiddlewareTests : HandlerTestBase<AssetState>
     {
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
