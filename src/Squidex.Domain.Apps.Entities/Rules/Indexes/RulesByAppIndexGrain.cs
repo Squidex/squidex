@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Apps.Indexes;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes

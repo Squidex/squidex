@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;

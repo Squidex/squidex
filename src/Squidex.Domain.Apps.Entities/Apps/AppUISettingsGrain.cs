@@ -8,7 +8,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;

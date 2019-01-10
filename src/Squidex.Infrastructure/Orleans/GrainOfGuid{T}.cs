@@ -8,11 +8,10 @@
 using System;
 using System.Threading.Tasks;
 using Orleans;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Indexes
+namespace Squidex.Infrastructure.Orleans
 {
     public abstract class GrainOfGuid<T> : Grain where T : class, new()
     {

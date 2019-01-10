@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using NodaTime;
 using Orleans.Concurrency;
-using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;

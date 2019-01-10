@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Tags;
-using Squidex.Domain.Apps.Entities.Apps.Indexes;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Tags
