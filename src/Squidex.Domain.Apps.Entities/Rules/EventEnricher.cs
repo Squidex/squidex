@@ -46,26 +46,38 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             Guard.NotNull(@event, nameof(@event));
 
-            if (@event.Payload is ContentEvent contentEvent)
+            switch (@event.Payload)
             {
-                var result = new EnrichedContentEvent();
+                case ContentEvent contentEvent:
+                    {
+                        var result = new EnrichedContentEvent();
 
-                await Task.WhenAll(
-                    EnrichContentAsync(result, contentEvent, @event),
-                    EnrichDefaultAsync(result, @event));
+                        await Task.WhenAll(
+                            EnrichContentAsync(result, contentEvent, @event),
+                            EnrichDefaultAsync(result, @event));
 
-                return result;
-            }
+                        return result;
+                    }
 
-            if (@event.Payload is AssetEvent assetEvent)
-            {
-                var result = new EnrichedAssetEvent();
+                case AssetEvent assetEvent:
+                    {
+                        var result = new EnrichedAssetEvent();
 
-                await Task.WhenAll(
-                    EnrichAssetAsync(result, assetEvent, @event),
-                    EnrichDefaultAsync(result, @event));
+                        await Task.WhenAll(
+                            EnrichAssetAsync(result, assetEvent, @event),
+                            EnrichDefaultAsync(result, @event));
 
-                return result;
+                        return result;
+                    }
+
+                case AppUsageExceeded usageExceeded:
+                    {
+                        var result = new EnrichedUsageExceededEvent { Current = usageExceeded.Current, Limit = usageExceeded.Limit };
+
+                        await EnrichDefaultAsync(result, @event);
+
+                        return result;
+                    }
             }
 
             return null;
@@ -149,17 +161,20 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             result.Timestamp = @event.Headers.Timestamp();
 
-            if (@event.Payload is SquidexEvent squidexEvent)
+            if (result is EnrichedUserEvent userEvent)
             {
-                result.Actor = squidexEvent.Actor;
+                if (@event.Payload is SquidexEvent squidexEvent)
+                {
+                    userEvent.Actor = squidexEvent.Actor;
+                }
+
+                userEvent.User = await FindUserAsync(userEvent.Actor);
             }
 
             if (@event.Payload is AppEvent appEvent)
             {
                 result.AppId = appEvent.AppId;
             }
-
-            result.User = await FindUserAsync(result.Actor);
         }
 
         private Task<IUser> FindUserAsync(RefToken actor)

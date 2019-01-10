@@ -224,17 +224,32 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         private static string UserName(EnrichedEvent @event)
         {
-            return @event.User?.DisplayName() ?? Fallback;
+            if (@event is EnrichedUserEvent userEvent)
+            {
+                return userEvent.User?.DisplayName() ?? Fallback;
+            }
+
+            return Fallback;
         }
 
         private static string UserId(EnrichedEvent @event)
         {
-            return @event.User?.Id ?? Fallback;
+            if (@event is EnrichedUserEvent userEvent)
+            {
+                return userEvent.User?.Id ?? Fallback;
+            }
+
+            return Fallback;
         }
 
         private static string UserEmail(EnrichedEvent @event)
         {
-            return @event.User?.Email ?? Fallback;
+            if (@event is EnrichedUserEvent userEvent)
+            {
+                return userEvent.User?.Email ?? Fallback;
+            }
+
+            return Fallback;
         }
 
         private static string CalculateData(NamedContentData data, Match match)

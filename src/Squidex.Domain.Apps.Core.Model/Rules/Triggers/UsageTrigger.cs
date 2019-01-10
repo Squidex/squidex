@@ -1,7 +1,7 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
@@ -9,12 +9,12 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
-    [TypeName(nameof(AssetChangedTriggerV2))]
-    public sealed class AssetChangedTriggerV2 : RuleTrigger
+    [TypeName(nameof(UsageTrigger))]
+    public sealed class UsageTrigger : RuleTrigger
     {
-        public const string Name = "AssetChanged";
+        public const string Name = "Usage";
 
-        public string Condition { get; set; }
+        public int Limit { get; set; }
 
         public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
         {

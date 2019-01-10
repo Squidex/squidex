@@ -5,22 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using NodaTime;
-using Squidex.Infrastructure;
-
 namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 {
-    public abstract class EnrichedEvent
+    public sealed class EnrichedUsageExceededEvent : EnrichedEvent
     {
-        public NamedId<Guid> AppId { get; set; }
+        public long Current { get; set; }
 
-        public Instant Timestamp { get; set; }
+        public long Limit { get; set; }
 
-        public string Name { get; set; }
-
-        public long Version { get; set; }
-
-        public abstract long Partition { get; }
+        public override long Partition
+        {
+            get { return AppId.GetHashCode(); }
+        }
     }
 }

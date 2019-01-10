@@ -31,6 +31,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
             return SimpleMapper.Map(trigger, new AssetChangedRuleTriggerDto());
         }
 
+        public RuleTriggerDto Visit(UsageTrigger trigger)
+        {
+            return SimpleMapper.Map(trigger, new UsageTriggerDto());
+        }
+
         public RuleTriggerDto Visit(ContentChangedTriggerV2 trigger)
         {
             var schemas = trigger.Schemas.Select(x => SimpleMapper.Map(x, new ContentChangedRuleTriggerSchemaDto())).ToArray();

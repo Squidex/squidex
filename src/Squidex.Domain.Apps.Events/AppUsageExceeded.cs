@@ -1,20 +1,19 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Core.Rules
+namespace Squidex.Domain.Apps.Events
 {
-    public interface IRuleTriggerVisitor<out T>
+    [EventType(nameof(AppUsageExceeded))]
+    public sealed class AppUsageExceeded : AppEvent
     {
-        T Visit(AssetChangedTriggerV2 trigger);
+        public long Current { get; set; }
 
-        T Visit(ContentChangedTriggerV2 trigger);
-
-        T Visit(UsageTrigger trigger);
+        public long Limit { get; set; }
     }
 }

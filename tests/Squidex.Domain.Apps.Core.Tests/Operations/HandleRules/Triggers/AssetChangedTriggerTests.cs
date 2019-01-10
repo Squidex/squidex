@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -35,76 +36,76 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_when_event_type_not_correct()
+        public Task Should_not_trigger_precheck_when_event_type_not_correct()
         {
-            TestForCondition(string.Empty, trigger =>
+            return TestForConditionAsync(string.Empty, async trigger =>
             {
-                var result = sut.Triggers(new ContentCreated(), trigger);
+                var result = await sut.TriggersAsync(new ContentCreated(), trigger);
 
                 Assert.False(result);
             });
         }
 
         [Fact]
-        public void Should_trigger_precheck_when_event_type_correct()
+        public Task Should_trigger_precheck_when_event_type_correct()
         {
-            TestForCondition(string.Empty, trigger =>
+            return TestForConditionAsync(string.Empty, async trigger =>
             {
-                var result = sut.Triggers(new AssetCreated(), trigger);
+                var result = await sut.TriggersAsync(new AssetCreated(), trigger);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_event_type_not_correct()
+        public Task Should_not_trigger_check_when_event_type_not_correct()
         {
-            TestForCondition(string.Empty, trigger =>
+            return TestForConditionAsync(string.Empty, async trigger =>
             {
-                var result = sut.Triggers(new EnrichedContentEvent(), trigger);
+                var result = await sut.TriggersAsync(new EnrichedContentEvent(), trigger);
 
                 Assert.False(result);
             });
         }
 
         [Fact]
-        public void Should_trigger_check_when_condition_is_empty()
+        public Task Should_trigger_check_when_condition_is_empty()
         {
-            TestForCondition(string.Empty, trigger =>
+            return TestForConditionAsync(string.Empty, async trigger =>
             {
-                var result = sut.Triggers(new EnrichedAssetEvent(), trigger);
+                var result = await sut.TriggersAsync(new EnrichedAssetEvent(), trigger);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public void Should_trigger_check_when_condition_matchs()
+        public Task Should_trigger_check_when_condition_matchs()
         {
-            TestForCondition("true", trigger =>
+            return TestForConditionAsync("true", async trigger =>
             {
-                var result = sut.Triggers(new EnrichedAssetEvent(), trigger);
+                var result = await sut.TriggersAsync(new EnrichedAssetEvent(), trigger);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_condition_does_not_matchs()
+        public Task Should_not_trigger_check_when_condition_does_not_matchs()
         {
-            TestForCondition("false", trigger =>
+            return TestForConditionAsync("false", async trigger =>
             {
-                var result = sut.Triggers(new EnrichedAssetEvent(), trigger);
+                var result = await sut.TriggersAsync(new EnrichedAssetEvent(), trigger);
 
                 Assert.False(result);
             });
         }
 
-        private void TestForCondition(string condition, Action<AssetChangedTriggerV2> action)
+        private async Task TestForConditionAsync(string condition, Func<AssetChangedTriggerV2, Task> action)
         {
             var trigger = new AssetChangedTriggerV2 { Condition = condition };
 
-            action(trigger);
+            await action(trigger);
 
             if (string.IsNullOrWhiteSpace(condition))
             {

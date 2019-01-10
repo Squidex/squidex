@@ -33,6 +33,8 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly string actionDump = "MyDump";
         private readonly string actionName = "ValidAction";
         private readonly string actionDescription = "MyDescription";
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private readonly RuleService sut;
 
@@ -68,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             typeNameRegistry.Map(typeof(ValidAction), actionName);
 
             A.CallTo(() => eventEnricher.EnrichAsync(A<Envelope<AppEvent>>.Ignored))
-                .Returns(new EnrichedContentEvent());
+                .Returns(new EnrichedContentEvent { AppId = appId });
 
             A.CallTo(() => ruleActionHandler.ActionType)
                 .Returns(typeof(ValidAction));
@@ -144,7 +146,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var ruleConfig = ValidRule();
             var ruleEnvelope = Envelope.Create(new ContentCreated());
 
-            A.CallTo(() => ruleTriggerHandler.Triggers(A<IEvent>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.TriggersAsync(A<IEvent>.Ignored, ruleConfig.Trigger))
                 .Returns(false);
 
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
@@ -161,10 +163,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             var ruleConfig = ValidRule();
             var ruleEnvelope = Envelope.Create(new ContentCreated());
 
-            A.CallTo(() => ruleTriggerHandler.Triggers(A<IEvent>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.TriggersAsync(A<IEvent>.Ignored, ruleConfig.Trigger))
                 .Returns(true);
 
-            A.CallTo(() => ruleTriggerHandler.Triggers(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.TriggersAsync(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
                 .Returns(false);
 
             var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
@@ -175,7 +177,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_if_too_old()
         {
-            var @event = new ContentCreated { SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"), AppId = NamedId.Of(Guid.NewGuid(), "my-event") };
+            var @event = new ContentCreated { SchemaId = schemaId, AppId = appId };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -201,7 +203,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_job_if_triggered()
         {
-            var @event = new ContentCreated { SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"), AppId = NamedId.Of(Guid.NewGuid(), "my-event") };
+            var @event = new ContentCreated { SchemaId = schemaId, AppId = appId };
 
             var now = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
 
@@ -213,10 +215,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
 
-            A.CallTo(() => ruleTriggerHandler.Triggers(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.TriggersAsync(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
                 .Returns(true);
 
-            A.CallTo(() => ruleTriggerHandler.Triggers(A<IEvent>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.TriggersAsync(A<IEvent>.Ignored, ruleConfig.Trigger))
                 .Returns(true);
 
             A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure.EventSourcing;
@@ -16,8 +17,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
     {
         Type TriggerType { get; }
 
-        bool Triggers(EnrichedEvent @event, RuleTrigger trigger);
+        Task<bool> TriggersAsync(EnrichedEvent @event, RuleTrigger trigger);
 
-        bool Triggers(IEvent @event, RuleTrigger trigger);
+        Task<bool> TriggersAsync(IEvent @event, RuleTrigger trigger);
     }
 }

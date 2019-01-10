@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
@@ -22,21 +24,21 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             get { return typeof(TTrigger); }
         }
 
-        bool IRuleTriggerHandler.Triggers(EnrichedEvent @event, RuleTrigger trigger)
+        Task<bool> IRuleTriggerHandler.TriggersAsync(EnrichedEvent @event, RuleTrigger trigger)
         {
-            return @event is TEnrichedEvent e && Triggers(e, (TTrigger)trigger);
+            return @event is TEnrichedEvent e ? TriggersAsync(e, (TTrigger)trigger) : TaskHelper.False;
         }
 
-        bool IRuleTriggerHandler.Triggers(IEvent @event, RuleTrigger trigger)
+        Task<bool> IRuleTriggerHandler.TriggersAsync(IEvent @event, RuleTrigger trigger)
         {
-            return @event is TEvent e && Triggers(e, (TTrigger)trigger);
+            return @event is TEvent e ? TriggersAsync(e, (TTrigger)trigger) : TaskHelper.False;
         }
 
-        protected abstract bool Triggers(TEnrichedEvent @event, TTrigger trigger);
+        protected abstract Task<bool> TriggersAsync(TEnrichedEvent @event, TTrigger trigger);
 
-        protected virtual bool Triggers(TEvent @event, TTrigger trigger)
+        protected virtual Task<bool> TriggersAsync(TEvent @event, TTrigger trigger)
         {
-            return true;
+            return TaskHelper.True;
         }
     }
 }

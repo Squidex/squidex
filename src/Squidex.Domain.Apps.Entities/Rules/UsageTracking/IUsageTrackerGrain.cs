@@ -6,21 +6,20 @@
 // ==========================================================================
 
 using System;
-using NodaTime;
+using System.Threading.Tasks;
+using Orleans;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
+namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
-    public abstract class EnrichedEvent
+    public interface IUsageTrackerGrain : IGrainWithStringKey
     {
-        public NamedId<Guid> AppId { get; set; }
+        Task AddTargetAsync(NamedId<Guid> appId, int limits);
 
-        public Instant Timestamp { get; set; }
+        Task ActivateTargetAsync(NamedId<Guid> appId);
 
-        public string Name { get; set; }
+        Task DeactivateTargetAsync(NamedId<Guid> appId);
 
-        public long Version { get; set; }
-
-        public abstract long Partition { get; }
+        Task RemoveTargetAsync(NamedId<Guid> appId);
     }
 }

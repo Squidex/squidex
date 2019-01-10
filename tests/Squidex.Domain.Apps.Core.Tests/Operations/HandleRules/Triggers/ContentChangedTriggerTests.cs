@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -43,138 +44,138 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_when_event_type_not_correct()
+        public Task Should_not_trigger_precheck_when_event_type_not_correct()
         {
-            TestForTrigger(handleAll: true, schemaId: null, condition: null, action: trigger =>
+            return TestForTriggerAsync(handleAll: true, schemaId: null, condition: null, action: async trigger =>
             {
-                var result = sut.Triggers(new AssetCreated(), trigger);
+                var result = await sut.TriggersAsync(new AssetCreated(), trigger);
 
                 Assert.False(result);
             });
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_when_trigger_contains_no_schemas()
+        public Task Should_not_trigger_precheck_when_trigger_contains_no_schemas()
         {
-            TestForTrigger(handleAll: false, schemaId: null, condition: null, action: trigger =>
+            return TestForTriggerAsync(handleAll: false, schemaId: null, condition: null, action: async trigger =>
             {
-                var result = sut.Triggers(new ContentCreated { SchemaId = SchemaMatch }, trigger);
+                var result = await sut.TriggersAsync(new ContentCreated { SchemaId = SchemaMatch }, trigger);
 
                 Assert.False(result);
             });
         }
 
         [Fact]
-        public void Should_trigger_precheck_when_handling_all_events()
+        public Task Should_trigger_precheck_when_handling_all_events()
         {
-            TestForTrigger(handleAll: true, schemaId: SchemaMatch, condition: null, action: trigger =>
+            return TestForTriggerAsync(handleAll: true, schemaId: SchemaMatch, condition: null, action: async trigger =>
             {
-                var result = sut.Triggers(new ContentCreated { SchemaId = SchemaMatch }, trigger);
+                var result = await sut.TriggersAsync(new ContentCreated { SchemaId = SchemaMatch }, trigger);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public void Should_trigger_precheck_when_condition_is_empty()
+        public Task Should_trigger_precheck_when_condition_is_empty()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaMatch, condition: string.Empty, action: trigger =>
+            return TestForTriggerAsync(handleAll: false, schemaId: SchemaMatch, condition: string.Empty, action: async trigger =>
             {
-                var result = sut.Triggers(new ContentCreated { SchemaId = SchemaMatch }, trigger);
+                var result = await sut.TriggersAsync(new ContentCreated { SchemaId = SchemaMatch }, trigger);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public void Should_not_trigger_precheck_when_schema_id_does_not_match()
+        public Task Should_not_trigger_precheck_when_schema_id_does_not_match()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaNonMatch, condition: null, action: trigger =>
+            return TestForTriggerAsync(handleAll: false, schemaId: SchemaNonMatch, condition: null, action: async trigger =>
             {
-                var result = sut.Triggers(new ContentCreated { SchemaId = SchemaMatch }, trigger);
+                var result = await sut.TriggersAsync(new ContentCreated { SchemaId = SchemaMatch }, trigger);
 
                 Assert.False(result);
             });
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_event_type_not_correct()
+        public Task Should_not_trigger_check_when_event_type_not_correct()
         {
-            TestForTrigger(handleAll: true, schemaId: null, condition: null, action: trigger =>
+            return TestForTriggerAsync(handleAll: true, schemaId: null, condition: null, action: async trigger =>
             {
-                var result = sut.Triggers(new EnrichedAssetEvent(), trigger);
+                var result = await sut.TriggersAsync(new EnrichedAssetEvent(), trigger);
 
                 Assert.False(result);
             });
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_trigger_contains_no_schemas()
+        public Task Should_not_trigger_check_when_trigger_contains_no_schemas()
         {
-            TestForTrigger(handleAll: false, schemaId: null, condition: null, action: trigger =>
+            return TestForTriggerAsync(handleAll: false, schemaId: null, condition: null, action: async trigger =>
             {
-                var result = sut.Triggers(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = await sut.TriggersAsync(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
 
                 Assert.False(result);
             });
         }
 
         [Fact]
-        public void Should_trigger_check_when_handling_all_events()
+        public Task Should_trigger_check_when_handling_all_events()
         {
-            TestForTrigger(handleAll: true, schemaId: SchemaMatch, condition: null, action: trigger =>
+            return TestForTriggerAsync(handleAll: true, schemaId: SchemaMatch, condition: null, action: async trigger =>
             {
-                var result = sut.Triggers(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = await sut.TriggersAsync(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public void Should_trigger_check_when_condition_is_empty()
+        public Task Should_trigger_check_when_condition_is_empty()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaMatch, condition: string.Empty, action: trigger =>
+            return TestForTriggerAsync(handleAll: false, schemaId: SchemaMatch, condition: string.Empty, action: async trigger =>
             {
-                var result = sut.Triggers(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = await sut.TriggersAsync(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public void Should_trigger_check_when_condition_matchs()
+        public Task Should_trigger_check_when_condition_matchs()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaMatch, condition: "true", action: trigger =>
+            return TestForTriggerAsync(handleAll: false, schemaId: SchemaMatch, condition: "true", action: async trigger =>
             {
-                var result = sut.Triggers(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = await sut.TriggersAsync(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_schema_id_does_not_match()
+        public Task Should_not_trigger_check_when_schema_id_does_not_match()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaNonMatch, condition: null, action: trigger =>
+            return TestForTriggerAsync(handleAll: false, schemaId: SchemaNonMatch, condition: null, action: async trigger =>
             {
-                var result = sut.Triggers(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = await sut.TriggersAsync(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
 
                 Assert.False(result);
             });
         }
 
         [Fact]
-        public void Should_not_trigger_check_when_condition_does_not_matchs()
+        public Task Should_not_trigger_check_when_condition_does_not_matchs()
         {
-            TestForTrigger(handleAll: false, schemaId: SchemaMatch, condition: "false", action: trigger =>
+            return TestForTriggerAsync(handleAll: false, schemaId: SchemaMatch, condition: "false", action: async trigger =>
             {
-                var result = sut.Triggers(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
+                var result = await sut.TriggersAsync(new EnrichedContentEvent { SchemaId = SchemaMatch }, trigger);
 
                 Assert.False(result);
             });
         }
 
-        private void TestForTrigger(bool handleAll, NamedId<Guid> schemaId, string condition, Action<ContentChangedTriggerV2> action)
+        private async Task TestForTriggerAsync(bool handleAll, NamedId<Guid> schemaId, string condition, Func<ContentChangedTriggerV2, Task> action)
         {
             var trigger = new ContentChangedTriggerV2 { HandleAll = handleAll };
 
@@ -189,7 +190,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
                 });
             }
 
-            action(trigger);
+            await action(trigger);
 
             if (string.IsNullOrWhiteSpace(condition))
             {

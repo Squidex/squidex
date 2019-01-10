@@ -5,22 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using NodaTime;
+using System.Runtime.Serialization;
 using Squidex.Infrastructure;
+using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 {
-    public abstract class EnrichedEvent
+    public abstract class EnrichedUserEvent : EnrichedEvent
     {
-        public NamedId<Guid> AppId { get; set; }
+        public RefToken Actor { get; set; }
 
-        public Instant Timestamp { get; set; }
-
-        public string Name { get; set; }
-
-        public long Version { get; set; }
-
-        public abstract long Partition { get; }
+        [IgnoreDataMember]
+        public IUser User { get; set; }
     }
 }

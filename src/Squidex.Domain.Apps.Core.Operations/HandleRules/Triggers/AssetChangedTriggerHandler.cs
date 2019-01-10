@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -24,9 +25,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
             this.scriptEngine = scriptEngine;
         }
 
-        protected override bool Triggers(EnrichedAssetEvent @event, AssetChangedTriggerV2 trigger)
+        protected override Task<bool> TriggersAsync(EnrichedAssetEvent @event, AssetChangedTriggerV2 trigger)
         {
-            return string.IsNullOrWhiteSpace(trigger.Condition) || scriptEngine.Evaluate("event", @event, trigger.Condition);
+            return Task.FromResult(string.IsNullOrWhiteSpace(trigger.Condition) || scriptEngine.Evaluate("event", @event, trigger.Condition));
         }
     }
 }
