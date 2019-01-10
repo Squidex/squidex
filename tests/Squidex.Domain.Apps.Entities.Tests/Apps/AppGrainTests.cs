@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             };
 
             sut = new AppGrain(initialPatterns, Store, A.Dummy<ISemanticLog>(), appPlansProvider, appPlansBillingManager, userResolver);
-            sut.OnActivateAsync(Id).Wait();
+            sut.ActivateAsync(Id).Wait();
         }
 
         [Fact]

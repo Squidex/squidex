@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.State;
 using Squidex.Domain.Apps.Events;
@@ -26,7 +27,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class RestoreGrain : GrainOfString, IRestoreGrain
+    public sealed class RestoreGrain : GrainOfString<RestoreState>, IRestoreGrain
     {
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
@@ -37,14 +38,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly ISemanticLog log;
         private readonly IStreamNameResolver streamNameResolver;
-        private readonly IStore<string> store;
         private RefToken actor;
-        private RestoreState state = new RestoreState();
-        private IPersistence<RestoreState> persistence;
 
         private RestoreStateJob CurrentJob
         {
-            get { return state.Job; }
+            get { return State.Job; }
         }
 
         public RestoreGrain(IBackupArchiveLocation backupArchiveLocation,
@@ -57,6 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             ISemanticLog log,
             IStreamNameResolver streamNameResolver,
             IStore<string> store)
+            : base(store)
         {
             Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
             Guard.NotNull(clock, nameof(clock));
@@ -76,25 +75,17 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.eventDataFormatter = eventDataFormatter;
             this.handlers = handlers;
             this.serializer = serializer;
-            this.store = store;
             this.streamNameResolver = streamNameResolver;
             this.log = log;
         }
 
-        public override async Task OnActivateAsync(string key)
+        protected override Task OnActivateAsync(string key)
         {
             actor = new RefToken(RefTokenType.Subject, key);
 
-            persistence = store.WithSnapshots<RestoreState, string>(GetType(), key, s => state = s);
-
-            await ReadAsync();
-
-            RecoverAfterRestart();
-        }
-
-        private void RecoverAfterRestart()
-        {
             RecoverAfterRestartAsync().Forget();
+
+            return TaskHelper.Done;
         }
 
         private async Task RecoverAfterRestartAsync()
@@ -106,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 CurrentJob.Status = JobStatus.Failed;
 
                 await CleanupAsync();
-                await WriteAsync();
+                await WriteStateAsync();
             }
         }
 
@@ -124,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 throw new DomainException("A restore operation is already running.");
             }
 
-            state.Job = new RestoreStateJob
+            State.Job = new RestoreStateJob
             {
                 Id = Guid.NewGuid(),
                 NewAppName = newAppName,
@@ -239,7 +230,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     CurrentJob.Stopped = clock.GetCurrentInstant();
 
-                    await WriteAsync();
+                    await WriteStateAsync();
                 }
             }
         }
@@ -338,16 +329,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 CurrentJob.Log.Add($"{clock.GetCurrentInstant()}: {message}");
             }
-        }
-
-        private async Task ReadAsync()
-        {
-            await persistence.ReadAsync();
-        }
-
-        private async Task WriteAsync()
-        {
-            await persistence.WriteSnapshotAsync(state);
         }
 
         public Task<J<IRestoreJob>> GetJobAsync()

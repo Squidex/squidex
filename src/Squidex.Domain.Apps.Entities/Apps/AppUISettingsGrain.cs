@@ -8,6 +8,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
@@ -15,42 +16,29 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class AppUISettingsGrain : GrainOfGuid, IAppUISettingsGrain
+    public sealed class AppUISettingsGrain : GrainOfGuid<AppUISettingsGrain.GrainState>, IAppUISettingsGrain
     {
-        private readonly IStore<Guid> store;
-        private IPersistence<State> persistence;
-        private State state = new State();
-
         [CollectionName("UISettings")]
-        public sealed class State
+        public sealed class GrainState
         {
             public JsonObject Settings { get; set; } = JsonValue.Object();
         }
 
         public AppUISettingsGrain(IStore<Guid> store)
+            : base(store)
         {
-            Guard.NotNull(store, nameof(store));
-
-            this.store = store;
-        }
-
-        public override Task OnActivateAsync(Guid key)
-        {
-            persistence = store.WithSnapshots<State, Guid>(GetType(), key, x => state = x);
-
-            return persistence.ReadAsync();
         }
 
         public Task<J<JsonObject>> GetAsync()
         {
-            return Task.FromResult(state.Settings.AsJ());
+            return Task.FromResult(State.Settings.AsJ());
         }
 
         public Task SetAsync(J<JsonObject> settings)
         {
-            state.Settings = settings;
+            State.Settings = settings;
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         public Task SetAsync(string path, J<IJsonValue> value)
@@ -64,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             container[key] = value.Value;
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         public Task RemoveAsync(string path)
@@ -76,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 container.Remove(key);
             }
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         private JsonObject GetContainer(string path, out string key)
@@ -87,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             key = segments[segments.Length - 1];
 
-            var current = state.Settings;
+            var current = State.Settings;
 
             if (segments.Length > 1)
             {

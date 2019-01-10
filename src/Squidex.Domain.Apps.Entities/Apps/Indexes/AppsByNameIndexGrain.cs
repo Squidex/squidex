@@ -9,56 +9,39 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public sealed class AppsByNameIndexGrain : GrainOfString, IAppsByNameIndex
+    public sealed class AppsByNameIndexGrain : GrainOfString<AppsByNameIndexGrain.GrainState>, IAppsByNameIndex
     {
-        private readonly IStore<string> store;
         private readonly HashSet<Guid> reservedIds = new HashSet<Guid>();
         private readonly HashSet<string> reservedNames = new HashSet<string>();
-        private IPersistence<State> persistence;
-        private State state = new State();
 
         [CollectionName("Index_AppsByName")]
-        public sealed class State
+        public sealed class GrainState
         {
             public Dictionary<string, Guid> Apps { get; set; } = new Dictionary<string, Guid>();
         }
 
         public AppsByNameIndexGrain(IStore<string> store)
+            : base(store)
         {
-            Guard.NotNull(store, nameof(store));
-
-            this.store = store;
-        }
-
-        public override Task OnActivateAsync(string key)
-        {
-            persistence = store.WithSnapshots<AppsByNameIndexGrain, State, string>(key, s =>
-            {
-                state = s;
-            });
-
-            return persistence.ReadAsync();
         }
 
         public Task RebuildAsync(Dictionary<string, Guid> apps)
         {
-            state = new State { Apps = apps };
+            State = new GrainState { Apps = apps };
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         public Task<bool> ReserveAppAsync(Guid appId, string name)
         {
             var canReserve =
-                !state.Apps.ContainsKey(name) &&
-                !state.Apps.Any(x => x.Value == appId) &&
+                !State.Apps.ContainsKey(name) &&
+                !State.Apps.Any(x => x.Value == appId) &&
                 !reservedIds.Contains(appId) &&
                 !reservedNames.Contains(name);
 
@@ -81,27 +64,27 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public Task AddAppAsync(Guid appId, string name)
         {
-            state.Apps[name] = appId;
+            State.Apps[name] = appId;
 
             reservedIds.Remove(appId);
             reservedNames.Remove(name);
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         public Task RemoveAppAsync(Guid appId)
         {
-            var name = state.Apps.FirstOrDefault(x => x.Value == appId).Key;
+            var name = State.Apps.FirstOrDefault(x => x.Value == appId).Key;
 
             if (!string.IsNullOrWhiteSpace(name))
             {
-                state.Apps.Remove(name);
+                State.Apps.Remove(name);
 
                 reservedIds.Remove(appId);
                 reservedNames.Remove(name);
             }
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         public Task<List<Guid>> GetAppIdsAsync(params string[] names)
@@ -110,7 +93,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             foreach (var appName in names)
             {
-                if (state.Apps.TryGetValue(appName, out var appId))
+                if (State.Apps.TryGetValue(appName, out var appId))
                 {
                     appIds.Add(appId);
                 }
@@ -121,19 +104,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public Task<Guid> GetAppIdAsync(string appName)
         {
-            state.Apps.TryGetValue(appName, out var appId);
+            State.Apps.TryGetValue(appName, out var appId);
 
             return Task.FromResult(appId);
         }
 
         public Task<List<Guid>> GetAppIdsAsync()
         {
-            return Task.FromResult(state.Apps.Values.ToList());
+            return Task.FromResult(State.Apps.Values.ToList());
         }
 
         public Task<long> CountAsync()
         {
-            return Task.FromResult((long)state.Apps.Count);
+            return Task.FromResult((long)State.Apps.Count);
         }
     }
 }

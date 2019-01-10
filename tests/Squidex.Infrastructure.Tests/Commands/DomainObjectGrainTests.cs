@@ -239,7 +239,7 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task SetupCreatedAsync()
         {
-            await sut.OnActivateAsync(id);
+            await sut.ActivateAsync(id);
 
             await sut.ExecuteAsync(C(new CreateAuto { Value = 4 }));
         }
@@ -251,7 +251,7 @@ namespace Squidex.Infrastructure.Commands
 
         private async Task SetupEmptyAsync()
         {
-            await sut.OnActivateAsync(id);
+            await sut.ActivateAsync(id);
         }
     }
 }

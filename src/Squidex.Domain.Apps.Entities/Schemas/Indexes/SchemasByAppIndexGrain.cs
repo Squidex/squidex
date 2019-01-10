@@ -9,79 +9,60 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
-    public sealed class SchemasByAppIndexGrain : GrainOfGuid, ISchemasByAppIndex
+    public sealed class SchemasByAppIndexGrain : GrainOfGuid<SchemasByAppIndexGrain.GrainState>, ISchemasByAppIndex
     {
-        private readonly IStore<Guid> store;
-        private IPersistence<State> persistence;
-        private State state = new State();
-
         [CollectionName("Index_SchemasByApp")]
-        public sealed class State
+        public sealed class GrainState
         {
             public Dictionary<string, Guid> Schemas { get; set; } = new Dictionary<string, Guid>();
         }
 
         public SchemasByAppIndexGrain(IStore<Guid> store)
+            : base(store)
         {
-            Guard.NotNull(store, nameof(store));
-
-            this.store = store;
-        }
-
-        public override Task OnActivateAsync(Guid key)
-        {
-            persistence = store.WithSnapshots<SchemasByAppIndexGrain, State, Guid>(key, s =>
-            {
-                state = s;
-            });
-
-            return persistence.ReadAsync();
         }
 
         public Task ClearAsync()
         {
-            state = new State();
-
-            return persistence.DeleteAsync();
+            return ClearStateAsync();
         }
 
         public Task RebuildAsync(Dictionary<string, Guid> schemas)
         {
-            state = new State { Schemas = schemas };
+            State = new GrainState { Schemas = schemas };
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         public Task AddSchemaAsync(Guid schemaId, string name)
         {
-            state.Schemas[name] = schemaId;
+            State.Schemas[name] = schemaId;
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         public Task RemoveSchemaAsync(Guid schemaId)
         {
-            state.Schemas.Remove(state.Schemas.FirstOrDefault(x => x.Value == schemaId).Key ?? string.Empty);
+            State.Schemas.Remove(State.Schemas.FirstOrDefault(x => x.Value == schemaId).Key ?? string.Empty);
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         public Task<Guid> GetSchemaIdAsync(string name)
         {
-            state.Schemas.TryGetValue(name, out var schemaId);
+            State.Schemas.TryGetValue(name, out var schemaId);
 
             return Task.FromResult(schemaId);
         }
 
         public Task<List<Guid>> GetSchemaIdsAsync()
         {
-            return Task.FromResult(state.Schemas.Values.ToList());
+            return Task.FromResult(State.Schemas.Values.ToList());
         }
     }
 }

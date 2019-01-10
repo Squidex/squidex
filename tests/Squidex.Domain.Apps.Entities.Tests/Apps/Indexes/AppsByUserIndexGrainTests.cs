@@ -18,18 +18,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
     public class AppsByUserIndexGrainTests
     {
         private readonly IStore<string> store = A.Fake<IStore<string>>();
-        private readonly IPersistence<AppsByUserIndexGrain.State> persistence = A.Fake<IPersistence<AppsByUserIndexGrain.State>>();
+        private readonly IPersistence<AppsByUserIndexGrain.GrainState> persistence = A.Fake<IPersistence<AppsByUserIndexGrain.GrainState>>();
         private readonly Guid appId1 = Guid.NewGuid();
         private readonly Guid appId2 = Guid.NewGuid();
         private readonly AppsByUserIndexGrain sut;
 
         public AppsByUserIndexGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<string>.Ignored, A<Func<AppsByUserIndexGrain.State, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<string>.Ignored, A<Func<AppsByUserIndexGrain.GrainState, Task>>.Ignored))
                 .Returns(persistence);
 
             sut = new AppsByUserIndexGrain(store);
-            sut.OnActivateAsync("user").Wait();
+            sut.ActivateAsync("user").Wait();
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             Assert.Equal(new List<Guid> { appId1, appId2 }, result);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByUserIndexGrain.State>.Ignored))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByUserIndexGrain.GrainState>.Ignored))
                 .MustHaveHappenedTwiceExactly();
         }
 
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             Assert.Equal(new List<Guid> { appId2 }, result);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByUserIndexGrain.State>.Ignored))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByUserIndexGrain.GrainState>.Ignored))
                 .MustHaveHappenedTwiceOrMore();
         }
 
@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             Assert.Equal(new List<Guid> { appId1, appId2 }, result);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByUserIndexGrain.State>.Ignored))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByUserIndexGrain.GrainState>.Ignored))
                 .MustHaveHappened();
         }
     }

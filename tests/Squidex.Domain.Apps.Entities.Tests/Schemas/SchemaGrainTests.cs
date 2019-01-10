@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 .Returns((ISchemaEntity)null);
 
             sut = new SchemaGrain(Store, A.Dummy<ISemanticLog>(), appProvider, registry);
-            sut.OnActivateAsync(Id).Wait();
+            sut.ActivateAsync(Id).Wait();
         }
 
         [Fact]

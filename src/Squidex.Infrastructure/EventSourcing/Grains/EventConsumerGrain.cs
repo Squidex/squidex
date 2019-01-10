@@ -50,7 +50,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             this.eventConsumerFactory = eventConsumerFactory;
         }
 
-        public override Task OnActivateAsync(string key)
+        protected override Task OnActivateAsync(string key)
         {
             scheduler = TaskScheduler.Current;
 

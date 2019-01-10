@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .Returns(new Dictionary<string, string>());
 
             sut = new AssetGrain(Store, tagService, A.Dummy<ISemanticLog>());
-            sut.OnActivateAsync(Id).Wait();
+            sut.ActivateAsync(Id).Wait();
         }
 
         [Fact]

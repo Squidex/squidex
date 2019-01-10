@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Commands
             this.log = log;
         }
 
-        public sealed override async Task OnActivateAsync(Guid key)
+        protected sealed override async Task OnActivateAsync(Guid key)
         {
             using (log.MeasureInformation(w => w
                 .WriteProperty("action", "ActivateDomainObject")

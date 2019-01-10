@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
     public class AppsByNameIndexGrainTests
     {
         private readonly IStore<string> store = A.Fake<IStore<string>>();
-        private readonly IPersistence<AppsByNameIndexGrain.State> persistence = A.Fake<IPersistence<AppsByNameIndexGrain.State>>();
+        private readonly IPersistence<AppsByNameIndexGrain.GrainState> persistence = A.Fake<IPersistence<AppsByNameIndexGrain.GrainState>>();
         private readonly Guid appId1 = Guid.NewGuid();
         private readonly Guid appId2 = Guid.NewGuid();
         private readonly string appName1 = "my-app1";
@@ -27,11 +27,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public AppsByNameIndexGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<string>.Ignored, A<Func<AppsByNameIndexGrain.State, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<string>.Ignored, A<Func<AppsByNameIndexGrain.GrainState, Task>>.Ignored))
                 .Returns(persistence);
 
             sut = new AppsByNameIndexGrain(store);
-            sut.OnActivateAsync(SingleGrain.Id).Wait();
+            sut.ActivateAsync(SingleGrain.Id).Wait();
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             Assert.Equal(appId1, result);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByNameIndexGrain.State>.Ignored))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByNameIndexGrain.GrainState>.Ignored))
                 .MustHaveHappened();
         }
 
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             Assert.Equal(Guid.Empty, result);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByNameIndexGrain.State>.Ignored))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByNameIndexGrain.GrainState>.Ignored))
                 .MustHaveHappenedTwiceExactly();
         }
 
@@ -148,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             Assert.Equal(2, await sut.CountAsync());
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByNameIndexGrain.State>.Ignored))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByNameIndexGrain.GrainState>.Ignored))
                 .MustHaveHappened();
         }
     }

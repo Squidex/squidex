@@ -98,7 +98,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             patched = patch.MergeInto(data);
 
             sut = new ContentGrain(Store, A.Dummy<ISemanticLog>(), appProvider, A.Dummy<IAssetRepository>(), scriptEngine, A.Dummy<IContentRepository>());
-            sut.OnActivateAsync(Id).Wait();
+            sut.ActivateAsync(Id).Wait();
         }
 
         [Fact]

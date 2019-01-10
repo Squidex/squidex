@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
 
             asset = new AssetGrain(Store, tagService, A.Dummy<ISemanticLog>());
-            asset.OnActivateAsync(Id).Wait();
+            asset.ActivateAsync(Id).Wait();
 
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
                 .Returns(new Dictionary<string, string>());

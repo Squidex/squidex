@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
     public class SchemasByAppIndexGrainTests
     {
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
-        private readonly IPersistence<SchemasByAppIndexGrain.State> persistence = A.Fake<IPersistence<SchemasByAppIndexGrain.State>>();
+        private readonly IPersistence<SchemasByAppIndexGrain.GrainState> persistence = A.Fake<IPersistence<SchemasByAppIndexGrain.GrainState>>();
         private readonly Guid schemaId1 = Guid.NewGuid();
         private readonly Guid schemaId2 = Guid.NewGuid();
         private readonly string schemaName1 = "my-schema1";
@@ -26,11 +26,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public SchemasByAppIndexGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<Guid>.Ignored, A<Func<SchemasByAppIndexGrain.State, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<Guid>.Ignored, A<Func<SchemasByAppIndexGrain.GrainState, Task>>.Ignored))
                 .Returns(persistence);
 
             sut = new SchemasByAppIndexGrain(store);
-            sut.OnActivateAsync(Guid.NewGuid()).Wait();
+            sut.ActivateAsync(Guid.NewGuid()).Wait();
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             Assert.Equal(schemaId1, result);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<SchemasByAppIndexGrain.State>.Ignored))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<SchemasByAppIndexGrain.GrainState>.Ignored))
                 .MustHaveHappened();
         }
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             Assert.Equal(Guid.Empty, result);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<SchemasByAppIndexGrain.State>.Ignored))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<SchemasByAppIndexGrain.GrainState>.Ignored))
                 .MustHaveHappenedTwiceExactly();
         }
 
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             Assert.Equal(new List<Guid> { schemaId1, schemaId2 }, await sut.GetSchemaIdsAsync());
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<SchemasByAppIndexGrain.State>.Ignored))
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<SchemasByAppIndexGrain.GrainState>.Ignored))
                 .MustHaveHappened();
         }
     }

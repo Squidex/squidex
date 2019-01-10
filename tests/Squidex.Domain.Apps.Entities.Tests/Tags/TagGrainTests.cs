@@ -19,16 +19,16 @@ namespace Squidex.Domain.Apps.Entities.Tags
     public class TagGrainTests
     {
         private readonly IStore<string> store = A.Fake<IStore<string>>();
-        private readonly IPersistence<TagGrain.State> persistence = A.Fake<IPersistence<TagGrain.State>>();
+        private readonly IPersistence<TagGrain.GrainState> persistence = A.Fake<IPersistence<TagGrain.GrainState>>();
         private readonly TagGrain sut;
 
         public TagGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<string>.Ignored, A<Func<TagGrain.State, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<string>.Ignored, A<Func<TagGrain.GrainState, Task>>.Ignored))
                 .Returns(persistence);
 
             sut = new TagGrain(store);
-            sut.OnActivateAsync(string.Empty).Wait();
+            sut.ActivateAsync(string.Empty).Wait();
         }
 
         [Fact]

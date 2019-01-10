@@ -14,12 +14,21 @@ namespace Squidex.Infrastructure.Orleans
 {
     public abstract class GrainOfGuid : Grain
     {
+        public Guid Key { get; private set; }
+
         public sealed override Task OnActivateAsync()
         {
-            return OnActivateAsync(this.GetPrimaryKey());
+            return ActivateAsync(this.GetPrimaryKey());
         }
 
-        public virtual Task OnActivateAsync(Guid key)
+        public Task ActivateAsync(Guid key)
+        {
+            Key = key;
+
+            return OnActivateAsync(key);
+        }
+
+        protected virtual Task OnActivateAsync(Guid key)
         {
             return TaskHelper.Done;
         }

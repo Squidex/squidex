@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
         public CommentsGrainTests()
         {
             sut = new CommentsGrain(Store, A.Dummy<ISemanticLog>());
-            sut.OnActivateAsync(Id).Wait();
+            sut.ActivateAsync(Id).Wait();
         }
 
         [Fact]
