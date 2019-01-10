@@ -23,6 +23,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public Guid Key { get; private set; }
 
+        protected IPersistence<T> Persistence
+        {
+            get { return persistence; }
+        }
+
         protected GrainOfGuid(IStore<Guid> store)
         {
             Guard.NotNull(store, nameof(store));

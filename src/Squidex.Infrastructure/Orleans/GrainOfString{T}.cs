@@ -22,6 +22,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         protected T State { get; set; }
 
+        protected IPersistence<T> Persistence
+        {
+            get { return persistence; }
+        }
+
         protected GrainOfString(IStore<string> store)
         {
             Guard.NotNull(store, nameof(store));
