@@ -19,7 +19,7 @@ namespace Squidex.Infrastructure.Orleans
 
         public string Key { get; set; }
 
-        protected T State { get; set; }
+        protected T State { get; set; } = new T();
 
         protected IPersistence<T> Persistence
         {

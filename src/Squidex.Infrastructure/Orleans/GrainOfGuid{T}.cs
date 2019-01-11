@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Orleans
         private readonly IStore<Guid> store;
         private IPersistence<T> persistence;
 
-        protected T State { get; set; }
+        protected T State { get; set; } = new T();
 
         public Guid Key { get; private set; }
 
