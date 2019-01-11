@@ -54,7 +54,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         private readonly EventConsumerGrain sut;
         private readonly string consumerName;
         private readonly string initialPosition = Guid.NewGuid().ToString();
-        private Func<EventConsumerState, Task> apply;
+        private HandleSnapshot<EventConsumerState> apply;
         private EventConsumerState state = new EventConsumerState();
 
         public EventConsumerGrainTests()
@@ -63,8 +63,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             consumerName = eventConsumer.GetType().Name;
 
-            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, consumerName, A<Func<EventConsumerState, Task>>.Ignored))
-                .Invokes(new Action<Type, string, Func<EventConsumerState, Task>>((t, key, a) =>
+            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, consumerName, A<HandleSnapshot<EventConsumerState>>.Ignored))
+                .Invokes(new Action<Type, string, HandleSnapshot<EventConsumerState>>((t, key, a) =>
                 {
                     apply = a;
                 }))

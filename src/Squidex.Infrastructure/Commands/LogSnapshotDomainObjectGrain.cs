@@ -64,7 +64,7 @@ namespace Squidex.Infrastructure.Commands
 
         protected sealed override Task ReadAsync(Type type, Guid id)
         {
-            persistence = store.WithEventSourcing<Guid>(type, id, ApplyEvent);
+            persistence = store.WithEventSourcing(type, id, ApplyEvent);
 
             return persistence.ReadAsync();
         }

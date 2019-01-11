@@ -25,9 +25,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
             this.scriptEngine = scriptEngine;
         }
 
-        protected override Task<bool> TriggersAsync(EnrichedAssetEvent @event, AssetChangedTriggerV2 trigger)
+        protected override bool Trigger(EnrichedAssetEvent @event, AssetChangedTriggerV2 trigger)
         {
-            return Task.FromResult(string.IsNullOrWhiteSpace(trigger.Condition) || scriptEngine.Evaluate("event", @event, trigger.Condition));
+            return string.IsNullOrWhiteSpace(trigger.Condition) || scriptEngine.Evaluate("event", @event, trigger.Condition);
         }
     }
 }

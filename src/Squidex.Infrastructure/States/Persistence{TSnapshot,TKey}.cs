@@ -24,8 +24,8 @@ namespace Squidex.Infrastructure.States
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly PersistenceMode persistenceMode;
-        private readonly Func<TSnapshot, Task> applyState;
-        private readonly Func<Envelope<IEvent>, Task> applyEvent;
+        private readonly HandleSnapshot<TSnapshot> applyState;
+        private readonly HandleEvent applyEvent;
         private long versionSnapshot = EtagVersion.Empty;
         private long versionEvents = EtagVersion.Empty;
         private long version;
@@ -41,8 +41,8 @@ namespace Squidex.Infrastructure.States
             ISnapshotStore<TSnapshot, TKey> snapshotStore,
             IStreamNameResolver streamNameResolver,
             PersistenceMode persistenceMode,
-            Func<TSnapshot, Task> applyState,
-            Func<Envelope<IEvent>, Task> applyEvent)
+            HandleSnapshot<TSnapshot> applyState,
+            HandleEvent applyEvent)
         {
             this.ownerKey = ownerKey;
             this.ownerType = ownerType;
@@ -94,7 +94,7 @@ namespace Squidex.Infrastructure.States
 
                 if (applyState != null && position >= 0)
                 {
-                    await applyState(state);
+                    applyState(state);
                 }
             }
         }
@@ -116,9 +116,9 @@ namespace Squidex.Infrastructure.States
 
                     var parsedEvent = ParseKnownEvent(@event);
 
-                    if (parsedEvent != null && applyEvent != null)
+                    if (applyEvent != null && parsedEvent != null)
                     {
-                        await applyEvent(parsedEvent);
+                        applyEvent(parsedEvent);
                     }
                 }
             }

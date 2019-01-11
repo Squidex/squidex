@@ -20,15 +20,16 @@ namespace Squidex.Domain.Apps.Entities.Tags
     {
         private readonly IStore<string> store = A.Fake<IStore<string>>();
         private readonly IPersistence<TagGrain.GrainState> persistence = A.Fake<IPersistence<TagGrain.GrainState>>();
+        private readonly string id = Guid.NewGuid().ToString();
         private readonly TagGrain sut;
 
         public TagGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<string>.Ignored, A<Func<TagGrain.GrainState, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(typeof(TagGrain), id, A<HandleSnapshot<TagGrain.GrainState>>.Ignored))
                 .Returns(persistence);
 
             sut = new TagGrain(store);
-            sut.ActivateAsync(string.Empty).Wait();
+            sut.ActivateAsync(id).Wait();
         }
 
         [Fact]

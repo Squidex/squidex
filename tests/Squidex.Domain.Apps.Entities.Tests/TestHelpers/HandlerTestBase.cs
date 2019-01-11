@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -58,10 +57,10 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected HandlerTestBase()
         {
-            A.CallTo(() => store.WithSnapshotsAndEventSourcing(A<Type>.Ignored, Id, A<Func<TState, Task>>.Ignored, A<Func<Envelope<IEvent>, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshotsAndEventSourcing(A<Type>.Ignored, Id, A<HandleSnapshot<TState>>.Ignored, A<HandleEvent>.Ignored))
                 .Returns(persistence1);
 
-            A.CallTo(() => store.WithEventSourcing(A<Type>.Ignored, Id, A<Func<Envelope<IEvent>, Task>>.Ignored))
+            A.CallTo(() => store.WithEventSourcing(A<Type>.Ignored, Id, A<HandleEvent>.Ignored))
                 .Returns(persistence2);
 
             A.CallTo(() => persistence1.WriteEventsAsync(A<IEnumerable<Envelope<IEvent>>>.Ignored))

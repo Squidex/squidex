@@ -27,6 +27,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentChangedTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
+            services.AddSingletonAs<UsageTriggerHandler>()
+                .As<IRuleTriggerHandler>();
+
             services.AddSingletonAs<RuleEnqueuer>()
                 .As<IEventConsumer>();
 

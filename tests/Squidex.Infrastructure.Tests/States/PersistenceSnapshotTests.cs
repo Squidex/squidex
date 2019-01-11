@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.States
                 .Returns((20, 10));
 
             var persistedState = 0;
-            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
+            var persistence = sut.WithSnapshots(None.Type, key, (int x) => persistedState = x);
 
             await persistence.ReadAsync();
 
@@ -55,7 +55,7 @@ namespace Squidex.Infrastructure.States
                 .Returns((20, -10));
 
             var persistedState = 0;
-            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
+            var persistence = sut.WithSnapshots(None.Type, key, (int x) => persistedState = x);
 
             await persistence.ReadAsync();
 
@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.States
                 .Returns((20, EtagVersion.Empty));
 
             var persistedState = 0;
-            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
+            var persistence = sut.WithSnapshots(None.Type, key, (int x) => persistedState = x);
 
             await persistence.ReadAsync();
 
@@ -84,7 +84,7 @@ namespace Squidex.Infrastructure.States
                 .Returns((123, EtagVersion.Empty));
 
             var persistedState = 0;
-            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
+            var persistence = sut.WithSnapshots(None.Type, key, (int x) => persistedState = x);
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => persistence.ReadAsync(1));
         }
@@ -96,7 +96,7 @@ namespace Squidex.Infrastructure.States
                 .Returns((123, 2));
 
             var persistedState = 0;
-            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
+            var persistence = sut.WithSnapshots(None.Type, key, (int x) => persistedState = x);
 
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.ReadAsync(1));
         }
@@ -108,7 +108,7 @@ namespace Squidex.Infrastructure.States
                 .Returns((20, 10));
 
             var persistedState = 0;
-            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
+            var persistence = sut.WithSnapshots(None.Type, key, (int x) => persistedState = x);
 
             await persistence.ReadAsync();
 
@@ -131,7 +131,7 @@ namespace Squidex.Infrastructure.States
                 .Throws(new InconsistentStateException(1, 1, new InvalidOperationException()));
 
             var persistedState = 0;
-            var persistence = sut.WithSnapshots<object, int, string>(key, x => persistedState = x);
+            var persistence = sut.WithSnapshots(None.Type, key, (int x) => persistedState = x);
 
             await persistence.ReadAsync();
 
@@ -141,7 +141,8 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_delete_snapshot_but_not_events_when_deleted()
         {
-            var persistence = sut.WithSnapshots<object, int, string>(key, x => { });
+            var persistedState = 0;
+            var persistence = sut.WithSnapshots(None.Type, key, (int x) => persistedState = x);
 
             await persistence.DeleteAsync();
 

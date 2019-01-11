@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -36,76 +35,76 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         }
 
         [Fact]
-        public Task Should_not_trigger_precheck_when_event_type_not_correct()
+        public void Should_not_trigger_precheck_when_event_type_not_correct()
         {
-            return TestForConditionAsync(string.Empty, async trigger =>
+            TestForCondition(string.Empty, trigger =>
             {
-                var result = await sut.TriggersAsync(new ContentCreated(), trigger);
+                var result = sut.Trigger(new ContentCreated(), trigger);
 
                 Assert.False(result);
             });
         }
 
         [Fact]
-        public Task Should_trigger_precheck_when_event_type_correct()
+        public void Should_trigger_precheck_when_event_type_correct()
         {
-            return TestForConditionAsync(string.Empty, async trigger =>
+            TestForCondition(string.Empty, trigger =>
             {
-                var result = await sut.TriggersAsync(new AssetCreated(), trigger);
+                var result = sut.Trigger(new AssetCreated(), trigger);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public Task Should_not_trigger_check_when_event_type_not_correct()
+        public void Should_not_trigger_check_when_event_type_not_correct()
         {
-            return TestForConditionAsync(string.Empty, async trigger =>
+            TestForCondition(string.Empty, trigger =>
             {
-                var result = await sut.TriggersAsync(new EnrichedContentEvent(), trigger);
+                var result = sut.Trigger(new EnrichedContentEvent(), trigger);
 
                 Assert.False(result);
             });
         }
 
         [Fact]
-        public Task Should_trigger_check_when_condition_is_empty()
+        public void Should_trigger_check_when_condition_is_empty()
         {
-            return TestForConditionAsync(string.Empty, async trigger =>
+            TestForCondition(string.Empty, trigger =>
             {
-                var result = await sut.TriggersAsync(new EnrichedAssetEvent(), trigger);
+                var result = sut.Trigger(new EnrichedAssetEvent(), trigger);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public Task Should_trigger_check_when_condition_matchs()
+        public void Should_trigger_check_when_condition_matchs()
         {
-            return TestForConditionAsync("true", async trigger =>
+            TestForCondition("true", trigger =>
             {
-                var result = await sut.TriggersAsync(new EnrichedAssetEvent(), trigger);
+                var result = sut.Trigger(new EnrichedAssetEvent(), trigger);
 
                 Assert.True(result);
             });
         }
 
         [Fact]
-        public Task Should_not_trigger_check_when_condition_does_not_matchs()
+        public void Should_not_trigger_check_when_condition_does_not_matchs()
         {
-            return TestForConditionAsync("false", async trigger =>
+            TestForCondition("false", trigger =>
             {
-                var result = await sut.TriggersAsync(new EnrichedAssetEvent(), trigger);
+                var result = sut.Trigger(new EnrichedAssetEvent(), trigger);
 
                 Assert.False(result);
             });
         }
 
-        private async Task TestForConditionAsync(string condition, Func<AssetChangedTriggerV2, Task> action)
+        private void TestForCondition(string condition, Action<AssetChangedTriggerV2> action)
         {
             var trigger = new AssetChangedTriggerV2 { Condition = condition };
 
-            await action(trigger);
+            action(trigger);
 
             if (string.IsNullOrWhiteSpace(condition))
             {

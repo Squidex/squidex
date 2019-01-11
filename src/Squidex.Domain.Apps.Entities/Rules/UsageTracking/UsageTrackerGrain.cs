@@ -12,19 +12,15 @@ using Orleans;
 using Orleans.Runtime;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
-    public sealed class UsageTrackerGrain : GrainOfString, IRemindable, IUsageTrackerGrain
+    public sealed class UsageTrackerGrain : GrainOfString<UsageTrackerGrain.GrainState>, IRemindable, IUsageTrackerGrain
     {
-        private readonly IStore<string> store;
         private readonly IUsageTracker usageTracker;
-        private IPersistence<State> persistence;
-        private State state;
 
         public sealed class Target
         {
@@ -36,46 +32,33 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         }
 
         [CollectionName("UsageTracker")]
-        public sealed class State
+        public sealed class GrainState
         {
             public Dictionary<NamedId<Guid>, Target> Targets { get; set; } = new Dictionary<NamedId<Guid>, Target>();
         }
 
         public UsageTrackerGrain(IStore<string> store, IUsageTracker usageTracker)
+            : base(store)
         {
-            Guard.NotNull(store, nameof(store));
             Guard.NotNull(usageTracker, nameof(usageTracker));
-
-            this.store = store;
 
             this.usageTracker = usageTracker;
         }
 
-        public override Task OnActivateAsync(string key)
+        protected override Task OnActivateAsync(string key)
         {
             DelayDeactivation(TimeSpan.FromDays(1));
 
             RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
 
-            persistence = store.WithSnapshotsAndEventSourcing<State, string>(GetType(), key, ApplySnapshot, ApplyEvent);
-
-            return persistence.ReadAsync();
-        }
-
-        private void ApplySnapshot(State s)
-        {
-            state = s;
-        }
-
-        private void ApplyEvent(Envelope<IEvent> @event)
-        {
+            return Task.CompletedTask;
         }
 
         public async Task ReceiveReminder(string reminderName, TickStatus status)
         {
             var today = DateTime.Today;
 
-            foreach (var kvp in state.Targets)
+            foreach (var kvp in State.Targets)
             {
                 var appId = kvp.Key;
 
@@ -91,15 +74,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
                         var @event = new AppUsageExceeded { AppId = appId, Current = usage, Limit = limit };
 
-                        await persistence.WriteEventsAsync(new[]
-                        {
-                            Envelope.Create(@event)
-                        });
+                        await Persistence.WriteEventAsync(@event);
                     }
                 }
             }
 
-            await persistence.WriteSnapshotAsync(state);
+            await WriteStateAsync();
         }
 
         private static bool IsSameMonth(DateTime lhs, DateTime rhs)
@@ -111,33 +91,33 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         {
             UpdateTarget(appId, t => t.Enabled = true);
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         public Task DeactivateTargetAsync(NamedId<Guid> appId)
         {
             UpdateTarget(appId, t => t.Enabled = false);
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         public Task AddTargetAsync(NamedId<Guid> appId, int limits)
         {
             UpdateTarget(appId, t => t.Limit = limits);
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         public Task RemoveTargetAsync(NamedId<Guid> appId)
         {
-            state.Targets.Remove(appId);
+            State.Targets.Remove(appId);
 
-            return persistence.WriteSnapshotAsync(state);
+            return WriteStateAsync();
         }
 
         private void UpdateTarget(NamedId<Guid> appId, Action<Target> updater)
         {
-            updater(state.Targets.GetOrAddNew(appId));;
+            updater(State.Targets.GetOrAddNew(appId));;
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Version = EtagVersion.Empty
             };
 
-            var persistence = store.WithSnapshotsAndEventSourcing<TState, Guid>(typeof(TGrain), key, s => state = s, e =>
+            var persistence = store.WithSnapshotsAndEventSourcing(typeof(TGrain), key, (TState s) => state = s, e =>
             {
                 state = func(e, state);
 

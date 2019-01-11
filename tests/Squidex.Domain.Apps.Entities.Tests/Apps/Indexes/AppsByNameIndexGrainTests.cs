@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public AppsByNameIndexGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<string>.Ignored, A<Func<AppsByNameIndexGrain.GrainState, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(typeof(AppsByNameIndexGrain), SingleGrain.Id, A<HandleSnapshot<AppsByNameIndexGrain.GrainState>>.Ignored))
                 .Returns(persistence);
 
             sut = new AppsByNameIndexGrain(store);

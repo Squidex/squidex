@@ -6,13 +6,11 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
 {
@@ -27,11 +25,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
             this.scriptEngine = scriptEngine;
         }
 
-        protected override Task<bool> TriggersAsync(ContentEvent @event, ContentChangedTriggerV2 trigger)
+        protected override bool Trigger(ContentEvent @event, ContentChangedTriggerV2 trigger)
         {
             if (trigger.HandleAll)
             {
-                return TaskHelper.True;
+                return true;
             }
 
             if (trigger.Schemas != null)
@@ -40,19 +38,19 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
                 {
                     if (MatchsSchema(schema, @event.SchemaId))
                     {
-                        return TaskHelper.True;
+                        return true;
                     }
                 }
             }
 
-            return TaskHelper.False;
+            return false;
         }
 
-        protected override Task<bool> TriggersAsync(EnrichedContentEvent @event, ContentChangedTriggerV2 trigger)
+        protected override bool Trigger(EnrichedContentEvent @event, ContentChangedTriggerV2 trigger)
         {
             if (trigger.HandleAll)
             {
-                return TaskHelper.True;
+                return true;
             }
 
             if (trigger.Schemas != null)
@@ -61,12 +59,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
                 {
                     if (MatchsSchema(schema, @event.SchemaId) && MatchsCondition(schema, @event))
                     {
-                        return TaskHelper.True;
+                        return true;
                     }
                 }
             }
 
-            return TaskHelper.False;
+            return false;
         }
 
         private static bool MatchsSchema(ContentChangedTriggerSchemaV2 schema, NamedId<Guid> eventId)

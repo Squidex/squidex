@@ -6,18 +6,21 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
+    public delegate void HandleEvent(Envelope<IEvent> @event);
+
+    public delegate void HandleSnapshot<T>(T state);
+
     public interface IStore<in TKey>
     {
-        IPersistence WithEventSourcing(Type owner, TKey key, Func<Envelope<IEvent>, Task> applyEvent);
+        IPersistence WithEventSourcing(Type owner, TKey key, HandleEvent applyEvent);
 
-        IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, Func<TState, Task> applySnapshot);
+        IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, HandleSnapshot<TState> applySnapshot);
 
-        IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent);
+        IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, HandleSnapshot<TState> applySnapshot, HandleEvent applyEvent);
 
         ISnapshotStore<TState, TKey> GetSnapshotStore<TState>();
     }

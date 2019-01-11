@@ -21,15 +21,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         private readonly IPersistence<AppsByUserIndexGrain.GrainState> persistence = A.Fake<IPersistence<AppsByUserIndexGrain.GrainState>>();
         private readonly Guid appId1 = Guid.NewGuid();
         private readonly Guid appId2 = Guid.NewGuid();
+        private readonly string userId = "user";
         private readonly AppsByUserIndexGrain sut;
 
         public AppsByUserIndexGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<string>.Ignored, A<Func<AppsByUserIndexGrain.GrainState, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(typeof(AppsByUserIndexGrain), userId, A<HandleSnapshot<AppsByUserIndexGrain.GrainState>>.Ignored))
                 .Returns(persistence);
 
             sut = new AppsByUserIndexGrain(store);
-            sut.ActivateAsync("user").Wait();
+            sut.ActivateAsync(userId).Wait();
         }
 
         [Fact]

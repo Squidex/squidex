@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return null;
             }
 
-            if (!await triggerHandler.TriggersAsync(@event.Payload, rule.Trigger))
+            if (!triggerHandler.Trigger(@event.Payload, rule.Trigger))
             {
                 return null;
             }
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             var enrichedEvent = await eventEnricher.EnrichAsync(appEventEnvelope);
 
-            if (!await triggerHandler.TriggersAsync(enrichedEvent, rule.Trigger))
+            if (!triggerHandler.Trigger(enrichedEvent, rule.Trigger))
             {
                 return null;
             }

@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Comments
 
         protected override Task ReadAsync(Type type, Guid id)
         {
-            persistence = store.WithEventSourcing<Guid>(GetType(), id, ApplyEvent);
+            persistence = store.WithEventSourcing(GetType(), id, ApplyEvent);
 
             return persistence.ReadAsync();
         }
