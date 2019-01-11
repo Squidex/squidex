@@ -18,6 +18,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         bool Trigger(EnrichedEvent @event, RuleTrigger trigger);
 
-        bool Trigger(IEvent @event, RuleTrigger trigger);
+        bool Trigger(IEvent @event, RuleTrigger trigger, Guid ruleId);
     }
 }

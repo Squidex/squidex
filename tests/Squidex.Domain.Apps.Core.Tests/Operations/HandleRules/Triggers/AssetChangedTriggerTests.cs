@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         {
             TestForCondition(string.Empty, trigger =>
             {
-                var result = sut.Trigger(new ContentCreated(), trigger);
+                var result = sut.Trigger(new ContentCreated(), trigger, Guid.NewGuid());
 
                 Assert.False(result);
             });
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         {
             TestForCondition(string.Empty, trigger =>
             {
-                var result = sut.Trigger(new AssetCreated(), trigger);
+                var result = sut.Trigger(new AssetCreated(), trigger, Guid.NewGuid());
 
                 Assert.True(result);
             });

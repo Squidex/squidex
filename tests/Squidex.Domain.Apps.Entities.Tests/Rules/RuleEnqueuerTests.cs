@@ -28,9 +28,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly IRuleEventRepository ruleEventRepository = A.Fake<IRuleEventRepository>();
-        private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly Instant now = SystemClock.Instance.GetCurrentInstant();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly RuleService ruleService = A.Fake<RuleService>();
         private readonly RuleEnqueuer sut;
 
         public sealed class TestAction : RuleAction
@@ -72,37 +72,27 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
             var rule1 = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
             var rule2 = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
-            var rule3 = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
 
             var job1 = new RuleJob { Created = now };
-            var job2 = new RuleJob { Created = now };
 
             var ruleEntity1 = A.Fake<IRuleEntity>();
             var ruleEntity2 = A.Fake<IRuleEntity>();
-            var ruleEntity3 = A.Fake<IRuleEntity>();
 
             A.CallTo(() => ruleEntity1.RuleDef).Returns(rule1);
             A.CallTo(() => ruleEntity2.RuleDef).Returns(rule2);
-            A.CallTo(() => ruleEntity3.RuleDef).Returns(rule3);
 
             A.CallTo(() => appProvider.GetRulesAsync(appId.Id))
-                .Returns(new List<IRuleEntity> { ruleEntity1, ruleEntity2, ruleEntity3 });
+                .Returns(new List<IRuleEntity> { ruleEntity1, ruleEntity2 });
 
-            A.CallTo(() => ruleService.CreateJobAsync(rule1, @event))
+            A.CallTo(() => ruleService.CreateJobAsync(rule1, ruleEntity1.Id, @event))
                 .Returns(job1);
 
-            A.CallTo(() => ruleService.CreateJobAsync(rule2, @event))
-                .Returns(job2);
-
-            A.CallTo(() => ruleService.CreateJobAsync(rule3, @event))
+            A.CallTo(() => ruleService.CreateJobAsync(rule2, ruleEntity2.Id, @event))
                 .Returns(Task.FromResult<RuleJob>(null));
 
             await sut.On(@event);
 
             A.CallTo(() => ruleEventRepository.EnqueueAsync(job1, now))
-                .MustHaveHappened();
-
-            A.CallTo(() => ruleEventRepository.EnqueueAsync(job2, now))
                 .MustHaveHappened();
         }
     }

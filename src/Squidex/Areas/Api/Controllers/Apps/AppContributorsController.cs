@@ -75,14 +75,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var command = request.ToCommand();
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<object>();
             var response = (ContributorAssignedDto)null;
 
-            if (result is EntityCreatedResult<string> idOrValue)
+            if (context.PlainResult is EntityCreatedResult<string> idOrValue)
             {
                 response = ContributorAssignedDto.FromId(idOrValue.IdOrValue, false);
             }
-            else if (result is InvitedResult invited)
+            else if (context.PlainResult is InvitedResult invited)
             {
                 response = ContributorAssignedDto.FromId(invited.Id.IdOrValue, true);
             }

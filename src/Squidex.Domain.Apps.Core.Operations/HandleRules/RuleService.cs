@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.clock = clock;
         }
 
-        public virtual async Task<RuleJob> CreateJobAsync(Rule rule, Envelope<IEvent> @event)
+        public virtual async Task<RuleJob> CreateJobAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
@@ -83,7 +83,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return null;
             }
 
-            if (!triggerHandler.Trigger(@event.Payload, rule.Trigger))
+            if (!triggerHandler.Trigger(@event.Payload, rule.Trigger, ruleId))
             {
                 return null;
             }

@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
             this.scriptEngine = scriptEngine;
         }
 
-        protected override bool Trigger(ContentEvent @event, ContentChangedTriggerV2 trigger)
+        protected override bool Trigger(ContentEvent @event, ContentChangedTriggerV2 trigger, Guid ruleId)
         {
             if (trigger.HandleAll)
             {

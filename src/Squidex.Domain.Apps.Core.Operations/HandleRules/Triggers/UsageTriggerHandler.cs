@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
 {
@@ -17,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.Triggers
     {
         protected override bool Trigger(EnrichedUsageExceededEvent @event, UsageTrigger trigger)
         {
-            return true;
+            return @event.Limit == trigger.Limit;
         }
     }
 }

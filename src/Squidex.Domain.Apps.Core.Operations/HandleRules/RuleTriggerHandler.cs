@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure.EventSourcing;
@@ -28,14 +27,14 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return @event is TEnrichedEvent e && Trigger(e, (TTrigger)trigger);
         }
 
-        bool IRuleTriggerHandler.Trigger(IEvent @event, RuleTrigger trigger)
+        bool IRuleTriggerHandler.Trigger(IEvent @event, RuleTrigger trigger, Guid ruleId)
         {
-            return @event is TEvent e && Trigger(e, (TTrigger)trigger);
+            return @event is TEvent e && Trigger(e, (TTrigger)trigger, ruleId);
         }
 
         protected abstract bool Trigger(TEnrichedEvent @event, TTrigger trigger);
 
-        protected virtual bool Trigger(TEvent @event, TTrigger trigger)
+        protected virtual bool Trigger(TEvent @event, TTrigger trigger, Guid ruleId)
         {
             return true;
         }

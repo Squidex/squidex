@@ -14,12 +14,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
     public interface IUsageTrackerGrain : IGrainWithStringKey
     {
-        Task AddTargetAsync(NamedId<Guid> appId, int limits);
+        Task AddTargetAsync(Guid ruleId, NamedId<Guid> appId, int limits);
 
-        Task ActivateTargetAsync(NamedId<Guid> appId);
+        Task ActivateTargetAsync(Guid ruleId);
 
-        Task DeactivateTargetAsync(NamedId<Guid> appId);
+        Task DeactivateTargetAsync(Guid ruleId);
 
-        Task RemoveTargetAsync(NamedId<Guid> appId);
+        Task RemoveTargetAsync(Guid ruleId);
+
+        Task UpdateTargetAsync(Guid ruleId, int limits);
     }
 }

@@ -19,6 +19,11 @@ namespace Squidex.Infrastructure.Commands
 
         public ICommandBus CommandBus { get; }
 
+        public object PlainResult
+        {
+            get { return result?.Item1; }
+        }
+
         public bool IsCompleted
         {
             get { return result != null; }

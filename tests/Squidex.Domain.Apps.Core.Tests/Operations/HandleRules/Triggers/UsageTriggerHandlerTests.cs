@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.HandleRules.Triggers;
@@ -17,20 +18,29 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
 {
     public class UsageTriggerHandlerTests
     {
+        private readonly Guid ruleId = Guid.NewGuid();
         private readonly IRuleTriggerHandler sut = new UsageTriggerHandler();
 
         [Fact]
         public void Should_not_trigger_precheck_when_event_type_not_correct()
         {
-            var result = sut.Trigger(new ContentCreated(), new UsageTrigger());
+            var result = sut.Trigger(new ContentCreated(), new UsageTrigger(), ruleId);
 
             Assert.False(result);
         }
 
         [Fact]
-        public void Should_trigger_precheck_when_event_type_correct()
+        public void Should_not_trigger_precheck_when_rule_id_not_matchs()
         {
-            var result = sut.Trigger(new AppUsageExceeded(), new UsageTrigger());
+            var result = sut.Trigger(new AppUsageExceeded { RuleId = Guid.NewGuid() }, new UsageTrigger(), ruleId);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void Should_trigger_precheck_when_event_type_correct_and_rule_id_matchs()
+        {
+            var result = sut.Trigger(new AppUsageExceeded { RuleId = ruleId }, new UsageTrigger(), ruleId);
 
             Assert.True(result);
         }
@@ -41,14 +51,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
             var result = sut.Trigger(new EnrichedContentEvent(), new UsageTrigger());
 
             Assert.False(result);
-        }
-
-        [Fact]
-        public void Should_trigger_check_when_type_correct()
-        {
-            var result = sut.Trigger(new AppUsageExceeded(), new UsageTrigger());
-
-            Assert.True(result);
         }
     }
 }

@@ -24,17 +24,19 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
         public sealed class Target
         {
-            public int Limit { get; set; }
+            public int Limits { get; set; }
 
-            public bool Enabled { get; set; }
+            public bool Disabled { get; set; }
 
             public DateTime Triggered { get; set; }
+
+            public NamedId<Guid> AppId { get; set; }
         }
 
         [CollectionName("UsageTracker")]
         public sealed class GrainState
         {
-            public Dictionary<NamedId<Guid>, Target> Targets { get; set; } = new Dictionary<NamedId<Guid>, Target>();
+            public Dictionary<Guid, Target> Targets { get; set; } = new Dictionary<Guid, Target>();
         }
 
         public UsageTrackerGrain(IStore<string> store, IUsageTracker usageTracker)
@@ -60,19 +62,25 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
             foreach (var kvp in State.Targets)
             {
-                var appId = kvp.Key;
+                var appId = kvp.Value.AppId;
 
                 if (!IsSameMonth(today, kvp.Value.Triggered))
                 {
                     var usage = await usageTracker.GetMonthlyCallsAsync(appId.Id.ToString(), today);
 
-                    var limit = kvp.Value.Limit;
+                    var limit = kvp.Value.Limits;
 
                     if (usage > limit)
                     {
                         kvp.Value.Triggered = today;
 
-                        var @event = new AppUsageExceeded { AppId = appId, Current = usage, Limit = limit };
+                        var @event = new AppUsageExceeded
+                        {
+                            AppId = appId,
+                            CallsCurrent = usage,
+                            CallsLimit = limit,
+                            RuleId = kvp.Key
+                        };
 
                         await Persistence.WriteEventAsync(@event);
                     }
@@ -87,37 +95,51 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             return lhs.Year == rhs.Year && lhs.Month == rhs.Month;
         }
 
-        public Task ActivateTargetAsync(NamedId<Guid> appId)
+        public Task AddTargetAsync(Guid ruleId, NamedId<Guid> appId, int limits)
         {
-            UpdateTarget(appId, t => t.Enabled = true);
+            UpdateTarget(ruleId, t => { t.Limits = limits; t.AppId = appId; });
 
             return WriteStateAsync();
         }
 
-        public Task DeactivateTargetAsync(NamedId<Guid> appId)
+        public Task UpdateTargetAsync(Guid ruleId, int limits)
         {
-            UpdateTarget(appId, t => t.Enabled = false);
+            UpdateTarget(ruleId, t => t.Limits = limits);
 
             return WriteStateAsync();
         }
 
-        public Task AddTargetAsync(NamedId<Guid> appId, int limits)
+        public Task ActivateTargetAsync(Guid ruleId)
         {
-            UpdateTarget(appId, t => t.Limit = limits);
+            UpdateTarget(ruleId, t => t.Disabled = false);
 
             return WriteStateAsync();
         }
 
-        public Task RemoveTargetAsync(NamedId<Guid> appId)
+        public Task DeactivateTargetAsync(Guid ruleId)
         {
-            State.Targets.Remove(appId);
+            UpdateTarget(ruleId, t => t.Disabled = true);
 
             return WriteStateAsync();
         }
 
-        private void UpdateTarget(NamedId<Guid> appId, Action<Target> updater)
+        public Task AddTargetAsync(Guid ruleId, int limits)
         {
-            updater(State.Targets.GetOrAddNew(appId));;
+            UpdateTarget(ruleId, t => t.Limits = limits);
+
+            return WriteStateAsync();
+        }
+
+        public Task RemoveTargetAsync(Guid ruleId)
+        {
+            State.Targets.Remove(ruleId);
+
+            return WriteStateAsync();
+        }
+
+        private void UpdateTarget(Guid ruleId, Action<Target> updater)
+        {
+            updater(State.Targets.GetOrAddNew(ruleId));
         }
     }
 }

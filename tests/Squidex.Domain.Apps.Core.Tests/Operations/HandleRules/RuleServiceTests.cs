@@ -33,6 +33,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly string actionDump = "MyDump";
         private readonly string actionName = "ValidAction";
         private readonly string actionDescription = "MyDescription";
+        private readonly Guid ruleId = Guid.NewGuid();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
@@ -87,10 +88,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_if_rule_disabled()
         {
-            var ruleConfig = ValidRule().Disable();
-            var ruleEnvelope = Envelope.Create(new ContentCreated());
+            var rule = ValidRule().Disable();
+            var ruleEvent = Envelope.Create(new ContentCreated());
 
-            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(rule, ruleId, ruleEvent);
 
             Assert.Null(job);
 
@@ -101,10 +102,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_for_invalid_event()
         {
-            var ruleConfig = ValidRule();
-            var ruleEnvelope = Envelope.Create(new InvalidEvent());
+            var rule = ValidRule();
+            var ruleEvent = Envelope.Create(new InvalidEvent());
 
-            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(rule, ruleId, ruleEvent);
 
             Assert.Null(job);
 
@@ -115,10 +116,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_if_no_trigger_handler_registered()
         {
-            var ruleConfig = new Rule(new InvalidTrigger(), new ValidAction());
-            var ruleEnvelope = Envelope.Create(new ContentCreated());
+            var rule = new Rule(new InvalidTrigger(), new ValidAction());
+            var ruleEvent = Envelope.Create(new ContentCreated());
 
-            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(rule, ruleId, ruleEvent);
 
             Assert.Null(job);
 
@@ -129,10 +130,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_if_no_action_handler_registered()
         {
-            var ruleConfig = new Rule(new ContentChangedTriggerV2(), new InvalidAction());
-            var ruleEnvelope = Envelope.Create(new ContentCreated());
+            var rule = new Rule(new ContentChangedTriggerV2(), new InvalidAction());
+            var ruleEvent = Envelope.Create(new ContentCreated());
 
-            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(rule, ruleId, ruleEvent);
 
             Assert.Null(job);
 
@@ -143,13 +144,13 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_if_not_triggered_with_precheck()
         {
-            var ruleConfig = ValidRule();
-            var ruleEnvelope = Envelope.Create(new ContentCreated());
+            var rule = ValidRule();
+            var ruleEvent = Envelope.Create(new ContentCreated());
 
-            A.CallTo(() => ruleTriggerHandler.Trigger(A<IEvent>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<IEvent>.Ignored, rule.Trigger, ruleId))
                 .Returns(false);
 
-            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(rule, ruleId, ruleEvent);
 
             Assert.Null(job);
 
@@ -160,16 +161,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_if_not_triggered()
         {
-            var ruleConfig = ValidRule();
-            var ruleEnvelope = Envelope.Create(new ContentCreated());
+            var rule = ValidRule();
+            var ruleEvent = Envelope.Create(new ContentCreated());
 
-            A.CallTo(() => ruleTriggerHandler.Trigger(A<IEvent>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<IEvent>.Ignored, rule.Trigger, ruleId))
                 .Returns(true);
 
-            A.CallTo(() => ruleTriggerHandler.Trigger(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<EnrichedEvent>.Ignored, rule.Trigger))
                 .Returns(false);
 
-            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(rule, ruleId, ruleEvent);
 
             Assert.Null(job);
         }
@@ -177,22 +178,22 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_not_create_job_if_too_old()
         {
-            var @event = new ContentCreated { SchemaId = schemaId, AppId = appId };
+            var ruleEvent = new ContentCreated { SchemaId = schemaId, AppId = appId };
 
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var ruleConfig = ValidRule();
-            var ruleEnvelope = Envelope.Create(@event);
+            var rule = ValidRule();
+            var ruleEnvelope = Envelope.Create(ruleEvent);
 
             ruleEnvelope.SetTimestamp(now.Minus(Duration.FromDays(3)));
 
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
 
-            A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))
+            A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, rule.Action))
                 .Returns((actionDescription, actionData));
 
-            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(rule, ruleId, ruleEnvelope);
 
             Assert.Null(job);
 
@@ -203,28 +204,28 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_create_job_if_triggered()
         {
-            var @event = new ContentCreated { SchemaId = schemaId, AppId = appId };
+            var ruleEvent = new ContentCreated { SchemaId = schemaId, AppId = appId };
 
             var now = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
 
-            var ruleConfig = ValidRule();
-            var ruleEnvelope = Envelope.Create(@event);
+            var rule = ValidRule();
+            var ruleEnvelope = Envelope.Create(ruleEvent);
 
             ruleEnvelope.SetTimestamp(now);
 
             A.CallTo(() => clock.GetCurrentInstant())
                 .Returns(now);
 
-            A.CallTo(() => ruleTriggerHandler.Trigger(A<EnrichedEvent>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<EnrichedEvent>.Ignored, rule.Trigger))
                 .Returns(true);
 
-            A.CallTo(() => ruleTriggerHandler.Trigger(A<IEvent>.Ignored, ruleConfig.Trigger))
+            A.CallTo(() => ruleTriggerHandler.Trigger(A<IEvent>.Ignored, rule.Trigger, ruleId))
                 .Returns(true);
 
-            A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, ruleConfig.Action))
+            A.CallTo(() => ruleActionHandler.CreateJobAsync(A<EnrichedEvent>.Ignored, rule.Action))
                 .Returns((actionDescription, new ValidData { Value = 10 }));
 
-            var job = await sut.CreateJobAsync(ruleConfig, ruleEnvelope);
+            var job = await sut.CreateJobAsync(rule, ruleId, ruleEnvelope);
 
             Assert.Equal(actionData, job.ActionData);
             Assert.Equal(actionName, job.ActionName);
@@ -233,7 +234,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             Assert.Equal(now, job.Created);
             Assert.Equal(now.Plus(Duration.FromDays(2)), job.Expires);
 
-            Assert.Equal(@event.AppId.Id, job.AppId);
+            Assert.Equal(ruleEvent.AppId.Id, job.AppId);
 
             Assert.NotEqual(Guid.Empty, job.JobId);
         }

@@ -72,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                 case AppUsageExceeded usageExceeded:
                     {
-                        var result = new EnrichedUsageExceededEvent { Current = usageExceeded.Current, Limit = usageExceeded.Limit };
+                        var result = new EnrichedUsageExceededEvent { Current = usageExceeded.CallsCurrent, Limit = usageExceeded.CallsLimit };
 
                         await EnrichDefaultAsync(result, @event);
 

@@ -28,6 +28,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IRuleTriggerHandler sut;
+        private readonly Guid ruleId = Guid.NewGuid();
         private static readonly NamedId<Guid> SchemaMatch = NamedId.Of(Guid.NewGuid(), "my-schema1");
         private static readonly NamedId<Guid> SchemaNonMatch = NamedId.Of(Guid.NewGuid(), "my-schema2");
 
@@ -47,7 +48,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         {
             TestForTrigger(handleAll: true, schemaId: null, condition: null, action: trigger =>
             {
-                var result = sut.Trigger(new AssetCreated(), trigger);
+                var result = sut.Trigger(new AssetCreated(), trigger, ruleId);
 
                 Assert.False(result);
             });
@@ -58,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         {
             TestForTrigger(handleAll: false, schemaId: null, condition: null, action: trigger =>
             {
-                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger);
+                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger, ruleId);
 
                 Assert.False(result);
             });
@@ -69,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         {
             TestForTrigger(handleAll: true, schemaId: SchemaMatch, condition: null, action: trigger =>
             {
-                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger);
+                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger, ruleId);
 
                 Assert.True(result);
             });
@@ -80,7 +81,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         {
             TestForTrigger(handleAll: false, schemaId: SchemaMatch, condition: string.Empty, action: trigger =>
             {
-                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger);
+                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger, ruleId);
 
                 Assert.True(result);
             });
@@ -91,7 +92,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
         {
             TestForTrigger(handleAll: false, schemaId: SchemaNonMatch, condition: null, action: trigger =>
             {
-                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger);
+                var result = sut.Trigger(new ContentCreated { SchemaId = SchemaMatch }, trigger, ruleId);
 
                 Assert.False(result);
             });

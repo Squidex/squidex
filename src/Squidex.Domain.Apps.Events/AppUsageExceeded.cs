@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events
@@ -12,8 +13,10 @@ namespace Squidex.Domain.Apps.Events
     [EventType(nameof(AppUsageExceeded))]
     public sealed class AppUsageExceeded : AppEvent
     {
-        public long Current { get; set; }
+        public long CallsCurrent { get; set; }
 
-        public long Limit { get; set; }
+        public long CallsLimit { get; set; }
+
+        public Guid RuleId { get; set; }
     }
 }
