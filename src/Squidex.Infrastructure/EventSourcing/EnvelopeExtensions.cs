@@ -20,7 +20,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return headers.GetString(CommonHeaders.EventNumber);
         }
 
-        public static Envelope<T> SetEventPosition<T>(this Envelope<T> envelope, string value) where T : class
+        public static Envelope<T> SetEventPosition<T>(this Envelope<T> envelope, string value) where T : class, IEvent
         {
             envelope.Headers.Add(CommonHeaders.EventNumber, value);
 
@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return headers.GetLong(CommonHeaders.EventStreamNumber);
         }
 
-        public static Envelope<T> SetEventStreamNumber<T>(this Envelope<T> envelope, long value) where T : class
+        public static Envelope<T> SetEventStreamNumber<T>(this Envelope<T> envelope, long value) where T : class, IEvent
         {
             envelope.Headers.Add(CommonHeaders.EventStreamNumber, value);
 
@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return headers.GetGuid(CommonHeaders.CommitId);
         }
 
-        public static Envelope<T> SetCommitId<T>(this Envelope<T> envelope, Guid value) where T : class
+        public static Envelope<T> SetCommitId<T>(this Envelope<T> envelope, Guid value) where T : class, IEvent
         {
             envelope.Headers.Add(CommonHeaders.CommitId, value.ToString());
 
@@ -56,7 +56,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return headers.GetGuid(CommonHeaders.AggregateId);
         }
 
-        public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, Guid value) where T : class
+        public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, Guid value) where T : class, IEvent
         {
             envelope.Headers.Add(CommonHeaders.AggregateId, value.ToString());
 
@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return headers.GetGuid(CommonHeaders.EventId);
         }
 
-        public static Envelope<T> SetEventId<T>(this Envelope<T> envelope, Guid value) where T : class
+        public static Envelope<T> SetEventId<T>(this Envelope<T> envelope, Guid value) where T : class, IEvent
         {
             envelope.Headers.Add(CommonHeaders.EventId, value.ToString());
 
@@ -80,7 +80,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return headers.GetInstant(CommonHeaders.Timestamp);
         }
 
-        public static Envelope<T> SetTimestamp<T>(this Envelope<T> envelope, Instant value) where T : class
+        public static Envelope<T> SetTimestamp<T>(this Envelope<T> envelope, Instant value) where T : class, IEvent
         {
             envelope.Headers.Add(CommonHeaders.Timestamp, value.ToString());
 

@@ -12,7 +12,7 @@ using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using NodaTime.Extensions;
+using NodaTime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null)
         {
-            var now = DateTime.UtcNow.ToInstant();
+            var now = SystemClock.Instance.GetCurrentInstant();
 
             data = data ??
                 new NamedContentData()
@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         protected static IAssetEntity CreateAsset(Guid id)
         {
-            var now = DateTime.UtcNow.ToInstant();
+            var now = SystemClock.Instance.GetCurrentInstant();
 
             var asset = new FakeAssetEntity
             {

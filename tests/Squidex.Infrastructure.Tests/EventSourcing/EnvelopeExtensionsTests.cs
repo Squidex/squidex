@@ -13,7 +13,11 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public class EnvelopeExtensionsTests
     {
-        private readonly Envelope<string> sut = new Envelope<string>(string.Empty);
+        private readonly Envelope<MyEvent> sut = new Envelope<MyEvent>(new MyEvent());
+
+        public sealed class MyEvent : IEvent
+        {
+        }
 
         [Fact]
         public void Should_set_and_get_timestamp()

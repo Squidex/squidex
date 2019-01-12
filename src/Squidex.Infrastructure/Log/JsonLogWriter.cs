@@ -6,9 +6,9 @@
 // ==========================================================================
 
 using System;
-using System.Globalization;
 using System.IO;
 using Newtonsoft.Json;
+using NodaTime;
 
 namespace Squidex.Infrastructure.Log
 {
@@ -73,23 +73,16 @@ namespace Squidex.Infrastructure.Log
             return this;
         }
 
-        IArrayWriter IArrayWriter.WriteValue(DateTime value)
+        IArrayWriter IArrayWriter.WriteValue(Instant value)
         {
-            jsonWriter.WriteValue(value.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture));
-
-            return this;
-        }
-
-        IArrayWriter IArrayWriter.WriteValue(DateTimeOffset value)
-        {
-            jsonWriter.WriteValue(value.ToString("o", CultureInfo.InvariantCulture));
+            jsonWriter.WriteValue(value.ToString());
 
             return this;
         }
 
         IArrayWriter IArrayWriter.WriteValue(TimeSpan value)
         {
-            jsonWriter.WriteValue(value);
+            jsonWriter.WriteValue(value.ToString());
 
             return this;
         }
@@ -126,18 +119,10 @@ namespace Squidex.Infrastructure.Log
             return this;
         }
 
-        IObjectWriter IObjectWriter.WriteProperty(string property, DateTime value)
+        IObjectWriter IObjectWriter.WriteProperty(string property, Instant value)
         {
             jsonWriter.WritePropertyName(Format(property));
-            jsonWriter.WriteValue(value.ToString("o", CultureInfo.InvariantCulture));
-
-            return this;
-        }
-
-        IObjectWriter IObjectWriter.WriteProperty(string property, DateTimeOffset value)
-        {
-            jsonWriter.WritePropertyName(Format(property));
-            jsonWriter.WriteValue(value.ToString("o", CultureInfo.InvariantCulture));
+            jsonWriter.WriteValue(value.ToString());
 
             return this;
         }
@@ -145,7 +130,7 @@ namespace Squidex.Infrastructure.Log
         IObjectWriter IObjectWriter.WriteProperty(string property, TimeSpan value)
         {
             jsonWriter.WritePropertyName(Format(property));
-            jsonWriter.WriteValue(value);
+            jsonWriter.WriteValue(value.ToString());
 
             return this;
         }

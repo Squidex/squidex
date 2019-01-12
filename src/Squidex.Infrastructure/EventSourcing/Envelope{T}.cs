@@ -7,7 +7,7 @@
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public class Envelope<T> where T : class
+    public class Envelope<T> where T : class, IEvent
     {
         private readonly EnvelopeHeaders headers;
         private readonly T payload;
@@ -30,9 +30,14 @@ namespace Squidex.Infrastructure.EventSourcing
             this.headers = headers ?? new EnvelopeHeaders();
         }
 
-        public Envelope<TOther> To<TOther>() where TOther : class
+        public Envelope<TOther> To<TOther>() where TOther : class, IEvent
         {
             return new Envelope<TOther>(payload as TOther, headers.Clone());
+        }
+
+        public static implicit operator Envelope<IEvent>(Envelope<T> source)
+        {
+            return source == null ? source : new Envelope<IEvent>(source.payload, source.headers);
         }
     }
 }

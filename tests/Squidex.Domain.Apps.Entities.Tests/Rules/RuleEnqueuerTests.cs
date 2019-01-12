@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         [Fact]
         public async Task Should_update_repositories_on_with_jobs_from_sender()
         {
-            var @event = Envelope.Create(new ContentCreated { AppId = appId });
+            var @event = Envelope.Create<IEvent>(new ContentCreated { AppId = appId });
 
             var rule1 = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });
             var rule2 = new Rule(new ContentChangedTriggerV2(), new TestAction { Url = new Uri("https://squidex.io") });

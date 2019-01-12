@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using NodaTime;
 
 namespace Squidex.Infrastructure.Log
 {
@@ -21,9 +22,7 @@ namespace Squidex.Infrastructure.Log
 
         IArrayWriter WriteValue(TimeSpan value);
 
-        IArrayWriter WriteValue(DateTime value);
-
-        IArrayWriter WriteValue(DateTimeOffset value);
+        IArrayWriter WriteValue(Instant value);
 
         IArrayWriter WriteObject(Action<IObjectWriter> objectWriter);
     }

@@ -5,15 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure.EventSourcing;
+using NodaTime;
 
-namespace Squidex.Domain.Apps.Core.HandleRules
+namespace Squidex.Infrastructure
 {
-    public interface IEventEnricher
+    public static class InstantExtensions
     {
-        Task EnrichAsync(EnrichedEvent enrichedEvent, Envelope<AppEvent> @event);
+        public static Instant WithoutMs(this Instant value)
+        {
+            return Instant.FromUnixTimeSeconds(value.ToUnixTimeSeconds());
+        }
     }
 }

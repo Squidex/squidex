@@ -12,6 +12,7 @@ using Orleans;
 using Orleans.Runtime;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
@@ -82,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
                             RuleId = kvp.Key
                         };
 
-                        await Persistence.WriteEventAsync(@event);
+                        await Persistence.WriteEventAsync(Envelope.Create<IEvent>(@event));
                     }
                 }
             }

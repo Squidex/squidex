@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Events
             return headers.GetGuid(SquidexHeaders.AppId);
         }
 
-        public static Envelope<T> SetAppId<T>(this Envelope<T> envelope, Guid value) where T : class
+        public static Envelope<T> SetAppId<T>(this Envelope<T> envelope, Guid value) where T : class, IEvent
         {
             envelope.Headers.Add(SquidexHeaders.AppId, value.ToString());
 

@@ -9,9 +9,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 {
     public sealed class EnrichedUsageExceededEvent : EnrichedEvent
     {
-        public long Current { get; set; }
+        public long CallsCurrent { get; set; }
 
-        public long Limit { get; set; }
+        public long CallsLimit { get; set; }
 
         public override long Partition
         {

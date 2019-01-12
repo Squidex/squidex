@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using Squidex.Infrastructure.Log.Adapter;
 using Xunit;
 
@@ -63,16 +64,19 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_log_timestamp()
         {
-            var now = DateTime.UtcNow;
+            var clock = A.Fake<IClock>();
 
-            appenders.Add(new TimestampLogAppender(() => now));
+            A.CallTo(() => clock.GetCurrentInstant())
+                .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
+
+            appenders.Add(new TimestampLogAppender(clock));
 
             Log.LogFatal(w => { /* Do Nothing */ });
 
             var expected =
                 LogTest(w => w
                     .WriteProperty("logLevel", "Fatal")
-                    .WriteProperty("timestamp", now));
+                    .WriteProperty("timestamp", clock.GetCurrentInstant()));
 
             Assert.Equal(expected, output);
         }

@@ -12,12 +12,12 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public static class Envelope
     {
-        public static Envelope<IEvent> Create<TPayload>(TPayload payload) where TPayload : IEvent
+        public static Envelope<TPayload> Create<TPayload>(TPayload payload) where TPayload : class, IEvent
         {
             var eventId = Guid.NewGuid();
 
             var envelope =
-                new Envelope<IEvent>(payload)
+                new Envelope<TPayload>(payload)
                     .SetEventId(eventId)
                     .SetTimestamp(SystemClock.Instance.GetCurrentInstant());
 

@@ -183,12 +183,12 @@ namespace Squidex.Infrastructure.States
 
             await persistence.ReadAsync();
 
-            await persistence.WriteEventsAsync(new[] { new MyEvent(), new MyEvent() }.Select(Envelope.Create));
-            await persistence.WriteEventsAsync(new[] { new MyEvent(), new MyEvent() }.Select(Envelope.Create));
+            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
+            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
 
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 4, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 3, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
         }
 
@@ -202,10 +202,10 @@ namespace Squidex.Infrastructure.States
 
             await persistence.ReadAsync();
 
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .Throws(new WrongEventVersionException(1, 1));
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.WriteEventsAsync(new[] { new MyEvent(), new MyEvent() }.Select(Envelope.Create)));
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.WriteEventAsync(Envelope.Create(new MyEvent())));
         }
 
         [Fact]

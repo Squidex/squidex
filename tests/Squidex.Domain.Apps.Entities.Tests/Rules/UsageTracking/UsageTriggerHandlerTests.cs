@@ -6,15 +6,16 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Domain.Apps.Core.HandleRules.Triggers;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
+namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
     public class UsageTriggerHandlerTests
     {
@@ -51,6 +52,17 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
             var result = sut.Trigger(new EnrichedContentEvent(), new UsageTrigger());
 
             Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_create_enriched_event()
+        {
+            var @event = new AppUsageExceeded { CallsCurrent = 80, CallsLimit = 120 };
+
+            var result = (EnrichedUsageExceededEvent)await sut.CreateEnrichedEventAsync(Envelope.Create<AppEvent>(@event));
+
+            Assert.Equal(@event.CallsCurrent, result.CallsCurrent);
+            Assert.Equal(@event.CallsLimit, result.CallsLimit);
         }
     }
 }

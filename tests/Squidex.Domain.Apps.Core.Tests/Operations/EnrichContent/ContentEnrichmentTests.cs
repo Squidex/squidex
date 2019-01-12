@@ -193,7 +193,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
 
         private static Instant FutureDays(int days)
         {
-            return Instant.FromDateTimeUtc(DateTime.UtcNow.Date.AddDays(days));
+            return SystemClock.Instance.GetCurrentInstant().WithoutMs().Plus(Duration.FromDays(days));
         }
     }
 }

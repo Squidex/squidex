@@ -8,25 +8,31 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using FakeItEasy;
+using Orleans;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Domain.Apps.Core.HandleRules.Triggers;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 #pragma warning disable SA1401 // Fields must be private
 #pragma warning disable RECS0070
 
-namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
+namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class ContentChangedTriggerTests
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IRuleTriggerHandler sut;
         private readonly Guid ruleId = Guid.NewGuid();
         private static readonly NamedId<Guid> SchemaMatch = NamedId.Of(Guid.NewGuid(), "my-schema1");
@@ -34,13 +40,43 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules.Triggers
 
         public ContentChangedTriggerTests()
         {
-            sut = new ContentChangedTriggerHandler(scriptEngine);
+            sut = new ContentChangedTriggerHandler(scriptEngine, grainFactory);
 
             A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "true"))
                 .Returns(true);
 
             A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "false"))
                 .Returns(false);
+        }
+
+        public static IEnumerable<object[]> TestEvents = new[]
+        {
+            new object[] { new ContentCreated(), EnrichedContentEventType.Created },
+            new object[] { new ContentUpdated(), EnrichedContentEventType.Updated },
+            new object[] { new ContentDeleted(), EnrichedContentEventType.Deleted },
+            new object[] { new ContentStatusChanged { Change = StatusChange.Archived }, EnrichedContentEventType.Archived },
+            new object[] { new ContentStatusChanged { Change = StatusChange.Published }, EnrichedContentEventType.Published },
+            new object[] { new ContentStatusChanged { Change = StatusChange.Restored }, EnrichedContentEventType.Restored },
+            new object[] { new ContentStatusChanged { Change = StatusChange.Unpublished }, EnrichedContentEventType.Unpublished }
+        };
+
+        [Theory]
+        [MemberData(nameof(TestEvents))]
+        public async Task Should_enrich_events(ContentEvent @event, EnrichedContentEventType type)
+        {
+            var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
+
+            var contentGrain = A.Fake<IContentGrain>();
+
+            A.CallTo(() => grainFactory.GetGrain<IContentGrain>(@event.ContentId, null))
+                .Returns(contentGrain);
+
+            A.CallTo(() => contentGrain.GetStateAsync(12))
+                .Returns(A.Fake<IContentEntity>().AsJ());
+
+            var result = await sut.CreateEnrichedEventAsync(envelope);
+
+            Assert.Equal(type, ((EnrichedContentEvent)result).Type);
         }
 
         [Fact]

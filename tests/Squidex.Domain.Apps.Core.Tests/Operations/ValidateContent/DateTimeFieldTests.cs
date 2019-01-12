@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         private static Instant FutureDays(int days)
         {
-            return Instant.FromDateTimeUtc(DateTime.UtcNow.Date.AddDays(days));
+            return SystemClock.Instance.GetCurrentInstant().WithoutMs().Plus(Duration.FromDays(days));
         }
 
         private static IJsonValue CreateValue(Instant v)

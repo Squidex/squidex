@@ -17,11 +17,6 @@ namespace Squidex.Infrastructure.States
             return persistence.WriteEventsAsync(new[] { @event });
         }
 
-        public static Task WriteEventAsync<T>(this IPersistence<T> persistence, IEvent @event)
-        {
-            return persistence.WriteEventsAsync(new[] { Envelope.Create(@event) });
-        }
-
         public static Task ClearSnapshotsAsync<TKey, TSnapshot>(this IStore<TKey> store)
         {
             return store.GetSnapshotStore<TSnapshot>().ClearAsync();

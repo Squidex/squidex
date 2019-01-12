@@ -20,11 +20,11 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public void Should_serialize_and_deserialize()
         {
-            var value = new Envelope<IEvent>(new MyEvent { Value = 1 });
+            var value = Envelope.Create(new MyEvent { Value = 1 });
 
             var deserialized = value.SerializeAndDeserialize();
 
-            Assert.Equal(1, deserialized.To<MyEvent>().Payload.Value);
+            Assert.Equal(1, deserialized.Payload.Value);
         }
     }
 }
