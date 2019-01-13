@@ -5,7 +5,7 @@
 
     <ng-container content>
         <div class="help">
-            <ngx-md [data]="helpMarkdown | async"></ngx-md>
+            <div [innerHTML]="helpMarkdown | async | sqxHelpMarkdown"></div>
         </div>
     </ng-container>
 </sqx-panel>
