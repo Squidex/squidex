@@ -25,21 +25,21 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetChangedTriggerTests
+    public class AssetChangedTriggerHandlerTests
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly IRuleTriggerHandler sut;
 
-        public AssetChangedTriggerTests()
+        public AssetChangedTriggerHandlerTests()
         {
-            sut = new AssetChangedTriggerHandler(scriptEngine, grainFactory);
-
             A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "true"))
                 .Returns(true);
 
             A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "false"))
                 .Returns(false);
+
+            sut = new AssetChangedTriggerHandler(scriptEngine, grainFactory);
         }
 
         public static IEnumerable<object[]> TestEvents = new[]

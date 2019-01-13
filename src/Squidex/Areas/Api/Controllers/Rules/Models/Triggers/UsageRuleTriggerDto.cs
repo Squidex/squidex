@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
 {
-    public sealed class UsageTriggerDto : RuleTriggerDto
+    public sealed class UsageRuleTriggerDto : RuleTriggerDto
     {
         /// <summary>
         /// The number of monthly api calls.

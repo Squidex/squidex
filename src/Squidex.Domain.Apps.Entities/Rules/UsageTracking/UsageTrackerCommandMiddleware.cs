@@ -34,12 +34,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
                 case DeleteRule deleteRule:
                     await usageTrackerGrain.RemoveTargetAsync(deleteRule.RuleId);
                     break;
-                case EnableRule enableRule:
-                    await usageTrackerGrain.ActivateTargetAsync(enableRule.RuleId);
-                    break;
-                case DisableRule disableRule:
-                    await usageTrackerGrain.DeactivateTargetAsync(disableRule.RuleId);
-                    break;
                 case CreateRule createRule:
                     {
                         if (createRule.Trigger is UsageTrigger createdTrigger)

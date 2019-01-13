@@ -29,7 +29,7 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public class ContentChangedTriggerTests
+    public class ContentChangedTriggerHandlerTests
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
@@ -38,15 +38,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private static readonly NamedId<Guid> SchemaMatch = NamedId.Of(Guid.NewGuid(), "my-schema1");
         private static readonly NamedId<Guid> SchemaNonMatch = NamedId.Of(Guid.NewGuid(), "my-schema2");
 
-        public ContentChangedTriggerTests()
+        public ContentChangedTriggerHandlerTests()
         {
-            sut = new ContentChangedTriggerHandler(scriptEngine, grainFactory);
-
             A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "true"))
                 .Returns(true);
 
             A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "false"))
                 .Returns(false);
+
+            sut = new ContentChangedTriggerHandler(scriptEngine, grainFactory);
         }
 
         public static IEnumerable<object[]> TestEvents = new[]

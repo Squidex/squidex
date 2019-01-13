@@ -33,7 +33,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Converters
 
         public RuleTriggerDto Visit(UsageTrigger trigger)
         {
-            return SimpleMapper.Map(trigger, new UsageTriggerDto());
+            return SimpleMapper.Map(trigger, new UsageRuleTriggerDto());
         }
 
         public RuleTriggerDto Visit(ContentChangedTriggerV2 trigger)

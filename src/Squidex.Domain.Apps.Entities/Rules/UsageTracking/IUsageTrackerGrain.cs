@@ -9,16 +9,13 @@ using System;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
-    public interface IUsageTrackerGrain : IGrainWithStringKey
+    public interface IUsageTrackerGrain : IGrainWithStringKey, IBackgroundGrain
     {
         Task AddTargetAsync(Guid ruleId, NamedId<Guid> appId, int limits);
-
-        Task ActivateTargetAsync(Guid ruleId);
-
-        Task DeactivateTargetAsync(Guid ruleId);
 
         Task RemoveTargetAsync(Guid ruleId);
 

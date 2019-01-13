@@ -9,16 +9,19 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
+using Orleans.Concurrency;
 using Orleans.Runtime;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
+    [Reentrant]
     public sealed class UsageTrackerGrain : GrainOfString<UsageTrackerGrain.GrainState>, IRemindable, IUsageTrackerGrain
     {
         private readonly IUsageTracker usageTracker;
@@ -27,9 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         {
             public int Limits { get; set; }
 
-            public bool Disabled { get; set; }
-
-            public DateTime Triggered { get; set; }
+            public DateTime? Triggered { get; set; }
 
             public NamedId<Guid> AppId { get; set; }
         }
@@ -53,11 +54,22 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             DelayDeactivation(TimeSpan.FromDays(1));
 
             RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
+            RegisterTimer(x => CheckUsagesAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(10));
 
             return Task.CompletedTask;
         }
 
-        public async Task ReceiveReminder(string reminderName, TickStatus status)
+        public Task ActivateAsync()
+        {
+            return TaskHelper.Done;
+        }
+
+        public Task ReceiveReminder(string reminderName, TickStatus status)
+        {
+            return TaskHelper.Done;
+        }
+
+        public async Task CheckUsagesAsync()
         {
             var today = DateTime.Today;
 
@@ -65,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             {
                 var appId = kvp.Value.AppId;
 
-                if (!IsSameMonth(today, kvp.Value.Triggered))
+                if (!kvp.Value.Triggered.HasValue || !IsSameMonth(today, kvp.Value.Triggered.Value))
                 {
                     var usage = await usageTracker.GetMonthlyCallsAsync(appId.Id.ToString(), today);
 
@@ -106,20 +118,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         public Task UpdateTargetAsync(Guid ruleId, int limits)
         {
             UpdateTarget(ruleId, t => t.Limits = limits);
-
-            return WriteStateAsync();
-        }
-
-        public Task ActivateTargetAsync(Guid ruleId)
-        {
-            UpdateTarget(ruleId, t => t.Disabled = false);
-
-            return WriteStateAsync();
-        }
-
-        public Task DeactivateTargetAsync(Guid ruleId)
-        {
-            UpdateTarget(ruleId, t => t.Disabled = true);
 
             return WriteStateAsync();
         }

@@ -1,0 +1,13 @@
+<div [formGroup]="triggerForm" class="form-horizontal">
+    <div class="form-group">
+        <label for="condition">Limit</label>
+
+        <sqx-control-errors for="condition" [submitted]="triggerFormSubmitted"></sqx-control-errors>
+
+        <input type="number" class="form-control" id="limit" formControlName="limit" />
+        
+        <small class="form-text text-muted">
+            The monthly api calls to trigger.
+        </small>
+    </div>
+</div>
