@@ -64,10 +64,32 @@ namespace Squidex.Infrastructure.UsageTracking
                 new StoredUsage("category1", date.AddDays(7), Counters(17, 22))
             };
 
-            A.CallTo(() => usageStore.QueryAsync($"{key}_API", new DateTime(2016, 1, 1), new DateTime(2016, 1, 31)))
+            A.CallTo(() => usageStore.QueryAsync($"{key}_API", new DateTime(2016, 1, 1), new DateTime(2016, 1, 15)))
                 .Returns(originalData);
 
             var result = await sut.GetMonthlyCallsAsync(key, date);
+
+            Assert.Equal(55, result);
+        }
+
+        [Fact]
+        public async Task Should_sum_up_when_getting_last_calls_calls()
+        {
+            var f = DateTime.Today;
+            var t = DateTime.Today.AddDays(10);
+
+            IReadOnlyList<StoredUsage> originalData = new List<StoredUsage>
+            {
+                new StoredUsage("category1", f.AddDays(1), Counters(10, 15)),
+                new StoredUsage("category1", f.AddDays(3), Counters(13, 18)),
+                new StoredUsage("category1", f.AddDays(5), Counters(15, 20)),
+                new StoredUsage("category1", f.AddDays(7), Counters(17, 22))
+            };
+
+            A.CallTo(() => usageStore.QueryAsync($"{key}_API", f, t))
+                .Returns(originalData);
+
+            var result = await sut.GetPreviousCallsAsync(key, f, t);
 
             Assert.Equal(55, result);
         }

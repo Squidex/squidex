@@ -167,16 +167,18 @@ namespace Squidex.Infrastructure.UsageTracking
             return result;
         }
 
-        public async Task<long> GetMonthlyCallsAsync(string key, DateTime date)
+        public Task<long> GetMonthlyCallsAsync(string key, DateTime date)
+        {
+            return GetPreviousCallsAsync(key, new DateTime(date.Year, date.Month, 1), date);
+        }
+
+        public async Task<long> GetPreviousCallsAsync(string key, DateTime fromDate, DateTime toDate)
         {
             key = GetKey(key);
 
             ThrowIfDisposed();
 
-            var dateFrom = new DateTime(date.Year, date.Month, 1);
-            var dateTo = dateFrom.AddMonths(1).AddDays(-1);
-
-            var originalUsages = await usageRepository.QueryAsync(key, dateFrom, dateTo);
+            var originalUsages = await usageRepository.QueryAsync(key, fromDate, toDate);
 
             return originalUsages.Sum(x => (long)x.Counters.Get(CounterTotalCalls));
         }

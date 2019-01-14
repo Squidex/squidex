@@ -18,6 +18,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models.Triggers
         /// </summary>
         public int Limit { get; set; }
 
+        /// <summary>
+        /// The number of days to check or null for the current month.
+        /// </summary>
+        public int? NumDays { get; set; }
+
         public override RuleTrigger ToTrigger()
         {
             return SimpleMapper.Map(this, new UsageTrigger());

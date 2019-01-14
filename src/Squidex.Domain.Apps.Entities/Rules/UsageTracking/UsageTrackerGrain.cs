@@ -24,11 +24,14 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
     [Reentrant]
     public sealed class UsageTrackerGrain : GrainOfString<UsageTrackerGrain.GrainState>, IRemindable, IUsageTrackerGrain
     {
+        private const int MaxDays = 30;
         private readonly IUsageTracker usageTracker;
 
         public sealed class Target
         {
             public int Limits { get; set; }
+
+            public int? NumDays { get; set; }
 
             public DateTime? Triggered { get; set; }
 
@@ -75,11 +78,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
             foreach (var kvp in State.Targets)
             {
-                var appId = kvp.Value.AppId;
+                var target = kvp.Value;
 
-                if (!kvp.Value.Triggered.HasValue || !IsSameMonth(today, kvp.Value.Triggered.Value))
+                var (from, to) = GetDateRange(today, target.NumDays);
+
+                if (!target.Triggered.HasValue || target.Triggered < from)
                 {
-                    var usage = await usageTracker.GetMonthlyCallsAsync(appId.Id.ToString(), today);
+                    var usage = await usageTracker.GetMonthlyCallsAsync(target.AppId.Id.ToString(), today);
 
                     var limit = kvp.Value.Limits;
 
@@ -89,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
                         var @event = new AppUsageExceeded
                         {
-                            AppId = appId,
+                            AppId = target.AppId,
                             CallsCurrent = usage,
                             CallsLimit = limit,
                             RuleId = kvp.Key
@@ -103,21 +108,28 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             await WriteStateAsync();
         }
 
-        private static bool IsSameMonth(DateTime lhs, DateTime rhs)
+        private (DateTime, DateTime) GetDateRange(DateTime today, int? numDays)
         {
-            return lhs.Year == rhs.Year && lhs.Month == rhs.Month;
+            if (numDays > 0 && numDays < MaxDays)
+            {
+                return (today.AddDays(-numDays.Value).AddDays(1), today);
+            }
+            else
+            {
+                return (new DateTime(today.Year, today.Month, 1), today);
+            }
         }
 
-        public Task AddTargetAsync(Guid ruleId, NamedId<Guid> appId, int limits)
+        public Task AddTargetAsync(Guid ruleId, NamedId<Guid> appId, int limits, int? numDays)
         {
-            UpdateTarget(ruleId, t => { t.Limits = limits; t.AppId = appId; });
+            UpdateTarget(ruleId, t => { t.Limits = limits; t.AppId = appId; t.NumDays = numDays; });
 
             return WriteStateAsync();
         }
 
-        public Task UpdateTargetAsync(Guid ruleId, int limits)
+        public Task UpdateTargetAsync(Guid ruleId, int limits, int? numDays)
         {
-            UpdateTarget(ruleId, t => t.Limits = limits);
+            UpdateTarget(ruleId, t => { t.Limits = limits; t.NumDays = numDays; });
 
             return WriteStateAsync();
         }

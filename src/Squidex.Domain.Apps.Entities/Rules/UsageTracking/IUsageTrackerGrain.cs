@@ -15,10 +15,10 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
     public interface IUsageTrackerGrain : IGrainWithStringKey, IBackgroundGrain
     {
-        Task AddTargetAsync(Guid ruleId, NamedId<Guid> appId, int limits);
+        Task AddTargetAsync(Guid ruleId, NamedId<Guid> appId, int limits, int? numDays);
 
         Task RemoveTargetAsync(Guid ruleId);
 
-        Task UpdateTargetAsync(Guid ruleId, int limits);
+        Task UpdateTargetAsync(Guid ruleId, int limits, int? numDays);
     }
 }

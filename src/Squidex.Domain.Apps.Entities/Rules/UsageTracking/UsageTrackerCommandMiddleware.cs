@@ -36,21 +36,23 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
                     break;
                 case CreateRule createRule:
                     {
-                        if (createRule.Trigger is UsageTrigger createdTrigger)
+                        if (createRule.Trigger is UsageTrigger usage)
                         {
-                            await usageTrackerGrain.AddTargetAsync(createRule.RuleId, createRule.AppId, createdTrigger.Limit);
+                            await usageTrackerGrain.AddTargetAsync(createRule.RuleId, createRule.AppId, usage.Limit, usage.NumDays);
                         }
 
                         break;
                     }
 
                 case UpdateRule ruleUpdated:
-                    if (ruleUpdated.Trigger is UsageTrigger updatedTrigger)
                     {
-                        await usageTrackerGrain.UpdateTargetAsync(ruleUpdated.RuleId, updatedTrigger.Limit);
-                    }
+                        if (ruleUpdated.Trigger is UsageTrigger usage)
+                        {
+                            await usageTrackerGrain.UpdateTargetAsync(ruleUpdated.RuleId, usage.Limit, usage.NumDays);
+                        }
 
-                    break;
+                        break;
+                    }
             }
 
             await next();
