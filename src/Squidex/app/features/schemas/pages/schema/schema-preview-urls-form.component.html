@@ -33,13 +33,13 @@
 
                 <div class="form-group row no-gutters" [formGroup]="addForm.form">
                     <div class="col col-name pr-1">
-                        <sqx-control-errors for="name" fieldName="Name" [submitted]="addForm.submitted | async"></sqx-control-errors>
+                        <sqx-control-errors for="name" [submitted]="addForm.submitted | async"></sqx-control-errors>
 
                         <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="Name, e.g. Web or Mobile" />
                     </div>
 
                     <div class="col pr-1">
-                        <sqx-control-errors for="url" fieldName="Url" [submitted]="addForm.submitted | async"></sqx-control-errors>
+                        <sqx-control-errors for="url" [submitted]="addForm.submitted | async"></sqx-control-errors>
 
                         <input type="text" class="form-control" maxlength="1000" formControlName="url" placeholder="Url" />
 

@@ -42,23 +42,52 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
         public Task<IEnumerable<ValidationError>> Visit(UsageTrigger trigger)
         {
-            return Task.FromResult(Enumerable.Empty<ValidationError>());
+            var errors = new List<ValidationError>();
+
+            if (trigger.NumDays.HasValue && (trigger.NumDays < 1 || trigger.NumDays > 30))
+            {
+                errors.Add(new ValidationError("Num days must be between 1 and 30.", nameof(trigger.NumDays)));
+            }
+
+            return Task.FromResult< IEnumerable<ValidationError>>(errors);
         }
 
         public async Task<IEnumerable<ValidationError>> Visit(ContentChangedTriggerV2 trigger)
         {
+            var errors = new List<ValidationError>();
+
             if (trigger.Schemas != null)
             {
-                var schemaErrors = await Task.WhenAll(
-                    trigger.Schemas.Select(async s =>
-                        await SchemaProvider(s.SchemaId) == null
-                            ? new ValidationError($"Schema {s.SchemaId} does not exist.", nameof(trigger.Schemas))
-                            : null));
+                var tasks = new List<Task<ValidationError>>();
 
-                return schemaErrors.Where(x => x != null).ToList();
+                foreach (var schema in trigger.Schemas)
+                {
+                    if (schema.SchemaId == Guid.Empty)
+                    {
+                        errors.Add(new ValidationError("Schema id is required.", nameof(trigger.Schemas)));
+                    }
+                    else
+                    {
+                        tasks.Add(CheckSchemaAsync(schema));
+                    }
+                }
+
+                var checkErrors = await Task.WhenAll(tasks);
+
+                errors.AddRange(checkErrors.Where(x => x != null));
             }
 
-            return new List<ValidationError>();
+            return errors;
+        }
+
+        private async Task<ValidationError> CheckSchemaAsync(ContentChangedTriggerSchemaV2 schema)
+        {
+            if (await SchemaProvider(schema.SchemaId) == null)
+            {
+                return new ValidationError($"Schema {schema.SchemaId} does not exist.", nameof(ContentChangedTriggerV2.Schemas));
+            }
+
+            return null;
         }
     }
 }

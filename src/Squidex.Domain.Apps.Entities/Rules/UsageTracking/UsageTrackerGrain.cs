@@ -24,7 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
     [Reentrant]
     public sealed class UsageTrackerGrain : GrainOfString<UsageTrackerGrain.GrainState>, IRemindable, IUsageTrackerGrain
     {
-        private const int MaxDays = 30;
         private readonly IUsageTracker usageTracker;
 
         public sealed class Target
@@ -110,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
         private (DateTime, DateTime) GetDateRange(DateTime today, int? numDays)
         {
-            if (numDays > 0 && numDays < MaxDays)
+            if (numDays.HasValue)
             {
                 return (today.AddDays(-numDays.Value).AddDays(1), today);
             }

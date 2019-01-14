@@ -26,6 +26,22 @@ describe('ValidatorsEx.between', () => {
         expect(error).toBeNull();
     });
 
+    it('should return null when value is null', () => {
+        const input = new FormControl(null);
+
+        const error = <any>ValidatorsEx.between(1, 5)(input);
+
+        expect(error).toBeNull();
+    });
+
+    it('should return null when value is undefined', () => {
+        const input = new FormControl(undefined);
+
+        const error = <any>ValidatorsEx.between(1, 5)(input);
+
+        expect(error).toBeNull();
+    });
+
     it('should return error when not a number', () => {
         const input = new FormControl('text');
 

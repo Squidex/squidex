@@ -6,7 +6,9 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+
+import { ValidatorsEx } from '@app/shared';
 
 @Component({
     selector: 'sqx-usage-trigger',
@@ -25,6 +27,13 @@ export class UsageTriggerComponent implements OnInit {
 
     public ngOnInit() {
         this.triggerForm.setControl('limit',
-            new FormControl(this.trigger.limit || 20000));
+            new FormControl(this.trigger.limit || 20000, [
+                Validators.required
+            ]));
+
+        this.triggerForm.setControl('numDays',
+            new FormControl(this.trigger.numDays, [
+                ValidatorsEx.between(1, 30)
+            ]));
     }
 }
