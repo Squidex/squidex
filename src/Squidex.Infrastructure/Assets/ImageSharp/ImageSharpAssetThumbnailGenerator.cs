@@ -34,9 +34,16 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
                     return;
                 }
 
+                var isCropUpsize = string.Equals("CropUpsize", mode, StringComparison.OrdinalIgnoreCase);
+
                 if (!Enum.TryParse<ResizeMode>(mode, true, out var resizeMode))
                 {
                     resizeMode = ResizeMode.Max;
+                }
+
+                if (isCropUpsize)
+                {
+                    resizeMode = ResizeMode.Crop;
                 }
 
                 var w = width ?? 0;
@@ -44,7 +51,7 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 
                 using (var sourceImage = Image.Load(source, out var format))
                 {
-                    if (w >= sourceImage.Width && h >= sourceImage.Height && resizeMode == ResizeMode.Crop)
+                    if (w >= sourceImage.Width && h >= sourceImage.Height && resizeMode == ResizeMode.Crop && !isCropUpsize)
                     {
                         resizeMode = ResizeMode.BoxPad;
                     }
