@@ -35,6 +35,7 @@ using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
+using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
@@ -206,6 +207,9 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<CreateProfileCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
+            services.AddSingletonAs<UsageTrackerCommandMiddleware>()
                 .As<ICommandMiddleware>();
         }
 

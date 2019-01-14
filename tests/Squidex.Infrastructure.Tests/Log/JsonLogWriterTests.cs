@@ -7,6 +7,7 @@
 
 using System;
 using Newtonsoft.Json;
+using NodaTime;
 using Xunit;
 
 namespace Squidex.Infrastructure.Log
@@ -48,31 +49,21 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
-        public void Should_write_timespan_property()
+        public void Should_write_duration_property()
         {
-            var result = sut.WriteProperty("property", new TimeSpan(1, 40, 30, 20, 100)).ToString();
+            var result = sut.WriteProperty("property", new TimeSpan(2, 16, 30, 20, 100)).ToString();
 
             Assert.Equal(@"{""property"":""2.16:30:20.1000000""}", result);
         }
 
         [Fact]
-        public void Should_write_datetimeoffset_property()
-        {
-            var value = DateTimeOffset.UtcNow;
-
-            var result = sut.WriteProperty("property", value).ToString();
-
-            Assert.Equal($"{{\"property\":\"{value:o}\"}}", result);
-        }
-
-        [Fact]
         public void Should_write_date_property()
         {
-            var value = DateTime.UtcNow;
+            var value = Instant.FromUtc(2012, 11, 10, 9, 8, 45);
 
             var result = sut.WriteProperty("property", value).ToString();
 
-            Assert.Equal($"{{\"property\":\"{value:o}\"}}", result);
+            Assert.Equal(@"{""property"":""2012-11-10T09:08:45Z""}", result);
         }
 
         [Fact]
@@ -108,9 +99,9 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
-        public void Should_write_timespan_value()
+        public void Should_write_duration_value()
         {
-            var result = sut.WriteArray("property", a => a.WriteValue(new TimeSpan(1, 40, 30, 20, 100))).ToString();
+            var result = sut.WriteArray("property", a => a.WriteValue(new TimeSpan(2, 16, 30, 20, 100))).ToString();
 
             Assert.Equal(@"{""property"":[""2.16:30:20.1000000""]}", result);
         }
@@ -124,23 +115,13 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
-        public void Should_write_datetimeoffset_value()
-        {
-            var value = DateTimeOffset.UtcNow;
-
-            var result = sut.WriteArray("property", a => a.WriteValue(value)).ToString();
-
-            Assert.Equal($"{{\"property\":[\"{value:o}\"]}}", result);
-        }
-
-        [Fact]
         public void Should_write_date_value()
         {
-            var value = DateTime.UtcNow;
+            var value = Instant.FromUtc(2012, 11, 10, 9, 8, 45);
 
             var result = sut.WriteArray("property", a => a.WriteValue(value)).ToString();
 
-            Assert.Equal($"{{\"property\":[\"{value:yyyy-MM-ddTHH:mm:ssZ}\"]}}", result);
+            Assert.Equal(@"{""property"":[""2012-11-10T09:08:45Z""]}", result);
         }
 
         [Fact]

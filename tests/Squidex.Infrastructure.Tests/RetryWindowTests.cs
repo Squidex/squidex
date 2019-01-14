@@ -6,20 +6,28 @@
 // ==========================================================================
 
 using System;
+using FakeItEasy;
+using NodaTime;
 using Xunit;
 
 namespace Squidex.Infrastructure
 {
     public class RetryWindowTests
     {
-        private const int WindowSize = 5;
+        private readonly IClock clock = A.Fake<IClock>();
+
+        public RetryWindowTests()
+        {
+            A.CallTo(() => clock.GetCurrentInstant())
+                .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
+        }
 
         [Fact]
         public void Should_allow_to_retry_after_reset()
         {
-            var sut = new RetryWindow(TimeSpan.FromSeconds(1), WindowSize);
+            var sut = new RetryWindow(TimeSpan.FromSeconds(1), 5);
 
-            for (var i = 0; i < WindowSize * 2; i++)
+            for (var i = 0; i < 5 * 2; i++)
             {
                 sut.CanRetryAfterFailure();
             }
@@ -34,19 +42,18 @@ namespace Squidex.Infrastructure
         [InlineData(7)]
         public void Should_not_allow_to_retry_after_many_errors(int errors)
         {
-            var sut = new RetryWindow(TimeSpan.FromSeconds(1), WindowSize);
-            var now = DateTime.UtcNow;
+            var sut = new RetryWindow(TimeSpan.FromSeconds(1), 5, clock);
 
-            for (var i = 0; i < WindowSize; i++)
+            for (var i = 0; i < 5; i++)
             {
-                Assert.True(sut.CanRetryAfterFailure(now));
+                Assert.True(sut.CanRetryAfterFailure());
             }
 
-            var remaining = errors - WindowSize;
+            var remaining = errors - 5;
 
             for (var i = 0; i < remaining; i++)
             {
-                Assert.False(sut.CanRetryAfterFailure(now));
+                Assert.False(sut.CanRetryAfterFailure());
             }
         }
 
@@ -57,12 +64,11 @@ namespace Squidex.Infrastructure
         [InlineData(4)]
         public void Should_allow_to_retry_after_few_errors(int errors)
         {
-            var sut = new RetryWindow(TimeSpan.FromSeconds(1), WindowSize);
-            var now = DateTime.UtcNow;
+            var sut = new RetryWindow(TimeSpan.FromSeconds(1), 5, clock);
 
             for (var i = 0; i < errors; i++)
             {
-                Assert.True(sut.CanRetryAfterFailure(now));
+                Assert.True(sut.CanRetryAfterFailure());
             }
         }
 
@@ -77,12 +83,18 @@ namespace Squidex.Infrastructure
         [InlineData(8)]
         public void Should_allow_to_retry_after_few_errors_in_window(int errors)
         {
-            var sut = new RetryWindow(TimeSpan.FromSeconds(1), WindowSize);
-            var now = DateTime.UtcNow;
+            var sut = new RetryWindow(TimeSpan.FromSeconds(1), 5, clock);
+
+            var now = SystemClock.Instance.GetCurrentInstant();
+
+            A.CallTo(() => clock.GetCurrentInstant())
+                .ReturnsLazily(() => now);
 
             for (var i = 0; i < errors; i++)
             {
-                Assert.True(sut.CanRetryAfterFailure(now.AddMilliseconds(i * 300)));
+                now = now.Plus(Duration.FromMilliseconds(300));
+
+                Assert.True(sut.CanRetryAfterFailure());
             }
         }
     }

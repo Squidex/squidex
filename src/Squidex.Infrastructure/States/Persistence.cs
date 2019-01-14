@@ -6,19 +6,18 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
 {
-    internal sealed class Persistence<TKey> : Persistence<object, TKey>, IPersistence
+    internal sealed class Persistence<TKey> : Persistence<None, TKey>, IPersistence
     {
         public Persistence(TKey ownerKey, Type ownerType,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            ISnapshotStore<object, TKey> snapshotStore,
+            ISnapshotStore<None, TKey> snapshotStore,
             IStreamNameResolver streamNameResolver,
-            Func<Envelope<IEvent>, Task> applyEvent)
+            HandleEvent applyEvent)
             : base(ownerKey, ownerType, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, PersistenceMode.EventSourcing, null, applyEvent)
         {
         }

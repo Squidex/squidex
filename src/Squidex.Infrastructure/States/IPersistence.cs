@@ -7,7 +7,7 @@
 
 namespace Squidex.Infrastructure.States
 {
-    public interface IPersistence : IPersistence<object>
+    public interface IPersistence : IPersistence<None>
     {
     }
 }

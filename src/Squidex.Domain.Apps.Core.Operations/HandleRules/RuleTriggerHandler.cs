@@ -6,15 +6,19 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
+
+#pragma warning disable IDE0019 // Use pattern matching
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public abstract class RuleTriggerHandler<TTrigger, TEvent, TEnrichedEvent> : IRuleTriggerHandler
         where TTrigger : RuleTrigger
-        where TEvent : IEvent
+        where TEvent : AppEvent
         where TEnrichedEvent : EnrichedEvent
     {
         public Type TriggerType
@@ -22,19 +26,40 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             get { return typeof(TTrigger); }
         }
 
-        bool IRuleTriggerHandler.Triggers(EnrichedEvent @event, RuleTrigger trigger)
+        async Task<EnrichedEvent> IRuleTriggerHandler.CreateEnrichedEventAsync(Envelope<AppEvent> @event)
         {
-            return @event is TEnrichedEvent e && Triggers(e, (TTrigger)trigger);
+            return await CreateEnrichedEventAsync(@event.To<TEvent>());
         }
 
-        bool IRuleTriggerHandler.Triggers(IEvent @event, RuleTrigger trigger)
+        bool IRuleTriggerHandler.Trigger(EnrichedEvent @event, RuleTrigger trigger)
         {
-            return @event is TEvent e && Triggers(e, (TTrigger)trigger);
+            var typed = @event as TEnrichedEvent;
+
+            if (typed != null)
+            {
+                return Trigger(typed, (TTrigger)trigger);
+            }
+
+            return false;
         }
 
-        protected abstract bool Triggers(TEnrichedEvent @event, TTrigger trigger);
+        bool IRuleTriggerHandler.Trigger(AppEvent @event, RuleTrigger trigger, Guid ruleId)
+        {
+            var typed = @event as TEvent;
 
-        protected virtual bool Triggers(TEvent @event, TTrigger trigger)
+            if (typed != null)
+            {
+                return Trigger(typed, (TTrigger)trigger, ruleId);
+            }
+
+            return false;
+        }
+
+        protected abstract Task<TEnrichedEvent> CreateEnrichedEventAsync(Envelope<TEvent> @event);
+
+        protected abstract bool Trigger(TEnrichedEvent @event, TTrigger trigger);
+
+        protected virtual bool Trigger(TEvent @event, TTrigger trigger, Guid ruleId)
         {
             return true;
         }

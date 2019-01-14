@@ -17,31 +17,33 @@ namespace Squidex.Infrastructure.Commands
     {
         private readonly IClock clock = A.Fake<IClock>();
         private readonly ICommandBus commandBus = A.Dummy<ICommandBus>();
+        private readonly EnrichWithTimestampCommandMiddleware sut;
+
+        public EnrichWithTimestampCommandMiddlewareTests()
+        {
+            A.CallTo(() => clock.GetCurrentInstant())
+                .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
+
+            sut = new EnrichWithTimestampCommandMiddleware(clock);
+        }
 
         [Fact]
         public async Task Should_set_timestamp_for_timestamp_command()
         {
-            var utc = Instant.FromUnixTimeSeconds(1000);
-            var sut = new EnrichWithTimestampCommandMiddleware(clock);
-
-            A.CallTo(() => clock.GetCurrentInstant())
-                .Returns(utc);
-
             var command = new MyCommand();
 
             await sut.HandleAsync(new CommandContext(command, commandBus));
 
-            Assert.Equal(utc, command.Timestamp);
+            Assert.Equal(clock.GetCurrentInstant(), command.Timestamp);
         }
 
         [Fact]
         public async Task Should_do_nothing_for_normal_command()
         {
-            var sut = new EnrichWithTimestampCommandMiddleware(clock);
-
             await sut.HandleAsync(new CommandContext(A.Dummy<ICommand>(), commandBus));
 
-            A.CallTo(() => clock.GetCurrentInstant()).MustNotHaveHappened();
+            A.CallTo(() => clock.GetCurrentInstant())
+                .MustNotHaveHappened();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.UsageTracking
 {
     public sealed class CachingUsageTracker : CachingProviderBase, IUsageTracker
     {
-        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
+        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
         private readonly IUsageTracker inner;
 
         public CachingUsageTracker(IUsageTracker inner, IMemoryCache cache)
@@ -43,13 +43,27 @@ namespace Squidex.Infrastructure.UsageTracking
         {
             Guard.NotNull(key, nameof(key));
 
-            var cacheKey = string.Concat(key, date);
+            var cacheKey = string.Join("$", "Usage", nameof(GetMonthlyCallsAsync), key, date);
 
             return Cache.GetOrCreateAsync(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheDuration;
 
                 return inner.GetMonthlyCallsAsync(key, date);
+            });
+        }
+
+        public Task<long> GetPreviousCallsAsync(string key, DateTime fromDate, DateTime toDate)
+        {
+            Guard.NotNull(key, nameof(key));
+
+            var cacheKey = string.Join("$", "Usage", nameof(GetPreviousCallsAsync), key, fromDate, toDate);
+
+            return Cache.GetOrCreateAsync(cacheKey, entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = CacheDuration;
+
+                return inner.GetPreviousCallsAsync(key, fromDate, toDate);
             });
         }
     }

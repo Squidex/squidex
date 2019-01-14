@@ -105,9 +105,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [InlineData("Script(`Date: ${formatDate(event.timestamp, 'yyyy-MM-dd')}, Full: ${formatDate(event.timestamp, 'yyyy-MM-dd-hh-mm-ss')}`)")]
         public void Should_replace_timestamp_information_from_event(string script)
         {
-            var now = DateTime.UtcNow;
+            var now = SystemClock.Instance.GetCurrentInstant();
 
-            var envelope = new EnrichedContentEvent { Timestamp = Instant.FromDateTimeUtc(now) };
+            var envelope = new EnrichedContentEvent { Timestamp = now };
 
             var result = sut.Format(script, envelope);
 

@@ -97,12 +97,14 @@ export module ValidatorsEx {
         return (control: AbstractControl) => {
             const value: number = control.value;
 
-            if (!Types.isNumber(value)) {
-                return { validnumber: false };
-            } else if (minValue && value < minValue) {
-                return { minvalue: { minValue, actualValue: value } };
-            } else if (maxValue && value > maxValue) {
-                return { maxvalue: { maxValue, actualValue: value } };
+            if (!Types.isUndefined(value) && !Types.isNull(value)) {
+                if (!Types.isNumber(value)) {
+                    return { validnumber: false };
+                } else if (minValue && value < minValue) {
+                    return { minvalue: { minValue, actualValue: value } };
+                } else if (maxValue && value > maxValue) {
+                    return { maxvalue: { maxValue, actualValue: value } };
+                }
             }
 
             return null;

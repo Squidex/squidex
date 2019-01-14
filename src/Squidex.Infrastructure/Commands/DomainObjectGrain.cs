@@ -47,9 +47,14 @@ namespace Squidex.Infrastructure.Commands
 
         protected sealed override Task ReadAsync(Type type, Guid id)
         {
-            persistence = store.WithSnapshotsAndEventSourcing<T, Guid>(GetType(), id, x => snapshot = x, ApplyEvent);
+            persistence = store.WithSnapshotsAndEventSourcing(GetType(), id, new HandleSnapshot<T>(ApplySnapshot), ApplyEvent);
 
             return persistence.ReadAsync();
+        }
+
+        private void ApplySnapshot(T state)
+        {
+            snapshot = state;
         }
 
         protected sealed override async Task WriteAsync(Envelope<IEvent>[] events, long previousVersion)

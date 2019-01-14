@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             this.clock = clock;
         }
 
-        public virtual async Task<RuleJob> CreateJobAsync(Rule rule, Envelope<IEvent> @event)
+        public virtual async Task<RuleJob> CreateJobAsync(Rule rule, Guid ruleId, Envelope<IEvent> @event)
         {
             Guard.NotNull(rule, nameof(rule));
             Guard.NotNull(@event, nameof(@event));
@@ -71,6 +70,8 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return null;
             }
 
+            var typed = @event.To<AppEvent>();
+
             var actionType = rule.Action.GetType();
 
             if (!ruleTriggerHandlers.TryGetValue(rule.Trigger.GetType(), out var triggerHandler))
@@ -79,11 +80,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
 
             if (!ruleActionHandlers.TryGetValue(actionType, out var actionHandler))
-            {
-                return null;
-            }
-
-            if (!triggerHandler.Triggers(@event.Payload, rule.Trigger))
             {
                 return null;
             }
@@ -102,11 +98,23 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                 return null;
             }
 
+            if (!triggerHandler.Trigger(typed.Payload, rule.Trigger, ruleId))
+            {
+                return null;
+            }
+
             var appEventEnvelope = @event.To<AppEvent>();
 
-            var enrichedEvent = await eventEnricher.EnrichAsync(appEventEnvelope);
+            var enrichedEvent = await triggerHandler.CreateEnrichedEventAsync(appEventEnvelope);
 
-            if (!triggerHandler.Triggers(enrichedEvent, rule.Trigger))
+            if (enrichedEvent == null)
+            {
+                return null;
+            }
+
+            await eventEnricher.EnrichAsync(enrichedEvent, typed);
+
+            if (!triggerHandler.Trigger(enrichedEvent, rule.Trigger))
             {
                 return null;
             }
@@ -116,14 +124,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             var json = jsonSerializer.Serialize(actionData.Data);
 
-            enrichedEvent.CalculatePartition();
-
             var job = new RuleJob
             {
                 JobId = Guid.NewGuid(),
                 ActionName = actionName,
                 ActionData = json,
-                AppId = appEvent.AppId.Id,
+                AppId = enrichedEvent.AppId.Id,
                 Created = now,
                 EventName = enrichedEvent.Name,
                 ExecutionPartition = enrichedEvent.Partition,
@@ -139,7 +145,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             try
             {
                 var actionType = typeNameRegistry.GetType(actionName);
-                var actionWatch = Stopwatch.StartNew();
+                var actionWatch = ValueStopwatch.StartNew();
 
                 var actionHandler = ruleActionHandlers[actionType];
 
@@ -147,12 +153,12 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 var result = await actionHandler.ExecuteJobAsync(deserialized);
 
-                actionWatch.Stop();
+                var elapsed = TimeSpan.FromMilliseconds(actionWatch.Stop());
 
                 var dumpBuilder = new StringBuilder(result.Dump);
 
                 dumpBuilder.AppendLine();
-                dumpBuilder.AppendFormat("Elapsed {0}.", actionWatch.Elapsed);
+                dumpBuilder.AppendFormat("Elapsed {0}.", elapsed);
                 dumpBuilder.AppendLine();
 
                 if (result.Exception is TimeoutException || result.Exception is OperationCanceledException)
@@ -160,15 +166,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     dumpBuilder.AppendLine();
                     dumpBuilder.AppendLine("Action timed out.");
 
-                    return (dumpBuilder.ToString(), RuleResult.Timeout, actionWatch.Elapsed);
+                    return (dumpBuilder.ToString(), RuleResult.Timeout, elapsed);
                 }
                 else if (result.Exception != null)
                 {
-                    return (dumpBuilder.ToString(), RuleResult.Failed, actionWatch.Elapsed);
+                    return (dumpBuilder.ToString(), RuleResult.Failed, elapsed);
                 }
                 else
                 {
-                    return (dumpBuilder.ToString(), RuleResult.Success, actionWatch.Elapsed);
+                    return (dumpBuilder.ToString(), RuleResult.Success, elapsed);
                 }
             }
             catch (Exception ex)

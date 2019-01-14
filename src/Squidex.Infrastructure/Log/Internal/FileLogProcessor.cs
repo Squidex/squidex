@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using NodaTime;
 
 namespace Squidex.Infrastructure.Log.Internal
 {
@@ -70,7 +71,7 @@ namespace Squidex.Infrastructure.Log.Internal
                     AutoFlush = true
                 };
 
-                writer.WriteLine($"--- Started Logging {DateTime.UtcNow} ---", 1);
+                writer.WriteLine($"--- Started Logging {SystemClock.Instance.GetCurrentInstant()} ---", 1);
             }
             catch (Exception ex)
             {

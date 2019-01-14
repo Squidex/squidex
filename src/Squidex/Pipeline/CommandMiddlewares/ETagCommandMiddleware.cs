@@ -54,7 +54,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             await next();
 
-            if (context.Result<object>() is EntitySavedResult result)
+            if (context.PlainResult is EntitySavedResult result)
             {
                 httpContextAccessor.HttpContext.Response.Headers[HeaderNames.ETag] = result.Version.ToString();
             }

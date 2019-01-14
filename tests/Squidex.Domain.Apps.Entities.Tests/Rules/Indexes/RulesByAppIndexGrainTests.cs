@@ -18,17 +18,18 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
     {
         private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
         private readonly IPersistence<RulesByAppIndexGrain.GrainState> persistence = A.Fake<IPersistence<RulesByAppIndexGrain.GrainState>>();
+        private readonly Guid appId = Guid.NewGuid();
         private readonly Guid ruleId1 = Guid.NewGuid();
         private readonly Guid ruleId2 = Guid.NewGuid();
         private readonly RulesByAppIndexGrain sut;
 
         public RulesByAppIndexGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<Guid>.Ignored, A<Func<RulesByAppIndexGrain.GrainState, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(typeof(RulesByAppIndexGrain), appId, A<HandleSnapshot<RulesByAppIndexGrain.GrainState>>.Ignored))
                 .Returns(persistence);
 
             sut = new RulesByAppIndexGrain(store);
-            sut.ActivateAsync(Guid.NewGuid()).Wait();
+            sut.ActivateAsync(appId).Wait();
         }
 
         [Fact]

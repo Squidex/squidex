@@ -22,16 +22,19 @@ namespace Squidex.Infrastructure.States
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
-        private readonly ISnapshotStore<object, string> snapshotStore = A.Fake<ISnapshotStore<object, string>>();
+        private readonly ISnapshotStore<int, string> snapshotStore = A.Fake<ISnapshotStore<int, string>>();
+        private readonly ISnapshotStore<None, string> snapshotStoreNone = A.Fake<ISnapshotStore<None, string>>();
         private readonly IStreamNameResolver streamNameResolver = A.Fake<IStreamNameResolver>();
         private readonly IStore<string> sut;
 
         public PersistenceEventSourcingTests()
         {
-            A.CallTo(() => services.GetService(typeof(ISnapshotStore<object, string>)))
+            A.CallTo(() => services.GetService(typeof(ISnapshotStore<int, string>)))
                 .Returns(snapshotStore);
+            A.CallTo(() => services.GetService(typeof(ISnapshotStore<None, string>)))
+                .Returns(snapshotStoreNone);
 
-            A.CallTo(() => streamNameResolver.GetStreamName(typeof(object), key))
+            A.CallTo(() => streamNameResolver.GetStreamName(None.Type, key))
                 .Returns(key);
 
             sut = new Store<string>(eventStore, eventDataFormatter, services, streamNameResolver);
@@ -46,7 +49,7 @@ namespace Squidex.Infrastructure.States
             SetupEventStore(event1, event2);
 
             var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
+            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
 
             await persistence.ReadAsync();
 
@@ -65,7 +68,7 @@ namespace Squidex.Infrastructure.States
                 .Throws(new TypeNameNotFoundException());
 
             var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
+            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
 
             await persistence.ReadAsync();
 
@@ -81,9 +84,9 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3, 2);
 
-            var persistedState = (object)null;
+            var persistedState = -1;
             var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => persistedState = x, x => persistedEvents.Add(x.Payload));
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, (int x) => persistedState = x, x => persistedEvents.Add(x.Payload));
 
             await persistence.ReadAsync();
 
@@ -99,9 +102,9 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3, 0, 3);
 
-            var persistedState = (object)null;
+            var persistedState = -1;
             var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => persistedState = x, x => persistedEvents.Add(x.Payload));
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, (int x) => persistedState = x, x => persistedEvents.Add(x.Payload));
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => persistence.ReadAsync());
         }
@@ -114,9 +117,9 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(3, 4, 3);
 
-            var persistedState = (object)null;
+            var persistedState = -1;
             var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => persistedState = x, x => persistedEvents.Add(x.Payload));
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, (int x) => persistedState = x, x => persistedEvents.Add(x.Payload));
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => persistence.ReadAsync());
         }
@@ -127,7 +130,7 @@ namespace Squidex.Infrastructure.States
             SetupEventStore(0);
 
             var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
+            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => persistence.ReadAsync(1));
         }
@@ -138,7 +141,7 @@ namespace Squidex.Infrastructure.States
             SetupEventStore(3);
 
             var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
+            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
 
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.ReadAsync(1));
         }
@@ -151,9 +154,9 @@ namespace Squidex.Infrastructure.States
 
             SetupEventStore(0);
 
-            var persistedState = (object)null;
+            var persistedState = -1;
             var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => persistedState = x, x => persistedEvents.Add(x.Payload));
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, (int x) => persistedState = x, x => persistedEvents.Add(x.Payload));
 
             await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.ReadAsync(1));
         }
@@ -163,9 +166,9 @@ namespace Squidex.Infrastructure.States
         {
             SetupEventStore(0);
 
-            var persistedState = (object)null;
+            var persistedState = -1;
             var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => persistedState = x, x => persistedEvents.Add(x.Payload));
+            var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, (int x) => persistedState = x, x => persistedEvents.Add(x.Payload));
 
             await persistence.ReadAsync();
         }
@@ -176,16 +179,16 @@ namespace Squidex.Infrastructure.States
             SetupEventStore(3);
 
             var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
+            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
 
             await persistence.ReadAsync();
 
-            await persistence.WriteEventsAsync(new[] { new MyEvent(), new MyEvent() }.Select(Envelope.Create));
-            await persistence.WriteEventsAsync(new[] { new MyEvent(), new MyEvent() }.Select(Envelope.Create));
+            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
+            await persistence.WriteEventAsync(Envelope.Create(new MyEvent()));
 
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 4, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 3, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
         }
 
@@ -195,20 +198,20 @@ namespace Squidex.Infrastructure.States
             SetupEventStore(3);
 
             var persistedEvents = new List<IEvent>();
-            var persistence = sut.WithEventSourcing<object, string>(key, x => persistedEvents.Add(x.Payload));
+            var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
 
             await persistence.ReadAsync();
 
-            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 2)))
+            A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .Throws(new WrongEventVersionException(1, 1));
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.WriteEventsAsync(new[] { new MyEvent(), new MyEvent() }.Select(Envelope.Create)));
+            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.WriteEventAsync(Envelope.Create(new MyEvent())));
         }
 
         [Fact]
         public async Task Should_delete_events_but_not_snapshot_when_deleted_snapshot_only()
         {
-            var persistence = sut.WithEventSourcing<object, string>(key, x => { });
+            var persistence = sut.WithEventSourcing(None.Type, key, null);
 
             await persistence.DeleteAsync();
 
@@ -222,7 +225,7 @@ namespace Squidex.Infrastructure.States
         [Fact]
         public async Task Should_delete_events_and_snapshot_when_deleted()
         {
-            var persistence = sut.WithSnapshotsAndEventSourcing<object, object, string>(key, x => { }, x => { });
+            var persistence = sut.WithSnapshotsAndEventSourcing<int>(None.Type, key, null, null);
 
             await persistence.DeleteAsync();
 

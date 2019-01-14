@@ -17,6 +17,8 @@ namespace Squidex.Infrastructure.UsageTracking
 
         Task<long> GetMonthlyCallsAsync(string key, DateTime date);
 
+        Task<long> GetPreviousCallsAsync(string key, DateTime fromDate, DateTime toDate);
+
         Task<IReadOnlyDictionary<string, IReadOnlyList<DateUsage>>> QueryAsync(string key, DateTime fromDate, DateTime toDate);
     }
 }

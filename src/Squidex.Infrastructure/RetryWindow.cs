@@ -7,19 +7,23 @@
 
 using System;
 using System.Collections.Generic;
+using NodaTime;
 
 namespace Squidex.Infrastructure
 {
     public sealed class RetryWindow
     {
-        private readonly TimeSpan windowDuration;
+        private readonly Duration windowDuration;
         private readonly int windowSize;
-        private readonly Queue<DateTime> retries = new Queue<DateTime>();
+        private readonly Queue<Instant> retries = new Queue<Instant>();
+        private readonly IClock clock;
 
-        public RetryWindow(TimeSpan windowDuration, int windowSize)
+        public RetryWindow(TimeSpan windowDuration, int windowSize, IClock clock = null)
         {
-            this.windowDuration = windowDuration;
+            this.windowDuration = Duration.FromTimeSpan(windowDuration);
             this.windowSize = windowSize + 1;
+
+            this.clock = clock ?? SystemClock.Instance;
         }
 
         public void Reset()
@@ -29,19 +33,16 @@ namespace Squidex.Infrastructure
 
         public bool CanRetryAfterFailure()
         {
-            return CanRetryAfterFailure(DateTime.UtcNow);
-        }
+            var now = clock.GetCurrentInstant();
 
-        public bool CanRetryAfterFailure(DateTime utcNow)
-        {
-            retries.Enqueue(utcNow);
+            retries.Enqueue(now);
 
             while (retries.Count > windowSize)
             {
                 retries.Dequeue();
             }
 
-            return retries.Count < windowSize || (retries.Count > 0 && (utcNow - retries.Peek()) > windowDuration);
+            return retries.Count < windowSize || (retries.Count > 0 && (now - retries.Peek()) > windowDuration);
         }
     }
 }

@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.EventSourcing
         [Fact]
         public async Task Should_invoke_all_consumers()
         {
-            var @event = Envelope.Create(new MyEvent());
+            var @event = Envelope.Create<IEvent>(new MyEvent());
 
             var sut = new CompoundEventConsumer("consumer-name", consumer1, consumer2);
 

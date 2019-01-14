@@ -80,7 +80,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
 
             string redirectUri = null;
 
-            if (context.Result<object>() is RedirectToCheckoutResult result)
+            if (context.PlainResult is RedirectToCheckoutResult result)
             {
                 redirectUri = result.Url.ToString();
             }

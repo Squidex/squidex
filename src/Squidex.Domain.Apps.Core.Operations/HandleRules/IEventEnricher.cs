@@ -14,6 +14,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public interface IEventEnricher
     {
-        Task<EnrichedEvent> EnrichAsync(Envelope<AppEvent> @event);
+        Task EnrichAsync(EnrichedEvent enrichedEvent, Envelope<AppEvent> @event);
     }
 }

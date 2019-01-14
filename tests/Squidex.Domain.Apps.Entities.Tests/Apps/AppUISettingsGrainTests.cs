@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public AppUISettingsGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(A<Type>.Ignored, A<Guid>.Ignored, A<Func<AppUISettingsGrain.GrainState, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshots(typeof(AppUISettingsGrain), Guid.Empty, A<HandleSnapshot<AppUISettingsGrain.GrainState>>.Ignored))
                 .Returns(persistence);
 
             sut = new AppUISettingsGrain(store);

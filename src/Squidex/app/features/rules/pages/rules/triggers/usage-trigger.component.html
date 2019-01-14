@@ -1,0 +1,25 @@
+<div [formGroup]="triggerForm" class="form-horizontal">
+    <div class="form-group">
+        <label for="condition">Limit</label>
+
+        <sqx-control-errors for="limit" [submitted]="triggerFormSubmitted"></sqx-control-errors>
+
+        <input type="number" step="1" class="form-control" id="limit" formControlName="limit" />
+        
+        <small class="form-text text-muted">
+            The monthly api calls to trigger.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="condition">Days</label>
+
+        <sqx-control-errors for="numDays" fieldName="Days" [submitted]="triggerFormSubmitted"></sqx-control-errors>
+
+        <input type="number" step="1" class="form-control" id="numDays" formControlName="numDays" />
+        
+        <small class="form-text text-muted">
+            The number of days to check or empty to check the current month.
+        </small>
+    </div>
+</div>

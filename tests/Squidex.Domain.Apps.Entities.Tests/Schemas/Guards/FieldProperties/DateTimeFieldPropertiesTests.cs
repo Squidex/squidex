@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
@@ -119,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
 
         private static Instant FutureDays(int days)
         {
-            return Instant.FromDateTimeUtc(DateTime.UtcNow.Date.AddDays(days));
+            return SystemClock.Instance.GetCurrentInstant().WithoutMs().Plus(Duration.FromDays(days));
         }
     }
 }

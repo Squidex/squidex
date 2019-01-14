@@ -18,6 +18,7 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Log;
@@ -68,6 +69,7 @@ namespace Squidex.Config.Orleans
                     .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
                     .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
                     .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()
+                    .AddStartupTask<Bootstrap<IUsageTrackerGrain>>()
                     .Configure<ClusterOptions>(options =>
                     {
                         options.Configure();

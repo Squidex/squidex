@@ -42,7 +42,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
         [Fact]
         public void Should_respect_property_converter()
         {
-            var value = Instant.FromDateTimeUtc(DateTime.UtcNow.Date);
+            var value = Instant.FromUtc(2012, 12, 10, 9, 8, 45);
 
             var serializerSettings = new JsonSerializerSettings
             {
@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
         [Fact]
         public void Should_ignore_other_converters()
         {
-            var value = Instant.FromDateTimeUtc(DateTime.UtcNow.Date);
+            var value = Instant.FromUtc(2012, 12, 10, 9, 8, 45);
 
             var serializerSettings = new JsonSerializerSettings
             {
@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
         [Fact]
         public void Should_serialize_and_deserialize_instant()
         {
-            var value = Instant.FromDateTimeUtc(DateTime.UtcNow.Date);
+            var value = Instant.FromUtc(2012, 12, 10, 9, 8, 45);
 
             var serialized = value.SerializeAndDeserialize();
 

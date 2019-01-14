@@ -59,5 +59,24 @@ namespace Squidex.Infrastructure.UsageTracking
             A.CallTo(() => inner.GetMonthlyCallsAsync(key, DateTime.Today))
                 .MustHaveHappened(Repeated.Exactly.Once);
         }
+
+        [Fact]
+        public async Task Should_cache_days_usage()
+        {
+            var f = DateTime.Today;
+            var t = DateTime.Today.AddDays(10);
+
+            A.CallTo(() => inner.GetPreviousCallsAsync(key, f, t))
+                .Returns(120);
+
+            var result1 = await sut.GetPreviousCallsAsync(key, f, t);
+            var result2 = await sut.GetPreviousCallsAsync(key, f, t);
+
+            Assert.Equal(120, result1);
+            Assert.Equal(120, result2);
+
+            A.CallTo(() => inner.GetPreviousCallsAsync(key, f, t))
+                .MustHaveHappened(Repeated.Exactly.Once);
+        }
     }
 }

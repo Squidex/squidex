@@ -104,7 +104,7 @@ namespace Squidex.Infrastructure.Commands
 
         public LogSnapshotDomainObjectGrainTests()
         {
-            A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), id, A<Func<Envelope<IEvent>, Task>>.Ignored))
+            A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>.Ignored))
                 .Returns(persistence);
 
             A.CallTo(() => store.GetSnapshotStore<MyDomainState>())

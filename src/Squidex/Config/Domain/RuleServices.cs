@@ -7,8 +7,10 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.HandleRules.Triggers;
+using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Extensions.Actions;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -25,6 +27,9 @@ namespace Squidex.Config.Domain
                 .As<IRuleTriggerHandler>();
 
             services.AddSingletonAs<ContentChangedTriggerHandler>()
+                .As<IRuleTriggerHandler>();
+
+            services.AddSingletonAs<UsageTriggerHandler>()
                 .As<IRuleTriggerHandler>();
 
             services.AddSingletonAs<RuleEnqueuer>()

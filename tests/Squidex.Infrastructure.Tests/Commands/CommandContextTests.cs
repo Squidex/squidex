@@ -26,8 +26,13 @@ namespace Squidex.Infrastructure.Commands
         public void Should_instantiate_and_provide_command()
         {
             Assert.Equal(command, sut.Command);
-            Assert.False(sut.IsCompleted);
+
+            Assert.Null(sut.PlainResult);
+            Assert.Null(sut.Result<string>());
+
             Assert.NotEqual(Guid.Empty, sut.ContextId);
+
+            Assert.False(sut.IsCompleted);
         }
 
         [Fact]
@@ -39,9 +44,19 @@ namespace Squidex.Infrastructure.Commands
         }
 
         [Fact]
-        public void Should_provide_result_valid_when_succeeded_with_value()
+        public void Should_provide_result_when_succeeded_with_value()
         {
             sut.Complete("RESULT");
+
+            Assert.Equal("RESULT", sut.Result<string>());
+        }
+
+        [Fact]
+        public void Should_provide_plain_result_when_succeeded_with_value()
+        {
+            sut.Complete("RESULT");
+
+            Assert.Equal("RESULT", sut.PlainResult);
         }
     }
 }

@@ -30,26 +30,31 @@ namespace Squidex.Infrastructure.States
             this.streamNameResolver = streamNameResolver;
         }
 
-        public IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, Func<TState, Task> applySnapshot)
+        public IPersistence WithEventSourcing(Type owner, TKey key, HandleEvent applyEvent)
+        {
+            return CreatePersistence(owner, key, applyEvent);
+        }
+
+        public IPersistence<TState> WithSnapshots<TState>(Type owner, TKey key, HandleSnapshot<TState> applySnapshot)
         {
             return CreatePersistence(owner, key, PersistenceMode.Snapshots, applySnapshot, null);
         }
 
-        public IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
+        public IPersistence<TState> WithSnapshotsAndEventSourcing<TState>(Type owner, TKey key, HandleSnapshot<TState> applySnapshot, HandleEvent applyEvent)
         {
             return CreatePersistence(owner, key, PersistenceMode.SnapshotsAndEventSourcing, applySnapshot, applyEvent);
         }
 
-        public IPersistence WithEventSourcing(Type owner, TKey key, Func<Envelope<IEvent>, Task> applyEvent)
+        private IPersistence CreatePersistence(Type owner, TKey key, HandleEvent applyEvent)
         {
             Guard.NotNull(key, nameof(key));
 
-            var snapshotStore = GetSnapshotStore<object>();
+            var snapshotStore = GetSnapshotStore<None>();
 
             return new Persistence<TKey>(key, owner, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, applyEvent);
         }
 
-        private IPersistence<TState> CreatePersistence<TState>(Type owner, TKey key, PersistenceMode mode, Func<TState, Task> applySnapshot, Func<Envelope<IEvent>, Task> applyEvent)
+        private IPersistence<TState> CreatePersistence<TState>(Type owner, TKey key, PersistenceMode mode, HandleSnapshot<TState> applySnapshot, HandleEvent applyEvent)
         {
             Guard.NotNull(key, nameof(key));
 

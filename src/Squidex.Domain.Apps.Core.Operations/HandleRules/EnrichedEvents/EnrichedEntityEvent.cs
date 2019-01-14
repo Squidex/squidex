@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 {
-    public abstract class EnrichedEntityEvent : EnrichedEvent
+    public abstract class EnrichedEntityEvent : EnrichedUserEvent
     {
         public Guid Id { get; set; }
 
@@ -23,9 +23,9 @@ namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 
         public RefToken LastModifiedBy { get; set; }
 
-        public override void CalculatePartition()
+        public override long Partition
         {
-            Partition = Id.GetHashCode();
+            get { return Id.GetHashCode(); }
         }
     }
 }

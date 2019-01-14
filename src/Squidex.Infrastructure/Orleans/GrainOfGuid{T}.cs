@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             Key = key;
 
-            persistence = store.WithSnapshots<T, Guid>(GetType(), key, ApplyState);
+            persistence = store.WithSnapshots(GetType(), key, new HandleSnapshot<T>(ApplyState));
 
             await persistence.ReadAsync();
 

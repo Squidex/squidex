@@ -109,7 +109,7 @@ namespace Squidex.Infrastructure.Commands
 
         public DomainObjectGrainTests()
         {
-            A.CallTo(() => store.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<Func<MyDomainState, Task>>.Ignored, A<Func<Envelope<IEvent>, Task>>.Ignored))
+            A.CallTo(() => store.WithSnapshotsAndEventSourcing(typeof(MyDomainObject), id, A<HandleSnapshot<MyDomainState>>.Ignored, A<HandleEvent>.Ignored))
                 .Returns(persistence);
 
             sut = new MyDomainObject(store);

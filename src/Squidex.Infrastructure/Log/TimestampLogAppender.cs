@@ -5,29 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using NodaTime;
 
 namespace Squidex.Infrastructure.Log
 {
     public sealed class TimestampLogAppender : ILogAppender
     {
-        private readonly Func<DateTime> timestamp;
+        private readonly IClock clock;
 
-        public TimestampLogAppender()
-            : this(() => DateTime.UtcNow)
+        public TimestampLogAppender(IClock clock = null)
         {
-        }
-
-        public TimestampLogAppender(Func<DateTime> timestamp)
-        {
-            Guard.NotNull(timestamp, nameof(timestamp));
-
-            this.timestamp = timestamp;
+            this.clock = clock ?? SystemClock.Instance;
         }
 
         public void Append(IObjectWriter writer)
         {
-            writer.WriteProperty("timestamp", timestamp());
+            writer.WriteProperty("timestamp", clock.GetCurrentInstant());
         }
     }
 }
