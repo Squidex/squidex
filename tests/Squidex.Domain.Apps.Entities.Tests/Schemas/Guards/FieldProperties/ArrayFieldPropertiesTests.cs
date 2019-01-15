@@ -26,8 +26,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Max items must be greater than min items.", "MinItems", "MaxItems")
+                    new ValidationError("Max items must be greater or equal to min items.", "MinItems", "MaxItems")
                 });
+        }
+
+        [Fact]
+        public void Should_not_add_error_if_min_items_equals_to_max_items()
+        {
+            var sut = new ArrayFieldProperties { MinItems = 2, MaxItems = 2 };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            Assert.Empty(errors);
         }
     }
 }

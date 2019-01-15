@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (command.Language == null)
                 {
-                    e("Language code is required.", nameof(command.Language));
+                    e(Not.Defined("Language code"), nameof(command.Language));
                 }
                 else if (languages.Contains(command.Language))
                 {
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (command.Language == null)
                 {
-                    e("Language code is required.", nameof(command.Language));
+                    e(Not.Defined("Language code"), nameof(command.Language));
                 }
 
                 if (languages.Master == config)
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (command.Language == null)
                 {
-                    e("Language is required.", nameof(command.Language));
+                    e(Not.Defined("Language code"), nameof(command.Language));
                 }
 
                 if ((languages.Master == config || command.IsMaster) && command.IsOptional)

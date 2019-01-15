@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public RangeValidator(T? min, T? max)
         {
-            if (min.HasValue && max.HasValue && min.Value.CompareTo(max.Value) >= 0)
+            if (min.HasValue && max.HasValue && min.Value.CompareTo(max.Value) > 0)
             {
                 throw new ArgumentException("Min value must be greater than max value.", nameof(min));
             }
@@ -36,14 +36,28 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             var typedValue = (T)value;
 
-            if (min.HasValue && typedValue.CompareTo(min.Value) < 0)
+            if (min.HasValue && max.HasValue)
             {
-                addError(context.Path, $"Must be greater than or equal to '{min}'.");
+                if (Equals(min, max) && Equals(min.Value, max.Value))
+                {
+                    addError(context.Path, $"Must be exactly '{max}'.");
+                }
+                else if (typedValue.CompareTo(min.Value) < 0 || typedValue.CompareTo(max.Value) > 0)
+                {
+                    addError(context.Path, $"Must be between '{min}' and '{max}'.");
+                }
             }
-
-            if (max.HasValue && typedValue.CompareTo(max.Value) > 0)
+            else
             {
-                addError(context.Path, $"Must be less than or equal to '{max}'.");
+                if (min.HasValue && typedValue.CompareTo(min.Value) < 0)
+                {
+                    addError(context.Path, $"Must be greater or equal to '{min}'.");
+                }
+
+                if (max.HasValue && typedValue.CompareTo(max.Value) > 0)
+                {
+                    addError(context.Path, $"Must be less or equal to '{max}'.");
+                }
             }
 
             return TaskHelper.Done;

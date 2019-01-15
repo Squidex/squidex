@@ -27,8 +27,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Max length must be greater than min length.", "MinLength", "MaxLength")
+                    new ValidationError("Max length must be greater or equal to min length.", "MinLength", "MaxLength")
                 });
+        }
+
+        [Fact]
+        public void Should_not_add_error_if_min_length_equal_to_max_length()
+        {
+            var sut = new StringFieldProperties { MinLength = 2, MaxLength = 2 };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -97,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Pattern is not a valid expression.", "Pattern")
+                    new ValidationError("Pattern is not a valid value.", "Pattern")
                 });
         }
 

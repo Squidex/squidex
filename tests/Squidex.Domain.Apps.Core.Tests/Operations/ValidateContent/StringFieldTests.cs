@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue("123"), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must have more than '10' characters." });
+                new[] { "Must have at least 10 character(s)." });
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue("12345678"), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must have less than '5' characters." });
+                new[] { "Must not have more than 5 character(s)." });
         }
 
         [Fact]
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue("abc"), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Not valid." });
+                new[] { "Does not match to the pattern." });
         }
 
         [Fact]

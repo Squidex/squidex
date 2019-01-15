@@ -49,6 +49,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
+        public async Task Should_not_add_error_if_number_of_tags_is_equal_to_min_and_max_items()
+        {
+            var sut = Field(new TagsFieldProperties { MinItems = 2, MaxItems = 2 });
+
+            await sut.ValidateAsync(CreateValue("tag1", "tag2"), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
         public async Task Should_add_error_if_tags_are_required_and_null()
         {
             var sut = Field(new TagsFieldProperties { IsRequired = true });
@@ -100,7 +110,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue("tag-1", "tag-2"), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must have not more than 1 item(s)." });
+                new[] { "Must not have more than 1 item(s)." });
         }
 
         [Fact]

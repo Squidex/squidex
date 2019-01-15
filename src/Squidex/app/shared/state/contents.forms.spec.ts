@@ -121,7 +121,7 @@ describe('ArrayField', () => {
     const field = createField(new ArrayFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
-        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(2);
     });
 
     it('should format to empty string if null', () => {
@@ -145,7 +145,7 @@ describe('AssetsField', () => {
     const field = createField(new AssetsFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
-        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(2);
     });
 
     it('should format to empty string if null', () => {
@@ -169,7 +169,7 @@ describe('TagsField', () => {
     const field = createField(new TagsFieldPropertiesDto('Tags', { isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
-        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(2);
     });
 
     it('should format to empty string if null', () => {
@@ -306,7 +306,7 @@ describe('NumberField', () => {
     const field = createField(new NumberFieldPropertiesDto('Input', { isRequired: true, minValue: 1, maxValue: 6, allowedValues: [1, 3] }));
 
     it('should create validators', () => {
-        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(4);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);
     });
 
     it('should format to empty string if null', () => {
@@ -328,7 +328,7 @@ describe('ReferencesField', () => {
     const field = createField(new ReferencesFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
-        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(2);
     });
 
     it('should format to empty string if null', () => {
@@ -352,7 +352,7 @@ describe('StringField', () => {
     const field = createField(new StringFieldPropertiesDto('Input', { isRequired: true, pattern: 'pattern', minLength: 1, maxLength: 5, allowedValues: ['a', 'b'] }));
 
     it('should create validators', () => {
-        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(5);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(4);
     });
 
     it('should format to empty string if null', () => {

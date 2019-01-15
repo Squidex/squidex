@@ -214,7 +214,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new UpdateField { FieldId = 2, Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 } };
 
             ValidationAssert.Throws(() => GuardSchemaField.CanUpdate(schema_0, command),
-                new ValidationError("Max length must be greater than min length.", "Properties.MinLength", "Properties.MaxLength"));
+                new ValidationError("Max length must be greater or equal to min length.", "Properties.MinLength", "Properties.MaxLength"));
         }
 
         [Fact]
@@ -250,7 +250,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new AddField { Name = "field4", Properties = invalidProperties };
 
             ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
-                new ValidationError("Max length must be greater than min length.", "Properties.MinLength", "Properties.MaxLength"));
+                new ValidationError("Max length must be greater or equal to min length.", "Properties.MinLength", "Properties.MaxLength"));
         }
 
         [Fact]
@@ -268,7 +268,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new AddField { Name = "field4", Partitioning = "INVALID_PARTITIONING", Properties = validProperties };
 
             ValidationAssert.Throws(() => GuardSchemaField.CanAdd(schema_0, command),
-                new ValidationError("Partitioning is not valid.", "Partitioning"));
+                new ValidationError("Partitioning is not a valid value.", "Partitioning"));
         }
 
         [Fact]

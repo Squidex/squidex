@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             return ValidationAssert.ThrowsAsync(() => GuardSchema.CanCreate(command, appProvider),
-                new ValidationError("Max length must be greater than min length.",
+                new ValidationError("Max length must be greater or equal to min length.",
                     "Fields[1].Properties.MinLength",
                     "Fields[1].Properties.MaxLength"));
         }
@@ -147,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             return ValidationAssert.ThrowsAsync(() => GuardSchema.CanCreate(command, appProvider),
-                new ValidationError("Field partitioning is not valid.",
+                new ValidationError("Partitioning is not a valid value.",
                     "Fields[1].Partitioning"));
         }
 
@@ -300,7 +300,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             };
 
             return ValidationAssert.ThrowsAsync(() => GuardSchema.CanCreate(command, appProvider),
-                new ValidationError("Max length must be greater than min length.",
+                new ValidationError("Max length must be greater or equal to min length.",
                     "Fields[1].Nested[1].Properties.MinLength",
                     "Fields[1].Nested[1].Properties.MaxLength"));
         }

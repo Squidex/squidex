@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             {
                 if (!StatusFlow.Exists(command.Status))
                 {
-                    e("Status is not valid.", nameof(command.Status));
+                    e(Not.Valid("Status"), nameof(command.Status));
                 }
                 else if (!StatusFlow.CanChange(status, command.Status))
                 {
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
         {
             if (command.Data == null)
             {
-                e("Data is required.", nameof(command.Data));
+               e(Not.Defined("Data"), nameof(command.Data));
             }
         }
     }

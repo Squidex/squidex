@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (!command.Name.IsSlug())
                 {
-                    e("Name must be a valid slug.", nameof(command.Name));
+                    e(Not.ValidSlug("Name"), nameof(command.Name));
                 }
             });
         }
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.PlanId))
                 {
-                    e("Plan id is required.", nameof(command.PlanId));
+                    e(Not.Defined("Plan id"), nameof(command.PlanId));
                     return;
                 }
 

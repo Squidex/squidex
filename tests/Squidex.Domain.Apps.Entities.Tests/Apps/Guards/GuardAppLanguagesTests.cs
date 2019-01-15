@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var languages_1 = languages_0.Set(new LanguageConfig(Language.EN));
 
             ValidationAssert.Throws(() => GuardAppLanguages.CanUpdate(languages_1, command),
-                new ValidationError("Language is required.", "Language"));
+                new ValidationError("Language code is required.", "Language"));
         }
 
         [Fact]

@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
 
             ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_0, command),
-                new ValidationError("Pattern is not a valid regular expression.", "Pattern"));
+                new ValidationError("Pattern is not a valid value.", "Pattern"));
         }
 
         [Fact]
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new UpdatePattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
 
             ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_1, command),
-                new ValidationError("Pattern is not a valid regular expression.", "Pattern"));
+                new ValidationError("Pattern is not a valid value.", "Pattern"));
         }
 
         [Fact]

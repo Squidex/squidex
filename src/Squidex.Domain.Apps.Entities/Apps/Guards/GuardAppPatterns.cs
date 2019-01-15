@@ -22,12 +22,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (command.PatternId == Guid.Empty)
                 {
-                    e("Id is required.", nameof(command.PatternId));
+                   e(Not.Defined("Id"), nameof(command.PatternId));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                    e("Name is required.", nameof(command.Name));
+                   e(Not.Defined("Name"), nameof(command.Name));
                 }
 
                 if (patterns.Values.Any(x => x.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
@@ -37,11 +37,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (string.IsNullOrWhiteSpace(command.Pattern))
                 {
-                    e("Pattern is required.", nameof(command.Pattern));
+                   e(Not.Defined("Pattern"), nameof(command.Pattern));
                 }
                 else if (!command.Pattern.IsValidRegex())
                 {
-                    e("Pattern is not a valid regular expression.", nameof(command.Pattern));
+                    e(Not.Valid("Pattern"), nameof(command.Pattern));
                 }
 
                 if (patterns.Values.Any(x => x.Pattern == command.Pattern))
@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                    e("Name is required.", nameof(command.Name));
+                   e(Not.Defined("Name"), nameof(command.Name));
                 }
 
                 if (patterns.Any(x => x.Key != command.PatternId && x.Value.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
@@ -84,11 +84,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (string.IsNullOrWhiteSpace(command.Pattern))
                 {
-                    e("Pattern is required.", nameof(command.Pattern));
+                   e(Not.Defined("Pattern"), nameof(command.Pattern));
                 }
                 else if (!command.Pattern.IsValidRegex())
                 {
-                    e("Pattern is not a valid regular expression.", nameof(command.Pattern));
+                    e(Not.Valid("Pattern"), nameof(command.Pattern));
                 }
 
                 if (patterns.Any(x => x.Key != command.PatternId && x.Value.Pattern == command.Pattern))

@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync("foo", errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Not valid." });
+                new[] { "Does not match to the pattern." });
         }
 
         [Fact]

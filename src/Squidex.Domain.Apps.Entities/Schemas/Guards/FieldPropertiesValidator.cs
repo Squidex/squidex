@@ -26,9 +26,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public IEnumerable<ValidationError> Visit(ArrayFieldProperties properties)
         {
-            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value >= properties.MaxItems.Value)
+            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
             {
-                yield return new ValidationError("Max items must be greater than min items.",
+                yield return new ValidationError(Not.GreaterEquals("Max items", "min items"),
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
             }
@@ -36,37 +36,37 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public IEnumerable<ValidationError> Visit(AssetsFieldProperties properties)
         {
-            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value >= properties.MaxItems.Value)
+            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
             {
-                yield return new ValidationError("Max items must be greater than min items.",
+                yield return new ValidationError(Not.GreaterEquals("Max items", "min items"),
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
             }
 
-            if (properties.MaxHeight.HasValue && properties.MinHeight.HasValue && properties.MinHeight.Value >= properties.MaxHeight.Value)
+            if (properties.MaxHeight.HasValue && properties.MinHeight.HasValue && properties.MinHeight.Value > properties.MaxHeight.Value)
             {
-                yield return new ValidationError("Max height must be greater than min height.",
+                yield return new ValidationError(Not.GreaterEquals("Max height", "min height"),
                     nameof(properties.MaxHeight),
                     nameof(properties.MinHeight));
             }
 
-            if (properties.MaxWidth.HasValue && properties.MinWidth.HasValue && properties.MinWidth.Value >= properties.MaxWidth.Value)
+            if (properties.MaxWidth.HasValue && properties.MinWidth.HasValue && properties.MinWidth.Value > properties.MaxWidth.Value)
             {
-                yield return new ValidationError("Max width must be greater than min width.",
+                yield return new ValidationError(Not.GreaterEquals("Max width", "min width"),
                     nameof(properties.MaxWidth),
                     nameof(properties.MinWidth));
             }
 
             if (properties.MaxSize.HasValue && properties.MinSize.HasValue && properties.MinSize.Value >= properties.MaxSize.Value)
             {
-                yield return new ValidationError("Max size must be greater than min size.",
+                yield return new ValidationError(Not.GreaterThan("Max size", "min size"),
                     nameof(properties.MaxSize),
                     nameof(properties.MinSize));
             }
 
             if (properties.AspectWidth.HasValue != properties.AspectHeight.HasValue)
             {
-                yield return new ValidationError("Aspect width and height is required.",
+                yield return new ValidationError(Not.Defined2("Aspect width", "aspect height"),
                     nameof(properties.AspectWidth),
                     nameof(properties.AspectHeight));
             }
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError("Editor is not a valid value.",
+                yield return new ValidationError(Not.Valid("Editor"),
                     nameof(properties.Editor));
             }
         }
@@ -85,25 +85,25 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError("Editor is not a valid value.",
+                yield return new ValidationError(Not.Valid("Editor"),
                     nameof(properties.Editor));
             }
 
             if (properties.DefaultValue.HasValue && properties.MinValue.HasValue && properties.DefaultValue.Value < properties.MinValue.Value)
             {
-                yield return new ValidationError("Default value must be greater than min value.",
+                yield return new ValidationError(Not.GreaterEquals("Default value", "min value"),
                     nameof(properties.DefaultValue));
             }
 
             if (properties.DefaultValue.HasValue && properties.MaxValue.HasValue && properties.DefaultValue.Value > properties.MaxValue.Value)
             {
-                yield return new ValidationError("Default value must be less than max value.",
+                yield return new ValidationError(Not.LessEquals("Default value", "max value"),
                     nameof(properties.DefaultValue));
             }
 
             if (properties.MaxValue.HasValue && properties.MinValue.HasValue && properties.MinValue.Value >= properties.MaxValue.Value)
             {
-                yield return new ValidationError("Max value must be greater than min value.",
+                yield return new ValidationError(Not.GreaterThan("Max value", "min value"),
                     nameof(properties.MinValue),
                     nameof(properties.MaxValue));
             }
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (!properties.CalculatedDefaultValue.Value.IsEnumValue())
                 {
-                    yield return new ValidationError("Calculated default value is not valid.",
+                    yield return new ValidationError(Not.Valid("Calculated default value"),
                         nameof(properties.CalculatedDefaultValue));
                 }
 
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError("Editor is not a valid value.",
+                yield return new ValidationError(Not.Valid("Editor"),
                     nameof(properties.Editor));
             }
         }
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError("Editor is not a valid value.",
+                yield return new ValidationError(Not.Valid("Editor"),
                     nameof(properties.Editor));
             }
 
@@ -155,19 +155,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (properties.DefaultValue.HasValue && properties.MinValue.HasValue && properties.DefaultValue.Value < properties.MinValue.Value)
             {
-                yield return new ValidationError("Default value must be greater than min value.",
+                yield return new ValidationError(Not.GreaterEquals("Default value", "min value"),
                     nameof(properties.DefaultValue));
             }
 
             if (properties.DefaultValue.HasValue && properties.MaxValue.HasValue && properties.DefaultValue.Value > properties.MaxValue.Value)
             {
-                yield return new ValidationError("Default value must be less than max value.",
+                yield return new ValidationError(Not.LessEquals("Default value", "max value"),
                     nameof(properties.DefaultValue));
             }
 
             if (properties.MaxValue.HasValue && properties.MinValue.HasValue && properties.MinValue.Value >= properties.MaxValue.Value)
             {
-                yield return new ValidationError("Max value must be greater than min value.",
+                yield return new ValidationError(Not.GreaterThan("Max value", "min value"),
                     nameof(properties.MinValue),
                     nameof(properties.MaxValue));
             }
@@ -190,9 +190,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public IEnumerable<ValidationError> Visit(ReferencesFieldProperties properties)
         {
-            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value >= properties.MaxItems.Value)
+            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
             {
-                yield return new ValidationError("Max items must be greater than min items.",
+                yield return new ValidationError(Not.GreaterEquals("Max items", "min items"),
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
             }
@@ -202,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError("Editor is not a valid value.",
+                yield return new ValidationError(Not.Valid("Editor"),
                     nameof(properties.Editor));
             }
 
@@ -214,13 +214,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (properties.Pattern != null && !properties.Pattern.IsValidRegex())
             {
-                yield return new ValidationError("Pattern is not a valid expression.",
+                yield return new ValidationError(Not.Valid("Pattern"),
                     nameof(properties.Pattern));
             }
 
-            if (properties.MaxLength.HasValue && properties.MinLength.HasValue && properties.MinLength.Value >= properties.MaxLength.Value)
+            if (properties.MaxLength.HasValue && properties.MinLength.HasValue && properties.MinLength.Value > properties.MaxLength.Value)
             {
-                yield return new ValidationError("Max length must be greater than min length.",
+                yield return new ValidationError(Not.GreaterEquals("Max length", "min length"),
                     nameof(properties.MinLength),
                     nameof(properties.MaxLength));
             }
@@ -245,7 +245,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         {
             if (!properties.Editor.IsEnumValue())
             {
-                yield return new ValidationError("Editor is not a valid value.",
+                yield return new ValidationError(Not.Valid("Editor"),
                     nameof(properties.Editor));
             }
 
@@ -255,9 +255,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.AllowedValues));
             }
 
-            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value >= properties.MaxItems.Value)
+            if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
             {
-                yield return new ValidationError("Max items must be greater than min items.",
+                yield return new ValidationError(Not.GreaterEquals("Max items", "min items"),
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
             }

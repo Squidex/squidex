@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                 if (command.Properties == null)
                 {
-                    e("Properties is required.", nameof(command.Properties));
+                   e(Not.Defined("Properties"), nameof(command.Properties));
                 }
                 else
                 {
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 {
                     if (command.ParentFieldId == null && !command.Partitioning.IsValidPartitioning())
                     {
-                        e("Partitioning is not valid.", nameof(command.Partitioning));
+                        e(Not.Valid("Partitioning"), nameof(command.Partitioning));
                     }
 
                     if (schema.FieldsByName.ContainsKey(command.Name))
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (command.Properties == null)
                 {
-                    e("Properties is required.", nameof(command.Properties));
+                   e(Not.Defined("Properties"), nameof(command.Properties));
                 }
                 else
                 {

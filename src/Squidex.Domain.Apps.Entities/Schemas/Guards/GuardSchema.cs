@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 if (!command.Name.IsSlug())
                 {
-                    e("Name is not a valid slug.", nameof(command.Name));
+                    e(Not.ValidSlug("Name"), nameof(command.Name));
                 }
                 else if (await appProvider.GetSchemaAsync(command.AppId.Id, command.Name) != null)
                 {
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
                         if (!field.Partitioning.IsValidPartitioning())
                         {
-                            e("Field partitioning is not valid.", $"{fieldPrefix}.{nameof(field.Partitioning)}");
+                            e(Not.Valid("Partitioning"), $"{fieldPrefix}.{nameof(field.Partitioning)}");
                         }
 
                         ValidateField(e, fieldPrefix, field);
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (field.Properties == null)
             {
-                e("Field properties is required.", $"{prefix}.{nameof(field.Properties)}");
+               e(Not.Defined("Field properties"), $"{prefix}.{nameof(field.Properties)}");
             }
             else
             {

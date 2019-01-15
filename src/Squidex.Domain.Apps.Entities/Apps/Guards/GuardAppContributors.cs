@@ -26,12 +26,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (!roles.ContainsKey(command.Role))
                 {
-                    e("Role is not valid.", nameof(command.Role));
+                    e(Not.Valid("role"), nameof(command.Role));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.ContributorId))
                 {
-                    e("Contributor id is required.", nameof(command.ContributorId));
+                    e(Not.Defined("Contributor id"), nameof(command.ContributorId));
                     return;
                 }
 
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 {
                     if (existing == command.Role)
                     {
-                        e("Contributor has already this role.", nameof(command.Role));
+                        e(Not.New("Contributor", "role"), nameof(command.Role));
                     }
                 }
                 else if (plan.MaxContributors == contributors.Count)
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.ContributorId))
                 {
-                    e("Contributor id is required.", nameof(command.ContributorId));
+                    e(Not.Defined("Contributor id"), nameof(command.ContributorId));
                 }
 
                 var ownerIds = contributors.Where(x => x.Value == Role.Owner).Select(x => x.Key).ToList();

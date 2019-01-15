@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var command = new ChangeContentStatus { Status = (Status)10 };
 
             ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Archived, command),
-                new ValidationError("Status is not valid.", "Status"));
+                new ValidationError("Status is not a valid value.", "Status"));
         }
 
         [Fact]

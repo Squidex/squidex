@@ -20,12 +20,12 @@ namespace Squidex.Domain.Apps.Entities.Assets.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.FileName))
                 {
-                    e("Name is required.", nameof(command.FileName));
+                   e(Not.Defined("Name"), nameof(command.FileName));
                 }
 
                 if (string.Equals(command.FileName, oldName))
                 {
-                    e("Asset has already this name.", nameof(command.FileName));
+                    e(Not.New("Asset", "name"), nameof(command.FileName));
                 }
             });
         }

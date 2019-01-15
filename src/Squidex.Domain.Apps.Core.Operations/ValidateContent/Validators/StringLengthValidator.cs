@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public StringLengthValidator(int? minLength, int? maxLength)
         {
-            if (minLength.HasValue && maxLength.HasValue && minLength.Value >= maxLength.Value)
+            if (minLength.HasValue && maxLength.HasValue && minLength.Value > maxLength.Value)
             {
                 throw new ArgumentException("Min length must be greater than max length.", nameof(minLength));
             }
@@ -31,14 +31,28 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
             {
-                if (minLength.HasValue && stringValue.Length < minLength.Value)
+                if (minLength.HasValue && maxLength.HasValue)
                 {
-                    addError(context.Path, $"Must have more than '{minLength}' characters.");
+                    if (minLength == maxLength && minLength != stringValue.Length)
+                    {
+                        addError(context.Path, $"Must have exactly {maxLength} character(s).");
+                    }
+                    else if (stringValue.Length < minLength || stringValue.Length > maxLength)
+                    {
+                        addError(context.Path, $"Must have between {minLength} and {maxLength} character(s).");
+                    }
                 }
-
-                if (maxLength.HasValue && stringValue.Length > maxLength.Value)
+                else
                 {
-                    addError(context.Path, $"Must have less than '{maxLength}' characters.");
+                    if (minLength.HasValue && stringValue.Length < minLength.Value)
+                    {
+                        addError(context.Path, $"Must have at least {minLength} character(s).");
+                    }
+
+                    if (maxLength.HasValue && stringValue.Length > maxLength.Value)
+                    {
+                        addError(context.Path, $"Must not have more than {maxLength} character(s).");
+                    }
                 }
             }
 

@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Default value must be greater than min value.", "DefaultValue")
+                    new ValidationError("Default value must be greater or equal to min value.", "DefaultValue")
                 });
         }
 
@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Default value must be less than max value.", "DefaultValue")
+                    new ValidationError("Default value must be less or equal to max value.", "DefaultValue")
                 });
         }
 

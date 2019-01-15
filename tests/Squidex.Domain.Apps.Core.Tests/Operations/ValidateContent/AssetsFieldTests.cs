@@ -93,6 +93,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
+        public async Task Should_not_add_error_if_number_of_assets_is_equal_to_min_and_max_items()
+        {
+            var sut = Field(new AssetsFieldProperties { MinItems = 2, MaxItems = 2 });
+
+            await sut.ValidateAsync(CreateValue(document.AssetId, document.AssetId), errors, ctx);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
         public async Task Should_add_error_if_assets_are_required_and_null()
         {
             var sut = Field(new AssetsFieldProperties { IsRequired = true });
@@ -144,7 +154,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(document.AssetId, document.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must have not more than 1 item(s)." });
+                new[] { "Must not have more than 1 item(s)." });
         }
 
         [Fact]

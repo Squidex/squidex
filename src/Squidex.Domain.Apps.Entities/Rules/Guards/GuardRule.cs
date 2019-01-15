@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             {
                 if (command.Trigger == null)
                 {
-                    e("Trigger is required.", nameof(command.Trigger));
+                   e(Not.Defined("Trigger"), nameof(command.Trigger));
                 }
                 else
                 {
@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
                 if (command.Action == null)
                 {
-                    e("Action is required.", nameof(command.Action));
+                   e(Not.Defined("Action"), nameof(command.Action));
                 }
                 else
                 {
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             {
                 if (command.Trigger == null && command.Action == null)
                 {
-                    e("Either trigger or action is required.", nameof(command.Trigger), nameof(command.Action));
+                   e(Not.Defined("Either trigger or action"), nameof(command.Trigger), nameof(command.Action));
                 }
 
                 if (command.Trigger != null)

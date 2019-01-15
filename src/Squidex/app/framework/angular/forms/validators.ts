@@ -7,7 +7,11 @@
 
 import { AbstractControl, ValidatorFn, Validators } from '@angular/forms';
 
-import { DateTime, Types } from '@app/framework/internal';
+import { DateTime } from '@app/framework/internal';
+
+function isEmptyInputValue(value: any): boolean {
+    return value == null || value.length === 0;
+}
 
 export module ValidatorsEx {
     export function pattern(regex: string | RegExp, message?: string): ValidatorFn {
@@ -15,33 +19,16 @@ export module ValidatorsEx {
             return Validators.nullValidator;
         }
 
-        let regeExp: RegExp;
-        let regexStr: string;
-
-        if (Types.isString(regex)) {
-            regexStr = `^${regex}$`;
-            regeExp = new RegExp(regexStr);
-        } else {
-            regexStr = regex.toString();
-            regeExp = regex;
-        }
+        const inner = Validators.pattern(regex);
 
         return (control: AbstractControl) => {
-            const n: string = control.value;
+            const error = inner(control);
 
-            if (n == null || n.length === 0) {
-                return null;
+            if (error !== null && error.pattern && message) {
+                return { patternmessage: { requiredPattern: error.pattern.requiredPattern, actualValue: error.pattern.actualValue, message } };
             }
 
-            if (!regeExp.test(n)) {
-                if (message) {
-                    return { patternmessage: { requiredPattern: regexStr, actualValue: n, message } };
-                } else {
-                    return { pattern: { requiredPattern: regexStr, actualValue: n } };
-                }
-            }
-
-            return null;
+            return error;
         };
     }
 
@@ -89,26 +76,68 @@ export module ValidatorsEx {
         };
     }
 
-    export function between(minValue?: number, maxValue?: number): ValidatorFn {
-        if (!minValue || !maxValue) {
+    export function between(min?: number, max?: number): ValidatorFn {
+        if (!min && !max) {
             return Validators.nullValidator;
         }
 
-        return (control: AbstractControl) => {
-            const value: number = control.value;
-
-            if (!Types.isUndefined(value) && !Types.isNull(value)) {
-                if (!Types.isNumber(value)) {
-                    return { validnumber: false };
-                } else if (minValue && value < minValue) {
-                    return { minvalue: { minValue, actualValue: value } };
-                } else if (maxValue && value > maxValue) {
-                    return { maxvalue: { maxValue, actualValue: value } };
+        if (max && min) {
+            return (control: AbstractControl) => {
+                if (isEmptyInputValue(control.value)) {
+                    return null;
                 }
-            }
 
-            return null;
-        };
+                const value = parseFloat(control.value);
+
+                if (min === max) {
+                    if (isNaN(value) || value !== min) {
+                        return { exactly: { expected: min, actual: value } };
+                    }
+                } else {
+                    if (isNaN(value) || value < min || value > max) {
+                        return { between: { min: min, max: max, actual: value }};
+                    }
+                }
+
+                return null;
+            };
+        } else if (max) {
+            return Validators.max(max);
+        } else {
+            return Validators.min(min!);
+        }
+    }
+
+    export function betweenLength(minLength?: number, maxLength?: number): ValidatorFn {
+        if (!minLength && !maxLength) {
+            return Validators.nullValidator;
+        }
+
+        if (maxLength && minLength) {
+            return (control: AbstractControl) => {
+                if (isEmptyInputValue(control.value)) {
+                    return null;
+                }
+
+                const length: number = control.value ? control.value.length : 0;
+
+                if (minLength === maxLength) {
+                    if (isNaN(length) || length !== minLength) {
+                        return { exactlylength: { expected: minLength, actual: length } };
+                    }
+                } else {
+                    if (isNaN(length) || length < minLength || length > maxLength) {
+                        return { betweenlength: { minLength, maxLength, actual: length }};
+                    }
+                }
+
+                return null;
+            };
+        } else if (maxLength) {
+            return Validators.maxLength(maxLength);
+        } else {
+            return Validators.minLength(minLength!);
+        }
     }
 
     export function validValues<T>(values: T[]): ValidatorFn {
@@ -143,12 +172,6 @@ export module ValidatorsEx {
                 }
             }
 
-            return null;
-        };
-    }
-
-    export function noop(): ValidatorFn {
-        return () => {
             return null;
         };
     }

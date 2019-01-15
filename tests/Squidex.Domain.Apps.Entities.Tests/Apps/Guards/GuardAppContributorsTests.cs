@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new AssignContributor { ContributorId = "1", Role = "Invalid" };
 
             return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan, roles),
-                new ValidationError("Role is not valid.", "Role"));
+                new ValidationError("Role is not a valid value.", "Role"));
         }
 
         [Fact]

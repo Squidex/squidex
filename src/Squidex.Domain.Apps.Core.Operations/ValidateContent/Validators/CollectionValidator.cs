@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Tasks;
@@ -19,6 +20,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public CollectionValidator(bool isRequired, int? minItems = null, int? maxItems = null)
         {
+            if (minItems.HasValue && maxItems.HasValue && minItems.Value > maxItems.Value)
+            {
+                throw new ArgumentException("Min length must be greater than max length.", nameof(minItems));
+            }
+
             this.isRequired = isRequired;
             this.minItems = minItems;
             this.maxItems = maxItems;
@@ -36,14 +42,28 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 return TaskHelper.Done;
             }
 
-            if (minItems.HasValue && items.Count < minItems.Value)
+            if (minItems.HasValue && maxItems.HasValue)
             {
-                addError(context.Path, $"Must have at least {minItems} item(s).");
+                if (minItems == maxItems && minItems != items.Count)
+                {
+                    addError(context.Path, $"Must have exactly {maxItems} item(s).");
+                }
+                else if (items.Count < minItems || items.Count > maxItems)
+                {
+                    addError(context.Path, $"Must have between {minItems} and {maxItems} item(s).");
+                }
             }
-
-            if (maxItems.HasValue && items.Count > maxItems.Value)
+            else
             {
-                addError(context.Path, $"Must have not more than {maxItems} item(s).");
+                if (minItems.HasValue && items.Count < minItems.Value)
+                {
+                    addError(context.Path, $"Must have at least {minItems} item(s).");
+                }
+
+                if (maxItems.HasValue && items.Count > maxItems.Value)
+                {
+                    addError(context.Path, $"Must not have more than {maxItems} item(s).");
+                }
             }
 
             return TaskHelper.Done;

@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e("Client id is required.", nameof(command.Id));
+                    e(Not.Defined("Client id"), nameof(command.Id));
                 }
                 else if (clients.ContainsKey(command.Id))
                 {
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e("Client id is required.", nameof(command.Id));
+                    e(Not.Defined("Client id"), nameof(command.Id));
                 }
             });
         }
@@ -55,17 +55,17 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Id))
                 {
-                    e("Client id is required.", nameof(command.Id));
+                    e(Not.Defined("Client id"), nameof(command.Id));
                 }
 
                 if (string.IsNullOrWhiteSpace(command.Name) && command.Role == null)
                 {
-                    e("Either name or role must be defined.", nameof(command.Name), nameof(command.Role));
+                    e(Not.DefinedOr("name", "role"), nameof(command.Name), nameof(command.Role));
                 }
 
                 if (command.Role != null && !roles.ContainsKey(command.Role))
                 {
-                    e("Role is not valid.", nameof(command.Role));
+                    e(Not.Valid("role"), nameof(command.Role));
                 }
 
                 if (client == null)
@@ -75,12 +75,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (!string.IsNullOrWhiteSpace(command.Name) && string.Equals(client.Name, command.Name))
                 {
-                    e("Client has already this name.", nameof(command.Name));
+                    e(Not.New("Client", "name"), nameof(command.Name));
                 }
 
                 if (command.Role == client.Role)
                 {
-                    e("Client has already this role.", nameof(command.Role));
+                    e(Not.New("Client", "role"), nameof(command.Role));
                 }
             });
         }

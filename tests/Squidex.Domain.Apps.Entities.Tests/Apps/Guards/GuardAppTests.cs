@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new CreateApp { Name = "INVALID NAME" };
 
             ValidationAssert.Throws(() => GuardApp.CanCreate(command),
-                new ValidationError("Name must be a valid slug.", "Name"));
+                new ValidationError("Name is not a valid slug.", "Name"));
         }
 
         [Fact]

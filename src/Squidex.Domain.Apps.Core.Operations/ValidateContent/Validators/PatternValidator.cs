@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                         {
                             if (string.IsNullOrWhiteSpace(errorMessage))
                             {
-                                addError(context.Path, "Not valid.");
+                                addError(context.Path, "Does not match to the pattern.");
                             }
                             else
                             {

@@ -55,10 +55,20 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
 
         [Theory]
         [InlineData(20, 10)]
-        [InlineData(10, 10)]
         public void Should_throw_error_if_min_greater_than_max(int? min, int? max)
         {
             Assert.Throws<ArgumentException>(() => new StringLengthValidator(min, max));
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_collection_has_not_exact_number_of_items()
+        {
+            var sut = new StringLengthValidator(2000, 2000);
+
+            await sut.ValidateAsync(CreateString(4), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must have exactly 2000 character(s)." });
         }
 
         [Fact]
@@ -69,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(CreateString(1500), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must have more than '2000' characters." });
+                new[] { "Must have at least 2000 character(s)." });
         }
 
         [Fact]
@@ -80,7 +90,18 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
             await sut.ValidateAsync(CreateString(1500), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must have less than '1000' characters." });
+                new[] { "Must not have more than 1000 character(s)." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_collection_count_is_not_in_range()
+        {
+            var sut = new StringLengthValidator(2000, 5000);
+
+            await sut.ValidateAsync(CreateString(1), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must have between 2000 and 5000 character(s)." });
         }
 
         private static string CreateString(int size)

@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Text))
                 {
-                    e("Text is required.", nameof(command.Text));
+                   e(Not.Defined("Text"), nameof(command.Text));
                 }
             });
         }
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Comments.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Text))
                 {
-                    e("Text is required.", nameof(command.Text));
+                   e(Not.Defined("Text"), nameof(command.Text));
                 }
             });
         }

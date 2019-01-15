@@ -11,20 +11,7 @@ import { merge, Subscription } from 'rxjs';
 
 import { fadeAnimation, Types } from '@app/framework/internal';
 
-const DEFAULT_ERRORS: { [key: string]: string } = {
-    required: '{field} is required.',
-    pattern: '{field} does not follow the pattern.',
-    patternmessage: '{message}',
-    minvalue: '{field} must be larger or equals to {minValue}.',
-    maxvalue: '{field} must be smaller or equals to {maxValue}.',
-    minmax: '{field} must have a length of more than {requiredLength}.',
-    maxlength: '{field} must have a length of less than {requiredLength}.',
-    match: '{message}',
-    validdatetime: '{field} is not a valid date time',
-    validnumber: '{field} is not a valid number.',
-    validvalues: '{field} is not a valid value.',
-    validarrayvalues: '{field} contains an invalid value.'
-};
+import { formatError } from './error-formatting';
 
 @Component({
     selector: 'sqx-control-errors',
@@ -130,23 +117,11 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
         if (this.control && this.control.invalid && ((this.control.touched && !this.submitOnly) || this.submitted) && this.control.errors) {
             for (let key in <any>this.control.errors) {
                 if (this.control.errors.hasOwnProperty(key)) {
-                    let message = (this.errors ? this.errors[key] : null) || DEFAULT_ERRORS[key.toLowerCase()];
+                    const message = formatError(this.displayFieldName, key, this.control.errors[key], this.control.value, this.errors);
 
-                    if (!message) {
-                        continue;
+                    if (message) {
+                        errors.push(message);
                     }
-
-                    const properties = this.control.errors[key];
-
-                    for (let property in properties) {
-                        if (properties.hasOwnProperty(property)) {
-                            message = message.replace(`{${property}}`, properties[property]);
-                        }
-                    }
-
-                    message = message.replace('{field}', this.displayFieldName);
-
-                    errors.push(message);
                 }
             }
         }

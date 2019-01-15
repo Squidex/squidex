@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                    e("Name is required.", nameof(command.Name));
+                   e(Not.Defined("Name"), nameof(command.Name));
                 }
                 else if (roles.ContainsKey(command.Name))
                 {
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                    e("Name is required.", nameof(command.Name));
+                   e(Not.Defined("Name"), nameof(command.Name));
                 }
                 else if (Role.IsDefaultRole(command.Name))
                 {
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             {
                 if (string.IsNullOrWhiteSpace(command.Name))
                 {
-                    e("Name is required.", nameof(command.Name));
+                   e(Not.Defined("Name"), nameof(command.Name));
                 }
                 else if (Role.IsDefaultRole(command.Name))
                 {
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 if (command.Permissions == null)
                 {
-                    e("Permissions is required.", nameof(command.Permissions));
+                   e(Not.Defined("Permissions"), nameof(command.Permissions));
                 }
             });
         }

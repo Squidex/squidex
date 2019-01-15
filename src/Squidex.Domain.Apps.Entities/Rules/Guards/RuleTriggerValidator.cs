@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
             if (trigger.NumDays.HasValue && (trigger.NumDays < 1 || trigger.NumDays > 30))
             {
-                errors.Add(new ValidationError("Num days must be between 1 and 30.", nameof(trigger.NumDays)));
+                errors.Add(new ValidationError(Not.Between("Num days", 1, 30), nameof(trigger.NumDays)));
             }
 
             return Task.FromResult< IEnumerable<ValidationError>>(errors);
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                 {
                     if (schema.SchemaId == Guid.Empty)
                     {
-                        errors.Add(new ValidationError("Schema id is required.", nameof(trigger.Schemas)));
+                        errors.Add(new ValidationError(Not.Defined("Schema id"), nameof(trigger.Schemas)));
                     }
                     else
                     {

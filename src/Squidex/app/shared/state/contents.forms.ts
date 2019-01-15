@@ -146,15 +146,9 @@ export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorF
     }
 
     public visitNumber(properties: NumberFieldPropertiesDto): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (properties.minValue) {
-            validators.push(Validators.min(properties.minValue));
-        }
-
-        if (properties.maxValue) {
-            validators.push(Validators.max(properties.maxValue));
-        }
+        const validators: ValidatorFn[] = [
+            ValidatorsEx.betweenLength(properties.minValue, properties.maxValue)
+        ];
 
         if (properties.allowedValues && properties.allowedValues.length > 0) {
             const values: (number | null)[] = properties.allowedValues;
@@ -170,15 +164,9 @@ export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorF
     }
 
     public visitString(properties: StringFieldPropertiesDto): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (properties.minLength) {
-            validators.push(Validators.minLength(properties.minLength));
-        }
-
-        if (properties.maxLength) {
-            validators.push(Validators.maxLength(properties.maxLength));
-        }
+        const validators: ValidatorFn[] = [
+            ValidatorsEx.betweenLength(properties.minLength, properties.maxLength)
+        ];
 
         if (properties.pattern && properties.pattern.length > 0) {
             validators.push(ValidatorsEx.pattern(properties.pattern, properties.patternMessage));
@@ -198,57 +186,33 @@ export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorF
     }
 
     public visitArray(properties: ArrayFieldPropertiesDto): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (properties.minItems) {
-            validators.push(Validators.minLength(properties.minItems));
-        }
-
-        if (properties.maxItems) {
-            validators.push(Validators.maxLength(properties.maxItems));
-        }
+        const validators: ValidatorFn[] = [
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+        ];
 
         return validators;
     }
 
     public visitAssets(properties: AssetsFieldPropertiesDto): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (properties.minItems) {
-            validators.push(Validators.minLength(properties.minItems));
-        }
-
-        if (properties.maxItems) {
-            validators.push(Validators.maxLength(properties.maxItems));
-        }
+        const validators: ValidatorFn[] = [
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+        ];
 
         return validators;
     }
 
     public visitReferences(properties: ReferencesFieldPropertiesDto): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (properties.minItems) {
-            validators.push(Validators.minLength(properties.minItems));
-        }
-
-        if (properties.maxItems) {
-            validators.push(Validators.maxLength(properties.maxItems));
-        }
+        const validators: ValidatorFn[] = [
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+        ];
 
         return validators;
     }
 
     public visitTags(properties: TagsFieldPropertiesDto): ValidatorFn[] {
-        const validators: ValidatorFn[] = [];
-
-        if (properties.minItems) {
-            validators.push(Validators.minLength(properties.minItems));
-        }
-
-        if (properties.maxItems) {
-            validators.push(Validators.maxLength(properties.maxItems));
-        }
+        const validators: ValidatorFn[] = [
+            ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
+        ];
 
         if (properties.allowedValues && properties.allowedValues.length > 0) {
             const values: (string | null)[] = properties.allowedValues;

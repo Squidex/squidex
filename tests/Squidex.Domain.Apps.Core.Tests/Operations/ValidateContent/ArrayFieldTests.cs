@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_tags_are_valid()
+        public async Task Should_not_add_error_if_items_are_valid()
         {
             var sut = Field(new ArrayFieldProperties());
 
@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_not_add_error_if_tags_are_null_and_valid()
+        public async Task Should_not_add_error_if_items_are_null_and_valid()
         {
             var sut = Field(new ArrayFieldProperties());
 
@@ -48,7 +48,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_error_if_tags_are_required_and_null()
+        public async Task Should_not_add_error_if_number_of_items_is_equal_to_min_and_max_items()
+        {
+            var sut = Field(new ArrayFieldProperties { MinItems = 2, MaxItems = 2 });
+
+            await sut.ValidateAsync(CreateValue(JsonValue.Object(), JsonValue.Object()), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_items_are_required_and_null()
         {
             var sut = Field(new ArrayFieldProperties { IsRequired = true });
 
@@ -59,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_error_if_tags_are_required_and_empty()
+        public async Task Should_add_error_if_items_are_required_and_empty()
         {
             var sut = Field(new ArrayFieldProperties { IsRequired = true });
 
@@ -99,7 +109,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await sut.ValidateAsync(CreateValue(JsonValue.Object(), JsonValue.Object()), errors);
 
             errors.Should().BeEquivalentTo(
-                new[] { "Must have not more than 1 item(s)." });
+                new[] { "Must not have more than 1 item(s)." });
         }
 
         private static IJsonValue CreateValue(params JsonObject[] ids)

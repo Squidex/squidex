@@ -26,8 +26,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Max items must be greater than min items.", "MinItems", "MaxItems")
+                    new ValidationError("Max items must be greater or equal to min items.", "MinItems", "MaxItems")
                 });
+        }
+
+        [Fact]
+        public void Should_not_add_error_if_min_equals_to_max_items()
+        {
+            var sut = new AssetsFieldProperties { MinItems = 2, MaxItems = 2 };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -40,8 +50,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Max width must be greater than min width.", "MinWidth", "MaxWidth")
+                    new ValidationError("Max width must be greater or equal to min width.", "MinWidth", "MaxWidth")
                 });
+        }
+
+        [Fact]
+        public void Should_not_add_error_if_min_width_equals_to_max_width()
+        {
+            var sut = new AssetsFieldProperties { MinWidth = 2, MaxWidth = 2 };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -54,8 +74,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Max height must be greater than min height.", "MinHeight", "MaxHeight")
+                    new ValidationError("Max height must be greater or equal to min height.", "MinHeight", "MaxHeight")
                 });
+        }
+
+        [Fact]
+        public void Should_not_add_error_if_min_height_equals_to_max_height()
+        {
+            var sut = new AssetsFieldProperties { MinHeight = 2, MaxHeight = 2 };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -82,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Aspect width and height is required.", "AspectWidth", "AspectHeight")
+                    new ValidationError("If aspect width or aspect height is used both must be defined.", "AspectWidth", "AspectHeight")
                 });
         }
 
@@ -96,7 +126,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
             errors.Should().BeEquivalentTo(
                 new List<ValidationError>
                 {
-                    new ValidationError("Aspect width and height is required.", "AspectWidth", "AspectHeight")
+                    new ValidationError("If aspect width or aspect height is used both must be defined.", "AspectWidth", "AspectHeight")
                 });
         }
     }

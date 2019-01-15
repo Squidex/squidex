@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var clients_1 = clients_0.Add("ios", "secret");
 
             ValidationAssert.Throws(() => GuardAppClients.CanUpdate(clients_1, command, roles),
-                new ValidationError("Role is not valid.", "Role"));
+                new ValidationError("Role is not a valid value.", "Role"));
         }
 
         [Fact]
