@@ -20,6 +20,10 @@
     </div>
 </div>
 
-<button class="btn btn-success" (click)="addItem(undefined); $event.preventDefault()">
+<button class="btn btn-success" [disabled]="field.nested.length === 0" (click)="addItem(undefined); $event.preventDefault()">
     Add Item
 </button>
+
+<small class="text-muted ml-2" *ngIf="field.nested.length === 0">
+    Add a nested field first to add items.
+</small>
