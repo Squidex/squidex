@@ -137,8 +137,14 @@ noscript {
 //
 .splash {
     &-h1,
-    &-text {
+    &-text,
+    &-image {
         text-align: center;
+    }
+
+    &-image {
+        max-width: 100%;
+        margin-bottom: 2rem;
     }
 }
 
