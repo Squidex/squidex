@@ -6,14 +6,20 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.Extensions.Options;
+using Squidex.Infrastructure;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Config.Authentication
 {
     public sealed class GithubHandler : OAuthEvents
     {
+        private const string NoEmail = "Your email address is set to private in Github. Please set it to public to use Github login.";
+
         public override Task CreatingTicket(OAuthCreatingTicketContext context)
         {
             var nameClaim = context.Identity.FindFirst(ClaimTypes.Name)?.Value;
@@ -21,6 +27,11 @@ namespace Squidex.Config.Authentication
             if (!string.IsNullOrWhiteSpace(nameClaim))
             {
                 context.Identity.SetDisplayName(nameClaim);
+            }
+
+            if (string.IsNullOrWhiteSpace(context.Identity.FindFirst(ClaimTypes.Email)?.Value))
+            {
+                throw new DomainException(NoEmail);
             }
 
             return base.CreatingTicket(context);

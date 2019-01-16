@@ -1,9 +1,19 @@
-﻿@{
+﻿@model Squidex.Areas.IdentityServer.Controllers.Error.ErrorViewModel
+
+@{
+    ViewBag.Theme = "white";
     ViewBag.Title = "Operation failed";
 }
 
 <h1 class="splash-h1">Operation failed</h1>
-        
+
 <p class="splash-text">
-    We are really sorry that something went wrong.
+    @if (Model.Error?.ErrorDescription != null)
+    {
+        @Model.Error.ErrorDescription
+    }
+    else
+    {
+        <span>We are really sorry that something went wrong.</span>
+    }
 </p>

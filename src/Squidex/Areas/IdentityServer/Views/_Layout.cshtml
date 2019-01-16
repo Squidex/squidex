@@ -17,9 +17,13 @@
         @RenderSection("header")
     }
 </head>
-<body class="@ViewBag.Theme">
-    @RenderBody()
-    
+<body class="white">
+    <div class="profile @ViewBag.Class">
+        <img class="profile-logo" src="~/images/logo-small.png" />
+
+        @RenderBody()
+    </div>
+
     <environment names="Development">
         <script type="text/javascript" src="http://localhost:3000/shims.js"></script>
         <script type="text/javascript" src="http://localhost:3000/app.js"></script>

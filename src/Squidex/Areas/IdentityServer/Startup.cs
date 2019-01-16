@@ -23,9 +23,7 @@ namespace Squidex.Areas.IdentityServer
 
             app.Map(Constants.IdentityServerPrefix, identityApp =>
             {
-                identityApp.UseMyIdentityServer();
-
-                if (environment.IsDevelopment())
+                if (!environment.IsDevelopment())
                 {
                     identityApp.UseDeveloperExceptionPage();
                 }
@@ -33,6 +31,8 @@ namespace Squidex.Areas.IdentityServer
                 {
                     identityApp.UseExceptionHandler("/error");
                 }
+
+                identityApp.UseMyIdentityServer();
 
                 identityApp.UseStaticFiles();
                 identityApp.UseMvc();
