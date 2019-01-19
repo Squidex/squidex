@@ -28,6 +28,10 @@ interface Snapshot {
     selectedApp: AppDto | null;
 }
 
+function sameApp(lhs: AppDto, rhs?: AppDto): boolean {
+    return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id);
+}
+
 @Injectable()
 export class AppsState extends State<Snapshot> {
     public get appName() {
@@ -36,7 +40,7 @@ export class AppsState extends State<Snapshot> {
 
     public selectedApp =
         this.changes.pipe(map(s => s.selectedApp),
-            distinctUntilChanged());
+            distinctUntilChanged(sameApp));
 
     public apps =
         this.changes.pipe(map(s => s.apps),

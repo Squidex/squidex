@@ -53,11 +53,15 @@ interface Snapshot {
     selectedSchema?: SchemaDetailsDto | null;
 }
 
+function sameSchema(lhs: SchemaDetailsDto | null, rhs?: SchemaDetailsDto | null): boolean {
+    return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version === rhs.version);
+}
+
 @Injectable()
 export class SchemasState extends State<Snapshot> {
     public selectedSchema =
         this.changes.pipe(map(x => x.selectedSchema),
-            distinctUntilChanged());
+            distinctUntilChanged(sameSchema));
 
     public categories =
         this.changes.pipe(map(x => ImmutableArray.of(Object.keys(x.categories)).sortByStringAsc(s => s)),

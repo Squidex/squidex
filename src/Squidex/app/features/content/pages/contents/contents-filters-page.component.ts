@@ -6,13 +6,11 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { filter, onErrorResumeNext, takeUntil } from 'rxjs/operators';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     ContentsState,
-    navigatedToOtherComponent,
     Queries,
     SchemasState,
     UIState
@@ -31,7 +29,6 @@ export class ContentsFiltersPageComponent implements OnDestroy, OnInit {
     constructor(
         private readonly contentsState: ContentsState,
         private readonly schemasState: SchemasState,
-        private readonly router: Router,
         private readonly uiState: UIState
     ) {
     }
@@ -41,10 +38,8 @@ export class ContentsFiltersPageComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
-        const routeChanged = this.router.events.pipe(filter(navigatedToOtherComponent(this.router)));
-
         this.selectedSchemaSubscription =
-            this.schemasState.selectedSchema.pipe(takeUntil(routeChanged))
+            this.schemasState.selectedSchema
                 .subscribe(schema => {
                     if (schema) {
                         this.schemaQueries = new Queries(this.uiState, `schemas.${schema.name}`);

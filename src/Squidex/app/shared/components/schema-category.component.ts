@@ -46,9 +46,6 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
     @Input()
     public schemas: ImmutableArray<SchemaDto>;
 
-    @Input()
-    public suffix: string;
-
     public displayName: string;
 
     public schemasFiltered: ImmutableArray<SchemaDto>;
@@ -106,8 +103,6 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
     public schemaRoute(schema: SchemaDto) {
         if (schema.isSingleton && this.routeSingletonToContent) {
             return [schema.name, schema.id];
-        } else if (this.suffix) {
-            return [schema.name, this.suffix];
         } else {
             return [schema.name];
         }

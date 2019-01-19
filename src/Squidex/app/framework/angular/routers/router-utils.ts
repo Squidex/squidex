@@ -5,9 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ActivatedRoute, ActivatedRouteSnapshot, Data, Params, Router, RouterEvent, RouterStateSnapshot, RoutesRecognized } from '@angular/router';
-
-import { Types } from './../../utils/types';
+import { ActivatedRoute, ActivatedRouteSnapshot, Data, Params, RouterStateSnapshot } from '@angular/router';
 
 export function allData(value: ActivatedRouteSnapshot | ActivatedRoute): Data {
     let snapshot: ActivatedRouteSnapshot | null = value['snapshot'] || value;
@@ -56,8 +54,4 @@ export function childComponent(value: RouterStateSnapshot) {
     }
 
     return current.component;
-}
-
-export function navigatedToOtherComponent(router: Router) {
-    return (e: RouterEvent) => Types.is(e, RoutesRecognized) && childComponent(e.state) !== childComponent(router.routerState.snapshot);
 }

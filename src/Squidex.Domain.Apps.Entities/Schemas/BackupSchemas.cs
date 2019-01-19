@@ -39,6 +39,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 case SchemaCreated schemaCreated:
                     schemasByName[schemaCreated.SchemaId.Name] = schemaCreated.SchemaId.Id;
                     break;
+                case SchemaDeleted schemaDeleted:
+                    schemasByName.Remove(schemaDeleted.SchemaId.Name);
+                    break;
             }
 
             return TaskHelper.True;

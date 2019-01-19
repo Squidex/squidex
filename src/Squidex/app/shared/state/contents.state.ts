@@ -39,10 +39,14 @@ interface Snapshot {
     selectedContent?: ContentDto | null;
 }
 
+function sameContent(lhs: ContentDto, rhs?: ContentDto): boolean {
+    return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version === rhs.version);
+}
+
 export abstract class ContentsStateBase extends State<Snapshot> {
     public selectedContent =
         this.changes.pipe(map(x => x.selectedContent),
-            distinctUntilChanged());
+            distinctUntilChanged(sameContent));
 
     public contents =
         this.changes.pipe(map(x => x.contents),

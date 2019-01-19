@@ -56,7 +56,7 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const state: RouterStateSnapshot = <any>{ url: 'schemas/name/' };
 
         schemasState.setup(x => x.selectedSchema)
-            .returns(() => of(null));
+            .returns(() => of(undefined));
 
         let result: boolean;
 

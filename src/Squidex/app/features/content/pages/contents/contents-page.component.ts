@@ -6,9 +6,8 @@
  */
 
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { filter, onErrorResumeNext, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
@@ -18,7 +17,6 @@ import {
     ImmutableArray,
     LanguagesState,
     ModalModel,
-    navigatedToOtherComponent,
     Queries,
     SchemaDetailsDto,
     SchemasState,
@@ -61,7 +59,6 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         public readonly contentsState: ContentsState,
         private readonly languagesState: LanguagesState,
         private readonly schemasState: SchemasState,
-        private readonly router: Router,
         private readonly uiState: UIState
     ) {
     }
@@ -73,10 +70,8 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
     }
 
     public ngOnInit() {
-        const routeChanged = this.router.events.pipe(filter(navigatedToOtherComponent(this.router)));
-
         this.selectedSchemaSubscription =
-            this.schemasState.selectedSchema.pipe(takeUntil(routeChanged))
+            this.schemasState.selectedSchema
                 .subscribe(schema => {
                     this.resetSelection();
 
@@ -87,7 +82,7 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
                 });
 
         this.contentsSubscription =
-            this.contentsState.contents.pipe(takeUntil(routeChanged))
+            this.contentsState.contents
                 .subscribe(() => {
                     this.updateSelectionSummary();
                 });
