@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
                 errors.Add(new ValidationError(Not.Between("Num days", 1, 30), nameof(trigger.NumDays)));
             }
 
-            return Task.FromResult< IEnumerable<ValidationError>>(errors);
+            return Task.FromResult<IEnumerable<ValidationError>>(errors);
         }
 
         public async Task<IEnumerable<ValidationError>> Visit(ContentChangedTriggerV2 trigger)

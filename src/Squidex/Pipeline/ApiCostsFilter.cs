@@ -45,15 +45,19 @@ namespace Squidex.Pipeline
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+            context.HttpContext.Features.Set<IApiCostsFeature>(FilterDefinition);
+
             var appFeature = context.HttpContext.Features.Get<IAppFeature>();
 
             if (appFeature?.App != null && FilterDefinition.Weight > 0)
             {
+                var appId = appFeature.App.Id.ToString();
+
                 using (Profiler.Trace("CheckUsage"))
                 {
                     var plan = appPlanProvider.GetPlanForApp(appFeature.App);
 
-                    var usage = await usageTracker.GetMonthlyCallsAsync(appFeature.App.Id.ToString(), DateTime.Today);
+                    var usage = await usageTracker.GetMonthlyCallsAsync(appId, DateTime.Today);
 
                     if (plan.MaxApiCalls >= 0 && usage > plan.MaxApiCalls * 1.1)
                     {
@@ -72,7 +76,7 @@ namespace Squidex.Pipeline
                 {
                     var elapsedMs = watch.Stop();
 
-                    await usageTracker.TrackAsync(appFeature.App.Id.ToString(), context.HttpContext.User.OpenIdClientId(), FilterDefinition.Weight, elapsedMs);
+                    await usageTracker.TrackAsync(appId, context.HttpContext.User.OpenIdClientId(), FilterDefinition.Weight, elapsedMs);
                 }
             }
             else

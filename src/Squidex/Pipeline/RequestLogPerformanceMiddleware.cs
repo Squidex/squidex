@@ -40,35 +40,40 @@ namespace Squidex.Pipeline
                     {
                         Profiler.Session?.Write(w);
 
-                        w.WriteObject("ctx", ctx.context, (innerHttpContext, c) =>
-                        {
-                            var app = innerHttpContext.Features.Get<IAppFeature>()?.App;
-
-                            if (app != null)
-                            {
-                                c.WriteProperty("appId", app.Id.ToString());
-                                c.WriteProperty("appName", app.Name);
-                            }
-
-                            var subjectId = innerHttpContext.User.OpenIdSubject();
-
-                            if (!string.IsNullOrWhiteSpace(subjectId))
-                            {
-                                c.WriteProperty("userId", subjectId);
-                            }
-
-                            var clientId = innerHttpContext.User.OpenIdClientId();
-
-                            if (!string.IsNullOrWhiteSpace(subjectId))
-                            {
-                                c.WriteProperty("clientId", subjectId);
-                            }
-                        });
-
+                        w.WriteObject("filters", ctx.context, LogFilters);
                         w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
                     });
                 }
             }
+        }
+
+        private static void LogFilters(HttpContext context, IObjectWriter c)
+        {
+            var app = context.Features.Get<IAppFeature>()?.App;
+
+            if (app != null)
+            {
+                c.WriteProperty("appId", app.Id.ToString());
+                c.WriteProperty("appName", app.Name);
+            }
+
+            var userId = context.User.OpenIdSubject();
+
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                c.WriteProperty(nameof(userId), userId);
+            }
+
+            var clientId = context.User.OpenIdClientId();
+
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                c.WriteProperty(nameof(clientId), clientId);
+            }
+
+            var costs = context.Features.Get<IApiCostsFeature>()?.Weight ?? 0;
+
+            c.WriteProperty(nameof(costs), costs);
         }
     }
 }

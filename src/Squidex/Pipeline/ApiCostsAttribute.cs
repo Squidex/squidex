@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Squidex.Pipeline
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public sealed class ApiCostsAttribute : ServiceFilterAttribute
+    public sealed class ApiCostsAttribute : ServiceFilterAttribute, IApiCostsFeature
     {
         public double Weight { get; }
 
