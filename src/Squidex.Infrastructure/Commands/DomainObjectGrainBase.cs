@@ -49,10 +49,12 @@ namespace Squidex.Infrastructure.Commands
 
         protected sealed override async Task OnActivateAsync(Guid key)
         {
-            using (log.MeasureInformation(w => w
+            var logContext = (key: key.ToString(), name: GetType().Name);
+
+            using (log.MeasureInformation(logContext, (ctx, w) => w
                 .WriteProperty("action", "ActivateDomainObject")
-                .WriteProperty("domainObjectType", GetType().Name)
-                .WriteProperty("domainObjectKey", key.ToString())))
+                .WriteProperty("domainObjectType", ctx.name)
+                .WriteProperty("domainObjectKey", ctx.key)))
             {
                 id = key;
 
