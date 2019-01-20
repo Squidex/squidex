@@ -31,12 +31,17 @@ namespace Squidex.Infrastructure.Log
             this.writerFactory = writerFactory;
         }
 
-        public void Log(SemanticLogLevel logLevel, Action<IObjectWriter> action)
+        public void Log<T>(SemanticLogLevel logLevel, T context, Action<T, IObjectWriter> action)
         {
             Guard.NotNull(action, nameof(action));
 
-            var formattedText = FormatText(logLevel, action);
+            var formattedText = FormatText(logLevel, context, action);
 
+            LogFormattedText(logLevel, formattedText);
+        }
+
+        private void LogFormattedText(SemanticLogLevel logLevel, string formattedText)
+        {
             List<Exception> exceptions = null;
 
             for (var i = 0; i < channels.Length; i++)
@@ -62,7 +67,7 @@ namespace Squidex.Infrastructure.Log
             }
         }
 
-        private string FormatText(SemanticLogLevel logLevel, Action<IObjectWriter> objectWriter)
+        private string FormatText<T>(SemanticLogLevel logLevel, T context, Action<T, IObjectWriter> objectWriter)
         {
             var writer = writerFactory.Create();
 
@@ -70,7 +75,7 @@ namespace Squidex.Infrastructure.Log
             {
                 writer.WriteProperty(nameof(logLevel), logLevel.ToString());
 
-                objectWriter(writer);
+                objectWriter(context, writer);
 
                 for (var i = 0; i < appenders.Length; i++)
                 {

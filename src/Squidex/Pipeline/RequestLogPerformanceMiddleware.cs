@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Security;
 
 namespace Squidex.Pipeline
 {
@@ -35,11 +36,36 @@ namespace Squidex.Pipeline
                 {
                     var elapsedMs = watch.Stop();
 
-                    log.LogInformation(w =>
+                    log.LogInformation((elapsedMs, context), (ctx, w) =>
                     {
                         Profiler.Session?.Write(w);
 
-                        w.WriteProperty("elapsedRequestMs", elapsedMs);
+                        w.WriteObject("ctx", ctx.context, (innerHttpContext, c) =>
+                        {
+                            var app = innerHttpContext.Features.Get<IAppFeature>()?.App;
+
+                            if (app != null)
+                            {
+                                c.WriteProperty("appId", app.Id.ToString());
+                                c.WriteProperty("appName", app.Name);
+                            }
+
+                            var subjectId = innerHttpContext.User.OpenIdSubject();
+
+                            if (!string.IsNullOrWhiteSpace(subjectId))
+                            {
+                                c.WriteProperty("userId", subjectId);
+                            }
+
+                            var clientId = innerHttpContext.User.OpenIdClientId();
+
+                            if (!string.IsNullOrWhiteSpace(subjectId))
+                            {
+                                c.WriteProperty("clientId", subjectId);
+                            }
+                        });
+
+                        w.WriteProperty("elapsedRequestMs", ctx.elapsedMs);
                     });
                 }
             }

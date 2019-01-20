@@ -34,7 +34,7 @@ namespace Squidex.Pipeline
 
             Guid requestId;
 
-            if (httpContext.Items.TryGetValue(nameof(requestId), out var value) && value is Guid requestIdValue)
+            if (httpContext.Items.TryGetValue(nameof(requestId), out var requestIdvalue) && requestIdvalue is Guid requestIdValue)
             {
                 requestId = requestIdValue;
             }
@@ -43,21 +43,23 @@ namespace Squidex.Pipeline
                 httpContext.Items[nameof(requestId)] = requestId = Guid.NewGuid();
             }
 
-            writer.WriteObject("web", w =>
-            {
-                w.WriteProperty("requestId", requestId.ToString());
-                w.WriteProperty("requestPath", httpContext.Request.Path);
-                w.WriteProperty("requestMethod", httpContext.Request.Method);
+            var logContext = (requestId, context: httpContext, actionContextAccessor);
 
-                var actionContext = actionContextAccessor.ActionContext;
+            writer.WriteObject("web", logContext, (ctx, w) =>
+            {
+                w.WriteProperty("requestId", ctx.requestId.ToString());
+                w.WriteProperty("requestPath", ctx.context.Request.Path);
+                w.WriteProperty("requestMethod", ctx.context.Request.Method);
+
+                var actionContext = ctx.actionContextAccessor.ActionContext;
 
                 if (actionContext != null)
                 {
-                    w.WriteObject("routeValues", r =>
+                    w.WriteObject("routeValues", actionContext.ActionDescriptor.RouteValues, (routeValues, r) =>
                     {
-                        foreach (var kvp in actionContext.ActionDescriptor.RouteValues)
+                        foreach (var (key, val) in routeValues)
                         {
-                            r.WriteProperty(kvp.Key, kvp.Value);
+                            r.WriteProperty(key, val);
                         }
                     });
                 }

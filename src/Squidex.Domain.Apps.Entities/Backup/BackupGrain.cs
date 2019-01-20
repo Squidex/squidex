@@ -171,10 +171,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
+                log.LogError(ex, job.Id.ToString(), (ctx, w) => w
                     .WriteProperty("action", "makeBackup")
                     .WriteProperty("status", "failed")
-                    .WriteProperty("backupId", job.Id.ToString()));
+                    .WriteProperty("backupId", ctx));
 
                 job.Status = JobStatus.Failed;
             }

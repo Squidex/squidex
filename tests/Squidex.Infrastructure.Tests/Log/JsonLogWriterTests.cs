@@ -115,6 +115,22 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
+        public void Should_write_object_in_array_with_context()
+        {
+            var result = sut.WriteArray("property1", a => a.WriteObject(13, (ctx, b) => b.WriteProperty("property2", 13))).ToString();
+
+            Assert.Equal(@"{""property1"":[{""property2"":13}]}", result);
+        }
+
+        [Fact]
+        public void Should_write_array_value_with_context()
+        {
+            var result = sut.WriteArray("property", 13, (ctx, a) => a.WriteValue(ctx)).ToString();
+
+            Assert.Equal(@"{""property"":[13]}", result);
+        }
+
+        [Fact]
         public void Should_write_date_value()
         {
             var value = Instant.FromUtc(2012, 11, 10, 9, 8, 45);
@@ -127,9 +143,17 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_write_nested_object()
         {
-            var result = sut.WriteObject("property", a => a.WriteProperty("nested", "my-string")).ToString();
+            var result = sut.WriteObject("property", o => o.WriteProperty("nested", "my-string")).ToString();
 
             Assert.Equal(@"{""property"":{""nested"":""my-string""}}", result);
+        }
+
+        [Fact]
+        public void Should_write_nested_object_with_context()
+        {
+            var result = sut.WriteObject("property", 13, (ctx, o) => o.WriteProperty("nested", ctx)).ToString();
+
+            Assert.Equal(@"{""property"":{""nested"":13}}", result);
         }
 
         [Fact]

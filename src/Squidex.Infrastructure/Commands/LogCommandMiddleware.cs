@@ -24,47 +24,49 @@ namespace Squidex.Infrastructure.Commands
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
+            var logContext = (id: context.ContextId.ToString(), command: context.Command.GetType().Name);
+
             try
             {
-                log.LogInformation(w => w
+                log.LogInformation(logContext, (ctx, w) => w
                     .WriteProperty("action", "HandleCommand.")
-                    .WriteProperty("actionId", context.ContextId.ToString())
+                    .WriteProperty("actionId", ctx.id)
                     .WriteProperty("status", "Started")
-                    .WriteProperty("commandType", context.Command.GetType().Name));
+                    .WriteProperty("commandType", ctx.command));
 
-                using (log.MeasureInformation(w => w
+                using (log.MeasureInformation(logContext, (ctx, w) => w
                     .WriteProperty("action", "HandleCommand.")
-                    .WriteProperty("actionId", context.ContextId.ToString())
+                    .WriteProperty("actionId", ctx.id)
                     .WriteProperty("status", "Completed")
-                    .WriteProperty("commandType", context.Command.GetType().Name)))
+                    .WriteProperty("commandType", ctx.command)))
                 {
                     await next();
                 }
 
-                log.LogInformation(w => w
+                log.LogInformation(logContext, (ctx, w) => w
                     .WriteProperty("action", "HandleCommand.")
-                    .WriteProperty("actionId", context.ContextId.ToString())
+                    .WriteProperty("actionId", ctx.id)
                     .WriteProperty("status", "Succeeded")
-                    .WriteProperty("commandType", context.Command.GetType().Name));
+                    .WriteProperty("commandType", ctx.command));
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
+                log.LogError(ex, logContext, (ctx, w) => w
                     .WriteProperty("action", "HandleCommand.")
-                    .WriteProperty("actionId", context.ContextId.ToString())
+                    .WriteProperty("actionId", ctx.id)
                     .WriteProperty("status", "Failed")
-                    .WriteProperty("commandType", context.Command.GetType().Name));
+                    .WriteProperty("commandType", ctx.command));
 
                 throw;
             }
 
             if (!context.IsCompleted)
             {
-                log.LogFatal(w => w
+                log.LogFatal(logContext, (ctx, w) => w
                     .WriteProperty("action", "HandleCommand.")
-                    .WriteProperty("actionId", context.ContextId.ToString())
+                    .WriteProperty("actionId", ctx.id)
                     .WriteProperty("status", "Unhandled")
-                    .WriteProperty("commandType", context.Command.GetType().Name));
+                    .WriteProperty("commandType", ctx.command));
             }
         }
     }

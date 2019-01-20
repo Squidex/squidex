@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Log
 {
     public interface ISemanticLog
     {
-        void Log(SemanticLogLevel logLevel, Action<IObjectWriter> action);
+        void Log<T>(SemanticLogLevel logLevel, T context, Action<T, IObjectWriter> action);
 
         ISemanticLog CreateScope(Action<IObjectWriter> objectWriter);
     }

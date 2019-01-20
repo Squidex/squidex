@@ -185,19 +185,19 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private async Task ClearAsync()
         {
-            var actionId = Guid.NewGuid().ToString();
+            var logContext = (actionId: Guid.NewGuid().ToString(), consumer: eventConsumer.Name);
 
-            log.LogInformation(w => w
+            log.LogInformation(logContext, (ctx, w) => w
                 .WriteProperty("action", "EventConsumerReset")
-                .WriteProperty("actionId", actionId)
+                .WriteProperty("actionId", ctx.actionId)
                 .WriteProperty("status", "Started")
-                .WriteProperty("eventConsumer", eventConsumer.Name));
+                .WriteProperty("eventConsumer", ctx.consumer));
 
-            using (log.MeasureTrace(w => w
+            using (log.MeasureTrace(logContext, (ctx, w) => w
                 .WriteProperty("action", "EventConsumerReset")
-                .WriteProperty("actionId", actionId)
+                .WriteProperty("actionId", ctx.actionId)
                 .WriteProperty("status", "Completed")
-                .WriteProperty("eventConsumer", eventConsumer.Name)))
+                .WriteProperty("eventConsumer", ctx.consumer)))
             {
                 await eventConsumer.ClearAsync();
             }
@@ -208,21 +208,23 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             var eventId = @event.Headers.EventId().ToString();
             var eventType = @event.Payload.GetType().Name;
 
-            log.LogInformation(w => w
-                .WriteProperty("action", "HandleEvent")
-                .WriteProperty("actionId", eventId)
-                .WriteProperty("status", "Started")
-                .WriteProperty("eventId", eventId)
-                .WriteProperty("eventType", eventType)
-                .WriteProperty("eventConsumer", eventConsumer.Name));
+            var logContext = (eventId, eventType, consumer: eventConsumer.Name);
 
-            using (log.MeasureTrace(w => w
+            log.LogInformation(logContext, (ctx, w) => w
                 .WriteProperty("action", "HandleEvent")
-                .WriteProperty("actionId", eventId)
+                .WriteProperty("actionId", ctx.eventId)
+                .WriteProperty("status", "Started")
+                .WriteProperty("eventId", ctx.eventId)
+                .WriteProperty("eventType", ctx.eventType)
+                .WriteProperty("eventConsumer", ctx.consumer));
+
+            using (log.MeasureTrace(logContext, (ctx, w) => w
+                .WriteProperty("action", "HandleEvent")
+                .WriteProperty("actionId", ctx.eventId)
                 .WriteProperty("status", "Completed")
-                .WriteProperty("eventId", eventId)
-                .WriteProperty("eventType", eventType)
-                .WriteProperty("eventConsumer", eventConsumer.Name)))
+                .WriteProperty("eventId", ctx.eventId)
+                .WriteProperty("eventType", ctx.eventType)
+                .WriteProperty("eventConsumer", ctx.consumer)))
             {
                 await eventConsumer.On(@event);
             }

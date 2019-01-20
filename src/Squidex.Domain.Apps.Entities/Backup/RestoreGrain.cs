@@ -135,6 +135,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task ProcessAsync()
         {
+            var logContext = (jobId: CurrentJob.Id.ToString(), jobUrl: CurrentJob.Url.ToString());
+
             using (Profiler.StartSession())
             {
                 try
@@ -145,11 +147,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
                     Log("  * Restore all objects like app, schemas and contents");
                     Log("  * Complete the restore operation for all objects");
 
-                    log.LogInformation(w => w
+                    log.LogInformation(logContext, (ctx, w) => w
                         .WriteProperty("action", "restore")
                         .WriteProperty("status", "started")
-                        .WriteProperty("operationId", CurrentJob.Id.ToString())
-                        .WriteProperty("url", CurrentJob.Url.ToString()));
+                        .WriteProperty("operationId", ctx.jobId)
+                        .WriteProperty("url", ctx.jobUrl));
 
                     using (Profiler.Trace("Download"))
                     {
@@ -190,12 +192,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     Log("Completed, Yeah!");
 
-                    log.LogInformation(w =>
+                    log.LogInformation(logContext, (ctx, w) =>
                     {
                         w.WriteProperty("action", "restore");
                         w.WriteProperty("status", "completed");
-                        w.WriteProperty("operationId", CurrentJob.Id.ToString());
-                        w.WriteProperty("url", CurrentJob.Url.ToString());
+                        w.WriteProperty("operationId", ctx.jobId);
+                        w.WriteProperty("url", ctx.jobUrl);
 
                         Profiler.Session?.Write(w);
                     });
@@ -215,12 +217,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     CurrentJob.Status = JobStatus.Failed;
 
-                    log.LogError(ex, w =>
+                    log.LogError(ex, logContext, (ctx, w) =>
                     {
                         w.WriteProperty("action", "retore");
                         w.WriteProperty("status", "failed");
-                        w.WriteProperty("operationId", CurrentJob.Id.ToString());
-                        w.WriteProperty("url", CurrentJob.Url.ToString());
+                        w.WriteProperty("operationId", ctx.jobId);
+                        w.WriteProperty("url", ctx.jobUrl);
 
                         Profiler.Session?.Write(w);
                     });

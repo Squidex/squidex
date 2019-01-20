@@ -147,6 +147,18 @@ namespace Squidex.Infrastructure.Log
             return this;
         }
 
+        IObjectWriter IObjectWriter.WriteObject<T>(string property, T context, Action<T, IObjectWriter> objectWriter)
+        {
+            jsonWriter.WritePropertyName(Format(property));
+            jsonWriter.WriteStartObject();
+
+            objectWriter?.Invoke(context, this);
+
+            jsonWriter.WriteEndObject();
+
+            return this;
+        }
+
         IObjectWriter IObjectWriter.WriteArray(string property, Action<IArrayWriter> arrayWriter)
         {
             jsonWriter.WritePropertyName(Format(property));
@@ -159,11 +171,34 @@ namespace Squidex.Infrastructure.Log
             return this;
         }
 
+        IObjectWriter IObjectWriter.WriteArray<T>(string property, T context, Action<T, IArrayWriter> arrayWriter)
+        {
+            jsonWriter.WritePropertyName(Format(property));
+            jsonWriter.WriteStartArray();
+
+            arrayWriter?.Invoke(context, this);
+
+            jsonWriter.WriteEndArray();
+
+            return this;
+        }
+
         IArrayWriter IArrayWriter.WriteObject(Action<IObjectWriter> objectWriter)
         {
             jsonWriter.WriteStartObject();
 
             objectWriter?.Invoke(this);
+
+            jsonWriter.WriteEndObject();
+
+            return this;
+        }
+
+        IArrayWriter IArrayWriter.WriteObject<T>(T context, Action<T, IObjectWriter> objectWriter)
+        {
+            jsonWriter.WriteStartObject();
+
+            objectWriter?.Invoke(context, this);
 
             jsonWriter.WriteEndObject();
 

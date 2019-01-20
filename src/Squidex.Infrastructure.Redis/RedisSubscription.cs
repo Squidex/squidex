@@ -54,10 +54,10 @@ namespace Squidex.Infrastructure
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
+                log.LogError(ex, channelName, (logChannel, w) => w
                     .WriteProperty("action", "PublishRedisMessage")
                     .WriteProperty("status", "Failed")
-                    .WriteProperty("channel", channelName));
+                    .WriteProperty("channel", logChannel));
             }
         }
 
@@ -76,17 +76,17 @@ namespace Squidex.Infrastructure
                 {
                     subject.OnNext(envelope.Payload);
 
-                    log.LogDebug(w => w
+                    log.LogDebug(channelName, (logChannel, w) => w
                         .WriteProperty("action", "ReceiveRedisMessage")
-                        .WriteProperty("channel", channelName)
+                        .WriteProperty("channel", logChannel)
                         .WriteProperty("status", "Received"));
                 }
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
+                log.LogError(ex, channelName, (logChannel, w) => w
                     .WriteProperty("action", "ReceiveRedisMessage")
-                    .WriteProperty("channel", channelName)
+                    .WriteProperty("channel", logChannel)
                     .WriteProperty("status", "Failed"));
             }
         }

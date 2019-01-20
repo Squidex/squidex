@@ -123,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpGet]
         [Route("content/{app}/{name}/")]
         [ApiPermission]
-        [ApiCosts(2)]
+        [ApiCosts(1)]
         public async Task<IActionResult> GetContents(string app, string name, [FromQuery] bool archived = false, [FromQuery] string ids = null)
         {
             var context = Context().WithArchived(archived);

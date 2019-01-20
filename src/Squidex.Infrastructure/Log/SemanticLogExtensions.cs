@@ -13,47 +13,92 @@ namespace Squidex.Infrastructure.Log
     {
         public static void LogTrace(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
-            log.Log(SemanticLogLevel.Trace, objectWriter);
+            log.Log<None>(SemanticLogLevel.Trace, null, (_, w) => objectWriter(w));
+        }
+
+        public static void LogTrace<T>(this ISemanticLog log, T context, Action<T, IObjectWriter> objectWriter)
+        {
+            log.Log(SemanticLogLevel.Trace, context, objectWriter);
         }
 
         public static void LogDebug(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
-            log.Log(SemanticLogLevel.Debug, objectWriter);
+            log.Log<None>(SemanticLogLevel.Debug, null, (_, w) => objectWriter(w));
+        }
+
+        public static void LogDebug<T>(this ISemanticLog log, T context, Action<T, IObjectWriter> objectWriter)
+        {
+            log.Log(SemanticLogLevel.Debug, context, objectWriter);
         }
 
         public static void LogInformation(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
-            log.Log(SemanticLogLevel.Information, objectWriter);
+            log.Log<None>(SemanticLogLevel.Information, null, (_, w) => objectWriter(w));
+        }
+
+        public static void LogInformation<T>(this ISemanticLog log, T context, Action<T, IObjectWriter> objectWriter)
+        {
+            log.Log(SemanticLogLevel.Information, context, objectWriter);
         }
 
         public static void LogWarning(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
-            log.Log(SemanticLogLevel.Warning, objectWriter);
+            log.Log<None>(SemanticLogLevel.Warning, null, (_, w) => objectWriter(w));
+        }
+
+        public static void LogWarning<T>(this ISemanticLog log, T context, Action<T, IObjectWriter> objectWriter)
+        {
+            log.Log(SemanticLogLevel.Warning, context, objectWriter);
         }
 
         public static void LogWarning(this ISemanticLog log, Exception exception, Action<IObjectWriter> objectWriter = null)
         {
-            log.Log(SemanticLogLevel.Warning, writer => writer.WriteException(exception, objectWriter));
+            log.Log<None>(SemanticLogLevel.Warning, null, (_, w) => w.WriteException(exception, objectWriter));
+        }
+
+        public static void LogWarning<T>(this ISemanticLog log, Exception exception, T context, Action<T, IObjectWriter> objectWriter = null)
+        {
+            log.Log(SemanticLogLevel.Warning, context, (ctx, w) => w.WriteException(exception, ctx, objectWriter));
         }
 
         public static void LogError(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
-            log.Log(SemanticLogLevel.Error, objectWriter);
+            log.Log<None>(SemanticLogLevel.Error, null, (_, w) => objectWriter(w));
+        }
+
+        public static void LogError<T>(this ISemanticLog log, T context, Action<T, IObjectWriter> objectWriter)
+        {
+            log.Log(SemanticLogLevel.Error, context, objectWriter);
         }
 
         public static void LogError(this ISemanticLog log, Exception exception, Action<IObjectWriter> objectWriter = null)
         {
-            log.Log(SemanticLogLevel.Error, writer => writer.WriteException(exception, objectWriter));
+            log.Log<None>(SemanticLogLevel.Error, null, (_, w) => w.WriteException(exception, objectWriter));
+        }
+
+        public static void LogError<T>(this ISemanticLog log, Exception exception, T context, Action<T, IObjectWriter> objectWriter = null)
+        {
+            log.Log(SemanticLogLevel.Error, context, (ctx, w) => w.WriteException(exception, ctx, objectWriter));
         }
 
         public static void LogFatal(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
-            log.Log(SemanticLogLevel.Fatal, objectWriter);
+            log.Log<None>(SemanticLogLevel.Fatal, null, (_, w) => objectWriter(w));
+        }
+
+        public static void LogFatal<T>(this ISemanticLog log, T context, Action<T, IObjectWriter> objectWriter)
+        {
+            log.Log(SemanticLogLevel.Fatal, context, objectWriter);
         }
 
         public static void LogFatal(this ISemanticLog log, Exception exception, Action<IObjectWriter> objectWriter = null)
         {
-            log.Log(SemanticLogLevel.Fatal, writer => writer.WriteException(exception, objectWriter));
+            log.Log<None>(SemanticLogLevel.Fatal, null, (_, w) => w.WriteException(exception, objectWriter));
+        }
+
+        public static void LogFatal<T>(this ISemanticLog log, Exception exception, T context, Action<T, IObjectWriter> objectWriter = null)
+        {
+            log.Log(SemanticLogLevel.Fatal, context, (ctx, w) => w.WriteException(exception, ctx, objectWriter));
         }
 
         private static void WriteException(this IObjectWriter writer, Exception exception, Action<IObjectWriter> objectWriter)
@@ -66,32 +111,57 @@ namespace Squidex.Infrastructure.Log
             }
         }
 
+        private static void WriteException<T>(this IObjectWriter writer, Exception exception, T context, Action<T, IObjectWriter> objectWriter)
+        {
+            objectWriter?.Invoke(context, writer);
+
+            if (exception != null)
+            {
+                writer.WriteException(exception);
+            }
+        }
+
         public static IObjectWriter WriteException(this IObjectWriter writer, Exception exception)
         {
-            return writer.WriteObject(nameof(exception), inner =>
+            return writer.WriteObject(nameof(exception), exception, (ctx, w) =>
             {
-                inner.WriteProperty("type", exception.GetType().FullName);
-                inner.WriteProperty("message", exception.Message);
-                inner.WriteProperty("stackTrace", exception.StackTrace);
+                w.WriteProperty("type", ctx.GetType().FullName);
+                w.WriteProperty("message", ctx.Message);
+                w.WriteProperty("stackTrace", ctx.StackTrace);
             });
         }
 
         public static IDisposable MeasureTrace(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
-            return log.Measure(SemanticLogLevel.Trace, objectWriter);
+            return log.Measure<None>(SemanticLogLevel.Trace, null, (_, w) => objectWriter(w));
+        }
+
+        public static IDisposable MeasureTrace<T>(this ISemanticLog log, T context, Action<T, IObjectWriter> objectWriter)
+        {
+            return log.Measure(SemanticLogLevel.Trace, context, objectWriter);
         }
 
         public static IDisposable MeasureDebug(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
-            return log.Measure(SemanticLogLevel.Debug, objectWriter);
+            return log.Measure<None>(SemanticLogLevel.Debug, null, (_, w) => objectWriter(w));
+        }
+
+        public static IDisposable MeasureDebug<T>(this ISemanticLog log, T context, Action<T, IObjectWriter> objectWriter)
+        {
+            return log.Measure(SemanticLogLevel.Debug, context, objectWriter);
         }
 
         public static IDisposable MeasureInformation(this ISemanticLog log, Action<IObjectWriter> objectWriter)
         {
-            return log.Measure(SemanticLogLevel.Information, objectWriter);
+            return log.Measure<None>(SemanticLogLevel.Information, null, (_, w) => objectWriter(w));
         }
 
-        private static IDisposable Measure(this ISemanticLog log, SemanticLogLevel logLevel, Action<IObjectWriter> objectWriter)
+        public static IDisposable MeasureInformation<T>(this ISemanticLog log, T context, Action<T, IObjectWriter> objectWriter)
+        {
+            return log.Measure(SemanticLogLevel.Information, context, objectWriter);
+        }
+
+        private static IDisposable Measure<T>(this ISemanticLog log, SemanticLogLevel logLevel, T context, Action<T, IObjectWriter> objectWriter)
         {
             var watch = ValueStopwatch.StartNew();
 
@@ -99,11 +169,11 @@ namespace Squidex.Infrastructure.Log
             {
                 var elapsedMs = watch.Stop();
 
-                log.Log(logLevel, writer =>
+                log.Log(logLevel, (Context: context, elapsedMs), (ctx, w) =>
                 {
-                    objectWriter?.Invoke(writer);
+                    objectWriter?.Invoke(ctx.Context, w);
 
-                    writer.WriteProperty("elapsedMs", elapsedMs);
+                    w.WriteProperty("elapsedMs", elapsedMs);
                 });
             });
         }

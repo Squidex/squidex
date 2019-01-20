@@ -386,18 +386,20 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
                         errorMessageBuilder.AppendLine(error.Description);
                     }
 
-                    log.LogError(w => w
-                        .WriteProperty("action", operationName)
+                    var errorMessage = errorMessageBuilder.ToString();
+
+                    log.LogError((operationName, errorMessage), (ctx, w) => w
+                        .WriteProperty("action", ctx.operationName)
                         .WriteProperty("status", "Failed")
-                        .WriteProperty("message", errorMessageBuilder.ToString()));
+                        .WriteProperty("message", ctx.errorMessage));
                 }
 
                 return result.Succeeded;
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
-                    .WriteProperty("action", operationName)
+                log.LogError(ex, operationName, (logOperationName, w) => w
+                    .WriteProperty("action", logOperationName)
                     .WriteProperty("status", "Failed"));
 
                 return false;

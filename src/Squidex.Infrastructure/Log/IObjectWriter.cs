@@ -26,6 +26,10 @@ namespace Squidex.Infrastructure.Log
 
         IObjectWriter WriteObject(string property, Action<IObjectWriter> objectWriter);
 
+        IObjectWriter WriteObject<T>(string property, T context, Action<T, IObjectWriter> objectWriter);
+
         IObjectWriter WriteArray(string property, Action<IArrayWriter> arrayWriter);
+
+        IObjectWriter WriteArray<T>(string property, T context, Action<T, IArrayWriter> arrayWriter);
     }
 }

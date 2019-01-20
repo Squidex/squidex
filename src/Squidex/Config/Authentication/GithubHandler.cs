@@ -6,11 +6,8 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.Extensions.Options;
 using Squidex.Infrastructure;
 using Squidex.Shared.Identity;
 

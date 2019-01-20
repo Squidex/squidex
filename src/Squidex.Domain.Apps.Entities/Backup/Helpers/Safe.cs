@@ -22,10 +22,10 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
+                log.LogError(ex, id.ToString(), (logOperationId, w) => w
                     .WriteProperty("action", "deleteArchive")
                     .WriteProperty("status", "failed")
-                    .WriteProperty("operationId", id.ToString()));
+                    .WriteProperty("operationId", logOperationId));
             }
         }
 
@@ -37,10 +37,10 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
+                log.LogError(ex, id.ToString(), (logOperationId, w) => w
                     .WriteProperty("action", "deleteBackup")
                     .WriteProperty("status", "failed")
-                    .WriteProperty("operationId", id.ToString()));
+                    .WriteProperty("operationId", logOperationId));
             }
         }
 
@@ -52,10 +52,10 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
             }
             catch (Exception ex)
             {
-                log.LogError(ex, w => w
+                log.LogError(ex, id.ToString(), (logOperationId, w) => w
                     .WriteProperty("action", "cleanupRestore")
                     .WriteProperty("status", "failed")
-                    .WriteProperty("operationId", id.ToString()));
+                    .WriteProperty("operationId", logOperationId));
             }
         }
     }

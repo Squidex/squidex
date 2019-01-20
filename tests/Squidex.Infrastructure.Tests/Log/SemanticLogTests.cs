@@ -45,8 +45,8 @@ namespace Squidex.Infrastructure.Log
         [Fact]
         public void Should_log_multiple_lines()
         {
-            Log.Log(SemanticLogLevel.Error, w => w.WriteProperty("logMessage", "Msg1"));
-            Log.Log(SemanticLogLevel.Error, w => w.WriteProperty("logMessage", "Msg2"));
+            Log.Log<None>(SemanticLogLevel.Error, null, (_, w) => w.WriteProperty("logMessage", "Msg1"));
+            Log.Log<None>(SemanticLogLevel.Error, null, (_, w) => w.WriteProperty("logMessage", "Msg2"));
 
             var expected1 =
                 LogTest(w => w
@@ -130,9 +130,35 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
+        public void Should_log_with_trace_and_context()
+        {
+            Log.LogTrace(1500, (ctx, w) => w.WriteProperty("logValue", ctx));
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Trace")
+                    .WriteProperty("logValue", 1500));
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
         public void Should_log_with_debug()
         {
             Log.LogDebug(w => w.WriteProperty("logValue", 1500));
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Debug")
+                    .WriteProperty("logValue", 1500));
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
+        public void Should_log_with_debug_and_context()
+        {
+            Log.LogDebug(1500, (ctx, w) => w.WriteProperty("logValue", ctx));
 
             var expected =
                 LogTest(w => w
@@ -156,9 +182,35 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
+        public void Should_log_with_information_and_context()
+        {
+            Log.LogInformation(1500, (ctx, w) => w.WriteProperty("logValue", ctx));
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Information")
+                    .WriteProperty("logValue", 1500));
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
         public void Should_log_with_warning()
         {
             Log.LogWarning(w => w.WriteProperty("logValue", 1500));
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Warning")
+                    .WriteProperty("logValue", 1500));
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
+        public void Should_log_with_warning_and_context()
+        {
+            Log.LogWarning(1500, (ctx, w) => w.WriteProperty("logValue", ctx));
 
             var expected =
                 LogTest(w => w
@@ -184,9 +236,38 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
+        public void Should_log_with_warning_exception_and_context()
+        {
+            var exception = new InvalidOperationException();
+
+            Log.LogWarning(exception, 1500, (ctx, w) => w.WriteProperty("logValue", ctx));
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Warning")
+                    .WriteProperty("logValue", 1500)
+                    .WriteException(exception));
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
         public void Should_log_with_error()
         {
             Log.LogError(w => w.WriteProperty("logValue", 1500));
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Error")
+                    .WriteProperty("logValue", 1500));
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
+        public void Should_log_with_error_and_context()
+        {
+            Log.LogError(1500, (ctx, w) => w.WriteProperty("logValue", ctx));
 
             var expected =
                 LogTest(w => w
@@ -212,9 +293,38 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
+        public void Should_log_with_error_exception_and_context()
+        {
+            var exception = new InvalidOperationException();
+
+            Log.LogError(exception, 1500, (ctx, w) => w.WriteProperty("logValue", ctx));
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Error")
+                    .WriteProperty("logValue", 1500)
+                    .WriteException(exception));
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
         public void Should_log_with_fatal()
         {
             Log.LogFatal(w => w.WriteProperty("logValue", 1500));
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Fatal")
+                    .WriteProperty("logValue", 1500));
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
+        public void Should_log_with_fatal_and_context()
+        {
+            Log.LogFatal(1500, (ctx, w) => w.WriteProperty("logValue", ctx));
 
             var expected =
                 LogTest(w => w
@@ -234,6 +344,22 @@ namespace Squidex.Infrastructure.Log
             var expected =
                 LogTest(w => w
                     .WriteProperty("logLevel", "Fatal")
+                    .WriteException(exception));
+
+            Assert.Equal(expected, output);
+        }
+
+        [Fact]
+        public void Should_log_with_fatal_exception_and_context()
+        {
+            var exception = new InvalidOperationException();
+
+            Log.LogFatal(exception, 1500, (ctx, w) => w.WriteProperty("logValue", ctx));
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Fatal")
+                    .WriteProperty("logValue", 1500)
                     .WriteException(exception));
 
             Assert.Equal(expected, output);
@@ -266,6 +392,20 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
+        public void Should_measure_trace_with_contex()
+        {
+            Log.MeasureTrace("My Message", (ctx, w) => w.WriteProperty("message", ctx)).Dispose();
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Trace")
+                    .WriteProperty("message", "My Message")
+                    .WriteProperty("elapsedMs", 0));
+
+            Assert.StartsWith(expected.Substring(0, 55), output, StringComparison.Ordinal);
+        }
+
+        [Fact]
         public void Should_measure_debug()
         {
             Log.MeasureDebug(w => w.WriteProperty("message", "My Message")).Dispose();
@@ -280,9 +420,37 @@ namespace Squidex.Infrastructure.Log
         }
 
         [Fact]
+        public void Should_measure_debug_with_contex()
+        {
+            Log.MeasureDebug("My Message", (ctx, w) => w.WriteProperty("message", ctx)).Dispose();
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Debug")
+                    .WriteProperty("message", "My Message")
+                    .WriteProperty("elapsedMs", 0));
+
+            Assert.StartsWith(expected.Substring(0, 55), output, StringComparison.Ordinal);
+        }
+
+        [Fact]
         public void Should_measure_information()
         {
             Log.MeasureInformation(w => w.WriteProperty("message", "My Message")).Dispose();
+
+            var expected =
+                LogTest(w => w
+                    .WriteProperty("logLevel", "Information")
+                    .WriteProperty("message", "My Message")
+                    .WriteProperty("elapsedMs", 0));
+
+            Assert.StartsWith(expected.Substring(0, 55), output, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        public void Should_measure_information_with_contex()
+        {
+            Log.MeasureInformation("My Message", (ctx, w) => w.WriteProperty("message", ctx)).Dispose();
 
             var expected =
                 LogTest(w => w
@@ -334,7 +502,7 @@ namespace Squidex.Infrastructure.Log
 
             try
             {
-                sut.Log(SemanticLogLevel.Debug, w => w.WriteProperty("should", "throw"));
+                sut.Log<None>(SemanticLogLevel.Debug, null, (_, w) => w.WriteProperty("should", "throw"));
 
                 Assert.False(true);
             }

@@ -83,10 +83,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, w => w
+                        log.LogError(ex, content.Id.ToString(), (logContentId, w) => w
                             .WriteProperty("action", "ChangeStatusScheduled")
                             .WriteProperty("status", "Failed")
-                            .WriteProperty("contentId", content.Id.ToString()));
+                            .WriteProperty("contentId", logContentId));
                     }
                 });
             });

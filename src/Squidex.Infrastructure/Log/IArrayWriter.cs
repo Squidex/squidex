@@ -25,5 +25,7 @@ namespace Squidex.Infrastructure.Log
         IArrayWriter WriteValue(Instant value);
 
         IArrayWriter WriteObject(Action<IObjectWriter> objectWriter);
+
+        IArrayWriter WriteObject<T>(T context, Action<T, IObjectWriter> objectWriter);
     }
 }

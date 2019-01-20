@@ -46,10 +46,10 @@ namespace Squidex.Infrastructure.Log
                 {
                     foreach (var kvp in traces)
                     {
-                        p.WriteObject(kvp.Key, k => k
-                            .WriteProperty("elapsedMsTotal", kvp.Value.Total)
-                            .WriteProperty("elapsedMsAvg", kvp.Value.Total / kvp.Value.Count)
-                            .WriteProperty("count", kvp.Value.Count));
+                        p.WriteObject(kvp.Key, kvp.Value, (value, k) => k
+                            .WriteProperty("elapsedMsTotal", value.Total)
+                            .WriteProperty("elapsedMsAvg", value.Total / value.Count)
+                            .WriteProperty("count", value.Count));
                     }
                 });
             }

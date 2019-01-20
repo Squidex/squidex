@@ -30,11 +30,11 @@ namespace Squidex.Config.Domain
 
                     var orderedConfigs = config.AsEnumerable().Where(kvp => kvp.Value != null).OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase);
 
-                    foreach (var kvp in orderedConfigs)
+                    foreach (var (key, val) in orderedConfigs)
                     {
-                        if (logged.Add(kvp.Key))
+                        if (logged.Add(key))
                         {
-                            c.WriteProperty(kvp.Key.ToLowerInvariant(), kvp.Value);
+                            c.WriteProperty(key.ToLowerInvariant(), val);
                         }
                     }
                 }));

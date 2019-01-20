@@ -49,29 +49,31 @@ namespace Squidex.Infrastructure.Log.Adapter
                     break;
             }
 
-            semanticLog.Log(semanticLogLevel, writer =>
+            var context = (eventId, state, exception, formatter);
+
+            semanticLog.Log(semanticLogLevel, context, (ctx, writer) =>
             {
-                var message = formatter(state, exception);
+                var message = ctx.formatter(ctx.state, ctx.exception);
 
                 if (!string.IsNullOrWhiteSpace(message))
                 {
                     writer.WriteProperty(nameof(message), message);
                 }
 
-                if (eventId.Id > 0)
+                if (ctx.eventId.Id > 0)
                 {
-                    writer.WriteObject(nameof(eventId), eventIdWriter =>
+                    writer.WriteObject("eventId", ctx.eventId, (innerEventId, eventIdWriter) =>
                     {
-                        eventIdWriter.WriteProperty("id", eventId.Id);
+                        eventIdWriter.WriteProperty("id", innerEventId.Id);
 
-                        if (!string.IsNullOrWhiteSpace(eventId.Name))
+                        if (!string.IsNullOrWhiteSpace(innerEventId.Name))
                         {
-                            eventIdWriter.WriteProperty("name", eventId.Name);
+                            eventIdWriter.WriteProperty("name", innerEventId.Name);
                         }
                     });
                 }
 
-                if (state is IReadOnlyList<KeyValuePair<string, object>> parameters)
+                if (ctx.state is IReadOnlyList<KeyValuePair<string, object>> parameters)
                 {
                     foreach (var kvp in parameters)
                     {
@@ -87,9 +89,9 @@ namespace Squidex.Infrastructure.Log.Adapter
                     }
                 }
 
-                if (exception != null)
+                if (ctx.exception != null)
                 {
-                    writer.WriteException(exception);
+                    writer.WriteException(ctx.exception);
                 }
             });
         }
