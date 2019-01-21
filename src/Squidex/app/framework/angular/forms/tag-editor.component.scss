@@ -72,7 +72,7 @@ div {
         @include border-radius(10px);
         color: $color-dark-foreground;
         cursor: default;
-        padding: 0 .6rem;
+        padding: 1px .6rem;
         background: $color-theme-blue;
         border: 0;
         font-size: .8rem;

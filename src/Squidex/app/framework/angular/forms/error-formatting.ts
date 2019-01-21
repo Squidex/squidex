@@ -28,7 +28,7 @@ const DEFAULT_ERRORS: { [key: string]: string } = {
     requiredTrue: '{field} is required.',
     validdatetime: '{field} is not a valid date time.',
     validvalues: '{field} is not a valid value.',
-    validarrayvalues: '{field} contains an invalid value.'
+    validarrayvalues: '{field} contains an invalid value: {invalidvalue}.'
 };
 
 export function formatError(field: string, type: string, properties: any, value: any, errors?: any)  {

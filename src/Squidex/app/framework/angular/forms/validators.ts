@@ -167,7 +167,7 @@ export module ValidatorsEx {
             if (ns) {
                 for (let n of ns) {
                     if (values.indexOf(n) < 0) {
-                        return { validarrayvalues: false };
+                        return { validarrayvalues: { invalidvalue: n } };
                     }
                 }
             }

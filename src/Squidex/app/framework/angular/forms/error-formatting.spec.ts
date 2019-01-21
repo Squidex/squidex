@@ -129,7 +129,7 @@ describe('formatErrors', () => {
     it('should format validArrayValues', () => {
         const error = validate([2, 4], ValidatorsEx.validArrayValues([1, 2, 3]));
 
-        expect(error).toEqual('MY_FIELD contains an invalid value.');
+        expect(error).toEqual('MY_FIELD contains an invalid value: 4.');
     });
 
     it('should format match', () => {
