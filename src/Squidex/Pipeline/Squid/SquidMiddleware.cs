@@ -17,7 +17,9 @@ namespace Squidex.Pipeline.Squid
     public sealed class SquidMiddleware
     {
         private readonly RequestDelegate next;
+        private readonly string squidHappyLG = LoadSvg("happy-lg");
         private readonly string squidHappy = LoadSvg("happy");
+        private readonly string squidSadLG = LoadSvg("sad-lg");
         private readonly string squidSad = LoadSvg("sad");
 
         public SquidMiddleware(RequestDelegate next)
@@ -61,7 +63,23 @@ namespace Squidex.Pipeline.Squid
                     background = backgroundValue;
                 }
 
-                var svg = isSad ? squidSad : squidHappy;
+                var isSmall = false;
+
+                if (request.Query.TryGetValue("small", out _))
+                {
+                    isSmall = true;
+                }
+
+                var svg = string.Empty;
+
+                if (isSmall)
+                {
+                    svg = isSad ? squidSad : squidHappy;
+                }
+                else
+                {
+                    svg = isSad ? squidSadLG : squidHappyLG;
+                }
 
                 var (l1, l2, l3) = SplitText(text);
 

@@ -30,6 +30,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Pipeline\Squid\icon-happy-lg.svg" />
+    <None Remove="Pipeline\Squid\icon-sad-lg.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
