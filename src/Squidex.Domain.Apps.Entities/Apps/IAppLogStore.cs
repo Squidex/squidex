@@ -9,10 +9,10 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure.Log
+namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public interface ILogStore
+    public interface IAppLogStore
     {
-        Task ReadLogAsync(string key, DateTime from, DateTime to, Stream stream);
+        Task ReadLogAsync(IAppEntity app, DateTime from, DateTime to, Stream stream);
     }
 }

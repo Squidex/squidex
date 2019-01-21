@@ -6,6 +6,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { saveAs } from 'file-saver';
 import { Subscription } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
 
@@ -205,6 +206,13 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                             }))
                     };
                 }));
+    }
+
+    public downloadLog() {
+        this.usagesService.getLog(this.appsState.appName)
+            .subscribe(buffer => {
+                saveAs(buffer, 'Log.csv');
+            });
     }
 }
 

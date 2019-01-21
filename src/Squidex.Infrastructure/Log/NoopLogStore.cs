@@ -7,12 +7,18 @@
 
 using System;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.Log
 {
-    public interface ILogStore
+    public sealed class NoopLogStore : ILogStore
     {
-        Task ReadLogAsync(string key, DateTime from, DateTime to, Stream stream);
+        private static readonly byte[] NoopText = Encoding.UTF8.GetBytes("Not Supported");
+
+        public Task ReadLogAsync(string key, DateTime from, DateTime to, Stream stream)
+        {
+            return stream.WriteAsync(NoopText, 0, NoopText.Length);
+        }
     }
 }

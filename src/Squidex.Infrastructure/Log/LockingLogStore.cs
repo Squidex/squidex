@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Log
             lockGrain = grainFactory.GetGrain<ILockGrain>(SingleGrain.Id);
         }
 
-        public async Task ReadLockAsync(string key, DateTime from, DateTime to, Stream stream)
+        public async Task ReadLogAsync(string key, DateTime from, DateTime to, Stream stream)
         {
             string releaseToken = null;
 
@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Log
 
             try
             {
-                await inner.ReadLockAsync(key, from, to, stream);
+                await inner.ReadLogAsync(key, from, to, stream);
             }
             finally
             {

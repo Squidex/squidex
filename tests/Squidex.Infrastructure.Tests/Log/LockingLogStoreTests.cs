@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Log
             A.CallTo(() => lockGrain.AcquireLockAsync(key))
                 .Returns(releaseToken);
 
-            await sut.ReadLockAsync(key, dateFrom, dateTo, stream);
+            await sut.ReadLogAsync(key, dateFrom, dateTo, stream);
 
             A.CallTo(() => lockGrain.AcquireLockAsync(key))
                 .MustHaveHappened();
@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.Log
             A.CallTo(() => lockGrain.ReleaseLockAsync(releaseToken))
                 .MustHaveHappened();
 
-            A.CallTo(() => inner.ReadLockAsync(key, dateFrom, dateTo, stream))
+            A.CallTo(() => inner.ReadLogAsync(key, dateFrom, dateTo, stream))
                 .MustHaveHappened();
         }
     }

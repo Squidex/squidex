@@ -19,12 +19,12 @@ namespace Squidex.Pipeline
 {
     public sealed class ApiCostsFilter : IAsyncActionFilter, IFilterContainer
     {
-        private readonly IAppPlansProvider appPlanProvider;
+        private readonly IAppPlansProvider appPlansProvider;
         private readonly IUsageTracker usageTracker;
 
-        public ApiCostsFilter(IAppPlansProvider appPlanProvider, IUsageTracker usageTracker)
+        public ApiCostsFilter(IAppPlansProvider appPlansProvider, IUsageTracker usageTracker)
         {
-            this.appPlanProvider = appPlanProvider;
+            this.appPlansProvider = appPlansProvider;
 
             this.usageTracker = usageTracker;
         }
@@ -55,7 +55,7 @@ namespace Squidex.Pipeline
 
                 using (Profiler.Trace("CheckUsage"))
                 {
-                    var plan = appPlanProvider.GetPlanForApp(appFeature.App);
+                    var plan = appPlansProvider.GetPlanForApp(appFeature.App);
 
                     var usage = await usageTracker.GetMonthlyCallsAsync(appId, DateTime.Today);
 

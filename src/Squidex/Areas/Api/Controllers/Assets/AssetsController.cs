@@ -36,7 +36,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
     {
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetUsageTracker assetStatsRepository;
-        private readonly IAppPlansProvider appPlanProvider;
+        private readonly IAppPlansProvider appPlansProvider;
         private readonly IOptions<MyContentsControllerOptions> controllerOptions;
         private readonly ITagService tagService;
         private readonly AssetOptions assetOptions;
@@ -45,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             ICommandBus commandBus,
             IAssetQueryService assetQuery,
             IAssetUsageTracker assetStatsRepository,
-            IAppPlansProvider appPlanProvider,
+            IAppPlansProvider appPlansProvider,
             IOptions<AssetOptions> assetOptions,
             IOptions<MyContentsControllerOptions> controllerOptions,
             ITagService tagService)
@@ -54,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             this.assetOptions = assetOptions.Value;
             this.assetQuery = assetQuery;
             this.assetStatsRepository = assetStatsRepository;
-            this.appPlanProvider = appPlanProvider;
+            this.appPlansProvider = appPlansProvider;
             this.controllerOptions = controllerOptions;
             this.tagService = tagService;
         }
@@ -280,7 +280,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 throw new ValidationException("Cannot create asset.", error);
             }
 
-            var plan = appPlanProvider.GetPlanForApp(App);
+            var plan = appPlansProvider.GetPlanForApp(App);
 
             var currentSize = await assetStatsRepository.GetTotalSizeAsync(AppId);
 

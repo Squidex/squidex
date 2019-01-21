@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure.Commands;
@@ -27,20 +28,46 @@ namespace Squidex.Areas.Api.Controllers.Statistics
     public sealed class UsagesController : ApiController
     {
         private readonly IUsageTracker usageTracker;
-        private readonly IAppPlansProvider appPlanProvider;
+        private readonly IAppLogStore appLogStore;
+        private readonly IAppPlansProvider appPlansProvider;
         private readonly IAssetUsageTracker assetStatsRepository;
 
         public UsagesController(
             ICommandBus commandBus,
             IUsageTracker usageTracker,
-            IAppPlansProvider appPlanProvider,
+            IAppLogStore appLogStore,
+            IAppPlansProvider appPlansProvider,
             IAssetUsageTracker assetStatsRepository)
             : base(commandBus)
         {
             this.usageTracker = usageTracker;
 
-            this.appPlanProvider = appPlanProvider;
+            this.appLogStore = appLogStore;
+            this.appPlansProvider = appPlansProvider;
             this.assetStatsRepository = assetStatsRepository;
+        }
+
+        /// <summary>
+        /// Get api calls as log file.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => Usage tracking results returned.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/{app}/usages/log/")]
+        [ProducesResponseType(typeof(CurrentCallsDto), 200)]
+        [ApiPermission(Permissions.AppCommon)]
+        [ApiCosts(0)]
+        public IActionResult GetLog(string app)
+        {
+            var today = DateTime.Today;
+
+            return new FileCallbackResult("text/csv", $"Usage-{today:yyy-MM-dd}.csv", stream =>
+            {
+                return appLogStore.ReadLogAsync(App, today.AddDays(-30), today, stream);
+            });
         }
 
         /// <summary>
@@ -60,7 +87,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         {
             var count = await usageTracker.GetMonthlyCallsAsync(AppId.ToString(), DateTime.Today);
 
-            var plan = appPlanProvider.GetPlanForApp(App);
+            var plan = appPlansProvider.GetPlanForApp(App);
 
             var response = new CurrentCallsDto { Count = count, MaxAllowed = plan.MaxApiCalls };
 
@@ -114,7 +141,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         {
             var size = await assetStatsRepository.GetTotalSizeAsync(AppId);
 
-            var plan = appPlanProvider.GetPlanForApp(App);
+            var plan = appPlansProvider.GetPlanForApp(App);
 
             var response = new CurrentStorageDto { Size = size, MaxAllowed = plan.MaxAssetSize };
 

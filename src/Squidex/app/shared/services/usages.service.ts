@@ -59,6 +59,13 @@ export class UsagesService {
     ) {
     }
 
+    public getLog(app: string): Observable<Blob> {
+        const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/log`);
+
+        return this.http.get(url, { responseType: 'blob' }).pipe(
+            pretifyError('Failed to load monthly api calls. Please reload.'));
+    }
+
     public getMonthCalls(app: string): Observable<CurrentCallsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${app}/usages/calls/month`);
 

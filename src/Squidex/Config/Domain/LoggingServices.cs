@@ -8,6 +8,7 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Log;
 using Squidex.Pipeline;
 
@@ -65,6 +66,12 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<SemanticLog>()
                 .As<ISemanticLog>();
+
+            services.AddSingletonAs<DefaultAppLogStore>()
+                .As<IAppLogStore>();
+
+            services.AddSingletonAs<NoopLogStore>()
+                .As<ILogStore>();
         }
     }
 }

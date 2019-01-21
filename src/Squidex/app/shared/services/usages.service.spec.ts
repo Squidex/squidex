@@ -143,4 +143,23 @@ describe('UsagesService', () => {
 
         expect(usages!).toEqual(new CurrentStorageDto(130, 150));
     }));
+
+    it('should make get request to get log',
+        inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
+
+        let blob: Blob;
+
+        usagesService.getLog('my-app').subscribe(result => {
+            blob = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/usages/log');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({});
+
+        expect(blob!).toBeDefined();
+    }));
 });

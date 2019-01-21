@@ -26,7 +26,7 @@ namespace Squidex.Pipeline
     {
         private readonly IActionContextAccessor actionContextAccessor = A.Fake<IActionContextAccessor>();
         private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
-        private readonly IAppPlansProvider appPlanProvider = A.Fake<IAppPlansProvider>();
+        private readonly IAppPlansProvider appPlansProvider = A.Fake<IAppPlansProvider>();
         private readonly IUsageTracker usageTracker = A.Fake<IUsageTracker>();
         private readonly IAppLimitsPlan appPlan = A.Fake<IAppLimitsPlan>();
         private readonly ActionExecutingContext actionContext;
@@ -48,10 +48,10 @@ namespace Squidex.Pipeline
             A.CallTo(() => actionContextAccessor.ActionContext)
                 .Returns(actionContext);
 
-            A.CallTo(() => appPlanProvider.GetPlan(null))
+            A.CallTo(() => appPlansProvider.GetPlan(null))
                 .Returns(appPlan);
 
-            A.CallTo(() => appPlanProvider.GetPlanForApp(appEntity))
+            A.CallTo(() => appPlansProvider.GetPlanForApp(appEntity))
                 .Returns(appPlan);
 
             A.CallTo(() => appPlan.MaxApiCalls)
@@ -67,7 +67,7 @@ namespace Squidex.Pipeline
                 return Task.FromResult<ActionExecutedContext>(null);
             };
 
-            sut = new ApiCostsFilter(appPlanProvider, usageTracker);
+            sut = new ApiCostsFilter(appPlansProvider, usageTracker);
         }
 
         [Fact]
