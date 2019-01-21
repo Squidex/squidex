@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.MongoDb
                     CollectionSettings() ?? new MongoCollectionSettings()));
         }
 
-        protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection, CancellationToken ct = default(CancellationToken))
+        protected virtual Task SetupCollectionAsync(IMongoCollection<TEntity> collection, CancellationToken ct = default)
         {
             return TaskHelper.Done;
         }
@@ -85,7 +85,7 @@ namespace Squidex.Infrastructure.MongoDb
             await SetupCollectionAsync(Collection);
         }
 
-        public async Task<bool> DropCollectionIfExistsAsync(CancellationToken ct = default(CancellationToken))
+        public async Task<bool> DropCollectionIfExistsAsync(CancellationToken ct = default)
         {
             try
             {
@@ -103,7 +103,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default(CancellationToken))
+        public async Task InitializeAsync(CancellationToken ct = default)
         {
             try
             {

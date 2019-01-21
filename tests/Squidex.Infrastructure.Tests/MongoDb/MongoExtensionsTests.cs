@@ -54,14 +54,14 @@ namespace Squidex.Infrastructure.MongoDb
             {
             }
 
-            public bool MoveNext(CancellationToken cancellationToken = default(CancellationToken))
+            public bool MoveNext(CancellationToken cancellationToken = default)
             {
                 index++;
 
                 return index < items.Count;
             }
 
-            public async Task<bool> MoveNextAsync(CancellationToken cancellationToken = default(CancellationToken))
+            public async Task<bool> MoveNextAsync(CancellationToken cancellationToken = default)
             {
                 await Task.Delay(1, cancellationToken);
 

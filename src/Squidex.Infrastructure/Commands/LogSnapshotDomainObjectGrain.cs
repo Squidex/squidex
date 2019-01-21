@@ -51,7 +51,7 @@ namespace Squidex.Infrastructure.Commands
                 return snapshots[(int)version + 1];
             }
 
-            return default(T);
+            return default;
         }
 
         protected sealed override void ApplyEvent(Envelope<IEvent> @event)

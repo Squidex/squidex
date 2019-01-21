@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure.EventSourcing
             projectionClient = new ProjectionClient(connection, prefix, projectionHost);
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default(CancellationToken))
+        public async Task InitializeAsync(CancellationToken ct = default)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return projectionClient.CreateProjectionAsync(property, string.Empty);
         }
 
-        public async Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default(CancellationToken))
+        public async Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<GetEventStore>())
             {
@@ -74,7 +74,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default(CancellationToken))
+        public async Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<GetEventStore>())
             {
@@ -86,7 +86,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private async Task QueryAsync(Func<StoredEvent, Task> callback, string streamName, long sliceStart, CancellationToken ct = default(CancellationToken))
+        private async Task QueryAsync(Func<StoredEvent, Task> callback, string streamName, long sliceStart, CancellationToken ct = default)
         {
             StreamEventsSlice currentSlice;
             do

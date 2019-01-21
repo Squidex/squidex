@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.Tasks
 
         public void Dispose()
         {
-            asyncLocal.Value = default(T);
+            asyncLocal.Value = default;
         }
     }
 }

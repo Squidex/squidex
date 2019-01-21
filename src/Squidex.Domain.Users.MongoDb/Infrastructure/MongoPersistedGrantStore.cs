@@ -40,7 +40,7 @@ namespace Squidex.Domain.Users.MongoDb.Infrastructure
             return "Identity_PersistedGrants";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<PersistedGrant> collection, CancellationToken ct = default(CancellationToken))
+        protected override Task SetupCollectionAsync(IMongoCollection<PersistedGrant> collection, CancellationToken ct = default)
         {
             return collection.Indexes.CreateManyAsync(
                 new[]

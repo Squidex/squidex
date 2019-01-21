@@ -104,7 +104,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public async Task ConnectAsync(CancellationToken ct = default(CancellationToken))
+        public async Task ConnectAsync(CancellationToken ct = default)
         {
             var addressParts = projectionHost.Split(':');
 

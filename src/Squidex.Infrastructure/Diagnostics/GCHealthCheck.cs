@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.Diagnostics
             threshold = 1024 * 1024 * options.Value.Threshold;
         }
 
-        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             var allocated = GC.GetTotalMemory(false);
 

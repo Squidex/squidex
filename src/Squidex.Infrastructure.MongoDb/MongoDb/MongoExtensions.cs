@@ -149,14 +149,14 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursorSource<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursorSource<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default)
         {
             var cursor = await source.ToCursorAsync(cancellationToken);
 
             await cursor.ForEachPipelineAsync(processor, cancellationToken);
         }
 
-        public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursor<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursor<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default)
         {
             using (var selfToken = new CancellationTokenSource())
             {

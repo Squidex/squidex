@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         {
             public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
             {
-                return default(T);
+                return default;
             }
         }
 

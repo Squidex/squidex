@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.Diagnostics
             this.connection = connection;
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             await connection.ReadEventAsync("test", 1, false);
 

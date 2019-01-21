@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
             return "Projections_History";
         }
 
-        protected override Task SetupCollectionAsync(IMongoCollection<HistoryEvent> collection, CancellationToken ct = default(CancellationToken))
+        protected override Task SetupCollectionAsync(IMongoCollection<HistoryEvent> collection, CancellationToken ct = default)
         {
             return collection.Indexes.CreateManyAsync(
                 new[]

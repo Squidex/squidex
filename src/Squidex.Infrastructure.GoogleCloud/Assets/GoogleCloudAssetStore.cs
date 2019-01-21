@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Assets
             this.bucketName = bucketName;
         }
 
-        public async Task InitializeAsync(CancellationToken ct = default(CancellationToken))
+        public async Task InitializeAsync(CancellationToken ct = default)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace Squidex.Infrastructure.Assets
             return null;
         }
 
-        public async Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default(CancellationToken))
+        public async Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default)
         {
             var objectName = GetObjectName(id, version, suffix);
 
@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
+        public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
         {
             var objectName = GetObjectName(id, version, suffix);
 
@@ -81,12 +81,12 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken))
+        public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
         {
             return UploadCoreAsync(GetObjectName(id, version, suffix), stream, ct);
         }
 
-        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default(CancellationToken))
+        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
             return UploadCoreAsync(fileName, stream, ct);
         }
@@ -101,7 +101,7 @@ namespace Squidex.Infrastructure.Assets
             return DeleteCoreAsync(fileName);
         }
 
-        private async Task UploadCoreAsync(string objectName, Stream stream, CancellationToken ct = default(CancellationToken))
+        private async Task UploadCoreAsync(string objectName, Stream stream, CancellationToken ct = default)
         {
             try
             {

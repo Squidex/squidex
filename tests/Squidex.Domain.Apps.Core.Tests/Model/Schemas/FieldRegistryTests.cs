@@ -20,12 +20,12 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         {
             public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)
             {
-                return default(T);
+                return default;
             }
 
             public override T Accept<T>(IFieldVisitor<T> visitor, IField field)
             {
-                return default(T);
+                return default;
             }
 
             public override RootField CreateRootField(long id, string name, Partitioning partitioning, IFieldSettings settings = null)

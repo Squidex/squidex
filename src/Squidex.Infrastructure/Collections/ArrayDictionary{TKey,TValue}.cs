@@ -141,7 +141,7 @@ namespace Squidex.Infrastructure.Collections
                 }
             }
 
-            value = default(TValue);
+            value = default;
             return false;
         }
 

@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Diagnostics
             managementGrain = grainFactory.GetGrain<IManagementGrain>(0);
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             var activationCount = await managementGrain.GetTotalActivationCount();
 

@@ -12,6 +12,6 @@ namespace Squidex.Infrastructure
 {
     public interface IInitializable
     {
-        Task InitializeAsync(CancellationToken ct = default(CancellationToken));
+        Task InitializeAsync(CancellationToken ct = default);
     }
 }

@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
             return "RuleEvents";
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection, CancellationToken ct = default(CancellationToken))
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoRuleEventEntity> collection, CancellationToken ct = default)
         {
             await collection.Indexes.CreateManyAsync(
                 new[]
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
                 }, ct);
         }
 
-        public Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback, CancellationToken ct = default(CancellationToken))
+        public Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback, CancellationToken ct = default)
         {
             return Collection.Find(x => x.NextAttempt < now).ForEachAsync(callback, ct);
         }

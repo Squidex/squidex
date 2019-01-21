@@ -38,7 +38,7 @@ namespace Squidex.Infrastructure
             this.serializer = serializer;
         }
 
-        public Task InitializeAsync(CancellationToken ct = default(CancellationToken))
+        public Task InitializeAsync(CancellationToken ct = default)
         {
             try
             {

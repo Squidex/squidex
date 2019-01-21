@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             this.database = database;
         }
 
-        public Task InitializeAsync(CancellationToken ct = default(CancellationToken))
+        public Task InitializeAsync(CancellationToken ct = default)
         {
             return Task.WhenAll(contentsDraft.InitializeAsync(ct), contentsPublished.InitializeAsync(ct));
         }

@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.Tasks
             {
                 action(x);
 
-                return default(TOutput);
+                return default;
             };
         }
 
@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Tasks
             {
                 await action(x);
 
-                return default(TOutput);
+                return default;
             };
         }
 

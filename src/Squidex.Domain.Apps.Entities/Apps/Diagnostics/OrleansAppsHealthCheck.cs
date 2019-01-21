@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
             index = grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id);
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             await index.CountAsync();
 

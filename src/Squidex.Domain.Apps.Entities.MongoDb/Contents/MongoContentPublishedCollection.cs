@@ -25,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
         }
 
-        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default(CancellationToken))
+        protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
         {
             await collection.Indexes.CreateManyAsync(
                 new[]

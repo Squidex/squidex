@@ -15,13 +15,13 @@ namespace Squidex.Infrastructure.Assets
     {
         string GeneratePublicUrl(string id, long version, string suffix);
 
-        Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default(CancellationToken));
+        Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default);
 
-        Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken));
+        Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default);
 
-        Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default(CancellationToken));
+        Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default);
 
-        Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default(CancellationToken));
+        Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default);
 
         Task DeleteAsync(string fileName);
 

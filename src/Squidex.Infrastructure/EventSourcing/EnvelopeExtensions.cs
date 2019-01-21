@@ -114,20 +114,20 @@ namespace Squidex.Infrastructure.EventSourcing
                 }
             }
 
-            return default(Guid);
+            return default;
         }
 
         public static Instant GetInstant(this JsonObject obj, string key)
         {
             if (obj.TryGetValue(key, out var v))
             {
-                if (v.Type == JsonValueType.String && InstantPattern.General.Parse(v.ToString()).TryGetValue(default(Instant), out var instant))
+                if (v.Type == JsonValueType.String && InstantPattern.General.Parse(v.ToString()).TryGetValue(default, out var instant))
                 {
                     return instant;
                 }
             }
 
-            return default(Instant);
+            return default;
         }
 
         public static string GetString(this JsonObject obj, string key)

@@ -133,12 +133,12 @@ namespace Squidex.Infrastructure
 
         public static TValue GetOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key)
         {
-            return dictionary.GetOrCreate(key, _ => default(TValue));
+            return dictionary.GetOrCreate(key, _ => default);
         }
 
         public static TValue GetOrAddDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
-            return dictionary.GetOrAdd(key, _ => default(TValue));
+            return dictionary.GetOrAdd(key, _ => default);
         }
 
         public static TValue GetOrNew<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) where TValue : class, new()

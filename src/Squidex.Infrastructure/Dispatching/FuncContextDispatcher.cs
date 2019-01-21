@@ -48,7 +48,7 @@ namespace Squidex.Infrastructure.Dispatching
                     })
                     .ToDictionary(m => m.Item1, h => (FuncContextDelegate<TIn>)h.Item2);
 
-            return (target, input, context) => handlers.TryGetValue(input.GetType(), out var handler) ? handler(target, input, context) : default(TOut);
+            return (target, input, context) => handlers.TryGetValue(input.GetType(), out var handler) ? handler(target, input, context) : default;
         }
 
         private static FuncContextDelegate<TIn> Factory<T>(MethodInfo methodInfo) where T : TIn

@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         [Fact]
         public async Task Should_activate_all_grains_on_reminder()
         {
-            await sut.ReceiveReminder(null, default(TickStatus));
+            await sut.ReceiveReminder(null, default);
 
             A.CallTo(() => grainA.ActivateAsync())
                 .MustHaveHappened();
