@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             Response.Headers[HeaderNames.ETag] = entity.FileVersion.ToString();
 
-            return new FileCallbackResult(entity.MimeType, entity.FileName, async bodyStream =>
+            return new FileCallbackResult(entity.MimeType, entity.FileName, true, async bodyStream =>
             {
                 var assetId = entity.Id.ToString();
 

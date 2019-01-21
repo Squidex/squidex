@@ -45,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [AllowAnonymous]
         public IActionResult GetBackupContent(string app, Guid id)
         {
-            return new FileCallbackResult("application/zip", "Backup.zip", bodyStream =>
+            return new FileCallbackResult("application/zip", "Backup.zip", false, bodyStream =>
             {
                 return assetStore.DownloadAsync(id.ToString(), 0, null, bodyStream);
             });

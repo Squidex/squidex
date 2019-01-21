@@ -30,10 +30,17 @@ namespace Squidex.Pipeline
             }
             catch (Exception e)
             {
-                Logger.LogCritical(new EventId(99), e, "Failed to send result.");
+                if (!context.HttpContext.Response.HasStarted && result.Send404)
+                {
+                    context.HttpContext.Response.Headers.Clear();
+                    context.HttpContext.Response.StatusCode = 404;
 
-                context.HttpContext.Response.Headers.Clear();
-                context.HttpContext.Response.StatusCode = 404;
+                    Logger.LogCritical(new EventId(99), e, "Failed to send result.");
+                }
+                else
+                {
+                    throw;
+                }
             }
         }
     }

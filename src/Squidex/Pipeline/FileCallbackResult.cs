@@ -13,14 +13,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Squidex.Pipeline
 {
-    public class FileCallbackResult : FileResult
+    public sealed class FileCallbackResult : FileResult
     {
+        public bool Send404 { get; }
+
         public Func<Stream, Task> Callback { get; }
 
-        public FileCallbackResult(string contentType, string name, Func<Stream, Task> callback)
+        public FileCallbackResult(string contentType, string name, bool send404, Func<Stream, Task> callback)
             : base(contentType)
         {
             FileDownloadName = name;
+
+            Send404 = send404;
 
             Callback = callback;
         }
