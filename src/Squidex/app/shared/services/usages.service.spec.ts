@@ -158,7 +158,7 @@ describe('UsagesService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({});
+        req.flush(new Blob([]));
 
         expect(blob!).toBeDefined();
     }));

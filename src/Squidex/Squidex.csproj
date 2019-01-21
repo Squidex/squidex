@@ -3,7 +3,7 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <RuntimeFrameworkVersion>2.2.0</RuntimeFrameworkVersion>
-    <TargetFramework>netcoreapp2.2</TargetFramework>    
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <LangVersion>7.3</LangVersion>
@@ -13,14 +13,15 @@
     <DebugType>full</DebugType>
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <EmbeddedResource Include="Docs\*.md" />
     <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\*.*" />
     <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
+    <EmbeddedResource Include="Pipeline\Squid\*.svg" />
 
     <Compile Remove="Assets\**" />
-    
+
     <Content Remove="Assets\**" />
     <Content Remove="package-lock.json" />
     <Content Remove="package.json" />
@@ -100,7 +101,7 @@
       <ContentWithTargetPath Include="@(_DocumentationFile->'%(FullPath)')" RelativePath="%(_DocumentationFile.Identity)" TargetPath="%(_DocumentationFile.Filename)%(_DocumentationFile.Extension)" CopyToPublishDirectory="PreserveNewest" />
     </ItemGroup>
   </Target>
-  
+
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
@@ -112,7 +113,7 @@
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
-  
+
   <PropertyGroup>
     <NoWarn>$(NoWarn);CS1591;1591;1573;1572;NU1605</NoWarn>
   </PropertyGroup>

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Frontend.Middlewares;
+using Squidex.Pipeline.Squid;
 
 namespace Squidex.Areas.Frontend
 {
@@ -51,6 +52,8 @@ namespace Squidex.Areas.Frontend
 
                 return next();
             });
+
+            app.UseMiddleware<SquidMiddleware>();
 
             app.UseStaticFiles(new StaticFileOptions
             {
