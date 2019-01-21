@@ -66,7 +66,7 @@ namespace Squidex.Pipeline
 
             var clientId = context.User.OpenIdClientId();
 
-            if (!string.IsNullOrWhiteSpace(userId))
+            if (!string.IsNullOrWhiteSpace(clientId))
             {
                 c.WriteProperty(nameof(clientId), clientId);
             }

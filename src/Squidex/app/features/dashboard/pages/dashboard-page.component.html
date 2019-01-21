@@ -73,7 +73,9 @@
                         API Calls
 
                         <div class="float-right">
-                            <a class="force" (click)="downloadLog()">
+                            <img *ngIf="isLoadingLog" class="loader mr-2" src="/images/loader.gif" />
+
+                            <a class="force" (click)="downloadLog()" [class.disabled]="isLoadingLog">
                                 <small>Download Log</small>
                             </a>
                         </div>

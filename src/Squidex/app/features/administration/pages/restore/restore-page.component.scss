@@ -47,15 +47,15 @@ h3 {
             color: $color-dark-foreground;
             vertical-align: middle;
         }
-    
+
         &-pending {
             color: inherit;
         }
-    
+
         &-failed {
             background: $color-theme-error;
         }
-    
+
         &-success {
             background: $color-theme-green;
         }
