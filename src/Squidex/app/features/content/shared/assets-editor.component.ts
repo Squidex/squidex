@@ -115,6 +115,10 @@ export class AssetsEditorComponent implements ControlValueAccessor, OnInit, OnDe
         this.changeDetector.markForCheck();
     }
 
+    public noop() {
+        return;
+    }
+
     public registerOnChange(fn: any) {
         this.callChange = fn;
     }
@@ -123,9 +127,23 @@ export class AssetsEditorComponent implements ControlValueAccessor, OnInit, OnDe
         this.callTouched = fn;
     }
 
+    public pasteFiles(event: ClipboardEvent) {
+        for (let i = 0; i < event.clipboardData.items.length; i++) {
+            const file = event.clipboardData.items[i].getAsFile();
+
+            if (file) {
+                this.newAssets = this.newAssets.pushFront(file);
+            }
+        }
+    }
+
     public addFiles(files: FileList) {
         for (let i = 0; i < files.length; i++) {
-            this.newAssets = this.newAssets.pushFront(files[i]);
+            const file = files[i];
+
+            if (file) {
+                this.newAssets = this.newAssets.pushFront(file);
+            }
         }
     }
 

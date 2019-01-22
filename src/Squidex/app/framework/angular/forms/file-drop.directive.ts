@@ -7,6 +7,8 @@
 
 import { Directive, ElementRef, EventEmitter, HostListener, Output, Renderer2 } from '@angular/core';
 
+import { Types } from './../../utils/types';
+
 @Directive({
     selector: '[sqxFileDrop]'
 })
@@ -88,18 +90,14 @@ export class FileDropDirective {
             return false;
         }
 
-        if (isFunction(types.indexOf)) {
+        if (Types.isFunction(types.indexOf)) {
             return types.indexOf('Files') !== -1;
-        } else if (isFunction(types.contains)) {
+        } else if (Types.isFunction(types.contains)) {
             return types.contains('Files');
         } else {
             return false;
         }
     }
-}
-
-function isFunction(obj: any): boolean {
-    return !!(obj && obj.constructor && obj.call && obj.apply);
 }
 
 interface DragDropEvent extends MouseEvent {

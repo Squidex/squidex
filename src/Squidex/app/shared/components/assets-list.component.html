@@ -1,4 +1,4 @@
-<div class="file-drop" (sqxFileDrop)="addFiles($event)" *ngIf="!isDisabled">
+<div class="file-drop" (sqxFileDrop)="addFiles($event)" *ngIf="!isDisabled" (paste)="pasteFiles($event)">
     <h3 class="file-drop-header">Drop files here to upload</h3>
 
     <div class="file-drop-or">or</div>
@@ -14,7 +14,7 @@
     <div class="file-drop-info">Drop file on existing item to replace the asset with a newer version.</div>
 </div>
 
-<div class="row assets" [class.unrow]="isListView" *ngIf="state.tagsNames | async; let tags">
+<div class="row assets" [class.unrow]="isListView" *ngIf="state.tagsNames | async; let tags" (paste)="pasteFiles($event)">
     <sqx-asset *ngFor="let file of newFiles" [initFile]="file"
         [isListView]="isListView"
         (failed)="remove(file)" 

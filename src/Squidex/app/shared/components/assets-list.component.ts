@@ -78,10 +78,26 @@ export class AssetsListComponent {
         this.newFiles = this.newFiles.remove(file);
     }
 
+    public pasteFiles(event: ClipboardEvent) {
+        for (let i = 0; i < event.clipboardData.items.length; i++) {
+            const file = event.clipboardData.items[i].getAsFile();
+
+            if (file) {
+                this.newFiles = this.newFiles.pushFront(file);
+            }
+        }
+    }
+
     public addFiles(files: FileList) {
         for (let i = 0; i < files.length; i++) {
-            this.newFiles = this.newFiles.pushFront(files[i]);
+            const file = files[i];
+
+            if (file) {
+                this.newFiles = this.newFiles.pushFront(file);
+            }
         }
+
+        return true;
     }
 
     public trackByAsset(index: number, asset: AssetDto) {

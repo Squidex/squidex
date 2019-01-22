@@ -211,7 +211,7 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     public markTouched() {
-        this.selectValue(this.addInput.value);
+        this.selectValue(this.addInput.value, true);
 
         this.resetAutocompletion();
         this.resetFocus();
