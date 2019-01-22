@@ -1,9 +1,9 @@
 <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 391.9">
   <style>
     .st5{fill:#2d3964}
-    .st6{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"}
-    .st70{font-size:30px}
-    .st71{font-size:20px;font-weight:bold;}
+    .st6{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";}
+    .st70{font-size:22px}
+    .st71{font-size:14px;font-weight:bold;}
     .st8{fill:#e4e4ea}
     .st9{fill:#3389ff}
     .st11{fill:#3370ff}
@@ -11,13 +11,13 @@
     .st13{fill:#fff}
   </style>
   <path d="M349 231.4c-16.9-8.5-28.9-20-36.6-29.3 18.6-27 26.6-58.4 20.1-89.5C317.7 42.7 235 .9 147.7 19.3c-87.3 18.4-146.1 90-131.3 160s97.4 111.8 184.7 93.4c31.1-6.6 58.6-19.9 80.4-37.5 44.3 17.3 67.5-3.8 67.5-3.8z" fill="[COLOR]"/>
-  <text transform="translate(77.559 104.938)" letter-spacing="1" class="st6 st71" fill="#4cc159">
+  <text transform="translate(97.559 104.938)" letter-spacing="1" class="st6 st71" fill="#4cc159">
     {{TITLE}}
   </text>
-  <text transform="translate(77.559 147.894)">
+  <text transform="translate(97.559 147.894)">
     <tspan x="0" y="00" class="st5 st6 st70">{{TEXT1}}</tspan>
-	<tspan x="0" y="40" class="st5 st6 st70">{{TEXT2}}</tspan>
-	<tspan x="0" y="80" class="st5 st6 st70">{{TEXT3}}</tspan>
+	<tspan x="0" y="28" class="st5 st6 st70">{{TEXT2}}</tspan>
+	<tspan x="0" y="56" class="st5 st6 st70">{{TEXT3}}</tspan>
   </text>
   <circle class="st8" cx="581.9" cy="132.9" r="5.9"/>
   <circle class="st9" cx="566.2" cy="105.1" r="1.8"/>

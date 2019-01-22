@@ -30,8 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Pipeline\Squid\icon-happy-lg.svg" />
-    <None Remove="Pipeline\Squid\icon-sad-lg.svg" />
+    <None Remove="Pipeline\Squid\icon-happy-sm.svg" />
+    <None Remove="Pipeline\Squid\icon-sad-sm.svg" />
   </ItemGroup>
 
   <ItemGroup>
