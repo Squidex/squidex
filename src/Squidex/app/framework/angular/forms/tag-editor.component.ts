@@ -213,10 +213,10 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     public markTouched() {
         this.selectValue(this.addInput.value);
 
-        this.callTouched();
         this.resetAutocompletion();
+        this.resetFocus();
 
-        this.hasFocus = false;
+        this.callTouched();
     }
 
     public remove(index: number) {
@@ -299,7 +299,11 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
         return true;
     }
 
-    public selectValue(value: string) {
+    public selectValue(value: string, noFocus?: boolean) {
+        if (!noFocus) {
+            this.inputElement.nativeElement.focus();
+        }
+
         if (value && this.converter.isValidInput(value)) {
             const converted = this.converter.convert(value);
 
@@ -328,6 +332,10 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
         }
 
         this.suggestedIndex = selection;
+    }
+
+    public resetFocus(): any {
+        this.hasFocus = false;
     }
 
     private resetForm() {
