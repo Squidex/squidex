@@ -47,17 +47,19 @@
     </ng-container>
 
     <ng-container sidebar>
-        <sqx-tooltip position="leftTop" [target]="historyLink">History</sqx-tooltip>
+        <div class="panel-nav">
+            <sqx-tooltip position="leftTop" [target]="historyLink">History</sqx-tooltip>
 
-        <a class="panel-link" routerLink="history" routerLinkActive="active" #historyLink>
-            <i class="icon-time"></i>
-        </a>
+            <a class="panel-link" routerLink="history" routerLinkActive="active" #historyLink>
+                <i class="icon-time"></i>
+            </a>
 
-        <sqx-tooltip position="leftTop" [target]="helpLink">Help</sqx-tooltip>
+            <sqx-tooltip position="leftTop" [target]="helpLink">Help</sqx-tooltip>
 
-        <a class="panel-link" routerLink="help" routerLinkActive="active" #helpLink>
-            <i class="icon-help"></i>
-        </a>
+            <a class="panel-link" routerLink="help" routerLinkActive="active" #helpLink>
+                <i class="icon-help"></i>
+            </a>
+        </div>
     </ng-container>
 </sqx-panel>
 

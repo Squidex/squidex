@@ -40,6 +40,7 @@
         height: 100%;
         background: $color-background;
         border-right: 1px solid $color-border;
+        position: relative;
     }
 
     // First row of the panel with the header. Fixed height.
@@ -74,6 +75,7 @@
         @include flex-box;
         @include flex-flow(row);
         @include flex-grow(1);
+        overflow: hidden;
     }
 
     // First column of the main row (second row) with the main content.
@@ -155,6 +157,12 @@
         &.wide {
             min-width: 16rem;
             max-width: 16rem;
+        }
+
+        & .panel-nav {
+            min-width: $panel-sidebar;
+            max-width: $panel-sidebar;
+            position: absolute;
         }
 
         & .panel-link {

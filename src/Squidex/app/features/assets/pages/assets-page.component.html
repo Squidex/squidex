@@ -52,11 +52,13 @@
     </ng-container>
 
     <ng-container sidebar>   
-        <sqx-tooltip position="leftTop" [target]="filtersLink">Filters</sqx-tooltip>
+        <div class="panel-nav">
+            <sqx-tooltip position="leftTop" [target]="filtersLink">Filters</sqx-tooltip>
 
-        <a class="panel-link" routerLink="filters" routerLinkActive="active" #filtersLink>
-            <i class="icon-filter"></i>
-        </a>         
+            <a class="panel-link" routerLink="filters" routerLinkActive="active" #filtersLink>
+                <i class="icon-filter"></i>
+            </a>    
+        </div> 
     </ng-container>
 </sqx-panel>
 

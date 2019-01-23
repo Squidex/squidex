@@ -79,11 +79,13 @@
     </ng-container>
 
     <ng-container sidebar>
-        <sqx-tooltip position="leftTop" [target]="historyLink">History</sqx-tooltip>
-
-        <a class="panel-link" routerLink="history" routerLinkActive="active" #historyLink>
-            <i class="icon-time"></i>
-        </a>
+        <div class="panel-nav">
+            <sqx-tooltip position="leftTop" [target]="historyLink">History</sqx-tooltip>
+        
+            <a class="panel-link" routerLink="history" routerLinkActive="active" #historyLink>
+                <i class="icon-time"></i>
+            </a>
+        </div>
     </ng-container>
 </sqx-panel>
 

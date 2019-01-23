@@ -82,11 +82,13 @@
     </ng-container>
 
     <ng-container sidebar>
-        <sqx-tooltip position="leftTop" [target]="helpLink">Help</sqx-tooltip>
-
-        <a class="panel-link" routerLink="help" routerLinkActive="active" #helpLink>
-            <i class="icon-help"></i>
-        </a>
+        <div class="panel-nav">
+            <sqx-tooltip position="leftTop" [target]="helpLink">Help</sqx-tooltip>
+        
+            <a class="panel-link" routerLink="help" routerLinkActive="active" #helpLink>
+                <i class="icon-help"></i>
+            </a>
+        </div>
     </ng-container>
 </sqx-panel>
 

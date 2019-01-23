@@ -124,21 +124,23 @@
         </ng-container>
 
         <ng-container sidebar>
-            <sqx-tooltip position="leftTop" [target]="historyLink">commentsLink</sqx-tooltip>
+            <div class="panel-nav">
+                <sqx-tooltip position="leftTop" [target]="historyLink">commentsLink</sqx-tooltip>
 
-            <a class="panel-link" routerLink="comments" routerLinkActive="active" #commentsLink>
-                <i class="icon-comments"></i>
-            </a>
+                <a class="panel-link" routerLink="comments" routerLinkActive="active" #commentsLink>
+                    <i class="icon-comments"></i>
+                </a>
 
-            <sqx-tooltip position="leftTop" [target]="historyLink">History</sqx-tooltip>
+                <sqx-tooltip position="leftTop" [target]="historyLink">History</sqx-tooltip>
 
-            <a class="panel-link" routerLink="history" routerLinkActive="active" #historyLink>
-                <i class="icon-time"></i>
-            </a>
+                <a class="panel-link" routerLink="history" routerLinkActive="active" #historyLink>
+                    <i class="icon-time"></i>
+                </a>
 
-            <sqx-onboarding-tooltip helpId="history" [for]="historyLink" position="leftTop" after="120000">
-                The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
-            </sqx-onboarding-tooltip>
+                <sqx-onboarding-tooltip helpId="history" [for]="historyLink" position="leftTop" after="120000">
+                    The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
+                </sqx-onboarding-tooltip>
+            </div>
         </ng-container>
     </sqx-panel>
 </form>
