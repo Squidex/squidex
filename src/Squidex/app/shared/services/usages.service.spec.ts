@@ -147,10 +147,10 @@ describe('UsagesService', () => {
     it('should make get request to get log',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
 
-        let blob: Blob;
+        let url: string;
 
         usagesService.getLog('my-app').subscribe(result => {
-            blob = result;
+            url = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/usages/log');
@@ -158,8 +158,8 @@ describe('UsagesService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush(new Blob([]));
+        req.flush({ downloadUrl: 'download/url' });
 
-        expect(blob!).toBeDefined();
+        expect(url!).toEqual('download/url');
     }));
 });

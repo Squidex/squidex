@@ -24,11 +24,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
             this.logStore = logStore;
         }
 
-        public Task ReadLogAsync(IAppEntity app, DateTime from, DateTime to, Stream stream)
+        public Task ReadLogAsync(string appId, DateTime from, DateTime to, Stream stream)
         {
-            Guard.NotNull(app, nameof(app));
+            Guard.NotNull(appId, nameof(appId));
 
-            return logStore.ReadLogAsync(app.Id.ToString(), from, to, stream);
+            return logStore.ReadLogAsync(appId, from, to, stream);
         }
     }
 }

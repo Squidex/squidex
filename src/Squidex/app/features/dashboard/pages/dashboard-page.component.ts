@@ -6,7 +6,6 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { saveAs } from 'file-saver';
 import { Subscription } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
 
@@ -98,8 +97,6 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
 
     public callsCurrent = 0;
     public callsMax = 0;
-
-    public isLoadingLog = false;
 
     constructor(
         public readonly appsState: AppsState,
@@ -211,15 +208,9 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
     }
 
     public downloadLog() {
-        this.isLoadingLog = true;
-
         this.usagesService.getLog(this.appsState.appName)
-            .subscribe(buffer => {
-                saveAs(buffer, 'Log.csv');
-            }, () => {
-                this.isLoadingLog = false;
-            }, () => {
-                this.isLoadingLog = false;
+            .subscribe(url => {
+                window.open(url, '_blank');
             });
     }
 }

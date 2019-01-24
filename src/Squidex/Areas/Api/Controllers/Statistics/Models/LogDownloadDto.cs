@@ -5,14 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Areas.Api.Controllers.Statistics.Models
 {
-    public interface IAppLogStore
+    public sealed class LogDownloadDto
     {
-        Task ReadLogAsync(string appId, DateTime from, DateTime to, Stream stream);
+        /// <summary>
+        /// The url to download the log.
+        /// </summary>
+        public string DownloadUrl { get; set; }
     }
 }

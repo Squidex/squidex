@@ -9,8 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
+using Squidex.Config;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -31,13 +34,17 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         private readonly IAppLogStore appLogStore;
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAssetUsageTracker assetStatsRepository;
+        private readonly IDataProtector dataProtector;
+        private readonly MyUrlsOptions urlsOptions;
 
         public UsagesController(
             ICommandBus commandBus,
             IUsageTracker usageTracker,
             IAppLogStore appLogStore,
             IAppPlansProvider appPlansProvider,
-            IAssetUsageTracker assetStatsRepository)
+            IAssetUsageTracker assetStatsRepository,
+            IDataProtectionProvider dataProtection,
+            IOptions<MyUrlsOptions> urlsOptions)
             : base(commandBus)
         {
             this.usageTracker = usageTracker;
@@ -45,6 +52,9 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             this.appLogStore = appLogStore;
             this.appPlansProvider = appPlansProvider;
             this.assetStatsRepository = assetStatsRepository;
+            this.urlsOptions = urlsOptions.Value;
+
+            dataProtector = dataProtection.CreateProtector("LogToken");
         }
 
         /// <summary>
@@ -57,16 +67,40 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/usages/log/")]
-        [ProducesResponseType(typeof(CurrentCallsDto), 200)]
+        [ProducesResponseType(typeof(LogDownloadDto), 200)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public IActionResult GetLog(string app)
         {
+            var token = dataProtector.Protect(App.Id.ToString());
+
+            var url = urlsOptions.BuildUrl($"/api/apps/log/{token}/");
+
+            var response = new LogDownloadDto { DownloadUrl = url };
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Get api calls as log file.
+        /// </summary>
+        /// <param name="token">The token for the log file.</param>
+        /// <returns>
+        /// 200 => Usage tracking results returned.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/log/{token}/")]
+        [ApiCosts(0)]
+        public IActionResult GetLogFile(string token)
+        {
+            var appId = dataProtector.Unprotect(token);
+
             var today = DateTime.Today;
 
             return new FileCallbackResult("text/csv", $"Usage-{today:yyy-MM-dd}.csv", false, stream =>
             {
-                return appLogStore.ReadLogAsync(App, today.AddDays(-30), today, stream);
+                return appLogStore.ReadLogAsync(appId, today.AddDays(-30), today, stream);
             });
         }
 
