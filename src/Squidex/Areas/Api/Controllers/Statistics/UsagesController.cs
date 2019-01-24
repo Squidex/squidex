@@ -82,29 +82,6 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         }
 
         /// <summary>
-        /// Get api calls as log file.
-        /// </summary>
-        /// <param name="token">The token for the log file.</param>
-        /// <returns>
-        /// 200 => Usage tracking results returned.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpGet]
-        [Route("apps/log/{token}/")]
-        [ApiCosts(0)]
-        public IActionResult GetLogFile(string token)
-        {
-            var appId = dataProtector.Unprotect(token);
-
-            var today = DateTime.Today;
-
-            return new FileCallbackResult("text/csv", $"Usage-{today:yyy-MM-dd}.csv", false, stream =>
-            {
-                return appLogStore.ReadLogAsync(appId, today.AddDays(-30), today, stream);
-            });
-        }
-
-        /// <summary>
         /// Get api calls for this month.
         /// </summary>
         /// <param name="app">The name of the app.</param>
@@ -210,6 +187,21 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             var models = entities.Select(StorageUsageDto.FromStats).ToArray();
 
             return Ok(models);
+        }
+
+        [HttpGet]
+        [Route("apps/log/{token}/")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public IActionResult GetLogFile(string token)
+        {
+            var appId = dataProtector.Unprotect(token);
+
+            var today = DateTime.Today;
+
+            return new FileCallbackResult("text/csv", $"Usage-{today:yyy-MM-dd}.csv", false, stream =>
+            {
+                return appLogStore.ReadLogAsync(appId, today.AddDays(-30), today, stream);
+            });
         }
     }
 }
