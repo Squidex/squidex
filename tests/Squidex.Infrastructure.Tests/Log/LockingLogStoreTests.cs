@@ -56,5 +56,32 @@ namespace Squidex.Infrastructure.Log
             A.CallTo(() => inner.ReadLogAsync(key, dateFrom, dateTo, stream))
                 .MustHaveHappened();
         }
+
+        [Fact]
+        public async Task Should_write_default_message_if_lock_could_not_be_acquired()
+        {
+            var stream = new MemoryStream();
+
+            var dateFrom = DateTime.Today;
+            var dateTo = dateFrom.AddDays(2);
+
+            var key = "MyKey";
+
+            A.CallTo(() => lockGrain.AcquireLockAsync(key))
+                .Returns(Task.FromResult<string>(null));
+
+            await sut.ReadLogAsync(key, dateFrom, dateTo, stream, TimeSpan.FromSeconds(2));
+
+            A.CallTo(() => lockGrain.AcquireLockAsync(key))
+                .MustHaveHappened();
+
+            A.CallTo(() => lockGrain.ReleaseLockAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => inner.ReadLogAsync(A<string>.Ignored, A<DateTime>.Ignored, A<DateTime>.Ignored, A<Stream>.Ignored))
+                .MustNotHaveHappened();
+
+            Assert.True(stream.Length > 0);
+        }
     }
 }
