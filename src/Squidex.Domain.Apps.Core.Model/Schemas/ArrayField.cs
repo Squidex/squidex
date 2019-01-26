@@ -31,6 +31,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return fields.ByName; }
         }
 
+        public FieldCollection<NestedField> FieldCollection
+        {
+            get { return fields; }
+        }
+
         public ArrayField(long id, string name, Partitioning partitioning, ArrayFieldProperties properties = null, IFieldSettings settings = null)
             : base(id, name, partitioning, properties)
         {

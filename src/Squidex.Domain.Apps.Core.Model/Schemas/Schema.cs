@@ -14,8 +14,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class Schema : Cloneable<Schema>
     {
+        private static readonly Dictionary<string, string> EmptyScripts = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> EmptyPreviewUrls = new Dictionary<string, string>();
         private readonly string name;
+        private readonly bool isSingleton;
+        private string category;
         private FieldCollection<RootField> fields = FieldCollection<RootField>.Empty;
+        private IReadOnlyDictionary<string, string> scripts = EmptyScripts;
+        private IReadOnlyDictionary<string, string> previewUrls = EmptyPreviewUrls;
         private SchemaProperties properties;
         private bool isPublished;
 
@@ -24,9 +30,19 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return name; }
         }
 
+        public string Category
+        {
+            get { return category; }
+        }
+
         public bool IsPublished
         {
             get { return isPublished; }
+        }
+
+        public bool IsSingleton
+        {
+            get { return isSingleton; }
         }
 
         public IReadOnlyList<RootField> Fields
@@ -44,12 +60,27 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return fields.ByName; }
         }
 
+        public IReadOnlyDictionary<string, string> Scripts
+        {
+            get { return scripts; }
+        }
+
+        public IReadOnlyDictionary<string, string> PreviewUrls
+        {
+            get { return previewUrls; }
+        }
+
+        public FieldCollection<RootField> FieldCollection
+        {
+            get { return fields; }
+        }
+
         public SchemaProperties Properties
         {
             get { return properties; }
         }
 
-        public Schema(string name, SchemaProperties properties = null)
+        public Schema(string name, SchemaProperties properties = null, bool isSingleton = false)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
@@ -57,10 +88,12 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
             this.properties = properties ?? new SchemaProperties();
             this.properties.Freeze();
+
+            this.isSingleton = isSingleton;
         }
 
-        public Schema(string name, RootField[] fields, SchemaProperties properties, bool isPublished)
-            : this(name, properties)
+        public Schema(string name, RootField[] fields, SchemaProperties properties, bool isPublished, bool isSingleton = false)
+            : this(name, properties, isSingleton)
         {
             Guard.NotNull(fields, nameof(fields));
 
@@ -100,30 +133,57 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
+        public Schema MoveTo(string category)
+        {
+            return Clone(clone =>
+            {
+                clone.category = category;
+            });
+        }
+
+        [Pure]
+        public Schema ConfigureScripts(IReadOnlyDictionary<string, string> scripts)
+        {
+            return Clone(clone =>
+            {
+                clone.scripts = scripts ?? EmptyScripts;
+            });
+        }
+
+        [Pure]
+        public Schema ConfigurePreviewUrls(IReadOnlyDictionary<string, string> previewUrls)
+        {
+            return Clone(clone =>
+            {
+                clone.previewUrls = previewUrls ?? EmptyPreviewUrls;
+            });
+        }
+
+        [Pure]
         public Schema DeleteField(long fieldId)
         {
-            return Updatefields(f => f.Remove(fieldId));
+            return UpdateFields(f => f.Remove(fieldId));
         }
 
         [Pure]
         public Schema ReorderFields(List<long> ids)
         {
-            return Updatefields(f => f.Reorder(ids));
+            return UpdateFields(f => f.Reorder(ids));
         }
 
         [Pure]
         public Schema AddField(RootField field)
         {
-            return Updatefields(f => f.Add(field));
+            return UpdateFields(f => f.Add(field));
         }
 
         [Pure]
         public Schema UpdateField(long fieldId, Func<RootField, RootField> updater)
         {
-            return Updatefields(f => f.Update(fieldId, updater));
+            return UpdateFields(f => f.Update(fieldId, updater));
         }
 
-        private Schema Updatefields(Func<FieldCollection<RootField>, FieldCollection<RootField>> updater)
+        private Schema UpdateFields(Func<FieldCollection<RootField>, FieldCollection<RootField>> updater)
         {
             var newFields = updater(fields);
 

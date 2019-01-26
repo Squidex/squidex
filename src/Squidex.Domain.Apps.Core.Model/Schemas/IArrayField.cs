@@ -16,5 +16,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         IReadOnlyDictionary<long, NestedField> FieldsById { get; }
 
         IReadOnlyDictionary<string, NestedField> FieldsByName { get; }
+
+        FieldCollection<NestedField> FieldCollection { get; }
     }
 }
