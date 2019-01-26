@@ -353,19 +353,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     {
                         Name = "field1",
                         Properties = ValidProperties(),
-                        Partitioning = "invariant"
+                        Partitioning = Partitioning.Invariant.Key
                     },
                     new UpsertSchemaField
                     {
                         Name = "field2",
                         Properties = ValidProperties(),
-                        Partitioning = "invariant"
+                        Partitioning = Partitioning.Invariant.Key
                     },
                     new UpsertSchemaField
                     {
                         Name = "field3",
                         Properties = new ArrayFieldProperties(),
-                        Partitioning = "invariant",
+                        Partitioning = Partitioning.Invariant.Key,
                         Nested = new List<UpsertSchemaNestedField>
                         {
                             new UpsertSchemaNestedField

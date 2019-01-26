@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             {
                 Scripts = new Dictionary<string, string>
                 {
-                    ["Query"] = "<script-query>"
+                    [Scripts.Query] = "<script-query>"
                 }
             };
 
@@ -634,6 +634,46 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new FieldDeleted { ParentFieldId = arrayId, FieldId = nestedId })
+                );
+        }
+
+        [Fact]
+        public async Task Synchronize_should_create_events_and_update_state()
+        {
+            var command = new SynchronizeSchema
+            {
+                Scripts = new Dictionary<string, string>
+                {
+                    [Scripts.Query] = "<script-query>"
+                },
+                PreviewUrls = new Dictionary<string, string>
+                {
+                    ["Web"] = "web-url"
+                },
+                Fields = new List<UpsertSchemaField>
+                {
+                    new UpsertSchemaField { Name = fieldId.Name, Properties = ValidProperties() }
+                },
+                Category = "My-Category"
+            };
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(4));
+
+            Assert.NotNull(GetField(1));
+            Assert.Equal(command.Category, sut.Snapshot.SchemaDef.Category);
+            Assert.Equal(command.Scripts, sut.Snapshot.SchemaDef.Scripts);
+            Assert.Equal(command.PreviewUrls, sut.Snapshot.SchemaDef.PreviewUrls);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new SchemaCategoryChanged { Name = command.Category }),
+                    CreateEvent(new SchemaScriptsConfigured { Scripts = command.Scripts }),
+                    CreateEvent(new SchemaPreviewUrlsConfigured { PreviewUrls = command.PreviewUrls }),
+                    CreateEvent(new FieldAdded { FieldId = fieldId, Name = fieldId.Name, Properties = command.Fields[0].Properties, Partitioning = Partitioning.Invariant.Key })
                 );
         }
 

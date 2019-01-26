@@ -35,6 +35,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
                 schema = schema.Publish();
             }
 
+            if (Scripts != null)
+            {
+                schema = schema.ConfigureScripts(Scripts);
+            }
+
+            if (PreviewUrls != null)
+            {
+                schema = schema.ConfigurePreviewUrls(PreviewUrls);
+            }
+
+            if (!string.IsNullOrWhiteSpace(Category))
+            {
+                schema = schema.ChangeCategory(Category);
+            }
+
             var totalFields = 0;
 
             if (Fields != null)

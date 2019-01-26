@@ -76,6 +76,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                         Create(c);
                     });
 
+                case SynchronizeSchema synchronizeSchema:
+                    return UpdateAsync(synchronizeSchema, c =>
+                    {
+                        GuardSchema.CanSynchronize(c);
+
+                        Synchronize(c);
+                    });
+
                 case DeleteField deleteField:
                     return UpdateAsync(deleteField, c =>
                     {
@@ -203,14 +211,20 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public void Synchronize(SynchronizeSchema command)
         {
+            var options = new SchemaSynchronizationOptions
+            {
+                NoFieldDeletion = command.NoFieldDeletion,
+                NoFieldRecreation = command.NoFieldRecreation
+            };
+
             var schemaSource = Snapshot.SchemaDef;
             var schemaTarget = command.ToSchema(schemaSource.Name, schemaSource.IsSingleton);
 
-            var @events = schemaTarget.Synchronize(schemaSource, serializer, () => Snapshot.SchemaFieldsTotal + 1);
+            var @events = schemaSource.Synchronize(schemaTarget, serializer, () => Snapshot.SchemaFieldsTotal + 1, options);
 
             foreach (var @event in @events)
             {
-                RaiseEvent(@event);
+                RaiseEvent(SimpleMapper.Map(command, (SchemaEvent)@event));
             }
         }
 
@@ -221,7 +235,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public void Add(AddField command)
         {
-            RaiseEvent(command, new FieldAdded { FieldId = NamedId.Of(Snapshot.SchemaFieldsTotal + 1, command.Name) });
+            RaiseEvent(command, new FieldAdded { FieldId = CreateFieldId(command) });
         }
 
         public void UpdateField(UpdateField command)
@@ -321,9 +335,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     {
                         pe.ParentFieldId = NamedId.Of(field.Id, field.Name);
 
-                        if (field is IArrayField arrayField && command is FieldCommand fc && @event is FieldEvent fe && arrayField.FieldsById.TryGetValue(fc.FieldId, out var nestedField))
+                        if (command is FieldCommand fc && @event is FieldEvent fe)
                         {
-                            fe.FieldId = NamedId.Of(nestedField.Id, nestedField.Name);
+                            if (field is IArrayField arrayField && arrayField.FieldsById.TryGetValue(fc.FieldId, out var nestedField))
+                            {
+                                fe.FieldId = NamedId.Of(nestedField.Id, nestedField.Name);
+                            }
                         }
                     }
                 }

@@ -5,16 +5,25 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public sealed class ConfigureScriptsDto : Dictionary<string, string>
+    public sealed class SynchronizeSchemaDto : UpsertDto
     {
-        public ConfigureScripts ToCommand()
+        /// <summary>
+        /// True, when fields should not be deleted.
+        /// </summary>
+        public bool NoFieldDeletion { get; set; }
+
+        /// <summary>
+        /// True, when fields with different types should not be recreated.
+        /// </summary>
+        public bool NoFieldRecreation { get; set; }
+
+        public SynchronizeSchema ToCommand()
         {
-            return new ConfigureScripts { Scripts = this };
+            return ToCommand(this, new SynchronizeSchema());
         }
     }
 }

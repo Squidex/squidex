@@ -38,13 +38,6 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     return @event;
                 }
 
-                var events = SyncFields(source.FieldCollection, target.FieldCollection, serializer, idGenerator, null, options);
-
-                foreach (var @event in events)
-                {
-                    yield return E(@event);
-                }
-
                 if (!source.Properties.EqualsJson(target.Properties, serializer))
                 {
                     yield return E(new SchemaUpdated { Properties = target.Properties });
@@ -55,14 +48,14 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     yield return E(new SchemaCategoryChanged { Name = target.Category });
                 }
 
-                if (!source.PreviewUrls.EqualsDictionary(target.PreviewUrls))
-                {
-                    yield return E(new SchemaPreviewUrlsConfigured { PreviewUrls = target.PreviewUrls.ToDictionary(x => x.Key, x => x.Value) });
-                }
-
                 if (!source.Scripts.EqualsDictionary(target.Scripts))
                 {
                     yield return E(new SchemaScriptsConfigured { Scripts = target.Scripts.ToDictionary(x => x.Key, x => x.Value) });
+                }
+
+                if (!source.PreviewUrls.EqualsDictionary(target.PreviewUrls))
+                {
+                    yield return E(new SchemaPreviewUrlsConfigured { PreviewUrls = target.PreviewUrls.ToDictionary(x => x.Key, x => x.Value) });
                 }
 
                 if (source.IsPublished != target.IsPublished)
@@ -70,6 +63,13 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     yield return target.IsPublished ?
                         E(new SchemaPublished()) :
                         E(new SchemaUnpublished());
+                }
+
+                var events = SyncFields(source.FieldCollection, target.FieldCollection, serializer, idGenerator, null, options);
+
+                foreach (var @event in events)
+                {
+                    yield return E(@event);
                 }
             }
         }

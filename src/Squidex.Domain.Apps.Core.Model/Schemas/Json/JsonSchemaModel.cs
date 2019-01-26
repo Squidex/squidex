@@ -6,8 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
 {
@@ -15,6 +18,12 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
     {
         [JsonProperty]
         public string Name { get; set; }
+
+        [JsonProperty]
+        public string Category { get; set; }
+
+        [JsonProperty]
+        public bool IsSingleton { get; set; }
 
         [JsonProperty]
         public bool IsPublished { get; set; }
@@ -25,15 +34,19 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         [JsonProperty]
         public JsonFieldModel[] Fields { get; set; }
 
+        [JsonProperty]
+        public IReadOnlyDictionary<string, string> Scripts { get; set; }
+
+        [JsonProperty]
+        public IReadOnlyDictionary<string, string> PreviewUrls { get; set; }
+
         public JsonSchemaModel()
         {
         }
 
         public JsonSchemaModel(Schema schema)
         {
-            Name = schema.Name;
-
-            Properties = schema.Properties;
+            SimpleMapper.Map(schema, this);
 
             Fields =
                 schema.Fields.ToArray(x =>
@@ -48,8 +61,6 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         Partitioning = x.Partitioning.Key,
                         Properties = x.RawProperties
                     });
-
-            IsPublished = schema.IsPublished;
         }
 
         private static JsonNestedFieldModel[] CreateChildren(IField field)
@@ -62,6 +73,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         Id = x.Id,
                         Name = x.Name,
                         IsHidden = x.IsHidden,
+                        IsLocked = x.IsLocked,
                         IsDisabled = x.IsDisabled,
                         Properties = x.RawProperties
                     });
@@ -74,7 +86,24 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         {
             var fields = Fields.ToArray(f => f.ToField()) ?? Array.Empty<RootField>();
 
-            return new Schema(Name, fields, Properties, IsPublished);
+            var schema = new Schema(Name, fields, Properties, IsPublished, IsSingleton);
+
+            if (!string.IsNullOrWhiteSpace(Category))
+            {
+                schema = schema.ChangeCategory(Category);
+            }
+
+            if (Scripts?.Count > 0)
+            {
+                schema = schema.ConfigureScripts(Scripts);
+            }
+
+            if (PreviewUrls?.Count > 0)
+            {
+                schema = schema.ConfigurePreviewUrls(PreviewUrls);
+            }
+
+            return schema;
         }
     }
 }

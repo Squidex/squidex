@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public sealed class CreateSchemaFieldDto
+    public sealed class UpsertSchemaFieldDto
     {
         /// <summary>
         /// The name of the field. Must be unique within the schema.
@@ -48,6 +48,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// The nested fields.
         /// </summary>
-        public List<CreateSchemaNestedFieldDto> Nested { get; set; }
+        public List<UpsertSchemaNestedFieldDto> Nested { get; set; }
     }
 }
