@@ -31,18 +31,15 @@ namespace Migrate_01
 {
     public sealed class Rebuilder
     {
-        private readonly FieldRegistry fieldRegistry;
         private readonly ILocalCache localCache;
         private readonly IStore<Guid> store;
         private readonly IEventStore eventStore;
 
         public Rebuilder(
-            FieldRegistry fieldRegistry,
             ILocalCache localCache,
             IStore<Guid> store,
             IEventStore eventStore)
         {
-            this.fieldRegistry = fieldRegistry;
             this.eventStore = eventStore;
             this.localCache = localCache;
             this.store = store;
@@ -59,7 +56,7 @@ namespace Migrate_01
         {
             await store.GetSnapshotStore<SchemaState>().ClearAsync();
 
-            await RebuildManyAsync("^schema\\-", id => RebuildAsync<SchemaState, SchemaGrain>(id, (e, s) => s.Apply(e, fieldRegistry)));
+            await RebuildManyAsync("^schema\\-", id => RebuildAsync<SchemaState, SchemaGrain>(id, (e, s) => s.Apply(e)));
         }
 
         public async Task RebuildRulesAsync()

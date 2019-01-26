@@ -8,6 +8,7 @@
 using FakeItEasy;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Guards;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -25,6 +26,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanCreate_should_throw_exception_if_data_is_null()
         {
+            SetupSingleton(false);
+
             var command = new CreateContent();
 
             ValidationAssert.Throws(() => GuardContent.CanCreate(schema, command),
@@ -34,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanCreate_should_throw_exception_if_singleton()
         {
-            A.CallTo(() => schema.IsSingleton).Returns(true);
+            SetupSingleton(true);
 
             var command = new CreateContent { Data = new NamedContentData() };
 
@@ -44,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanCreate_should_not_throw_exception_if_singleton_and_id_is_schema_id()
         {
-            A.CallTo(() => schema.IsSingleton).Returns(true);
+            SetupSingleton(true);
 
             var command = new CreateContent { Data = new NamedContentData(), ContentId = schema.Id };
 
@@ -54,6 +57,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanCreate_should_not_throw_exception_if_data_is_not_null()
         {
+            SetupSingleton(false);
+
             var command = new CreateContent { Data = new NamedContentData() };
 
             GuardContent.CanCreate(schema, command);
@@ -62,6 +67,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanUpdate_should_throw_exception_if_data_is_null()
         {
+            SetupSingleton(false);
+
             var command = new UpdateContent();
 
             ValidationAssert.Throws(() => GuardContent.CanUpdate(command),
@@ -71,6 +78,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanUpdate_should_not_throw_exception_if_data_is_not_null()
         {
+            SetupSingleton(false);
+
             var command = new UpdateContent { Data = new NamedContentData() };
 
             GuardContent.CanUpdate(command);
@@ -79,6 +88,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanPatch_should_throw_exception_if_data_is_null()
         {
+            SetupSingleton(false);
+
             var command = new PatchContent();
 
             ValidationAssert.Throws(() => GuardContent.CanPatch(command),
@@ -88,6 +99,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanPatch_should_not_throw_exception_if_data_is_not_null()
         {
+            SetupSingleton(false);
+
             var command = new PatchContent { Data = new NamedContentData() };
 
             GuardContent.CanPatch(command);
@@ -96,6 +109,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanChangeContentStatus_should_throw_exception_if_status_not_valid()
         {
+            SetupSingleton(false);
+
             var command = new ChangeContentStatus { Status = (Status)10 };
 
             ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Archived, command),
@@ -105,6 +120,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanChangeContentStatus_should_throw_exception_if_status_flow_not_valid()
         {
+            SetupSingleton(false);
+
             var command = new ChangeContentStatus { Status = Status.Published };
 
             ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Archived, command),
@@ -114,6 +131,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanChangeContentStatus_should_throw_exception_if_due_date_in_past()
         {
+            SetupSingleton(false);
+
             var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast };
 
             ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Draft, command),
@@ -123,6 +142,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanChangeContentStatus_should_throw_exception_if_publishing_without_pending_changes()
         {
+            SetupSingleton(false);
+
             var command = new ChangeContentStatus { Status = Status.Published };
 
             ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Published, command),
@@ -132,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanChangeContentStatus_should_throw_exception_if_singleton()
         {
-            A.CallTo(() => schema.IsSingleton).Returns(true);
+            SetupSingleton(true);
 
             var command = new ChangeContentStatus { Status = Status.Draft };
 
@@ -142,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanChangeContentStatus_should_not_throw_exception_if_publishing_with_pending_changes()
         {
-            A.CallTo(() => schema.IsSingleton).Returns(true);
+            SetupSingleton(true);
 
             var command = new ChangeContentStatus { Status = Status.Published };
 
@@ -152,6 +173,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanChangeContentStatus_should_not_throw_exception_if_status_flow_valid()
         {
+            SetupSingleton(false);
+
             var command = new ChangeContentStatus { Status = Status.Published };
 
             GuardContent.CanChangeContentStatus(schema, false, Status.Draft, command);
@@ -168,6 +191,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanDiscardChanges_should_not_throw_exception_if_pending()
         {
+            SetupSingleton(false);
+
             var command = new DiscardChanges();
 
             GuardContent.CanDiscardChanges(true, command);
@@ -176,7 +201,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanDelete_should_throw_exception_if_singleton()
         {
-            A.CallTo(() => schema.IsSingleton).Returns(true);
+            SetupSingleton(true);
 
             var command = new DeleteContent();
 
@@ -186,9 +211,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanDelete_should_not_throw_exception()
         {
+            SetupSingleton(false);
+
             var command = new DeleteContent();
 
             GuardContent.CanDelete(schema, command);
+        }
+
+        private void SetupSingleton(bool isSingleton)
+        {
+            A.CallTo(() => schema.SchemaDef)
+                .Returns(new Schema("schema", isSingleton: isSingleton));
         }
     }
 }

@@ -6,10 +6,7 @@
 // ==========================================================================
 
 using System;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
-using NamedIdStatic = Squidex.Infrastructure.NamedId;
 
 namespace Squidex.Domain.Apps.Core.EventSynchronization
 {
@@ -28,11 +25,6 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
         public static bool TypeEquals(this object lhs, object rhs)
         {
             return lhs.GetType() == rhs.GetType();
-        }
-
-        public static NamedId<long> NamedId(this IField field)
-        {
-            return NamedIdStatic.Of(field.Id, field.Name);
         }
 
         public static bool EqualsJson<T>(this T lhs, T rhs, IJsonSerializer serializer)

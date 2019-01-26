@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Xunit;
 
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var schema = A.Fake<ISchemaEntity>();
 
-            A.CallTo(() => schema.Name).Returns(name);
+            A.CallTo(() => schema.SchemaDef).Returns(new Schema(name));
 
             return schema;
         }

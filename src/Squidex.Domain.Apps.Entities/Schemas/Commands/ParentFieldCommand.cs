@@ -5,18 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Templates
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public static class Scripts
+    public abstract class ParentFieldCommand : SchemaCommand
     {
-        public const string Slug =
-@"var data = ctx.data;
-    
-if (data.title && data.title.iv) {
-    data.slug = { iv: slugify(data.title.iv) };
-
-    replace(data);
-}
-";
+        public long? ParentFieldId { get; set; }
     }
 }

@@ -22,6 +22,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
     {
         private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly HttpContext httpContext = new DefaultHttpContext();
         private readonly EnrichWithAppIdCommandMiddleware sut;
 
@@ -30,12 +31,21 @@ namespace Squidex.Pipeline.CommandMiddlewares
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(httpContext);
 
+            var appEntity = A.Fake<IAppEntity>();
+
+            A.CallTo(() => appEntity.Id).Returns(appId.Id);
+            A.CallTo(() => appEntity.Name).Returns(appId.Name);
+
+            httpContext.Features.Set<IAppFeature>(new AppResolver.AppFeature(appEntity));
+
             sut = new EnrichWithAppIdCommandMiddleware(httpContextAccessor);
         }
 
         [Fact]
         public async Task Should_throw_exception_if_app_not_found()
         {
+            httpContext.Features.Set<IAppFeature>(new AppResolver.AppFeature(null));
+
             var command = new CreateContent();
             var context = new CommandContext(command, commandBus);
 
@@ -59,22 +69,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
         [Fact]
         public async Task Should_assign_app_id_and_name_to_app_command()
         {
-            SetupApp(out var appId, out var appName);
-
             var command = new CreateContent();
-            var context = new CommandContext(command, commandBus);
-
-            await sut.HandleAsync(context);
-
-            Assert.Equal(NamedId.Of(appId, appName), command.AppId);
-        }
-
-        [Fact]
-        public async Task Should_assign_app_id_to_app_self_command()
-        {
-            SetupApp(out var appId, out _);
-
-            var command = new AddPattern();
             var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
@@ -83,41 +78,36 @@ namespace Squidex.Pipeline.CommandMiddlewares
         }
 
         [Fact]
+        public async Task Should_assign_app_id_to_app_self_command()
+        {
+            var command = new AddPattern();
+            var context = new CommandContext(command, commandBus);
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(appId.Id, command.AppId);
+        }
+
+        [Fact]
         public async Task Should_not_override_app_id()
         {
-            SetupApp(out var appId, out _);
-
             var command = new AddPattern { AppId = Guid.NewGuid() };
             var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
 
-            Assert.NotEqual(appId, command.AppId);
+            Assert.NotEqual(appId.Id, command.AppId);
         }
 
         [Fact]
         public async Task Should_not_override_app_id_and_name()
         {
-            SetupApp(out var appId, out var appName);
-
             var command = new CreateContent { AppId = NamedId.Of(Guid.NewGuid(), "other-app") };
             var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
 
-            Assert.NotEqual(NamedId.Of(appId, appName), command.AppId);
-        }
-
-        private void SetupApp(out Guid appId, out string appName)
-        {
-            appId = Guid.NewGuid();
-            appName = "my-app";
-
-            var appEntity = A.Fake<IAppEntity>();
-            A.CallTo(() => appEntity.Id).Returns(appId);
-            A.CallTo(() => appEntity.Name).Returns(appName);
-
-            httpContext.Features.Set<IAppFeature>(new AppResolver.AppFeature(appEntity));
+            Assert.NotEqual(appId, command.AppId);
         }
     }
 }

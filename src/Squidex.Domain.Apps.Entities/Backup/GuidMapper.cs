@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     var newGuid = GenerateNewGuid(namedId.Id);
 
-                    strings[value] = result = new NamedId<Guid>(newGuid, namedId.Name).ToString();
+                    strings[value] = result = NamedId.Of(newGuid, namedId.Name).ToString();
 
                     return true;
                 }

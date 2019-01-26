@@ -5,12 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure;
 using System.Collections.Generic;
+using NamedIdStatic = Squidex.Infrastructure.NamedId;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public static class FieldExtensions
     {
+        public static NamedId<long> NamedId(this IField field)
+        {
+            return NamedIdStatic.Of(field.Id, field.Name);
+        }
+
         public static Schema ReorderFields(this Schema schema, List<long> ids, long? parentId = null)
         {
             if (parentId != null)

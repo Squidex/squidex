@@ -8,6 +8,7 @@
 using System;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using StaticNamedId = Squidex.Infrastructure.NamedId;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
@@ -15,7 +16,27 @@ namespace Squidex.Domain.Apps.Entities.Schemas
     {
         public static NamedId<Guid> NamedId(this ISchemaEntity schema)
         {
-            return new NamedId<Guid>(schema.Id, schema.Name);
+            return StaticNamedId.Of(schema.Id, schema.SchemaDef.Name);
+        }
+
+        public static long MaxId(this Schema schema)
+        {
+            var id = 0L;
+
+            foreach (var field in schema.Fields)
+            {
+                if (field is IArrayField arrayField)
+                {
+                    foreach (var nestedField in arrayField.Fields)
+                    {
+                        id = Math.Max(id, nestedField.Id);
+                    }
+                }
+
+                id = Math.Max(id, field.Id);
+            }
+
+            return id;
         }
 
         public static string EscapePartition(this string value)

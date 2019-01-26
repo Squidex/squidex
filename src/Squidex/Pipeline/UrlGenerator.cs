@@ -57,7 +57,7 @@ namespace Squidex.Pipeline
 
         public string GenerateContentUrl(IAppEntity app, ISchemaEntity schema, IContentEntity content)
         {
-            return urlsOptions.BuildUrl($"api/content/{app.Name}/{schema.Name}/{content.Id}");
+            return urlsOptions.BuildUrl($"api/content/{app.Name}/{schema.SchemaDef.Name}/{content.Id}");
         }
 
         public string GenerateContentUIUrl(NamedId<Guid> appId, NamedId<Guid> schemaId, Guid contentId)

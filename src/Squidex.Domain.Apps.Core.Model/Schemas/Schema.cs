@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema MoveTo(string category)
+        public Schema ChangeCategory(string category)
         {
             return Clone(clone =>
             {

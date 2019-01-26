@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         public void Should_create_events_if_category_changed()
         {
             var sourceSchema = new Schema("source");
-            var targetSchema = new Schema("target").MoveTo("Category");
+            var targetSchema = new Schema("target").ChangeCategory("Category");
 
             var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
 

@@ -18,18 +18,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
     public sealed class CreateIdentityCommandMiddleware : ICommandMiddleware
     {
         private const string TemplateName = "Identity";
-        private const string NormalizeScript = @"
-            var data = ctx.data;
-            
-            if (data.userName && data.userName.iv) {
-                data.normalizedUserName = { iv: data.userName.iv.toUpperCase() };
-            }
-            
-            if (data.email && data.email.iv) {
-                data.normalizedEmail = { iv: data.email.iv.toUpperCase() };
-            }
-
-            replace(data);";
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
@@ -250,8 +238,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             await publish(new ConfigureScripts
             {
                 SchemaId = schemaId.Id,
-                ScriptCreate = NormalizeScript,
-                ScriptUpdate = NormalizeScript
+                Scripts = DefaultScripts.GenerateUsername
             });
         }
 

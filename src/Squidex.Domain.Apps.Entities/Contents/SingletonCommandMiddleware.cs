@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 context.Command is CreateSchema createSchema &&
                 createSchema.Singleton)
             {
-                var schemaId = new NamedId<Guid>(createSchema.SchemaId, createSchema.Name);
+                var schemaId = NamedId.Of(createSchema.SchemaId, createSchema.Name);
 
                 var data = new NamedContentData();
 

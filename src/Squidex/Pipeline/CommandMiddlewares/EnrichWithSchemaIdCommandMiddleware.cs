@@ -97,7 +97,7 @@ namespace Squidex.Pipeline.CommandMiddlewares
                         throw new DomainObjectNotFoundException(schemaName, typeof(ISchemaEntity));
                     }
 
-                    return NamedId.Of(schema.Id, schema.Name);
+                    return schema.NamedId();
                 }
             }
 

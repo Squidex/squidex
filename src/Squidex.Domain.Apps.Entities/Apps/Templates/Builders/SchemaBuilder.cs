@@ -105,9 +105,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             return this;
         }
 
-        private CreateSchemaField AddField<T>(string name) where T : FieldProperties, new()
+        private UpsertSchemaField AddField<T>(string name) where T : FieldProperties, new()
         {
-            var field = new CreateSchemaField
+            var field = new UpsertSchemaField
             {
                 Name = name.ToCamelCase(),
                 Properties = new T
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
                 }
             };
 
-            command.Fields = command.Fields ?? new List<CreateSchemaField>();
+            command.Fields = command.Fields ?? new List<UpsertSchemaField>();
             command.Fields.Add(field);
 
             return field;

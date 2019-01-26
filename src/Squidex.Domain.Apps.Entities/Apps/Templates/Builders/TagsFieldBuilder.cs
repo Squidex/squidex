@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public class TagsFieldBuilder : FieldBuilder
     {
-        public TagsFieldBuilder(CreateSchemaField field)
+        public TagsFieldBuilder(UpsertSchemaField field)
             : base(field)
         {
         }

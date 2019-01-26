@@ -5,22 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
+using System.Collections.Generic;
 
-namespace Squidex.Domain.Apps.Entities.Schemas
+namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public interface ISchemaEntity :
-        IEntity,
-        IEntityWithCreatedBy,
-        IEntityWithLastModifiedBy,
-        IEntityWithVersion
+    public sealed class UpsertSchemaField : UpsertSchemaFieldBase
     {
-        NamedId<Guid> AppId { get; }
+        public string Partitioning { get; set; } = "invariant";
 
-        bool IsDeleted { get; }
-
-        Schema SchemaDef { get; }
+        public List<UpsertSchemaNestedField> Nested { get; set; }
     }
 }

@@ -115,8 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             await publish(new ConfigureScripts
             {
                 SchemaId = schemaId.Id,
-                ScriptCreate = Scripts.Slug,
-                ScriptUpdate = Scripts.Slug
+                Scripts = DefaultScripts.GenerateSlug
             });
 
             return schemaId;
@@ -149,8 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
             await publish(new ConfigureScripts
             {
                 SchemaId = schemaId.Id,
-                ScriptCreate = Scripts.Slug,
-                ScriptUpdate = Scripts.Slug
+                Scripts = DefaultScripts.GenerateSlug
             });
 
             return schemaId;

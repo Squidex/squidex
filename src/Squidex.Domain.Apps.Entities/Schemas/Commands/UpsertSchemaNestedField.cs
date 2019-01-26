@@ -5,14 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class CreateSchemaField : CreateSchemaFieldBase
+    public sealed class UpsertSchemaNestedField : UpsertSchemaFieldBase
     {
-        public string Partitioning { get; set; } = "invariant";
-
-        public List<CreateSchemaNestedField> Nested { get; set; }
     }
 }
