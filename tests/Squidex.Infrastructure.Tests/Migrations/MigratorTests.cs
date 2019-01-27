@@ -126,8 +126,8 @@ namespace Squidex.Infrastructure.Migrations
 
             await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(sut.MigrateAsync)));
 
-            A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened(Repeated.Exactly.Once);
-            A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened(Repeated.Exactly.Once);
+            A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened(1, Times.Exactly);
+            A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened(1, Times.Exactly);
         }
 
         private IMigration BuildMigration(int fromVersion, int toVersion)

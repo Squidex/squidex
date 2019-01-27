@@ -58,7 +58,7 @@ namespace Squidex.Infrastructure.Orleans
             await sut.Execute(CancellationToken.None);
 
             A.CallTo(() => grain.ActivateAsync())
-                .MustHaveHappened(Repeated.Exactly.Twice);
+                .MustHaveHappened(2, Times.Exactly);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace Squidex.Infrastructure.Orleans
             await Assert.ThrowsAsync<OrleansException>(() => sut.Execute(CancellationToken.None));
 
             A.CallTo(() => grain.ActivateAsync())
-                .MustHaveHappened(Repeated.Exactly.Times(10));
+                .MustHaveHappened(10, Times.Exactly);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await WaitAndStopAsync(sut);
 
             A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
-                .MustHaveHappened(Repeated.Exactly.Once);
+                .MustHaveHappened(1, Times.Exactly);
         }
 
         [Fact]
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await WaitAndStopAsync(sut);
 
             A.CallTo(() => eventStore.QueryAsync(A<Func<StoredEvent, Task>>.Ignored, "^my-stream", position, A<CancellationToken>.Ignored))
-                .MustHaveHappened(Repeated.Exactly.Twice);
+                .MustHaveHappened(2, Times.Exactly);
         }
 
         private static async Task WaitAndStopAsync(IEventSubscription sut)

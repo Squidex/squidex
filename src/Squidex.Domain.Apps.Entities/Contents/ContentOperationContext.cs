@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Tasks;
 
@@ -86,20 +87,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
         }
 
-        public Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<ISchemaEntity, string> script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
+        public Task<NamedContentData> ExecuteScriptAndTransformAsync(string script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
         {
             var ctx = CreateScriptContext(operation, command, data, oldData);
 
-            var result = scriptEngine.ExecuteAndTransform(ctx, script(schemaEntity));
+            var result = scriptEngine.ExecuteAndTransform(ctx, GetScript(script));
 
             return Task.FromResult(result);
         }
 
-        public Task ExecuteScriptAsync(Func<ISchemaEntity, string> script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
+        public Task ExecuteScriptAsync(string script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
         {
             var ctx = CreateScriptContext(operation, command, data, oldData);
 
-            scriptEngine.Execute(ctx, script(schemaEntity));
+            scriptEngine.Execute(ctx, GetScript(script));
 
             return TaskHelper.Done;
         }
@@ -122,6 +123,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid filterSchemaId, FilterNode filterNode)
         {
             return await contentRepository.QueryIdsAsync(appEntity.Id, filterSchemaId, filterNode);
+        }
+
+        private string GetScript(string script)
+        {
+            return schemaEntity.SchemaDef.Scripts.GetOrDefault(script);
         }
     }
 }

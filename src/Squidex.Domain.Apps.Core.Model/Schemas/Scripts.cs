@@ -14,9 +14,10 @@ namespace Squidex.Domain.Apps.Core.Schemas
     {
         public const string Change = "Change";
         public const string Create = "Create";
-        public const string Query = "Query";
-        public const string Update = "Update";
         public const string Delete = "Delete";
+        public const string Update = "Update";
+
+        public const string Query = "Query";
 
         public static string GetChange(this IReadOnlyDictionary<string, string> scripts)
         {

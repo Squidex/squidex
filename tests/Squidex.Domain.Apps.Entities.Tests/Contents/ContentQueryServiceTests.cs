@@ -202,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Equal(content.Id, result.Id);
 
             A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .MustHaveHappened(Repeated.Exactly.Once);
+                .MustHaveHappened(1, Times.Exactly);
         }
 
         [Fact]
@@ -301,7 +301,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Equal(total, result.Total);
 
             A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .MustHaveHappened(Repeated.Exactly.Times(count));
+                .MustHaveHappened(count, Times.Exactly);
         }
 
         [Fact]
@@ -377,7 +377,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Equal(total, result.Total);
 
             A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
-                .MustHaveHappened(Repeated.Exactly.Times(count));
+                .MustHaveHappened(count, Times.Exactly);
         }
 
         private void SetupClaims(bool isFrontend = false, bool allowSchema = true)

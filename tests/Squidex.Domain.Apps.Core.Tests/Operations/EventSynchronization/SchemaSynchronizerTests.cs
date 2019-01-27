@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         {
             var scripts = new Dictionary<string, string>
             {
-                ["Create"] = "Script"
+                [Scripts.Create] = "<create-script>"
             };
 
             var sourceSchema = new Schema("source");
