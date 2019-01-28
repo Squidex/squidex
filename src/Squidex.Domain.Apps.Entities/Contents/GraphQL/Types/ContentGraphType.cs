@@ -95,6 +95,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     Resolver = Resolve(x => x.Data),
                     Description = $"The data of the {schemaName} content."
                 });
+
+                AddField(new FieldType
+                {
+                    Name = "dataDraft",
+                    ResolvedType = new NonNullGraphType(contentDataType),
+                    Resolver = Resolve(x => x.DataDraft),
+                    Description = $"The draft data of the {schemaName} content."
+                });
             }
 
             Description = $"The structure of a {schemaName} content type.";
