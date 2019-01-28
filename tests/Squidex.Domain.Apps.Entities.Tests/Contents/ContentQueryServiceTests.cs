@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var schemaDef =
                 new Schema(schemaId.Name)
-                    .ConfigureScripts(new Dictionary<string, string> { [Scripts.Query] = "<script-query>" });
+                    .ConfigureScripts(new SchemaScripts { Query = "<query-script>" });
 
             A.CallTo(() => schema.Id).Returns(schemaId.Id);
             A.CallTo(() => schema.AppId).Returns(appId);
@@ -397,7 +397,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             foreach (var id in ids)
             {
-                A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == id && x.Data == contentData), "<script-query>"))
+                A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.That.Matches(x => x.User == user && x.ContentId == id && x.Data == contentData), "<query-script>"))
                     .Returns(contentTransformed);
             }
         }

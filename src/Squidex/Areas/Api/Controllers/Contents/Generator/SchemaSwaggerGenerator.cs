@@ -230,7 +230,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerPathItem AddOperation(SwaggerOperationMethod method, string entityName, string path, Action<SwaggerOperation> updater)
+        private SwaggerPathItem AddOperation(string method, string entityName, string path, Action<SwaggerOperation> updater)
         {
             var operations = document.Paths.GetOrAddNew(path);
             var operation = new SwaggerOperation();

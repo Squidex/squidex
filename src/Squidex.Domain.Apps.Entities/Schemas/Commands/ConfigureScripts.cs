@@ -5,12 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
     public sealed class ConfigureScripts : SchemaCommand
     {
-        public Dictionary<string, string> Scripts { get; set; }
+        public SchemaScripts Scripts { get; set; }
     }
 }

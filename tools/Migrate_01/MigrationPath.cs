@@ -16,7 +16,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 13;
+        private const int CurrentVersion = 14;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -82,6 +82,12 @@ namespace Migrate_01
             if (version < 13)
             {
                 yield return serviceProvider.GetRequiredService<ConvertRuleEventsJson>();
+            }
+
+            // Version 14: Schema refactoring
+            if (version < 14)
+            {
+                yield return serviceProvider.GetRequiredService<ClearSchemas>();
             }
 
             // Version 01: Introduce app patterns.

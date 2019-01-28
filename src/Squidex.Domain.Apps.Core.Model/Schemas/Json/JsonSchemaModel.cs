@@ -32,10 +32,10 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         public SchemaProperties Properties { get; set; }
 
         [JsonProperty]
-        public JsonFieldModel[] Fields { get; set; }
+        public SchemaScripts Scripts { get; set; }
 
         [JsonProperty]
-        public IReadOnlyDictionary<string, string> Scripts { get; set; }
+        public JsonFieldModel[] Fields { get; set; }
 
         [JsonProperty]
         public IReadOnlyDictionary<string, string> PreviewUrls { get; set; }
@@ -93,7 +93,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                 schema = schema.ChangeCategory(Category);
             }
 
-            if (Scripts?.Count > 0)
+            if (Scripts != null)
             {
                 schema = schema.ConfigureScripts(Scripts);
             }

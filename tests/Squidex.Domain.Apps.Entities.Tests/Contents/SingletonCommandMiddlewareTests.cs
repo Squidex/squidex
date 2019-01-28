@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public async Task Should_create_content_when_singleton_schema_is_created()
         {
             var context =
-                new CommandContext(new CreateSchema { Singleton = true, Name = "my-schema" }, commandBus)
+                new CommandContext(new CreateSchema { IsSingleton = true, Name = "my-schema" }, commandBus)
                     .Complete();
 
             await sut.HandleAsync(context);
@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public async Task Should_not_create_content_when_non_singleton_schema_is_created()
         {
             var context =
-                new CommandContext(new CreateSchema { Singleton = false }, commandBus)
+                new CommandContext(new CreateSchema { IsSingleton = false }, commandBus)
                     .Complete();
 
             await sut.HandleAsync(context);
@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public async Task Should_not_create_content_when_singleton_schema_not_created()
         {
             var context =
-                new CommandContext(new CreateSchema { Singleton = true }, commandBus);
+                new CommandContext(new CreateSchema { IsSingleton = true }, commandBus);
 
             await sut.HandleAsync(context);
 

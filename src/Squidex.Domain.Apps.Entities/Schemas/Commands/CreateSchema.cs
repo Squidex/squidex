@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public string Name { get; set; }
 
-        public bool Singleton { get; set; }
+        public bool IsSingleton { get; set; }
 
         public CreateSchema()
         {
@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 
         public Schema ToSchema()
         {
-            return ToSchema(Name, Singleton);
+            return ToSchema(Name, IsSingleton);
         }
     }
 }

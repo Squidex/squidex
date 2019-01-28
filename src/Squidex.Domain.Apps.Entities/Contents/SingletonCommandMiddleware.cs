@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (context.IsCompleted &&
                 context.Command is CreateSchema createSchema &&
-                createSchema.Singleton)
+                createSchema.IsSingleton)
             {
                 var schemaId = NamedId.Of(createSchema.SchemaId, createSchema.Name);
 

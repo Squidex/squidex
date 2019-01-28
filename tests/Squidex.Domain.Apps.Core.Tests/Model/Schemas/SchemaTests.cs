@@ -276,6 +276,44 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
         }
 
         [Fact]
+        public void Should_change_category()
+        {
+            var schema_1 = schema_0.ChangeCategory("Category");
+
+            Assert.Equal("Category", schema_1.Category);
+        }
+
+        [Fact]
+        public void Should_configure_scripts()
+        {
+            var scripts = new SchemaScripts
+            {
+                Query = "<query-script>"
+            };
+
+            var schema_1 = schema_0.ConfigureScripts(scripts);
+
+            Assert.Equal(scripts, schema_1.Scripts);
+
+            Assert.Equal("<query-script>", schema_1.Scripts.Query);
+        }
+
+        [Fact]
+        public void Should_configure_preview_urls()
+        {
+            var urls = new Dictionary<string, string>
+            {
+                ["web"] = "Url"
+            };
+
+            var schema_1 = schema_0.ConfigurePreviewUrls(urls);
+
+            Assert.Equal(urls, schema_1.PreviewUrls);
+
+            Assert.Equal("Url", schema_1.PreviewUrls["web"]);
+        }
+
+        [Fact]
         public void Should_serialize_and_deserialize_schema()
         {
             var schemaSource =
@@ -285,9 +323,9 @@ namespace Squidex.Domain.Apps.Core.Model.Schemas
                     {
                         ["web"] = "Url"
                     })
-                    .ConfigureScripts(new Dictionary<string, string>
+                    .ConfigureScripts(new SchemaScripts
                     {
-                        ["create"] = "<create-script>"
+                        Create = "<create-script>"
                     });
 
             var schemaTarget = schemaSource.SerializeAndDeserialize();

@@ -32,31 +32,31 @@ namespace Migrate_01.OldEvents
 
         public IEvent Migrate()
         {
-            var scripts = new Dictionary<string, string>();
+            var scripts = new SchemaScripts();
 
             if (!string.IsNullOrWhiteSpace(ScriptQuery))
             {
-                scripts[Scripts.Query] = ScriptQuery;
+                scripts.Query = ScriptQuery;
             }
 
             if (!string.IsNullOrWhiteSpace(ScriptCreate))
             {
-                scripts[Scripts.Create] = ScriptCreate;
+                scripts.Create = ScriptCreate;
             }
 
             if (!string.IsNullOrWhiteSpace(ScriptUpdate))
             {
-                scripts[Scripts.Update] = ScriptUpdate;
+                scripts.Update = ScriptUpdate;
             }
 
             if (!string.IsNullOrWhiteSpace(ScriptDelete))
             {
-                scripts[Scripts.Delete] = ScriptDelete;
+                scripts.Delete = ScriptDelete;
             }
 
             if (!string.IsNullOrWhiteSpace(ScriptChange))
             {
-                scripts[Scripts.Change] = ScriptChange;
+                scripts.Change = ScriptChange;
             }
 
             return SimpleMapper.Map(this, new SchemaScriptsConfigured { Scripts = scripts });

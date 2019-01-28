@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.EnrichContent;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -17,7 +18,6 @@ using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Tasks;
 
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
         }
 
-        public Task<NamedContentData> ExecuteScriptAndTransformAsync(string script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
+        public Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
         {
             var ctx = CreateScriptContext(operation, command, data, oldData);
 
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Task.FromResult(result);
         }
 
-        public Task ExecuteScriptAsync(string script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
+        public Task ExecuteScriptAsync(Func<SchemaScripts, string> script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
         {
             var ctx = CreateScriptContext(operation, command, data, oldData);
 
@@ -125,9 +125,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return await contentRepository.QueryIdsAsync(appEntity.Id, filterSchemaId, filterNode);
         }
 
-        private string GetScript(string script)
+        private string GetScript(Func<SchemaScripts, string> script)
         {
-            return schemaEntity.SchemaDef.Scripts.GetOrDefault(script);
+            return script(schemaEntity.SchemaDef.Scripts);
         }
     }
 }

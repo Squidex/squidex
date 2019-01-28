@@ -14,14 +14,13 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class Schema : Cloneable<Schema>
     {
-        private static readonly Dictionary<string, string> EmptyScripts = new Dictionary<string, string>();
         private static readonly Dictionary<string, string> EmptyPreviewUrls = new Dictionary<string, string>();
         private readonly string name;
         private readonly bool isSingleton;
         private string category;
         private FieldCollection<RootField> fields = FieldCollection<RootField>.Empty;
-        private IReadOnlyDictionary<string, string> scripts = EmptyScripts;
         private IReadOnlyDictionary<string, string> previewUrls = EmptyPreviewUrls;
+        private SchemaScripts scripts = new SchemaScripts();
         private SchemaProperties properties;
         private bool isPublished;
 
@@ -60,11 +59,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             get { return fields.ByName; }
         }
 
-        public IReadOnlyDictionary<string, string> Scripts
-        {
-            get { return scripts; }
-        }
-
         public IReadOnlyDictionary<string, string> PreviewUrls
         {
             get { return previewUrls; }
@@ -73,6 +67,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public FieldCollection<RootField> FieldCollection
         {
             get { return fields; }
+        }
+
+        public SchemaScripts Scripts
+        {
+            get { return scripts; }
         }
 
         public SchemaProperties Properties
@@ -115,6 +114,16 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
+        public Schema ConfigureScripts(SchemaScripts newScripts)
+        {
+            return Clone(clone =>
+            {
+                clone.scripts = newScripts ?? new SchemaScripts();
+                clone.scripts.Freeze();
+            });
+        }
+
+        [Pure]
         public Schema Publish()
         {
             return Clone(clone =>
@@ -138,15 +147,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return Clone(clone =>
             {
                 clone.category = category;
-            });
-        }
-
-        [Pure]
-        public Schema ConfigureScripts(IReadOnlyDictionary<string, string> scripts)
-        {
-            return Clone(clone =>
-            {
-                clone.scripts = scripts ?? EmptyScripts;
             });
         }
 

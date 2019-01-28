@@ -34,11 +34,11 @@
                 <div class="row no-gutters">
                     <div class="col-6 type">
                         <label>
-                            <input type="radio" class="radio-input" formControlName="singleton" [value]="false" />
+                            <input type="radio" class="radio-input" formControlName="isSingleton" [value]="false" />
                         
                             <div class="row no-gutters">
                                 <div class="col-auto">
-                                    <div class="type-icon" [class.active]="createForm.form.controls['singleton'].value !== true">
+                                    <div class="type-icon" [class.active]="createForm.form.controls['isSingleton'].value !== true">
                                         <i class="icon-multiple-content"></i>
                                     </div>
                                 </div>
@@ -52,11 +52,11 @@
                     </div>
                     <div class="col-6 type">
                         <label>
-                            <input type="radio" class="radio-input" formControlName="singleton" [value]="true" />
+                            <input type="radio" class="radio-input" formControlName="isSingleton" [value]="true" />
                         
                             <div class="row no-gutters">
                                 <div class="col-auto">
-                                    <div class="type-icon" [class.active]="createForm.form.controls['singleton'].value === true">
+                                    <div class="type-icon" [class.active]="createForm.form.controls['isSingleton'].value === true">
                                         <i class="icon-single-content"></i>
                                     </div>
                                 </div>

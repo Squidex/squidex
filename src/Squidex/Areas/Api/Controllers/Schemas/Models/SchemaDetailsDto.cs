@@ -19,6 +19,8 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
     public sealed class SchemaDetailsDto
     {
+        private static readonly Dictionary<string, string> EmptyPreviewUrls = new Dictionary<string, string>();
+
         /// <summary>
         /// The id of the schema.
         /// </summary>
@@ -47,34 +49,14 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public bool IsPublished { get; set; }
 
         /// <summary>
-        /// The script that is executed for each query when querying contents.
+        /// The scripts.
         /// </summary>
-        public string ScriptQuery { get; set; }
-
-        /// <summary>
-        /// The script that is executed when creating a content.
-        /// </summary>
-        public string ScriptCreate { get; set; }
-
-        /// <summary>
-        /// The script that is executed when updating a content.
-        /// </summary>
-        public string ScriptUpdate { get; set; }
-
-        /// <summary>
-        /// The script that is executed when deleting a content.
-        /// </summary>
-        public string ScriptDelete { get; set; }
-
-        /// <summary>
-        /// The script that is executed when changing a content status.
-        /// </summary>
-        public string ScriptChange { get; set; }
+        public SchemaScriptsDto Scripts { get; set; } = new SchemaScriptsDto();
 
         /// <summary>
         /// The preview Urls.
         /// </summary>
-        public Dictionary<string, string> PreviewUrls { get; set; }
+        public Dictionary<string, string> PreviewUrls { get; set; } = EmptyPreviewUrls;
 
         /// <summary>
         /// The list of fields.
@@ -86,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// The schema properties.
         /// </summary>
         [Required]
-        public SchemaPropertiesDto Properties { get; set; }
+        public SchemaPropertiesDto Properties { get; set; } = new SchemaPropertiesDto();
 
         /// <summary>
         /// The user that has created the schema.
@@ -117,11 +99,17 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
         public static SchemaDetailsDto FromSchema(ISchemaEntity schema)
         {
-            var response = new SchemaDetailsDto { Properties = new SchemaPropertiesDto() };
+            var response = new SchemaDetailsDto();
 
             SimpleMapper.Map(schema, response);
             SimpleMapper.Map(schema.SchemaDef, response);
+            SimpleMapper.Map(schema.SchemaDef.Scripts, response.Scripts);
             SimpleMapper.Map(schema.SchemaDef.Properties, response.Properties);
+
+            if (schema.SchemaDef.PreviewUrls.Count > 0)
+            {
+                response.PreviewUrls = new Dictionary<string, string>(schema.SchemaDef.PreviewUrls);
+            }
 
             response.Fields = new List<FieldDto>();
 

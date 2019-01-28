@@ -14,7 +14,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
@@ -159,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var converters = GenerateConverters(context, checkType).ToArray();
 
-                var scriptText = schema.SchemaDef.Scripts.GetQuery();
+                var scriptText = schema.SchemaDef.Scripts.Query;
 
                 var isScripting = !string.IsNullOrWhiteSpace(scriptText);
 

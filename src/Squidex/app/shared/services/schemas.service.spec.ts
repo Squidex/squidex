@@ -284,11 +284,13 @@ describe('SchemasService', () => {
                     }
                 }
             ],
-            scriptQuery: '<script-query>',
-            scriptCreate: '<script-create>',
-            scriptUpdate: '<script-update>',
-            scriptDelete: '<script-delete>',
-            scriptChange: '<script-change>'
+            scripts: {
+                query: '<script-query>',
+                create: '<script-create>',
+                change: '<script-change>',
+                delete: '<script-delete>',
+                update: '<script-update>'
+            }
         }, {
             headers: {
                 etag: '2'
@@ -316,13 +318,15 @@ describe('SchemasService', () => {
                     new RootFieldDto(20, 'field20', createProperties('Tags'), 'language', true, true, true)
                 ],
                 {
-                    'Default': 'url'
+                    query: '<script-query>',
+                    create: '<script-create>',
+                    change: '<script-change>',
+                    delete: '<script-delete>',
+                    update: '<script-update>'
                 },
-                '<script-query>',
-                '<script-create>',
-                '<script-update>',
-                '<script-delete>',
-                '<script-change>'));
+                {
+                    'Default': 'url'
+                }));
     }));
 
     it('should make post request to create schema',
@@ -349,7 +353,7 @@ describe('SchemasService', () => {
             }
         });
 
-        expect(schema!).toEqual(new SchemaDetailsDto('1', dto.name, '', new SchemaPropertiesDto(), true, false, now, user, now, user, new Version('2'), [], {}));
+        expect(schema!).toEqual(new SchemaDetailsDto('1', dto.name, '', new SchemaPropertiesDto(), true, false, now, user, now, user, new Version('2'), [], {}, {}));
     }));
 
     it('should make put request to update schema',
@@ -370,7 +374,7 @@ describe('SchemasService', () => {
     it('should make put request to update schema scripts',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateSchemaScriptsDto();
+        const dto = new UpdateSchemaScriptsDto({});
 
         schemasService.putScripts('my-app', 'my-schema', dto, version).subscribe();
 

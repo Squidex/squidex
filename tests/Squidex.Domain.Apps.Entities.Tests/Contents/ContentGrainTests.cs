@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
@@ -75,12 +74,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentGrainTests()
         {
-            var scripts = new Dictionary<string, string>
+            var scripts = new SchemaScripts
             {
-                [Scripts.Change] = "<change-script>",
-                [Scripts.Create] = "<create-script>",
-                [Scripts.Delete] = "<delete-script>",
-                [Scripts.Update] = "<update-script>",
+                Change = "<change-script>",
+                Create = "<create-script>",
+                Delete = "<delete-script>",
+                Update = "<update-script>",
             };
 
             var schemaDef =

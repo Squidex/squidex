@@ -24,20 +24,39 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public static SchemaBuilder Create(string name)
         {
+            var schemaName = name.ToKebabCase();
+
             return new SchemaBuilder(new CreateSchema
             {
-                Name = name.ToKebabCase(),
-                Publish = true,
-                Properties = new SchemaProperties
-                {
-                    Label = name
-                }
-            });
+                Name = schemaName
+            }).Published().WithLabel(name);
+        }
+
+        public SchemaBuilder WithLabel(string label)
+        {
+            command.Properties = command.Properties ?? new SchemaProperties();
+            command.Properties.Label = label;
+
+            return this;
+        }
+
+        public SchemaBuilder WithScripts(SchemaScripts scripts)
+        {
+            command.Scripts = scripts;
+
+            return this;
+        }
+
+        public SchemaBuilder Published()
+        {
+            command.IsPublished = true;
+
+            return this;
         }
 
         public SchemaBuilder Singleton()
         {
-            command.Singleton = true;
+            command.IsSingleton = true;
 
             return this;
         }

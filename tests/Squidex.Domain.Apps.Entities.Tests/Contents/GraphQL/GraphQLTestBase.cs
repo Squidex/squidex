@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddArray(13, "my-array", Partitioning.Invariant, f => f
                         .AddBoolean(121, "nested-boolean")
                         .AddNumber(122, "nested-number"))
-                    .ConfigureScripts(new Dictionary<string, string> { [Scripts.Query] = "<script-query>" })
+                    .ConfigureScripts(new SchemaScripts { Query = "<query-script>" })
                     .Publish();
 
             A.CallTo(() => app.Id).Returns(appId);

@@ -7,7 +7,7 @@
         <ng-container tabs>
             <ul class="nav nav-tabs2">
                 <li class="nav-item" *ngFor="let script of editForm.form.controls | sqxKeys">
-                    <a class="nav-link" [class.active]="selectedField === script" (click)="selectField(script)">{{script.substr(6)}}</a>
+                    <a class="nav-link" [class.active]="selectedField === script" (click)="selectField(script)">{{script | titlecase}}</a>
                 </li>
             </ul>
         </ng-container>

@@ -5,16 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Squidex.Domain.Apps.Entities.Schemas.Commands;
-
-namespace Squidex.Areas.Api.Controllers.Schemas.Models
+namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class ConfigureScriptsDto : Dictionary<string, string>
+    public sealed class SchemaScripts : Freezable
     {
-        public ConfigureScripts ToCommand()
-        {
-            return new ConfigureScripts { Scripts = this };
-        }
+        public string Change { get; set; }
+
+        public string Create { get; set; }
+
+        public string Update { get; set; }
+
+        public string Delete { get; set; }
+
+        public string Query { get; set; }
     }
 }

@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Set to true to allow a single content item only.
         /// </summary>
-        public bool Singleton { get; set; }
+        public bool IsSingleton { get; set; }
 
         public CreateSchema ToCommand()
         {

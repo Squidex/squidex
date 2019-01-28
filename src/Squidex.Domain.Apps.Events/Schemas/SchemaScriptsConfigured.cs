@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Schemas
@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Events.Schemas
     [EventType(nameof(SchemaScriptsConfigured))]
     public sealed class SchemaScriptsConfigured : SchemaEvent
     {
-        public Dictionary<string, string> Scripts { get; set; }
+        public SchemaScripts Scripts { get; set; }
     }
 }

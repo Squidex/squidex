@@ -42,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// <summary>
         /// Set it to true to autopublish the schema.
         /// </summary>
-        public bool Publish { get; set; }
+        public bool IsPublished { get; set; }
 
         public static TCommand ToCommand<TCommand, TDto>(TDto dto, TCommand command) where TCommand : UpsertCommand where TDto : UpsertDto
         {

@@ -48,9 +48,9 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     yield return E(new SchemaCategoryChanged { Name = target.Category });
                 }
 
-                if (!source.Scripts.EqualsDictionary(target.Scripts))
+                if (!source.Scripts.EqualsJson(target.Scripts, serializer))
                 {
-                    yield return E(new SchemaScriptsConfigured { Scripts = target.Scripts.ToDictionary(x => x.Key, x => x.Value) });
+                    yield return E(new SchemaScriptsConfigured { Scripts = target.Scripts });
                 }
 
                 if (!source.PreviewUrls.EqualsDictionary(target.PreviewUrls))
@@ -115,6 +115,8 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                 if (source.ByName.TryGetValue(targetField.Name, out var sourceField))
                 {
+                    canCreateField = false;
+
                     id = sourceField.NamedId();
 
                     if (CanUpdate(sourceField, targetField))
@@ -126,14 +128,16 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     }
                     else if (!sourceField.IsLocked && !options.NoFieldRecreation)
                     {
+                        canCreateField = true;
+
+                        sourceIds.Remove(id);
+                        sourceNames.Remove(id.Name);
+
                         yield return E(new FieldDeleted { FieldId = id });
                     }
-                    else
-                    {
-                        canCreateField = false;
-                    }
                 }
-                else if (canCreateField)
+
+                if (canCreateField)
                 {
                     var partitioning = (string)null;
 
@@ -192,11 +196,14 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                 }
             }
 
-            var targetNames = target.Ordered.Select(x => x.Name);
-
-            if (sourceNames.Intersect(targetNames).Count() == target.Ordered.Count && !sourceNames.SequenceEqual(targetNames))
+            if (sourceNames.Count > 1)
             {
-                yield return new SchemaFieldsReordered { FieldIds = sourceIds.Select(x => x.Id).ToList(), ParentFieldId = parentId };
+                var targetNames = target.Ordered.Select(x => x.Name);
+
+                if (sourceNames.Intersect(targetNames).Count() == target.Ordered.Count && !sourceNames.SequenceEqual(targetNames))
+                {
+                    yield return new SchemaFieldsReordered { FieldIds = sourceIds.Select(x => x.Id).ToList(), ParentFieldId = parentId };
+                }
             }
         }
 

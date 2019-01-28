@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates
@@ -34,16 +33,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
 
             replace(data);";
 
-        public static readonly Dictionary<string, string> GenerateSlug = new Dictionary<string, string>
+        public static readonly SchemaScripts GenerateSlug = new SchemaScripts
         {
-            [Scripts.Create] = ScriptToGenerateSlug,
-            [Scripts.Update] = ScriptToGenerateSlug
+            Create = ScriptToGenerateSlug,
+            Update = ScriptToGenerateSlug
         };
 
-        public static readonly Dictionary<string, string> GenerateUsername = new Dictionary<string, string>
+        public static readonly SchemaScripts GenerateUsername = new SchemaScripts
         {
-            [Scripts.Create] = ScriptToGenerateUsername,
-            [Scripts.Update] = ScriptToGenerateUsername
+            Create = ScriptToGenerateUsername,
+            Update = ScriptToGenerateUsername
         };
     }
 }

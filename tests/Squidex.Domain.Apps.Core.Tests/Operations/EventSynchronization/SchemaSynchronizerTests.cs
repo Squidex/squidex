@@ -59,9 +59,9 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         [Fact]
         public void Should_create_events_if_scripts_configured()
         {
-            var scripts = new Dictionary<string, string>
+            var scripts = new SchemaScripts
             {
-                [Scripts.Create] = "<create-script>"
+                Create = "<create-script>"
             };
 
             var sourceSchema = new Schema("source");
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         {
             var previewUrls = new Dictionary<string, string>
             {
-                ["Web"] = "Url"
+                ["web"] = "Url"
             };
 
             var sourceSchema = new Schema("source");
@@ -403,6 +403,27 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             events.ShouldHaveSameEvents(
                 new FieldAdded { FieldId = createdId, Name = stringId.Name, Partitioning = Partitioning.Invariant.Key, Properties = new StringFieldProperties() },
                 new FieldHidden { FieldId = createdId }
+            );
+        }
+
+        [Fact]
+        public void Should_create_events_if_field_recreated()
+        {
+            var sourceSchema =
+                new Schema("source")
+                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant);
+
+            var targetSchema =
+                new Schema("target")
+                    .AddTags(stringId.Id, stringId.Name, Partitioning.Invariant);
+
+            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+
+            var createdId = NamedId.Of(50L, stringId.Name);
+
+            events.ShouldHaveSameEvents(
+                new FieldDeleted { FieldId = stringId },
+                new FieldAdded { FieldId = createdId, Name = stringId.Name, Partitioning = Partitioning.Invariant.Key, Properties = new TagsFieldProperties() }
             );
         }
 

@@ -34,8 +34,7 @@ import {
     SchemasService,
     UpdateFieldDto,
     UpdateSchemaCategoryDto,
-    UpdateSchemaDto,
-    UpdateSchemaScriptsDto
+    UpdateSchemaDto
 } from './../services/schemas.service';
 
 import { FieldPropertiesDto } from './../services/schemas.types';
@@ -195,7 +194,7 @@ export class SchemasState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public configurePreviewUrls(schema: SchemaDetailsDto, request: { [name: string]: string }, now?: DateTime): Observable<any> {
+    public configurePreviewUrls(schema: SchemaDetailsDto, request: {}, now?: DateTime): Observable<any> {
         return this.schemasService.putPreviewUrls(this.appName, schema.name, request, schema.version).pipe(
             tap(dto => {
                 this.replaceSchema(configurePreviewUrls(schema, request, this.user, dto.version, now));
@@ -203,7 +202,7 @@ export class SchemasState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public configureScripts(schema: SchemaDetailsDto, request: UpdateSchemaScriptsDto, now?: DateTime): Observable<any> {
+    public configureScripts(schema: SchemaDetailsDto, request: {}, now?: DateTime): Observable<any> {
         return this.schemasService.putScripts(this.appName, schema.name, request, schema.version).pipe(
             tap(dto => {
                 this.replaceSchema(configureScripts(schema, request, this.user, dto.version, now));
@@ -390,7 +389,7 @@ const changeCategory = <T extends SchemaDto>(schema: T, category: string, user: 
         version
     });
 
-const configurePreviewUrls = (schema: SchemaDetailsDto, previewUrls: { [name: string]: string }, user: string, version: Version, now?: DateTime) =>
+const configurePreviewUrls = (schema: SchemaDetailsDto, previewUrls: {}, user: string, version: Version, now?: DateTime) =>
     schema.with({
         previewUrls,
         lastModified: now || DateTime.now(),
@@ -398,9 +397,9 @@ const configurePreviewUrls = (schema: SchemaDetailsDto, previewUrls: { [name: st
         version
     });
 
-const configureScripts = (schema: SchemaDetailsDto, scripts: UpdateSchemaScriptsDto, user: string, version: Version, now?: DateTime) =>
+const configureScripts = (schema: SchemaDetailsDto, scripts: {}, user: string, version: Version, now?: DateTime) =>
     schema.with({
-        ...scripts,
+        scripts,
         lastModified: now || DateTime.now(),
         lastModifiedBy: user,
         version

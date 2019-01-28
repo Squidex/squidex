@@ -19,59 +19,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return StaticNamedId.Of(schema.Id, schema.SchemaDef.Name);
         }
 
-        public static long MaxId(this Schema schema)
-        {
-            var id = 0L;
-
-            foreach (var field in schema.Fields)
-            {
-                if (field is IArrayField arrayField)
-                {
-                    foreach (var nestedField in arrayField.Fields)
-                    {
-                        id = Math.Max(id, nestedField.Id);
-                    }
-                }
-
-                id = Math.Max(id, field.Id);
-            }
-
-            return id;
-        }
-
         public static string EscapePartition(this string value)
         {
             return value.Replace('-', '_');
         }
 
-        public static string TypeName(this IField field)
-        {
-            return field.Name.ToPascalCase();
-        }
-
         public static string TypeName(this ISchemaEntity schema)
         {
-            return schema.SchemaDef.Name.ToPascalCase();
-        }
-
-        public static string DisplayName(this IField field)
-        {
-            return field.RawProperties.Label.WithFallback(field.TypeName());
+            return schema.SchemaDef.TypeName();
         }
 
         public static string DisplayName(this ISchemaEntity schema)
         {
-            return schema.SchemaDef.Properties.Label.WithFallback(schema.TypeName());
-        }
-
-        public static string TypeName(this Schema schema)
-        {
-            return schema.Name.ToPascalCase();
-        }
-
-        public static string DisplayName(this Schema schema)
-        {
-            return schema.Properties.Label.WithFallback(schema.TypeName());
+            return schema.SchemaDef.DisplayName();
         }
     }
 }

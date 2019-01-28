@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var properties = new SchemaProperties();
 
-            var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, Singleton = true };
+            var command = new CreateSchema { Name = SchemaName, SchemaId = SchemaId, Properties = properties, IsSingleton = true };
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new SchemaCreated { Schema = new Schema(command.Name, command.Properties, command.Singleton) })
+                    CreateEvent(new SchemaCreated { Schema = new Schema(command.Name, command.Properties, command.IsSingleton) })
                 );
         }
 
@@ -140,9 +140,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var command = new ConfigureScripts
             {
-                Scripts = new Dictionary<string, string>
+                Scripts = new SchemaScripts
                 {
-                    [Scripts.Query] = "<script-query>"
+                    Query = "<query-script>"
                 }
             };
 
@@ -642,9 +642,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var command = new SynchronizeSchema
             {
-                Scripts = new Dictionary<string, string>
+                Scripts = new SchemaScripts
                 {
-                    [Scripts.Query] = "<script-query>"
+                    Query = "<query-script"
                 },
                 PreviewUrls = new Dictionary<string, string>
                 {

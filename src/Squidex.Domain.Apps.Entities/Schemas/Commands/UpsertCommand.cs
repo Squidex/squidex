@@ -14,15 +14,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
     public abstract class UpsertCommand : SchemaCommand
     {
-        public bool Publish { get; set; }
+        public bool IsPublished { get; set; }
 
         public string Category { get; set; }
 
         public SchemaFields Fields { get; set; }
 
-        public SchemaProperties Properties { get; set; }
+        public SchemaScripts Scripts { get; set; }
 
-        public Dictionary<string, string> Scripts { get; set; }
+        public SchemaProperties Properties { get; set; }
 
         public Dictionary<string, string> PreviewUrls { get; set; }
 
@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands
         {
             var schema = new Schema(name, Properties, isSingleton);
 
-            if (Publish)
+            if (IsPublished)
             {
                 schema = schema.Publish();
             }

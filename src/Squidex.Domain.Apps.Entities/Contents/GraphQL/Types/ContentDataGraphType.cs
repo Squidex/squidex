@@ -10,6 +10,7 @@ using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;

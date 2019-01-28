@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Templates.Builders;
-using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 
@@ -229,17 +228,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     .AddString("Security Stamp", f => f
                         .Disabled()
                         .Hints("Internal security stamp"))
+                    .WithScripts(DefaultScripts.GenerateUsername)
                     .Build();
 
             await publish(schema);
-
-            var schemaId = NamedId.Of(schema.SchemaId, schema.Name);
-
-            await publish(new ConfigureScripts
-            {
-                SchemaId = schemaId.Id,
-                Scripts = DefaultScripts.GenerateUsername
-            });
         }
 
         private static Task CreateApiResourcesSchemaAsync(Func<ICommand, Task> publish)

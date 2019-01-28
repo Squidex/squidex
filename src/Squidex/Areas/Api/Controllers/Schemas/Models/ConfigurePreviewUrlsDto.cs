@@ -6,10 +6,15 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public sealed class PreviewUrlsDto : Dictionary<string, string>
+    public sealed class ConfigurePreviewUrlsDto : Dictionary<string, string>
     {
+        public ConfigurePreviewUrls ToCommand()
+        {
+            return new ConfigurePreviewUrls { PreviewUrls = this };
+        }
     }
 }
