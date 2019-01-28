@@ -25,7 +25,6 @@ import {
     UpdateFieldDto,
     UpdateSchemaCategoryDto,
     UpdateSchemaDto,
-    UpdateSchemaScriptsDto,
     Version
 } from './../';
 
@@ -374,7 +373,7 @@ describe('SchemasService', () => {
     it('should make put request to update schema scripts',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateSchemaScriptsDto({});
+        const dto = {};
 
         schemasService.putScripts('my-app', 'my-schema', dto, version).subscribe();
 
