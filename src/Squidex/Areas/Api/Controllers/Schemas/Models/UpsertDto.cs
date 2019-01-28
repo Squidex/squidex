@@ -20,14 +20,14 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         public SchemaPropertiesDto Properties { get; set; }
 
         /// <summary>
+        /// The optional scripts.
+        /// </summary>
+        public SchemaScriptsDto Scripts { get; set; }
+
+        /// <summary>
         /// Optional fields.
         /// </summary>
         public List<UpsertSchemaFieldDto> Fields { get; set; }
-
-        /// <summary>
-        /// The optional scripts.
-        /// </summary>
-        public Dictionary<string, string> Scripts { get; set; }
 
         /// <summary>
         /// The optional preview urls.
@@ -55,23 +55,34 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 SimpleMapper.Map(dto.Properties, command.Properties);
             }
 
+            if (dto.Scripts != null)
+            {
+                command.Scripts = new SchemaScripts();
+
+                SimpleMapper.Map(dto.Scripts, command.Scripts);
+            }
+
             if (dto.Fields != null)
             {
                 command.Fields = new List<UpsertSchemaField>();
 
-                foreach (var fieldDto in dto.Fields)
+                foreach (var rootFieldDto in dto.Fields)
                 {
-                    var rootProperties = fieldDto?.Properties.ToProperties();
-                    var rootField = SimpleMapper.Map(fieldDto, new UpsertSchemaField { Properties = rootProperties });
+                    var rootProps = rootFieldDto?.Properties.ToProperties();
+                    var rootField = new UpsertSchemaField { Properties = rootProps };
 
-                    if (fieldDto.Nested != null)
+                    SimpleMapper.Map(rootFieldDto, rootField);
+
+                    if (rootFieldDto.Nested?.Count > 0)
                     {
                         rootField.Nested = new List<UpsertSchemaNestedField>();
 
-                        foreach (var nestedFieldDto in fieldDto.Nested)
+                        foreach (var nestedFieldDto in rootFieldDto.Nested)
                         {
-                            var nestedProperties = nestedFieldDto?.Properties.ToProperties();
-                            var nestedField = SimpleMapper.Map(nestedFieldDto, new UpsertSchemaNestedField { Properties = nestedProperties });
+                            var nestedProps = nestedFieldDto?.Properties.ToProperties();
+                            var nestedField = new UpsertSchemaNestedField { Properties = nestedProps };
+
+                            SimpleMapper.Map(nestedFieldDto, nestedField);
 
                             rootField.Nested.Add(nestedField);
                         }

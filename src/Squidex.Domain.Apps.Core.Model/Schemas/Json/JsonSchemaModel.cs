@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         public JsonFieldModel[] Fields { get; set; }
 
         [JsonProperty]
-        public IReadOnlyDictionary<string, string> PreviewUrls { get; set; }
+        public Dictionary<string, string> PreviewUrls { get; set; }
 
         public JsonSchemaModel()
         {
@@ -61,6 +61,8 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         Partitioning = x.Partitioning.Key,
                         Properties = x.RawProperties
                     });
+
+            PreviewUrls = schema.PreviewUrls.ToDictionary(x => x.Key, x => x.Value);
         }
 
         private static JsonNestedFieldModel[] CreateChildren(IField field)

@@ -19,10 +19,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public SchemaHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
             : base(typeNameRegistry)
         {
-            AddEventMessage("SchemaCreated",
+            AddEventMessage("SchemaCreatedEvent",
                 "created schema {[Name]}.");
 
-            AddEventMessage("ScriptsConfigured",
+            AddEventMessage("ScriptsConfiguredEvent",
                 "configured script of schema {[Name]}.");
 
             AddEventMessage<SchemaFieldsReordered>(
