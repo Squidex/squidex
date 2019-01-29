@@ -119,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         {
             if (Snapshot.IsDeleted)
             {
-                throw new DomainException("Webhook has already been deleted.");
+                throw new DomainException("Rule has already been deleted.");
             }
         }
 
