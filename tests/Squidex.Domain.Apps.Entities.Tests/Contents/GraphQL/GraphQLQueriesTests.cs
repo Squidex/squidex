@@ -823,6 +823,99 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             Assert.Contains("\"data\":null", json);
         }
 
+        [Fact]
+        public async Task Should_return_draft_content_when_querying_dataDraft()
+        {
+            var dataDraft = new NamedContentData()
+                .AddField("my-string",
+                    new ContentFieldData()
+                        .AddValue("de", "draft value"))
+                .AddField("my-number",
+                    new ContentFieldData()
+                        .AddValue("iv", 42));
+
+            var contentId = Guid.NewGuid();
+            var content = CreateContent(contentId, Guid.Empty, Guid.Empty, null, dataDraft);
+
+            var query = $@"
+                query {{
+                  findMySchemaContent(id: ""{contentId}"") {{
+                    dataDraft {{
+                      myString {{
+                        de
+                      }}
+                      myNumber {{
+                        iv
+                      }}
+                    }}
+                  }}
+                }}";
+
+            A.CallTo(() => contentQuery.FindContentAsync(MatchsContentContext(), schemaId.ToString(), contentId, EtagVersion.Any))
+                .Returns(content);
+
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        dataDraft = new
+                        {
+                            myString = new
+                            {
+                                de = "draft value"
+                            },
+                            myNumber = new
+                            {
+                                iv = 42
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_return_null_when_querying_dataDraft_and_no_draft_content_is_available()
+        {
+            var contentId = Guid.NewGuid();
+            var content = CreateContent(contentId, Guid.Empty, Guid.Empty, null);
+
+            var query = $@"
+                query {{
+                  findMySchemaContent(id: ""{contentId}"") {{
+                    dataDraft {{
+                      myString {{
+                        de
+                      }}
+                    }}
+                  }}
+                }}";
+
+            A.CallTo(() => contentQuery.FindContentAsync(MatchsContentContext(), schemaId.ToString(), contentId, EtagVersion.Any))
+                .Returns(content);
+
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        dataDraft = (object)null
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
         private QueryContext MatchsAssetContext()
         {
             return A<QueryContext>.That.Matches(x => x.App == app && x.User == user && !x.Archived);

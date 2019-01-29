@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 AddField(new FieldType
                 {
                     Name = "dataDraft",
-                    ResolvedType = new NonNullGraphType(contentDataType),
+                    ResolvedType = contentDataType,
                     Resolver = Resolve(x => x.DataDraft),
                     Description = $"The draft data of the {schemaName} content."
                 });
