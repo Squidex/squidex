@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             sut = new CachingGraphQLService(cache, appProvider, assetQuery, contentQuery, new FakeUrlGenerator());
         }
 
-        protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null)
+        protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null, NamedContentData dataDraft = null)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -151,7 +151,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 CreatedBy = new RefToken(RefTokenType.Subject, "user1"),
                 LastModified = now,
                 LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
-                Data = data
+                Data = data,
+                DataDraft = dataDraft
             };
 
             return content;
