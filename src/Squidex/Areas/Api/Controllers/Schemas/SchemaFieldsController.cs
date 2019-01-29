@@ -146,7 +146,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
-        [ProducesResponseType(typeof(ErrorDto), 409)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
@@ -172,7 +171,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/")]
-        [ProducesResponseType(typeof(ErrorDto), 409)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]

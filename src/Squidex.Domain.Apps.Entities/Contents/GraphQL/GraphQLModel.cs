@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             assetType = new AssetGraphType(this);
             assetListType = new ListGraphType(new NonNullGraphType(assetType));
 
-            schemasById = schemas.Where(x => x.IsPublished).ToDictionary(x => x.Id);
+            schemasById = schemas.Where(x => x.SchemaDef.IsPublished).ToDictionary(x => x.Id);
 
             graphQLSchema = BuildSchema(this);
             graphQLSchema.RegisterValueConverter(JsonConverter.Instance);

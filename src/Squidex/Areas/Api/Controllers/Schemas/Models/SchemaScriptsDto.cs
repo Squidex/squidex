@@ -5,41 +5,44 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public sealed class ConfigureScriptsDto
+    public sealed class SchemaScriptsDto
     {
         /// <summary>
         /// The script that is executed for each query when querying contents.
         /// </summary>
-        public string ScriptQuery { get; set; }
+        public string Query { get; set; }
 
         /// <summary>
         /// The script that is executed when creating a content.
         /// </summary>
-        public string ScriptCreate { get; set; }
+        public string Create { get; set; }
 
         /// <summary>
         /// The script that is executed when updating a content.
         /// </summary>
-        public string ScriptUpdate { get; set; }
+        public string Update { get; set; }
 
         /// <summary>
         /// The script that is executed when deleting a content.
         /// </summary>
-        public string ScriptDelete { get; set; }
+        public string Delete { get; set; }
 
         /// <summary>
         /// The script that is executed when change a content status.
         /// </summary>
-        public string ScriptChange { get; set; }
+        public string Change { get; set; }
 
         public ConfigureScripts ToCommand()
         {
-            return SimpleMapper.Map(this, new ConfigureScripts());
+            var scripts = SimpleMapper.Map(this, new SchemaScripts());
+
+            return new ConfigureScripts { Scripts = scripts };
         }
     }
 }

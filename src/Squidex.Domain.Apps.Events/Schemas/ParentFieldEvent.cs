@@ -1,15 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
+using Squidex.Infrastructure;
 
-namespace Squidex.Areas.Api.Controllers.Schemas.Models
+namespace Squidex.Domain.Apps.Events.Schemas
 {
-    public sealed class PreviewUrlsDto : Dictionary<string, string>
+    public abstract class ParentFieldEvent : SchemaEvent
     {
+        public NamedId<long> ParentFieldId { get; set; }
     }
 }

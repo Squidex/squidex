@@ -40,7 +40,7 @@ export class CreateSchemaForm extends Form<FormGroup> {
                     ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'Name can contain lower case letters (a-z), numbers and dashes only (not at the end).')
                 ]
             ],
-            singleton: false,
+            isSingleton: false,
             import: {}
         }));
     }
@@ -136,11 +136,11 @@ export class ConfigurePreviewUrlsForm extends Form<FormArray> {
 export class EditScriptsForm extends Form<FormGroup> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
-            scriptQuery: '',
-            scriptCreate: '',
-            scriptUpdate: '',
-            scriptDelete: '',
-            scriptChange: ''
+            query: '',
+            create: '',
+            change: '',
+            delete: '',
+            update: ''
         }));
     }
 }

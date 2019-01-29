@@ -8,27 +8,25 @@
 using System;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Entities.Schemas.Commands.CreateSchemaField>;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class CreateSchema : SchemaCommand, IAppCommand
+    public sealed class CreateSchema : UpsertCommand, IAppCommand
     {
         public NamedId<Guid> AppId { get; set; }
 
         public string Name { get; set; }
 
-        public SchemaFields Fields { get; set; }
-
-        public SchemaProperties Properties { get; set; }
-
-        public bool Singleton { get; set; }
-
-        public bool Publish { get; set; }
+        public bool IsSingleton { get; set; }
 
         public CreateSchema()
         {
             SchemaId = Guid.NewGuid();
+        }
+
+        public Schema ToSchema()
+        {
+            return ToSchema(Name, IsSingleton);
         }
     }
 }

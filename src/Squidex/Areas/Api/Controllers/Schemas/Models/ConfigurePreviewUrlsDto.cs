@@ -5,20 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Schemas;
+using System.Collections.Generic;
+using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Commands
+namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public abstract class CreateSchemaFieldBase
+    public sealed class ConfigurePreviewUrlsDto : Dictionary<string, string>
     {
-        public string Name { get; set; }
-
-        public bool IsLocked { get; set; }
-
-        public bool IsHidden { get; set; }
-
-        public bool IsDisabled { get; set; }
-
-        public FieldProperties Properties { get; set; }
+        public ConfigurePreviewUrls ToCommand()
+        {
+            return new ConfigurePreviewUrls { PreviewUrls = this };
+        }
     }
 }

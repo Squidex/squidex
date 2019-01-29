@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.EventSynchronization;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Guards;
@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
@@ -27,17 +28,17 @@ namespace Squidex.Domain.Apps.Entities.Schemas
     public sealed class SchemaGrain : SquidexDomainObjectGrain<SchemaState>, ISchemaGrain
     {
         private readonly IAppProvider appProvider;
-        private readonly FieldRegistry registry;
+        private readonly IJsonSerializer serializer;
 
-        public SchemaGrain(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider, FieldRegistry registry)
+        public SchemaGrain(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider, IJsonSerializer serializer)
             : base(store, log)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(registry, nameof(registry));
+            Guard.NotNull(serializer, nameof(serializer));
 
             this.appProvider = appProvider;
 
-            this.registry = registry;
+            this.serializer = serializer;
         }
 
         protected override Task<object> ExecuteAsync(IAggregateCommand command)
@@ -73,6 +74,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                         await GuardSchema.CanCreate(c, appProvider);
 
                         Create(c);
+                    });
+
+                case SynchronizeSchema synchronizeSchema:
+                    return UpdateAsync(synchronizeSchema, c =>
+                    {
+                        GuardSchema.CanSynchronize(c);
+
+                        Synchronize(c);
                     });
 
                 case DeleteField deleteField:
@@ -200,45 +209,38 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             }
         }
 
+        public void Synchronize(SynchronizeSchema command)
+        {
+            var options = new SchemaSynchronizationOptions
+            {
+                NoFieldDeletion = command.NoFieldDeletion,
+                NoFieldRecreation = command.NoFieldRecreation
+            };
+
+            var schemaSource = Snapshot.SchemaDef;
+            var schemaTarget = command.ToSchema(schemaSource.Name, schemaSource.IsSingleton);
+
+            var @events = schemaSource.Synchronize(schemaTarget, serializer, () => Snapshot.SchemaFieldsTotal + 1, options);
+
+            foreach (var @event in @events)
+            {
+                RaiseEvent(SimpleMapper.Map(command, (SchemaEvent)@event));
+            }
+        }
+
         public void Create(CreateSchema command)
         {
-            var @event = SimpleMapper.Map(command, new SchemaCreated { SchemaId = NamedId.Of(command.SchemaId, command.Name) });
-
-            if (command.Fields != null)
-            {
-                @event.Fields = new List<SchemaCreatedField>();
-
-                foreach (var commandField in command.Fields)
-                {
-                    var eventField = SimpleMapper.Map(commandField, new SchemaCreatedField());
-
-                    @event.Fields.Add(eventField);
-
-                    if (commandField.Nested != null)
-                    {
-                        eventField.Nested = new List<SchemaCreatedNestedField>();
-
-                        foreach (var nestedField in commandField.Nested)
-                        {
-                            var eventNestedField = SimpleMapper.Map(nestedField, new SchemaCreatedNestedField());
-
-                            eventField.Nested.Add(eventNestedField);
-                        }
-                    }
-                }
-            }
-
-            RaiseEvent(@event);
+            RaiseEvent(command, new SchemaCreated { SchemaId = NamedId.Of(command.SchemaId, command.Name), Schema = command.ToSchema() });
         }
 
         public void Add(AddField command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new FieldAdded { ParentFieldId = GetFieldId(command.ParentFieldId), FieldId = CreateFieldId(command) }));
+            RaiseEvent(command, new FieldAdded { FieldId = CreateFieldId(command) });
         }
 
         public void UpdateField(UpdateField command)
         {
-            RaiseEvent(command, SimpleMapper.Map(command, new FieldUpdated()));
+            RaiseEvent(command, new FieldUpdated());
         }
 
         public void LockField(LockField command)
@@ -273,88 +275,89 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public void Reorder(ReorderFields command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new SchemaFieldsReordered { ParentFieldId = GetFieldId(command.ParentFieldId) }));
+            RaiseEvent(command, new SchemaFieldsReordered());
         }
 
         public void Publish(PublishSchema command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new SchemaPublished()));
+            RaiseEvent(command, new SchemaPublished());
         }
 
         public void Unpublish(UnpublishSchema command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new SchemaUnpublished()));
+            RaiseEvent(command, new SchemaUnpublished());
         }
 
         public void ConfigureScripts(ConfigureScripts command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ScriptsConfigured()));
+            RaiseEvent(command, new SchemaScriptsConfigured());
         }
 
         public void ChangeCategory(ChangeCategory command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new SchemaCategoryChanged()));
+            RaiseEvent(command, new SchemaCategoryChanged());
         }
 
         public void ConfigurePreviewUrls(ConfigurePreviewUrls command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new SchemaPreviewUrlsConfigured()));
-        }
-
-        public void Delete(DeleteSchema command)
-        {
-            RaiseEvent(SimpleMapper.Map(command, new SchemaDeleted()));
+            RaiseEvent(command, new SchemaPreviewUrlsConfigured());
         }
 
         public void Update(UpdateSchema command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new SchemaUpdated()));
+            RaiseEvent(command, new SchemaUpdated());
         }
 
-        private void RaiseEvent(FieldCommand fieldCommand, FieldEvent @event)
+        public void Delete(DeleteSchema command)
         {
-            SimpleMapper.Map(fieldCommand, @event);
+            RaiseEvent(command, new SchemaDeleted());
+        }
 
-            if (fieldCommand.ParentFieldId.HasValue)
+        private void RaiseEvent<TCommand, TEvent>(TCommand command, TEvent @event) where TCommand : SchemaCommand where TEvent : SchemaEvent
+        {
+            SimpleMapper.Map(command, @event);
+
+            NamedId<long> GetFieldId(long? id)
             {
-                if (Snapshot.SchemaDef.FieldsById.TryGetValue(fieldCommand.ParentFieldId.Value, out var field))
+                if (id.HasValue && Snapshot.SchemaDef.FieldsById.TryGetValue(id.Value, out var field))
                 {
-                    @event.ParentFieldId = NamedId.Of(field.Id, field.Name);
+                    return NamedId.Of(field.Id, field.Name);
+                }
 
-                    if (field is IArrayField arrayField && arrayField.FieldsById.TryGetValue(fieldCommand.FieldId, out var nestedField))
+                return null;
+            }
+
+            if (command is ParentFieldCommand pc && @event is ParentFieldEvent pe)
+            {
+                if (pc.ParentFieldId.HasValue)
+                {
+                    if (Snapshot.SchemaDef.FieldsById.TryGetValue(pc.ParentFieldId.Value, out var field))
                     {
-                        @event.FieldId = NamedId.Of(nestedField.Id, nestedField.Name);
+                        pe.ParentFieldId = NamedId.Of(field.Id, field.Name);
+
+                        if (command is FieldCommand fc && @event is FieldEvent fe)
+                        {
+                            if (field is IArrayField arrayField && arrayField.FieldsById.TryGetValue(fc.FieldId, out var nestedField))
+                            {
+                                fe.FieldId = NamedId.Of(nestedField.Id, nestedField.Name);
+                            }
+                        }
                     }
                 }
-            }
-            else
-            {
-                @event.FieldId = GetFieldId(fieldCommand.FieldId);
+                else if (command is FieldCommand fc && @event is FieldEvent fe)
+                {
+                    fe.FieldId = GetFieldId(fc.FieldId);
+                }
             }
 
             RaiseEvent(@event);
-        }
-
-        private NamedId<long> CreateFieldId(AddField command)
-        {
-            return NamedId.Of(Snapshot.TotalFields + 1L, command.Name);
-        }
-
-        private NamedId<long> GetFieldId(long? id)
-        {
-            if (id.HasValue && Snapshot.SchemaDef.FieldsById.TryGetValue(id.Value, out var field))
-            {
-                return NamedId.Of(field.Id, field.Name);
-            }
-
-            return null;
         }
 
         private void RaiseEvent(SchemaEvent @event)
         {
             if (@event.SchemaId == null)
             {
-                @event.SchemaId = NamedId.Of(Snapshot.Id, Snapshot.Name);
+                @event.SchemaId = NamedId.Of(Snapshot.Id, Snapshot.SchemaDef.Name);
             }
 
             if (@event.AppId == null)
@@ -363,6 +366,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             }
 
             RaiseEvent(Envelope.Create(@event));
+        }
+
+        private NamedId<long> CreateFieldId(AddField command)
+        {
+            return NamedId.Of(Snapshot.SchemaFieldsTotal + 1, command.Name);
         }
 
         private void VerifyNotDeleted()
@@ -375,7 +383,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         protected override SchemaState OnEvent(Envelope<IEvent> @event)
         {
-            return Snapshot.Apply(@event, registry);
+            return Snapshot.Apply(@event);
         }
 
         public Task<J<ISchemaEntity>> GetStateAsync()

@@ -24,20 +24,39 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
         public static SchemaBuilder Create(string name)
         {
+            var schemaName = name.ToKebabCase();
+
             return new SchemaBuilder(new CreateSchema
             {
-                Name = name.ToKebabCase(),
-                Publish = true,
-                Properties = new SchemaProperties
-                {
-                    Label = name
-                }
-            });
+                Name = schemaName
+            }).Published().WithLabel(name);
+        }
+
+        public SchemaBuilder WithLabel(string label)
+        {
+            command.Properties = command.Properties ?? new SchemaProperties();
+            command.Properties.Label = label;
+
+            return this;
+        }
+
+        public SchemaBuilder WithScripts(SchemaScripts scripts)
+        {
+            command.Scripts = scripts;
+
+            return this;
+        }
+
+        public SchemaBuilder Published()
+        {
+            command.IsPublished = true;
+
+            return this;
         }
 
         public SchemaBuilder Singleton()
         {
-            command.Singleton = true;
+            command.IsSingleton = true;
 
             return this;
         }
@@ -105,9 +124,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
             return this;
         }
 
-        private CreateSchemaField AddField<T>(string name) where T : FieldProperties, new()
+        private UpsertSchemaField AddField<T>(string name) where T : FieldProperties, new()
         {
-            var field = new CreateSchemaField
+            var field = new UpsertSchemaField
             {
                 Name = name.ToCamelCase(),
                 Properties = new T
@@ -116,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
                 }
             };
 
-            command.Fields = command.Fields ?? new List<CreateSchemaField>();
+            command.Fields = command.Fields ?? new List<UpsertSchemaField>();
             command.Fields.Add(field);
 
             return field;

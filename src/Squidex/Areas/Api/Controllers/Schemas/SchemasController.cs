@@ -132,7 +132,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="request">The schema object that needs to updated.</param>
         /// <returns>
-        /// 204 => Schema has been updated.
+        /// 204 => Schema updated.
         /// 400 => Schema properties are not valid.
         /// 404 => Schema or app not found.
         /// </returns>
@@ -148,13 +148,35 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         }
 
         /// <summary>
+        /// Synchronize a schema.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="request">The schema object that needs to updated.</param>
+        /// <returns>
+        /// 204 => Schema updated.
+        /// 400 => Schema properties are not valid.
+        /// 404 => Schema or app not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/schemas/{name}/sync")]
+        [ApiPermission(Permissions.AppSchemasUpdate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutSchemaSync(string app, string name, [FromBody] SynchronizeSchemaDto request)
+        {
+            await CommandBus.PublishAsync(request.ToCommand());
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Update a schema category.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="request">The schema object that needs to updated.</param>
         /// <returns>
-        /// 204 => Schema has been updated.
+        /// 204 => Schema updated.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
@@ -175,16 +197,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="request">The preview urls for the schema.</param>
         /// <returns>
-        /// 204 => Schema has been updated.
+        /// 204 => Schema updated.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/preview-urls")]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutPreviewUrls(string app, string name, [FromBody] PreviewUrlsDto request)
+        public async Task<IActionResult> PutPreviewUrls(string app, string name, [FromBody] ConfigurePreviewUrlsDto request)
         {
-            await CommandBus.PublishAsync(new ConfigurePreviewUrls { PreviewUrls = request ?? new PreviewUrlsDto() });
+            await CommandBus.PublishAsync(request.ToCommand());
 
             return NoContent();
         }
@@ -196,7 +218,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="request">The schema scripts object that needs to updated.</param>
         /// <returns>
-        /// 204 => Schema has been updated.
+        /// 204 => Schema updated.
         /// 400 => Schema properties are not valid.
         /// 404 => Schema or app not found.
         /// </returns>
@@ -204,7 +226,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [Route("apps/{app}/schemas/{name}/scripts/")]
         [ApiPermission(Permissions.AppSchemasScripts)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutSchemaScripts(string app, string name, [FromBody] ConfigureScriptsDto request)
+        public async Task<IActionResult> PutSchemaScripts(string app, string name, [FromBody] SchemaScriptsDto request)
         {
             await CommandBus.PublishAsync(request.ToCommand());
 

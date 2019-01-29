@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -7,21 +7,12 @@
 
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.EventSourcing;
-using SchemaFields = System.Collections.Generic.List<Squidex.Domain.Apps.Events.Schemas.SchemaCreatedField>;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [EventType(nameof(SchemaCreated))]
+    [EventType(nameof(SchemaCreated), 2)]
     public sealed class SchemaCreated : SchemaEvent
     {
-        public string Name { get; set; }
-
-        public SchemaFields Fields { get; set; }
-
-        public SchemaProperties Properties { get; set; }
-
-        public bool Singleton { get; set; }
-
-        public bool Publish { get; set; }
+        public Schema Schema { get; set; }
     }
 }

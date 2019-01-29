@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -31,18 +30,15 @@ namespace Migrate_01
 {
     public sealed class Rebuilder
     {
-        private readonly FieldRegistry fieldRegistry;
         private readonly ILocalCache localCache;
         private readonly IStore<Guid> store;
         private readonly IEventStore eventStore;
 
         public Rebuilder(
-            FieldRegistry fieldRegistry,
             ILocalCache localCache,
             IStore<Guid> store,
             IEventStore eventStore)
         {
-            this.fieldRegistry = fieldRegistry;
             this.eventStore = eventStore;
             this.localCache = localCache;
             this.store = store;
@@ -59,7 +55,7 @@ namespace Migrate_01
         {
             await store.GetSnapshotStore<SchemaState>().ClearAsync();
 
-            await RebuildManyAsync("^schema\\-", id => RebuildAsync<SchemaState, SchemaGrain>(id, (e, s) => s.Apply(e, fieldRegistry)));
+            await RebuildManyAsync("^schema\\-", id => RebuildAsync<SchemaState, SchemaGrain>(id, (e, s) => s.Apply(e)));
         }
 
         public async Task RebuildRulesAsync()

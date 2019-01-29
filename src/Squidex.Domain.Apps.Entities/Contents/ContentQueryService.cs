@@ -158,7 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var converters = GenerateConverters(context, checkType).ToArray();
 
-                var scriptText = schema.ScriptQuery;
+                var scriptText = schema.SchemaDef.Scripts.Query;
 
                 var isScripting = !string.IsNullOrWhiteSpace(scriptText);
 
@@ -277,7 +277,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private static void CheckPermission(ISchemaEntity schema, ClaimsPrincipal user)
         {
             var permissions = user.Permissions();
-            var permission = Permissions.ForApp(Permissions.AppContentsRead, schema.AppId.Name, schema.Name);
+            var permission = Permissions.ForApp(Permissions.AppContentsRead, schema.AppId.Name, schema.SchemaDef.Name);
 
             if (!permissions.Allows(permission))
             {

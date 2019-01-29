@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
@@ -20,28 +19,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
     {
         NamedId<Guid> AppId { get; }
 
-        string Name { get; }
-
-        string Category { get; }
-
-        bool IsSingleton { get; }
-
-        bool IsPublished { get; }
-
         bool IsDeleted { get; }
 
-        string ScriptQuery { get; }
-
-        string ScriptCreate { get; }
-
-        string ScriptUpdate { get; }
-
-        string ScriptDelete { get; }
-
-        string ScriptChange { get; }
-
         Schema SchemaDef { get; }
-
-        Dictionary<string, string> PreviewUrls { get; }
     }
 }

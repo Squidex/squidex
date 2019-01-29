@@ -19,6 +19,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         public SchemaHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
             : base(typeNameRegistry)
         {
+            AddEventMessage("SchemaCreatedEvent",
+                "created schema {[Name]}.");
+
+            AddEventMessage("ScriptsConfiguredEvent",
+                "configured script of schema {[Name]}.");
+
+            AddEventMessage<SchemaFieldsReordered>(
+                "reordered fields of schema {[Name]}.");
+
             AddEventMessage<SchemaCreated>(
                 "created schema {[Name]}.");
 
@@ -36,6 +45,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             AddEventMessage<SchemaFieldsReordered>(
                 "reordered fields of schema {[Name]}.");
+
+            AddEventMessage<SchemaScriptsConfigured>(
+                "configured script of schema {[Name]}.");
 
             AddEventMessage<FieldAdded>(
                 "added field {[Field]} to schema {[Name]}.");

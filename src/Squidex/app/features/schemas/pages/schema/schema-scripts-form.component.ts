@@ -26,7 +26,7 @@ export class SchemaScriptsFormComponent implements OnInit {
     @Input()
     public schema: SchemaDetailsDto;
 
-    public selectedField = 'scriptQuery';
+    public selectedField = 'query';
 
     public editForm = new EditScriptsForm(this.formBuilder);
 
@@ -37,7 +37,7 @@ export class SchemaScriptsFormComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.editForm.load(this.schema);
+        this.editForm.load(this.schema.scripts);
     }
 
     public complete() {

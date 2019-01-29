@@ -64,9 +64,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<CreateSchemaField>
+                Fields = new List<UpsertSchemaField>
                 {
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "invalid name",
                         Properties = new StringFieldProperties(),
@@ -87,9 +87,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<CreateSchemaField>
+                Fields = new List<UpsertSchemaField>
                 {
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "field1",
                         Properties = null,
@@ -110,9 +110,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<CreateSchemaField>
+                Fields = new List<UpsertSchemaField>
                 {
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "field1",
                         Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 },
@@ -134,9 +134,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<CreateSchemaField>
+                Fields = new List<UpsertSchemaField>
                 {
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "field1",
                         Properties = new StringFieldProperties(),
@@ -157,15 +157,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<CreateSchemaField>
+                Fields = new List<UpsertSchemaField>
                 {
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "field1",
                         Properties = new StringFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key
                     },
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "field1",
                         Properties = new StringFieldProperties(),
@@ -186,16 +186,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<CreateSchemaField>
+                Fields = new List<UpsertSchemaField>
                 {
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "array",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key,
-                        Nested = new List<CreateSchemaNestedField>
+                        Nested = new List<UpsertSchemaNestedField>
                         {
-                            new CreateSchemaNestedField
+                            new UpsertSchemaNestedField
                             {
                                 Name = "invalid name",
                                 Properties = new StringFieldProperties()
@@ -217,16 +217,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<CreateSchemaField>
+                Fields = new List<UpsertSchemaField>
                 {
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "array",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key,
-                        Nested = new List<CreateSchemaNestedField>
+                        Nested = new List<UpsertSchemaNestedField>
                         {
-                            new CreateSchemaNestedField
+                            new UpsertSchemaNestedField
                             {
                                 Name = "nested1",
                                 Properties = null
@@ -248,16 +248,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<CreateSchemaField>
+                Fields = new List<UpsertSchemaField>
                 {
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "array",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key,
-                        Nested = new List<CreateSchemaNestedField>
+                        Nested = new List<UpsertSchemaNestedField>
                         {
-                            new CreateSchemaNestedField
+                            new UpsertSchemaNestedField
                             {
                                 Name = "nested1",
                                 Properties = new ArrayFieldProperties()
@@ -279,16 +279,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<CreateSchemaField>
+                Fields = new List<UpsertSchemaField>
                 {
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "array",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key,
-                        Nested = new List<CreateSchemaNestedField>
+                        Nested = new List<UpsertSchemaNestedField>
                         {
-                            new CreateSchemaNestedField
+                            new UpsertSchemaNestedField
                             {
                                 Name = "nested1",
                                 Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 }
@@ -311,21 +311,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<CreateSchemaField>
+                Fields = new List<UpsertSchemaField>
                 {
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "array",
                         Properties = new ArrayFieldProperties(),
                         Partitioning = Partitioning.Invariant.Key,
-                        Nested = new List<CreateSchemaNestedField>
+                        Nested = new List<UpsertSchemaNestedField>
                         {
-                            new CreateSchemaNestedField
+                            new UpsertSchemaNestedField
                             {
                                 Name = "nested1",
                                 Properties = new StringFieldProperties()
                             },
-                            new CreateSchemaNestedField
+                            new UpsertSchemaNestedField
                             {
                                 Name = "nested1",
                                 Properties = new StringFieldProperties()
@@ -347,33 +347,33 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             var command = new CreateSchema
             {
                 AppId = appId,
-                Fields = new List<CreateSchemaField>
+                Fields = new List<UpsertSchemaField>
                 {
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "field1",
                         Properties = ValidProperties(),
-                        Partitioning = "invariant"
+                        Partitioning = Partitioning.Invariant.Key
                     },
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "field2",
                         Properties = ValidProperties(),
-                        Partitioning = "invariant"
+                        Partitioning = Partitioning.Invariant.Key
                     },
-                    new CreateSchemaField
+                    new UpsertSchemaField
                     {
                         Name = "field3",
                         Properties = new ArrayFieldProperties(),
-                        Partitioning = "invariant",
-                        Nested = new List<CreateSchemaNestedField>
+                        Partitioning = Partitioning.Invariant.Key,
+                        Nested = new List<UpsertSchemaNestedField>
                         {
-                            new CreateSchemaNestedField
+                            new UpsertSchemaNestedField
                             {
                                 Name = "nested1",
                                 Properties = ValidProperties()
                             },
-                            new CreateSchemaNestedField
+                            new UpsertSchemaNestedField
                             {
                                 Name = "nested2",
                                 Properties = ValidProperties()

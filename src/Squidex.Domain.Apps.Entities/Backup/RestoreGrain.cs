@@ -301,7 +301,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (@event.Payload is AppEvent appEvent && !string.IsNullOrWhiteSpace(CurrentJob.NewAppName))
             {
-                appEvent.AppId = new NamedId<Guid>(appEvent.AppId.Id, CurrentJob.NewAppName);
+                appEvent.AppId = NamedId.Of(appEvent.AppId.Id, CurrentJob.NewAppName);
             }
 
             foreach (var handler in handlers)

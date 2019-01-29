@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         GuardContent.CanCreate(ctx.Schema, c);
 
-                        await ctx.ExecuteScriptAndTransformAsync(x => x.ScriptCreate, "Create", c, c.Data);
+                        await ctx.ExecuteScriptAndTransformAsync(s => s.Create, "Create", c, c.Data);
                         await ctx.EnrichAsync(c.Data);
 
                         if (!c.DoNotValidate)
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         if (c.Publish)
                         {
-                            await ctx.ExecuteScriptAsync(x => x.ScriptChange, "Published", c, c.Data);
+                            await ctx.ExecuteScriptAsync(s => s.Change, "Published", c, c.Data);
                         }
 
                         Create(c);
@@ -140,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                         reason = StatusChange.Restored;
                                     }
 
-                                    await ctx.ExecuteScriptAsync(x => x.ScriptChange, reason, c, Snapshot.Data);
+                                    await ctx.ExecuteScriptAsync(s => s.Change, reason, c, Snapshot.Data);
 
                                     ChangeStatus(c, reason);
                                 }
@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         GuardContent.CanDelete(ctx.Schema, c);
 
-                        await ctx.ExecuteScriptAsync(x => x.ScriptDelete, "Delete", c, Snapshot.Data);
+                        await ctx.ExecuteScriptAsync(s => s.Delete, "Delete", c, Snapshot.Data);
 
                         Delete(c);
                     });
@@ -208,7 +208,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     await ctx.ValidateAsync(c.Data);
                 }
 
-                newData = await ctx.ExecuteScriptAndTransformAsync(x => x.ScriptUpdate, "Update", c, newData, Snapshot.Data);
+                newData = await ctx.ExecuteScriptAndTransformAsync(s => s.Update, "Update", c, newData, Snapshot.Data);
 
                 if (isProposal)
                 {

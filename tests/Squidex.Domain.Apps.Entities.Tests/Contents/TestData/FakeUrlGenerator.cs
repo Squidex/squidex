@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
 
         public string GenerateContentUrl(IAppEntity app, ISchemaEntity schema, IContentEntity content)
         {
-            return $"contents/{schema.Name}/{content.Id}";
+            return $"contents/{schema.SchemaDef.Name}/{content.Id}";
         }
     }
 }

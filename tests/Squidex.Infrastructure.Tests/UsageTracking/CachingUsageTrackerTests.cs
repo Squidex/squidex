@@ -57,7 +57,7 @@ namespace Squidex.Infrastructure.UsageTracking
             Assert.Equal(100, result2);
 
             A.CallTo(() => inner.GetMonthlyCallsAsync(key, DateTime.Today))
-                .MustHaveHappened(Repeated.Exactly.Once);
+                .MustHaveHappened(1, Times.Exactly);
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace Squidex.Infrastructure.UsageTracking
             Assert.Equal(120, result2);
 
             A.CallTo(() => inner.GetPreviousCallsAsync(key, f, t))
-                .MustHaveHappened(Repeated.Exactly.Once);
+                .MustHaveHappened(1, Times.Exactly);
         }
     }
 }

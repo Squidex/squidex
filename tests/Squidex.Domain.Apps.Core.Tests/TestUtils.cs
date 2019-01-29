@@ -59,9 +59,9 @@ namespace Squidex.Domain.Apps.Core
             return new NewtonsoftJsonSerializer(serializerSettings);
         }
 
-        public static Schema MixedSchema()
+        public static Schema MixedSchema(bool isSingleton = false)
         {
-            var schema = new Schema("user")
+            var schema = new Schema("user", isSingleton: isSingleton)
                 .Publish()
                 .AddArray(101, "root-array", Partitioning.Language, f => f
                     .AddAssets(201, "nested-assets")

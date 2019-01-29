@@ -49,10 +49,10 @@ namespace Squidex.Infrastructure.EventSourcing
             await sut.StopAsync();
 
             A.CallTo(() => eventSubscription.StopAsync())
-                .MustHaveHappened(Repeated.Exactly.Twice);
+                .MustHaveHappened(2, Times.Exactly);
 
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored))
-                .MustHaveHappened(Repeated.Exactly.Twice);
+                .MustHaveHappened(2, Times.Exactly);
 
             A.CallTo(() => eventSubscriber.OnErrorAsync(A<IEventSubscription>.Ignored, A<Exception>.Ignored))
                 .MustNotHaveHappened();

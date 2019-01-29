@@ -7,10 +7,8 @@
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public class FieldCommand : SchemaCommand
+    public class FieldCommand : ParentFieldCommand
     {
-        public long? ParentFieldId { get; set; }
-
         public long FieldId { get; set; }
     }
 }

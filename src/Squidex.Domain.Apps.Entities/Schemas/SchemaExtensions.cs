@@ -8,6 +8,7 @@
 using System;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using StaticNamedId = Squidex.Infrastructure.NamedId;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
@@ -15,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
     {
         public static NamedId<Guid> NamedId(this ISchemaEntity schema)
         {
-            return new NamedId<Guid>(schema.Id, schema.Name);
+            return StaticNamedId.Of(schema.Id, schema.SchemaDef.Name);
         }
 
         public static string EscapePartition(this string value)
@@ -23,34 +24,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             return value.Replace('-', '_');
         }
 
-        public static string TypeName(this IField field)
-        {
-            return field.Name.ToPascalCase();
-        }
-
         public static string TypeName(this ISchemaEntity schema)
         {
-            return schema.SchemaDef.Name.ToPascalCase();
-        }
-
-        public static string DisplayName(this IField field)
-        {
-            return field.RawProperties.Label.WithFallback(field.TypeName());
+            return schema.SchemaDef.TypeName();
         }
 
         public static string DisplayName(this ISchemaEntity schema)
         {
-            return schema.SchemaDef.Properties.Label.WithFallback(schema.TypeName());
-        }
-
-        public static string TypeName(this Schema schema)
-        {
-            return schema.Name.ToPascalCase();
-        }
-
-        public static string DisplayName(this Schema schema)
-        {
-            return schema.Properties.Label.WithFallback(schema.TypeName());
+            return schema.SchemaDef.DisplayName();
         }
     }
 }

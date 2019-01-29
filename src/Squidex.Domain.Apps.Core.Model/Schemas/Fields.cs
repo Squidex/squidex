@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new NestedField<TagsFieldProperties>(id, name, properties, settings);
         }
 
-        public static Schema AddArray(this Schema schema, long id, string name, Partitioning partitioning, Func<ArrayField, ArrayField> handler, ArrayFieldProperties properties = null, IFieldSettings settings = null)
+        public static Schema AddArray(this Schema schema, long id, string name, Partitioning partitioning, Func<ArrayField, ArrayField> handler = null, ArrayFieldProperties properties = null, IFieldSettings settings = null)
         {
             var field = Array(id, name, partitioning, properties, settings);
 

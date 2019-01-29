@@ -5,21 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Schemas
 {
-    [EventType(nameof(ScriptsConfigured))]
-    public sealed class ScriptsConfigured : SchemaEvent
+    [EventType(nameof(SchemaScriptsConfigured))]
+    public sealed class SchemaScriptsConfigured : SchemaEvent
     {
-        public string ScriptQuery { get; set; }
-
-        public string ScriptCreate { get; set; }
-
-        public string ScriptUpdate { get; set; }
-
-        public string ScriptDelete { get; set; }
-
-        public string ScriptChange { get; set; }
+        public SchemaScripts Scripts { get; set; }
     }
 }

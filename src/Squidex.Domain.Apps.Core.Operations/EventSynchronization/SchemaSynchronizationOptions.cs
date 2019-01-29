@@ -5,18 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Templates
+namespace Squidex.Domain.Apps.Core.EventSynchronization
 {
-    public static class Scripts
+    public sealed class SchemaSynchronizationOptions
     {
-        public const string Slug =
-@"var data = ctx.data;
-    
-if (data.title && data.title.iv) {
-    data.slug = { iv: slugify(data.title.iv) };
+        public bool NoFieldDeletion { get; set; }
 
-    replace(data);
-}
-";
+        public bool NoFieldRecreation { get; set; }
     }
 }

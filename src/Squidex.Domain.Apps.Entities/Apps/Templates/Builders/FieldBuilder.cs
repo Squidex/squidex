@@ -13,14 +13,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 {
     public abstract class FieldBuilder
     {
-        private readonly CreateSchemaField field;
+        private readonly UpsertSchemaField field;
 
         protected T Properties<T>() where T : FieldProperties
         {
             return field.Properties as T;
         }
 
-        protected FieldBuilder(CreateSchemaField field)
+        protected FieldBuilder(UpsertSchemaField field)
         {
             this.field = field;
         }

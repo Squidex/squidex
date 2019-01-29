@@ -9,10 +9,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Commands
 {
-    public sealed class AddField : SchemaCommand
+    public sealed class AddField : ParentFieldCommand
     {
-        public long? ParentFieldId { get; set; }
-
         public string Name { get; set; }
 
         public string Partitioning { get; set; }

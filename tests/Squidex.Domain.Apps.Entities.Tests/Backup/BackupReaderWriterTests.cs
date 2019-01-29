@@ -74,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 var @event = new MyEvent
                 {
-                    GuidNamed = new NamedId<Guid>(RandomGuid(), $"name{i}"),
+                    GuidNamed = NamedId.Of(RandomGuid(), $"name{i}"),
                     GuidRaw = RandomGuid(),
                     Values = new Dictionary<Guid, string>
                     {

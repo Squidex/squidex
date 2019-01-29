@@ -74,12 +74,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentGrainTests()
         {
+            var scripts = new SchemaScripts
+            {
+                Change = "<change-script>",
+                Create = "<create-script>",
+                Delete = "<delete-script>",
+                Update = "<update-script>",
+            };
+
             var schemaDef =
                  new Schema("my-schema")
                      .AddNumber(1, "my-field1", Partitioning.Invariant,
                          new NumberFieldProperties { IsRequired = true })
                      .AddNumber(2, "my-field2", Partitioning.Invariant,
-                         new NumberFieldProperties { IsRequired = false });
+                         new NumberFieldProperties { IsRequired = false })
+                    .ConfigureScripts(scripts);
 
             A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
 
@@ -87,10 +96,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppId, SchemaId)).Returns((app, schema));
 
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
-            A.CallTo(() => schema.ScriptCreate).Returns("<create-script>");
-            A.CallTo(() => schema.ScriptChange).Returns("<change-script>");
-            A.CallTo(() => schema.ScriptUpdate).Returns("<update-script>");
-            A.CallTo(() => schema.ScriptDelete).Returns("<delete-script>");
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
                 .ReturnsLazily(x => x.GetArgument<ScriptContext>(0).Data);

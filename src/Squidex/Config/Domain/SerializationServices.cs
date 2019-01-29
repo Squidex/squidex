@@ -30,7 +30,6 @@ namespace Squidex.Config.Domain
                  .MapUnmapped(SquidexEvents.Assembly)
                  .MapUnmapped(SquidexInfrastructure.Assembly)
                  .MapUnmapped(SquidexMigrations.Assembly);
-        private static readonly FieldRegistry FieldRegistry = new FieldRegistry(TypeNameRegistry);
 
         public static readonly JsonSerializerSettings DefaultJsonSettings = new JsonSerializerSettings();
         public static readonly JsonSerializer DefaultJsonSerializer;
@@ -70,6 +69,8 @@ namespace Squidex.Config.Domain
 
         static SerializationServices()
         {
+            FieldRegistry.Setup(TypeNameRegistry);
+
             ConfigureJson(DefaultJsonSettings, TypeNameHandling.Auto);
 
             DefaultJsonSerializer = JsonSerializer.Create(DefaultJsonSettings);
@@ -77,7 +78,6 @@ namespace Squidex.Config.Domain
 
         public static IServiceCollection AddMySerializers(this IServiceCollection services)
         {
-            services.AddSingleton(FieldRegistry);
             services.AddSingleton(DefaultJsonSettings);
             services.AddSingleton(DefaultJsonSerializer);
             services.AddSingleton(TypeNameRegistry);

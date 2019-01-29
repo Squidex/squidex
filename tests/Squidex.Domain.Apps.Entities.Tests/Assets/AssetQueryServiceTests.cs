@@ -26,8 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IAppEntity app = A.Fake<IAppEntity>();
-        private readonly Guid appId = Guid.NewGuid();
-        private readonly string appName = "my-app";
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly ClaimsIdentity identity = new ClaimsIdentity();
         private readonly QueryContext context;
         private readonly AssetQueryService sut;
@@ -36,13 +35,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var user = new ClaimsPrincipal(identity);
 
-            A.CallTo(() => app.Id).Returns(appId);
-            A.CallTo(() => app.Name).Returns(appName);
+            A.CallTo(() => app.Id).Returns(appId.Id);
+            A.CallTo(() => app.Name).Returns(appId.Name);
             A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.English);
 
             context = QueryContext.Create(app, user);
 
-            A.CallTo(() => tagService.DenormalizeTagsAsync(appId, TagGroups.Assets, A<HashSet<string>>.That.IsSameSequenceAs("id1", "id2", "id3")))
+            A.CallTo(() => tagService.DenormalizeTagsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.IsSameSequenceAs("id1", "id2", "id3")))
                 .Returns(new Dictionary<string, string>
                 {
                     ["id1"] = "name1",
@@ -74,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var ids = HashSet.Of(id1, id2);
 
-            A.CallTo(() => assetRepository.QueryAsync(appId, A<HashSet<Guid>>.That.IsSameSequenceAs(ids)))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<HashSet<Guid>>.That.IsSameSequenceAs(ids)))
                 .Returns(ResultList.Create(8,
                     CreateAsset(id1, "id1", "id2", "id3"),
                     CreateAsset(id2)));
@@ -91,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_load_assets_with_query_and_resolve_tags()
         {
-            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.Ignored))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.Ignored))
                 .Returns(ResultList.Create(8,
                     CreateAsset(Guid.NewGuid(), "id1", "id2"),
                     CreateAsset(Guid.NewGuid(), "id2", "id3")));
@@ -110,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             await sut.QueryAsync(context, Q.Empty.WithODataQuery("$top=100&$orderby=fileName asc&$search=Hello World"));
 
-            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.That.Matches(x => x.ToString() == "FullText: 'Hello World'; Take: 100; Sort: fileName Ascending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Matches(x => x.ToString() == "FullText: 'Hello World'; Take: 100; Sort: fileName Ascending")))
                 .MustHaveHappened();
         }
 
@@ -119,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             await sut.QueryAsync(context, Q.Empty.WithODataQuery("$filter=fileName eq 'ABC'"));
 
-            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.That.Matches(x => x.ToString() == "Filter: fileName == 'ABC'; Take: 200; Sort: lastModified Descending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Matches(x => x.ToString() == "Filter: fileName == 'ABC'; Take: 200; Sort: lastModified Descending")))
                 .MustHaveHappened();
         }
 
@@ -128,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             await sut.QueryAsync(context, Q.Empty.WithODataQuery("$top=300&$skip=20"));
 
-            A.CallTo(() => assetRepository.QueryAsync(appId, A<Query>.That.Matches(x => x.ToString() == "Skip: 20; Take: 200; Sort: lastModified Descending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Matches(x => x.ToString() == "Skip: 20; Take: 200; Sort: lastModified Descending")))
                 .MustHaveHappened();
         }
 

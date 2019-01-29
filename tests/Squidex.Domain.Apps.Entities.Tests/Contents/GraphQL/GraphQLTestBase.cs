@@ -33,10 +33,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public class GraphQLTestBase
     {
-        protected static readonly Guid schemaId = Guid.NewGuid();
-        protected static readonly Guid appId = Guid.NewGuid();
-        protected static readonly string appName = "my-app";
         protected readonly Schema schemaDef;
+        protected readonly Guid schemaId = Guid.NewGuid();
+        protected readonly Guid appId = Guid.NewGuid();
+        protected readonly string appName = "my-app";
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         protected readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
@@ -76,7 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         new StringFieldProperties())
                     .AddArray(13, "my-array", Partitioning.Invariant, f => f
                         .AddBoolean(121, "nested-boolean")
-                        .AddNumber(122, "nested-number"));
+                        .AddNumber(122, "nested-number"))
+                    .ConfigureScripts(new SchemaScripts { Query = "<query-script>" })
+                    .Publish();
 
             A.CallTo(() => app.Id).Returns(appId);
             A.CallTo(() => app.Name).Returns(appName);
@@ -85,10 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             context = QueryContext.Create(app, user);
 
             A.CallTo(() => schema.Id).Returns(schemaId);
-            A.CallTo(() => schema.Name).Returns(schemaDef.Name);
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
-            A.CallTo(() => schema.IsPublished).Returns(true);
-            A.CallTo(() => schema.ScriptQuery).Returns("<script-query>");
 
             var allSchemas = new List<ISchemaEntity> { schema };
 

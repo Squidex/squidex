@@ -12,58 +12,26 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public sealed class FieldRegistry
+    public static class FieldRegistry
     {
-        private readonly TypeNameRegistry typeNameRegistry;
-        private readonly HashSet<Type> supportedFields = new HashSet<Type>();
-
-        public FieldRegistry(TypeNameRegistry typeNameRegistry)
+        public static void Setup(TypeNameRegistry typeNameRegistry)
         {
             Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
 
-            this.typeNameRegistry = typeNameRegistry;
-
             var types = typeof(FieldRegistry).Assembly.GetTypes().Where(x => x.BaseType == typeof(FieldProperties));
+
+            var supportedFields = new HashSet<Type>();
 
             foreach (var type in types)
             {
-                RegisterField(type);
+                if (supportedFields.Add(type))
+                {
+                    typeNameRegistry.Map(type);
+                }
             }
 
             typeNameRegistry.MapObsolete(typeof(ReferencesFieldProperties), "References");
             typeNameRegistry.MapObsolete(typeof(DateTimeFieldProperties), "DateTime");
-        }
-
-        private void RegisterField(Type type)
-        {
-            if (supportedFields.Add(type))
-            {
-                typeNameRegistry.Map(type);
-            }
-        }
-
-        public RootField CreateRootField(long id, string name, Partitioning partitioning, FieldProperties properties, IFieldSettings settings = null)
-        {
-            CheckProperties(properties);
-
-            return properties.CreateRootField(id, name, partitioning, settings);
-        }
-
-        public NestedField CreateNestedField(long id, string name, FieldProperties properties, IFieldSettings settings = null)
-        {
-            CheckProperties(properties);
-
-            return properties.CreateNestedField(id, name, settings);
-        }
-
-        private void CheckProperties(FieldProperties properties)
-        {
-            Guard.NotNull(properties, nameof(properties));
-
-            if (!supportedFields.Contains(properties.GetType()))
-            {
-                throw new InvalidOperationException($"The field property '{properties.GetType()}' is not supported.");
-            }
         }
     }
 }
