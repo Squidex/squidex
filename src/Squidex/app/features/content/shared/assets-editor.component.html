@@ -20,7 +20,7 @@
     </div>
 
     <div class="body">
-        <ng-container *ngIf="!isListView; else listTemplate">
+        <ng-container *ngIf="!snapshot.isListView; else listTemplate">
             <div class="row no-gutters">
                 <sqx-asset *ngFor="let file of snapshot.newAssets" [initFile]="file" 
                     (failed)="removeLoadingAsset(file)" (loaded)="addAsset(file, $event)">
