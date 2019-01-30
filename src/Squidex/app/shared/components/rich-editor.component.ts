@@ -6,11 +6,12 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AssetDto,
     DialogModel,
+    ExternalControlComponent,
     ResourceLoaderService,
     Types
 } from '@app/shared/internal';
@@ -28,9 +29,7 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RichEditorComponent implements ControlValueAccessor, AfterViewInit, OnDestroy {
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
+export class RichEditorComponent extends ExternalControlComponent<string> implements AfterViewInit, OnDestroy {
     private tinyEditor: any;
     private tinyInitTimer: any;
     private value: string;
@@ -44,10 +43,10 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     @Output()
     public assetPluginClicked = new EventEmitter<any>();
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
+        super(changeDetector);
     }
 
     public ngOnDestroy() {
@@ -66,8 +65,6 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
 
     private showSelector = () => {
         this.assetsDialog.show();
-
-        this.changeDetector.detectChanges();
     }
 
     private getEditorOptions() {
@@ -130,14 +127,6 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
         if (this.tinyEditor) {
             this.tinyEditor.setMode(isDisabled ? 'readonly' : 'design');
         }
-    }
-
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
     }
 
     public insertAssets(assets: AssetDto[]) {

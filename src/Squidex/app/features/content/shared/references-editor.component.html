@@ -1,27 +1,27 @@
-<div class="references-container" [class.disabled]="isDisabled">
-    <ng-container *ngIf="schema">
+<div class="references-container" [class.disabled]="snapshot.isDisabled">
+    <ng-container *ngIf="snapshot.schema">
         <div class="drop-area-container">
             <div class="drop-area" (click)="selectorDialog.show()">
                 Click here to link content items.
             </div>
         </div>
         
-        <table class="table table-items table-fixed" [class.disabled]="isDisabled" *ngIf="schema && contentItems && contentItems.length > 0"
-            [sqxSortModel]="contentItems.values" 
+        <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="snapshot.schema && snapshot.contentItems && snapshot.contentItems.length > 0"
+            [sqxSortModel]="snapshot.contentItems.values" 
             (sqxSorted)="sort($event)">
-            <tbody *ngFor="let content of contentItems">
+            <tbody *ngFor="let content of snapshot.contentItems">
                 <tr [sqxContent]="content"
                     [language]="language"
                     [isReadOnly]="true"
                     [isReference]="true"
-                    [schema]="schema"
+                    [schema]="snapshot.schema"
                     (deleting)="remove(content)"></tr>
                 <tr class="spacer"></tr>
             </tbody>
         </table>
     </ng-container>
 
-    <div class="invalid" *ngIf="isInvalidSchema">
+    <div class="invalid" *ngIf="snapshot.schemaInvalid">
         Schema not found or not configured yet.
     </div>
 </div>
@@ -30,7 +30,7 @@
     <sqx-contents-selector 
         [language]="language"
         [languages]="languages"
-        [schema]="schema"
+        [schema]="snapshot.schema"
         (selected)="select($event)">
     </sqx-contents-selector>
 </ng-container>

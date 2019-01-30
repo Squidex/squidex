@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { Types } from '@app/framework/internal';
 
@@ -26,7 +26,7 @@ interface State {
     templateUrl: './toggle.component.html',
     providers: [SQX_TOGGLE_CONTROL_VALUE_ACCESSOR]
 })
-export class ToggleComponent extends StatefulControlComponent<State, boolean | null> implements ControlValueAccessor {
+export class ToggleComponent extends StatefulControlComponent<State, boolean | null> {
     @Input()
     public threeStates = false;
 
@@ -37,7 +37,9 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
     }
 
     public writeValue(obj: any) {
-        this.next({ isChecked: Types.isBoolean(obj) ? obj : null });
+        const isChecked = Types.isBoolean(obj) ? obj : null;
+
+        this.next(s => ({ ...s, isChecked  }));
     }
 
     public changeState(event: MouseEvent) {
@@ -59,7 +61,7 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
             isChecked = !(isChecked === true);
         }
 
-        this.next({ isChecked });
+        this.next(s => ({ ...s, isChecked }));
 
         this.callChange(isChecked);
         this.callTouched();

@@ -7,13 +7,13 @@
 
 import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
 
-import { PureComponent, ShortcutService } from '@app/framework/internal';
+import { ShortcutService, StatefulComponent } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-shortcut',
     template: ''
 })
-export class ShortcutComponent extends PureComponent implements OnDestroy, OnInit {
+export class ShortcutComponent extends StatefulComponent implements OnDestroy, OnInit {
     private lastKeys: string;
 
     @Input()
@@ -30,7 +30,7 @@ export class ShortcutComponent extends PureComponent implements OnDestroy, OnIni
         private readonly shortcutService: ShortcutService,
         private readonly zone: NgZone
     ) {
-        super(changeDetector);
+        super(changeDetector, {});
 
         changeDetector.detach();
     }

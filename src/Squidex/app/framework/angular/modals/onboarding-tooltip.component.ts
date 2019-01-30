@@ -12,7 +12,7 @@ import {
     fadeAnimation,
     ModalModel,
     OnboardingService,
-    PureComponent,
+    StatefulComponent,
     Types
 } from '@app/framework/internal';
 
@@ -25,7 +25,7 @@ import {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OnboardingTooltipComponent extends PureComponent implements OnDestroy, OnInit {
+export class OnboardingTooltipComponent extends StatefulComponent implements OnDestroy, OnInit {
     public tooltipModal = new ModalModel();
 
     @Input()
@@ -44,7 +44,7 @@ export class OnboardingTooltipComponent extends PureComponent implements OnDestr
         private readonly onboardingService: OnboardingService,
         private readonly renderer: Renderer2
     ) {
-        super(changeDetector);
+        super(changeDetector, {});
     }
 
     public ngOnDestroy() {

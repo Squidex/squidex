@@ -53,7 +53,7 @@ export class UIState extends State<Snapshot> {
 
         this.uiService.getSettings(this.appName)
             .subscribe(dtos => {
-                return this.next({ settings: dtos });
+                return this.next(s => ({ ...s, settings: dtos }));
             });
     }
 
@@ -65,7 +65,7 @@ export class UIState extends State<Snapshot> {
 
             current[key] = value;
 
-            this.next({ settings: root });
+            this.next(s => ({ ...s, settings: root }));
         }
     }
 
@@ -77,7 +77,7 @@ export class UIState extends State<Snapshot> {
 
             delete current[key];
 
-            this.next({ settings: root });
+            this.next(s => ({ ...s, settings: root }));
         }
     }
 

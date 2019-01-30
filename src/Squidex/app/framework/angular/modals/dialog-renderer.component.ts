@@ -55,9 +55,10 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
 
         this.observe(
             this.dialogs.notifications.subscribe(notification => {
-                this.next(state => {
-                    state.notifications = [...state.notifications, notification];
-                });
+                this.next(s => ({
+                    ...s,
+                    notifications: [...s.notifications, notification]
+                }));
 
                 if (notification.displayTime > 0) {
                     this.observe(timer(notification.displayTime).subscribe(() => {
@@ -68,12 +69,10 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
 
         this.observe(
             this.dialogs.dialogs
-                .subscribe(request => {
+                .subscribe(dialogRequest => {
                     this.cancel();
 
-                    this.next(state => {
-                        state.dialogRequest = request;
-                    });
+                    this.next(s => ({ ...s, dialogRequest }));
                 }));
     }
 
@@ -90,17 +89,16 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
     }
 
     private finishRequest(value: boolean) {
-        this.next(state => {
-            if (state.dialogRequest) {
-                state.dialogRequest.complete(value);
-                state.dialogRequest = null;
+        this.next(s => {
+            if (s.dialogRequest) {
+                s.dialogRequest.complete(value);
             }
+
+            return { ...s, dialogRequest: null };
         });
     }
 
     public close(notification: Notification) {
-        this.next(state => {
-            state.notifications = state.notifications.filter(n => notification !== n);
-        });
+        this.next(s => ({ ...s, notifications: s.notifications.filter(n => notification !== n) }));
     }
 }

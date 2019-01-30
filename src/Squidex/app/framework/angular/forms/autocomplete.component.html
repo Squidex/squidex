@@ -5,13 +5,13 @@
         autocorrect="off"
         autocapitalize="off">
 
-    <div *ngIf="suggestedItems.length > 0" [sqxModalTarget]="input" class="control-dropdown" #container position="bottomLeft">
-        <div *ngFor="let item of suggestedItems; let i = index;" class="control-dropdown-item control-dropdown-item-selectable"
-            [class.active]="i === suggestedIndex"
+    <div *ngIf="snapshot.suggestedItems.length > 0" [sqxModalTarget]="input" class="control-dropdown" #container position="bottomLeft">
+        <div *ngFor="let item of snapshot.suggestedItems; let i = index;" class="control-dropdown-item control-dropdown-item-selectable"
+            [class.active]="i === snapshot.suggestedIndex"
             [container]="container"
             (mousedown)="selectItem(item)"
             (mouseover)="selectIndex(i)"
-            [sqxScrollActive]="i === suggestedIndex">
+            [sqxScrollActive]="i === snapshot.suggestedIndex">
             <ng-container *ngIf="!itemTemplate">{{item}}</ng-container>
 
             <ng-template *ngIf="itemTemplate" [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>

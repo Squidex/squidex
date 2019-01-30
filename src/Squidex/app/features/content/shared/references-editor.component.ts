@@ -8,7 +8,7 @@
 // tslint:disable:prefer-for-of
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AppLanguageDto,
@@ -20,12 +20,20 @@ import {
     MathHelper,
     SchemaDetailsDto,
     SchemasService,
+    StatefulControlComponent,
     Types
 } from '@app/shared';
 
 export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true
 };
+
+interface State {
+    schema?: SchemaDetailsDto;
+    schemaInvalid: boolean;
+
+    contentItems: ImmutableArray<ContentDto>;
+}
 
 @Component({
     selector: 'sqx-references-editor',
@@ -34,10 +42,7 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
-
+export class ReferencesEditorComponent extends StatefulControlComponent<State, string[]> implements OnInit {
     @Input()
     public schemaId: string;
 
@@ -49,49 +54,41 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
     public selectorDialog = new DialogModel();
 
-    public schema: SchemaDetailsDto;
-
-    public contentItems = ImmutableArray.empty<ContentDto>();
-
-    public isDisabled = false;
-    public isInvalidSchema = false;
-
-    constructor(
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
-        private readonly changeDetector: ChangeDetectorRef,
         private readonly contentsService: ContentsService,
         private readonly schemasService: SchemasService
     ) {
+        super(changeDetector, {
+            schemaInvalid: false,
+            contentItems: ImmutableArray.empty()
+        });
     }
 
     public ngOnInit() {
         if (this.schemaId === MathHelper.EMPTY_GUID) {
-            this.isInvalidSchema = true;
+            this.next(s => ({ ...s, schemaInvalid: true }));
             return;
         }
 
         this.schemasService.getSchema(this.appsState.appName, this.schemaId)
-            .subscribe(dto => {
-                this.schema = dto;
-
-                this.changeDetector.markForCheck();
+            .subscribe(schema => {
+                this.next(s => ({ ...s, schema }));
             }, () => {
-                this.isInvalidSchema = true;
-
-                this.changeDetector.markForCheck();
+                this.next(s => ({ ...s, schemaInvalid: true }));
             });
     }
 
     public writeValue(obj: any) {
         if (Types.isArrayOfString(obj)) {
-            if (!Types.isEquals(obj, this.contentItems.map(x => x.id).values)) {
+            if (!Types.isEquals(obj, this.snapshot.contentItems.map(x => x.id).values)) {
                 const contentIds: string[] = obj;
 
                 this.contentsService.getContents(this.appsState.appName, this.schemaId, 10000, 0, undefined, contentIds)
                     .subscribe(dtos => {
                         this.setContentItems(ImmutableArray.of(contentIds.map(id => dtos.items.find(c => c.id === id)!).filter(r => !!r)));
 
-                        if (this.contentItems.length !== contentIds.length) {
+                        if (this.snapshot.contentItems.length !== contentIds.length) {
                             this.updateValue();
                         }
                     }, () => {
@@ -103,29 +100,13 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
         }
     }
 
-    public setContentItems(contents: ImmutableArray<ContentDto>) {
-        this.contentItems = contents;
-
-        this.changeDetector.markForCheck();
-    }
-
-    public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
-
-        this.changeDetector.markForCheck();
-    }
-
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
+    public setContentItems(contentItems: ImmutableArray<ContentDto>) {
+        this.next(s => ({ ...s, contentItems }));
     }
 
     public select(contents: ContentDto[]) {
         for (let content of contents) {
-            this.contentItems = this.contentItems.push(content);
+            this.setContentItems(this.snapshot.contentItems.push(content));
         }
 
         if (contents.length > 0) {
@@ -137,7 +118,7 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
     public remove(content: ContentDto) {
         if (content) {
-            this.contentItems = this.contentItems.remove(content);
+            this.setContentItems(this.snapshot.contentItems.remove(content));
 
             this.updateValue();
         }
@@ -145,14 +126,14 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
     public sort(contents: ContentDto[]) {
         if (contents) {
-            this.contentItems = ImmutableArray.of(contents);
+            this.setContentItems(ImmutableArray.of(contents));
 
             this.updateValue();
         }
     }
 
     private updateValue() {
-        let ids: string[] | null = this.contentItems.values.map(x => x.id);
+        let ids: string[] | null = this.snapshot.contentItems.values.map(x => x.id);
 
         if (ids.length === 0) {
             ids = null;
@@ -160,7 +141,5 @@ export class ReferencesEditorComponent implements ControlValueAccessor, OnInit {
 
         this.callTouched();
         this.callChange(ids);
-
-        this.changeDetector.markForCheck();
     }
 }

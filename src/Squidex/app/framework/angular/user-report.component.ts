@@ -9,8 +9,8 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
 
 import {
-    PureComponent,
     ResourceLoaderService,
+    StatefulComponent,
     UserReportConfig
 } from '@app/framework/internal';
 
@@ -18,12 +18,12 @@ import {
     selector: 'sqx-user-report',
     template: ''
 })
-export class UserReportComponent extends PureComponent implements OnDestroy, OnInit {
+export class UserReportComponent extends StatefulComponent<any> implements OnDestroy, OnInit {
     constructor(changeDetector: ChangeDetectorRef,
         private readonly config: UserReportConfig,
         private readonly resourceLoader: ResourceLoaderService
     ) {
-        super(changeDetector);
+        super(changeDetector, {});
 
         changeDetector.detach();
     }

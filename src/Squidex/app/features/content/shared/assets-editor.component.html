@@ -1,4 +1,4 @@
-<div class="assets-container" [class.disabled]="isDisabled" (paste)="pasteFiles($event)" tabindex="1000">
+<div class="assets-container" [class.disabled]="snapshot.isDisabled" (paste)="pasteFiles($event)" tabindex="1000">
     <div class="header list">
         <div class="row no-gutters">
             <div class="col">
@@ -8,10 +8,10 @@
             </div>
             <div class="col-auto pl-1">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="isListView" [disabled]="isListView" (click)="changeView(true)">
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="snapshot.isListView" [disabled]="snapshot.isListView" (click)="changeView(true)">
                         <i class="icon-list"></i>
                     </button>
-                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="!isListView" [disabled]="!isListView" (click)="changeView(false)">
+                    <button type="button" class="btn btn-secondary btn-toggle" [class.btn-primary]="!snapshot.isListView" [disabled]="!snapshot.isListView" (click)="changeView(false)">
                         <i class="icon-grid"></i>
                     </button>
                 </div>
@@ -22,10 +22,10 @@
     <div class="body">
         <ng-container *ngIf="!isListView; else listTemplate">
             <div class="row no-gutters">
-                <sqx-asset *ngFor="let file of newAssets" [initFile]="file" 
+                <sqx-asset *ngFor="let file of snapshot.newAssets" [initFile]="file" 
                     (failed)="removeLoadingAsset(file)" (loaded)="addAsset(file, $event)">
                 </sqx-asset>
-                <sqx-asset *ngFor="let asset of oldAssets; trackBy: trackByAsset" [asset]="asset" removeMode="true"
+                <sqx-asset *ngFor="let asset of snapshot.oldAssets; trackBy: trackByAsset" [asset]="asset" removeMode="true"
                     (updated)="notifyOthers($event)" (removing)="removeLoadedAsset($event)">
                 </sqx-asset>
             </div>
@@ -33,14 +33,14 @@
     
         <ng-template #listTemplate>
             <div class="list-view">
-                <sqx-asset *ngFor="let file of newAssets" [initFile]="file"
+                <sqx-asset *ngFor="let file of snapshot.newAssets" [initFile]="file"
                     [isListView]="true" (failed)="removeLoadingAsset(file)" (loaded)="addAsset(file, $event)">
                 </sqx-asset>
                 
                 <div
-                    [sqxSortModel]="oldAssets.values"
+                    [sqxSortModel]="snapshot.oldAssets.values"
                     (sqxSorted)="sortAssets($event)">
-                    <div *ngFor="let asset of oldAssets; trackBy: trackByAsset">
+                    <div *ngFor="let asset of snapshot.oldAssets; trackBy: trackByAsset">
                         <sqx-asset [asset]="asset" removeMode="true" [isListView]="true"
                             (updated)="notifyOthers($event)" (removing)="removeLoadedAsset($event)">
                         </sqx-asset>

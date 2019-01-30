@@ -20,10 +20,10 @@ import {
     selector: 'sqx-preview-button',
     styleUrls: ['./preview-button.component.scss'],
     templateUrl: './preview-button.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PreviewButtonComponent implements OnInit {
     @Input()

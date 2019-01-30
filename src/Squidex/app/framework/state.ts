@@ -49,13 +49,13 @@ export class Form<T extends AbstractControl> {
     }
 
     public load(value: any) {
-        this.state.next({ submitted: false, error: null });
+        this.state.next(_ => ({ submitted: false, error: null }));
 
         this.setValue(value);
     }
 
     public submit(): any | null {
-        this.state.next({ submitted: true });
+        this.state.next(_ => ({ submitted: true }));
 
         if (this.form.valid) {
             const value = fullValue(this.form);
@@ -69,7 +69,7 @@ export class Form<T extends AbstractControl> {
     }
 
     public submitCompleted(newValue?: any) {
-        this.state.next({ submitted: false, error: null });
+        this.state.next(_ => ({ submitted: false, error: null }));
 
         this.enable();
 
@@ -81,7 +81,7 @@ export class Form<T extends AbstractControl> {
     }
 
     public submitFailed(error?: string | ErrorDto) {
-        this.state.next({ submitted: false, error: this.getError(error) });
+        this.state.next(_ => ({ submitted: false, error: this.getError(error) }));
 
         this.enable();
     }
@@ -133,17 +133,10 @@ export class State<T extends {}> {
     }
 
     public resetState() {
-        this.next(this.initialState);
+        this.next(_ => this.initialState);
     }
 
-    public next(update: ((v: T) => T | void) | Partial<T>) {
-        if (Types.isFunction(update)) {
-            const stateNew = { ...this.snapshot };
-            const stateUpdated = update(stateNew);
-
-            this.state.next(stateUpdated || stateNew);
-        } else {
-            this.state.next({ ...this.snapshot, ...update });
-        }
+    public next(update: (v: T) => T) {
+        this.state.next(update(this.snapshot));
     }
 }

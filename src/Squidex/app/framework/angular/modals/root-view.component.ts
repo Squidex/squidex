@@ -5,9 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, ViewContainerRef } from '@angular/core';
-
-import { PureComponent } from '@app/framework/internal';
+import { ChangeDetectionStrategy, Component, ViewChild, ViewContainerRef } from '@angular/core';
 
 @Component({
     selector: 'sqx-root-view',
@@ -15,11 +13,7 @@ import { PureComponent } from '@app/framework/internal';
     templateUrl: './root-view.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RootViewComponent extends PureComponent {
+export class RootViewComponent {
     @ViewChild('element', { read: ViewContainerRef })
     public viewContainer: ViewContainerRef;
-
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector);
-    }
 }

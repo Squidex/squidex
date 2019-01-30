@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { StatefulControlComponent, Types } from '@app/framework/internal';
 
@@ -28,7 +28,7 @@ interface State {
     providers: [SQX_STARS_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StarsComponent extends StatefulControlComponent<State, number | null> implements ControlValueAccessor {
+export class StarsComponent extends StatefulControlComponent<State, number | null> {
     private maximumStarsValue = 5;
 
     @Input()
@@ -38,13 +38,13 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
         if (this.maximumStarsValue !== maxStars) {
             this.maximumStarsValue = value;
 
-            const starsArray = [];
+            const starsArray: number[] = [];
 
-            for (let i = 1; i <= value; i++) {
+            for (let i = 1; i <= maxStars; i++) {
                 starsArray.push(i);
             }
 
-            this.next({ starsArray });
+            this.next(s => ({ ...s, starsArray }));
         }
     }
 
@@ -63,7 +63,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
     public writeValue(obj: any) {
         const value = Types.isNumber(obj) ? obj : 0;
 
-        this.next({ stars: value, value });
+        this.next(s => ({ ...s, stars: value, value }));
     }
 
     public setPreview(stars: number) {
@@ -71,7 +71,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
             return;
         }
 
-        this.next({ stars });
+        this.next(s => ({ ...s, stars }));
     }
 
     public stopPreview() {
@@ -79,7 +79,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
             return;
         }
 
-        this.next(s => { s.stars = s.value || 0; });
+        this.next(s => ({ ...s, stars: s.value || 0 }));
     }
 
     public reset() {
@@ -88,7 +88,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
         }
 
         if (this.snapshot.value) {
-            this.next({ stars: -1, value: null });
+            this.next(s => ({ ...s, stars: -1, value: null }));
 
             this.callChange(null);
             this.callTouched();
@@ -103,7 +103,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
         }
 
         if (this.snapshot.value !== value) {
-            this.next({ stars: value, value });
+            this.next(s => ({ ...s, stars: value, value }));
 
             this.callChange(value);
             this.callTouched();

@@ -10,7 +10,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy
 import {
     fadeAnimation,
     ModalModel,
-    PureComponent
+    StatefulComponent
 } from '@app/framework/internal';
 
 @Component({
@@ -22,7 +22,7 @@ import {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TooltipComponent extends PureComponent implements OnDestroy, OnInit {
+export class TooltipComponent extends StatefulComponent implements OnDestroy, OnInit {
     @Input()
     public target: any;
 
@@ -34,7 +34,7 @@ export class TooltipComponent extends PureComponent implements OnDestroy, OnInit
     constructor(changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2
     ) {
-        super(changeDetector);
+        super(changeDetector, {});
     }
 
     public ngOnInit() {

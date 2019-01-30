@@ -44,7 +44,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
     public writeValue(obj: any) {
         const checkedValues = Types.isArrayOfString(obj) ? obj.filter(x => this.values.indexOf(x) >= 0) : [];
 
-        this.next({ checkedValues });
+        this.next(s => ({ ...s, checkedValues }));
     }
 
     public check(isChecked: boolean, value: string) {
@@ -56,7 +56,7 @@ export class CheckboxGroupComponent extends StatefulControlComponent<State, stri
             checkedValues = checkedValues.filter(x => x !== value);
         }
 
-        this.next({ checkedValues });
+        this.next(s => ({ ...s, checkedValues }));
 
         this.callChange(checkedValues);
     }

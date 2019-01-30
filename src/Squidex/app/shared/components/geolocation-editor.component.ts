@@ -6,10 +6,11 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
-import { ControlValueAccessor, FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     ResourceLoaderService,
+    StatefulControlComponent,
     Types,
     UIState,
     ValidatorsEx
@@ -27,6 +28,10 @@ interface Geolocation {
     longitude: number;
 }
 
+interface State {
+    isGoogleMaps: boolean;
+}
+
 @Component({
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
@@ -34,9 +39,7 @@ interface Geolocation {
     providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GeolocationEditorComponent implements ControlValueAccessor, AfterViewInit {
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
+export class GeolocationEditorComponent extends StatefulControlComponent<State, Geolocation> implements AfterViewInit {
     private marker: any;
     private map: any;
     private value: Geolocation | null = null;
@@ -62,20 +65,19 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         });
 
     @ViewChild('editor')
-    public editor: ElementRef;
+    public editor: ElementRef<HTMLElement>;
 
     @ViewChild('searchBox')
-    public searchBoxInput: ElementRef;
+    public searchBoxInput: ElementRef<HTMLInputElement>;
 
-    public isGoogleMaps = false;
-    public isDisabled = false;
-
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
         private readonly uiState: UIState
     ) {
+        super(changeDetector, {
+            isGoogleMaps: false
+        });
     }
 
     public writeValue(obj: any) {
@@ -91,9 +93,9 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
+        super.setDisabledState(isDisabled);
 
-        if (!this.isGoogleMaps) {
+        if (!this.snapshot.isGoogleMaps) {
             this.setDisabledStateOSM(isDisabled);
         } else {
             this.setDisabledStateGoogle(isDisabled);
@@ -104,8 +106,6 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         } else {
             this.geolocationForm.enable();
         }
-
-        this.changeDetector.markForCheck();
     }
 
     private setDisabledStateOSM(isDisabled: boolean): void {
@@ -139,14 +139,6 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
         }
     }
 
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
-    }
-
     public updateValueByInput() {
         const lat = this.geolocationForm.controls['latitude'].value;
         const lng = this.geolocationForm.controls['longitude'].value;
@@ -164,9 +156,11 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     public ngAfterViewInit() {
         this.uiState.settings
             .subscribe(settings => {
-                this.isGoogleMaps = settings.mapType === 'GoogleMaps';
+                const isGoogleMaps = settings.mapType === 'GoogleMaps';
 
-                if (!this.isGoogleMaps) {
+                this.next(s => ({ ...s, isGoogleMaps }));
+
+                if (!this.snapshot.isGoogleMaps) {
                     this.ngAfterViewInitOSM();
                 } else {
                     this.ngAfterViewInitGoogle(settings.mapKey);
@@ -189,7 +183,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
                 this.map.on('click',
                     (event: any) => {
-                        if (!this.marker && !this.isDisabled) {
+                        if (!this.marker && !this.snapshot.isDisabled) {
                             const latlng = event.latlng.wrap();
 
                             this.updateValue(latlng.lat, latlng.lng);
@@ -199,7 +193,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
                 this.updateMarker(true, false);
 
-                if (this.isDisabled) {
+                if (this.snapshot.isDisabled) {
                     this.map.zoomControl.disable();
 
                     this.map._handlers.forEach((handler: any) => {
@@ -224,7 +218,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
                 this.map.addListener('click',
                     (event: any) => {
-                        if (!this.isDisabled) {
+                        if (!this.snapshot.isDisabled) {
                             this.updateValue(event.latLng.lat(), event.latLng.lng());
                             this.updateMarker(false, true);
                         }
@@ -244,7 +238,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                             return;
                         }
 
-                        if (!this.isDisabled) {
+                        if (!this.snapshot.isDisabled) {
                             let lat = place.geometry.location.lat();
                             let lng = place.geometry.location.lng();
 
@@ -256,7 +250,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
                 this.updateMarker(true, false);
 
-                if (this.isDisabled) {
+                if (this.snapshot.isDisabled) {
                     this.map.setOptions({ draggable: false, zoomControl: false });
                 }
             });
@@ -264,7 +258,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
 
     public reset() {
         this.value = null;
-        this.searchBoxInput.nativeElement.value = null;
+        this.searchBoxInput.nativeElement.value = '';
 
         this.updateMarker(true, true);
     }
@@ -274,7 +268,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
     }
 
     private updateMarker(zoom: boolean, fireEvent: boolean) {
-        if (!this.isGoogleMaps) {
+        if (!this.snapshot.isGoogleMaps) {
             this.updateMarkerOSM(zoom);
         } else {
             this.updateMarkerGoogle(zoom);
@@ -307,7 +301,7 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                     this.updateMarker(false, true);
                 });
 
-                if (this.isDisabled) {
+                if (this.snapshot.isDisabled) {
                     this.marker.dragging.disable();
                 }
             }
@@ -344,12 +338,12 @@ export class GeolocationEditorComponent implements ControlValueAccessor, AfterVi
                 });
 
                 this.marker.addListener('drag', (event: any) => {
-                    if (!this.isDisabled) {
+                    if (!this.snapshot.isDisabled) {
                         this.updateValue(event.latLng.lat(), event.LatLng.lng());
                     }
                 });
                 this.marker.addListener('dragend', (event: any) => {
-                    if (!this.isDisabled) {
+                    if (!this.snapshot.isDisabled) {
                         this.updateValue(event.latLng.lat(), event.LatLng.lng());
                         this.updateMarker(false, true);
                     }

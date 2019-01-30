@@ -15,7 +15,7 @@ import { State } from '../state';
 
 declare type UnsubscribeFunction = () => void;
 
-export abstract class StatefulComponent<T> extends State<T> implements OnDestroy, OnInit {
+export abstract class StatefulComponent<T = any> extends State<T> implements OnDestroy, OnInit {
     private subscriptions: (Subscription | UnsubscribeFunction)[] = [];
 
     constructor(
@@ -52,11 +52,7 @@ export abstract class StatefulComponent<T> extends State<T> implements OnDestroy
     }
 }
 
-export interface FormControlState {
-    isDisabled: boolean;
-}
-
-export abstract class StatefulControlComponent<T, TValue> extends StatefulComponent<T & FormControlState> implements ControlValueAccessor {
+export abstract class StatefulControlComponent<T, TValue> extends StatefulComponent<T & { isDisabled: boolean }> implements ControlValueAccessor {
     private fnChanged = (v: any) => { /* NOOP */ };
     private fnTouched = () => { /* NOOP */ };
 
@@ -81,24 +77,18 @@ export abstract class StatefulControlComponent<T, TValue> extends StatefulCompon
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.next(state => { state.isDisabled = isDisabled; });
+        this.next(s => ({ ...s, isDisabled }));
     }
 
     public abstract writeValue(obj: any): void;
 }
 
-export abstract class PureComponent extends StatefulComponent<any> {
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {});
-    }
-}
-
-export abstract class ExternalControlComponent<TValue> extends PureComponent implements ControlValueAccessor {
+export abstract class ExternalControlComponent<TValue> extends StatefulComponent<any> implements ControlValueAccessor {
     private fnChanged = (v: any) => { /* NOOP */ };
     private fnTouched = () => { /* NOOP */ };
 
     constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector);
+        super(changeDetector, {});
 
         changeDetector.detach();
     }

@@ -127,6 +127,6 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             }
         }
 
-        this.next({ errorMessages });
+        this.next(() => ({ errorMessages }));
     }
 }

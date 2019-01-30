@@ -6,12 +6,13 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Renderer2, ViewChild } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AssetDto,
     DialogModel,
     ResourceLoaderService,
+    StatefulControlComponent,
     Types
 } from '@app/shared/internal';
 
@@ -21,6 +22,10 @@ export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => MarkdownEditorComponent), multi: true
 };
 
+interface State {
+    isFullscreen: false;
+}
+
 @Component({
     selector: 'sqx-markdown-editor',
     styleUrls: ['./markdown-editor.component.scss'],
@@ -28,9 +33,7 @@ export const SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_MARKDOWN_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewInit {
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
+export class MarkdownEditorComponent extends StatefulControlComponent<State, string> implements AfterViewInit {
     private simplemde: any;
     private value: string;
     private isDisabled = false;
@@ -46,13 +49,14 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
     @ViewChild('inner')
     public inner: ElementRef;
 
-    public isFullscreen = false;
-
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2,
         private readonly resourceLoader: ResourceLoaderService
     ) {
+        super(changeDetector, {
+            isFullscreen: false
+        });
+
         this.resourceLoader.loadStyle('https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css');
     }
 
@@ -72,18 +76,8 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
         }
     }
 
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
-    }
-
     private showSelector = () => {
         this.assetsDialog.show();
-
-        this.changeDetector.detectChanges();
     }
 
     public ngAfterViewInit() {
@@ -182,17 +176,17 @@ export class MarkdownEditorComponent implements ControlValueAccessor, AfterViewI
             });
 
             this.simplemde.codemirror.on('refresh', () => {
-                this.isFullscreen = this.simplemde.isFullscreenActive();
+                const isFullscreen = this.simplemde.isFullscreenActive();
 
                 let target = this.container.nativeElement;
 
-                if (this.isFullscreen) {
+                if (isFullscreen) {
                     target = document.body;
                 }
 
                 this.renderer.appendChild(target, this.inner.nativeElement);
 
-                this.changeDetector.detectChanges();
+                this.next(s => ({ ...s, isFullscreen }));
             });
 
             this.simplemde.codemirror.on('blur', () => {
