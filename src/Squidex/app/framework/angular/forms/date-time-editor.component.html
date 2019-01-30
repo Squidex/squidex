@@ -1,19 +1,19 @@
 <div>
     <div class="form-inline">
         <div class="form-group date-group">
-            <input type="text" class="form-control" [formControl]="dateControl" (blur)="touched()" #dateInput />
+            <input type="text" class="form-control" [formControl]="dateControl" (blur)="callTouched()" #dateInput />
         </div>
         <div class="form-group time-group" *ngIf="showTime">
-            <input type="text" class="form-control" [formControl]="timeControl" (blur)="touched()" />
+            <input type="text" class="form-control" [formControl]="timeControl" (blur)="callTouched()" />
         </div>
         <div class="form-group" *ngIf="showTime">
-            <button class="btn btn-secondary" [disabled]="isDisabled" (click)="writeNow()">Now</button>
+            <button class="btn btn-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()">Now</button>
         </div>
         <div class="form-group" *ngIf="!showTime">
-            <button class="btn btn-secondary" [disabled]="isDisabled" (click)="writeNow()">Today</button>
+            <button class="btn btn-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()">Today</button>
         </div>
         <div class="form-group" [class.hidden]="!hasValue" *ngIf="!hideClear">
-            <button class="btn btn-text clear" [disabled]="isDisabled" (click)="reset()">Clear</button>
+            <button class="btn btn-text clear" [disabled]="snapshot.isDisabled" (click)="reset()">Clear</button>
         </div>
     </div>
 </div>

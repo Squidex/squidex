@@ -8,15 +8,13 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { StatefulComponent, Types } from '@app/framework/internal';
+import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StarsComponent), multi: true
 };
 
 interface State {
-    isDisabled: boolean;
-
     stars: number;
     starsArray: number[];
 
@@ -30,9 +28,7 @@ interface State {
     providers: [SQX_STARS_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StarsComponent extends StatefulComponent<State> implements ControlValueAccessor {
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
+export class StarsComponent extends StatefulControlComponent<State, number | null> implements ControlValueAccessor {
     private maximumStarsValue = 5;
 
     @Input()
@@ -58,7 +54,6 @@ export class StarsComponent extends StatefulComponent<State> implements ControlV
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
-            isDisabled: false,
             stars: -1,
             starsArray: [1, 2, 3, 4, 5],
             value: 1
@@ -69,18 +64,6 @@ export class StarsComponent extends StatefulComponent<State> implements ControlV
         const value = Types.isNumber(obj) ? obj : 0;
 
         this.next({ stars: value, value });
-    }
-
-    public setDisabledState(isDisabled: boolean): void {
-        this.next({ isDisabled });
-    }
-
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
     }
 
     public setPreview(stars: number) {

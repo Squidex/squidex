@@ -6,6 +6,7 @@
  */
 
 import { ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
+import { ControlValueAccessor } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { Types } from './../utils/types';
@@ -51,8 +52,74 @@ export abstract class StatefulComponent<T> extends State<T> implements OnDestroy
     }
 }
 
+export interface FormControlState {
+    isDisabled: boolean;
+}
+
+export abstract class StatefulControlComponent<T, TValue> extends StatefulComponent<T & FormControlState> implements ControlValueAccessor {
+    private fnChanged = (v: any) => { /* NOOP */ };
+    private fnTouched = () => { /* NOOP */ };
+
+    constructor(changeDetector: ChangeDetectorRef, state: T) {
+        super(changeDetector, { ...state, isDisabled: false });
+    }
+
+    public registerOnChange(fn: any) {
+        this.fnChanged = fn;
+    }
+
+    public registerOnTouched(fn: any) {
+        this.fnTouched = fn;
+    }
+
+    public callTouched() {
+        this.fnTouched();
+    }
+
+    public callChange(value: TValue | null | undefined) {
+        this.fnChanged(value);
+    }
+
+    public setDisabledState(isDisabled: boolean): void {
+        this.next(state => { state.isDisabled = isDisabled; });
+    }
+
+    public abstract writeValue(obj: any): void;
+}
+
 export abstract class PureComponent extends StatefulComponent<any> {
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {});
     }
+}
+
+export abstract class ExternalControlComponent<TValue> extends PureComponent implements ControlValueAccessor {
+    private fnChanged = (v: any) => { /* NOOP */ };
+    private fnTouched = () => { /* NOOP */ };
+
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector);
+
+        changeDetector.detach();
+    }
+
+    public registerOnChange(fn: any) {
+        this.fnChanged = fn;
+    }
+
+    public registerOnTouched(fn: any) {
+        this.fnTouched = fn;
+    }
+
+    protected callTouched() {
+        this.fnTouched();
+    }
+
+    protected callChange(value: TValue) {
+        this.fnChanged(value);
+    }
+
+    public abstract setDisabledState(isDisabled: boolean): void;
+
+    public abstract writeValue(obj: any): void;
 }

@@ -1,9 +1,9 @@
 <span class="form-check" *ngFor="let value of values">
-    <input type="checkbox" class="form-check-input" id="{{snapshot.controlId}}{{value}}"
-        (blur)="blur()"
+    <input type="checkbox" class="form-check-input" id="{{controlId}}{{value}}"
+        (blur)="callTouched()"
         (change)="check($event.target.checked, value)" 
         [checked]="isChecked(value)"
         [disabled]="snapshot.isDisabled">
 
-    <label class="form-check-label" for="{{snapshot.controlId}}{{value}}">{{value}}</label>
+    <label class="form-check-label" for="{{controlId}}{{value}}">{{value}}</label>
 </span>

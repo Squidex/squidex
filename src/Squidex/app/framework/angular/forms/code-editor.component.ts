@@ -6,12 +6,12 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
-import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 import {
-    PureComponent,
+    ExternalControlComponent,
     ResourceLoaderService,
     Types
 } from '@app/framework/internal';
@@ -29,9 +29,7 @@ export const SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CodeEditorComponent extends PureComponent implements ControlValueAccessor, AfterViewInit {
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
+export class CodeEditorComponent extends ExternalControlComponent<string> implements AfterViewInit {
     private valueChanged = new Subject();
     private aceEditor: any;
     private value: string;
@@ -48,8 +46,6 @@ export class CodeEditorComponent extends PureComponent implements ControlValueAc
         private readonly resourceLoader: ResourceLoaderService
     ) {
         super(changeDetector);
-
-        changeDetector.detach();
     }
 
     public writeValue(obj: any) {
@@ -66,14 +62,6 @@ export class CodeEditorComponent extends PureComponent implements ControlValueAc
         if (this.aceEditor) {
             this.aceEditor.setReadOnly(isDisabled);
         }
-    }
-
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
     }
 
     public ngAfterViewInit() {

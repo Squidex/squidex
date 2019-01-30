@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
-import { Types } from '@app/framework/internal';
+import { ExternalControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IFrameEditorComponent), multi: true
@@ -22,10 +22,7 @@ export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IFrameEditorComponent implements ControlValueAccessor, AfterViewInit,  OnInit, OnDestroy {
-    private windowMessageListener: Function;
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
+export class IFrameEditorComponent extends ExternalControlComponent<any> implements AfterViewInit,  OnInit {
     private value: any;
     private isDisabled = false;
     private isInitialized = false;
@@ -41,14 +38,11 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
 
     public sanitizedUrl: SafeResourceUrl;
 
-    constructor(
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly sanitizer: DomSanitizer,
         private readonly renderer: Renderer2
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.windowMessageListener();
+        super(changeDetector);
     }
 
     public ngAfterViewInit() {
@@ -56,7 +50,7 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
     }
 
     public ngOnInit(): void {
-        this.windowMessageListener =
+        this.observe(
             this.renderer.listen('window', 'message', (event: MessageEvent) => {
                 if (event.source === this.plugin.contentWindow) {
                     const { type } = event.data;
@@ -84,7 +78,7 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
                         this.callTouched();
                     }
                 }
-            });
+            }));
     }
 
     public writeValue(obj: any) {
@@ -101,13 +95,5 @@ export class IFrameEditorComponent implements ControlValueAccessor, AfterViewIni
         if (this.isInitialized && this.plugin.contentWindow && Types.isFunction(this.plugin.contentWindow.postMessage)) {
             this.plugin.contentWindow.postMessage({ type: 'disabled', isDisabled: this.isDisabled }, '*');
         }
-    }
-
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
     }
 }

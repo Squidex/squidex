@@ -6,11 +6,11 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     MathHelper,
-    StatefulComponent,
+    StatefulControlComponent,
     Types
 } from '@app/framework/internal';
 
@@ -20,8 +20,6 @@ export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
 
 interface State {
     checkedValues: string[];
-    controlId: string;
-    isDisabled: boolean;
 }
 
 @Component({
@@ -31,39 +29,22 @@ interface State {
     providers: [SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CheckboxGroupComponent extends StatefulComponent<State> implements ControlValueAccessor {
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
+export class CheckboxGroupComponent extends StatefulControlComponent<State, string[]> {
+    public readonly controlId = MathHelper.guid();
 
     @Input()
     public values: string[] = [];
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
-            controlId: MathHelper.guid(),
-            checkedValues: [],
-            isDisabled: false
+            checkedValues: []
         });
     }
 
     public writeValue(obj: any) {
-        this.next({ checkedValues: Types.isArrayOfString(obj) ? obj.filter(x => this.values.indexOf(x) >= 0) : [] });
-    }
+        const checkedValues = Types.isArrayOfString(obj) ? obj.filter(x => this.values.indexOf(x) >= 0) : [];
 
-    public setDisabledState(isDisabled: boolean): void {
-        this.next({ isDisabled });
-    }
-
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
-    }
-
-    public blur() {
-        this.callTouched();
+        this.next({ checkedValues });
     }
 
     public check(isChecked: boolean, value: string) {
@@ -78,7 +59,7 @@ export class CheckboxGroupComponent extends StatefulComponent<State> implements 
         this.next({ checkedValues });
 
         this.callChange(checkedValues);
-        }
+    }
 
     public isChecked(value: string) {
         return this.snapshot.checkedValues.indexOf(value) >= 0;

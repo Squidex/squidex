@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
-import { Types } from '@app/framework/internal';
+import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 const KEY_COMMA = 188;
 const KEY_DELETE = 8;
@@ -75,6 +74,15 @@ const CACHED_SIZES: { [key: string]: number } = {};
 
 let CACHED_FONT: string;
 
+interface State {
+    hasFocus: boolean;
+
+    suggestedItems: string[];
+    suggestedIndex: number;
+
+    items: any[];
+}
+
 @Component({
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
@@ -82,11 +90,7 @@ let CACHED_FONT: string;
     providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, OnDestroy, OnInit {
-    private subscription: Subscription;
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
-
+export class TagEditorComponent extends StatefulControlComponent<State, any[]> implements AfterViewInit, ControlValueAccessor, OnInit {
     @Input()
     public converter: Converter = new StringConverter();
 
@@ -115,27 +119,20 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     public inputName = 'tag-editor';
 
     @ViewChild('form')
-    public formElement: ElementRef<Element>;
+    public formElement: ElementRef<HTMLElement>;
 
     @ViewChild('input')
     public inputElement: ElementRef<HTMLInputElement>;
 
-    public hasFocus = false;
-
-    public suggestedItems: string[] = [];
-    public suggestedIndex = 0;
-
-    public items: any[] = [];
-
     public addInput = new FormControl();
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef
-    ) {
-    }
-
-    public ngOnDestroy() {
-        this.subscription.unsubscribe();
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector, {
+            hasFocus: false,
+            suggestedItems: [],
+            suggestedIndex: 0,
+            items: []
+        });
     }
 
     public ngAfterViewInit() {
@@ -149,7 +146,7 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     public ngOnInit() {
-        this.subscription =
+        this.observe(
             this.addInput.valueChanges.pipe(
                     tap(() => {
                         this.resetSize();
@@ -164,7 +161,7 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
                     distinctUntilChanged(),
                     map(query => {
                         if (Types.isArray(this.suggestions) && query && query.length > 0) {
-                            return this.suggestions.filter(s => s.indexOf(query) >= 0 && this.items.indexOf(s) < 0);
+                            return this.suggestions.filter(s => s.indexOf(query) >= 0 && this.snapshot.items.indexOf(s) < 0);
                         } else {
                             return [];
                         }
@@ -172,7 +169,7 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
                 .subscribe(items => {
                     this.suggestedIndex = -1;
                     this.suggestedItems = items || [];
-                });
+                }));
     }
 
     public writeValue(obj: any) {
@@ -189,6 +186,8 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     public setDisabledState(isDisabled: boolean): void {
+        super.setDisabledState(isDisabled);
+
         if (isDisabled) {
             this.addInput.disable();
         } else {
@@ -196,17 +195,9 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
         }
     }
 
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
-    }
-
     public focus() {
         if (this.addInput.enabled) {
-            this.hasFocus = true;
+            this.next({ hasFocus: true });
         }
     }
 
@@ -396,7 +387,7 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     private updateItems(items: any[]) {
-        this.items = items;
+        const items = items;
 
         if (items.length === 0 && this.undefinedWhenEmpty) {
             this.callChange(undefined);
