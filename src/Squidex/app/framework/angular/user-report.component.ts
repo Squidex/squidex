@@ -5,36 +5,36 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { timer } from 'rxjs';
 
-import { UserReportConfig } from './../configurations';
-import { ResourceLoaderService } from './../services/resource-loader.service';
+import {
+    PureComponent,
+    ResourceLoaderService,
+    UserReportConfig
+} from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-user-report',
-    template: '',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    template: ''
 })
-export class UserReportComponent implements OnDestroy, OnInit {
-    private loadingTimer: any;
-
-    constructor(config: UserReportConfig, changeDetector: ChangeDetectorRef,
+export class UserReportComponent extends PureComponent implements OnDestroy, OnInit {
+    constructor(changeDetector: ChangeDetectorRef,
+        private readonly config: UserReportConfig,
         private readonly resourceLoader: ResourceLoaderService
     ) {
+        super(changeDetector);
+
         changeDetector.detach();
-
-        window['_urq'] = window['_urq'] || [];
-        window['_urq'].push(['initSite', config.siteId]);
-    }
-
-    public ngOnDestroy() {
-        clearTimeout(this.loadingTimer);
     }
 
     public ngOnInit() {
-        this.loadingTimer =
-            setTimeout(() => {
+        window['_urq'] = window['_urq'] || [];
+        window['_urq'].push(['initSite', this.config.siteId]);
+
+        this.observe(
+            timer(4000).subscribe(() => {
                 this.resourceLoader.loadScript('https://cdn.userreport.com/userreport.js');
-            }, 4000);
+            }));
     }
 }

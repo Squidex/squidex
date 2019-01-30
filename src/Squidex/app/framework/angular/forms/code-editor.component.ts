@@ -5,12 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
-import { ResourceLoaderService, Types } from '@app/framework/internal';
+import {
+    PureComponent,
+    ResourceLoaderService,
+    Types
+} from '@app/framework/internal';
 
 declare var ace: any;
 
@@ -25,7 +29,7 @@ export const SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CodeEditorComponent implements ControlValueAccessor, AfterViewInit {
+export class CodeEditorComponent extends PureComponent implements ControlValueAccessor, AfterViewInit {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
     private valueChanged = new Subject();
@@ -40,8 +44,12 @@ export class CodeEditorComponent implements ControlValueAccessor, AfterViewInit 
     public mode = 'ace/mode/javascript';
 
     constructor(
+        changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
+        super(changeDetector);
+
+        changeDetector.detach();
     }
 
     public writeValue(obj: any) {

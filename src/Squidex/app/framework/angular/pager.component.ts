@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { Pager } from './../internal';
+import { Pager, PureComponent } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-pager',
@@ -15,16 +15,20 @@ import { Pager } from './../internal';
     templateUrl: './pager.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PagerComponent {
+export class PagerComponent extends PureComponent {
+    @Output()
+    public nextPage = new EventEmitter();
+
+    @Output()
+    public prevPage = new EventEmitter();
+
     @Input()
     public pager: Pager;
 
     @Input()
     public hideWhenButtonsDisabled = false;
 
-    @Output()
-    public next = new EventEmitter();
-
-    @Output()
-    public prev = new EventEmitter();
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector);
+    }
 }

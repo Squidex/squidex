@@ -147,7 +147,7 @@ export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorF
 
     public visitNumber(properties: NumberFieldPropertiesDto): ValidatorFn[] {
         const validators: ValidatorFn[] = [
-            ValidatorsEx.betweenLength(properties.minValue, properties.maxValue)
+            ValidatorsEx.between(properties.minValue, properties.maxValue)
         ];
 
         if (properties.allowedValues && properties.allowedValues.length > 0) {

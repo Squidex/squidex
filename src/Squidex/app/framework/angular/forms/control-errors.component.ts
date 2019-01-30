@@ -7,11 +7,19 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Host, Input, OnChanges, OnDestroy, Optional } from '@angular/core';
 import { AbstractControl, FormGroupDirective } from '@angular/forms';
-import { merge, Subscription } from 'rxjs';
+import { merge } from 'rxjs';
 
-import { fadeAnimation, Types } from '@app/framework/internal';
+import {
+    fadeAnimation,
+    StatefulComponent,
+    Types
+} from '@app/framework/internal';
 
 import { formatError } from './error-formatting';
+
+interface State {
+    errorMessages: string[];
+}
 
 @Component({
     selector: 'sqx-control-errors',
@@ -22,10 +30,9 @@ import { formatError } from './error-formatting';
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ControlErrorsComponent implements OnChanges, OnDestroy {
+export class ControlErrorsComponent extends StatefulComponent<State> implements OnChanges, OnDestroy {
     private displayFieldName: string;
     private control: AbstractControl;
-    private controlSubscription: Subscription | null = null;
     private originalMarkAsTouched: any;
 
     @Input()
@@ -43,16 +50,20 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
     @Input()
     public submitOnly = false;
 
-    public errorMessages: string[] = [];
-
-    constructor(
-        @Optional() @Host() private readonly formGroupDirective: FormGroupDirective,
-        private readonly changeDetector: ChangeDetectorRef
+    constructor(changeDetector: ChangeDetectorRef,
+        @Optional() @Host() private readonly formGroupDirective: FormGroupDirective
     ) {
+        super(changeDetector, {
+            errorMessages: []
+        });
     }
 
     public ngOnDestroy() {
-        this.unsubscribe();
+        super.ngOnDestroy();
+
+        if (this.control && this.originalMarkAsTouched) {
+            this.control['markAsTouched'] = this.originalMarkAsTouched;
+        }
     }
 
     public ngOnChanges() {
@@ -75,16 +86,16 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
         }
 
         if (this.control !== control) {
-            this.unsubscribe();
+            this.ngOnDestroy();
 
             this.control = control;
 
             if (control) {
-                this.controlSubscription =
+                this.observe(
                     merge(control.valueChanges, control.statusChanges)
                         .subscribe(() => {
                             this.createMessages();
-                        });
+                        }));
 
                 this.originalMarkAsTouched = this.control.markAsTouched;
 
@@ -101,18 +112,8 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
         this.createMessages();
     }
 
-    private unsubscribe() {
-        if (this.controlSubscription) {
-            this.controlSubscription.unsubscribe();
-        }
-
-        if (this.control && this.originalMarkAsTouched) {
-            this.control['markAsTouched'] = this.originalMarkAsTouched;
-        }
-    }
-
     private createMessages() {
-        const errors: string[] = [];
+        const errorMessages: string[] = [];
 
         if (this.control && this.control.invalid && ((this.control.touched && !this.submitOnly) || this.submitted) && this.control.errors) {
             for (let key in <any>this.control.errors) {
@@ -120,14 +121,12 @@ export class ControlErrorsComponent implements OnChanges, OnDestroy {
                     const message = formatError(this.displayFieldName, key, this.control.errors[key], this.control.value, this.errors);
 
                     if (message) {
-                        errors.push(message);
+                        errorMessages.push(message);
                     }
                 }
             }
         }
 
-        this.errorMessages = errors;
-
-        this.changeDetector.markForCheck();
+        this.next({ errorMessages });
     }
 }

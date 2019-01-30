@@ -35,4 +35,4 @@
     </ng-container>
 </div>
 
-<sqx-pager [hideWhenButtonsDisabled]="true" [pager]="state.assetsPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
+<sqx-pager [hideWhenButtonsDisabled]="true" [pager]="state.assetsPager | async" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>

@@ -28,7 +28,7 @@ interface Snapshot {
     assetsPager: Pager;
     assetsQuery?: string;
 
-    isLoaded?: false;
+    isLoaded?: boolean;
 }
 
 @Injectable()

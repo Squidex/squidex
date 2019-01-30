@@ -325,7 +325,7 @@ export class SchemasState extends State<Snapshot> {
     private replaceSchema(schema: SchemaDto) {
         return this.next(s => {
             const schemas = s.schemas.replaceBy('id', schema).sortByStringAsc(x => x.displayName);
-            const selectedSchema = s.selectedSchema && s.selectedSchema.id === schema.id ? schema : s.selectedSchema;
+            const selectedSchema = Types.is(schema, SchemaDetailsDto) && s.selectedSchema && s.selectedSchema.id === schema.id ? schema : s.selectedSchema;
 
             const categories = buildCategories(s.categories, schemas);
 

@@ -8,13 +8,21 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { Types } from '@app/framework/internal';
-
-import { MathHelper } from '../../utils/math-helper';
+import {
+    MathHelper,
+    StatefulComponent,
+    Types
+} from '@app/framework/internal';
 
 export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CheckboxGroupComponent), multi: true
 };
+
+interface State {
+    checkedValues: string[];
+    controlId: string;
+    isDisabled: boolean;
+}
 
 @Component({
     selector: 'sqx-checkbox-group',
@@ -23,33 +31,27 @@ export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CheckboxGroupComponent implements ControlValueAccessor {
+export class CheckboxGroupComponent extends StatefulComponent<State> implements ControlValueAccessor {
     private callChange = (v: any) => { /* NOOP */ };
     private callTouched = () => { /* NOOP */ };
-    private checkedValues: string[] = [];
 
     @Input()
     public values: string[] = [];
 
-    public isDisabled = false;
-
-    public control = MathHelper.guid();
-
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef
-    ) {
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector, {
+            controlId: MathHelper.guid(),
+            checkedValues: [],
+            isDisabled: false
+        });
     }
 
     public writeValue(obj: any) {
-        this.checkedValues = Types.isArrayOfString(obj) ? obj.filter(x => this.values.indexOf(x) >= 0) : [];
-
-        this.changeDetector.markForCheck();
+        this.next({ checkedValues: Types.isArrayOfString(obj) ? obj.filter(x => this.values.indexOf(x) >= 0) : [] });
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
-
-        this.changeDetector.markForCheck();
+        this.next({ isDisabled });
     }
 
     public registerOnChange(fn: any) {
@@ -65,16 +67,20 @@ export class CheckboxGroupComponent implements ControlValueAccessor {
     }
 
     public check(isChecked: boolean, value: string) {
+        let checkedValues = this.snapshot.checkedValues;
+
         if (isChecked) {
-            this.checkedValues = [value, ...this.checkedValues];
+            checkedValues = [value, ...checkedValues];
         } else {
-            this.checkedValues = this.checkedValues.filter(x => x !== value);
+            checkedValues = checkedValues.filter(x => x !== value);
         }
 
-        this.callChange(this.checkedValues);
-    }
+        this.next({ checkedValues });
+
+        this.callChange(checkedValues);
+        }
 
     public isChecked(value: string) {
-        return this.checkedValues.indexOf(value) >= 0;
+        return this.snapshot.checkedValues.indexOf(value) >= 0;
     }
 }

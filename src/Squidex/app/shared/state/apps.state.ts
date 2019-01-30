@@ -67,9 +67,9 @@ export class AppsState extends State<Snapshot> {
 
     public load(): Observable<any> {
         return this.appsService.getApps().pipe(
-            tap(dtos => {
+            tap((dto: AppDto[]) => {
                 this.next(s => {
-                    const apps = ImmutableArray.of(dtos);
+                    const apps = ImmutableArray.of(dto);
 
                     return { ...s, apps };
                 });

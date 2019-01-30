@@ -18,13 +18,13 @@ describe('ShortcutComponent', () => {
     });
 
     it('should instantiate', () => {
-        const shortcutComponent = new ShortcutComponent(shortcutService, new NgZone({}));
+        const shortcutComponent = new ShortcutComponent(<any>{}, shortcutService, new NgZone({}));
 
         expect(shortcutComponent).toBeDefined();
     });
 
     it('should init without keys', () => {
-        const shortcutComponent = new ShortcutComponent(shortcutService, new NgZone({}));
+        const shortcutComponent = new ShortcutComponent(<any>{}, shortcutService, new NgZone({}));
 
         shortcutComponent.keys = null!;
         shortcutComponent.ngOnInit();
@@ -33,7 +33,7 @@ describe('ShortcutComponent', () => {
     });
 
     it('should destroy without keys', () => {
-        const shortcutComponent = new ShortcutComponent(shortcutService, new NgZone({}));
+        const shortcutComponent = new ShortcutComponent(<any>{}, shortcutService, new NgZone({}));
 
         shortcutComponent.keys = null!;
         shortcutComponent.ngOnDestroy();
@@ -42,7 +42,7 @@ describe('ShortcutComponent', () => {
     });
 
     it('should raise event when triggered', () => {
-        const shortcutComponent = new ShortcutComponent(shortcutService, new NgZone({}));
+        const shortcutComponent = new ShortcutComponent(<any>{}, shortcutService, new NgZone({}));
 
         let isTriggered = false;
 
@@ -56,7 +56,7 @@ describe('ShortcutComponent', () => {
     });
 
     it('should not raise event when triggered but disabled', () => {
-        const shortcutComponent = new ShortcutComponent(shortcutService, new NgZone({}));
+        const shortcutComponent = new ShortcutComponent(<any>{}, shortcutService, new NgZone({}));
 
         let isTriggered = false;
 
@@ -71,7 +71,7 @@ describe('ShortcutComponent', () => {
     });
 
     it('should not raise event when triggered but destroyed', () => {
-        const shortcutComponent = new ShortcutComponent(shortcutService, new NgZone({}));
+        const shortcutComponent = new ShortcutComponent(<any>{}, shortcutService, new NgZone({}));
 
         let isTriggered = false;
 

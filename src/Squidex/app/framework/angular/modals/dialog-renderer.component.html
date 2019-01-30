@@ -2,11 +2,11 @@
 
 <sqx-modal-dialog *sqxModalView="dialogView;onRoot:true" showClose="false" (closed)="cancel()">
     <ng-container title>
-        {{dialogRequest?.title}}
+        {{snapshot.dialogRequest?.title}}
     </ng-container>
 
     <ng-container content>
-        {{dialogRequest?.text}}
+        {{snapshot.dialogRequest?.text}}
     </ng-container>
 
     <ng-container footer>
@@ -16,7 +16,7 @@
 </sqx-modal-dialog>
 
 <div class="notification-container notification-container-{{position}}">
-    <div class="alert alert-dismissible alert-{{notification.messageType}}" *ngFor="let notification of notifications" (click)="close(notification)" @fade>
+    <div class="alert alert-dismissible alert-{{notification.messageType}}" *ngFor="let notification of snapshot.notifications" (click)="close(notification)" @fade>
         <button type="button" class="close" data-dismiss="alert" (closed)="close(notification)">&times;</button>
 
         <span [innerHTML]="notification.message"></span>

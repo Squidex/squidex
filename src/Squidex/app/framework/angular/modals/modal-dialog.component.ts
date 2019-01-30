@@ -7,7 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 
-import { fadeAnimation } from './../animations';
+import { fadeAnimation } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-modal-dialog',
@@ -16,7 +16,7 @@ import { fadeAnimation } from './../animations';
     animations: [
         fadeAnimation
     ],
-    changeDetection: ChangeDetectionStrategy.Default
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ModalDialogComponent implements AfterViewInit {
     @Input()

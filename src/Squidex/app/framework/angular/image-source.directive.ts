@@ -7,7 +7,7 @@
 
 import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
-import { MathHelper } from './../utils/math-helper';
+import { MathHelper } from '@app/framework/internal';
 
 const LAYOUT_CACHE: { [key: string]: { width: number, height: number } } = {};
 

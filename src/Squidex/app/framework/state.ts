@@ -15,7 +15,7 @@ import { fullValue} from './angular/forms/forms-helper';
 export interface FormState {
     submitted: boolean;
 
-    error?: string;
+    error?: string | null;
 }
 
 export class Form<T extends AbstractControl> {
@@ -136,11 +136,14 @@ export class State<T extends {}> {
         this.next(this.initialState);
     }
 
-    public next(update: ((v: T) => T) | object) {
+    public next(update: ((v: T) => T | void) | Partial<T>) {
         if (Types.isFunction(update)) {
-            this.state.next(update(this.state.value));
+            const stateNew = { ...this.snapshot };
+            const stateUpdated = update(stateNew);
+
+            this.state.next(stateUpdated || stateNew);
         } else {
-            this.state.next(Object.assign({}, this.snapshot, update));
+            this.state.next({ ...this.snapshot, ...update });
         }
     }
 }

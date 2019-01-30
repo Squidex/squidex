@@ -5,7 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+
+import { PureComponent } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-code',
@@ -13,5 +15,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     templateUrl: './code.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CodeComponent {
+export class CodeComponent extends PureComponent {
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector);
+    }
 }

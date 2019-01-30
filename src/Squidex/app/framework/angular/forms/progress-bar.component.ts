@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges } from '@angular/core';
 
 import * as ProgressBar from 'progressbar.js';
 
@@ -38,10 +38,11 @@ export class ProgressBarComponent implements OnChanges, OnInit {
     @Input()
     public value = 0;
 
-    constructor(
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly element: ElementRef,
         private readonly renderer: Renderer2
     ) {
+        changeDetector.detach();
     }
 
     public ngOnInit() {

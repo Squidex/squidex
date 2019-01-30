@@ -42,7 +42,7 @@ export class UserPageComponent implements OnDestroy, OnInit {
         this.selectedUserSubscription =
             this.usersState.selectedUser
                 .subscribe(selectedUser => {
-                    this.user = selectedUser;
+                    this.user = selectedUser!;
 
                     if (selectedUser) {
                         this.userForm.load(selectedUser.user);

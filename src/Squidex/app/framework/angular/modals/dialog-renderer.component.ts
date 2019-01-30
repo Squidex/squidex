@@ -5,8 +5,8 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { timer } from 'rxjs';
 
 import {
     DialogModel,
@@ -15,6 +15,14 @@ import {
     fadeAnimation,
     Notification
 } from '@app/framework/internal';
+
+import { StatefulComponent } from '../stateful.component';
+
+interface State {
+    dialogRequest?: DialogRequest | null;
+
+    notifications: Notification[];
+}
 
 @Component({
     selector: 'sqx-dialog-renderer',
@@ -25,89 +33,74 @@ import {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DialogRendererComponent implements OnDestroy, OnInit {
-    private dialogSubscription: Subscription;
-    private dialogsSubscription: Subscription;
-    private notificationsSubscription: Subscription;
-
-    public dialogView = new DialogModel();
-    public dialogRequest: DialogRequest | null = null;
-
-    public notifications: Notification[] = [];
-
+export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
     @Input()
     public position = 'bottomright';
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
+    public dialogView = new DialogModel();
+
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.notificationsSubscription.unsubscribe();
-        this.dialogSubscription.unsubscribe();
-        this.dialogsSubscription.unsubscribe();
+        super(changeDetector, { notifications: [] });
     }
 
     public ngOnInit() {
-        this.dialogSubscription =
+        this.observe(
             this.dialogView.isOpen.subscribe(isOpen => {
                 if (!isOpen) {
-                    this.cancel();
-
-                    this.changeDetector.detectChanges();
+                    this.finishRequest(false);
                 }
-            });
+            }));
 
-        this.notificationsSubscription =
+        this.observe(
             this.dialogs.notifications.subscribe(notification => {
-                this.notifications.push(notification);
+                this.next(state => {
+                    state.notifications = [...state.notifications, notification];
+                });
 
                 if (notification.displayTime > 0) {
-                    setTimeout(() => {
+                    this.observe(timer(notification.displayTime).subscribe(() => {
                         this.close(notification);
-                    }, notification.displayTime);
+                    }));
                 }
+            }));
 
-                this.changeDetector.detectChanges();
-            });
-
-        this.dialogsSubscription =
+        this.observe(
             this.dialogs.dialogs
                 .subscribe(request => {
                     this.cancel();
 
-                    this.dialogRequest = request;
-                    this.dialogView.show();
-
-                    this.changeDetector.detectChanges();
-                });
+                    this.next(state => {
+                        state.dialogRequest = request;
+                    });
+                }));
     }
 
     public cancel() {
-        if (this.dialogRequest) {
-            this.dialogRequest.complete(false);
-            this.dialogRequest = null;
-            this.dialogView.hide();
-        }
+        this.finishRequest(false);
+
+        this.dialogView.hide();
     }
 
     public confirm() {
-        if (this.dialogRequest) {
-            this.dialogRequest.complete(true);
-            this.dialogRequest = null;
-            this.dialogView.hide();
-        }
+        this.finishRequest(true);
+
+        this.dialogView.hide();
+    }
+
+    private finishRequest(value: boolean) {
+        this.next(state => {
+            if (state.dialogRequest) {
+                state.dialogRequest.complete(value);
+                state.dialogRequest = null;
+            }
+        });
     }
 
     public close(notification: Notification) {
-        const index = this.notifications.indexOf(notification);
-
-        if (index >= 0) {
-            this.notifications.splice(index, 1);
-
-            this.changeDetector.detectChanges();
-        }
+        this.next(state => {
+            state.notifications = state.notifications.filter(n => notification !== n);
+        });
     }
 }

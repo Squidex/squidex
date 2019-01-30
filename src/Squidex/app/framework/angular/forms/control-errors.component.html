@@ -1,6 +1,6 @@
- <div class="errors-container" *ngIf="errorMessages.length > 0" @fade>
+ <div class="errors-container" *ngIf="snapshot.errorMessages.length > 0" @fade>
     <div class="errors">
-        <span *ngFor="let message of errorMessages">
+        <span *ngFor="let message of snapshot.errorMessages">
             {{message}}
         </span>
     </div>

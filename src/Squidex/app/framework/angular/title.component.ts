@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 
-import { TitleService } from './../services/title.service';
+import { TitleService } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-title',
