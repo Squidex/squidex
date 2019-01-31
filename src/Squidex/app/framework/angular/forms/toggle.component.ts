@@ -8,9 +8,7 @@
 import { ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { Types } from '@app/framework/internal';
-
-import { StatefulControlComponent } from '../stateful.component';
+import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_TOGGLE_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ToggleComponent), multi: true

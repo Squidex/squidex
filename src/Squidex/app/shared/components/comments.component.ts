@@ -7,7 +7,7 @@
 
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { Subscription, timer } from 'rxjs';
+import { timer } from 'rxjs';
 import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import {
@@ -17,6 +17,7 @@ import {
     CommentsService,
     CommentsState,
     DialogService,
+    ResourceOwner,
     UpsertCommentForm
 } from '@app/shared/internal';
 
@@ -25,9 +26,7 @@ import {
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html'
 })
-export class CommentsComponent implements OnDestroy, OnInit {
-    private timerSubscription: Subscription;
-
+export class CommentsComponent extends ResourceOwner implements OnDestroy, OnInit {
     public state: CommentsState;
 
     public userId: string;
@@ -43,19 +42,17 @@ export class CommentsComponent implements OnDestroy, OnInit {
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder
     ) {
-        this.userId = authService.user!.token;
-    }
+        super();
 
-    public ngOnDestroy() {
-        this.timerSubscription.unsubscribe();
+        this.userId = authService.user!.token;
     }
 
     public ngOnInit() {
         this.state = new CommentsState(this.appsState, this.commentsId, this.commentsService, this.dialogs);
 
-        this.timerSubscription =
+        this.takeOver(
             timer(0, 4000).pipe(switchMap(() => this.state.load().pipe(onErrorResumeNext())))
-                .subscribe();
+                .subscribe());
     }
 
     public delete(comment: CommentDto) {
@@ -76,7 +73,7 @@ export class CommentsComponent implements OnDestroy, OnInit {
         }
     }
 
-    public trackByComment(index: number, comment: CommentDto) {
+    public trackByComment(comment: CommentDto) {
         return comment.id;
     }
 }

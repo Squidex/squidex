@@ -5,27 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import { timer } from 'rxjs';
+
+import { ResourceOwner } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxIgnoreScrollbar]'
 })
-export class IgnoreScrollbarDirective implements OnDestroy, OnInit, AfterViewInit {
-    private resizeListener: Function;
+export class IgnoreScrollbarDirective extends ResourceOwner implements OnInit, AfterViewInit {
     private parent: any;
-    private checkTimer: any;
     private scollbarWidth = 0;
 
     constructor(
         private readonly element: ElementRef,
         private readonly renderer: Renderer2
     ) {
-    }
-
-    public ngOnDestroy() {
-        clearTimeout(this.checkTimer);
-
-        this.resizeListener();
+        super();
     }
 
     public ngOnInit() {
@@ -33,15 +29,12 @@ export class IgnoreScrollbarDirective implements OnDestroy, OnInit, AfterViewIni
             this.parent = this.renderer.parentNode(this.element.nativeElement);
         }
 
-        this.resizeListener =
+        this.takeOver(
             this.renderer.listen(this.element.nativeElement, 'resize', () => {
                 this.reposition();
-            });
+            }));
 
-        this.checkTimer =
-            setTimeout(() => {
-                this.reposition();
-            }, 100);
+        this.takeOver(timer(100, 100).subscribe(() => this.reposition));
     }
 
     public ngAfterViewInit() {

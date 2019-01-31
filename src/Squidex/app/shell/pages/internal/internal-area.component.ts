@@ -7,13 +7,13 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
 
 import {
     DialogService,
     fadeAnimation,
     LoadingService,
-    Notification
+    Notification,
+    ResourceOwner
 } from '@app/shared';
 
 @Component({
@@ -24,24 +24,17 @@ import {
         fadeAnimation
     ]
 })
-export class InternalAreaComponent implements OnDestroy, OnInit {
-    private queryParamsSubscription: Subscription;
-
-    public notifications: Notification[] = [];
-
+export class InternalAreaComponent extends ResourceOwner implements OnDestroy, OnInit {
     constructor(
         public readonly loadingService: LoadingService,
         private readonly dialogs: DialogService,
         private readonly route: ActivatedRoute
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.queryParamsSubscription.unsubscribe();
+        super();
     }
 
     public ngOnInit() {
-        this.queryParamsSubscription =
+        this.takeOver(
             this.route.queryParams.subscribe(params => {
                 const successMessage = params['successMessage'];
 
@@ -54,6 +47,6 @@ export class InternalAreaComponent implements OnDestroy, OnInit {
                 if (errorMessage) {
                     this.dialogs.notify(Notification.error(errorMessage));
                 }
-            });
+            }));
     }
  }

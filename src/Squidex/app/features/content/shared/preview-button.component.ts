@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 
 import {
     ContentDto,
@@ -13,8 +13,15 @@ import {
     interpolate,
     LocalStoreService,
     ModalModel,
-    SchemaDetailsDto
+    SchemaDetailsDto,
+    StatefulComponent
 } from '@app/shared';
+
+interface State {
+    selectedName?: string;
+
+    alternativeNames: string[];
+}
 
 @Component({
     selector: 'sqx-preview-button',
@@ -25,7 +32,7 @@ import {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PreviewButtonComponent implements OnInit {
+export class PreviewButtonComponent extends StatefulComponent<State> implements OnInit {
     @Input()
     public content: ContentDto;
 
@@ -34,13 +41,12 @@ export class PreviewButtonComponent implements OnInit {
 
     public dropdown = new ModalModel();
 
-    public selectedName: string | undefined;
-
-    public alternativeNames: string[];
-
-    constructor(
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly localStore: LocalStoreService
     ) {
+        super(changeDetector, {
+            alternativeNames: []
+        });
     }
 
     public ngOnInit() {
@@ -62,16 +68,23 @@ export class PreviewButtonComponent implements OnInit {
     }
 
     private selectUrl(selectedName: string) {
-        if (this.selectedName !== selectedName) {
+        this.next(s => {
+            if (selectedName === s.selectedName) {
+                return s;
+            }
+            const state = { ...s };
+
             const keys = Object.keys(this.schema.previewUrls);
 
-            this.selectedName = selectedName;
+            state.selectedName = selectedName;
 
-            this.alternativeNames = keys.filter(x => x !== this.selectedName);
-            this.alternativeNames.sort();
+            state.alternativeNames = keys.filter(x => x !== s.selectedName);
+            state.alternativeNames.sort();
 
             this.localStore.set(this.configKey(), selectedName);
-        }
+
+            return state;
+        });
     }
 
     private configKey() {

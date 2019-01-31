@@ -9,8 +9,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { filter, onErrorResumeNext } from 'rxjs/operators';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -21,6 +20,7 @@ import {
     MessageBus,
     ModalModel,
     PatternsState,
+    ResourceOwner,
     SchemaDetailsDto,
     SchemasState,
     Types
@@ -38,9 +38,7 @@ import {
         fadeAnimation
     ]
 })
-export class SchemaPageComponent implements OnDestroy, OnInit {
-    private selectedSchemaSubscription: Subscription;
-
+export class SchemaPageComponent extends ResourceOwner implements OnDestroy, OnInit {
     public fieldTypes = fieldTypes;
 
     public schemaExport: any;
@@ -64,22 +62,21 @@ export class SchemaPageComponent implements OnDestroy, OnInit {
         private readonly router: Router,
         private readonly messageBus: MessageBus
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.selectedSchemaSubscription.unsubscribe();
+        super();
     }
 
     public ngOnInit() {
         this.patternsState.load().pipe(onErrorResumeNext()).subscribe();
 
-        this.selectedSchemaSubscription =
-            this.schemasState.selectedSchema.pipe(filter(s => !!s))
+        this.takeOver(
+            this.schemasState.selectedSchema
                 .subscribe(schema => {
-                    this.schema = schema!;
+                    if (schema) {
+                        this.schema = schema;
 
-                    this.export();
-                });
+                        this.export();
+                    }
+                }));
     }
 
     public publish() {

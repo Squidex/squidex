@@ -7,7 +7,8 @@
 
 import { ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { onErrorResumeNext } from 'rxjs/operators';
 
 import { Types } from './../utils/types';
 
@@ -15,26 +16,19 @@ import { State } from '../state';
 
 declare type UnsubscribeFunction = () => void;
 
-export abstract class StatefulComponent<T = any> extends State<T> implements OnDestroy, OnInit {
+export class ResourceOwner implements OnDestroy {
     private subscriptions: (Subscription | UnsubscribeFunction)[] = [];
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
-        state: T
-    ) {
-        super(state);
-    }
-
-    protected observe(subscription: Subscription | UnsubscribeFunction) {
+    public takeOver<T>(subscription: Subscription | UnsubscribeFunction | Observable<T>) {
         if (subscription) {
-            this.subscriptions.push(subscription);
-        }
-    }
+            if (Types.isFunction(subscription['subscribe'])) {
+                const observable = <Observable<T>>subscription;
 
-    public ngOnInit() {
-        this.changes.subscribe(() => {
-            this.changeDetector.detectChanges();
-        });
+                this.subscriptions.push(observable.pipe(onErrorResumeNext()).subscribe());
+            } else {
+                this.subscriptions.push(<any>subscription);
+            }
+        }
     }
 
     public ngOnDestroy() {
@@ -49,6 +43,31 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
         } finally {
             this.subscriptions = [];
         }
+    }
+}
+
+export abstract class StatefulComponent<T = any> extends State<T> implements OnDestroy, OnInit {
+    private readonly subscriptions = new ResourceOwner();
+
+    constructor(
+        private readonly changeDetector: ChangeDetectorRef,
+        state: T
+    ) {
+        super(state);
+    }
+
+    public ngOnDestroy() {
+        this.subscriptions.ngOnDestroy();
+    }
+
+    public ngOnInit() {
+        this.changes.subscribe(() => {
+            this.changeDetector.detectChanges();
+        });
+    }
+
+    public takeOver<R>(subscription: Subscription | UnsubscribeFunction | Observable<R>) {
+        this.subscriptions.takeOver(subscription);
     }
 }
 

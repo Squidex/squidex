@@ -2,9 +2,9 @@
     <li class="nav-item dropdown">
         <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
             <span class="user">
-                <img class="user-picture" [attr.src]="profileId | sqxUserIdPicture" />
+                <img class="user-picture" [attr.src]="snapshot.profileId | sqxUserIdPicture" />
                 
-                <span>{{profileDisplayName}}</span>
+                <span>{{snapshot.profileDisplayName}}</span>
             </span>
         </span>
 
@@ -13,7 +13,7 @@
                 Administration
             </a>
 
-            <a class="dropdown-item" [sqxPopupLink]="profileUrl">
+            <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl">
                 Profile
             </a>
 

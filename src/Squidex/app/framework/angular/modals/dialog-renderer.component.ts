@@ -13,10 +13,9 @@ import {
     DialogRequest,
     DialogService,
     fadeAnimation,
-    Notification
+    Notification,
+    StatefulComponent
 } from '@app/framework/internal';
-
-import { StatefulComponent } from '../stateful.component';
 
 interface State {
     dialogRequest?: DialogRequest | null;
@@ -46,14 +45,14 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
     }
 
     public ngOnInit() {
-        this.observe(
+        this.takeOver(
             this.dialogView.isOpen.subscribe(isOpen => {
                 if (!isOpen) {
                     this.finishRequest(false);
                 }
             }));
 
-        this.observe(
+        this.takeOver(
             this.dialogs.notifications.subscribe(notification => {
                 this.next(s => ({
                     ...s,
@@ -61,13 +60,13 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
                 }));
 
                 if (notification.displayTime > 0) {
-                    this.observe(timer(notification.displayTime).subscribe(() => {
+                    this.takeOver(timer(notification.displayTime).subscribe(() => {
                         this.close(notification);
                     }));
                 }
             }));
 
-        this.observe(
+        this.takeOver(
             this.dialogs.dialogs
                 .subscribe(dialogRequest => {
                     this.cancel();

@@ -5,22 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
-import { FieldDto, FloatConverter, NumberFieldPropertiesDto } from '@app/shared';
+import {
+    FieldDto,
+    FloatConverter,
+    NumberFieldPropertiesDto,
+    ResourceOwner
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-number-ui',
     styleUrls: ['number-ui.component.scss'],
     templateUrl: 'number-ui.component.html'
 })
-export class NumberUIComponent implements OnDestroy, OnInit {
-    private hideAllowedValuesSubscription: Subscription;
-    private hideInlineEditableSubscription: Subscription;
-
+export class NumberUIComponent extends ResourceOwner implements OnInit {
     @Input()
     public editForm: FormGroup;
 
@@ -34,11 +36,6 @@ export class NumberUIComponent implements OnDestroy, OnInit {
 
     public hideAllowedValues: Observable<boolean>;
     public hideInlineEditable: Observable<boolean>;
-
-    public ngOnDestroy() {
-        this.hideAllowedValuesSubscription.unsubscribe();
-        this.hideInlineEditableSubscription.unsubscribe();
-    }
 
     public ngOnInit() {
         this.editForm.setControl('editor',
@@ -60,18 +57,18 @@ export class NumberUIComponent implements OnDestroy, OnInit {
             this.editForm.controls['editor'].valueChanges.pipe(
                 startWith(this.properties.editor), map(x => !(x && (x === 'Input' || x === 'Dropdown'))));
 
-        this.hideAllowedValuesSubscription =
+        this.takeOver(
             this.hideAllowedValues.subscribe(isSelection => {
                 if (isSelection) {
                     this.editForm.controls['allowedValues'].setValue(undefined);
                 }
-            });
+            }));
 
-        this.hideInlineEditableSubscription =
+        this.takeOver(
             this.hideInlineEditable.subscribe(isSelection => {
                 if (isSelection) {
                     this.editForm.controls['inlineEditable'].setValue(false);
                 }
-            });
+            }));
     }
 }

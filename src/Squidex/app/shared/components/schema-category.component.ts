@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
@@ -15,8 +15,19 @@ import {
     SchemaDetailsDto,
     SchemaDto,
     SchemasState,
+    StatefulComponent,
     Types
 } from '@app/shared/internal';
+
+interface State {
+    displayName?: string;
+
+    schemasFiltered: ImmutableArray<SchemaDto>;
+
+    schemasForCategory: ImmutableArray<SchemaDto>;
+
+    isOpen: boolean;
+}
 
 @Component({
     selector: 'sqx-schema-category',
@@ -27,7 +38,7 @@ import {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SchemaCategoryComponent implements OnInit, OnChanges {
+export class SchemaCategoryComponent extends StatefulComponent<State> implements OnInit, OnChanges {
     @Output()
     public removing = new EventEmitter();
 
@@ -46,31 +57,29 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
     @Input()
     public schemas: ImmutableArray<SchemaDto>;
 
-    public displayName: string;
-
-    public schemasFiltered: ImmutableArray<SchemaDto>;
-    public schemasForCategory: ImmutableArray<SchemaDto>;
-
-    public isOpen = true;
-
     public allowDrop = (schema: any) => {
         return (Types.is(schema, SchemaDto) || Types.is(schema, SchemaDetailsDto)) && !this.isSameCategory(schema);
     }
 
-    constructor(
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly localStore: LocalStoreService,
         private readonly schemasState: SchemasState
     ) {
+        super(changeDetector, {
+            schemasFiltered: ImmutableArray.empty(),
+            schemasForCategory: ImmutableArray.empty(),
+            isOpen: true
+        });
     }
 
     public ngOnInit() {
-        this.isOpen = !this.localStore.getBoolean(this.configKey());
+        this.next(s => ({ ...s, isOpen: !this.localStore.getBoolean(this.configKey()) }));
     }
 
     public toggle() {
-        this.isOpen = !this.isOpen;
+        this.next(s => ({ ...s, isOpen: !s.isOpen }));
 
-        this.localStore.setBoolean(this.configKey(), !this.isOpen);
+        this.localStore.setBoolean(this.configKey(), !this.snapshot.isOpen);
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
@@ -81,22 +90,28 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
 
             const query = this.schemasFilter;
 
-            this.schemasForCategory = this.schemas.filter(x => isSameCategory(x));
-            this.schemasFiltered = this.schemasForCategory.filter(x => !query || x.name.indexOf(query) >= 0);
+            const schemasForCategory = this.schemas.filter(x => isSameCategory(x));
+            const schemasFiltered = schemasForCategory.filter(x => !query || x.name.indexOf(query) >= 0);
+
+            let isOpen = false;
 
             if (query) {
-                this.isOpen = true;
+                isOpen = true;
             } else {
-                this.isOpen = this.localStore.get(`schema-category.${this.name}`) !== 'false';
+                isOpen = this.localStore.get(`schema-category.${this.name}`) !== 'false';
             }
+
+            this.next(s => ({ ...s, isOpen, schemasFiltered, schemasForCategory }));
         }
 
         if (changes['name']) {
-            if (!this.name || this.name.length === 0) {
-                this.displayName = 'Schemas';
-            } else {
-                this.displayName = this.name;
+            let displayName = 'Schemas';
+
+            if (this.name && this.name.length > 0) {
+                displayName = this.name;
             }
+
+            this.next(s => ({ ...s, displayName }));
         }
     }
 
@@ -116,12 +131,12 @@ export class SchemaCategoryComponent implements OnInit, OnChanges {
         this.schemasState.changeCategory(schema, this.name).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public schemaPermission(schema: SchemaDto) {
-        return `?squidex.apps.{app}.schemas.${schema.name}.*;squidex.apps.{app}.contents.${schema.name}.*`;
-    }
-
     public trackBySchema(index: number, schema: SchemaDto) {
         return schema.id;
+    }
+
+    public schemaPermission(schema: SchemaDto) {
+        return `?squidex.apps.{app}.schemas.${schema.name}.*;squidex.apps.{app}.contents.${schema.name}.*`;
     }
 
     private configKey(): string {

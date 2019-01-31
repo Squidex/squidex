@@ -7,18 +7,16 @@
 
 import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnChanges, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
-import { MathHelper } from '@app/framework/internal';
+import { MathHelper, ResourceOwner } from '@app/framework/internal';
 
 const LAYOUT_CACHE: { [key: string]: { width: number, height: number } } = {};
 
 @Directive({
     selector: '[sqxImageSource]'
 })
-export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, AfterViewInit {
-    private parentResizeListener: Function;
-
-    private loadingTimer: any;
+export class ImageSourceDirective extends ResourceOwner implements OnChanges, OnDestroy, OnInit, AfterViewInit {
     private size: any;
+    private loadTimer: any;
     private loadRetries = 0;
     private loadQuery: string | null = null;
 
@@ -38,12 +36,13 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
         private readonly element: ElementRef,
         private readonly renderer: Renderer2
     ) {
+        super();
     }
 
     public ngOnDestroy() {
-        clearTimeout(this.loadingTimer);
+        super.ngOnDestroy();
 
-        this.parentResizeListener();
+        clearTimeout(this.loadTimer);
     }
 
     public ngOnInit() {
@@ -51,10 +50,10 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
             this.parent = this.renderer.parentNode(this.element.nativeElement);
         }
 
-        this.parentResizeListener =
+        this.takeOver(
             this.renderer.listen(this.parent, 'resize', () => {
                 this.resize();
-            });
+            }));
     }
 
     public ngAfterViewInit() {
@@ -127,7 +126,7 @@ export class ImageSourceDirective implements OnChanges, OnDestroy, OnInit, After
         this.loadRetries++;
 
         if (this.loadRetries <= 10) {
-            this.loadingTimer =
+            this.loadTimer =
                 setTimeout(() => {
                     this.loadQuery = MathHelper.guid();
 

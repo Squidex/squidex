@@ -35,13 +35,13 @@ export class RichEditorComponent extends ExternalControlComponent<string> implem
     private value: string;
     private isDisabled = false;
 
-    public assetsDialog = new DialogModel();
-
     @ViewChild('editor')
     public editor: ElementRef;
 
     @Output()
     public assetPluginClicked = new EventEmitter<any>();
+
+    public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
@@ -52,7 +52,9 @@ export class RichEditorComponent extends ExternalControlComponent<string> implem
     public ngOnDestroy() {
         clearTimeout(this.tinyInitTimer);
 
-        tinymce.remove(this.editor);
+        if (tinymce && this.editor) {
+            tinymce.remove(this.editor);
+        }
     }
 
     public ngAfterViewInit() {

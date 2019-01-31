@@ -26,8 +26,6 @@ import {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class OnboardingTooltipComponent extends StatefulComponent implements OnDestroy, OnInit {
-    public tooltipModal = new ModalModel();
-
     @Input()
     public for: any;
 
@@ -39,6 +37,8 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
 
     @Input()
     public position = 'left';
+
+    public tooltipModal = new ModalModel();
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly onboardingService: OnboardingService,
@@ -55,7 +55,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
 
     public ngOnInit() {
         if (this.for && this.helpId && Types.isFunction(this.for.addEventListener)) {
-            this.observe(
+            this.takeOver(
                 timer(this.after).subscribe(() => {
                     if (this.onboardingService.shouldShow(this.helpId)) {
                         const forRect = this.for.getBoundingClientRect();
@@ -68,7 +68,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
                         if (this.isSameOrParent(fromPoint)) {
                             this.tooltipModal.show();
 
-                            this.observe(
+                            this.takeOver(
                                 timer(10000).subscribe(() => {
                                     this.hideThis();
                                 }));
@@ -78,7 +78,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
                     }
                 }));
 
-            this.observe(
+            this.takeOver(
                 this.renderer.listen(this.for, 'mousedown', () => {
                     this.onboardingService.disable(this.helpId);
 

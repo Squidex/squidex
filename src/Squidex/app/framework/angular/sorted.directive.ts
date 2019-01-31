@@ -30,7 +30,9 @@ export class SortedDirective implements OnDestroy, OnInit {
     }
 
     public ngOnDestroy() {
-        this.sortable.destroy();
+        if (this.sortable) {
+            this.sortable.destroy();
+        }
     }
 
     public ngOnInit() {

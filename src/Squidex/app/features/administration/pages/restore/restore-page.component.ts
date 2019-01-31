@@ -5,15 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { Subscription, timer } from 'rxjs';
-import { filter, onErrorResumeNext, switchMap } from 'rxjs/operators';
+import { timer } from 'rxjs';
+import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import {
     AuthService,
     BackupsService,
     DialogService,
+    ResourceOwner,
     RestoreDto,
     RestoreForm
 } from '@app/shared';
@@ -23,9 +24,7 @@ import {
     styleUrls: ['./restore-page.component.scss'],
     templateUrl: './restore-page.component.html'
 })
-export class RestorePageComponent implements OnDestroy, OnInit {
-    private timerSubscription: Subscription;
-
+export class RestorePageComponent extends ResourceOwner implements OnInit {
     public restoreJob: RestoreDto | null;
     public restoreForm = new RestoreForm(this.formBuilder);
 
@@ -35,18 +34,17 @@ export class RestorePageComponent implements OnDestroy, OnInit {
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.timerSubscription.unsubscribe();
+        super();
     }
 
     public ngOnInit() {
-        this.timerSubscription =
-            timer(0, 2000).pipe(switchMap(() => this.backupsService.getRestore().pipe(onErrorResumeNext())), filter(x => !!x))
-                .subscribe(dto => {
-                    this.restoreJob = dto!;
-                });
+        this.takeOver(
+            timer(0, 2000).pipe(switchMap(() => this.backupsService.getRestore().pipe(onErrorResumeNext())))
+                .subscribe(job => {
+                    if (job) {
+                        this.restoreJob = job;
+                    }
+                }));
     }
 
     public restore() {

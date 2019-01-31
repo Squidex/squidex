@@ -38,8 +38,6 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     private value: string;
     private isDisabled = false;
 
-    public assetsDialog = new DialogModel();
-
     @ViewChild('editor')
     public editor: ElementRef;
 
@@ -48,6 +46,8 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
 
     @ViewChild('inner')
     public inner: ElementRef;
+
+    public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2,

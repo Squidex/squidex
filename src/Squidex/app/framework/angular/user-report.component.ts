@@ -10,7 +10,7 @@ import { timer } from 'rxjs';
 
 import {
     ResourceLoaderService,
-    StatefulComponent,
+    ResourceOwner,
     UserReportConfig
 } from '@app/framework/internal';
 
@@ -18,12 +18,12 @@ import {
     selector: 'sqx-user-report',
     template: ''
 })
-export class UserReportComponent extends StatefulComponent<any> implements OnDestroy, OnInit {
+export class UserReportComponent extends ResourceOwner implements OnDestroy, OnInit {
     constructor(changeDetector: ChangeDetectorRef,
         private readonly config: UserReportConfig,
         private readonly resourceLoader: ResourceLoaderService
     ) {
-        super(changeDetector, {});
+        super();
 
         changeDetector.detach();
     }
@@ -32,7 +32,7 @@ export class UserReportComponent extends StatefulComponent<any> implements OnDes
         window['_urq'] = window['_urq'] || [];
         window['_urq'].push(['initSite', this.config.siteId]);
 
-        this.observe(
+        this.takeOver(
             timer(4000).subscribe(() => {
                 this.resourceLoader.loadScript('https://cdn.userreport.com/userreport.js');
             }));

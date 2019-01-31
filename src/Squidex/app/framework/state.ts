@@ -9,7 +9,9 @@ import { AbstractControl } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ErrorDto, Types } from '@app/framework/internal';
+import { ErrorDto } from './utils/error';
+import { Types } from './utils/types';
+
 import { fullValue} from './angular/forms/forms-helper';
 
 export interface FormState {
@@ -133,10 +135,14 @@ export class State<T extends {}> {
     }
 
     public resetState() {
-        this.next(_ => this.initialState);
+        this.next(this.initialState);
     }
 
-    public next(update: (v: T) => T) {
-        this.state.next(update(this.snapshot));
+    public next(update: ((v: T) => T) | object) {
+        if (Types.isFunction(update)) {
+            this.state.next(update(this.state.value));
+        } else {
+            this.state.next(Object.assign({}, this.snapshot, update));
+        }
     }
 }

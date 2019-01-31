@@ -44,7 +44,6 @@ type AnyFieldDto = NestedFieldDto | RootFieldDto;
 interface Snapshot {
     categories: { [name: string]: boolean };
 
-    schemasApp?: string;
     schemas: ImmutableArray<SchemaDto>;
 
     isLoaded?: boolean;
@@ -58,6 +57,10 @@ function sameSchema(lhs: SchemaDetailsDto | null, rhs?: SchemaDetailsDto | null)
 
 @Injectable()
 export class SchemasState extends State<Snapshot> {
+    public get schemaName() {
+        return this.snapshot.selectedSchema ? this.snapshot.selectedSchema.name : '';
+    }
+
     public selectedSchema =
         this.changes.pipe(map(x => x.selectedSchema),
             distinctUntilChanged(sameSchema));
@@ -78,10 +81,6 @@ export class SchemasState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
-    public get schemaName() {
-        return this.snapshot.selectedSchema!.name;
-    }
-
     constructor(
         private readonly appsState: AppsState,
         private readonly authState: AuthService,
@@ -93,11 +92,11 @@ export class SchemasState extends State<Snapshot> {
 
     public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
         return this.loadSchema(idOrName).pipe(
-            tap(schema => {
+            tap(selectedSchema => {
                 this.next(s => {
-                    const schemas = schema ? s.schemas.replaceBy('id', schema) : s.schemas;
+                    const schemas = selectedSchema ? s.schemas.replaceBy('id', selectedSchema) : s.schemas;
 
-                    return { ...s, selectedSchema: schema, schemas };
+                    return { ...s, selectedSchema, schemas };
                 });
             }));
     }
@@ -124,7 +123,7 @@ export class SchemasState extends State<Snapshot> {
 
                     const categories = buildCategories(s.categories, schemas);
 
-                    return { ...s, schemas, schemasApp: this.appName, isLoaded: true, categories };
+                    return { ...s, schemas, isLoaded: true, categories };
                 });
             }),
             notify(this.dialogs));

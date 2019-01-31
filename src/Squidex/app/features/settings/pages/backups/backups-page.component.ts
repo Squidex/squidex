@@ -5,14 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription, timer } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { timer } from 'rxjs';
 import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import {
     AppsState,
     BackupDto,
-    BackupsState
+    BackupsState,
+    ResourceOwner
 } from '@app/shared';
 
 @Component({
@@ -20,25 +21,20 @@ import {
     styleUrls: ['./backups-page.component.scss'],
     templateUrl: './backups-page.component.html'
 })
-export class BackupsPageComponent implements OnInit, OnDestroy {
-    private timerSubscription: Subscription;
-
+export class BackupsPageComponent extends ResourceOwner implements OnInit {
     constructor(
         public readonly appsState: AppsState,
         public readonly backupsState: BackupsState
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.timerSubscription.unsubscribe();
+        super();
     }
 
     public ngOnInit() {
         this.backupsState.load().pipe(onErrorResumeNext()).subscribe();
 
-        this.timerSubscription =
-            timer(3000, 3000).pipe(switchMap(t => this.backupsState.load(true, true).pipe(onErrorResumeNext())))
-                .subscribe();
+        this.takeOver(
+            timer(3000, 3000).pipe(switchMap(() => this.backupsState.load(true, true).pipe(onErrorResumeNext())))
+                .subscribe());
     }
 
     public reload() {
@@ -53,7 +49,7 @@ export class BackupsPageComponent implements OnInit, OnDestroy {
         this.backupsState.delete(backup).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public trackByBackup(index: number, item: BackupDto) {
+    public trackByBackup(item: BackupDto) {
         return item.id;
     }
 }

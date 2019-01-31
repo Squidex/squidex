@@ -91,7 +91,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             this.control = control;
 
             if (control) {
-                this.observe(
+                this.takeOver(
                     merge(control.valueChanges, control.statusChanges)
                         .subscribe(() => {
                             this.createMessages();
@@ -127,6 +127,6 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             }
         }
 
-        this.next(() => ({ errorMessages }));
+        this.next(s => ({ ...s, errorMessages }));
     }
 }

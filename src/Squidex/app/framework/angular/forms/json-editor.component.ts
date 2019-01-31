@@ -39,6 +39,8 @@ export class JsonEditorComponent extends ExternalControlComponent<string> implem
         private readonly resourceLoader: ResourceLoaderService
     ) {
         super(changeDetector);
+
+        changeDetector.detach();
     }
 
     public writeValue(obj: any) {

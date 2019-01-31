@@ -10,7 +10,7 @@ import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
 
-import { StatefulControlComponent } from '@app/shared';
+import { StatefulControlComponent } from '@app/framework/internal';
 
 export interface AutocompleteSource {
     find(query: string): Observable<any[]>;
@@ -27,6 +27,7 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
 
 interface State {
     suggestedItems: any[];
+
     suggestedIndex: number;
 }
 
@@ -66,7 +67,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, any[]
     }
 
     public ngOnInit() {
-        this.observe(
+        this.takeOver(
             this.queryInput.valueChanges.pipe(
                     tap(query => {
                         this.callChange(query);

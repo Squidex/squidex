@@ -7,7 +7,7 @@
 
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
 import {
@@ -15,6 +15,7 @@ import {
     FieldDto,
     ImmutableArray,
     ModalModel,
+    ResourceOwner,
     RootFieldDto,
     StringFieldPropertiesDto,
     Types
@@ -25,9 +26,7 @@ import {
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html'
 })
-export class StringValidationComponent implements OnDestroy, OnInit {
-    private patternSubscription: Subscription;
-
+export class StringValidationComponent extends ResourceOwner implements OnDestroy, OnInit {
     @Input()
     public editForm: FormGroup;
 
@@ -48,10 +47,6 @@ export class StringValidationComponent implements OnDestroy, OnInit {
     public patternsModal = new ModalModel();
 
     public showUnique: boolean;
-
-    public ngOnDestroy() {
-        this.patternSubscription.unsubscribe();
-    }
 
     public ngOnInit() {
         this.showUnique = Types.is(this.field, RootFieldDto) && !this.field.isLocalizable;
@@ -87,14 +82,15 @@ export class StringValidationComponent implements OnDestroy, OnInit {
         this.showPatternMessage =
             this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim().length > 0;
 
-        this.patternSubscription =
+        this.takeOver(
             this.editForm.controls['pattern'].valueChanges
                 .subscribe((value: string) => {
                     if (!value || value.length === 0) {
                         this.editForm.controls['patternMessage'].setValue(undefined);
                     }
+
                     this.setPatternName();
-                });
+                }));
 
         this.setPatternName();
     }

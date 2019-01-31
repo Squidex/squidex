@@ -35,7 +35,7 @@ function sameApp(lhs: AppDto, rhs?: AppDto): boolean {
 @Injectable()
 export class AppsState extends State<Snapshot> {
     public get appName() {
-        return this.snapshot.selectedApp!.name;
+        return this.snapshot.selectedApp ? this.snapshot.selectedApp.name : '';
     }
 
     public selectedApp =

@@ -50,7 +50,7 @@ export class IFrameEditorComponent extends ExternalControlComponent<any> impleme
     }
 
     public ngOnInit(): void {
-        this.observe(
+        this.takeOver(
             this.renderer.listen('window', 'message', (event: MessageEvent) => {
                 if (event.source === this.plugin.contentWindow) {
                     const { type } = event.data;

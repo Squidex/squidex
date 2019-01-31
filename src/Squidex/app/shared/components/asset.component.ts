@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import {
@@ -20,10 +19,19 @@ import {
     fadeAnimation,
     RenameAssetDto,
     RenameAssetForm,
+    StatefulComponent,
     TagAssetDto,
     Types,
     Versioned
 } from '@app/shared/internal';
+
+interface State {
+    isTagging: boolean;
+
+    isRenaming: boolean;
+
+    progress: number;
+}
 
 @Component({
     selector: 'sqx-asset',
@@ -34,9 +42,7 @@ import {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AssetComponent implements OnChanges, OnDestroy, OnInit {
-    private tagSubscription: Subscription;
-
+export class AssetComponent extends StatefulComponent<State> implements OnChanges, OnInit {
     @Input()
     public initFile: File;
 
@@ -79,27 +85,22 @@ export class AssetComponent implements OnChanges, OnDestroy, OnInit {
     @Output()
     public failed = new EventEmitter();
 
-    public isTagging = false;
-
-    public renaming = false;
     public renameForm = new RenameAssetForm(this.formBuilder);
 
     public tagInput = new FormControl();
 
-    public progress = 0;
-
-    constructor(
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
         private readonly authState: AuthService,
-        private readonly changeDetector: ChangeDetectorRef,
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.tagSubscription.unsubscribe();
+        super(changeDetector, {
+            isRenaming: false,
+            isTagging: false,
+            progress: 0
+        });
     }
 
     public ngOnInit() {
@@ -122,13 +123,13 @@ export class AssetComponent implements OnChanges, OnDestroy, OnInit {
                 });
         }
 
-        this.tagSubscription =
+        this.takeOver(
             this.tagInput.valueChanges.pipe(
                 distinctUntilChanged(),
                 debounceTime(2000)
             ).subscribe(tags => {
                 this.tagAsset(tags);
-            });
+            }));
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -189,13 +190,15 @@ export class AssetComponent implements OnChanges, OnDestroy, OnInit {
     public renameStart() {
         if (!this.isDisabled) {
             this.renameForm.load(this.asset);
-            this.renaming = true;
+
+            this.next(s => ({ ...s, isRenaming: true }));
         }
     }
 
     public renameCancel() {
         this.renameForm.submitCompleted();
-        this.renaming = false;
+
+        this.next(s => ({ ...s, isRenaming: false }));
     }
 
     private emitFailed(error: any) {
@@ -211,14 +214,11 @@ export class AssetComponent implements OnChanges, OnDestroy, OnInit {
     }
 
     private setProgress(progress: number) {
-        this.progress = progress;
-
-        this.changeDetector.markForCheck();
+        this.next(s => ({ ...s, progress }));
     }
 
     private updateAsset(asset: AssetDto, emitEvent: boolean) {
         this.asset = asset;
-        this.progress = 0;
 
         this.tagInput.setValue(asset.tags, { emitEvent: false });
 
@@ -228,6 +228,6 @@ export class AssetComponent implements OnChanges, OnDestroy, OnInit {
 
         this.renameCancel();
 
-        this.changeDetector.markForCheck();
+        this.next(s => ({ ...s, progress: 0 }));
     }
 }

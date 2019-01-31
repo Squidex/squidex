@@ -29,7 +29,8 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 interface State {
-    schema?: SchemaDetailsDto;
+    schema?: SchemaDetailsDto | null;
+
     schemaInvalid: boolean;
 
     contentItems: ImmutableArray<ContentDto>;
@@ -61,6 +62,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
     ) {
         super(changeDetector, {
             schemaInvalid: false,
+            schema: null,
             contentItems: ImmutableArray.empty()
         });
     }

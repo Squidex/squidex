@@ -39,12 +39,12 @@ export class TooltipComponent extends StatefulComponent implements OnDestroy, On
 
     public ngOnInit() {
         if (this.target) {
-            this.observe(
+            this.takeOver(
                 this.renderer.listen(this.target, 'mouseenter', () => {
                     this.modal.show();
                 }));
 
-            this.observe(
+            this.takeOver(
                 this.renderer.listen(this.target, 'mouseleave', () => {
                     this.modal.hide();
                 }));

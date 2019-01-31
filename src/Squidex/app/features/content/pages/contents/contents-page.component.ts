@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 
 import {
@@ -18,6 +17,7 @@ import {
     LanguagesState,
     ModalModel,
     Queries,
+    ResourceOwner,
     SchemaDetailsDto,
     SchemasState,
     UIState
@@ -30,11 +30,7 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
     styleUrls: ['./contents-page.component.scss'],
     templateUrl: './contents-page.component.html'
 })
-export class ContentsPageComponent implements OnDestroy, OnInit {
-    private contentsSubscription: Subscription;
-    private languagesSubscription: Subscription;
-    private selectedSchemaSubscription: Subscription;
-
+export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public schema: SchemaDetailsDto;
     public schemaQueries: Queries;
 
@@ -61,16 +57,11 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
         private readonly schemasState: SchemasState,
         private readonly uiState: UIState
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.contentsSubscription.unsubscribe();
-        this.languagesSubscription.unsubscribe();
-        this.selectedSchemaSubscription.unsubscribe();
+        super();
     }
 
     public ngOnInit() {
-        this.selectedSchemaSubscription =
+        this.takeOver(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
                     this.resetSelection();
@@ -79,20 +70,20 @@ export class ContentsPageComponent implements OnDestroy, OnInit {
                     this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
 
                     this.contentsState.init().pipe(onErrorResumeNext()).subscribe();
-                });
+                }));
 
-        this.contentsSubscription =
+        this.takeOver(
             this.contentsState.contents
                 .subscribe(() => {
                     this.updateSelectionSummary();
-                });
+                }));
 
-        this.languagesSubscription =
+        this.takeOver(
             this.languagesState.languages
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.at(0);
-                });
+                }));
     }
 
     public reload() {

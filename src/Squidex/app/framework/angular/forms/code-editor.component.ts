@@ -41,8 +41,7 @@ export class CodeEditorComponent extends ExternalControlComponent<string> implem
     @Input()
     public mode = 'ace/mode/javascript';
 
-    constructor(
-        changeDetector: ChangeDetectorRef,
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
         super(changeDetector);

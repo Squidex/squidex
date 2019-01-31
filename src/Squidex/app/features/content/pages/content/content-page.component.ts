@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, of, Subscription } from 'rxjs';
-import { filter, onErrorResumeNext, switchMap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import { ContentVersionSelected } from './../messages';
 
@@ -25,6 +25,7 @@ import {
     LanguagesState,
     MessageBus,
     ModalModel,
+    ResourceOwner,
     SchemaDetailsDto,
     SchemasState,
     Version
@@ -40,12 +41,7 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
         fadeAnimation
     ]
 })
-export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, OnInit {
-    private languagesSubscription: Subscription;
-    private contentSubscription: Subscription;
-    private contentVersionSelectedSubscription: Subscription;
-    private selectedSchemaSubscription: Subscription;
-
+export class ContentPageComponent extends ResourceOwner implements CanComponentDeactivate, OnInit {
     public schema: SchemaDetailsDto;
 
     public content: ContentDto;
@@ -70,44 +66,42 @@ export class ContentPageComponent implements CanComponentDeactivate, OnDestroy, 
         private readonly router: Router,
         private readonly schemasState: SchemasState
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.languagesSubscription.unsubscribe();
-        this.contentSubscription.unsubscribe();
-        this.contentVersionSelectedSubscription.unsubscribe();
-        this.selectedSchemaSubscription.unsubscribe();
+        super();
     }
 
     public ngOnInit() {
-        this.languagesSubscription =
+        this.takeOver(
             this.languagesState.languages
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.at(0);
-                });
+                }));
 
-        this.selectedSchemaSubscription =
-            this.schemasState.selectedSchema.pipe(filter(s => !!s))
+        this.takeOver(
+            this.schemasState.selectedSchema
                 .subscribe(schema => {
-                    this.schema = schema!;
+                    if (schema) {
+                        this.schema = schema!;
 
-                    this.contentForm = new EditContentForm(this.schema, this.languages);
-                });
+                        this.contentForm = new EditContentForm(this.schema, this.languages);
+                    }
+                }));
 
-        this.contentSubscription =
-            this.contentsState.selectedContent.pipe(filter(c => !!c))
+        this.takeOver(
+            this.contentsState.selectedContent
                 .subscribe(content => {
-                    this.content = content!;
+                    if (content) {
+                        this.content = content;
 
-                    this.loadContent(this.content.dataDraft);
-                });
+                        this.loadContent(this.content.dataDraft);
+                    }
+                }));
 
-        this.contentVersionSelectedSubscription =
+        this.takeOver(
             this.messageBus.of(ContentVersionSelected)
                 .subscribe(message => {
                     this.loadVersion(message.version);
-                });
+                }));
     }
 
     public canDeactivate(): Observable<boolean> {

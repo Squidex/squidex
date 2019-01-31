@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 import { filter, map, switchMap } from 'rxjs/operators';
 
 import {
@@ -17,6 +16,7 @@ import {
     fadeAnimation,
     HistoryEventDto,
     HistoryService,
+    ResourceOwner,
     UsagesService
 } from '@app/shared';
 
@@ -42,9 +42,7 @@ const COLORS = [
         fadeAnimation
     ]
 })
-export class DashboardPageComponent implements OnDestroy, OnInit {
-    private subscriptions: Subscription[] = [];
-
+export class DashboardPageComponent extends ResourceOwner implements OnInit {
     public profileDisplayName = '';
 
     public chartStorageCount: any;
@@ -104,18 +102,11 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
         private readonly historyService: HistoryService,
         private readonly usagesService: UsagesService
     ) {
-    }
-
-    public ngOnDestroy() {
-        for (let subscription of this.subscriptions) {
-            subscription.unsubscribe();
-        }
-
-        this.subscriptions = [];
+        super();
     }
 
     public ngOnInit() {
-        this.subscriptions.push(
+        this.takeOver(
             this.app.pipe(
                     switchMap(app => this.usagesService.getTodayStorage(app.name)))
                 .subscribe(dto => {
@@ -123,7 +114,7 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                     this.assetsMax = dto.maxAllowed;
                 }));
 
-        this.subscriptions.push(
+        this.takeOver(
             this.app.pipe(
                     switchMap(app => this.usagesService.getMonthCalls(app.name)))
                 .subscribe(dto => {
@@ -131,14 +122,14 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                     this.callsMax = dto.maxAllowed;
                 }));
 
-        this.subscriptions.push(
+        this.takeOver(
             this.app.pipe(
                     switchMap(app => this.historyService.getHistory(app.name, '')))
                 .subscribe(dto => {
                     this.history = dto;
                 }));
 
-        this.subscriptions.push(
+        this.takeOver(
             this.app.pipe(
                     switchMap(app => this.usagesService.getStorageUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {
@@ -175,7 +166,7 @@ export class DashboardPageComponent implements OnDestroy, OnInit {
                     };
                 }));
 
-        this.subscriptions.push(
+        this.takeOver(
             this.app.pipe(
                     switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {

@@ -78,6 +78,7 @@ interface State {
     hasFocus: boolean;
 
     suggestedItems: string[];
+
     suggestedIndex: number;
 
     items: any[];
@@ -146,7 +147,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     }
 
     public ngOnInit() {
-        this.observe(
+        this.takeOver(
             this.addInput.valueChanges.pipe(
                     tap(() => {
                         this.resetSize();

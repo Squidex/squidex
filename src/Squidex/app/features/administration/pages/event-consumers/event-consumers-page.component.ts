@@ -5,11 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription, timer } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { timer } from 'rxjs';
 import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
-import { DialogModel } from '@app/shared';
+import { DialogModel, ResourceOwner } from '@app/shared';
 
 import { EventConsumerDto } from './../../services/event-consumers.service';
 import { EventConsumersState } from './../../state/event-consumers.state';
@@ -19,27 +19,20 @@ import { EventConsumersState } from './../../state/event-consumers.state';
     styleUrls: ['./event-consumers-page.component.scss'],
     templateUrl: './event-consumers-page.component.html'
 })
-export class EventConsumersPageComponent implements OnDestroy, OnInit {
-    private timerSubscription: Subscription;
-
+export class EventConsumersPageComponent extends ResourceOwner implements OnInit {
     public eventConsumerErrorDialog = new DialogModel();
     public eventConsumerError = '';
 
     constructor(
         public readonly eventConsumersState: EventConsumersState
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.timerSubscription.unsubscribe();
+        super();
     }
 
     public ngOnInit() {
         this.eventConsumersState.load().pipe(onErrorResumeNext()).subscribe();
 
-        this.timerSubscription =
-            timer(2000, 2000).pipe(switchMap(x => this.eventConsumersState.load(true, true).pipe(onErrorResumeNext())))
-                .subscribe();
+        this.takeOver(timer(2000, 2000).pipe(switchMap(() => this.eventConsumersState.load(true, true))));
     }
 
     public reload() {
@@ -58,7 +51,7 @@ export class EventConsumersPageComponent implements OnDestroy, OnInit {
         this.eventConsumersState.reset(es).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public trackByEventConsumer(index: number, es: EventConsumerDto) {
+    public trackByEventConsumer(es: EventConsumerDto) {
         return es.name;
     }
 
