@@ -115,6 +115,7 @@ namespace Squidex.Config.Web
             });
 
             app.UseMiddleware<EnforceHttpsMiddleware>();
+            app.UseMiddleware<CleanupHostMiddleware>();
         }
     }
 }
