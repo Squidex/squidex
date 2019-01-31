@@ -33,12 +33,12 @@ namespace Squidex.Pipeline
 
         private static bool HasHttpPort(HttpRequest request)
         {
-            return request.Protocol == "http" && request.Host.Port == 80;
+            return request.Scheme == "http" && request.Host.Port == 80;
         }
 
         private static bool HasHttpsPort(HttpRequest request)
         {
-            return request.Protocol == "https" && request.Host.Port == 443;
+            return request.Scheme == "https" && request.Host.Port == 443;
         }
     }
 }
