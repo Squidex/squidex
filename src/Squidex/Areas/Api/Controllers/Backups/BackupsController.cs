@@ -21,7 +21,7 @@ using Squidex.Shared;
 namespace Squidex.Areas.Api.Controllers.Backups
 {
     /// <summary>
-    /// Manages backups for app.
+    /// Manages backups for apps.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Backups))]
     public class BackupsController : ApiController

@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         private IValidator CreateSchemaValidator(bool isPartial)
         {
-            var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>();
+            var fieldsValidators = new Dictionary<string, (bool IsOptional, IValidator Validator)>(schema.Fields.Count);
 
             foreach (var field in schema.FieldsByName)
             {

@@ -57,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpGet]
         [Route("assets/{id}/")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(FileResult), 200)]
         [ApiCosts(0.5)]
         public async Task<IActionResult> GetAssetContent(Guid id, [FromQuery] long version = EtagVersion.Any, [FromQuery] int? width = null, [FromQuery] int? height = null, [FromQuery] string mode = null)
         {

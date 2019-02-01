@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [CollectionName("Index_AppsByName")]
         public sealed class GrainState
         {
-            public Dictionary<string, Guid> Apps { get; set; } = new Dictionary<string, Guid>();
+            public Dictionary<string, Guid> Apps { get; set; } = new Dictionary<string, Guid>(StringComparer.Ordinal);
         }
 
         public AppsByNameIndexGrain(IStore<string> store)

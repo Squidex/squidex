@@ -17,6 +17,10 @@ using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Backups
 {
+    /// <summary>
+    /// Manages backups for apps.
+    /// </summary>
+    [ApiExplorerSettings(GroupName = nameof(Backups))]
     public class RestoreController : ApiController
     {
         private readonly IGrainFactory grainFactory;
@@ -28,13 +32,14 @@ namespace Squidex.Areas.Api.Controllers.Backups
         }
 
         /// <summary>
-        /// Get current status.
+        /// Get current restore status.
         /// </summary>
         /// <returns>
         /// 200 => Status returned.
         /// </returns>
         [HttpGet]
         [Route("apps/restore/")]
+        [ProducesResponseType(typeof(RestoreJobDto), 200)]
         [ApiPermission(Permissions.AdminRestoreRead)]
         public async Task<IActionResult> GetJob()
         {
