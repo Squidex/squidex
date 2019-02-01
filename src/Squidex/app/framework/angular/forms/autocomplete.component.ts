@@ -27,7 +27,6 @@ export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
 
 interface State {
     suggestedItems: any[];
-
     suggestedIndex: number;
 }
 

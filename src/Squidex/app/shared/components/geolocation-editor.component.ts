@@ -25,7 +25,6 @@ export const SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 
 interface Geolocation {
     latitude: number;
-
     longitude: number;
 }
 

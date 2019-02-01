@@ -11,7 +11,6 @@ import { fadeAnimation, StatefulComponent } from '@app/framework/internal';
 
 interface State {
     hasTabs: boolean;
-
     hasFooter: boolean;
 }
 

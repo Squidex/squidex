@@ -30,7 +30,6 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 
 interface State {
     schema?: SchemaDetailsDto | null;
-
     schemaInvalid: boolean;
 
     contentItems: ImmutableArray<ContentDto>;

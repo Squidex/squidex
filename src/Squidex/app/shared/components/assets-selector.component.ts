@@ -20,7 +20,6 @@ import {
 
 interface State {
     selectedAssets: { [id: string]: AssetDto };
-
     selectionCount: number;
 
     isListView: boolean;

@@ -23,7 +23,6 @@ interface State {
     displayName?: string;
 
     schemasFiltered: ImmutableArray<SchemaDto>;
-
     schemasForCategory: ImmutableArray<SchemaDto>;
 
     isOpen: boolean;

@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
+import { onErrorResumeNext, skip } from 'rxjs/operators';
 
 import { Types } from './../utils/types';
 
@@ -46,7 +46,7 @@ export class ResourceOwner implements OnDestroy {
     }
 }
 
-export abstract class StatefulComponent<T = any> extends State<T> implements OnDestroy, OnInit {
+export abstract class StatefulComponent<T = any> extends State<T> implements OnDestroy {
     private readonly subscriptions = new ResourceOwner();
 
     constructor(
@@ -54,16 +54,15 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
         state: T
     ) {
         super(state);
+
+        this.takeOver(
+            this.changes.pipe(skip(1)).subscribe(() => {
+                this.changeDetector.detectChanges();
+            }));
     }
 
     public ngOnDestroy() {
         this.subscriptions.ngOnDestroy();
-    }
-
-    public ngOnInit() {
-        this.changes.subscribe(() => {
-            this.changeDetector.detectChanges();
-        });
     }
 
     public takeOver<R>(subscription: Subscription | UnsubscribeFunction | Observable<R>) {

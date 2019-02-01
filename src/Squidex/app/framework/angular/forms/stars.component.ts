@@ -16,7 +16,6 @@ export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
 
 interface State {
     stars: number;
-
     starsArray: number[];
 
     value: number | null;

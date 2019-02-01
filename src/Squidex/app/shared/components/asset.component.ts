@@ -27,7 +27,6 @@ import {
 
 interface State {
     isTagging: boolean;
-
     isRenaming: boolean;
 
     progress: number;

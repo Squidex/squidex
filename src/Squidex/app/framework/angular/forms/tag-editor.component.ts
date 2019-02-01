@@ -78,7 +78,6 @@ interface State {
     hasFocus: boolean;
 
     suggestedItems: string[];
-
     suggestedIndex: number;
 
     items: any[];
