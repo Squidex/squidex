@@ -11,7 +11,7 @@ using Orleans;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Pipeline;
 using Squidex.Shared;
 
@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiPermission(Permissions.AdminRestoreRead)]
         public async Task<IActionResult> GetJob()
         {
-            var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(User.UserOrClientId());
+            var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
 
             var job = await restoreGrain.GetJobAsync();
 
@@ -69,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiPermission(Permissions.AdminRestoreCreate)]
         public async Task<IActionResult> PostRestore([FromBody] RestoreRequest request)
         {
-            var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(User.UserOrClientId());
+            var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
 
             await restoreGrain.RestoreAsync(request.Url, request.Name);
 
