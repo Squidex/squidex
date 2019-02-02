@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#define LOG_ALL_IDENTITY_SERVER_NONE
+
 using System;
 using Microsoft.Extensions.Logging;
 
@@ -40,7 +42,12 @@ namespace Squidex.Config
                 {
                     return level > LogLevel.Information;
                 }
-
+#if LOG_ALL_IDENTITY_SERVER
+                if (category.StartsWith("IdentityServer4.", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+#endif
                 return level >= LogLevel.Information;
             });
         }

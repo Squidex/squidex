@@ -21,7 +21,11 @@ namespace Squidex.Shared.Identity
 
         public static readonly string Permissions = "urn:squidex:permissions";
 
+        public static readonly string PermissionsClient = "client_urn:squidex:permissions";
+
         public static readonly string Prefix = "urn:squidex:";
+
+        public static readonly string PrefixClient = "client_urn:squidex:";
 
         public static readonly string PictureUrlStore = "store";
     }

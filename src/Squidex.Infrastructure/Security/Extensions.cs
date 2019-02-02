@@ -23,6 +23,11 @@ namespace Squidex.Infrastructure.Security
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.ClientId)?.Value;
         }
 
+        public static string UserOrClientId(this ClaimsPrincipal principal)
+        {
+            return principal.OpenIdSubject() ?? principal.OpenIdClientId();
+        }
+
         public static string OpenIdPreferredUserName(this ClaimsPrincipal principal)
         {
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.PreferredUserName)?.Value;
