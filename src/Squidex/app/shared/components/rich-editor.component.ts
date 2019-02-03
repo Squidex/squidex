@@ -96,6 +96,20 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
             removed_menuitems: 'newdocument',
             resize: true,
             toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets',
+
+            images_upload_handler: (blob: any, success: (url: string) => void, failed: () => void) => {
+                const file = new File([blob.blob()], blob.filename(), { lastModified: new Date().getTime() });
+
+                this.assetsService.uploadFile(this.appsState.appName, file, this.authState.user!.token, DateTime.now())
+                    .subscribe(asset => {
+                        if (Types.is(asset, AssetDto)) {
+                            success(asset.url);
+                        }
+                    }, () => {
+                        failed();
+                    });
+            },
+
             setup: (editor: any) => {
                 self.tinyEditor = editor;
                 self.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
@@ -126,6 +140,19 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
                         }
                     }
                 });
+
+                self.tinyEditor.on('drop', (event: DragEvent) => {
+                    if (event.dataTransfer) {
+                        for (let i = 0; i < event.dataTransfer.files.length; i++) {
+                            const file = event.dataTransfer.files.item(i);
+
+                            if (file && ImageTypes.indexOf(file.type) >= 0) {
+                                self.uploadFile(file);
+                            }
+                        }
+                    }
+                });
+
                 self.tinyEditor.on('blur', () => {
                     self.callTouched();
                 });
