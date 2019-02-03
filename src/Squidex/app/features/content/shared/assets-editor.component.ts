@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:prefer-for-of
-
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnDestroy, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -127,23 +125,9 @@ export class AssetsEditorComponent implements ControlValueAccessor, OnInit, OnDe
         this.callTouched = fn;
     }
 
-    public pasteFiles(event: ClipboardEvent) {
-        for (let i = 0; i < event.clipboardData.items.length; i++) {
-            const file = event.clipboardData.items[i].getAsFile();
-
-            if (file) {
-                this.newAssets = this.newAssets.pushFront(file);
-            }
-        }
-    }
-
-    public addFiles(files: FileList) {
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-
-            if (file) {
-                this.newAssets = this.newAssets.pushFront(file);
-            }
+    public addFiles(files: File[]) {
+        for (let file of files) {
+            this.newAssets = this.newAssets.pushFront(file);
         }
     }
 

@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:prefer-for-of
-
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { onErrorResumeNext } from 'rxjs/operators';

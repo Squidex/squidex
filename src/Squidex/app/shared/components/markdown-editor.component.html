@@ -1,10 +1,6 @@
-<div #container class="drop-container">
+<div #container class="drop-container" (sqxFileDrop)="insertFiles($event)" [onlyImages]="true">
     <div #inner [class.fullscreen]="isFullscreen">
         <textarea class="form-control" #editor></textarea>
-    </div>
-
-    <div class="file-drop drag drop-area">
-        <div class="drop-text">Drop assets here to add them.</div>
     </div>
 </div>
 
