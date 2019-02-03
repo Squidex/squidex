@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, Input, OnChanges, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Directive, Input, OnChanges, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 
 import {
     AppDto,
@@ -15,11 +15,15 @@ import {
     SchemaDto,
     SchemasState
 } from '@app/shared/internal';
+import { Subscription } from 'rxjs';
 
 @Directive({
     selector: '[sqxPermission]'
 })
-export class PermissionDirective implements OnChanges {
+export class PermissionDirective implements OnChanges, OnInit, OnDestroy {
+    private selectedAppSubscription: Subscription;
+    private selectedSchemaSubscription: Subscription;
+
     private viewCreated = false;
 
     @Input('sqxPermissionApp')
@@ -34,14 +38,54 @@ export class PermissionDirective implements OnChanges {
     constructor(
         private readonly authService: AuthService,
         private readonly appsState: AppsState,
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly schemasState: SchemasState,
         private readonly templateRef: TemplateRef<any>,
         private readonly viewContainer: ViewContainerRef
     ) {
     }
 
+    public ngOnDestroy() {
+        if (this.selectedAppSubscription) {
+            this.selectedAppSubscription.unsubscribe();
+        }
+
+        if (this.selectedSchemaSubscription) {
+            this.selectedSchemaSubscription.unsubscribe();
+        }
+    }
+
+    public ngOnInit() {
+        this.selectedAppSubscription =
+            this.appsState.selectedApp.subscribe(app => {
+                if (app && !this.app) {
+                    this.update(app, this.schemasState.snapshot.selectedSchema);
+                }
+            });
+
+        this.selectedSchemaSubscription =
+            this.schemasState.selectedSchema.subscribe(schema => {
+                if (schema && !this.schema) {
+                    this.update(this.appsState.snapshot.selectedApp, schema);
+                }
+            });
+    }
+
     public ngOnChanges() {
+        this.update(this.appsState.snapshot.selectedApp, this.schemasState.snapshot.selectedSchema);
+    }
+
+    private update(app?: AppDto | null, schema?: SchemaDto | null) {
+        if (this.app) {
+            app = this.app;
+        }
+
+        if (this.schema) {
+            schema = this.schema;
+        }
+
         let permissions = this.permissions;
+
         let show = false;
 
         if (permissions) {
@@ -54,13 +98,9 @@ export class PermissionDirective implements OnChanges {
             const array = permissions.split(';');
 
             for (let id of array) {
-                const app = this.app || this.appsState.snapshot.selectedApp;
-
                 if (app) {
                     id = id.replace('{app}', app.name);
                 }
-
-                const schema = this.schema || this.schemasState.snapshot.selectedSchema;
 
                 if (schema) {
                     id = id.replace('{name}', schema.name);
@@ -95,9 +135,11 @@ export class PermissionDirective implements OnChanges {
         if (show && !this.viewCreated) {
             this.viewContainer.createEmbeddedView(this.templateRef);
             this.viewCreated = true;
-        } else if (show && this.viewCreated) {
+        } else if (!show && this.viewCreated) {
             this.viewContainer.clear();
             this.viewCreated = false;
         }
+
+        this.changeDetector.markForCheck();
     }
 }
