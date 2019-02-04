@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { AppLanguageDto, RootFieldDto } from '@app/shared';
 
@@ -28,7 +28,8 @@ import { AppLanguageDto, RootFieldDto } from '@app/shared';
                     Please remember to check all languages when you see validation errors.
                 </sqx-onboarding-tooltip>
             </ng-container>
-        </ng-container>`
+        </ng-container>`,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FieldLanguagesComponent {
     @Input()

@@ -16,7 +16,7 @@
             <div class="col-auto offset-xl-4">
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
-                <button class="btn btn-text-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">
+                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">
                     <i class="icon-reset"></i> Refresh
                 </button>
             </div>
@@ -36,7 +36,7 @@
                 <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.mutableValues"></sqx-language-selector>
             </div>
             <div class="col-auto pl-1">
-                <button class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
+                <button type="button" class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
                     <i class="icon-plus"></i> New
                 </button>
                 
@@ -73,23 +73,23 @@
         <div class="selection" *ngIf="selectionCount > 0">
             {{selectionCount}} items selected:&nbsp;&nbsp;
 
-            <button class="btn btn-secondary mr-1" (click)="publishSelected()" *ngIf="canPublish">
+            <button type="button" class="btn btn-secondary mr-1" (click)="publishSelected()" *ngIf="canPublish">
                 Publish
             </button>
             
-            <button class="btn btn-secondary mr-1" (click)="unpublishSelected()" *ngIf="canUnpublish">
+            <button type="button" class="btn btn-secondary mr-1" (click)="unpublishSelected()" *ngIf="canUnpublish">
                 Unpublish
             </button>
             
-            <button class="btn btn-secondary mr-1" (click)="archiveSelected()" *ngIf="(contentsState.isArchive | async) === false">
+            <button type="button" class="btn btn-secondary mr-1" (click)="archiveSelected()" *ngIf="(contentsState.isArchive | async) === false">
                 Archive
             </button>
             
-            <button class="btn btn-secondary mr-1" (click)="restoreSelected()" *ngIf="contentsState.isArchive | async">
+            <button type="button" class="btn btn-secondary mr-1" (click)="restoreSelected()" *ngIf="contentsState.isArchive | async">
                 Restore
             </button>
             
-            <button class="btn btn-danger"
+            <button type="button" class="btn btn-danger"
                 (sqxConfirmClick)="deleteSelected()"
                 confirmTitle="Delete content" 
                 confirmText="Do you really want to delete the selected content items?">

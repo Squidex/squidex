@@ -61,7 +61,7 @@
         <div class="table-items-row table-items-row-empty" *ngIf="schema && schema.fields.length === 0">
             No field created yet.
             
-            <button class="btn btn-success btn-sm ml-2" (click)="addFieldDialog.show()">
+            <button type="button" class="btn btn-success btn-sm ml-2" (click)="addFieldDialog.show()">
                 <i class="icon icon-plus"></i> Add Field
             </button>
         </div>
@@ -75,7 +75,7 @@
                 </div>
             </div>
     
-            <button class="btn btn-success field-button" (click)="addFieldDialog.show()">
+            <button type="button" class="btn btn-success field-button" (click)="addFieldDialog.show()">
                 <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">Add Field</div>
             </button>
         </ng-container>

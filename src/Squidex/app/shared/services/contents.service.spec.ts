@@ -217,6 +217,7 @@ describe('ContentsService', () => {
             createdBy: 'Created1',
             lastModified: '2017-12-12T10:10',
             lastModifiedBy: 'LastModifiedBy1',
+            isPending: false,
             data: {}
         }, {
             headers: {
@@ -229,7 +230,7 @@ describe('ContentsService', () => {
                 DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
                 DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
                 null,
-                true,
+                false,
                 null,
                 {},
                 new Version('2')));

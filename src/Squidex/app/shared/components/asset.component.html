@@ -21,10 +21,10 @@
                             <i class="icon-download"></i>
                         </a>
         
-                        <a class="file-delete ml-2" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
+                        <a class="file-delete ml-2" (click)="deleting.emit(asset)" *ngIf="!isDisabled && !removeMode">
                             <i class="icon-delete"></i>
                         </a>
-                        <a class="file-delete ml-2" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
+                        <a class="file-delete ml-2" (click)="removing.emit(asset)" *ngIf="removeMode">
                             <i class="icon-close"></i>
                         </a>
                     </div>
@@ -121,10 +121,10 @@
                     </a>
                 </td>
                 <td class="col-actions text-right" *ngIf="!isDisabled || removeMode">
-                    <button class="btn btn-text-danger" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
+                    <button type="button" class="btn btn-text-danger" (click)="deleting.emit(asset)" *ngIf="!isDisabled && !removeMode">
                         <i class="icon-bin2"></i>
                     </button>
-                    <button class="btn btn-text-secondary" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
+                    <button type="button" class="btn btn-text-secondary" (click)="removing.emit(asset)" *ngIf="removeMode">
                         <i class="icon-close"></i>
                     </button>
                 </td>

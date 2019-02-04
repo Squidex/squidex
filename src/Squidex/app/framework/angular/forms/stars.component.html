@@ -8,6 +8,6 @@
             <span class="star" *ngFor="let star of snapshot.starsArray" (mouseenter)="setPreview(star)" (click)="setValue(star)" [class.selected]="star <= snapshot.stars"></span>
         </span>
 
-        <button class="btn btn-text" [class.hidden]="!value" (click)="reset()">Clear</button>
+        <button type="button" class="btn btn-text" [class.hidden]="!value" (click)="reset()">Clear</button>
     </ng-container>
 </div>
