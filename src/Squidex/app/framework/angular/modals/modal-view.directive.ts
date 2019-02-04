@@ -6,19 +6,22 @@
  */
 
 import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 import {
     DialogModel,
     ModalModel,
-    ResourceOwner,
     Types
 } from '@app/framework/internal';
 
 import { RootViewComponent } from './root-view.component';
+
 @Directive({
     selector: '[sqxModalView]'
 })
-export class ModalViewDirective extends ResourceOwner implements OnChanges, OnDestroy {
+export class ModalViewDirective implements OnChanges, OnDestroy {
+    private subscription: Subscription | null = null;
+    private documentClickListener: Function | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
 
     @Input('sqxModalView')
@@ -39,11 +42,11 @@ export class ModalViewDirective extends ResourceOwner implements OnChanges, OnDe
         private readonly viewContainer: ViewContainerRef,
         private readonly rootView: RootViewComponent
     ) {
-        super();
     }
 
     public ngOnDestroy() {
-        super.ngOnDestroy();
+        this.unsubscribeToModal();
+        this.unsubscribeToClick();
 
         if (Types.is(this.modalView, DialogModel) || Types.is(this.modalView, ModalModel)) {
             this.modalView.hide();
@@ -55,13 +58,13 @@ export class ModalViewDirective extends ResourceOwner implements OnChanges, OnDe
             return;
         }
 
-        super.ngOnDestroy();
+        this.unsubscribeToModal();
 
         if (Types.is(this.modalView, DialogModel) || Types.is(this.modalView, ModalModel)) {
-            this.takeOver(
+            this.subscription =
                 this.modalView.isOpen.subscribe(isOpen => {
                     this.update(isOpen);
-                }));
+                });
         } else {
             this.update(!!this.modalView);
         }
@@ -92,7 +95,7 @@ export class ModalViewDirective extends ResourceOwner implements OnChanges, OnDe
 
             this.renderedView = null;
 
-            super.ngOnDestroy();
+            this.unsubscribeToClick();
         }
     }
 
@@ -105,7 +108,7 @@ export class ModalViewDirective extends ResourceOwner implements OnChanges, OnDe
             return;
         }
 
-        this.takeOver(
+        this.documentClickListener =
             this.renderer.listen('document', 'click', (event: MouseEvent) => {
                 if (!event.target || this.renderedView === null) {
                     return;
@@ -133,6 +136,20 @@ export class ModalViewDirective extends ResourceOwner implements OnChanges, OnDe
                         return;
                     }
                 }
-            }));
+            });
+    }
+
+    private unsubscribeToModal() {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+            this.subscription = null;
+        }
+    }
+
+    private unsubscribeToClick() {
+        if (this.documentClickListener) {
+            this.documentClickListener();
+            this.documentClickListener = null;
+        }
     }
 }

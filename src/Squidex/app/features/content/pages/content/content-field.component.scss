@@ -11,8 +11,26 @@
     @include absolute(.7rem, 1.25rem, auto, auto);
 }
 
-.invalid {
-    border-left-color: $color-theme-error;
+.row {
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+}
+
+.col-12 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.col-6 {
+    & {
+        padding-left: 1.5rem;
+        padding-right: .5rem;
+    }
+
+    &.col-right {
+        padding-left: .5rem;
+        padding-right: 1.5rem;
+    }
 }
 
 .field {
@@ -20,9 +38,24 @@
         color: $color-theme-error;
     }
 
+    &-invalid {
+        border-left-color: $color-theme-error;
+    }
+
     &-disabled {
         color: $color-border-dark;
         font-size: .8rem;
         font-weight: normal;
     }
+
+    &-copy {
+        @include absolute(1rem, auto, auto, -1rem);
+        z-index: 1000;
+    }
+}
+
+.compare {
+    padding: .5rem 0;
+    border: 0;
+    border-bottom: 1px solid $color-border;
 }

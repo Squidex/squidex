@@ -29,7 +29,7 @@ export class ParentLinkDirective extends ResourceOwner implements OnDestroy, OnI
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.route.url.subscribe(() => {
                 this.url = this.isLazyLoaded ?
                     this.router.createUrlTree(['.'], { relativeTo: this.route.parent!.parent }).toString() :

@@ -32,7 +32,7 @@ export class UserReportComponent extends ResourceOwner implements OnDestroy, OnI
         window['_urq'] = window['_urq'] || [];
         window['_urq'].push(['initSite', this.config.siteId]);
 
-        this.takeOver(
+        this.own(
             timer(4000).subscribe(() => {
                 this.resourceLoader.loadScript('https://cdn.userreport.com/userreport.js');
             }));

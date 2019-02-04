@@ -36,6 +36,7 @@ import {
     ContentStatusComponent,
     DueTimeSelectorComponent,
     FieldEditorComponent,
+    FieldLanguagesComponent,
     PreviewButtonComponent,
     ReferencesEditorComponent,
     SchemasPageComponent
@@ -119,6 +120,7 @@ const routes: Routes = [
         ContentsSelectorComponent,
         DueTimeSelectorComponent,
         FieldEditorComponent,
+        FieldLanguagesComponent,
         PreviewButtonComponent,
         ReferencesEditorComponent,
         SchemasPageComponent

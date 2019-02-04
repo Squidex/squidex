@@ -34,7 +34,7 @@ export class LanguagesPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.languagesState.newLanguages
                 .subscribe(languages => {
                     if (languages.length > 0) {

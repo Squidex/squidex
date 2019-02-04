@@ -44,14 +44,14 @@ export class PermissionDirective extends ResourceOwner implements OnChanges, OnI
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.appsState.selectedApp.subscribe(app => {
                 if (app && !this.app) {
                     this.update(app, this.schemasState.snapshot.selectedSchema);
                 }
             }));
 
-        this.takeOver(
+        this.own(
             this.schemasState.selectedSchema.subscribe(schema => {
                 if (schema && !this.schema) {
                     this.update(this.appsState.snapshot.selectedApp, schema);

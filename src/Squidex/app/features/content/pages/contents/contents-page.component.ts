@@ -61,7 +61,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
                     this.resetSelection();
@@ -72,13 +72,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.contentsState.init().pipe(onErrorResumeNext()).subscribe();
                 }));
 
-        this.takeOver(
+        this.own(
             this.contentsState.contents
                 .subscribe(() => {
                     this.updateSelectionSummary();
                 }));
 
-        this.takeOver(
+        this.own(
             this.languagesState.languages
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);

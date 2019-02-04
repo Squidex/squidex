@@ -10,6 +10,18 @@ export class Version {
         public readonly value: string
     ) {
     }
+
+    public eq(other: Version) {
+        return other && other.trimmed() === this.trimmed();
+    }
+
+    private trimmed(): string {
+        if (this.value.startsWith('W/')) {
+            return this.value.substr(2);
+        } else {
+            return this.value;
+        }
+    }
 }
 
 export class Versioned<T> {

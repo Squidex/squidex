@@ -1,7 +1,7 @@
 <sqx-title message="{app} | {schema} | Content" parameter1="app" parameter2="schema" [value1]="appsState.appName" [value2]="schema.displayName"></sqx-title>
 
 <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
-    <sqx-panel desiredWidth="*" [showSidebar]="content">
+    <sqx-panel desiredWidth="*" minWidth="40rem" [showSidebar]="content">
         <ng-container title>
             <a class="btn btn-text" (click)="back()" *ngIf="!schema.isSingleton">
                 <i class="icon-angle-left"></i>
@@ -116,6 +116,7 @@
                     [form]="contentForm"
                     [field]="field"
                     [fieldForm]="contentForm.form.get(field.name)"
+                    [fieldFormCompare]="contentFormCompare?.form.get(field.name)"
                     [schema]="schema"
                     [languages]="languages"
                     [(language)]="language">

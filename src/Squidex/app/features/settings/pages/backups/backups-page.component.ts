@@ -32,7 +32,7 @@ export class BackupsPageComponent extends ResourceOwner implements OnInit {
     public ngOnInit() {
         this.backupsState.load().pipe(onErrorResumeNext()).subscribe();
 
-        this.takeOver(
+        this.own(
             timer(3000, 3000).pipe(switchMap(() => this.backupsState.load(true, true).pipe(onErrorResumeNext())))
                 .subscribe());
     }

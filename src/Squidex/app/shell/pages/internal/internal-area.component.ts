@@ -34,7 +34,7 @@ export class InternalAreaComponent extends ResourceOwner implements OnDestroy, O
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.route.queryParams.subscribe(params => {
                 const successMessage = params['successMessage'];
 

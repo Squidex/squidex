@@ -32,7 +32,7 @@ export class EventConsumersPageComponent extends ResourceOwner implements OnInit
     public ngOnInit() {
         this.eventConsumersState.load().pipe(onErrorResumeNext()).subscribe();
 
-        this.takeOver(timer(2000, 2000).pipe(switchMap(() => this.eventConsumersState.load(true, true))));
+        this.own(timer(2000, 2000).pipe(switchMap(() => this.eventConsumersState.load(true, true))));
     }
 
     public reload() {

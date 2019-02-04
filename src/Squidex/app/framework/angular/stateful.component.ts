@@ -19,7 +19,7 @@ declare type UnsubscribeFunction = () => void;
 export class ResourceOwner implements OnDestroy {
     private subscriptions: (Subscription | UnsubscribeFunction)[] = [];
 
-    public takeOver<T>(subscription: Subscription | UnsubscribeFunction | Observable<T>) {
+    public own<T>(subscription: Subscription | UnsubscribeFunction | Observable<T>) {
         if (subscription) {
             if (Types.isFunction(subscription['subscribe'])) {
                 const observable = <Observable<T>>subscription;
@@ -66,7 +66,7 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
     }
 
     public takeOver<R>(subscription: Subscription | UnsubscribeFunction | Observable<R>) {
-        this.subscriptions.takeOver(subscription);
+        this.subscriptions.own(subscription);
     }
 }
 

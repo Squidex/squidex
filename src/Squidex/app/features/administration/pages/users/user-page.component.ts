@@ -35,7 +35,7 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.usersState.selectedUser
                 .subscribe(selectedUser => {
                     this.user = selectedUser!;

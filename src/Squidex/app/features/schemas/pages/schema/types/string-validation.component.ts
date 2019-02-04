@@ -82,7 +82,7 @@ export class StringValidationComponent extends ResourceOwner implements OnDestro
         this.showPatternMessage =
             this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim().length > 0;
 
-        this.takeOver(
+        this.own(
             this.editForm.controls['pattern'].valueChanges
                 .subscribe((value: string) => {
                     if (!value || value.length === 0) {

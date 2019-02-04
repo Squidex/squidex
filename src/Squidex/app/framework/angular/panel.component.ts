@@ -32,6 +32,9 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     public desiredWidth = '10rem';
 
     @Input()
+    public minWidth?: string;
+
+    @Input()
     public isBlank = false;
 
     @Input()
@@ -84,6 +87,7 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
             this.styleWidth = size;
 
             this.renderer.setStyle(this.panel.nativeElement, 'width', size);
+            this.renderer.setStyle(this.panel.nativeElement, 'minWidth', this.minWidth);
             this.renderWidth = this.panel.nativeElement.offsetWidth;
         }
     }

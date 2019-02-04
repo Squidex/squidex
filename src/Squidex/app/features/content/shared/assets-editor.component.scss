@@ -44,8 +44,7 @@
     & {
         @include transition(border-color .4s ease);
         @include border-radius;
-        @include flex-box;
-        @include truncate;
+        @include truncate-nowidth;
         border: 2px dashed darken($color-border, 10%);
         font-weight: normal;
         text-align: center;

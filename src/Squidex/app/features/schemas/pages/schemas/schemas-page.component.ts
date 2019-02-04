@@ -47,7 +47,7 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.messageBus.of(SchemaCloning)
                 .subscribe(m => {
                     this.import = m.schema;
@@ -55,7 +55,7 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
                     this.addSchemaDialog.show();
                 }));
 
-        this.takeOver(
+        this.own(
             this.route.params.pipe(map(q => q['showDialog']))
                 .subscribe(showDialog => {
                     if (showDialog) {

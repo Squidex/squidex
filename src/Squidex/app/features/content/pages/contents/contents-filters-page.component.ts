@@ -33,7 +33,7 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
                     if (schema) {

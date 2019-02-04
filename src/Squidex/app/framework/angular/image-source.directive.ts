@@ -50,7 +50,7 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
             this.parent = this.renderer.parentNode(this.element.nativeElement);
         }
 
-        this.takeOver(
+        this.own(
             this.renderer.listen(this.parent, 'resize', () => {
                 this.resize();
             }));

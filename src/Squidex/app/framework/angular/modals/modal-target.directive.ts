@@ -49,17 +49,17 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
         if (this.target) {
             this.targetElement = this.target;
 
-            this.takeOver(
+            this.own(
                 this.renderer.listen(this.targetElement, 'resize', () => {
                     this.updatePosition();
                 }));
 
-            this.takeOver(
+            this.own(
                 this.renderer.listen(this.element.nativeElement, 'resize', () => {
                     this.updatePosition();
                 }));
 
-            this.takeOver(timer(100, 100).subscribe(() => this.updatePosition()));
+            this.own(timer(100, 100).subscribe(() => this.updatePosition()));
         }
     }
 

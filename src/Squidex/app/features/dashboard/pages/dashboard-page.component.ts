@@ -106,7 +106,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.app.pipe(
                     switchMap(app => this.usagesService.getTodayStorage(app.name)))
                 .subscribe(dto => {
@@ -114,7 +114,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
                     this.assetsMax = dto.maxAllowed;
                 }));
 
-        this.takeOver(
+        this.own(
             this.app.pipe(
                     switchMap(app => this.usagesService.getMonthCalls(app.name)))
                 .subscribe(dto => {
@@ -122,14 +122,14 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
                     this.callsMax = dto.maxAllowed;
                 }));
 
-        this.takeOver(
+        this.own(
             this.app.pipe(
                     switchMap(app => this.historyService.getHistory(app.name, '')))
                 .subscribe(dto => {
                     this.history = dto;
                 }));
 
-        this.takeOver(
+        this.own(
             this.app.pipe(
                     switchMap(app => this.usagesService.getStorageUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {
@@ -166,7 +166,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
                     };
                 }));
 
-        this.takeOver(
+        this.own(
             this.app.pipe(
                     switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {

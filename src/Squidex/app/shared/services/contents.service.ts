@@ -162,12 +162,12 @@ export class ContentsService {
                 pretifyError('Failed to load content. Please reload.'));
     }
 
-    public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<any> {
+    public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${version.value}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
                 map(response => {
-                    return response.payload.body;
+                    return new Versioned(response.version, response.payload.body);
                 }),
                 pretifyError('Failed to load data. Please reload.'));
     }

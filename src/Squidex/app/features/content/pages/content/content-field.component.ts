@@ -37,6 +37,9 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
     public fieldForm: FormGroup;
 
     @Input()
+    public fieldFormCompare?: FormGroup;
+
+    @Input()
     public schema: SchemaDto;
 
     @Input()
@@ -49,6 +52,8 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
     public languageChange = new EventEmitter<AppLanguageDto>();
 
     public selectedFormControl: AbstractControl;
+    public selectedFormControlCompare?: AbstractControl;
+
     public showAllControls = false;
 
     public isInvalid: Observable<boolean>;
@@ -68,20 +73,24 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
         }
     }
 
-    public toggleShowAll() {
-        this.showAllControls = !this.showAllControls;
+    public changeShowAllControls(value: boolean) {
+        this.showAllControls = value;
 
         this.localStore.setBoolean(this.configKey(), this.showAllControls);
     }
 
-    public ngDoCheck() {
-        let control: AbstractControl;
-
-        if (this.field.isLocalizable) {
-            control = this.fieldForm.controls[this.language.iso2Code];
-        } else {
-            control = this.fieldForm.controls[fieldInvariant];
+    public copy() {
+        if (this.selectedFormControlCompare && this.fieldFormCompare) {
+            if (this.showAllControls) {
+                this.fieldForm.setValue(this.fieldFormCompare.value);
+            } else {
+                this.selectedFormControl.setValue(this.selectedFormControlCompare.value);
+            }
         }
+    }
+
+    public ngDoCheck() {
+        const control = this.findControl(this.fieldForm);
 
         if (this.selectedFormControl !== control) {
             if (this.selectedFormControl && Types.isFunction(this.selectedFormControl['_clearChangeFns'])) {
@@ -90,6 +99,34 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
 
             this.selectedFormControl = control;
         }
+
+        if (this.fieldFormCompare) {
+            const controlCompare = this.findControl(this.fieldFormCompare);
+
+            if (this.selectedFormControlCompare !== controlCompare) {
+                if (this.selectedFormControlCompare && Types.isFunction(this.selectedFormControlCompare['_clearChangeFns'])) {
+                    this.selectedFormControlCompare['_clearChangeFns']();
+                }
+
+                this.selectedFormControlCompare = controlCompare;
+            }
+        }
+    }
+
+    private findControl(form: FormGroup) {
+        if (this.field.isLocalizable) {
+            return form.controls[this.language.iso2Code];
+        } else {
+            return form.controls[fieldInvariant];
+        }
+    }
+
+    public prefix(language: AppLanguageDto) {
+        return `(${language.iso2Code}`;
+    }
+
+    public trackByLanguage(index: number, language: AppLanguageDto) {
+        return language.iso2Code;
     }
 
     private configKey() {

@@ -54,14 +54,14 @@ export class StringUIComponent extends ResourceOwner implements OnInit {
             this.editForm.controls['editor'].valueChanges.pipe(
                 startWith(this.properties.editor), map(x => !(x && (x === 'Input' || x === 'Dropdown' || x === 'Slug'))));
 
-        this.takeOver(
+        this.own(
             this.hideAllowedValues.subscribe(isSelection => {
                 if (isSelection) {
                     this.editForm.controls['allowedValues'].setValue(undefined);
                 }
             }));
 
-        this.takeOver(
+        this.own(
             this.hideInlineEditable.subscribe(isSelection => {
                 if (isSelection) {
                     this.editForm.controls['inlineEditable'].setValue(false);

@@ -50,7 +50,7 @@ export class CommentsComponent extends ResourceOwner implements OnDestroy, OnIni
     public ngOnInit() {
         this.state = new CommentsState(this.appsState, this.commentsId, this.commentsService, this.dialogs);
 
-        this.takeOver(
+        this.own(
             timer(0, 4000).pipe(switchMap(() => this.state.load().pipe(onErrorResumeNext())))
                 .subscribe());
     }

@@ -1,42 +1,79 @@
-<div class="table-items-row" [class.invalid]="isInvalid | async">
-    <div class="languages-buttons" *ngIf="field.isLocalizable && languages.length > 1">
-        <button *ngIf="!field.properties.isComplexUI" type="button" class="btn btn-secondary btn-sm btn-text mr-1" (click)="toggleShowAll()">
-            {{showAllControls ? 'Single Language' : 'All Languages'}}
-        </button>
-    
-        <ng-container *ngIf="field.properties.isComplexUI || !showAllControls">
-            <sqx-language-selector size="sm" #buttonLanguages
-                [selectedLanguage]="language"
-                (selectedLanguageChange)="languageChange.emit($event)"
-                [languages]="languages.values">
-            </sqx-language-selector>
-    
-            <sqx-onboarding-tooltip helpId="languages" [for]="buttonLanguages" position="topRight" after="120000">
-                Please remember to check all languages when you see validation errors.
-            </sqx-onboarding-tooltip>
-        </ng-container> 
+<div class="row no-gutters" [class.compare]="fieldFormCompare">
+    <div [class.col-12]="!fieldFormCompare" [class.col-6]="fieldFormCompare">
+        <div class="table-items-row" [class.field-invalid]="isInvalid | async">
+            <div class="languages-buttons">
+                <sqx-field-languages 
+                    [field]="field"
+                    [language]="language"
+                    (languageChange)="languageChange.emit($event)"
+                    [languages]="languages"
+                    [showAllControls]="showAllControls"
+                    (showAllControlsChange)="changeShowAllControls($event)">
+                </sqx-field-languages>
+            </div>
+            
+            <ng-container *ngIf="showAllControls; else singleControl">
+                <div class="form-group" *ngFor="let language of languages; trackBy: trackByLanguage">
+                    <sqx-field-editor
+                        [displaySuffix]="prefix(language)"
+                        [form]="form"
+                        [field]="field"
+                        [language]="language"
+                        [languages]="languages"
+                        [control]="fieldForm.controls[language.iso2Code]">
+                    </sqx-field-editor>
+                </div>
+            </ng-container>
+        
+            <ng-template #singleControl>
+                <sqx-field-editor
+                    [form]="form"
+                    [field]="field"
+                    [language]="language"
+                    [languages]="languages"
+                    [control]="selectedFormControl">
+                </sqx-field-editor>
+            </ng-template>
+        </div>
     </div>
 
-    <ng-container *ngIf="showAllControls; else singleControl">
-        <div class="form-group" *ngFor="let language of languages">
-            <sqx-field-editor
-                [displaySuffix]="'(' + language.iso2Code + ')'"
-                [form]="form"
-                [field]="field"
-                [language]="language"
-                [languages]="languages"
-                [control]="fieldForm.controls[language.iso2Code]">
-            </sqx-field-editor>
-        </div>
-    </ng-container>
+    <div class="col-6 col-right" *ngIf="fieldFormCompare">
+        <button type="button" class="btn btn-primary btn-sm field-copy" (click)="copy()">
+            <i class="icon-arrow_back"></i>
+        </button>
 
-    <ng-template #singleControl>
-        <sqx-field-editor
-            [form]="form"
-            [field]="field"
-            [language]="language"
-            [languages]="languages"
-            [control]="selectedFormControl">
-        </sqx-field-editor>
-    </ng-template>
+        <div class="table-items-row">
+            <div class="languages-buttons">
+                <sqx-field-languages 
+                    [field]="field"
+                    [language]="language"
+                    (languageChange)="languageChange.emit($event)"
+                    [languages]="languages"
+                    [showAllControls]="showAllControls"
+                    (showAllControlsChange)="changeShowAllControls($event)">
+                </sqx-field-languages>
+            </div>
+
+            <ng-container *ngIf="showAllControls; else singleControlCompare">
+                <div class="form-group" *ngFor="let language of languages; trackBy: trackByLanguage">
+                    <sqx-field-editor
+                        [displaySuffix]="prefix(language)"
+                        [field]="field"
+                        [language]="language"
+                        [languages]="languages"
+                        [control]="fieldFormCompare?.controls[language.iso2Code]">
+                    </sqx-field-editor>
+                </div>
+            </ng-container>
+        
+            <ng-template #singleControlCompare>
+                <sqx-field-editor
+                    [field]="field"
+                    [language]="language"
+                    [languages]="languages"
+                    [control]="selectedFormControlCompare">
+                </sqx-field-editor>
+            </ng-template>
+        </div>
+    </div>
 </div>

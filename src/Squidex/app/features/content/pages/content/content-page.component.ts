@@ -47,6 +47,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public content: ContentDto;
     public contentVersion: Version | null;
     public contentForm: EditContentForm;
+    public contentFormCompare: EditContentForm | null = null;
 
     public dropdown = new ModalModel();
 
@@ -70,14 +71,14 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.languagesState.languages
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.at(0);
                 }));
 
-        this.takeOver(
+        this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
                     if (schema) {
@@ -87,7 +88,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     }
                 }));
 
-        this.takeOver(
+        this.own(
             this.contentsState.selectedContent
                 .subscribe(content => {
                     if (content) {
@@ -97,7 +98,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     }
                 }));
 
-        this.takeOver(
+        this.own(
             this.messageBus.of(ContentVersionSelected)
                 .subscribe(message => {
                     this.loadVersion(message.version);
@@ -208,26 +209,25 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             .subscribe();
     }
 
-    private loadVersion(version: Version) {
-        if (this.content) {
+    private loadVersion(version: Version | null) {
+        if (!this.content || version === null || version.eq(this.content.version)) {
+            this.contentFormCompare = null;
+            this.contentVersion = null;
+        } else {
             this.contentsState.loadVersion(this.content, version)
                 .subscribe(dto => {
-                    if (this.content.version.value !== version.value) {
-                        this.contentVersion = version;
-                    } else {
-                        this.contentVersion = null;
+                    if (this.contentFormCompare === null) {
+                        this.contentFormCompare = new EditContentForm(this.schema, this.languages);
+                        this.contentFormCompare.form.disable();
                     }
 
-                    this.loadContent(dto);
+                    this.contentFormCompare.load(dto.payload);
+                    this.contentVersion = version;
                 });
         }
     }
 
     public showLatest() {
-        if (this.contentVersion) {
-            this.contentVersion = null;
-
-            this.loadContent(this.content.dataDraft);
-        }
+        this.loadVersion(null);
     }
 }

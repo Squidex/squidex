@@ -68,7 +68,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnDestroy, OnI
     public ngOnInit() {
         this.patternsState.load().pipe(onErrorResumeNext()).subscribe();
 
-        this.takeOver(
+        this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
                     if (schema) {
@@ -92,8 +92,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnDestroy, OnI
     }
 
     public trackByField(index: number, field: FieldDto) {
-        const a = this;
-        return field.fieldId + a.schema.id;
+        return field.fieldId + this.schema.id;
     }
 
     public deleteSchema() {

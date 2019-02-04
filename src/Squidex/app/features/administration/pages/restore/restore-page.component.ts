@@ -38,7 +38,7 @@ export class RestorePageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             timer(0, 2000).pipe(switchMap(() => this.backupsService.getRestore().pipe(onErrorResumeNext())))
                 .subscribe(job => {
                     if (job) {
