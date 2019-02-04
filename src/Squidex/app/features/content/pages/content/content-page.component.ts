@@ -101,7 +101,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.own(
             this.messageBus.of(ContentVersionSelected)
                 .subscribe(message => {
-                    this.loadVersion(message.version);
+                    this.loadVersion(message.version, message.compare);
                 }));
     }
 
@@ -209,25 +209,36 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             .subscribe();
     }
 
-    private loadVersion(version: Version | null) {
+    private loadVersion(version: Version | null, compare: boolean) {
         if (!this.content || version === null || version.eq(this.content.version)) {
             this.contentFormCompare = null;
             this.contentVersion = null;
+            this.contentForm.load(this.content.dataDraft);
         } else {
             this.contentsState.loadVersion(this.content, version)
                 .subscribe(dto => {
-                    if (this.contentFormCompare === null) {
-                        this.contentFormCompare = new EditContentForm(this.schema, this.languages);
-                        this.contentFormCompare.form.disable();
+                    if (compare) {
+                        if (this.contentFormCompare === null) {
+                            this.contentFormCompare = new EditContentForm(this.schema, this.languages);
+                            this.contentFormCompare.form.disable();
+                        }
+
+                        this.contentFormCompare.load(dto.payload);
+                        this.contentForm.load(this.content.dataDraft);
+                    } else {
+                        if (this.contentFormCompare) {
+                            this.contentFormCompare = null;
+                        }
+
+                        this.contentForm.load(dto.payload);
                     }
 
-                    this.contentFormCompare.load(dto.payload);
                     this.contentVersion = version;
                 });
         }
     }
 
     public showLatest() {
-        this.loadVersion(null);
+        this.loadVersion(null, false);
     }
 }

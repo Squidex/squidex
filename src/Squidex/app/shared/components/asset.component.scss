@@ -107,8 +107,7 @@ $list-height: 2.375rem;
         background: $color-dark-black;
     }
 
-    &-name,
-    &-info {
+    &-name, &-info {
         @include truncate;
     }
 
@@ -187,7 +186,7 @@ $list-height: 2.375rem;
 .table-items-row {
     & {
         position: relative;
-        padding-left: $list-height + 2rem;
+        padding-left: $list-height + 3rem;
         height: $list-height + 2rem;
     }
 
@@ -229,34 +228,29 @@ $list-height: 2.375rem;
             height: $list-height;
         }
 
+        &-name {
+            width: 100%;
+            padding-right: .5rem;
+        }
+
         &-user {
-            padding-top: .2rem;
+            width: 3rem;
         }
 
         &-actions {
-            line-height: $list-height;
-        }
-
-        &-name,
-        &-info {
-            @include truncate;
-            padding-right: 1rem;
-            padding-left: 1rem;
-            line-height: $list-height;
-        }
-
-        &-actions,
-        &-user {
-            max-width: 3rem;
-            min-width: 3rem;
+            width: 3rem;
         }
 
         &-info {
             color: $color-text-decent;
             font-size: .9rem;
-            max-width: 12rem;
-            min-width: 12rem;
+            font-weight: normal;
+            width: 12rem;
         }
+    }
+
+    table {
+        width: 100%;
     }
 
     .upload-progress {

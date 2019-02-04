@@ -91,7 +91,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             this.control = control;
 
             if (control) {
-                this.takeOver(
+                this.own(
                     merge(control.valueChanges, control.statusChanges)
                         .subscribe(() => {
                             this.createMessages();
@@ -113,7 +113,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     }
 
     private createMessages() {
-        const errorMessages: string[] = [];
+        const errors: string[] = [];
 
         if (this.control && this.control.invalid && ((this.control.touched && !this.submitOnly) || this.submitted) && this.control.errors) {
             for (let key in <any>this.control.errors) {
@@ -121,12 +121,14 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
                     const message = formatError(this.displayFieldName, key, this.control.errors[key], this.control.value, this.errors);
 
                     if (message) {
-                        errorMessages.push(message);
+                        errors.push(message);
                     }
                 }
             }
         }
 
-        this.next(s => ({ ...s, errorMessages }));
+        if (errors.length !== this.snapshot.errorMessages.length || errors.length > 0) {
+            this.next(s => ({ ...s, errorMessages: errors }));
+        }
     }
 }

@@ -146,7 +146,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.addInput.valueChanges.pipe(
                     tap(() => {
                         this.resetSize();

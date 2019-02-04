@@ -46,9 +46,10 @@
         @include border-radius;
         @include truncate-nowidth;
         border: 2px dashed darken($color-border, 10%);
+        padding: 5px .5rem;
         font-weight: normal;
+        font-size: 1rem;
         text-align: center;
-        padding: 5px 2rem;
         color: darken($color-border, 30%);
         cursor: pointer;
     }

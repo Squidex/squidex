@@ -66,7 +66,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, any[]
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.queryInput.valueChanges.pipe(
                     tap(query => {
                         this.callChange(query);

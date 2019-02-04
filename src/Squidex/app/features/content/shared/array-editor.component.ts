@@ -11,7 +11,6 @@ import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 import {
     AppLanguageDto,
     EditContentForm,
-    ImmutableArray,
     RootFieldDto,
     StatefulComponent
 } from '@app/shared';
@@ -37,7 +36,7 @@ export class ArrayEditorComponent extends StatefulComponent<State> {
     public language: AppLanguageDto;
 
     @Input()
-    public languages: ImmutableArray<AppLanguageDto>;
+    public languages: AppLanguageDto[];
 
     @Input()
     public arrayControl: FormArray;

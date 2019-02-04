@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
@@ -50,6 +50,9 @@ interface State {
 export class AssetsEditorComponent extends StatefulControlComponent<State, string[]> implements OnInit {
     public assetsDialog = new DialogModel();
 
+    @Input()
+    public isCompact = false;
+
     constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
@@ -89,7 +92,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.messageBus.of(AssetUpdated)
                 .subscribe(event => {
                     if (event.source !== this) {
@@ -167,7 +170,7 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
         this.callChange(ids);
     }
 
-    public trackByAsset(asset: AssetDto) {
+    public trackByAsset(index: number, asset: AssetDto) {
         return asset.id;
     }
 }

@@ -60,7 +60,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.timeControl.valueChanges.subscribe(value => {
                 if (!value || value.length === 0) {
                     this.timeValue = null;
@@ -71,7 +71,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
                 this.updateValue();
             }));
 
-        this.takeOver(
+        this.own(
             this.dateControl.valueChanges.subscribe(value => {
                 if (!value || value.length === 0) {
                     this.dateValue = null;

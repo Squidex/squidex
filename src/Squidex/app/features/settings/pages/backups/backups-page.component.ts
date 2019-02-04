@@ -49,7 +49,7 @@ export class BackupsPageComponent extends ResourceOwner implements OnInit {
         this.backupsState.delete(backup).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public trackByBackup(item: BackupDto) {
+    public trackByBackup(index: number, item: BackupDto) {
         return item.id;
     }
 }

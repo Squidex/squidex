@@ -62,7 +62,11 @@ export class ContentHistoryPageComponent {
     }
 
     public loadVersion(version: number) {
-        this.messageBus.emit(new ContentVersionSelected(new Version(version.toString())));
+        this.messageBus.emit(new ContentVersionSelected(new Version(version.toString()), false));
+    }
+
+    public compareVersion(version: number) {
+        this.messageBus.emit(new ContentVersionSelected(new Version(version.toString()), true));
     }
 
     public trackByEvent(index: number, event: HistoryEventDto) {

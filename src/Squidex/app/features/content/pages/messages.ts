@@ -9,7 +9,8 @@ import { Version } from '@app/shared';
 
 export class ContentVersionSelected {
     constructor(
-        public readonly version: Version
+        public readonly version: Version,
+        public readonly compare: boolean
     ) {
     }
 }

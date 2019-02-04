@@ -14,7 +14,6 @@ import {
     AppLanguageDto,
     EditContentForm,
     FieldDto,
-    ImmutableArray,
     RootFieldDto
 } from '@app/shared';
 
@@ -62,7 +61,7 @@ export class ArrayItemComponent implements OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public languages: ImmutableArray<AppLanguageDto>;
+    public languages: AppLanguageDto[];
 
     public isInvalid: Observable<boolean>;
 

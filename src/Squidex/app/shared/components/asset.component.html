@@ -95,39 +95,41 @@
             <img class="icon" [attr.src]="asset | sqxFileIcon">
         </div>
 
-        <div class="row no-gutters" *ngIf="asset && snapshot.progress === 0" @fade>
-            <div class="col col-name">
-                <div *ngIf="!snapshot.isRenaming" class="file-name editable" (dblclick)="renameStart()">
-                    {{asset.fileName}}
-                </div>
-                <div *ngIf="snapshot.isRenaming">
-                    <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">                   
-                        <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
+        <table class="table-fixed" *ngIf="asset && snapshot.progress === 0" @fade>
+            <tr>
+                <td class="col-name">
+                    <div *ngIf="!snapshot.isRenaming" class="file-name editable" (dblclick)="renameStart()">
+                        {{asset.fileName}}
+                    </div>
+                    <div *ngIf="snapshot.isRenaming">
+                        <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">                   
+                            <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
 
-                        <input type="text" class="form-control editable form-underlined" id="assetName" formControlName="name" autocomplete="off" spellcheck="false" sqxFocusOnInit (blur)="renameCancel()" />
-                    </form>
-                </div>
-            </div>
-            <div class="col col-info">
-                <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
-            </div>
-            <div class="col col-user">
-                <img class="user-picture" [attr.title]="asset.lastModifiedBy | sqxUserNameRef" [attr.src]="asset.lastModifiedBy | sqxUserPictureRef" />
-            </div>
-            <div class="col col-actions text-right">
-                <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl" sqxExternalLink="noicon" (click)="$event.stopPropagation()">
-                    <i class="icon-download"></i>
-                </a>
-            </div>
-            <div class="col col-actions text-right" *ngIf="!isDisabled || removeMode">
-                <button class="btn btn-text-danger" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
-                    <i class="icon-bin2"></i>
-                </button>
-                <button class="btn btn-text-secondary" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
-                    <i class="icon-close"></i>
-                </button>
-            </div>
-        </div>
+                            <input type="text" class="form-control editable form-underlined" id="assetName" formControlName="name" autocomplete="off" spellcheck="false" sqxFocusOnInit (blur)="renameCancel()" />
+                        </form>
+                    </div>
+                </td>
+                <td class="col-info" *ngIf="!isCompact">
+                    <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
+                </td>
+                <td class="col-user" *ngIf="!isCompact">
+                    <img class="user-picture" [attr.title]="asset.lastModifiedBy | sqxUserNameRef" [attr.src]="asset.lastModifiedBy | sqxUserPictureRef" />
+                </td>
+                <td class="col-actions text-right" *ngIf="!isCompact">
+                    <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl" sqxExternalLink="noicon" (click)="$event.stopPropagation()">
+                        <i class="icon-download"></i>
+                    </a>
+                </td>
+                <td class="col-actions text-right" *ngIf="!isDisabled || removeMode">
+                    <button class="btn btn-text-danger" (click)="deleting.emit(asset); $event.stopPropagation()" *ngIf="!isDisabled && !removeMode">
+                        <i class="icon-bin2"></i>
+                    </button>
+                    <button class="btn btn-text-secondary" (click)="removing.emit(asset); $event.stopPropagation()" *ngIf="removeMode">
+                        <i class="icon-close"></i>
+                    </button>
+                </td>
+            </tr>
+        </table>
 
         <div class="upload-progress" *ngIf="snapshot.progress > 0">
             <sqx-progress-bar [value]="snapshot.progress" [trailWidth]="0.8" [strokeWidth]="0.8" [showText]="false"></sqx-progress-bar>

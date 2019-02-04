@@ -69,6 +69,9 @@ export class ContentItemComponent implements OnChanges {
     @Input()
     public isReference = false;
 
+    @Input()
+    public isCompact = false;
+
     @Input('sqxContent')
     public content: ContentDto;
 

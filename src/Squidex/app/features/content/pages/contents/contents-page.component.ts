@@ -200,7 +200,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public trackByContent(content: ContentDto): string {
+    public trackByContent(index: number, content: ContentDto): string {
         return content.id;
     }
 

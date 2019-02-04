@@ -7,11 +7,7 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-import {
-    AppLanguageDto,
-    ImmutableArray,
-    RootFieldDto
-} from '@app/shared';
+import { AppLanguageDto, RootFieldDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-languages',
@@ -25,7 +21,7 @@ import {
                 <sqx-language-selector size="sm" #buttonLanguages
                     [selectedLanguage]="language"
                     (selectedLanguageChange)="languageChange.emit($event)"
-                    [languages]="languages.values">
+                    [languages]="languages">
                 </sqx-language-selector>
 
                 <sqx-onboarding-tooltip helpId="languages" [for]="buttonLanguages" position="topRight" after="120000">
@@ -45,7 +41,7 @@ export class FieldLanguagesComponent {
     public language: AppLanguageDto;
 
     @Input()
-    public languages: ImmutableArray<AppLanguageDto>;
+    public languages: AppLanguageDto[];
 
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();

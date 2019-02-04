@@ -44,7 +44,7 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
         });
     }
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.authService.userChanges.pipe(filter(user => !!user))
                 .subscribe(user => {
                     const profileId = user!.id;

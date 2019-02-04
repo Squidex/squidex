@@ -45,14 +45,14 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
     }
 
     public ngOnInit() {
-        this.takeOver(
+        this.own(
             this.dialogView.isOpen.subscribe(isOpen => {
                 if (!isOpen) {
                     this.finishRequest(false);
                 }
             }));
 
-        this.takeOver(
+        this.own(
             this.dialogs.notifications.subscribe(notification => {
                 this.next(s => ({
                     ...s,
@@ -60,16 +60,18 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
                 }));
 
                 if (notification.displayTime > 0) {
-                    this.takeOver(timer(notification.displayTime).subscribe(() => {
+                    this.own(timer(notification.displayTime).subscribe(() => {
                         this.close(notification);
                     }));
                 }
             }));
 
-        this.takeOver(
+        this.own(
             this.dialogs.dialogs
                 .subscribe(dialogRequest => {
                     this.cancel();
+
+                    this.dialogView.show();
 
                     this.next(s => ({ ...s, dialogRequest }));
                 }));

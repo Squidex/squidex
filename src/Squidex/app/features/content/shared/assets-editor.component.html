@@ -4,7 +4,7 @@
         <div class="row no-gutters">
             <div class="col">
                 <div class="drop-area align-items-center" (click)="assetsDialog.show()" (sqxFileDrop)="addFiles($event)">
-                    Drop files or click here to add assets.
+                    Drop files or click
                 </div>
             </div>
             <div class="col-auto pl-1">
@@ -26,7 +26,7 @@
                 <sqx-asset *ngFor="let file of snapshot.assetFiles" [initFile]="file" 
                     (failed)="removeLoadingAsset(file)" (loaded)="addAsset(file, $event)">
                 </sqx-asset>
-                <sqx-asset *ngFor="let asset of snapshot.assets; trackBy: trackByAsset" [asset]="asset" removeMode="true"
+                <sqx-asset *ngFor="let asset of snapshot.assets; trackBy: trackByAsset" [asset]="asset" [isCompact]="isCompact" removeMode="true"
                     (updated)="notifyOthers($event)" (removing)="removeLoadedAsset($event)">
                 </sqx-asset>
             </div>
@@ -39,10 +39,12 @@
                 </sqx-asset>
                 
                 <div
-                    [sqxSortModel]="snapshot.assets.values"
+                    [sqxSortModel]="snapshot.assets.mutableValues"
                     (sqxSorted)="sortAssets($event)">
                     <div *ngFor="let asset of snapshot.assets; trackBy: trackByAsset">
-                        <sqx-asset [asset]="asset" removeMode="true" [isListView]="true"
+                        <sqx-asset [asset]="asset" removeMode="true" 
+                            [isListView]="true"
+                            [isCompact]="isCompact"
                             (updated)="notifyOthers($event)" (removing)="removeLoadedAsset($event)">
                         </sqx-asset>
                     </div>

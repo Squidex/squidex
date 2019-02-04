@@ -52,6 +52,9 @@ export class AssetComponent extends StatefulComponent<State> implements OnChange
     public removeMode = false;
 
     @Input()
+    public isCompact = false;
+
+    @Input()
     public isDisabled = false;
 
     @Input()
@@ -122,7 +125,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnChange
                 });
         }
 
-        this.takeOver(
+        this.own(
             this.tagInput.valueChanges.pipe(
                 distinctUntilChanged(),
                 debounceTime(2000)

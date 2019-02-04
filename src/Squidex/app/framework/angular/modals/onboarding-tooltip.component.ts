@@ -55,7 +55,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
 
     public ngOnInit() {
         if (this.for && this.helpId && Types.isFunction(this.for.addEventListener)) {
-            this.takeOver(
+            this.own(
                 timer(this.after).subscribe(() => {
                     if (this.onboardingService.shouldShow(this.helpId)) {
                         const forRect = this.for.getBoundingClientRect();
@@ -68,7 +68,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
                         if (this.isSameOrParent(fromPoint)) {
                             this.tooltipModal.show();
 
-                            this.takeOver(
+                            this.own(
                                 timer(10000).subscribe(() => {
                                     this.hideThis();
                                 }));
@@ -78,7 +78,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
                     }
                 }));
 
-            this.takeOver(
+            this.own(
                 this.renderer.listen(this.for, 'mousedown', () => {
                     this.onboardingService.disable(this.helpId);
 

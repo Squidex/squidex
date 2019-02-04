@@ -48,7 +48,10 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
     public language: AppLanguageDto;
 
     @Input()
-    public languages: ImmutableArray<AppLanguageDto>;
+    public languages: AppLanguageDto[];
+
+    @Input()
+    public isCompact = false;
 
     public selectorDialog = new DialogModel();
 

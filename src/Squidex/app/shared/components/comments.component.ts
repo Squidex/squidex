@@ -73,7 +73,7 @@ export class CommentsComponent extends ResourceOwner implements OnDestroy, OnIni
         }
     }
 
-    public trackByComment(comment: CommentDto) {
+    public trackByComment(index: number, comment: CommentDto) {
         return comment.id;
     }
 }

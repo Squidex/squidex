@@ -33,7 +33,7 @@
                 </sqx-search-form>
             </div>
             <div class="col-auto pl-1" *ngIf="languages.length > 1">
-                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
+                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.mutableValues"></sqx-language-selector>
             </div>
             <div class="col-auto pl-1">
                 <button class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">

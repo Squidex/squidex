@@ -55,7 +55,7 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
     ) {
         super(state);
 
-        this.takeOver(
+        this.own(
             this.changes.pipe(skip(1)).subscribe(() => {
                 this.changeDetector.detectChanges();
             }));
@@ -65,7 +65,7 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
         this.subscriptions.ngOnDestroy();
     }
 
-    public takeOver<R>(subscription: Subscription | UnsubscribeFunction | Observable<R>) {
+    public own<R>(subscription: Subscription | UnsubscribeFunction | Observable<R>) {
         this.subscriptions.own(subscription);
     }
 }

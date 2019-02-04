@@ -59,7 +59,7 @@
         {{values[i]}}
     </div>
 </td>
-<td class="cell-time" (click)="shouldStop($event)">
+<td class="cell-time" *ngIf="!isCompact" (click)="shouldStop($event)">
     <sqx-content-status 
         [status]="content.status"
         [scheduledTo]="content.scheduleJob?.status"
@@ -68,6 +68,10 @@
     </sqx-content-status>
     
     <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
+</td>
+
+<td class="cell-user" *ngIf="!isCompact && patchForm.form.pristine" (click)="shouldStop($event)">
+    <img class="user-picture" [attr.title]="content.lastModifiedBy | sqxUserNameRef" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
 </td>
 
 <td class="cell-user" *ngIf="patchForm.form.dirty" (click)="shouldStop($event)">
@@ -79,10 +83,6 @@
     <button type="button" class="btn btn-text-secondary btn-cancel" (click)="cancel(); $event.stopPropagation()">
         <i class="icon-close"></i>
     </button>
-</td>
-
-<td class="cell-user" *ngIf="patchForm.form.pristine" (click)="shouldStop($event)">
-    <img class="user-picture" [attr.title]="content.lastModifiedBy | sqxUserNameRef" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
 </td>
 
 <td class="cell-actions" *ngIf="!isReadOnly && patchForm.form.pristine" (click)="shouldStop($event)">

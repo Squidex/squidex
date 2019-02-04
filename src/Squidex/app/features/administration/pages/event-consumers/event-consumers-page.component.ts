@@ -51,7 +51,7 @@ export class EventConsumersPageComponent extends ResourceOwner implements OnInit
         this.eventConsumersState.reset(es).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public trackByEventConsumer(es: EventConsumerDto) {
+    public trackByEventConsumer(index: number, es: EventConsumerDto) {
         return es.name;
     }
 

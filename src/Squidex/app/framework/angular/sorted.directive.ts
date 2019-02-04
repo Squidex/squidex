@@ -5,14 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 
 import * as Sortable from 'sortablejs';
 
 @Directive({
     selector: '[sqxSortModel]'
 })
-export class SortedDirective implements OnDestroy, OnInit {
+export class SortedDirective implements OnDestroy, OnInit, OnChanges {
     private sortable: Sortable.Ref;
 
     @Input()
@@ -29,6 +29,13 @@ export class SortedDirective implements OnDestroy, OnInit {
     ) {
     }
 
+    public ngOnChanges(changes: SimpleChanges) {
+        const sortModel = changes['sortModel'].currentValue;
+        if (sortModel) {
+            console.log(JSON.stringify(sortModel.map((x: any) => x.fileName)));
+        }
+    }
+
     public ngOnDestroy() {
         if (this.sortable) {
             this.sortable.destroy();
@@ -41,6 +48,7 @@ export class SortedDirective implements OnDestroy, OnInit {
             animation: 150,
 
             onSort: (event: { oldIndex: number, newIndex: number }) => {
+                console.log('FOO');
                 if (this.sortModel && event.newIndex !== event.oldIndex) {
                     const newModel = [...this.sortModel];
 

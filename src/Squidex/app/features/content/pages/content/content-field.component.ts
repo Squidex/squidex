@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, DoCheck, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
@@ -14,7 +14,6 @@ import {
     AppLanguageDto,
     EditContentForm,
     fieldInvariant,
-    ImmutableArray,
     LocalStoreService,
     RootFieldDto,
     SchemaDto,
@@ -26,7 +25,7 @@ import {
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html'
 })
-export class ContentFieldComponent implements DoCheck, OnChanges {
+export class ContentFieldComponent implements OnChanges {
     @Input()
     public form: EditContentForm;
 
@@ -46,7 +45,7 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
     public language: AppLanguageDto;
 
     @Input()
-    public languages: ImmutableArray<AppLanguageDto>;
+    public languages: AppLanguageDto[];
 
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();
@@ -71,25 +70,7 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
         if (changes['field']) {
             this.showAllControls = this.localStore.getBoolean(this.configKey());
         }
-    }
 
-    public changeShowAllControls(value: boolean) {
-        this.showAllControls = value;
-
-        this.localStore.setBoolean(this.configKey(), this.showAllControls);
-    }
-
-    public copy() {
-        if (this.selectedFormControlCompare && this.fieldFormCompare) {
-            if (this.showAllControls) {
-                this.fieldForm.setValue(this.fieldFormCompare.value);
-            } else {
-                this.selectedFormControl.setValue(this.selectedFormControlCompare.value);
-            }
-        }
-    }
-
-    public ngDoCheck() {
         const control = this.findControl(this.fieldForm);
 
         if (this.selectedFormControl !== control) {
@@ -109,6 +90,22 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
                 }
 
                 this.selectedFormControlCompare = controlCompare;
+            }
+        }
+    }
+
+    public changeShowAllControls(value: boolean) {
+        this.showAllControls = value;
+
+        this.localStore.setBoolean(this.configKey(), this.showAllControls);
+    }
+
+    public copy() {
+        if (this.selectedFormControlCompare && this.fieldFormCompare) {
+            if (this.showAllControls) {
+                this.fieldForm.setValue(this.fieldFormCompare.value);
+            } else {
+                this.selectedFormControl.setValue(this.selectedFormControlCompare.value);
             }
         }
     }
