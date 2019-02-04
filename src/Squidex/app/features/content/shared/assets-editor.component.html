@@ -1,8 +1,9 @@
-<div class="assets-container" [class.disabled]="snapshot.isDisabled" (paste)="pasteFiles($event)" tabindex="1000">
+
+<div class="assets-container" [class.disabled]="snapshot.isDisabled" (sqxFileDrop)="addFiles($event)" tabindex="1000">
     <div class="header list">
         <div class="row no-gutters">
             <div class="col">
-                <div class="drop-area align-items-center" (click)="assetsDialog.show()">
+                <div class="drop-area align-items-center" (click)="assetsDialog.show()" (sqxFileDrop)="addFiles($event)">
                     Drop files or click here to add assets.
                 </div>
             </div>

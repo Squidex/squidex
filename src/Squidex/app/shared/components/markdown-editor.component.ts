@@ -9,7 +9,11 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
+    AppsState,
     AssetDto,
+    AssetsService,
+    AuthService,
+    DateTime,
     DialogModel,
     ResourceLoaderService,
     StatefulControlComponent,
@@ -50,6 +54,9 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
+        private readonly appsState: AppsState,
+        private readonly assetsService: AssetsService,
+        private readonly authState: AuthService,
         private readonly renderer: Renderer2,
         private readonly resourceLoader: ResourceLoaderService
     ) {
@@ -206,5 +213,45 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         }
 
         this.assetsDialog.hide();
+    }
+
+    public insertFiles(files: File[]) {
+        const doc = this.simplemde.codemirror.getDoc();
+
+        for (let file of files) {
+            this.uploadFile(doc, file);
+        }
+    }
+
+    private uploadFile(doc: any, file: File) {
+        const uploadCursor = doc.getCursor();
+        const uploadText = `![Uploading file...${new Date()}]()`;
+
+        doc.replaceSelection(uploadText);
+
+        const replaceText = (replacement: string) => {
+            const cursor = doc.getCursor();
+
+            const text = doc.getValue().replace(uploadText, replacement);
+
+            doc.setValue(text);
+
+            if (uploadCursor && uploadCursor.line === cursor.line) {
+                const offset = replacement.length - uploadText.length;
+
+                doc.setCursor({ line: cursor.line, ch: cursor.ch + offset });
+            } else {
+                doc.setCursor(cursor);
+            }
+        };
+
+        this.assetsService.uploadFile(this.appsState.appName, file, this.authState.user!.token, DateTime.now())
+            .subscribe(asset => {
+                if (Types.is(asset, AssetDto)) {
+                    replaceText(`![${asset.fileName}](${asset.url} '${asset.fileName}')`);
+                }
+            }, () => {
+                replaceText('FAILED');
+            });
     }
 }

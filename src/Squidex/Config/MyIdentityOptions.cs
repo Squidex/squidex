@@ -13,6 +13,10 @@ namespace Squidex.Config
 
         public string AdminPassword { get; set; }
 
+        public string AdminClientId { get; set; }
+
+        public string AdminClientSecret { get; set; }
+
         public string GithubClient { get; set; }
 
         public string GithubSecret { get; set; }
@@ -46,6 +50,11 @@ namespace Squidex.Config
         public bool IsAdminConfigured()
         {
             return !string.IsNullOrWhiteSpace(AdminEmail) && !string.IsNullOrWhiteSpace(AdminPassword);
+        }
+
+        public bool IsAdminClientConfigured()
+        {
+            return !string.IsNullOrWhiteSpace(AdminClientId) && !string.IsNullOrWhiteSpace(AdminClientSecret);
         }
 
         public bool IsOidcConfigured()

@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 {
                     Task.Delay(ReconnectWaitMs, timerCts.Token).ContinueWith(t =>
                     {
-                        dispatcher.DispatchAsync(() => Subscribe());
+                        dispatcher.DispatchAsync(Subscribe);
                     }).Forget();
                 }
                 else
@@ -104,7 +104,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task StopAsync()
         {
-            await dispatcher.DispatchAsync(() => Unsubscribe());
+            await dispatcher.DispatchAsync(Unsubscribe);
             await dispatcher.StopAndWaitAsync();
 
             timerCts.Cancel();

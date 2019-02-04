@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper
 
             switch (value)
             {
-                case JsonNull n:
+                case JsonNull _:
                     return JsValue.Null;
                 case JsonScalar<string> s:
                     return new JsString(s.Value);

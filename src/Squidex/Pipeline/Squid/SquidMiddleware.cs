@@ -63,14 +63,9 @@ namespace Squidex.Pipeline.Squid
                     background = backgroundValue;
                 }
 
-                var isSmall = false;
+                var isSmall = request.Query.TryGetValue("small", out _);
 
-                if (request.Query.TryGetValue("small", out _))
-                {
-                    isSmall = true;
-                }
-
-                var svg = string.Empty;
+                string svg;
 
                 if (isSmall)
                 {

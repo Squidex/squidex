@@ -53,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.Ping
         [Route("ping/{app}/")]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
-        public IActionResult GetPing(string app)
+        public IActionResult GetAppPing(string app)
         {
             return NoContent();
         }

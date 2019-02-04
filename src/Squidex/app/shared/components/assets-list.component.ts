@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:prefer-for-of
-
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
@@ -78,23 +76,9 @@ export class AssetsListComponent {
         this.newFiles = this.newFiles.remove(file);
     }
 
-    public pasteFiles(event: ClipboardEvent) {
-        for (let i = 0; i < event.clipboardData.items.length; i++) {
-            const file = event.clipboardData.items[i].getAsFile();
-
-            if (file) {
-                this.newFiles = this.newFiles.pushFront(file);
-            }
-        }
-    }
-
-    public addFiles(files: FileList) {
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-
-            if (file) {
-                this.newFiles = this.newFiles.pushFront(file);
-            }
+    public addFiles(files: File[]) {
+        for (let file of files) {
+            this.newFiles = this.newFiles.pushFront(file);
         }
 
         return true;

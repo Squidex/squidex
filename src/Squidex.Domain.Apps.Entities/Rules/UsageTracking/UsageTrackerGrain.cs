@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             {
                 var target = kvp.Value;
 
-                var (from, to) = GetDateRange(today, target.NumDays);
+                var (from, _) = GetDateRange(today, target.NumDays);
 
                 if (!target.Triggered.HasValue || target.Triggered < from)
                 {
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             await WriteStateAsync();
         }
 
-        private (DateTime, DateTime) GetDateRange(DateTime today, int? numDays)
+        private static (DateTime, DateTime) GetDateRange(DateTime today, int? numDays)
         {
             if (numDays.HasValue)
             {

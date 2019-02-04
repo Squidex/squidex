@@ -29,12 +29,17 @@ namespace Squidex.Pipeline
         {
             var parts = clientId.Split(':', '~');
 
-            if (parts.Length != 2)
+            if (parts.Length == 1)
             {
-                return (null, null);
+                return (null, parts[0]);
             }
 
-            return (parts[0], parts[1]);
+            if (parts.Length == 2)
+            {
+                return (parts[0], parts[1]);
+            }
+
+            return (null, null);
         }
     }
 }

@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:prefer-for-of
-
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
@@ -40,7 +38,7 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
 
     constructor(changeDector: ChangeDetectorRef,
         public readonly assetsState: AssetsDialogState,
-        private readonly localStore: LocalStoreService
+        public readonly localStore: LocalStoreService
     ) {
         super(changeDector, {
             selectedAssets: {},

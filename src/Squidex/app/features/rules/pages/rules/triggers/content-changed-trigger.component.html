@@ -21,7 +21,7 @@
                 <span class="truncate">{{schema.schema.displayName}}</span>
             </td>
             <td class="text-center">
-                <input type="text" class="form-control code" [(ngModel)]="schema.condition" (blur)="updateValue()" />
+                <input type="text" class="form-control code" [(ngModel)]="schema.condition" (blur)="updateValue()" placeholder="Optional condition as javascript expression" />
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-text-secondary" (click)="removeSchema(schema)">

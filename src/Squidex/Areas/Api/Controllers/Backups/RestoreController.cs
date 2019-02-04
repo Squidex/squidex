@@ -11,12 +11,16 @@ using Orleans;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Pipeline;
 using Squidex.Shared;
 
 namespace Squidex.Areas.Api.Controllers.Backups
 {
+    /// <summary>
+    /// Manages backups for apps.
+    /// </summary>
+    [ApiExplorerSettings(GroupName = nameof(Backups))]
     public class RestoreController : ApiController
     {
         private readonly IGrainFactory grainFactory;
@@ -28,17 +32,18 @@ namespace Squidex.Areas.Api.Controllers.Backups
         }
 
         /// <summary>
-        /// Get current status.
+        /// Get current restore status.
         /// </summary>
         /// <returns>
         /// 200 => Status returned.
         /// </returns>
         [HttpGet]
         [Route("apps/restore/")]
+        [ProducesResponseType(typeof(RestoreJobDto), 200)]
         [ApiPermission(Permissions.AdminRestoreRead)]
         public async Task<IActionResult> GetJob()
         {
-            var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(User.OpenIdSubject());
+            var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
 
             var job = await restoreGrain.GetJobAsync();
 
@@ -64,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ApiPermission(Permissions.AdminRestoreCreate)]
         public async Task<IActionResult> PostRestore([FromBody] RestoreRequest request)
         {
-            var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(User.OpenIdSubject());
+            var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
 
             await restoreGrain.RestoreAsync(request.Url, request.Name);
 

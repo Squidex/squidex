@@ -43,7 +43,7 @@ namespace Squidex.Infrastructure.States
                     return (existing.Doc, existing.Version);
                 }
 
-                return (default(T), EtagVersion.NotFound);
+                return (default, EtagVersion.NotFound);
             }
         }
 

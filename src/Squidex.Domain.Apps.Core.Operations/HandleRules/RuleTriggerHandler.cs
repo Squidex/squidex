@@ -33,9 +33,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         bool IRuleTriggerHandler.Trigger(EnrichedEvent @event, RuleTrigger trigger)
         {
-            var typed = @event as TEnrichedEvent;
-
-            if (typed != null)
+            if (@event is TEnrichedEvent typed)
             {
                 return Trigger(typed, (TTrigger)trigger);
             }
@@ -45,9 +43,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         bool IRuleTriggerHandler.Trigger(AppEvent @event, RuleTrigger trigger, Guid ruleId)
         {
-            var typed = @event as TEvent;
-
-            if (typed != null)
+            if (@event is TEvent typed)
             {
                 return Trigger(typed, (TTrigger)trigger, ruleId);
             }

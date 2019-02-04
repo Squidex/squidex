@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Log
                         break;
                     }
 
-                    await Task.Delay(2000);
+                    await Task.Delay(2000, cts.Token);
                 }
 
                 if (!cts.IsCancellationRequested)
@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.Log
                 }
                 else
                 {
-                    await stream.WriteAsync(LockedText, 0, LockedText.Length);
+                    await stream.WriteAsync(LockedText, 0, LockedText.Length, cts.Token);
                 }
             }
         }

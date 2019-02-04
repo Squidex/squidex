@@ -29,8 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly IUserResolver userResolver;
         private readonly IAppsByNameIndex appsByNameIndex;
         private readonly HashSet<string> contributors = new HashSet<string>();
+        private readonly Dictionary<string, RefToken> userMapping = new Dictionary<string, RefToken>();
         private Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
-        private Dictionary<string, RefToken> userMapping = new Dictionary<string, RefToken>();
         private bool isReserved;
         private string appName;
 

@@ -5,11 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable:prefer-for-of
+
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
+    AppsState,
     AssetDto,
+    AssetsService,
+    AuthService,
+    DateTime,
     DialogModel,
     ExternalControlComponent,
     ResourceLoaderService,
@@ -21,6 +27,13 @@ declare var tinymce: any;
 export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true
 };
+
+const ImageTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/jpg',
+    'image/gif'
+];
 
 @Component({
     selector: 'sqx-rich-editor',
@@ -44,6 +57,9 @@ export class RichEditorComponent extends ExternalControlComponent<string> implem
     public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
+        private readonly appsState: AppsState,
+        private readonly assetsService: AssetsService,
+        private readonly authState: AuthService,
         private readonly resourceLoader: ResourceLoaderService
     ) {
         super(changeDetector);
@@ -60,7 +76,7 @@ export class RichEditorComponent extends ExternalControlComponent<string> implem
     public ngAfterViewInit() {
         const self = this;
 
-        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.4/tinymce.min.js').then(() => {
+        this.resourceLoader.loadScript('https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.9.3/tinymce.min.js').then(() => {
             tinymce.init(self.getEditorOptions());
         });
     }
@@ -75,11 +91,24 @@ export class RichEditorComponent extends ExternalControlComponent<string> implem
         return {
             convert_fonts_to_spans: true,
             convert_urls: false,
-            plugins: 'code image media link lists advlist',
+            plugins: 'code image media link lists advlist paste',
             removed_menuitems: 'newdocument',
             resize: true,
-            theme: 'modern',
             toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter | bullist numlist outdent indent | link image media | assets',
+
+            images_upload_handler: (blob: any, success: (url: string) => void, failed: () => void) => {
+                const file = new File([blob.blob()], blob.filename(), { lastModified: new Date().getTime() });
+
+                this.assetsService.uploadFile(this.appsState.appName, file, this.authState.user!.token, DateTime.now())
+                    .subscribe(asset => {
+                        if (Types.is(asset, AssetDto)) {
+                            success(asset.url);
+                        }
+                    }, () => {
+                        failed();
+                    });
+            },
+
             setup: (editor: any) => {
                 self.tinyEditor = editor;
                 self.tinyEditor.setMode(this.isDisabled ? 'readonly' : 'design');
@@ -98,6 +127,28 @@ export class RichEditorComponent extends ExternalControlComponent<string> implem
                         this.value = value;
 
                         self.callChange(value);
+                    }
+                });
+
+                self.tinyEditor.on('paste', (event: ClipboardEvent) => {
+                    for (let i = 0; i < event.clipboardData.items.length; i++) {
+                        const file = event.clipboardData.items[i].getAsFile();
+
+                        if (file && ImageTypes.indexOf(file.type) >= 0) {
+                            self.uploadFile(file);
+                        }
+                    }
+                });
+
+                self.tinyEditor.on('drop', (event: DragEvent) => {
+                    if (event.dataTransfer) {
+                        for (let i = 0; i < event.dataTransfer.files.length; i++) {
+                            const file = event.dataTransfer.files.item(i);
+
+                            if (file && ImageTypes.indexOf(file.type) >= 0) {
+                                self.uploadFile(file);
+                            }
+                        }
                     }
                 });
 
@@ -143,5 +194,32 @@ export class RichEditorComponent extends ExternalControlComponent<string> implem
         }
 
         this.assetsDialog.hide();
+    }
+
+    public insertFiles(files: File[]) {
+        for (let file of files) {
+            this.uploadFile(file);
+        }
+    }
+
+    private uploadFile(file: File) {
+        const uploadText = `[Uploading file...${new Date()}]`;
+
+        this.tinyEditor.execCommand('mceInsertContent', false, uploadText);
+
+        const replaceText = (replacement: string) => {
+            const content =  this.tinyEditor.getContent().replace(uploadText, replacement);
+
+            this.tinyEditor.setContent(content);
+        };
+
+        this.assetsService.uploadFile(this.appsState.appName, file, this.authState.user!.token, DateTime.now())
+            .subscribe(asset => {
+                if (Types.is(asset, AssetDto)) {
+                    replaceText(`<img src="${asset.url}" alt="${asset.fileName}" />`);
+                }
+            }, () => {
+                replaceText('FAILED');
+            });
     }
 }

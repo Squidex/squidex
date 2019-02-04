@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         {
             lhs.Should().BeOfType(rhs.GetType());
 
-            ((object)lhs).Should().BeEquivalentTo(rhs, o => o.IncludingAllRuntimeProperties().Excluding((IMemberInfo x) => x.SelectedMemberPath == "Properties.IsFrozen"));
+            ((object)lhs).Should().BeEquivalentTo(rhs, o => o.IncludingAllRuntimeProperties().Excluding(x => x.SelectedMemberPath == "Properties.IsFrozen"));
         }
 
         public static void ShouldBeSameEventType(this IEvent lhs, IEvent rhs)

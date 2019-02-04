@@ -27,12 +27,19 @@ namespace Squidex.Shared.Identity
 
         public static PermissionSet Permissions(this ClaimsPrincipal principal)
         {
-            return new PermissionSet(principal.Claims.Where(x => x.Type == SquidexClaimTypes.Permissions).Select(x => new Permission(x.Value)));
+            return new PermissionSet(principal.Claims
+                .Where(x =>
+                    x.Type == SquidexClaimTypes.Permissions ||
+                    x.Type == SquidexClaimTypes.PermissionsClient)
+                .Select(x => new Permission(x.Value)));
         }
 
         public static IEnumerable<Claim> GetSquidexClaims(this ClaimsPrincipal principal)
         {
-            return principal.Claims.Where(c => c.Type.StartsWith(SquidexClaimTypes.Prefix, StringComparison.Ordinal));
+            return principal.Claims
+                .Where(x =>
+                    x.Type.StartsWith(SquidexClaimTypes.Prefix, StringComparison.Ordinal) ||
+                    x.Type.StartsWith(SquidexClaimTypes.PrefixClient, StringComparison.Ordinal));
         }
     }
 }

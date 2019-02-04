@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
                     }
                     else
                     {
-                        fieldsByName = fieldsOrdered.ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+                        fieldsByName = fieldsOrdered.ToDictionary(x => x.Name);
                     }
                 }
 

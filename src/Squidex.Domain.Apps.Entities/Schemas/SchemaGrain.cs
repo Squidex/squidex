@@ -220,9 +220,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             var schemaSource = Snapshot.SchemaDef;
             var schemaTarget = command.ToSchema(schemaSource.Name, schemaSource.IsSingleton);
 
-            var @events = schemaSource.Synchronize(schemaTarget, serializer, () => Snapshot.SchemaFieldsTotal + 1, options);
+            var events = schemaSource.Synchronize(schemaTarget, serializer, () => Snapshot.SchemaFieldsTotal + 1, options);
 
-            foreach (var @event in @events)
+            foreach (var @event in events)
             {
                 RaiseEvent(SimpleMapper.Map(command, (SchemaEvent)@event));
             }

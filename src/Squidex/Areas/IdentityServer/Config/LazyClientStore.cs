@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using IdentityServer4;
 using IdentityServer4.Models;
@@ -17,6 +18,8 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Pipeline;
+using Squidex.Shared;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
@@ -25,14 +28,17 @@ namespace Squidex.Areas.IdentityServer.Config
         private readonly IAppProvider appProvider;
         private readonly Dictionary<string, Client> staticClients = new Dictionary<string, Client>(StringComparer.OrdinalIgnoreCase);
 
-        public LazyClientStore(IOptions<MyUrlsOptions> urlsOptions, IAppProvider appProvider)
+        public LazyClientStore(
+            IOptions<MyUrlsOptions> urlsOptions,
+            IOptions<MyIdentityOptions> identityOptions,
+            IAppProvider appProvider)
         {
             Guard.NotNull(urlsOptions, nameof(urlsOptions));
             Guard.NotNull(appProvider, nameof(appProvider));
 
             this.appProvider = appProvider;
 
-            CreateStaticClients(urlsOptions);
+            CreateStaticClients(urlsOptions, identityOptions);
         }
 
         public async Task<Client> FindClientByIdAsync(string clientId)
@@ -83,15 +89,15 @@ namespace Squidex.Areas.IdentityServer.Config
             };
         }
 
-        private void CreateStaticClients(IOptions<MyUrlsOptions> urlsOptions)
+        private void CreateStaticClients(IOptions<MyUrlsOptions> urlsOptions, IOptions<MyIdentityOptions> identityOptions)
         {
-            foreach (var client in CreateStaticClients(urlsOptions.Value))
+            foreach (var client in CreateStaticClients(urlsOptions.Value, identityOptions.Value))
             {
                 staticClients[client.ClientId] = client;
             }
         }
 
-        private static IEnumerable<Client> CreateStaticClients(MyUrlsOptions urlsOptions)
+        private static IEnumerable<Client> CreateStaticClients(MyUrlsOptions urlsOptions, MyIdentityOptions identityOptions)
         {
             var frontendId = Constants.FrontendClient;
 
@@ -150,6 +156,30 @@ namespace Squidex.Areas.IdentityServer.Config
                 },
                 RequireConsent = false
             };
+
+            if (identityOptions.IsAdminClientConfigured())
+            {
+                var id = identityOptions.AdminClientId;
+
+                yield return new Client
+                {
+                    ClientId = id,
+                    ClientName = id,
+                    ClientSecrets = new List<Secret> { new Secret(identityOptions.AdminClientSecret.Sha256()) },
+                    AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    AllowedScopes = new List<string>
+                    {
+                        Constants.ApiScope,
+                        Constants.RoleScope,
+                        Constants.PermissionsScope
+                    },
+                    Claims = new List<Claim>
+                    {
+                        new Claim(SquidexClaimTypes.Permissions, Permissions.Admin)
+                    }
+                };
+            }
         }
     }
 }

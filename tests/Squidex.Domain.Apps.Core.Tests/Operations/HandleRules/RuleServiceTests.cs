@@ -35,7 +35,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         private readonly string actionDescription = "MyDescription";
         private readonly Guid ruleId = Guid.NewGuid();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly TypeNameRegistry typeNameRegistry = new TypeNameRegistry();
         private readonly RuleService sut;
 

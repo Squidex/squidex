@@ -5,9 +5,18 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, EventEmitter, HostListener, Output, Renderer2 } from '@angular/core';
+// tslint:disable:prefer-for-of
+
+import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
 
 import { Types } from './../../utils/types';
+
+const ImageTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/jpg',
+    'image/gif'
+];
 
 @Directive({
     selector: '[sqxFileDrop]'
@@ -15,13 +24,38 @@ import { Types } from './../../utils/types';
 export class FileDropDirective {
     private dragCounter = 0;
 
+    @Input()
+    public allowedFiles: string[];
+
+    @Input()
+    public onlyImages: boolean;
+
     @Output('sqxFileDrop')
-    public drop = new EventEmitter<FileList>();
+    public drop = new EventEmitter<File[]>();
 
     constructor(
         private readonly element: ElementRef,
         private readonly renderer: Renderer2
     ) {
+    }
+
+    @HostListener('paste', ['$event'])
+    public onPaste(event: ClipboardEvent) {
+        const result: File[] = [];
+
+        for (let i = 0; i < event.clipboardData.items.length; i++) {
+            const file = event.clipboardData.items[i].getAsFile();
+
+            if (this.isAllowedFile(file)) {
+                result.push(file!);
+            }
+        }
+
+        if (result.length > 0) {
+            this.drop.emit(result);
+        }
+
+        this.stopEvent(event);
     }
 
     @HostListener('dragend', ['$event'])
@@ -57,7 +91,19 @@ export class FileDropDirective {
         const hasFiles = this.hasFiles(event.dataTransfer.types);
 
         if (hasFiles) {
-            this.drop.emit(event.dataTransfer.files);
+            const result: File[] = [];
+
+            for (let i = 0; i < event.dataTransfer.files.length; i++) {
+                const file = event.dataTransfer.files.item(i);
+
+                if (this.isAllowedFile(file)) {
+                    result.push(file!);
+                }
+            }
+
+            if (result.length > 0) {
+                this.drop.emit(result);
+            }
 
             this.dragEnd(0);
             this.stopEvent(event);
@@ -83,6 +129,10 @@ export class FileDropDirective {
         if (this.dragCounter === 0) {
             this.renderer.removeClass(this.element.nativeElement, 'drag');
         }
+    }
+
+    private isAllowedFile(file: File | null) {
+        return file && (!this.allowedFiles || this.allowedFiles.indexOf(file.type) >= 0) && (!this.onlyImages || ImageTypes.indexOf(file.type) >= 0);
     }
 
     private hasFiles(types: any): boolean {

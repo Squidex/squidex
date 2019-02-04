@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.States
 {
     public delegate void HandleEvent(Envelope<IEvent> @event);
 
-    public delegate void HandleSnapshot<T>(T state);
+    public delegate void HandleSnapshot<in T>(T state);
 
     public interface IStore<in TKey>
     {

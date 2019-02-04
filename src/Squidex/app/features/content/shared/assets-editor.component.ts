@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-// tslint:disable:prefer-for-of
-
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -104,23 +102,9 @@ export class AssetsEditorComponent extends StatefulControlComponent<State, strin
         this.next(s => ({ ...s, assets }));
     }
 
-    public pasteFiles(event: ClipboardEvent) {
-        for (let i = 0; i < event.clipboardData.items.length; i++) {
-            const file = event.clipboardData.items[i].getAsFile();
-
-            if (file) {
-                this.next(s => ({ ...s, assetFiles: s.assetFiles.pushFront(file) }));
-            }
-        }
-    }
-
-    public addFiles(files: FileList) {
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-
-            if (file) {
-                this.next(s => ({ ...s, assetFiles: s.assetFiles.pushFront(file) }));
-            }
+    public addFiles(files: File[]) {
+        for (let file of files) {
+            this.next(s => ({ ...s, assetFiles: s.assetFiles.pushFront(file) }));
         }
     }
 
