@@ -8,12 +8,12 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
     EditContentForm,
     FieldDto,
+    invalid$,
     RootFieldDto
 } from '@app/shared';
 
@@ -69,7 +69,7 @@ export class ArrayItemComponent implements OnChanges {
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['itemForm']) {
-            this.isInvalid = this.itemForm.statusChanges.pipe(startWith(this.itemForm.invalid), map(x => this.itemForm.invalid));
+            this.isInvalid = invalid$(this.itemForm);
         }
 
         if (changes['itemForm'] || changes['field']) {

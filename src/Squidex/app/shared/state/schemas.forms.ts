@@ -6,12 +6,12 @@
  */
 
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
 
 import {
     Form,
     Types,
-    ValidatorsEx
+    ValidatorsEx,
+    value$
 } from '@app/framework';
 
 import { createProperties } from './../services/schemas.types';
@@ -28,8 +28,7 @@ export class CreateCategoryForm extends Form<FormGroup> {
 
 export class CreateSchemaForm extends Form<FormGroup> {
     public schemaName =
-        this.form.controls['name'].valueChanges.pipe(
-            map(n => n || FALLBACK_NAME), startWith(FALLBACK_NAME));
+        value$(this.form.controls['name']).pipe(n => n || FALLBACK_NAME);
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({

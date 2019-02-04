@@ -6,13 +6,15 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
 
-import { Form, ValidatorsEx } from '@app/framework';
+import {
+    Form,
+    hasValue$,
+    ValidatorsEx
+} from '@app/framework';
 
 export class RestoreForm extends Form<FormGroup> {
-    public hasNoUrl =
-        this.form.controls['url'].valueChanges.pipe(startWith(null), map(x => !x));
+    public hasNoUrl = hasValue$(this.form.controls['url']);
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({

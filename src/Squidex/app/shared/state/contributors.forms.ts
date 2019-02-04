@@ -6,13 +6,11 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
 
-import { Form } from '@app/framework';
+import { Form, hasValue$ } from '@app/framework';
 
 export class AssignContributorForm extends Form<FormGroup> {
-    public hasNoUser =
-        this.form.controls['user'].valueChanges.pipe(startWith(null), map(x => !x));
+    public hasNoUser = hasValue$(this.form.controls['user']);
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({

@@ -8,12 +8,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import {
     FieldDto,
     ResourceOwner,
-    StringFieldPropertiesDto
+    StringFieldPropertiesDto,
+    value$
 } from '@app/shared';
 
 @Component({
@@ -47,12 +48,10 @@ export class StringUIComponent extends ResourceOwner implements OnInit {
             new FormControl(this.properties.inlineEditable));
 
         this.hideAllowedValues =
-            this.editForm.controls['editor'].valueChanges.pipe(
-                startWith(this.properties.editor), map(x => !(x && (x === 'Radio' || x === 'Dropdown'))));
+            value$<string>(this.editForm.controls['editor']).pipe(map(x => !(x && (x === 'Radio' || x === 'Dropdown'))));
 
         this.hideInlineEditable =
-            this.editForm.controls['editor'].valueChanges.pipe(
-                startWith(this.properties.editor), map(x => !(x && (x === 'Input' || x === 'Dropdown' || x === 'Slug'))));
+            value$<string>(this.editForm.controls['editor']).pipe(map(x => !(x && (x === 'Input' || x === 'Dropdown' || x === 'Slug'))));
 
         this.own(
             this.hideAllowedValues.subscribe(isSelection => {

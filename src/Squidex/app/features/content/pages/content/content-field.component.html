@@ -40,7 +40,7 @@
     </div>
 
     <div class="col-6 col-right" *ngIf="fieldFormCompare">
-        <button type="button" class="btn btn-primary btn-sm field-copy" (click)="copy()">
+        <button type="button" class="btn btn-primary btn-sm field-copy" (click)="copy()" *ngIf="isDifferent | async">
             <i class="icon-arrow_back"></i>
         </button>
 

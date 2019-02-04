@@ -8,16 +8,18 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { combineLatest } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
     EditContentForm,
     fieldInvariant,
+    invalid$,
     LocalStoreService,
     RootFieldDto,
     SchemaDto,
-    Types
+    Types,
+    value$
 } from '@app/shared';
 
 @Component({
@@ -56,6 +58,7 @@ export class ContentFieldComponent implements OnChanges {
     public showAllControls = false;
 
     public isInvalid: Observable<boolean>;
+    public isDifferent: Observable<boolean>;
 
     constructor(
         private readonly localStore: LocalStoreService
@@ -64,7 +67,14 @@ export class ContentFieldComponent implements OnChanges {
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['fieldForm']) {
-            this.isInvalid = this.fieldForm.statusChanges.pipe(startWith(this.fieldForm.invalid), map(x => this.fieldForm.invalid));
+            this.isInvalid = invalid$(this.fieldForm);
+        }
+
+        if ((changes['fieldForm'] || changes['fieldFormCompare']) && this.fieldFormCompare) {
+            this.isDifferent =
+                value$(this.fieldForm).pipe(
+                    combineLatest(value$(this.fieldFormCompare),
+                        (lhs, rhs) => !Types.jsJsonEquals(lhs, rhs)));
         }
 
         if (changes['field']) {

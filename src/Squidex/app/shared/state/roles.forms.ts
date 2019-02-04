@@ -6,9 +6,8 @@
  */
 
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
 
-import { Form } from '@app/framework';
+import { Form, hasValue$ } from '@app/framework';
 
 export class EditPermissionsForm extends Form<FormArray> {
     constructor() {
@@ -37,8 +36,7 @@ export class EditPermissionsForm extends Form<FormArray> {
 }
 
 export class AddPermissionForm extends Form<FormGroup> {
-    public hasPermission =
-        this.form.controls['permission'].valueChanges.pipe(startWith(''), map(x => !x || x.length === 0));
+    public hasPermission = hasValue$(this.form.controls['permission']);
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
@@ -52,8 +50,7 @@ export class AddPermissionForm extends Form<FormGroup> {
 }
 
 export class AddRoleForm extends Form<FormGroup> {
-    public hasNoName =
-        this.form.controls['name'].valueChanges.pipe(startWith(''), map(x => !x || x.length === 0));
+    public hasNoName = hasValue$(this.form.controls['name']);
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({

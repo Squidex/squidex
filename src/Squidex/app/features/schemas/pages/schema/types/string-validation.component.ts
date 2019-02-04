@@ -8,11 +8,11 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
 
 import {
     AppPatternDto,
     FieldDto,
+    hasNoValue$,
     ImmutableArray,
     ModalModel,
     ResourceOwner,
@@ -72,12 +72,10 @@ export class StringValidationComponent extends ResourceOwner implements OnDestro
             new FormControl(this.properties.defaultValue));
 
         this.showDefaultValue =
-            this.editForm.controls['isRequired'].valueChanges.pipe(
-                startWith(this.properties.isRequired), map(x => !x));
+            hasNoValue$(this.editForm.controls['isRequired']);
 
         this.showPatternSuggestions =
-            this.editForm.controls['pattern'].valueChanges.pipe(
-                startWith(''), map(x => !x || x.trim().length === 0));
+            hasNoValue$(this.editForm.controls['pattern']);
 
         this.showPatternMessage =
             this.editForm.controls['pattern'].value && this.editForm.controls['pattern'].value.trim().length > 0;
