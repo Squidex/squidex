@@ -14,10 +14,10 @@ import {
     AppRoleDto,
     AppRolesDto,
     AppRolesService,
+    CreateAppRoleDto,
     UpdateAppRoleDto,
     Version
 } from './../';
-import { CreateAppRoleDto } from './app-roles.service';
 
 describe('AppRolesService', () => {
     const version = new Version('1');
