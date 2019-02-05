@@ -6,7 +6,7 @@
         autocapitalize="off">
 
     <div *ngIf="snapshot.suggestedItems.length > 0" [sqxModalTarget]="input" class="control-dropdown" #container position="bottomLeft">
-        <div *ngFor="let item of snapshot.suggestedItems; let i = index;" class="control-dropdown-item control-dropdown-item-selectable"
+        <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
             [class.active]="i === snapshot.suggestedIndex"
             [container]="container"
             (mousedown)="selectItem(item)"

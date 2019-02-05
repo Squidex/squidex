@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<button class="btn btn-success" [disabled]="field.nested.length === 0" (click)="addItem(undefined); $event.preventDefault()">
+<button type="button" class="btn btn-success" [disabled]="field.nested.length === 0" (click)="addItem(undefined)">
     Add Item
 </button>
 

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <RuntimeFrameworkVersion>2.1.1</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>2.2.0</RuntimeFrameworkVersion>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>

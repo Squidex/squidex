@@ -1,64 +1,25 @@
-<td class="cell-select" *ngIf="!isReference" (click)="shouldStop($event)">
-    <input type="checkbox" class="form-check"
-        [ngModel]="selected" 
-        (ngModelChange)="selectedChange.emit($event);"
-        (click)="$event.stopPropagation()" />
+<td class="cell-select" (click)="stop($event)">
+    <ng-container *ngIf="!isReference; else referenceTemplate">
+        <input type="checkbox" class="form-check"
+            [ngModel]="selected" 
+            (ngModelChange)="selectedChange.emit($event)" />
+    </ng-container>
+    
+    <ng-template #referenceTemplate>
+        <i class="icon-drag2 drag-handle"></i>
+    </ng-template>
 </td>
 
-<td class="cell-select" *ngIf="isReference" (click)="shouldStop($event)">
-    <i class="icon-drag2 drag-handle"></i>
-</td>
+<td class="cell-auto" *ngFor="let field of schema.listFields; let i = index" (click)="shouldStop($event, field)">
+    <ng-container *ngIf="field.isInlineEditable && !isReadOnly; else displayTemplate">
+        <sqx-content-item-editor [form]="patchForm.form" [field]="field"></sqx-content-item-editor>
+    </ng-container>
 
-<td class="cell-auto" *ngFor="let field of schema.listFields; let i = index" (click)="shouldStop($event)">
-    <div *ngIf="field.isInlineEditable && !isReadOnly" [formGroup]="patchForm.form" (click)="$event.stopPropagation()">
-        <div [ngSwitch]="field.properties.fieldType">
-            <div *ngSwitchCase="'Number'">
-                <div [ngSwitch]="field.properties['editor']">
-                    <div *ngSwitchCase="'Input'">
-                        <input class="form-control" type="number" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
-                    </div>
-                    <div *ngSwitchCase="'Dropdown'">
-                        <select class="form-control" [formControlName]="field.name">
-                            <option [ngValue]="null"></option>
-                            <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div *ngSwitchCase="'String'">
-                <div [ngSwitch]="field.properties['editor']">
-                    <div *ngSwitchCase="'Input'">
-                        <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
-                    </div>
-                    <div *ngSwitchCase="'Slug'">
-                        <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify" />
-                    </div>
-                    <div *ngSwitchCase="'Dropdown'">
-                        <select class="form-control" [formControlName]="field.name">
-                            <option [ngValue]="null"></option>
-                            <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div *ngSwitchCase="'Boolean'">
-                <div [ngSwitch]="field.properties['editor']">
-                    <div *ngSwitchCase="'Toggle'">
-                        <sqx-toggle [formControlName]="field.name" [threeStates]="!field.properties.isRequired"></sqx-toggle>
-                    </div>
-                    <div *ngSwitchCase="'Checkbox'">
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" [formControlName]="field.name" sqxIndeterminateValue />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div *ngIf="!field.isInlineEditable || isReadOnly" class="truncate">
+    <ng-template #displayTemplate>
         {{values[i]}}
-    </div>
+    </ng-template>
 </td>
+
 <td class="cell-time" *ngIf="!isCompact" (click)="shouldStop($event)">
     <sqx-content-status 
         [status]="content.status"
@@ -74,36 +35,38 @@
     <img class="user-picture" [attr.title]="content.lastModifiedBy | sqxUserNameRef" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
 </td>
 
-<td class="cell-user" *ngIf="patchForm.form.dirty" (click)="shouldStop($event)">
-    <button type="button" class="btn btn-success" (click)="save(); $event.stopPropagation()">
-        <i class="icon-checkmark"></i>
-    </button>
-</td>
-<td class="cell-actions" *ngIf="patchForm.form.dirty" (click)="shouldStop($event)">
-    <button type="button" class="btn btn-text-secondary btn-cancel" (click)="cancel(); $event.stopPropagation()">
-        <i class="icon-close"></i>
-    </button>
-</td>
+<ng-container *ngIf="patchForm.form.dirty">
+    <td class="cell-user" (click)="stop($event)">
+        <button type="button" class="btn btn-success" (click)="save()">
+            <i class="icon-checkmark"></i>
+        </button>
+    </td>
+    <td class="cell-actions" (click)="stop($event)">
+        <button type="button" class="btn btn-text-secondary btn-cancel" (click)="cancel()">
+            <i class="icon-close"></i>
+        </button>
+    </td>
+</ng-container>
 
-<td class="cell-actions" *ngIf="!isReadOnly && patchForm.form.pristine" (click)="shouldStop($event)">
+<td class="cell-actions" *ngIf="!isReadOnly && patchForm.form.pristine" (click)="stop($event)">
     <div class="dropdown dropdown-options" *ngIf="content">
-        <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle(); $event.stopPropagation()" [class.active]="dropdown.isOpen | async" #optionsButton>
+        <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
             <i class="icon-dots"></i>
         </button>
         <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
-            <a class="dropdown-item" (click)="publishing.emit(); $event.stopPropagation()" *ngIf="content.status === 'Draft'">
+            <a class="dropdown-item" (click)="publishing.emit()" *ngIf="content.status === 'Draft'">
                 Publish
             </a>
-            <a class="dropdown-item" (click)="unpublishing.emit(); $event.stopPropagation()" *ngIf="content.status === 'Published'">
+            <a class="dropdown-item" (click)="unpublishing.emit()" *ngIf="content.status === 'Published'">
                 Unpublish
             </a>
-            <a class="dropdown-item" (click)="archiving.emit(); $event.stopPropagation()" *ngIf="content.status !== 'Archived'">
+            <a class="dropdown-item" (click)="archiving.emit()" *ngIf="content.status !== 'Archived'">
                 Archive
             </a>
-            <a class="dropdown-item" (click)="restoring.emit(); $event.stopPropagation()" *ngIf="content.status === 'Archived'">
+            <a class="dropdown-item" (click)="restoring.emit()" *ngIf="content.status === 'Archived'">
                 Restore
             </a>
-            <a class="dropdown-item" (click)="cloning.emit(); dropdown.hide(); $event.stopPropagation()" *ngIf="content.status !== 'Archived'">
+            <a class="dropdown-item" (click)="cloning.emit(); dropdown.hide()" *ngIf="content.status !== 'Archived'">
                 Clone
             </a>
             
@@ -119,7 +82,7 @@
     </div>
 </td>
 <td class="cell-actions" *ngIf="isReference" (click)="shouldStop($event)">
-    <button type="button" class="btn btn-text-secondary" (click)="deleting.emit(); $event.stopPropagation()">
+    <button type="button" class="btn btn-text-secondary" (click)="deleting.emit()">
         <i class="icon-close"></i>
     </button>
 </td>

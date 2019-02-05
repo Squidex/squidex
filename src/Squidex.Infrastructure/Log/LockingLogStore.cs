@@ -68,7 +68,7 @@ namespace Squidex.Infrastructure.Log
                 }
                 else
                 {
-                    await stream.WriteAsync(LockedText, 0, LockedText.Length, cts.Token);
+                    await stream.WriteAsync(LockedText, 0, LockedText.Length);
                 }
             }
         }

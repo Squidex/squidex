@@ -18,6 +18,7 @@ export * from './shared/array-editor.component';
 export * from './shared/assets-editor.component';
 export * from './shared/array-item.component';
 export * from './shared/content-item.component';
+export * from './shared/content-item-editor.component';
 export * from './shared/content-status.component';
 export * from './shared/contents-selector.component';
 export * from './shared/due-time-selector.component';

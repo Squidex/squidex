@@ -185,7 +185,7 @@ export class ContentsService {
                         DateTime.parseISO_UTC(body.created), body.createdBy,
                         DateTime.parseISO_UTC(body.lastModified), body.lastModifiedBy,
                         null,
-                        true,
+                        body.isPending,
                         null,
                         body.data,
                         response.version);
