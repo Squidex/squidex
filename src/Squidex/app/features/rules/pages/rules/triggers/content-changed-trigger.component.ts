@@ -61,7 +61,9 @@ export class ContentChangedTriggerComponent implements OnInit {
                 const schema = this.schemas.find(s => s.id === triggerSchema.schemaId);
 
                 if (schema) {
-                    schemas.push({ schema, condition: triggerSchema.condition });
+                    const condition = triggerSchema.condition;
+
+                    schemas.push({ schema, condition });
                 }
             }
         }
@@ -83,6 +85,12 @@ export class ContentChangedTriggerComponent implements OnInit {
 
         this.updateValue();
         this.updateSchemaToAdd();
+    }
+
+    public updateCondition(schema: SchemaDto, condition: string) {
+        this.triggerSchemas = this.triggerSchemas.map(s => s.schema === schema ? { schema, condition } : s);
+
+        this.updateValue();
     }
 
     public updateValue() {

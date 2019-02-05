@@ -16,15 +16,18 @@
             <th></th>
         </tr>
 
-        <tr *ngFor="let schema of triggerSchemas">
+        <tr *ngFor="let triggerSchema of triggerSchemas">
             <td>
-                <span class="truncate">{{schema.schema.displayName}}</span>
+                <span class="truncate">{{triggerSchema.schema.displayName}}</span>
             </td>
             <td class="text-center">
-                <input type="text" class="form-control code" [(ngModel)]="schema.condition" (blur)="updateValue()" placeholder="Optional condition as javascript expression" />
+                <input type="text" class="form-control code" placeholder="Optional condition as javascript expression"
+                    [ngModelOptions]="{ updateOn: 'blur' }"
+                    [ngModel]="triggerSchema.condition" 
+                    (ngModelChange)="updateCondition(triggerSchema.schema, $event)" />
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-text-secondary" (click)="removeSchema(schema)">
+                <button type="button" class="btn btn-text-secondary" (click)="removeSchema(triggerSchema)">
                     <i class="icon-close"></i>
                 </button>
             </td>
