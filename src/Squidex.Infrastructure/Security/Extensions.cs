@@ -19,14 +19,14 @@ namespace Squidex.Infrastructure.Security
 
             if (!string.IsNullOrWhiteSpace(subjectId))
             {
-                return new RefToken(subjectId, RefTokenType.Subject);
+                return new RefToken(RefTokenType.Subject, subjectId);
             }
 
             var clientId = principal.OpenIdClientId();
 
             if (!string.IsNullOrWhiteSpace(clientId))
             {
-                return new RefToken(clientId, RefTokenType.Client);
+                return new RefToken(RefTokenType.Client, clientId);
             }
 
             return null;
