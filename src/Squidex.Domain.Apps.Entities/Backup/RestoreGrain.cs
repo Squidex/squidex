@@ -37,7 +37,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly ISemanticLog log;
         private readonly IStreamNameResolver streamNameResolver;
-        private RefToken actor;
 
         private RestoreStateJob CurrentJob
         {
@@ -80,8 +79,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         protected override Task OnActivateAsync(string key)
         {
-            actor = new RefToken(RefTokenType.Subject, key);
-
             RecoverAfterRestartAsync().Forget();
 
             return TaskHelper.Done;
@@ -100,9 +97,10 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        public Task RestoreAsync(Uri url, string newAppName)
+        public Task RestoreAsync(Uri url, RefToken actor, string newAppName)
         {
             Guard.NotNull(url, nameof(url));
+            Guard.NotNull(actor, nameof(actor));
 
             if (!string.IsNullOrWhiteSpace(newAppName))
             {
@@ -118,6 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 Id = Guid.NewGuid(),
                 NewAppName = newAppName,
+                Actor = actor,
                 Started = clock.GetCurrentInstant(),
                 Status = JobStatus.Started,
                 Url = url
@@ -238,16 +237,25 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task AssignContributorAsync()
         {
-            await commandBus.PublishAsync(new AssignContributor
-            {
-                Actor = actor,
-                AppId = CurrentJob.AppId,
-                ContributorId = actor.Identifier,
-                IsRestore = true,
-                Role = Role.Owner
-            });
+            var actor = CurrentJob.Actor;
 
-            Log("Assigned current user.");
+            if (string.Equals(actor?.Type, RefTokenType.Subject))
+            {
+                await commandBus.PublishAsync(new AssignContributor
+                {
+                    Actor = actor,
+                    AppId = CurrentJob.AppId,
+                    ContributorId = actor.Identifier,
+                    IsRestore = true,
+                    Role = Role.Owner
+                });
+
+                Log("Assigned current user.");
+            }
+            else
+            {
+                Log("Current user not assigned because restore was triggered by client.");
+            }
         }
 
         private async Task CleanupAsync()
@@ -286,7 +294,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             if (@event.Payload is SquidexEvent squidexEvent)
             {
-                squidexEvent.Actor = actor;
+                squidexEvent.Actor = CurrentJob.Actor;
             }
 
             if (@event.Payload is AppCreated appCreated)
@@ -306,7 +314,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             foreach (var handler in handlers)
             {
-                if (!await handler.RestoreEventAsync(@event, CurrentJob.AppId, reader, actor))
+                if (!await handler.RestoreEventAsync(@event, CurrentJob.AppId, reader, CurrentJob.Actor))
                 {
                     return;
                 }

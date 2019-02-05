@@ -13,6 +13,25 @@ namespace Squidex.Infrastructure.Security
 {
     public static class Extensions
     {
+        public static RefToken Token(this ClaimsPrincipal principal)
+        {
+            var subjectId = principal.OpenIdSubject();
+
+            if (!string.IsNullOrWhiteSpace(subjectId))
+            {
+                return new RefToken(subjectId, RefTokenType.Subject);
+            }
+
+            var clientId = principal.OpenIdClientId();
+
+            if (!string.IsNullOrWhiteSpace(clientId))
+            {
+                return new RefToken(clientId, RefTokenType.Client);
+            }
+
+            return null;
+        }
+
         public static string OpenIdSubject(this ClaimsPrincipal principal)
         {
             return principal.Claims.FirstOrDefault(x => x.Type == OpenIdClaims.Subject)?.Value;

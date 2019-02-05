@@ -10,7 +10,6 @@ using System.Security;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 
@@ -34,11 +33,11 @@ namespace Squidex.Pipeline.CommandMiddlewares
 
             if (context.Command is SquidexCommand squidexCommand)
             {
+                var user = httpContextAccessor.HttpContext.User;
+
                 if (squidexCommand.Actor == null)
                 {
-                    var actorToken =
-                        FindActorFromSubject() ??
-                        FindActorFromClient();
+                    var actorToken = user.Token();
 
                     squidexCommand.Actor = actorToken ?? throw new SecurityException("No actor with subject or client id available.");
                 }
@@ -50,20 +49,6 @@ namespace Squidex.Pipeline.CommandMiddlewares
             }
 
             return next();
-        }
-
-        private RefToken FindActorFromSubject()
-        {
-            var subjectId = httpContextAccessor.HttpContext.User.OpenIdSubject();
-
-            return subjectId == null ? null : new RefToken(RefTokenType.Subject, subjectId);
-        }
-
-        private RefToken FindActorFromClient()
-        {
-            var clientId = httpContextAccessor.HttpContext.User.OpenIdClientId();
-
-            return clientId == null ? null : new RefToken(RefTokenType.Client, clientId);
         }
     }
 }

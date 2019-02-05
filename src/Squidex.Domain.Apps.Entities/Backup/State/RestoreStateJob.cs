@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using NodaTime;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup.State
 {
@@ -23,6 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Backup.State
 
         [DataMember]
         public Guid AppId { get; set; }
+
+        [DataMember]
+        public RefToken Actor { get; set; }
 
         [DataMember]
         public Uri Url { get; set; }
