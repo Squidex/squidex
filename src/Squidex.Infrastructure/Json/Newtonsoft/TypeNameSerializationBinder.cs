@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
             if (typeName == null)
             {
-                throw new JsonException("Trying to serialize object with type name.");
+                throw new JsonException($"Trying to serialize object with type name {serializedType}.");
             }
         }
     }

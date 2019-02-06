@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("JsonField")]
     public sealed class JsonFieldProperties : FieldProperties
     {
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)

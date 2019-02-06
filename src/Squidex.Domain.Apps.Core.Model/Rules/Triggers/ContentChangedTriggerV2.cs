@@ -13,8 +13,6 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers
     [TypeName(nameof(ContentChangedTriggerV2))]
     public sealed class ContentChangedTriggerV2 : RuleTrigger
     {
-        public const string Name = "ContentChanged";
-
         public ReadOnlyCollection<ContentChangedTriggerSchemaV2> Schemas { get; set; }
 
         public bool HandleAll { get; set; }

@@ -6,11 +6,9 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("ReferencesField")]
     public sealed class ReferencesFieldProperties : FieldProperties
     {
         public int? MinItems { get; set; }

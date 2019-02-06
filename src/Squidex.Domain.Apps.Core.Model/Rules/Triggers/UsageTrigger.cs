@@ -12,8 +12,6 @@ namespace Squidex.Domain.Apps.Core.Rules.Triggers
     [TypeName(nameof(UsageTrigger))]
     public sealed class UsageTrigger : RuleTrigger
     {
-        public const string Name = "Usage";
-
         public int Limit { get; set; }
 
         public int? NumDays { get; set; }

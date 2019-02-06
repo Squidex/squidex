@@ -11,6 +11,7 @@ using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
+using Squidex.Infrastructure;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore
@@ -36,11 +37,13 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             }
         }
 
+        [TypeName(nameof(TestAction1))]
         public sealed class TestAction1 : RuleAction
         {
             public string Property { get; set; }
         }
 
+        [TypeName(nameof(TestAction2))]
         public sealed class TestAction2 : RuleAction
         {
             public string Property { get; set; }

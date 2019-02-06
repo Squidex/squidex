@@ -14,24 +14,26 @@ namespace Squidex.Domain.Apps.Core.Schemas
 {
     public static class FieldRegistry
     {
-        public static void Setup(TypeNameRegistry typeNameRegistry)
+        private const string Suffix = "Properties";
+        private const string SuffixOld = "FieldProperties";
+
+        public static TypeNameRegistry MapFields(this TypeNameRegistry typeNameRegistry)
         {
-            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
+            var types = typeof(FieldRegistry).Assembly.GetTypes().Where(x => typeof(FieldProperties).IsAssignableFrom(x) && !x.IsAbstract);
 
-            var types = typeof(FieldRegistry).Assembly.GetTypes().Where(x => x.BaseType == typeof(FieldProperties));
-
-            var supportedFields = new HashSet<Type>();
+            var addedTypes = new HashSet<Type>();
 
             foreach (var type in types)
             {
-                if (supportedFields.Add(type))
+                if (addedTypes.Add(type))
                 {
-                    typeNameRegistry.Map(type);
+                    typeNameRegistry.Map(type, type.TypeName(false, Suffix));
+
+                    typeNameRegistry.MapObsolete(type, type.TypeName(false, SuffixOld));
                 }
             }
 
-            typeNameRegistry.MapObsolete(typeof(ReferencesFieldProperties), "References");
-            typeNameRegistry.MapObsolete(typeof(DateTimeFieldProperties), "DateTime");
+            return typeNameRegistry;
         }
     }
 }

@@ -5,11 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("BooleanField")]
     public sealed class BooleanFieldProperties : FieldProperties
     {
         public bool? DefaultValue { get; set; }

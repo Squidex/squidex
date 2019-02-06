@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("NumberField")]
     public sealed class NumberFieldProperties : FieldProperties
     {
         public ReadOnlyCollection<double> AllowedValues { get; set; }
