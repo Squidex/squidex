@@ -6,11 +6,9 @@
 // ==========================================================================
 
 using NodaTime;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("DateTimeField")]
     public sealed class DateTimeFieldProperties : FieldProperties
     {
         public Instant? MaxValue { get; set; }

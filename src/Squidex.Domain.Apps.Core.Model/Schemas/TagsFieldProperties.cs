@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("TagsField")]
     public sealed class TagsFieldProperties : FieldProperties
     {
         public ReadOnlyCollection<string> AllowedValues { get; set; }

@@ -5,11 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("GeolocationField")]
     public sealed class GeolocationFieldProperties : FieldProperties
     {
         public GeolocationFieldEditor Editor { get; set; }

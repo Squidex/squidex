@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 using System.Collections.ObjectModel;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    [TypeName("AssetsField")]
     public sealed class AssetsFieldProperties : FieldProperties
     {
         public bool MustBeImage { get; set; }

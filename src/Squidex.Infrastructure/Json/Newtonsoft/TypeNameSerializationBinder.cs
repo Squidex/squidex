@@ -10,7 +10,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public class TypeNameSerializationBinder : DefaultSerializationBinder
+    public sealed class TypeNameSerializationBinder : DefaultSerializationBinder
     {
         private readonly TypeNameRegistry typeNameRegistry;
 

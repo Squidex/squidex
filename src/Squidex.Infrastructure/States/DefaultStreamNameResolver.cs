@@ -18,19 +18,7 @@ namespace Squidex.Infrastructure.States
             Guard.NotNullOrEmpty(id, nameof(id));
             Guard.NotNull(aggregateType, nameof(aggregateType));
 
-            var typeName = char.ToLower(aggregateType.Name[0]) + aggregateType.Name.Substring(1);
-
-            foreach (var suffix in Suffixes)
-            {
-                if (typeName.EndsWith(suffix, StringComparison.Ordinal))
-                {
-                    typeName = typeName.Substring(0, typeName.Length - suffix.Length);
-
-                    break;
-                }
-            }
-
-            return $"{typeName}-{id}";
+            return $"{aggregateType.TypeName(true, Suffixes)}-{id}";
         }
 
         public string WithNewId(string streamName, Func<string, string> idGenerator)
