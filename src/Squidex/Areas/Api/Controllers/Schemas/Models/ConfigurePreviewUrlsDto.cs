@@ -14,7 +14,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
     {
         public ConfigurePreviewUrls ToCommand()
         {
-            return new ConfigurePreviewUrls { PreviewUrls = this };
+            return new ConfigurePreviewUrls
+            {
+                PreviewUrls = new Dictionary<string, string>(this)
+            };
         }
     }
 }

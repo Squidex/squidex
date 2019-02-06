@@ -6,11 +6,12 @@
 // ==========================================================================
 
 using System;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Squidex.Infrastructure.Json.Newtonsoft
 {
-    public class TypeNameSerializationBinder : DefaultSerializationBinder
+    public sealed class TypeNameSerializationBinder : ISerializationBinder
     {
         private readonly TypeNameRegistry typeNameRegistry;
 
@@ -21,26 +22,20 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             this.typeNameRegistry = typeNameRegistry;
         }
 
-        public override Type BindToType(string assemblyName, string typeName)
+        public Type BindToType(string assemblyName, string typeName)
         {
-            var type = typeNameRegistry.GetTypeOrNull(typeName);
-
-            return type ?? base.BindToType(assemblyName, typeName);
+            return typeNameRegistry.GetTypeOrNull(typeName);
         }
 
-        public override void BindToName(Type serializedType, out string assemblyName, out string typeName)
+        public void BindToName(Type serializedType, out string assemblyName, out string typeName)
         {
             assemblyName = null;
 
-            var name = typeNameRegistry.GetNameOrNull(serializedType);
+            typeName = typeNameRegistry.GetNameOrNull(serializedType);
 
-            if (name != null)
+            if (typeName == null)
             {
-                typeName = name;
-            }
-            else
-            {
-                base.BindToName(serializedType, out assemblyName, out typeName);
+                throw new JsonException("Trying to serialize object with type name.");
             }
         }
     }

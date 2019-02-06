@@ -12,17 +12,17 @@
                     <div class="col col-name pr-1">
                         <sqx-control-errors [for]="form.get('name')" fieldName="Name" [submitted]="editForm.submitted | async"></sqx-control-errors>
     
-                        <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('name')" placeholder="Name, e.g. Web or Mobile" />
+                        <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('name')" placeholder="Web or Mobile" />
                     </div>
     
                     <div class="col pr-1">
                         <sqx-control-errors [for]="form.get('url')" fieldName="Url" [submitted]="editForm.submitted | async"></sqx-control-errors>
     
-                        <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('url')" placeholder="Url" />
+                        <input type="text" class="form-control" maxlength="1000" [formControl]="form.get('url')" placeholder="Url with placeholders like ${id} or ${data.slug}" />
                     </div>
 
                     <div class="col-auto col-options">
-                        <button type="button" class="btn btn-text-delete btn-danger"
+                        <button type="button" class="btn btn-text-danger"
                             (sqxConfirmClick)="editForm.remove(i)"
                             confirmTitle="Remove url" 
                             confirmText="Do you really want to remove this url?">
@@ -35,17 +35,13 @@
                     <div class="col col-name pr-1">
                         <sqx-control-errors for="name" [submitted]="addForm.submitted | async"></sqx-control-errors>
 
-                        <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="Name, e.g. Web or Mobile" />
+                        <input type="text" class="form-control" maxlength="1000" formControlName="name" placeholder="Web or Mobile" />
                     </div>
 
                     <div class="col pr-1">
                         <sqx-control-errors for="url" [submitted]="addForm.submitted | async"></sqx-control-errors>
 
-                        <input type="text" class="form-control" maxlength="1000" formControlName="url" placeholder="Url" />
-
-                        <small class="form-text text-muted">
-                            {{editHelp}}
-                        </small>
+                        <input type="text" class="form-control" maxlength="1000" formControlName="url" placeholder="Url with placeholders like ${id} or ${data.slug}" />
                     </div>
 
                     <div class="col-auto col-options">
