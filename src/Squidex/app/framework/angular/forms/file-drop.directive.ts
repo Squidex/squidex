@@ -30,6 +30,9 @@ export class FileDropDirective {
     @Input()
     public onlyImages: boolean;
 
+    @Input()
+    public noDrop: boolean;
+
     @Output('sqxFileDrop')
     public drop = new EventEmitter<File[]>();
 
@@ -41,6 +44,10 @@ export class FileDropDirective {
 
     @HostListener('paste', ['$event'])
     public onPaste(event: ClipboardEvent) {
+        if (this.noDrop) {
+            return;
+        }
+
         const result: File[] = [];
 
         for (let i = 0; i < event.clipboardData.items.length; i++) {

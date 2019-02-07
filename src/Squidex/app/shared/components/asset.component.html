@@ -1,5 +1,5 @@
  <ng-container *ngIf="!isListView; else listTemplate">
-    <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)">
+    <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)" [noDrop]="true">
         <div class="card-body">
             <div class="file-preview" *ngIf="asset && snapshot.progress === 0" @fade>
                 <span class="file-type" *ngIf="asset.fileType">
@@ -85,7 +85,7 @@
 </ng-container>
 
 <ng-template #listTemplate>
-    <div class="table-items-row" [class.selectable]="isSelectable" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)">
+    <div class="table-items-row" [class.selectable]="isSelectable" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)" [noDrop]="true">
         <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected" ></div>
 
         <div *ngIf="asset && asset.canPreview && snapshot.progress === 0" class="image drag-handle" [class.image-left]="!isSelectable" @fade>
