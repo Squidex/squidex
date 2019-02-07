@@ -12,15 +12,10 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Log;
 using Squidex.Pipeline;
 
-#pragma warning disable RECS0092 // Convert field to readonly
-
 namespace Squidex.Config.Domain
 {
     public static class LoggingServices
     {
-        private static ILogChannel console = new ConsoleLogChannel();
-        private static ILogChannel file;
-
         public static void AddMyLoggingServices(this IServiceCollection services, IConfiguration config)
         {
             if (config.GetValue<bool>("logging:human"))
@@ -38,18 +33,13 @@ namespace Squidex.Config.Domain
 
             if (!string.IsNullOrWhiteSpace(loggingFile))
             {
-                services.AddSingletonAs(file ?? (file = new FileChannel(loggingFile)))
+                services.AddSingletonAs(new FileChannel(loggingFile))
                     .As<ILogChannel>();
             }
 
             var useColors = config.GetValue<bool>("logging:colors");
 
-            if (console == null)
-            {
-                console = new ConsoleLogChannel(useColors);
-            }
-
-            services.AddSingletonAs(console)
+            services.AddSingletonAs(new ConsoleLogChannel(useColors))
                 .As<ILogChannel>();
 
             services.AddSingletonAs(c => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))

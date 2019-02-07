@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -26,7 +26,7 @@ import {
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html'
 })
-export class StringValidationComponent extends ResourceOwner implements OnDestroy, OnInit {
+export class StringValidationComponent extends ResourceOwner implements OnInit {
     @Input()
     public editForm: FormGroup;
 

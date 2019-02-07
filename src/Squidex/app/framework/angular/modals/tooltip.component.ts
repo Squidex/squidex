@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, Renderer2 } from '@angular/core';
 
 import {
     fadeAnimation,
@@ -22,7 +22,7 @@ import {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TooltipComponent extends StatefulComponent implements OnDestroy, OnInit {
+export class TooltipComponent extends StatefulComponent implements OnInit {
     @Input()
     public target: any;
 

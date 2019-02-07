@@ -8,7 +8,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using FluentAssertions.Equivalency;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Orleans;
 

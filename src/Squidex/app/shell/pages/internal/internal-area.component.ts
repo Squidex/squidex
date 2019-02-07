@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import {
@@ -24,7 +24,7 @@ import {
         fadeAnimation
     ]
 })
-export class InternalAreaComponent extends ResourceOwner implements OnDestroy, OnInit {
+export class InternalAreaComponent extends ResourceOwner implements OnInit {
     constructor(
         public readonly loadingService: LoadingService,
         private readonly dialogs: DialogService,

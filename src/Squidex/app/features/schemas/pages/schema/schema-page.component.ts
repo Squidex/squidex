@@ -7,7 +7,7 @@
 
 // tslint:disable:no-shadowed-variable
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { onErrorResumeNext } from 'rxjs/operators';
 
@@ -38,7 +38,7 @@ import {
         fadeAnimation
     ]
 })
-export class SchemaPageComponent extends ResourceOwner implements OnDestroy, OnInit {
+export class SchemaPageComponent extends ResourceOwner implements OnInit {
     public fieldTypes = fieldTypes;
 
     public schemaExport: any;

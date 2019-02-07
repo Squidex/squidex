@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, HostListener, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { ResourceOwner } from '@app/framework/internal';
@@ -13,7 +13,7 @@ import { ResourceOwner } from '@app/framework/internal';
 @Directive({
     selector: '[sqxParentLink]'
 })
-export class ParentLinkDirective extends ResourceOwner implements OnDestroy, OnInit {
+export class ParentLinkDirective extends ResourceOwner implements OnInit {
     private url: string;
 
     @Input()

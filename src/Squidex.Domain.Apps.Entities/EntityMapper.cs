@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using NodaTime;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
 

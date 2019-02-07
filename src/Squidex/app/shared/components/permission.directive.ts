@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Directive, Input, OnChanges, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Directive, Input, OnChanges, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 
 import {
     AppDto,
@@ -20,7 +20,7 @@ import {
 @Directive({
     selector: '[sqxPermission]'
 })
-export class PermissionDirective extends ResourceOwner implements OnChanges, OnInit, OnDestroy {
+export class PermissionDirective extends ResourceOwner implements OnChanges, OnInit {
     private viewCreated = false;
 
     @Input('sqxPermissionApp')

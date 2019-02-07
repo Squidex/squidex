@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
 
 import {
@@ -18,7 +18,7 @@ import {
     selector: 'sqx-user-report',
     template: ''
 })
-export class UserReportComponent extends ResourceOwner implements OnDestroy, OnInit {
+export class UserReportComponent extends ResourceOwner implements OnInit {
     constructor(changeDetector: ChangeDetectorRef,
         private readonly config: UserReportConfig,
         private readonly resourceLoader: ResourceLoaderService

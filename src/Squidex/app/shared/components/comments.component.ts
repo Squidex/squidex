@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { timer } from 'rxjs';
 import { onErrorResumeNext, switchMap } from 'rxjs/operators';
@@ -26,7 +26,7 @@ import {
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html'
 })
-export class CommentsComponent extends ResourceOwner implements OnDestroy, OnInit {
+export class CommentsComponent extends ResourceOwner implements OnInit {
     public state: CommentsState;
 
     public userId: string;
