@@ -49,4 +49,12 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
     public isSelectedQuery(query: string) {
         return query === this.contentsState.snapshot.contentsQuery || (!query && !this.contentsState.snapshot.contentsQuery);
     }
+
+    public trackByTag(index: number, tag: { name: string }) {
+        return tag.name;
+    }
+
+    public trackByQuery(index: number, query: { name: string }) {
+        return query.name;
+    }
 }
