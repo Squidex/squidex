@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Log
                         break;
                     }
 
-                    await Task.Delay(2000);
+                    await Task.Delay(2000, cts.Token);
                 }
 
                 if (!cts.IsCancellationRequested)

@@ -6,13 +6,20 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Input } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { Types } from '@app/framework/internal';
+import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StarsComponent), multi: true
 };
+
+interface State {
+    stars: number;
+    starsArray: number[];
+
+    value: number | null;
+}
 
 @Component({
     selector: 'sqx-stars',
@@ -21,9 +28,7 @@ export const SQX_STARS_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_STARS_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StarsComponent implements ControlValueAccessor {
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
+export class StarsComponent extends StatefulControlComponent<State, number | null> {
     private maximumStarsValue = 5;
 
     @Input()
@@ -33,11 +38,13 @@ export class StarsComponent implements ControlValueAccessor {
         if (this.maximumStarsValue !== maxStars) {
             this.maximumStarsValue = value;
 
-            this.starsArray = [];
+            const starsArray: number[] = [];
 
-            for (let i = 1; i <= value; i++) {
-                this.starsArray.push(i);
+            for (let i = 1; i <= maxStars; i++) {
+                starsArray.push(i);
             }
+
+            this.next(s => ({ ...s, starsArray }));
         }
     }
 
@@ -45,64 +52,45 @@ export class StarsComponent implements ControlValueAccessor {
         return this.maximumStarsValue;
     }
 
-    public isDisabled = false;
-
-    public stars: number;
-    public starsArray: number[] = [1, 2, 3, 4, 5];
-
-    public value: number | null = 1;
-
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef
-    ) {
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector, {
+            stars: -1,
+            starsArray: [1, 2, 3, 4, 5],
+            value: 1
+        });
     }
 
     public writeValue(obj: any) {
-        this.value = this.stars = Types.isNumber(obj) ? obj : 0;
+        const value = Types.isNumber(obj) ? obj : 0;
 
-        this.changeDetector.markForCheck();
+        this.next(s => ({ ...s, stars: value, value }));
     }
 
-    public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
-
-        this.changeDetector.markForCheck();
-    }
-
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
-    }
-
-    public setPreview(value: number) {
-        if (this.isDisabled) {
+    public setPreview(stars: number) {
+        if (this.snapshot.isDisabled) {
             return;
         }
 
-        this.stars = value;
+        this.next(s => ({ ...s, stars }));
     }
 
     public stopPreview() {
-        if (this.isDisabled) {
+        if (this.snapshot.isDisabled) {
             return;
         }
 
-        this.stars = this.value || 0;
+        this.next(s => ({ ...s, stars: s.value || 0 }));
     }
 
     public reset() {
-        if (this.isDisabled) {
+        if (this.snapshot.isDisabled) {
             return false;
         }
 
-        if (this.value) {
-            this.value = null;
-            this.stars = 0;
+        if (this.snapshot.value) {
+            this.next(s => ({ ...s, stars: -1, value: null }));
 
-            this.callChange(this.value);
+            this.callChange(null);
             this.callTouched();
         }
 
@@ -110,14 +98,14 @@ export class StarsComponent implements ControlValueAccessor {
     }
 
     public setValue(value: number) {
-        if (this.isDisabled) {
+        if (this.snapshot.isDisabled) {
             return false;
         }
 
-        if (this.value !== value) {
-            this.value = this.stars = value;
+        if (this.snapshot.value !== value) {
+            this.next(s => ({ ...s, stars: value, value }));
 
-            this.callChange(this.value);
+            this.callChange(value);
             this.callTouched();
         }
 

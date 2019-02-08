@@ -5,7 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
+import { timer } from 'rxjs';
+
+import { ResourceOwner } from '@app/framework/internal';
 
 const POSITION_TOPLEFT = 'topLeft';
 const POSITION_TOPRIGHT = 'topRight';
@@ -20,10 +23,7 @@ const POSITION_FULL = 'full';
 @Directive({
     selector: '[sqxModalTarget]'
 })
-export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
-    private elementResizeListener: Function;
-    private targetResizeListener: Function;
-    private renderTimer: any;
+export class ModalTargetDirective extends ResourceOwner implements AfterViewInit, OnInit {
     private targetElement: any;
 
     @Input('sqxModalTarget')
@@ -42,38 +42,24 @@ export class ModalTargetDirective implements AfterViewInit, OnDestroy, OnInit {
         private readonly renderer: Renderer2,
         private readonly element: ElementRef
     ) {
-    }
-
-    public ngOnDestroy() {
-        if (this.targetResizeListener) {
-            this.targetResizeListener();
-        }
-
-        if (this.elementResizeListener) {
-            this.elementResizeListener();
-        }
-
-        clearInterval(this.renderTimer);
+        super();
     }
 
     public ngOnInit() {
         if (this.target) {
             this.targetElement = this.target;
 
-            this.targetResizeListener =
+            this.own(
                 this.renderer.listen(this.targetElement, 'resize', () => {
                     this.updatePosition();
-                });
+                }));
 
-            this.elementResizeListener =
+            this.own(
                 this.renderer.listen(this.element.nativeElement, 'resize', () => {
                     this.updatePosition();
-                });
+                }));
 
-            this.renderTimer =
-                setInterval(() => {
-                    this.updatePosition();
-                }, 100);
+            this.own(timer(100, 100).subscribe(() => this.updatePosition()));
         }
     }
 

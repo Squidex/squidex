@@ -6,7 +6,7 @@
     </ng-container>
     
     <ng-container menu>
-        <button class="btn btn-text-secondary" (click)="reload()" title="Refresh Events (CTRL + SHIFT + R)">
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh Events (CTRL + SHIFT + R)">
             <i class="icon-reset"></i> Refresh
         </button>
 
@@ -70,11 +70,11 @@
                                 Next: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
                             </div>
                             <div class="col-3 text-right">
-                                <button class="btn btn-outline-danger btn-sm mr-1" (click)="cancel(event)" [class.hidden]="!event.nextAttempt">
+                                <button type="button" class="btn btn-outline-danger btn-sm mr-1" (click)="cancel(event)" [class.hidden]="!event.nextAttempt">
                                     Cancel
                                 </button>
 
-                                <button class="btn btn-success btn-sm" (click)="enqueue(event)">
+                                <button type="button" class="btn btn-success btn-sm" (click)="enqueue(event)">
                                     Enqueue
                                 </button>
                             </div>
@@ -90,7 +90,7 @@
             </tbody>
         </table>
 
-        <sqx-pager [pager]="ruleEventsState.ruleEventsPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
+        <sqx-pager [pager]="ruleEventsState.ruleEventsPager | async" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
     </ng-container>
 </sqx-panel>
 

@@ -8,58 +8,21 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Security.Claims;
 using Jint;
 using Jint.Native;
 using Jint.Native.Date;
 using Jint.Native.Object;
 using Jint.Runtime;
 using Jint.Runtime.Interop;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Infrastructure;
-using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Core.Scripting
 {
     public sealed class JintScriptEngine : IScriptEngine
     {
         public TimeSpan Timeout { get; set; } = TimeSpan.FromMilliseconds(200);
-
-        public sealed class Converter : IObjectConverter
-        {
-            public Engine Engine { get; set; }
-
-            public bool TryConvert(object value, out JsValue result)
-            {
-                result = null;
-
-                if (value is Enum)
-                {
-                    result = value.ToString();
-                    return true;
-                }
-
-                switch (value)
-                {
-                    case IUser user:
-                        result = JintUser.Create(Engine, user);
-                        return true;
-                    case ClaimsPrincipal principal:
-                        result = JintUser.Create(Engine, principal);
-                        return true;
-                    case Instant instant:
-                        result = JsValue.FromObject(Engine, instant.ToDateTimeUtc());
-                        return true;
-                    case NamedContentData content:
-                        result = new ContentDataObject(Engine, content);
-                        return true;
-                }
-
-                return false;
-            }
-        }
 
         public void Execute(ScriptContext context, string script)
         {
@@ -198,8 +161,6 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
         private Engine CreateScriptEngine(IReferenceResolver resolver = null, Dictionary<string, Func<string>> customFormatters = null)
         {
-            var converter = new Converter();
-
             var engine = new Engine(options =>
             {
                 if (resolver != null)
@@ -207,7 +168,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
                     options.SetReferencesResolver(resolver);
                 }
 
-                options.TimeoutInterval(Timeout).Strict().AddObjectConverter(converter);
+                options.TimeoutInterval(Timeout).Strict().AddObjectConverter(DefaultConverter.Instance);
             });
 
             if (customFormatters != null)
@@ -217,8 +178,6 @@ namespace Squidex.Domain.Apps.Core.Scripting
                     engine.SetValue(kvp.Key, Safe(kvp.Value));
                 }
             }
-
-            converter.Engine = engine;
 
             engine.SetValue("slugify", new ClrFunctionInstance(engine, "slugify", Slugify));
             engine.SetValue("formatTime", new ClrFunctionInstance(engine, "formatTime", FormatDate));

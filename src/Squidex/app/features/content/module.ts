@@ -29,6 +29,7 @@ import {
     ContentFieldComponent,
     ContentHistoryPageComponent,
     ContentItemComponent,
+    ContentItemEditorComponent,
     ContentPageComponent,
     ContentsFiltersPageComponent,
     ContentsPageComponent,
@@ -36,6 +37,7 @@ import {
     ContentStatusComponent,
     DueTimeSelectorComponent,
     FieldEditorComponent,
+    FieldLanguagesComponent,
     PreviewButtonComponent,
     ReferencesEditorComponent,
     SchemasPageComponent
@@ -112,6 +114,7 @@ const routes: Routes = [
         ContentFieldComponent,
         ContentHistoryPageComponent,
         ContentItemComponent,
+        ContentItemEditorComponent,
         ContentPageComponent,
         ContentsFiltersPageComponent,
         ContentStatusComponent,
@@ -119,6 +122,7 @@ const routes: Routes = [
         ContentsSelectorComponent,
         DueTimeSelectorComponent,
         FieldEditorComponent,
+        FieldLanguagesComponent,
         PreviewButtonComponent,
         ReferencesEditorComponent,
         SchemasPageComponent

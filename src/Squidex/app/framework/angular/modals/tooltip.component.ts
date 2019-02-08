@@ -5,11 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, Renderer2 } from '@angular/core';
 
-import { ModalModel } from './../../utils/modal-view';
-
-import { fadeAnimation } from './../animations';
+import {
+    fadeAnimation,
+    ModalModel,
+    StatefulComponent
+} from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-tooltip',
@@ -20,10 +22,7 @@ import { fadeAnimation } from './../animations';
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TooltipComponent implements OnDestroy, OnInit {
-    private targetMouseEnterListener: any;
-    private targetMouseLeaveListener: any;
-
+export class TooltipComponent extends StatefulComponent implements OnInit {
     @Input()
     public target: any;
 
@@ -32,35 +31,23 @@ export class TooltipComponent implements OnDestroy, OnInit {
 
     public modal = new ModalModel();
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef,
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2
     ) {
-    }
-
-    public ngOnDestroy() {
-        if (this.targetMouseEnterListener) {
-            this.targetMouseEnterListener();
-        }
-
-        if (this.targetMouseLeaveListener) {
-            this.targetMouseLeaveListener();
-        }
+        super(changeDetector, {});
     }
 
     public ngOnInit() {
         if (this.target) {
-            this.targetMouseEnterListener =
+            this.own(
                 this.renderer.listen(this.target, 'mouseenter', () => {
                     this.modal.show();
+                }));
 
-                    this.changeDetector.markForCheck();
-                });
-
-            this.targetMouseLeaveListener =
+            this.own(
                 this.renderer.listen(this.target, 'mouseleave', () => {
                     this.modal.hide();
-                });
+                }));
         }
     }
 }

@@ -5,7 +5,7 @@
 </div>
 
 <div class="dropdown-options btn-group btn-group-{{size}}" *ngIf="isLargeMode">
-    <button type="button" class="btn btn-secondary dropdown-toggle" [attr.title]="selectedLanguage.englishName" (click)="dropdown.toggle(); $event.stopPropagation()" #button tabindex="-1">
+    <button type="button" class="btn btn-secondary dropdown-toggle" [attr.title]="selectedLanguage.englishName" (click)="dropdown.toggle()" #button tabindex="-1">
         {{selectedLanguage.iso2Code}}
     </button>
     <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="button" @fade>

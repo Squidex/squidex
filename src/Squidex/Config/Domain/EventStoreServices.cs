@@ -37,7 +37,6 @@ namespace Squidex.Config.Domain
 
                             return new MongoEventStore(mongDatabase, c.GetRequiredService<IEventNotifier>());
                         })
-                        .As<IInitializable>()
                         .As<IEventStore>();
                 },
                 ["GetEventStore"] = () =>

@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
             {
                 foreach (var sourceField in source.Ordered)
                 {
-                    if (!target.ByName.TryGetValue(sourceField.Name, out var targetField))
+                    if (!target.ByName.TryGetValue(sourceField.Name, out _))
                     {
                         var id = sourceField.NamedId();
 
@@ -184,7 +184,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                     if ((sourceField == null || sourceField is IArrayField) && targetField is IArrayField targetArrayField)
                     {
-                        var fields = (sourceField as IArrayField)?.FieldCollection ?? FieldCollection<NestedField>.Empty;
+                        var fields = ((IArrayField)sourceField)?.FieldCollection ?? FieldCollection<NestedField>.Empty;
 
                         var events = SyncFields(fields, targetArrayField.FieldCollection, serializer, idGenerator, id, options);
 

@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnInit, ViewChild } from '@angular/core';
+import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import * as moment from 'moment';
-import { Subscription } from 'rxjs';
 
-import { Types } from '@app/framework/internal';
+import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 declare module 'pikaday/pikaday';
 
@@ -27,15 +26,11 @@ export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy, OnInit, AfterViewInit {
-    private timeSubscription: Subscription;
-    private dateSubscription: Subscription;
+export class DateTimeEditorComponent extends StatefulControlComponent<{}, string | null> implements OnInit, AfterViewInit {
     private picker: any;
     private timeValue: any | null = null;
     private dateValue: any | null = null;
     private suppressEvents = false;
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
 
     @Input()
     public mode: string;
@@ -49,8 +44,6 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     @ViewChild('dateInput')
     public dateInput: ElementRef;
 
-    public isDisabled = false;
-
     public timeControl = new FormControl();
     public dateControl = new FormControl();
 
@@ -62,18 +55,12 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
         return !!this.dateValue;
     }
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef
-    ) {
-    }
-
-    public ngOnDestroy() {
-        this.dateSubscription.unsubscribe();
-        this.timeSubscription.unsubscribe();
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector, {});
     }
 
     public ngOnInit() {
-        this.timeSubscription =
+        this.own(
             this.timeControl.valueChanges.subscribe(value => {
                 if (!value || value.length === 0) {
                     this.timeValue = null;
@@ -82,9 +69,9 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
                 }
 
                 this.updateValue();
-            });
+            }));
 
-        this.dateSubscription =
+        this.own(
             this.dateControl.valueChanges.subscribe(value => {
                 if (!value || value.length === 0) {
                     this.dateValue = null;
@@ -93,7 +80,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
                 }
 
                 this.updateValue();
-            });
+            }));
     }
 
     public writeValue(obj: any) {
@@ -114,7 +101,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.isDisabled = isDisabled;
+        super.setDisabledState(isDisabled);
 
         if (isDisabled) {
             this.dateControl.disable({ emitEvent: false });
@@ -123,8 +110,6 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
             this.dateControl.enable({ emitEvent: false });
             this.timeControl.enable({ emitEvent: false });
         }
-
-        this.changeDetector.markForCheck();
     }
 
     public registerOnChange(fn: any) {
@@ -144,17 +129,11 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
                 this.dateValue = this.picker.getMoment();
 
                 this.updateValue();
-                this.touched();
-
-                this.changeDetector.markForCheck();
+                this.callTouched();
             }
         });
 
         this.updateControls();
-    }
-
-    public touched() {
-        this.callTouched();
     }
 
     public writeNow() {
@@ -162,7 +141,7 @@ export class DateTimeEditorComponent implements ControlValueAccessor, OnDestroy,
 
         this.updateControls();
         this.updateValue();
-        this.touched();
+        this.callTouched();
 
         return false;
     }

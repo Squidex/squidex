@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { Pager } from './../internal';
+import { Pager } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-pager',
@@ -16,15 +16,15 @@ import { Pager } from './../internal';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PagerComponent {
+    @Output()
+    public nextPage = new EventEmitter();
+
+    @Output()
+    public prevPage = new EventEmitter();
+
     @Input()
     public pager: Pager;
 
     @Input()
     public hideWhenButtonsDisabled = false;
-
-    @Output()
-    public next = new EventEmitter();
-
-    @Output()
-    public prev = new EventEmitter();
 }

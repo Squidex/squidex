@@ -5,10 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { map, onErrorResumeNext } from 'rxjs/operators';
 
 import {
@@ -16,6 +15,7 @@ import {
     CreateCategoryForm,
     DialogModel,
     MessageBus,
+    ResourceOwner,
     SchemaDto,
     SchemasState
 } from '@app/shared';
@@ -27,9 +27,7 @@ import { SchemaCloning } from './../messages';
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html'
 })
-export class SchemasPageComponent implements OnDestroy, OnInit {
-    private schemaCloningSubscription: Subscription;
-
+export class SchemasPageComponent extends ResourceOwner implements OnInit {
     public addSchemaDialog = new DialogModel();
     public addCategoryForm = new CreateCategoryForm(this.formBuilder);
 
@@ -45,27 +43,25 @@ export class SchemasPageComponent implements OnDestroy, OnInit {
         private readonly route: ActivatedRoute,
         private readonly router: Router
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.schemaCloningSubscription.unsubscribe();
+        super();
     }
 
     public ngOnInit() {
-        this.schemaCloningSubscription =
+        this.own(
             this.messageBus.of(SchemaCloning)
                 .subscribe(m => {
                     this.import = m.schema;
 
                     this.addSchemaDialog.show();
-                });
+                }));
 
-        this.route.params.pipe(map(q => q['showDialog']))
-            .subscribe(showDialog => {
-                if (showDialog) {
-                    this.addSchemaDialog.show();
-                }
-            });
+        this.own(
+            this.route.params.pipe(map(q => q['showDialog']))
+                .subscribe(showDialog => {
+                    if (showDialog) {
+                        this.addSchemaDialog.show();
+                    }
+                }));
 
         this.schemasState.load().pipe(onErrorResumeNext()).subscribe();
     }

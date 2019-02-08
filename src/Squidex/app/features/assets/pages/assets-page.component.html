@@ -1,6 +1,6 @@
 <sqx-title message="{app} | Assets" parameter1="app" [value1]="appsState.appName"></sqx-title>
 
-<sqx-panel desiredWidth="*" showSidebar="true">
+<sqx-panel desiredWidth="*" minWidth="50rem" showSidebar="true">
     <ng-container title>
         Assets
     </ng-container>
@@ -10,7 +10,7 @@
             <div class="col-auto offset-xl-4">
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
-                <button class="btn btn-text-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">
+                <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">
                     <i class="icon-reset"></i> Refresh
                 </button>
             </div>

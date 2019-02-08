@@ -6,14 +6,14 @@
     </ng-container>
 
     <ng-container menu>
-        <button class="btn btn-text-secondary mr-1" (click)="reload()" title="Refresh Assets (CTRL + SHIFT + R)">
+        <button type="button" class="btn btn-text-secondary mr-1" (click)="reload()" title="Refresh Assets (CTRL + SHIFT + R)">
             <i class="icon-reset"></i> Refresh
         </button>
 
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
         <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
 
-        <button class="btn btn-success" #buttonNew (click)="createNew()" title="New Rule (CTRL + M)">
+        <button type="button" class="btn btn-success" #buttonNew (click)="createNew()" title="New Rule (CTRL + M)">
             <i class="icon-plus"></i> New
         </button>
     </ng-container>
@@ -24,7 +24,7 @@
                 <div class="table-items-row table-items-row-empty" *ngIf="rules.length === 0">
                     No Rule created yet.
 
-                    <button class="btn btn-success btn-sm ml-2" (click)="createNew()">
+                    <button type="button" class="btn btn-success btn-sm ml-2" (click)="createNew()">
                         <i class="icon icon-plus"></i> Add Rule
                     </button>
                 </div>

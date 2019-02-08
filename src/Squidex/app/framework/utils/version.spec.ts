@@ -13,6 +13,13 @@ describe('Version', () => {
 
         expect(version.value).toBe('1.0');
     });
+
+    it('should ignore prefix for equal comparison', () => {
+        expect(new Version('2').eq(new Version('2'))).toBeTruthy();
+        expect(new Version('2').eq(new Version('W/2'))).toBeTruthy();
+        expect(new Version('W/2').eq(new Version('2'))).toBeTruthy();
+        expect(new Version('W/2').eq(new Version('W/2'))).toBeTruthy();
+    });
 });
 
 describe('Versioned', () => {

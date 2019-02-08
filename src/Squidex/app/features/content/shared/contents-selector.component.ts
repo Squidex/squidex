@@ -115,7 +115,7 @@ export class ContentsSelectorComponent implements OnInit {
         this.isAllSelected = this.selectionCount === this.contentsState.snapshot.contents.length;
     }
 
-    public trackByContent(content: ContentDto): string {
+    public trackByContent(index: number, content: ContentDto): string {
         return content.id;
     }
 }

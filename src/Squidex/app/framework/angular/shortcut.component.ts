@@ -5,16 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output } from '@angular/core';
 
-import { ShortcutService } from './../services/shortcut.service';
+import { ShortcutService, StatefulComponent } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-shortcut',
-    template: '',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    template: ''
 })
-export class ShortcutComponent implements OnDestroy, OnInit {
+export class ShortcutComponent extends StatefulComponent implements OnDestroy, OnInit {
+    private lastKeys: string;
+
     @Input()
     public keys: string;
 
@@ -24,12 +25,14 @@ export class ShortcutComponent implements OnDestroy, OnInit {
     @Output()
     public trigger = new EventEmitter();
 
-    private lastKeys: string;
-
     constructor(
+        changeDetector: ChangeDetectorRef,
         private readonly shortcutService: ShortcutService,
         private readonly zone: NgZone
     ) {
+        super(changeDetector, {});
+
+        changeDetector.detach();
     }
 
     public ngOnDestroy() {
@@ -42,10 +45,10 @@ export class ShortcutComponent implements OnDestroy, OnInit {
         this.lastKeys = this.keys;
 
         if (this.lastKeys) {
-            this.shortcutService.on(this.lastKeys, e => {
+            this.shortcutService.on(this.lastKeys, () => {
                 if (!this.disabled) {
                     this.zone.run(() => {
-                        this.trigger.next(e);
+                        this.trigger.next();
                     });
                 }
 

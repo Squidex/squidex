@@ -98,7 +98,7 @@ interface Snapshot {
 
     isLoaded?: boolean;
 
-    selectedUser?: SnapshotUser;
+    selectedUser?: SnapshotUser | null;
 }
 
 @Injectable()

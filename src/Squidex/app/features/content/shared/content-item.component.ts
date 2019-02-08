@@ -12,6 +12,7 @@ import {
     ContentDto,
     ContentsState,
     fadeAnimation,
+    FieldDto,
     FieldFormatter,
     fieldInvariant,
     ModalModel,
@@ -69,6 +70,9 @@ export class ContentItemComponent implements OnChanges {
     @Input()
     public isReference = false;
 
+    @Input()
+    public isCompact = false;
+
     @Input('sqxContent')
     public content: ContentDto;
 
@@ -93,11 +97,16 @@ export class ContentItemComponent implements OnChanges {
         }
     }
 
-    public shouldStop(event: Event) {
-        if (this.patchForm.form.dirty) {
+    public shouldStop(event: Event, field?: FieldDto) {
+        if (this.patchForm.form.dirty || (field && field.isInlineEditable)) {
             event.stopPropagation();
             event.stopImmediatePropagation();
         }
+    }
+
+    public stop(event: Event) {
+        event.stopPropagation();
+        event.stopImmediatePropagation();
     }
 
     public save() {

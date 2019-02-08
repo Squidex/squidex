@@ -5,25 +5,22 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Directive, Input, OnChanges, OnDestroy, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Directive, Input, OnChanges, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 
 import {
     AppDto,
     AppsState,
     AuthService,
     Permission,
+    ResourceOwner,
     SchemaDto,
     SchemasState
 } from '@app/shared/internal';
-import { Subscription } from 'rxjs';
 
 @Directive({
     selector: '[sqxPermission]'
 })
-export class PermissionDirective implements OnChanges, OnInit, OnDestroy {
-    private selectedAppSubscription: Subscription;
-    private selectedSchemaSubscription: Subscription;
-
+export class PermissionDirective extends ResourceOwner implements OnChanges, OnInit {
     private viewCreated = false;
 
     @Input('sqxPermissionApp')
@@ -43,32 +40,23 @@ export class PermissionDirective implements OnChanges, OnInit, OnDestroy {
         private readonly templateRef: TemplateRef<any>,
         private readonly viewContainer: ViewContainerRef
     ) {
-    }
-
-    public ngOnDestroy() {
-        if (this.selectedAppSubscription) {
-            this.selectedAppSubscription.unsubscribe();
-        }
-
-        if (this.selectedSchemaSubscription) {
-            this.selectedSchemaSubscription.unsubscribe();
-        }
+        super();
     }
 
     public ngOnInit() {
-        this.selectedAppSubscription =
+        this.own(
             this.appsState.selectedApp.subscribe(app => {
                 if (app && !this.app) {
                     this.update(app, this.schemasState.snapshot.selectedSchema);
                 }
-            });
+            }));
 
-        this.selectedSchemaSubscription =
+        this.own(
             this.schemasState.selectedSchema.subscribe(schema => {
                 if (schema && !this.schema) {
                     this.update(this.appsState.snapshot.selectedApp, schema);
                 }
-            });
+            }));
     }
 
     public ngOnChanges() {

@@ -5,15 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
 
 import {
     AppLanguageDto,
     EditContentForm,
-    ImmutableArray,
-    RootFieldDto
+    RootFieldDto,
+    StatefulComponent
 } from '@app/shared';
+
+interface State {
+    isHidden: boolean;
+}
 
 @Component({
     selector: 'sqx-array-editor',
@@ -21,7 +25,7 @@ import {
     templateUrl: './array-editor.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ArrayEditorComponent {
+export class ArrayEditorComponent extends StatefulComponent<State> {
     @Input()
     public form: EditContentForm;
 
@@ -32,15 +36,19 @@ export class ArrayEditorComponent {
     public language: AppLanguageDto;
 
     @Input()
-    public languages: ImmutableArray<AppLanguageDto>;
+    public languages: AppLanguageDto[];
 
     @Input()
     public arrayControl: FormArray;
 
-    public isHidden = false;
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector, {
+            isHidden: false
+        });
+    }
 
-    public hide(hide: boolean) {
-        this.isHidden = hide;
+    public hide(isHidden: boolean) {
+        this.next(s => ({ ...s, isHidden }));
     }
 
     public removeItem(index: number) {

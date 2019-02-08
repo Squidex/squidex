@@ -5,16 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { Subscription } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AddLanguageForm,
     AppLanguageDto,
     AppsState,
-    LanguagesState
+    LanguagesState,
+    ResourceOwner
 } from '@app/shared';
 
 @Component({
@@ -22,9 +22,7 @@ import {
     styleUrls: ['./languages-page.component.scss'],
     templateUrl: './languages-page.component.html'
 })
-export class LanguagesPageComponent implements OnDestroy, OnInit {
-    private newLanguagesSubscription: Subscription;
-
+export class LanguagesPageComponent extends ResourceOwner implements OnInit {
     public addLanguageForm = new AddLanguageForm(this.formBuilder);
 
     constructor(
@@ -32,20 +30,17 @@ export class LanguagesPageComponent implements OnDestroy, OnInit {
         public readonly languagesState: LanguagesState,
         private readonly formBuilder: FormBuilder
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.newLanguagesSubscription.unsubscribe();
+        super();
     }
 
     public ngOnInit() {
-        this.newLanguagesSubscription =
+        this.own(
             this.languagesState.newLanguages
                 .subscribe(languages => {
                     if (languages.length > 0) {
                         this.addLanguageForm.load({ language: languages.at(0) });
                     }
-                });
+                }));
 
         this.languagesState.load().pipe(onErrorResumeNext()).subscribe();
     }
@@ -67,7 +62,7 @@ export class LanguagesPageComponent implements OnDestroy, OnInit {
         }
     }
 
-    public trackByLanguage(index: number, language: { language: AppLanguageDto }) {
+    public trackByLanguage(language: { language: AppLanguageDto }) {
         return language.language;
     }
 }

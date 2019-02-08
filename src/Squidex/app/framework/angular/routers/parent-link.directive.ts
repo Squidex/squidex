@@ -5,15 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, HostListener, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+
+import { ResourceOwner } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxParentLink]'
 })
-export class ParentLinkDirective implements OnDestroy, OnInit {
-    private urlSubscription: Subscription;
+export class ParentLinkDirective extends ResourceOwner implements OnInit {
     private url: string;
 
     @Input()
@@ -25,23 +25,18 @@ export class ParentLinkDirective implements OnDestroy, OnInit {
         private readonly element: ElementRef,
         private readonly renderer: Renderer2
     ) {
-    }
-
-    public ngOnDestroy() {
-        if (this.urlSubscription) {
-            this.urlSubscription.unsubscribe();
-        }
+        super();
     }
 
     public ngOnInit() {
-        this.urlSubscription =
+        this.own(
             this.route.url.subscribe(() => {
                 this.url = this.isLazyLoaded ?
                     this.router.createUrlTree(['.'], { relativeTo: this.route.parent!.parent }).toString() :
                     this.router.createUrlTree(['.'], { relativeTo: this.route.parent }).toString();
 
                 this.renderer.setProperty(this.element.nativeElement, 'href', this.url);
-            });
+            }));
     }
 
     @HostListener('click')

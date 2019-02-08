@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+
+import { ResourceOwner } from '@app/shared';
 
 import { UserDto } from './../../services/users.service';
 import { UserForm, UsersState } from './../../state/users.state';
@@ -18,9 +19,7 @@ import { UserForm, UsersState } from './../../state/users.state';
     styleUrls: ['./user-page.component.scss'],
     templateUrl: './user-page.component.html'
 })
-export class UserPageComponent implements OnDestroy, OnInit {
-    private selectedUserSubscription: Subscription;
-
+export class UserPageComponent extends ResourceOwner implements OnInit {
     public canUpdate = false;
 
     public user?: { user: UserDto, isCurrentUser: boolean };
@@ -32,22 +31,19 @@ export class UserPageComponent implements OnDestroy, OnInit {
         private readonly route: ActivatedRoute,
         private readonly router: Router
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.selectedUserSubscription.unsubscribe();
+        super();
     }
 
     public ngOnInit() {
-        this.selectedUserSubscription =
+        this.own(
             this.usersState.selectedUser
                 .subscribe(selectedUser => {
-                    this.user = selectedUser;
+                    this.user = selectedUser!;
 
                     if (selectedUser) {
                         this.userForm.load(selectedUser.user);
                     }
-                });
+                }));
     }
 
     public save() {

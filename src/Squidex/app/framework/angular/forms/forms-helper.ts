@@ -6,10 +6,12 @@
  */
 
  import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
+ import { Observable } from 'rxjs';
+ import { map, startWith } from 'rxjs/operators';
 
 import { Types } from '@app/framework/internal';
 
-export const formControls = (form: AbstractControl): AbstractControl[] => {
+export function formControls(form: AbstractControl): AbstractControl[] {
     if (Types.is(form, FormGroup)) {
         return Object.values(form.controls);
     } else if (Types.is(form, FormArray)) {
@@ -17,9 +19,25 @@ export const formControls = (form: AbstractControl): AbstractControl[] => {
     } else {
         return [];
     }
-};
+}
 
-export const fullValue = (form: AbstractControl): any => {
+export function invalid$(form: AbstractControl): Observable<boolean> {
+    return form.statusChanges.pipe(map(_ => form.invalid), startWith(form.invalid));
+}
+
+export function value$<T = any>(form: AbstractControl): Observable<T> {
+    return form.valueChanges.pipe(startWith(form.value));
+}
+
+export function hasValue$(form: AbstractControl): Observable<boolean> {
+    return value$(form).pipe(map(v => !!v));
+}
+
+export function hasNoValue$(form: AbstractControl): Observable<boolean> {
+    return value$(form).pipe(map(v => !v));
+}
+
+export function fullValue(form: AbstractControl): any {
     if (Types.is(form, FormGroup)) {
         const groupValue = {};
 
@@ -41,4 +59,4 @@ export const fullValue = (form: AbstractControl): any => {
     } else {
         return form.value;
     }
-};
+}

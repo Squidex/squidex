@@ -4,10 +4,10 @@
     </div>
 
     <ng-container *ngIf="maximumStars > 0 && maximumStars <= 15">
-        <span class="stars" (mouseleave)="stopPreview()" [class.disabled]="isDisabled">
-            <span class="star" *ngFor="let star of starsArray" (mouseenter)="setPreview(star)" (click)="setValue(star)" [class.selected]="star <= stars"></span>
+        <span class="stars" (mouseleave)="stopPreview()" [class.disabled]="snapshot.isDisabled">
+            <span class="star" *ngFor="let star of snapshot.starsArray" (mouseenter)="setPreview(star)" (click)="setValue(star)" [class.selected]="star <= snapshot.stars"></span>
         </span>
 
-        <button class="btn btn-text" [class.hidden]="!value" (click)="reset()">Clear</button>
+        <button type="button" class="btn btn-text" [class.hidden]="!value" (click)="reset()">Clear</button>
     </ng-container>
 </div>

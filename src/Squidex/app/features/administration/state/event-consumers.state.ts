@@ -21,7 +21,7 @@ import { EventConsumerDto, EventConsumersService } from './../services/event-con
 interface Snapshot {
     eventConsumers: ImmutableArray<EventConsumerDto>;
 
-    isLoaded?: false;
+    isLoaded?: boolean;
 }
 
 @Injectable()

@@ -9,13 +9,15 @@ import { AbstractControl } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ErrorDto, Types } from '@app/framework/internal';
+import { ErrorDto } from './utils/error';
+import { Types } from './utils/types';
+
 import { fullValue} from './angular/forms/forms-helper';
 
 export interface FormState {
     submitted: boolean;
 
-    error?: string;
+    error?: string | null;
 }
 
 export class Form<T extends AbstractControl> {
@@ -49,13 +51,13 @@ export class Form<T extends AbstractControl> {
     }
 
     public load(value: any) {
-        this.state.next({ submitted: false, error: null });
+        this.state.next(_ => ({ submitted: false, error: null }));
 
         this.setValue(value);
     }
 
     public submit(): any | null {
-        this.state.next({ submitted: true });
+        this.state.next(_ => ({ submitted: true }));
 
         if (this.form.valid) {
             const value = fullValue(this.form);
@@ -69,7 +71,7 @@ export class Form<T extends AbstractControl> {
     }
 
     public submitCompleted(newValue?: any) {
-        this.state.next({ submitted: false, error: null });
+        this.state.next(_ => ({ submitted: false, error: null }));
 
         this.enable();
 
@@ -81,7 +83,7 @@ export class Form<T extends AbstractControl> {
     }
 
     public submitFailed(error?: string | ErrorDto) {
-        this.state.next({ submitted: false, error: this.getError(error) });
+        this.state.next(_ => ({ submitted: false, error: this.getError(error) }));
 
         this.enable();
     }

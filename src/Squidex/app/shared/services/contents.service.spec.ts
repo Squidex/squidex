@@ -16,7 +16,8 @@ import {
     ContentsService,
     DateTime,
     ScheduleDto,
-    Version
+    Version,
+    Versioned
 } from './../';
 
 describe('ContentsService', () => {
@@ -216,6 +217,7 @@ describe('ContentsService', () => {
             createdBy: 'Created1',
             lastModified: '2017-12-12T10:10',
             lastModifiedBy: 'LastModifiedBy1',
+            isPending: false,
             data: {}
         }, {
             headers: {
@@ -228,7 +230,7 @@ describe('ContentsService', () => {
                 DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
                 DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
                 null,
-                true,
+                false,
                 null,
                 {},
                 new Version('2')));
@@ -239,7 +241,7 @@ describe('ContentsService', () => {
 
         const response = {};
 
-        let data: any;
+        let data: Versioned<any>;
 
         contentsService.getVersionData('my-app', 'my-schema', 'content1', version).subscribe(result => {
             data = result;
@@ -252,7 +254,7 @@ describe('ContentsService', () => {
 
         req.flush(response);
 
-        expect(data).toBe(response);
+        expect(data!.payload).toBe(response);
     }));
 
     it('should make put request to update content',

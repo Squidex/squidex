@@ -47,4 +47,12 @@ export class AssetsFiltersPageComponent {
     public isSelectedQuery(query: string) {
         return query === this.assetsState.snapshot.assetsQuery || (!query && !this.assetsState.assetsQuery);
     }
+
+    public trackByTag(index: number, tag: { name: string }) {
+        return tag.name;
+    }
+
+    public trackByQuery(index: number, query: { name: string }) {
+        return query.name;
+    }
 }

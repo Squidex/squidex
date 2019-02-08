@@ -20,7 +20,6 @@ export * from './angular/forms/iframe-editor.component';
 export * from './angular/forms/indeterminate-value.directive';
 export * from './angular/forms/json-editor.component';
 export * from './angular/forms/progress-bar.component';
-export * from './angular/forms/slider.component';
 export * from './angular/forms/stars.component';
 export * from './angular/forms/tag-editor.component';
 export * from './angular/forms/toggle.component';

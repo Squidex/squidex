@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnInit, ViewChild } from '@angular/core';
+import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
-import { Types } from '@app/framework/internal';
+import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 const KEY_COMMA = 188;
 const KEY_DELETE = 8;
@@ -75,6 +74,15 @@ const CACHED_SIZES: { [key: string]: number } = {};
 
 let CACHED_FONT: string;
 
+interface State {
+    hasFocus: boolean;
+
+    suggestedItems: string[];
+    suggestedIndex: number;
+
+    items: any[];
+}
+
 @Component({
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
@@ -82,11 +90,7 @@ let CACHED_FONT: string;
     providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, OnDestroy, OnInit {
-    private subscription: Subscription;
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
-
+export class TagEditorComponent extends StatefulControlComponent<State, any[]> implements AfterViewInit, OnInit {
     @Input()
     public converter: Converter = new StringConverter();
 
@@ -115,27 +119,20 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     public inputName = 'tag-editor';
 
     @ViewChild('form')
-    public formElement: ElementRef<Element>;
+    public formElement: ElementRef<HTMLElement>;
 
     @ViewChild('input')
     public inputElement: ElementRef<HTMLInputElement>;
 
-    public hasFocus = false;
-
-    public suggestedItems: string[] = [];
-    public suggestedIndex = 0;
-
-    public items: any[] = [];
-
     public addInput = new FormControl();
 
-    constructor(
-        private readonly changeDetector: ChangeDetectorRef
-    ) {
-    }
-
-    public ngOnDestroy() {
-        this.subscription.unsubscribe();
+    constructor(changeDetector: ChangeDetectorRef) {
+        super(changeDetector, {
+            hasFocus: false,
+            suggestedItems: [],
+            suggestedIndex: 0,
+            items: []
+        });
     }
 
     public ngAfterViewInit() {
@@ -149,7 +146,7 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     public ngOnInit() {
-        this.subscription =
+        this.own(
             this.addInput.valueChanges.pipe(
                     tap(() => {
                         this.resetSize();
@@ -164,15 +161,18 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
                     distinctUntilChanged(),
                     map(query => {
                         if (Types.isArray(this.suggestions) && query && query.length > 0) {
-                            return this.suggestions.filter(s => s.indexOf(query) >= 0 && this.items.indexOf(s) < 0);
+                            return this.suggestions.filter(s => s.indexOf(query) >= 0 && this.snapshot.items.indexOf(s) < 0);
                         } else {
                             return [];
                         }
                     }))
                 .subscribe(items => {
-                    this.suggestedIndex = -1;
-                    this.suggestedItems = items || [];
-                });
+                    this.next(s => ({
+                        ...s,
+                        suggestedIndex: -1,
+                        suggestedItems: items || []
+                    }));
+                }));
     }
 
     public writeValue(obj: any) {
@@ -180,15 +180,15 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
         this.resetSize();
 
         if (this.converter && Types.isArrayOf(obj, v => this.converter.isValidValue(v))) {
-            this.items = obj;
+            this.next(s => ({ ...s, items: obj }));
         } else {
-            this.items = [];
+            this.next(s => ({ ...s, items: [] }));
         }
-
-        this.changeDetector.markForCheck();
     }
 
     public setDisabledState(isDisabled: boolean): void {
+        super.setDisabledState(isDisabled);
+
         if (isDisabled) {
             this.addInput.disable();
         } else {
@@ -196,17 +196,9 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
         }
     }
 
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
-    }
-
     public focus() {
         if (this.addInput.enabled) {
-            this.hasFocus = true;
+            this.next(s => ({ ...s, hasFocus: true }));
         }
     }
 
@@ -220,7 +212,7 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     public remove(index: number) {
-        this.updateItems([...this.items.slice(0, index), ...this.items.splice(index + 1)]);
+        this.updateItems(this.snapshot.items.filter((_, i) => i !== index));
     }
 
     public resetSize() {
@@ -274,7 +266,7 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
             const value = <string>this.addInput.value;
 
             if (!value || value.length === 0) {
-                this.updateItems(this.items.slice(0, this.items.length - 1));
+                this.updateItems(this.snapshot.items.slice(0, this.snapshot.items.length - 1));
 
                 return false;
             }
@@ -285,8 +277,8 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
             this.down();
             return false;
         } else if (key === KEY_ENTER) {
-            if (this.suggestedIndex >= 0) {
-                if (this.selectValue(this.suggestedItems[this.suggestedIndex])) {
+            if (this.snapshot.suggestedIndex >= 0) {
+                if (this.selectValue(this.snapshot.suggestedItems[this.snapshot.suggestedIndex])) {
                     return false;
                 }
             } else if (this.acceptEnter) {
@@ -307,8 +299,8 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
         if (value && this.converter.isValidInput(value)) {
             const converted = this.converter.convert(value);
 
-            if (this.allowDuplicates || this.items.indexOf(converted) < 0) {
-                this.updateItems([...this.items, converted]);
+            if (this.allowDuplicates || this.snapshot.items.indexOf(converted) < 0) {
+                this.updateItems([...this.snapshot.items, converted]);
             }
 
             this.resetForm();
@@ -318,24 +310,27 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     private resetAutocompletion() {
-        this.suggestedItems = [];
-        this.suggestedIndex = -1;
+        this.next(s => ({
+            ...s,
+            suggestedItems: [],
+            suggestedIndex: -1
+        }));
     }
 
-    public selectIndex(selection: number) {
-        if (selection < 0) {
-            selection = 0;
+    public selectIndex(suggestedIndex: number) {
+        if (suggestedIndex < 0) {
+            suggestedIndex = 0;
         }
 
-        if (selection >= this.suggestedItems.length) {
-            selection = this.suggestedItems.length - 1;
+        if (suggestedIndex >= this.snapshot.suggestedItems.length) {
+            suggestedIndex = this.snapshot.suggestedItems.length - 1;
         }
 
-        this.suggestedIndex = selection;
+        this.next(s => ({ ...s, suggestedIndex }));
     }
 
     public resetFocus(): any {
-        this.hasFocus = false;
+        this.next(s => ({ ...s, hasFocus: false }));
     }
 
     private resetForm() {
@@ -343,11 +338,11 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     private up() {
-        this.selectIndex(this.suggestedIndex - 1);
+        this.selectIndex(this.snapshot.suggestedIndex - 1);
     }
 
     private down() {
-        this.selectIndex(this.suggestedIndex + 1);
+        this.selectIndex(this.snapshot.suggestedIndex + 1);
     }
 
     public onCut(event: ClipboardEvent) {
@@ -360,7 +355,7 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
 
     public onCopy(event: ClipboardEvent) {
         if (!this.hasSelection()) {
-            event.clipboardData.setData('text/plain', this.items.filter(x => !!x).join(','));
+            event.clipboardData.setData('text/plain', this.snapshot.items.filter(x => !!x).join(','));
 
             event.preventDefault();
         }
@@ -372,7 +367,7 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
         if (value) {
             this.resetForm();
 
-            const values = [...this.items];
+            const values = [...this.snapshot.items];
 
             for (let part of value.split(',')) {
                 const converted = this.converter.convert(part);
@@ -396,12 +391,12 @@ export class TagEditorComponent implements AfterViewInit, ControlValueAccessor, 
     }
 
     private updateItems(items: any[]) {
-        this.items = items;
+        this.next(s => ({ ...s, items }));
 
         if (items.length === 0 && this.undefinedWhenEmpty) {
             this.callChange(undefined);
         } else {
-            this.callChange(this.items);
+            this.callChange(items);
         }
 
         this.resetSize();

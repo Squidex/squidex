@@ -5,7 +5,7 @@
         <sqx-array-item
             [form]="form"
             [field]="field"
-            [isHidden]="isHidden"
+            [isHidden]="snapshot.isHidden"
             [isFirst]="i === 0"
             [isLast]="i === arrayControl.controls.length - 1"
             [index]="i"
@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<button class="btn btn-success" [disabled]="field.nested.length === 0" (click)="addItem(undefined); $event.preventDefault()">
+<button type="button" class="btn btn-success" [disabled]="field.nested.length === 0" (click)="addItem(undefined)">
     Add Item
 </button>
 

@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 Change = "<change-script>",
                 Create = "<create-script>",
                 Delete = "<delete-script>",
-                Update = "<update-script>",
+                Update = "<update-script>"
             };
 
             var schemaDef =

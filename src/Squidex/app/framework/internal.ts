@@ -35,4 +35,6 @@ export * from './utils/string-helper';
 export * from './utils/types';
 export * from './utils/version';
 
+export * from './angular/stateful.component';
+
 export * from './configurations';

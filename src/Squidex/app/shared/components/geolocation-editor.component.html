@@ -1,7 +1,7 @@
 <div class="editor-container">
     <form>
         <div class="editor" #editor></div>
-        <input [class.hidden]="!isGoogleMaps" class="form-control search-control" type="text" [disabled]="isDisabled" placeholder="Search Google Maps" #searchBox />
+        <input [class.hidden]="!snapshot.isGoogleMaps" class="form-control search-control" type="text" [disabled]="snapshot.isDisabled" placeholder="Search Google Maps" #searchBox />
     </form>
     <div>
         <form class="form-inline no-gutters" [formGroup]="geolocationForm" (change)="updateValueByInput()" (ngSubmit)="updateValueByInput()">
@@ -9,7 +9,7 @@
                 <label for="latitude">Latitude: </label>
             </div>
             <div class="form-group">
-                <sqx-control-errors for="latitude" style="z-index: 10000;"></sqx-control-errors>
+                <sqx-control-errors for="latitude" style="z-index: 10000"></sqx-control-errors>
 
                 <input type="number" class="form-control" id="latitude" formControlName="latitude" step="any" />
             </div>
@@ -18,13 +18,13 @@
                 <label for="longitude">Longitude: </label>
             </div>
             <div class="form-group">
-                <sqx-control-errors for="longitude" style="z-index: 10000;"></sqx-control-errors>
+                <sqx-control-errors for="longitude" style="z-index: 10000"></sqx-control-errors>
                 
                 <input type="number" class="form-control" id="longitude" formControlName="longitude" step="any" />
             </div>
 
             <div class="form-group col-auto">
-                <button [class.hidden]="!hasValue" type="reset" class="btn btn-text clear" [disabled]="isDisabled" (click)="reset()">Clear</button>
+                <button [class.hidden]="!hasValue" type="reset" class="btn btn-text clear" [disabled]="snapshot.isDisabled" (click)="reset()">Clear</button>
             </div>
         </form>
     </div>

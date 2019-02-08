@@ -2,7 +2,7 @@
     <div class="form-group row">
         <div class="col-9 offset-3">
             <ng-container *ngIf="!isRedirected">
-                <button class="btn btn-twitter" [disabled]="isAuthenticating" (click)="auth()">
+                <button type="button" class="btn btn-twitter" [disabled]="isAuthenticating" (click)="auth()">
                     Request access token with twitter
                 </button>
             </ng-container>

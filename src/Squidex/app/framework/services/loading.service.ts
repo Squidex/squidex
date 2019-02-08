@@ -41,7 +41,9 @@ export class LoadingService implements OnDestroy {
     }
 
     public ngOnDestroy() {
-        this.routerSubscription.unsubscribe();
+        if (this.routerSubscription) {
+            this.routerSubscription.unsubscribe();
+        }
     }
 
     public startLoading(key: string) {

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using NodaTime;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -46,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities
 
         private static void SetCreated(IEntity entity, EnvelopeHeaders headers)
         {
-            if (entity is IUpdateableEntity updateable && updateable.Created == default(Instant))
+            if (entity is IUpdateableEntity updateable && updateable.Created == default)
             {
                 updateable.Created = headers.Timestamp();
             }

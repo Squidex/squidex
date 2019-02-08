@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
-import { ControlValueAccessor,  NG_VALUE_ACCESSOR } from '@angular/forms';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
-import { ResourceLoaderService } from '@app/framework/internal';
+import { ExternalControlComponent, ResourceLoaderService } from '@app/framework/internal';
 
 declare var ace: any;
 
@@ -25,9 +25,7 @@ export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit {
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
+export class JsonEditorComponent extends ExternalControlComponent<string> implements AfterViewInit {
     private valueChanged = new Subject();
     private aceEditor: any;
     private value: any;
@@ -35,11 +33,14 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
     private isDisabled = false;
 
     @ViewChild('editor')
-    public editor: ElementRef;
+    public editor: ElementRef<HTMLDivElement>;
 
-    constructor(
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
+        super(changeDetector);
+
+        changeDetector.detach();
     }
 
     public writeValue(obj: any) {
@@ -62,14 +63,6 @@ export class JsonEditorComponent implements ControlValueAccessor, AfterViewInit 
         if (this.aceEditor) {
             this.aceEditor.setReadOnly(isDisabled);
         }
-    }
-
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
     }
 
     public ngAfterViewInit() {

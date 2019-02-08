@@ -6,15 +6,18 @@
  */
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
-import { Form, ValidatorsEx } from '@app/framework';
+import {
+    Form,
+    ValidatorsEx,
+    value$
+} from '@app/framework';
 
 const FALLBACK_NAME = 'my-app';
 
 export class CreateAppForm extends Form<FormGroup> {
-    public appName =
-        this.form.controls['name'].valueChanges.pipe(map(n => n || FALLBACK_NAME), startWith(FALLBACK_NAME));
+    public appName = value$(this.form.controls['name']).pipe(map(v => v || FALLBACK_NAME));
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({

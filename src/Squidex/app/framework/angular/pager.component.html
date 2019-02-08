@@ -2,10 +2,10 @@
     <div class="float-right pagination">
         <span class="pagination-text">{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}</span>
 
-        <button class="btn btn-text-secondary pagination-button" [disabled]="!pager.canGoPrev" (click)="prev.emit()">
+        <button type="button" class="btn btn-text-secondary pagination-button" [disabled]="!pager.canGoPrev" (click)="prevPage.emit()">
             <i class="icon-angle-left"></i>
         </button>
-        <button class="btn btn-text-secondary pagination-button" [disabled]="!pager.canGoNext" (click)="next.emit()">
+        <button type="button" class="btn btn-text-secondary pagination-button" [disabled]="!pager.canGoNext" (click)="nextPage.emit()">
             <i class="icon-angle-right"></i>
         </button>
     </div>

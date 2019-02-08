@@ -7,7 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 
-import { slideRightAnimation } from './animations';
+import { slideRightAnimation } from '@app/framework/internal';
 
 import { PanelContainerDirective } from './panel-container.directive';
 
@@ -30,6 +30,9 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
 
     @Input()
     public desiredWidth = '10rem';
+
+    @Input()
+    public minWidth?: string;
 
     @Input()
     public isBlank = false;
@@ -84,6 +87,7 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
             this.styleWidth = size;
 
             this.renderer.setStyle(this.panel.nativeElement, 'width', size);
+            this.renderer.setStyle(this.panel.nativeElement, 'minWidth', this.minWidth);
             this.renderWidth = this.panel.nativeElement.offsetWidth;
         }
     }

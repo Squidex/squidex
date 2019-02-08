@@ -6,7 +6,7 @@
     <ng-container tabs>
         <div class="row no-gutters">
             <div class="col-auto offset-lg-4">
-                <button class="btn btn-text-secondary" (click)="reload()">
+                <button type="button" class="btn btn-text-secondary" (click)="reload()">
                     <i class="icon-reset"></i> Refresh
                 </button>
             </div>
@@ -19,7 +19,7 @@
             </div>
                 
             <div class="col pl-1" *ngIf="languages.length > 1">
-                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.values"></sqx-language-selector>
+                <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
             </div>
         </div>
     </ng-container>
@@ -63,7 +63,7 @@
         </div>
 
         <div class="grid-footer">
-            <sqx-pager [pager]="contentsState.contentsPager | async" (prev)="goPrev()" (next)="goNext()"></sqx-pager>
+            <sqx-pager [pager]="contentsState.contentsPager | async" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
         </div>
     </ng-container>
 

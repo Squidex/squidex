@@ -8,9 +8,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
 
-import { DateTimeFieldPropertiesDto, FieldDto, ValidatorsEx } from '@app/shared';
+import {
+    DateTimeFieldPropertiesDto,
+    FieldDto,
+    hasNoValue$,
+    ValidatorsEx
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-date-time-validation',
@@ -52,11 +56,9 @@ export class DateTimeValidationComponent implements OnInit {
             ]));
 
         this.showDefaultValues =
-            this.editForm.controls['isRequired'].valueChanges.pipe(
-                startWith(this.properties.isRequired), map(x => !x));
+            hasNoValue$(this.editForm.controls['isRequired']);
 
         this.showDefaultValue =
-            this.editForm.controls['calculatedDefaultValue'].valueChanges.pipe(
-                startWith(this.properties.calculatedDefaultValue), map(x => !x));
+            hasNoValue$(this.editForm.controls['calculatedDefaultValue']);
     }
 }

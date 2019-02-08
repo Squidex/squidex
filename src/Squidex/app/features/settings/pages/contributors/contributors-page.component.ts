@@ -8,7 +8,7 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { filter, onErrorResumeNext, withLatestFrom } from 'rxjs/operators';
+import { onErrorResumeNext, withLatestFrom } from 'rxjs/operators';
 
 import {
     AppContributorDto,
@@ -34,7 +34,7 @@ export class UsersDataSource implements AutocompleteSource {
 
     public find(query: string): Observable<any[]> {
         return this.usersService.getUsers(query).pipe(
-            withLatestFrom(this.contributorsState.contributors.pipe(filter(x => !!x)), (users, contributors) => {
+            withLatestFrom(this.contributorsState.contributors, (users, contributors) => {
                 const results: any[] = [];
 
                 for (let user of users) {

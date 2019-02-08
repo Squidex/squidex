@@ -30,7 +30,8 @@ export class AppFormComponent {
 
     public createForm = new CreateAppForm(this.formBuilder);
 
-    constructor(public readonly apiUrl: ApiUrlConfig,
+    constructor(
+        public readonly apiUrl: ApiUrlConfig,
         private readonly appsStore: AppsState,
         private readonly formBuilder: FormBuilder
     ) {

@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     ContentsState,
     Queries,
+    ResourceOwner,
     SchemasState,
     UIState
 } from '@app/shared';
@@ -21,9 +21,7 @@ import {
     styleUrls: ['./contents-filters-page.component.scss'],
     templateUrl: './contents-filters-page.component.html'
 })
-export class ContentsFiltersPageComponent implements OnDestroy, OnInit {
-    private selectedSchemaSubscription: Subscription;
-
+export class ContentsFiltersPageComponent extends ResourceOwner implements OnInit {
     public schemaQueries: Queries;
 
     constructor(
@@ -31,20 +29,17 @@ export class ContentsFiltersPageComponent implements OnDestroy, OnInit {
         private readonly schemasState: SchemasState,
         private readonly uiState: UIState
     ) {
-    }
-
-    public ngOnDestroy() {
-        this.selectedSchemaSubscription.unsubscribe();
+        super();
     }
 
     public ngOnInit() {
-        this.selectedSchemaSubscription =
+        this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
                     if (schema) {
                         this.schemaQueries = new Queries(this.uiState, `schemas.${schema.name}`);
                     }
-                });
+                }));
     }
 
     public search(query: string) {
@@ -53,5 +48,13 @@ export class ContentsFiltersPageComponent implements OnDestroy, OnInit {
 
     public isSelectedQuery(query: string) {
         return query === this.contentsState.snapshot.contentsQuery || (!query && !this.contentsState.snapshot.contentsQuery);
+    }
+
+    public trackByTag(index: number, tag: { name: string }) {
+        return tag.name;
+    }
+
+    public trackByQuery(index: number, query: { name: string }) {
+        return query.name;
     }
 }

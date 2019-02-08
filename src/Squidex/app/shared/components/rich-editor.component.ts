@@ -8,7 +8,7 @@
 // tslint:disable:prefer-for-of
 
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, OnDestroy, Output, ViewChild } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AppsState,
@@ -17,6 +17,7 @@ import {
     AuthService,
     DateTime,
     DialogModel,
+    ExternalControlComponent,
     ResourceLoaderService,
     Types
 } from '@app/shared/internal';
@@ -41,15 +42,11 @@ const ImageTypes = [
     providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RichEditorComponent implements ControlValueAccessor, AfterViewInit, OnDestroy {
-    private callChange = (v: any) => { /* NOOP */ };
-    private callTouched = () => { /* NOOP */ };
+export class RichEditorComponent extends ExternalControlComponent<string> implements AfterViewInit, OnDestroy {
     private tinyEditor: any;
     private tinyInitTimer: any;
     private value: string;
     private isDisabled = false;
-
-    public assetsDialog = new DialogModel();
 
     @ViewChild('editor')
     public editor: ElementRef;
@@ -57,19 +54,23 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
     @Output()
     public assetPluginClicked = new EventEmitter<any>();
 
-    constructor(
+    public assetsDialog = new DialogModel();
+
+    constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
         private readonly authState: AuthService,
-        private readonly changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
+        super(changeDetector);
     }
 
     public ngOnDestroy() {
         clearTimeout(this.tinyInitTimer);
 
-        tinymce.remove(this.editor);
+        if (tinymce && this.editor) {
+            tinymce.remove(this.editor);
+        }
     }
 
     public ngAfterViewInit() {
@@ -82,8 +83,6 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
 
     private showSelector = () => {
         this.assetsDialog.show();
-
-        this.changeDetector.detectChanges();
     }
 
     private getEditorOptions() {
@@ -181,14 +180,6 @@ export class RichEditorComponent implements ControlValueAccessor, AfterViewInit,
         if (this.tinyEditor) {
             this.tinyEditor.setMode(isDisabled ? 'readonly' : 'design');
         }
-    }
-
-    public registerOnChange(fn: any) {
-        this.callChange = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.callTouched = fn;
     }
 
     public insertAssets(assets: AssetDto[]) {

@@ -5,7 +5,7 @@
 
 	<span class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</span>
 
-	<sqx-control-errors [for]="control" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
+	<sqx-control-errors *ngIf="form" [for]="control" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
 
 	<div>
 		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
@@ -101,7 +101,7 @@
 					<sqx-json-editor [formControl]="control"></sqx-json-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Assets'">
-					<sqx-assets-editor [formControl]="control"></sqx-assets-editor>
+					<sqx-assets-editor [formControl]="control" [isCompact]="isCompact"></sqx-assets-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Tags'">
                     <ng-container [ngSwitch]="field.properties['editor']">
@@ -122,7 +122,7 @@
 					<sqx-array-editor 
 						[arrayControl]="control"
 						[form]="form"
-						[field]="field"
+                        [field]="field"
 						[language]="language"
 						[languages]="languages">
 					</sqx-array-editor>
@@ -132,7 +132,8 @@
 						[formControl]="control" 
 						[language]="language"
 						[languages]="languages"
-						[schemaId]="field.properties['schemaId']">
+						[schemaId]="field.properties['schemaId']"
+                        [isCompact]="isCompact">
 					</sqx-references-editor>
 				</ng-container>
 			</ng-container>
