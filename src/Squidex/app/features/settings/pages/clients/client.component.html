@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header">
         <div class="row no-gutters">
-            <div class="col">
+            <div class="col col-name">
                 <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm.form" (ngSubmit)="rename()">
                     <div class="form-group mr-1">
                         <sqx-control-errors for="name"></sqx-control-errors>

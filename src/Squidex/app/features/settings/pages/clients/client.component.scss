@@ -15,11 +15,13 @@ $color-editor: #eceeef;
         & {
             margin-bottom: .5rem;
         }
+    }
+}
 
-        &:hover {
-            .client-edit {
-                display: inline-block;
-            }
+.col-name {
+    &:hover {
+        .client-edit {
+            display: inline-block;
         }
     }
 }

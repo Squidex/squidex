@@ -47,6 +47,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Get the asset content.
         /// </summary>
         /// <param name="id">The id of the asset.</param>
+        /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="version">The optional version of the asset.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
         /// <param name="height">The target height of the asset, if it is an image.</param>
@@ -56,10 +57,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// 404 => Asset or app not found.
         /// </returns>
         [HttpGet]
-        [Route("assets/{id}/")]
+        [Route("assets/{id}/{*more}")]
         [ProducesResponseType(typeof(FileResult), 200)]
         [ApiCosts(0.5)]
-        public async Task<IActionResult> GetAssetContent(Guid id, [FromQuery] long version = EtagVersion.Any, [FromQuery] int? width = null, [FromQuery] int? height = null, [FromQuery] string mode = null)
+        public async Task<IActionResult> GetAssetContent(Guid id, string more, [FromQuery] long version = EtagVersion.Any, [FromQuery] int? width = null, [FromQuery] int? height = null, [FromQuery] string mode = null)
         {
             var entity = await assetRepository.FindAssetAsync(id);
 

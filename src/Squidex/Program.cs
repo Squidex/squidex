@@ -37,7 +37,7 @@ namespace Squidex
                 {
                     builder.Sources.Clear();
 
-                    builder.AddJsonFile("appsettings.json", true, true);
+                    builder.AddJsonFile($"appsettings.json", true, true);
                     builder.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true);
 
                     builder.AddEnvironmentVariables();
