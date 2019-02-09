@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_error_if_tags_are_required_and_null()
+        public async Task Should_add_error_if_tags_are_required_but_null()
         {
             var sut = Field(new TagsFieldProperties { IsRequired = true });
 
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_error_if_tags_are_required_and_empty()
+        public async Task Should_add_error_if_tags_are_required_but_empty()
         {
             var sut = Field(new TagsFieldProperties { IsRequired = true });
 
@@ -78,6 +78,28 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             errors.Should().BeEquivalentTo(
                 new[] { "Field is required." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_tag_value_is_null()
+        {
+            var sut = Field(new TagsFieldProperties { IsRequired = true });
+
+            await sut.ValidateAsync(JsonValue.Array(JsonValue.Null), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "[1]: Field is required." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_tag_value_is_empty()
+        {
+            var sut = Field(new TagsFieldProperties { IsRequired = true });
+
+            await sut.ValidateAsync(CreateValue(string.Empty), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "[1]: Field is required." });
         }
 
         [Fact]

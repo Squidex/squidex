@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new CollectionItemValidator(new AllowedValuesValidator<string>(field.Properties.AllowedValues));
             }
 
-            yield return new CollectionItemValidator(new RequiredStringValidator());
+            yield return new CollectionItemValidator(new RequiredStringValidator(true));
         }
     }
 }

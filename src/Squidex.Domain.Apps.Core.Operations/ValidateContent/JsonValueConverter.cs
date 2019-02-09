@@ -179,7 +179,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                 foreach (var item in array)
                 {
-                    if (item is JsonScalar<string> s)
+                    if (item is JsonNull n)
+                    {
+                        result.Add(null);
+                    }
+                    else if (item is JsonScalar<string> s)
                     {
                         result.Add(s.Value);
                     }

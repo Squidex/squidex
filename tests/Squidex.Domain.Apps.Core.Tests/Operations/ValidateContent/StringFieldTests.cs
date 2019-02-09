@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_error_if_string_is_required()
+        public async Task Should_add_error_if_string_is_required_but_null()
         {
             var sut = Field(new StringFieldProperties { IsRequired = true });
 
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
-        public async Task Should_add_error_if_string_is_required_and_empty_string_is_passed()
+        public async Task Should_add_error_if_string_is_required_but_empty()
         {
             var sut = Field(new StringFieldProperties { IsRequired = true });
 
