@@ -50,6 +50,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
+        public async Task Should_add_error_if_string_is_required_and_empty_string_is_passed()
+        {
+            var sut = Field(new StringFieldProperties { IsRequired = true });
+
+            await sut.ValidateAsync(CreateValue(string.Empty), errors);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Field is required." });
+        }
+
+        [Fact]
         public async Task Should_add_error_if_string_is_shorter_than_min_length()
         {
             var sut = Field(new StringFieldProperties { MinLength = 10 });

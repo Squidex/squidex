@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             if (field.Properties.IsRequired)
             {
-                yield return new RequiredStringValidator();
+                yield return new RequiredStringValidator(true);
             }
 
             if (field.Properties.MinLength.HasValue || field.Properties.MaxLength.HasValue)
