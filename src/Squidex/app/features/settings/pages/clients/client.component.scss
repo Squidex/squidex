@@ -59,9 +59,12 @@ $color-editor: #eceeef;
     }
 }
 
+.no-padding {
+    padding: 0;
+}
+
 .cell-actions {
     width: 3.2rem;
-    padding: 0;
 }
 
 .cell-input {

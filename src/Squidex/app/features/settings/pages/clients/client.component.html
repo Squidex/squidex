@@ -27,7 +27,7 @@
             <div class="col-auto">
                 <button type="button" class="btn btn-primary" (click)="connect()">Connect</button>
             </div>
-            <div class="col-auto cell-actions">
+            <div class="col-auto cell-actions no-padding">
                 <button type="button" class="btn btn-text-danger"
                     (sqxConfirmClick)="revoke()"
                     confirmTitle="Revoke client" 
@@ -46,7 +46,7 @@
                 <div class="col cell-input">
                     <input readonly class="form-control" value="{{appsState.appName}}:{{client.id}}" #inputName />
                 </div>
-                <div class="col-auto cell-actions">
+                <div class="col-auto cell-actions no-padding">
                     <button type="button" class="btn btn-text" [sqxCopy]="inputName">
                         <i class="icon-copy"></i>
                     </button>
@@ -59,7 +59,7 @@
                 <div class="col cell-input">
                     <input readonly class="form-control" [attr.value]="client.secret" #inputSecret />
                 </div>
-                <div class="col-auto cell-actions">
+                <div class="col-auto cell-actions no-padding">
                     <button type="button" class="btn btn-text" [sqxCopy]="inputSecret">
                         <i class="icon-copy"></i>
                     </button>
