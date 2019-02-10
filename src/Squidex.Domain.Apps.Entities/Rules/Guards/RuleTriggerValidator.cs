@@ -40,6 +40,11 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
             return Task.FromResult(Enumerable.Empty<ValidationError>());
         }
 
+        public Task<IEnumerable<ValidationError>> Visit(SchemaChangedTrigger trigger)
+        {
+            return Task.FromResult(Enumerable.Empty<ValidationError>());
+        }
+
         public Task<IEnumerable<ValidationError>> Visit(UsageTrigger trigger)
         {
             var errors = new List<ValidationError>();

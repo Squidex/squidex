@@ -10,7 +10,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, R
 import {
     fadeAnimation,
     ModalModel,
-    StatefulComponent
+    ResourceOwner
 } from '@app/framework/internal';
 
 @Component({
@@ -22,7 +22,7 @@ import {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TooltipComponent extends StatefulComponent implements OnInit {
+export class TooltipComponent extends ResourceOwner implements OnInit {
     @Input()
     public target: any;
 
@@ -31,10 +31,11 @@ export class TooltipComponent extends StatefulComponent implements OnInit {
 
     public modal = new ModalModel();
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2
     ) {
-        super(changeDetector, {});
+        super();
     }
 
     public ngOnInit() {
@@ -42,6 +43,8 @@ export class TooltipComponent extends StatefulComponent implements OnInit {
             this.own(
                 this.renderer.listen(this.target, 'mouseenter', () => {
                     this.modal.show();
+
+                    this.changeDetector.detectChanges();
                 }));
 
             this.own(

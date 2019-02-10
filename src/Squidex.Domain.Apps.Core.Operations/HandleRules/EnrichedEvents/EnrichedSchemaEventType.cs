@@ -5,22 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
 namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 {
-    public sealed class EnrichedSchemaEvent : EnrichedSchemaEventBase, IEnrichedEntityEvent
+    public enum EnrichedSchemaEventType
     {
-        public EnrichedSchemaEventType Type { get; set; }
-
-        public Guid Id
-        {
-            get { return SchemaId.Id; }
-        }
-
-        public override long Partition
-        {
-            get { return SchemaId.GetHashCode(); }
-        }
+        Created,
+        Deleted,
+        Published,
+        Unpublished,
+        Updated
     }
 }

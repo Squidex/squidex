@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         {
             enrichedEvent.Timestamp = @event.Headers.Timestamp();
 
-            if (enrichedEvent is EnrichedUserEvent userEvent)
+            if (enrichedEvent is EnrichedUserEventBase userEvent)
             {
                 if (@event.Payload is SquidexEvent squidexEvent)
                 {

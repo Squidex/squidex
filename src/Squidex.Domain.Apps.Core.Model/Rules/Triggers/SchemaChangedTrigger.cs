@@ -5,22 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
+namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
-    public sealed class EnrichedSchemaEvent : EnrichedSchemaEventBase, IEnrichedEntityEvent
+    [TypeName(nameof(SchemaChangedTrigger))]
+    public sealed class SchemaChangedTrigger : RuleTrigger
     {
-        public EnrichedSchemaEventType Type { get; set; }
+        public string Condition { get; set; }
 
-        public Guid Id
+        public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
         {
-            get { return SchemaId.Id; }
-        }
-
-        public override long Partition
-        {
-            get { return SchemaId.GetHashCode(); }
+            return visitor.Visit(this);
         }
     }
 }

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { timer } from 'rxjs';
 
 import { ResourceOwner } from '@app/framework/internal';
@@ -23,7 +23,7 @@ const POSITION_FULL = 'full';
 @Directive({
     selector: '[sqxModalTarget]'
 })
-export class ModalTargetDirective extends ResourceOwner implements AfterViewInit, OnInit {
+export class ModalTargetDirective extends ResourceOwner implements AfterViewInit, OnDestroy, OnInit {
     private targetElement: any;
 
     @Input('sqxModalTarget')

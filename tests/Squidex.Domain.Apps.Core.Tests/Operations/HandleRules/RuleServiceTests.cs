@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Log;
 using Xunit;
 
 #pragma warning disable xUnit2009 // Do not use boolean check to check for string equality
@@ -80,7 +81,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             A.CallTo(() => ruleTriggerHandler.TriggerType)
                 .Returns(typeof(ContentChangedTriggerV2));
 
-            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, TestUtils.DefaultSerializer, clock, typeNameRegistry);
+            var log = A.Fake<ISemanticLog>();
+
+            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, TestUtils.DefaultSerializer, clock, log, typeNameRegistry);
         }
 
         [Fact]

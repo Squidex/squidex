@@ -5,11 +5,25 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using NodaTime;
+using Squidex.Infrastructure;
+
 namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 {
-    public sealed class EnrichedAssetEvent : EnrichedEntityEvent
+    public sealed class EnrichedAssetEvent : EnrichedUserEventBase, IEnrichedEntityEvent
     {
         public EnrichedAssetEventType Type { get; set; }
+
+        public Guid Id { get; set; }
+
+        public Instant Created { get; set; }
+
+        public Instant LastModified { get; set; }
+
+        public RefToken CreatedBy { get; set; }
+
+        public RefToken LastModifiedBy { get; set; }
 
         public string MimeType { get; set; }
 
@@ -24,5 +38,10 @@ namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
         public int? PixelWidth { get; set; }
 
         public int? PixelHeight { get; set; }
+
+        public override long Partition
+        {
+            get { return Id.GetHashCode(); }
+        }
     }
 }

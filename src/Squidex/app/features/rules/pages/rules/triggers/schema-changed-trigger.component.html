@@ -1,0 +1,28 @@
+<div [formGroup]="triggerForm" class="form-horizontal">
+    <div class="form-group">
+        <label for="condition">Condition</label>
+
+        <sqx-control-errors for="condition" [submitted]="triggerFormSubmitted"></sqx-control-errors>
+
+        <textarea class="form-control code" id="condition" formControlName="condition" placeholder="Optional condition as javascript expression"></textarea>
+    </div>
+
+    <div class="help">
+        <h4>Conditions</h4>
+    
+        <p>Conditions are javascript expressions that define when to trigger, for example:</p>
+    
+        <ul class="help-examples">
+            <li class="help-example">
+                Specific events:<br/>
+
+                <sqx-code>event.type == 'Created' || event.type == 'Updated'</sqx-code>
+            </li>
+            <li class="help-example">
+                Specific schema only:<br/>
+
+                <sqx-code>schemaId.name === 'my-schema'</sqx-code>
+            </li>
+        </ul>
+    </div>
+</div>

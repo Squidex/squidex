@@ -184,7 +184,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         private static string SchemaId(EnrichedEvent @event)
         {
-            if (@event is EnrichedSchemaEvent schemaEvent)
+            if (@event is EnrichedSchemaEventBase schemaEvent)
             {
                 return schemaEvent.SchemaId.Id.ToString();
             }
@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         private static string SchemaName(EnrichedEvent @event)
         {
-            if (@event is EnrichedSchemaEvent schemaEvent)
+            if (@event is EnrichedSchemaEventBase schemaEvent)
             {
                 return schemaEvent.SchemaId.Name;
             }
@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         private static string UserName(EnrichedEvent @event)
         {
-            if (@event is EnrichedUserEvent userEvent)
+            if (@event is EnrichedUserEventBase userEvent)
             {
                 return userEvent.User?.DisplayName() ?? Fallback;
             }
@@ -234,7 +234,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         private static string UserId(EnrichedEvent @event)
         {
-            if (@event is EnrichedUserEvent userEvent)
+            if (@event is EnrichedUserEventBase userEvent)
             {
                 return userEvent.User?.Id ?? Fallback;
             }
@@ -244,7 +244,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         private static string UserEmail(EnrichedEvent @event)
         {
-            if (@event is EnrichedUserEvent userEvent)
+            if (@event is EnrichedUserEventBase userEvent)
             {
                 return userEvent.User?.Email ?? Fallback;
             }

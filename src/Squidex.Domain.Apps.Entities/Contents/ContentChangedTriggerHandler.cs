@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return eventId.Id == schema.SchemaId;
         }
 
-        private bool MatchsCondition(ContentChangedTriggerSchemaV2 schema, EnrichedSchemaEvent @event)
+        private bool MatchsCondition(ContentChangedTriggerSchemaV2 schema, EnrichedSchemaEventBase @event)
         {
             return string.IsNullOrWhiteSpace(schema.Condition) || scriptEngine.Evaluate("event", @event, schema.Condition);
         }

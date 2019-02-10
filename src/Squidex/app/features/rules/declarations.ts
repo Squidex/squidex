@@ -19,6 +19,7 @@ export * from './pages/rules/actions/webhook-action.component';
 
 export * from './pages/rules/triggers/asset-changed-trigger.component';
 export * from './pages/rules/triggers/content-changed-trigger.component';
+export * from './pages/rules/triggers/schema-changed-trigger.component';
 export * from './pages/rules/triggers/usage-trigger.component';
 
 export * from './pages/rules/rule-element.component';

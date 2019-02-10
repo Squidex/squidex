@@ -49,6 +49,13 @@
                             [triggerFormSubmitted]="triggerForm.submitted | async">
                         </sqx-content-changed-trigger>
                     </ng-container>
+                    <ng-container *ngSwitchCase="'SchemaChanged'">
+                        <sqx-schema-changed-trigger
+                            [trigger]="trigger"
+                            [triggerForm]="triggerForm.form"
+                            [triggerFormSubmitted]="triggerForm.submitted | async">
+                        </sqx-schema-changed-trigger>
+                    </ng-container>
                     <ng-container *ngSwitchCase="'Usage'">
                         <sqx-usage-trigger
                             [trigger]="trigger"
