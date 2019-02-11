@@ -58,7 +58,10 @@ namespace Squidex.Config.Orleans
             {
                 ["MongoDB"] = () =>
                 {
-                    hostBuilder.ConfigureEndpoints(Dns.GetHostName(), 11111, 40000, listenOnAnyHostAddress: true);
+                    var siloPort = int.Parse(config.GetRequiredValue("orleans:siloPort") ?? "11111");
+                    var gatewayPort = int.Parse(config.GetRequiredValue("orleans:gatewayPort") ?? "400000");
+
+                    hostBuilder.ConfigureEndpoints(Dns.GetHostName(), siloPort, gatewayPort, listenOnAnyHostAddress: true);
 
                     var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
                     var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
