@@ -22,7 +22,7 @@ namespace Squidex.Config.Orleans
 {
     public static class OrleansServices
     {
-        public static IServiceProvider AddAndBuildOrleans(this IServiceCollection services, IConfiguration config)
+        public static IServiceProvider AddAndBuildOrleans(this IServiceCollection services, IConfiguration config, Action<IServiceCollection> afterServices)
         {
             services.Configure<ClusterOptions>(options =>
             {
@@ -101,6 +101,8 @@ namespace Squidex.Config.Orleans
                 {
                     siloServices.Add(descriptor);
                 }
+
+                afterServices(siloServices);
 
                 provider = siloServices.BuildServiceProvider();
 

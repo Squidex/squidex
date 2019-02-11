@@ -93,10 +93,11 @@ namespace Squidex
             services.Configure<MyUsageOptions>(
                 config.GetSection("usage"));
 
-            services.AddHostedService<InitializerHost>();
-            services.AddHostedService<MigratorHost>();
-
-            var provider = services.AddAndBuildOrleans(configuration);
+            var provider = services.AddAndBuildOrleans(configuration, afterServices =>
+            {
+                afterServices.AddHostedService<InitializerHost>();
+                afterServices.AddHostedService<MigratorHost>();
+            });
 
             return provider;
         }
