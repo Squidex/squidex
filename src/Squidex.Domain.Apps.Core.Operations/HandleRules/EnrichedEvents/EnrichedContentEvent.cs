@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
 
         public override long Partition
         {
-            get { return SchemaId.GetHashCode(); }
+            get { return Id.GetHashCode(); }
         }
     }
 }
