@@ -47,6 +47,11 @@ namespace Squidex.Infrastructure.Queries
             return Binary(path, FilterOperator.Equals, value);
         }
 
+        public static FilterComparison Empty(string path)
+        {
+            return new FilterComparison(path.Split('.', '/'), FilterOperator.Empty, FilterValue.Null);
+        }
+
         public static FilterComparison In(string path, params long[] value)
         {
             return new FilterComparison(path.Split('.', '/'), FilterOperator.In, new FilterValue(value.ToList()));
