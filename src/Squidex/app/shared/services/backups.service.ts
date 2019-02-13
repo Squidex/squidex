@@ -63,11 +63,9 @@ export class BackupsService {
     public getBackups(appName: string): Observable<BackupDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups`);
 
-        return this.http.get(url).pipe(
+        return this.http.get<any[]>(url).pipe(
                 map(response => {
-                    const items: any[] = <any>response;
-
-                    return items.map(item => {
+                    return response.map(item => {
                         return new BackupDto(
                             item.id,
                             DateTime.parseISO_UTC(item.started),
@@ -83,16 +81,14 @@ export class BackupsService {
     public getRestore(): Observable<RestoreDto | null> {
         const url = this.apiUrl.buildUrl(`api/apps/restore`);
 
-        return this.http.get(url).pipe(
+        return this.http.get<any>(url).pipe(
                 map(response => {
-                    const body: any = response;
-
                     return new RestoreDto(
-                        body.url,
-                        DateTime.parseISO_UTC(body.started),
-                        body.stopped ? DateTime.parseISO_UTC(body.stopped) : null,
-                        body.status,
-                        body.log);
+                        response.url,
+                        DateTime.parseISO_UTC(response.started),
+                        response.stopped ? DateTime.parseISO_UTC(response.stopped) : null,
+                        response.status,
+                        response.log);
                 }),
                 catchError(error => {
                     if (Types.is(error, HttpErrorResponse) && error.status === 404) {

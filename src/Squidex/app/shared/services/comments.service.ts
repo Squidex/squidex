@@ -15,7 +15,8 @@ import {
     DateTime,
     Model,
     pretifyError,
-    Version
+    Version,
+    HTTP
 } from '@app/framework';
 
 export class CommentsDto extends Model {
@@ -62,9 +63,9 @@ export class CommentsService {
     public getComments(appName: string, commentsId: string, version: Version): Observable<CommentsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}?version=${version.value}`);
 
-        return this.http.get(url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
                 map(response => {
-                    const body: any = response;
+                    const body: any = response.payload.body;
 
                     return new CommentsDto(
                         body.createdComments.map((item: any) => {

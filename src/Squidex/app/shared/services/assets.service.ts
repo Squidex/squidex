@@ -128,8 +128,8 @@ export class AssetsService {
     public getTags(appName: string): Observable<{ [name: string]: number }> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/tags`);
 
-        return this.http.get(url).pipe(
-                map(response => <any>response));
+        return HTTP.getVersioned(this.http, url).pipe(
+                map(response => <any>response.payload.body));
     }
 
     public getAssets(appName: string, take: number, skip: number, query?: string, tags?: string[], ids?: string[]): Observable<AssetsDto> {

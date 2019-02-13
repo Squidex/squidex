@@ -12,7 +12,6 @@ import { map } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
-    HTTP,
     Model,
     pretifyError
 } from '@app/shared';
@@ -73,13 +72,9 @@ export class UsersService {
     public getUsers(take: number, skip: number, query?: string): Observable<UsersDto> {
         const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return this.http.get<{ total: number, items: any[] }>(url).pipe(
                 map(response => {
-                    const body = response.payload.body;
-
-                    const items: any[] = body.items;
-
-                    const users = items.map(item => {
+                    const users = response.items.map(item => {
                         return new UserDto(
                             item.id,
                             item.email,
@@ -88,7 +83,7 @@ export class UsersService {
                             item.isLocked);
                     });
 
-                    return new UsersDto(body.total, users);
+                    return new UsersDto(response.total, users);
                 }),
                 pretifyError('Failed to load users. Please reload.'));
     }
@@ -96,16 +91,14 @@ export class UsersService {
     public getUser(id: string): Observable<UserDto> {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return this.http.get<any>(url).pipe(
                 map(response => {
-                    const body = response.payload.body;
-
                     return new UserDto(
-                        body.id,
-                        body.email,
-                        body.displayName,
-                        body.permissions,
-                        body.isLocked);
+                        response.id,
+                        response.email,
+                        response.displayName,
+                        response.permissions,
+                        response.isLocked);
                 }),
                 pretifyError('Failed to load user. Please reload.'));
     }
@@ -113,12 +106,10 @@ export class UsersService {
     public postUser(dto: CreateUserDto): Observable<UserDto> {
         const url = this.apiUrl.buildUrl('api/user-management');
 
-        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
+        return this.http.post<any>(url, dto).pipe(
                 map(response => {
-                    const body = response.payload.body;
-
                     return new UserDto(
-                        body.id,
+                        response.id,
                         dto.email,
                         dto.displayName,
                         dto.permissions,
@@ -130,21 +121,21 @@ export class UsersService {
     public putUser(id: string, dto: UpdateUserDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
 
-        return HTTP.putVersioned(this.http, url, dto).pipe(
+        return this.http.put(url, dto).pipe(
                 pretifyError('Failed to update user. Please reload.'));
     }
 
     public lockUser(id: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}/lock`);
 
-        return HTTP.putVersioned(this.http, url, {}).pipe(
+        return this.http.put(url, {}).pipe(
                 pretifyError('Failed to load users. Please retry.'));
     }
 
     public unlockUser(id: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}/unlock`);
 
-        return HTTP.putVersioned(this.http, url, {}).pipe(
+        return this.http.put(url, {}).pipe(
                 pretifyError('Failed to load users. Please retry.'));
     }
 }

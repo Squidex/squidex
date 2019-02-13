@@ -15,7 +15,7 @@ using Squidex.Pipeline;
 namespace Squidex.Areas.Api.Controllers.Languages
 {
     /// <summary>
-    /// Readonly API to the supported langauges.
+    /// Readonly API for supported languages.
     /// </summary>
     [ApiExplorerSettings(GroupName = nameof(Languages))]
     public sealed class LanguagesController : ApiController

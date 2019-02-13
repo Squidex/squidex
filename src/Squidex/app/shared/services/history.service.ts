@@ -15,7 +15,6 @@ import { UsersProviderService } from './users-provider.service';
 import {
     ApiUrlConfig,
     DateTime,
-    HTTP,
     pretifyError
 } from '@app/framework';
 
@@ -82,13 +81,9 @@ export class HistoryService {
     public getHistory(appName: string, channel: string): Observable<HistoryEventDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/history?channel=${channel}`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return this.http.get<any[]>(url).pipe(
                 map(response => {
-                    const body = response.payload.body;
-
-                    const items: any[] = body;
-
-                    return items.map(item => {
+                    return response.map(item => {
                         return new HistoryEventDto(
                             item.eventId,
                             item.actor,

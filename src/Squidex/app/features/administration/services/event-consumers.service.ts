@@ -12,7 +12,6 @@ import { map } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
-    HTTP,
     Model,
     pretifyError
 } from '@app/shared';
@@ -44,13 +43,9 @@ export class EventConsumersService {
     public getEventConsumers(): Observable<EventConsumerDto[]> {
         const url = this.apiUrl.buildUrl('/api/event-consumers');
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return this.http.get<any[]>(url).pipe(
                 map(response => {
-                    const body = response.payload.body;
-
-                    const items: any[] = body;
-
-                    return items.map(item => {
+                    return response.map(item => {
                         return new EventConsumerDto(
                             item.name,
                             item.isStopped,
@@ -65,21 +60,21 @@ export class EventConsumersService {
     public putStart(name: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/start`);
 
-        return HTTP.putVersioned(this.http, url, {}).pipe(
+        return this.http.put(url, {}).pipe(
                 pretifyError('Failed to start event consumer. Please reload.'));
     }
 
     public putStop(name: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/stop`);
 
-        return HTTP.putVersioned(this.http, url, {}).pipe(
+        return this.http.put(url, {}).pipe(
                 pretifyError('Failed to stop event consumer. Please reload.'));
     }
 
     public putReset(name: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/event-consumers/${name}/reset`);
 
-        return HTTP.putVersioned(this.http, url, {}).pipe(
+        return this.http.put(url, {}).pipe(
                 pretifyError('Failed to reset event consumer. Please reload.'));
     }
 }
