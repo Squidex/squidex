@@ -49,6 +49,12 @@ namespace Squidex.Infrastructure.Queries.OData
         public override FilterNode Visit(SingleValueFunctionCallNode nodeIn)
         {
             var fieldNode = nodeIn.Parameters.ElementAt(0);
+
+            if (string.Equals(nodeIn.Name, "empty", StringComparison.OrdinalIgnoreCase))
+            {
+                return new FilterComparison(PropertyPathVisitor.Visit(fieldNode), FilterOperator.Empty, FilterValue.Null);
+            }
+
             var valueNode = nodeIn.Parameters.ElementAt(1);
 
             if (string.Equals(nodeIn.Name, "endswith", StringComparison.OrdinalIgnoreCase))

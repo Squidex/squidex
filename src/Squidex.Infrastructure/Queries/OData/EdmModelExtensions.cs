@@ -14,6 +14,14 @@ namespace Squidex.Infrastructure.Queries.OData
 {
     public static class EdmModelExtensions
     {
+        static EdmModelExtensions()
+        {
+            CustomUriFunctions.AddCustomUriFunction("empty",
+                new FunctionSignatureWithReturnType(
+                    EdmCoreModel.Instance.GetBoolean(false),
+                    EdmCoreModel.Instance.GetString(true)));
+        }
+
         public static ODataUriParser ParseQuery(this IEdmModel model, string query)
         {
             if (!model.EntityContainer.EntitySets().Any())

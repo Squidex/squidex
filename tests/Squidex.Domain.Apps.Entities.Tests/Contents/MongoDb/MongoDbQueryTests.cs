@@ -19,7 +19,6 @@ using Squidex.Domain.Apps.Entities.MongoDb.Contents;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
@@ -46,13 +45,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             schemaDef =
                 new Schema("user")
                     .AddString(1, "firstName", Partitioning.Language,
-                        new StringFieldProperties { Label = "FirstName", IsRequired = true, AllowedValues = ReadOnlyCollection.Create("1", "2") })
+                        new StringFieldProperties())
                     .AddString(2, "lastName", Partitioning.Language,
-                        new StringFieldProperties { Hints = "Last Name", Editor = StringFieldEditor.Input })
+                        new StringFieldProperties())
                     .AddBoolean(3, "isAdmin", Partitioning.Invariant,
                         new BooleanFieldProperties())
                     .AddNumber(4, "age", Partitioning.Invariant,
-                        new NumberFieldProperties { MinValue = 1, MaxValue = 10 })
+                        new NumberFieldProperties())
                     .AddDateTime(5, "birthday", Partitioning.Invariant,
                         new DateTimeFieldProperties())
                     .AddAssets(6, "pictures", Partitioning.Invariant,
@@ -61,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                         new ReferencesFieldProperties())
                     .AddString(8, "dashed-field", Partitioning.Invariant,
                         new StringFieldProperties())
-                    .Update(new SchemaProperties { Hints = "The User" });
+                    .Update(new SchemaProperties());
 
             var schema = A.Dummy<ISchemaEntity>();
             A.CallTo(() => schema.Id).Returns(Guid.NewGuid());
@@ -144,7 +143,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         }
 
         [Fact]
-        public void Should_make_query_date_field_created()
+        public void Should_make_query_with_empty_test()
+        {
+            var i = F(FilterBuilder.Empty("data/firstName/iv"), true);
+            var o = C("{ '$or' : [{ 'dd.1.iv' : { '$exists' : false } }, { 'dd.1.iv' : null }, { 'dd.1.iv' : '' }, { 'dd.1.iv' : [] }] }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_datetime_data()
         {
             var i = F(FilterBuilder.Eq("data/birthday/iv", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
             var o = C("{ 'do.5.iv' : '1988-01-19T12:00:00Z' }");

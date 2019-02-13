@@ -10,6 +10,7 @@ namespace Squidex.Infrastructure.Queries
     public enum FilterOperator
     {
         Contains,
+        Empty,
         EndsWith,
         Equals,
         GreaterThan,

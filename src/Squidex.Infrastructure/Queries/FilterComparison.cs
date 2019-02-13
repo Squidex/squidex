@@ -42,6 +42,8 @@ namespace Squidex.Infrastructure.Queries
             {
                 case FilterOperator.Contains:
                     return $"contains({path}, {Rhs})";
+                case FilterOperator.Empty:
+                    return $"empty({path})";
                 case FilterOperator.EndsWith:
                     return $"endsWith({path}, {Rhs})";
                 case FilterOperator.StartsWith:

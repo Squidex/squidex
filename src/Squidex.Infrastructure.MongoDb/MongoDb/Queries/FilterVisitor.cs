@@ -51,6 +51,8 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 
             switch (nodeIn.Operator)
             {
+                case FilterOperator.Empty:
+                    return Filter.Or(Filter.Exists(propertyName, false), Filter.Eq(propertyName, default(T)), Filter.Eq(propertyName, string.Empty), Filter.Eq(propertyName, new T[0]));
                 case FilterOperator.StartsWith:
                     return Filter.Regex(propertyName, BuildRegex(nodeIn, s => "^" + s));
                 case FilterOperator.Contains:

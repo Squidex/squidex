@@ -230,6 +230,24 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_filter_with_empty()
+        {
+            var i = Q("$filter=empty(lastName)");
+            var o = C("Filter: empty(lastName)");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_parse_filter_with_empty_to_true()
+        {
+            var i = Q("$filter=empty(lastName) eq true");
+            var o = C("Filter: empty(lastName)");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_parse_filter_with_contains()
         {
             var i = Q("$filter=contains(lastName, 'Duck')");
