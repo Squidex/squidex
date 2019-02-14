@@ -165,4 +165,4 @@ volumes:
       path: /var/lib/docker
   - name: npm_logs
     host:
-      path: /var/logs/npm
+      path: /var/log/npm
