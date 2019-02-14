@@ -49,24 +49,22 @@ export class AppsPageComponent implements OnInit {
                 if (shouldShowOnboarding && apps.length === 0) {
                     this.onboardingService.disable('dialog');
                     this.onboardingDialog.show();
+                } else {
+                    const newsVersion = this.localStore.getInt('squidex.news.version');
+
+                    this.newsService.getFeatures(newsVersion)
+                        .subscribe(result => {
+                            if (result.version !== newsVersion) {
+                                if (result.features.length > 0) {
+                                    this.newsFeatures = result.features;
+                                    this.newsDialog.show();
+                                }
+
+                                this.localStore.setInt('squidex.news.version', result.version);
+                            }
+                        });
                 }
             });
-
-        if (!shouldShowOnboarding) {
-            const newsVersion = this.localStore.getInt('squidex.news.version');
-
-            this.newsService.getFeatures(newsVersion)
-                .subscribe(result => {
-                    if (result.version !== newsVersion) {
-                        if (result.features.length > 0) {
-                            this.newsFeatures = result.features;
-                            this.newsDialog.show();
-                        }
-
-                        this.localStore.setInt('squidex.news.version', result.version);
-                    }
-                });
-        }
     }
 
     public createNewApp(template: string) {
