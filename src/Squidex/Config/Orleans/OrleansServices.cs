@@ -54,13 +54,14 @@ namespace Squidex.Config.Orleans
                     builder.AddMyParts();
                 });
 
+            var gatewayPort = config.GetOptionalValue("orleans:gatewayPort", 40000);
+
+            var siloPort = config.GetOptionalValue("orleans:siloPort", 11111);
+
             config.ConfigureByOption("orleans:clustering", new Options
             {
                 ["MongoDB"] = () =>
                 {
-                    int siloPort = int.TryParse(config.GetRequiredValue("orleans:siloPort"), out siloPort) ? siloPort : 11111;
-                    int gatewayPort = int.TryParse(config.GetRequiredValue("orleans:gatewayPort"), out gatewayPort) ? gatewayPort : 40000;
-
                     hostBuilder.ConfigureEndpoints(Dns.GetHostName(), siloPort, gatewayPort, listenOnAnyHostAddress: true);
 
                     var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
@@ -75,7 +76,7 @@ namespace Squidex.Config.Orleans
                 },
                 ["Development"] = () =>
                 {
-                    hostBuilder.UseLocalhostClustering(gatewayPort: 40000, serviceId: Constants.OrleansClusterId, clusterId: Constants.OrleansClusterId);
+                    hostBuilder.UseLocalhostClustering(siloPort, gatewayPort, null, Constants.OrleansClusterId, Constants.OrleansClusterId);
                     hostBuilder.Configure<ClusterMembershipOptions>(options => options.ExpectedClusterSize = 1);
                 }
             });

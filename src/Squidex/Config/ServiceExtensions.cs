@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -94,6 +95,19 @@ namespace Squidex.Config
             var value = config.GetValue(path, defaultValue);
 
             return value;
+        }
+
+        public static int GetOptionalValue(this IConfiguration config, string path, int defaultValue)
+        {
+            var value = config.GetValue<string>(path);
+            var result = defaultValue;
+
+            if (string.IsNullOrWhiteSpace(value) || !int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out result))
+            {
+                result = defaultValue;
+            }
+
+            return result;
         }
 
         public static string GetRequiredValue(this IConfiguration config, string path)
