@@ -12,6 +12,7 @@ import { SqxFrameworkModule, SqxSharedModule } from '@app/shared';
 
 import {
     AppsPageComponent,
+    NewsDialogComponent,
     OnboardingDialogComponent
 } from './declarations';
 
@@ -30,6 +31,7 @@ const routes: Routes = [
     ],
     declarations: [
         AppsPageComponent,
+        NewsDialogComponent,
         OnboardingDialogComponent
     ]
 })

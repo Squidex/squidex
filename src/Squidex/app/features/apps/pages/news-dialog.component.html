@@ -1,0 +1,17 @@
+<sqx-modal-dialog large="true">
+    <ng-container title>
+        New Features
+    </ng-container>
+
+    <ng-container content>
+        <div class="help">
+            <h1>What's new?</h1>
+
+            <div *ngFor="let feature of features">
+                <h4>{{feature.name}}</h4>
+
+                <div [innerHTML]="feature.text | sqxHelpMarkdown"></div>
+            </div>
+        </div>
+    </ng-container>
+</sqx-modal-dialog>

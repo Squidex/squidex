@@ -20,11 +20,12 @@ namespace Squidex.Areas.Api.Controllers.News
     [ApiExplorerSettings(GroupName = nameof(Languages))]
     public sealed class NewsController : ApiController
     {
-        private readonly FeaturesService featuresService = new FeaturesService();
+        private FeaturesService featuresService;
 
-        public NewsController(ICommandBus commandBus)
+        public NewsController(ICommandBus commandBus, FeaturesService featuresService)
             : base(commandBus)
         {
+            this.featuresService = featuresService;
         }
 
         /// <summary>

@@ -37,11 +37,11 @@ describe('NewsService', () => {
 
         let features: FeaturesDto;
 
-        newsService.getFeatures().subscribe(result => {
+        newsService.getFeatures(13).subscribe(result => {
             features = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/news/features');
+        const req = httpMock.expectOne('http://service/p/api/news/features?version=13');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();

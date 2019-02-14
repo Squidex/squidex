@@ -12,7 +12,9 @@ import {
     AppsState,
     AuthService,
     DialogModel,
-    ModalModel,
+    FeatureDto,
+    LocalStoreService,
+    NewsService,
     OnboardingService
 } from '@app/shared';
 
@@ -25,11 +27,16 @@ export class AppsPageComponent implements OnInit {
     public addAppDialog = new DialogModel();
     public addAppTemplate = '';
 
-    public onboardingModal = new ModalModel();
+    public onboardingDialog = new DialogModel();
+
+    public newsFeatures: FeatureDto[];
+    public newsDialog = new DialogModel();
 
     constructor(
         public readonly appsState: AppsState,
         public readonly authState: AuthService,
+        private readonly localStore: LocalStoreService,
+        private readonly newsService: NewsService,
         private readonly onboardingService: OnboardingService
     ) {
     }
@@ -38,9 +45,24 @@ export class AppsPageComponent implements OnInit {
         this.appsState.apps.pipe(
                 take(1))
             .subscribe(apps => {
-                if (this.onboardingService.shouldShow('dialog') && apps.length === 0) {
-                    this.onboardingService.disable('dialog');
-                    this.onboardingModal.show();
+                if (this.onboardingService.shouldShow('dialog')) {
+                    if (apps.length === 0) {
+                        this.onboardingService.disable('dialog');
+                        this.onboardingDialog.show();
+                    }
+                } else {
+                    const newsVersion = this.localStore.getInt('squidex.news.version');
+
+                    this.newsService.getFeatures(newsVersion).subscribe(result => {
+                        if (result.version !== newsVersion) {
+                            if (result.features.length > 0) {
+                                this.newsFeatures = result.features;
+                                this.newsDialog.show();
+                            }
+
+                            this.localStore.setInt('squidex.news.version', result.version);
+                        }
+                    });
                 }
             });
     }

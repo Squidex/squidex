@@ -85,4 +85,16 @@ describe('LocalStore', () => {
 
         expect(localStoreService.getBoolean('not_set')).toBe(false);
     });
+
+    it('should get int from local store', () => {
+        const localStoreService = new LocalStoreService();
+
+        localStoreService.set('key1', 'abc');
+        localStoreService.setInt('key2', 2);
+
+        expect(localStoreService.getInt('key1', 13)).toBe(13);
+        expect(localStoreService.getInt('key2', 13)).toBe(2);
+
+        expect(localStoreService.getInt('not_set', 13)).toBe(13);
+    });
 });

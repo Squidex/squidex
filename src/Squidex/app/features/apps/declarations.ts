@@ -6,4 +6,5 @@
  */
 
 export * from './pages/apps-page.component';
+export * from './pages/news-dialog.component';
 export * from './pages/onboarding-dialog.component';

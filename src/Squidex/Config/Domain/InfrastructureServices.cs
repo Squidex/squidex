@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
+using Squidex.Areas.Api.Controllers.News.Service;
 using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
@@ -35,6 +36,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs(SystemClock.Instance)
                 .As<IClock>();
+
+            services.AddSingletonAs<FeaturesService>()
+                .AsSelf();
 
             services.AddSingletonAs<BackgroundUsageTracker>()
                 .AsSelf();

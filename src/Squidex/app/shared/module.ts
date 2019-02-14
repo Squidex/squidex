@@ -139,6 +139,7 @@ import {
         FileIconPipe,
         GeolocationEditorComponent,
         HelpComponent,
+        HelpMarkdownPipe,
         HistoryComponent,
         HistoryListComponent,
         HistoryMessagePipe,

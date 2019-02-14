@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Areas.Api;
 using Squidex.Areas.Api.Config.Swagger;
 using Squidex.Areas.Api.Controllers.Contents;
+using Squidex.Areas.Api.Controllers.News;
 using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer;
 using Squidex.Areas.IdentityServer.Config;
@@ -92,6 +93,8 @@ namespace Squidex
                 config.GetSection("ui"));
             services.Configure<MyUsageOptions>(
                 config.GetSection("usage"));
+            services.Configure<MyNewsOptions>(
+                config.GetSection("news"));
 
             var provider = services.AddAndBuildOrleans(configuration, afterServices =>
             {

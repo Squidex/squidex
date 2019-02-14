@@ -15,8 +15,7 @@ import {
     DateTime,
     Model,
     pretifyError,
-    Version,
-    HTTP
+    Version
 } from '@app/framework';
 
 export class CommentsDto extends Model {
@@ -63,27 +62,25 @@ export class CommentsService {
     public getComments(appName: string, commentsId: string, version: Version): Observable<CommentsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}?version=${version.value}`);
 
-        return HTTP.getVersioned(this.http, url).pipe(
+        return this.http.get<any>(url).pipe(
                 map(response => {
-                    const body: any = response.payload.body;
-
                     return new CommentsDto(
-                        body.createdComments.map((item: any) => {
+                        response.createdComments.map((item: any) => {
                             return new CommentDto(
                                 item.id,
                                 DateTime.parseISO_UTC(item.time),
                                 item.text,
                                 item.user);
                         }),
-                        body.updatedComments.map((item: any) => {
+                        response.updatedComments.map((item: any) => {
                             return new CommentDto(
                                 item.id,
                                 DateTime.parseISO_UTC(item.time),
                                 item.text,
                                 item.user);
                         }),
-                        body.deletedComments,
-                        new Version(body.version)
+                        response.deletedComments,
+                        new Version(response.version)
                     );
                 }),
                 pretifyError('Failed to load comments.'));

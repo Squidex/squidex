@@ -34,6 +34,12 @@ export class LocalStoreService {
         return value === 'true';
     }
 
+    public getInt(key: string, fallback = 0): number {
+        const value = this.get(key);
+
+        return value ? (parseInt(value, 10) || fallback) : fallback;
+    }
+
     public set(key: string, value: string) {
         try {
             this.store.setItem(key, value);
@@ -44,6 +50,12 @@ export class LocalStoreService {
 
     public setBoolean(key: string, value: boolean) {
         const converted = value ? 'true' : 'false';
+
+        this.store.setItem(key, converted);
+    }
+
+    public setInt(key: string, value: number) {
+        const converted = `${value}`;
 
         this.store.setItem(key, converted);
     }

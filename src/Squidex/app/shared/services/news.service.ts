@@ -40,8 +40,8 @@ export class NewsService {
     ) {
     }
 
-    public getFeatures(): Observable<FeaturesDto> {
-        const url = this.apiUrl.buildUrl('api/news/features');
+    public getFeatures(version: number): Observable<FeaturesDto> {
+        const url = this.apiUrl.buildUrl(`api/news/features?version=${version}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
                 map(response => {
