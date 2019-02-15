@@ -61,7 +61,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Algolia.Search" Version="6.0.2" />
+    <PackageReference Include="Algolia.Search" Version="5.3.1" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="2.0.1" />
     <PackageReference Include="Ben.BlockingDetector" Version="0.0.3" />
     <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.1.0.23" />

@@ -13,9 +13,9 @@
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="5.0.1" />
+    <PackageReference Include="FakeItEasy" Version="5.1.0" />
     <PackageReference Include="FluentAssertions" Version="5.6.0" />
-    <PackageReference Include="Google.Cloud.Storage.V1" Version="2.2.1" />
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />

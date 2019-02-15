@@ -11,7 +11,7 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.5.3" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.5.4" />
     <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="2.2.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

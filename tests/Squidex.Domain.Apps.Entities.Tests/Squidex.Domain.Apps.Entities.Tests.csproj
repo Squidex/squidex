@@ -17,7 +17,7 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="5.0.1" />
+    <PackageReference Include="FakeItEasy" Version="5.1.0" />
     <PackageReference Include="FluentAssertions" Version="5.6.0" />
     <PackageReference Include="GraphQL" Version="2.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
