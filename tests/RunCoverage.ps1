@@ -22,7 +22,7 @@ Write-Host "Recreated '$folderReports' folder"
 New-Item -ItemType directory -Path $folderReports
 
 if ($all -Or $infrastructure) {
-	&"$folderHome\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
+	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
@@ -33,7 +33,7 @@ if ($all -Or $infrastructure) {
 }
 
 if ($all -Or $appsCore) {
-	&"$folderHome\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
+	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" `
@@ -44,7 +44,7 @@ if ($all -Or $appsCore) {
 }
 
 if ($all -Or $appsEntities) {
-	&"$folderHome\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
+	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj" `
@@ -55,7 +55,7 @@ if ($all -Or $appsEntities) {
 }
 
 if ($all -Or $users) {
-	&"$folderHome\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
+	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj" `
@@ -66,7 +66,7 @@ if ($all -Or $users) {
 }
 
 if ($all -Or $web) {
-	&"$folderHome\.nuget\packages\OpenCover\4.6.519\tools\OpenCover.Console.exe" `
+	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Tests\Squidex.Tests.csproj" `
@@ -76,6 +76,6 @@ if ($all -Or $web) {
 	-oldStyle
 }
 
-&"$folderHome\.nuget\packages\ReportGenerator\4.0.4\tools\net47\ReportGenerator.exe" `
+&"$folderHome\.nuget\packages\ReportGenerator\4.0.9\tools\net47\ReportGenerator.exe" `
 -reports:"$folderWorking\$folderReports\*.xml" `
 -targetdir:"$folderWorking\$folderReports\Output"

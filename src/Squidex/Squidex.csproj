@@ -61,7 +61,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Algolia.Search" Version="5.3.1" />
+    <PackageReference Include="Algolia.Search" Version="6.0.2" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="2.0.1" />
     <PackageReference Include="Ben.BlockingDetector" Version="0.0.3" />
     <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.1.0.23" />
@@ -70,7 +70,7 @@
     <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
@@ -81,19 +81,19 @@
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.4" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.5.3" />
+    <PackageReference Include="Microsoft.OData.Core" Version="7.5.4" />
     <PackageReference Include="Microsoft.Orleans.Client" Version="2.2.0" />
     <PackageReference Include="Microsoft.Orleans.Core" Version="2.2.0" />
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.2.3" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.3" />
-    <PackageReference Include="NJsonSchema" Version="9.13.17" />
-    <PackageReference Include="NSwag.AspNetCore" Version="12.0.13" />
-    <PackageReference Include="OpenCover" Version="4.6.519" />
-    <PackageReference Include="Orleans.Providers.MongoDB" Version="2.0.1" />
+    <PackageReference Include="NJsonSchema" Version="9.13.18" />
+    <PackageReference Include="NSwag.AspNetCore" Version="12.0.14" />
+    <PackageReference Include="OpenCover" Version="4.7.922" />
+    <PackageReference Include="Orleans.Providers.MongoDB" Version="2.0.2" />
     <PackageReference Include="OrleansDashboard" Version="2.2.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="ReportGenerator" Version="4.0.9" />
+    <PackageReference Include="ReportGenerator" Version="4.0.12" />
     <PackageReference Include="Squidex.ClientLibrary" Version="2.8.0" />
     <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
