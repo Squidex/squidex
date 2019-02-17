@@ -9,7 +9,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
     Form,
-    hasValue$,
+    hasNoValue$,
     ValidatorsEx
 } from '@app/framework';
 
@@ -26,7 +26,7 @@ export class RenameClientForm extends Form<FormGroup> {
 }
 
 export class AttachClientForm extends Form<FormGroup> {
-    public hasNoName = hasValue$(this.form.controls['name']);
+    public hasNoName = hasNoValue$(this.form.controls['name']);
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({

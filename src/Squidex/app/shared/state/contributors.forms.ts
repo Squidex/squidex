@@ -7,10 +7,10 @@
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Form, hasValue$ } from '@app/framework';
+import { Form, hasNoValue$ } from '@app/framework';
 
 export class AssignContributorForm extends Form<FormGroup> {
-    public hasNoUser = hasValue$(this.form.controls['user']);
+    public hasNoUser = hasNoValue$(this.form.controls['user']);
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
