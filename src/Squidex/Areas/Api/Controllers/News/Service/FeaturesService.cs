@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.News.Service
 
             if (client != null && version < FeatureVersion)
             {
-                var entities = await client.GetAsync(filter: $"data/version/iv ge {version}", context: Flatten);
+                var entities = await client.GetAsync(filter: $"data/version/iv gt {version}", context: Flatten);
 
                 result.Features.AddRange(entities.Items.Select(x => x.Data));
             }
