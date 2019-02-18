@@ -17,8 +17,8 @@ import {
     AuthService,
     DateTime,
     DialogModel,
-    ExternalControlComponent,
     ResourceLoaderService,
+    StatefulControlComponent,
     Types
 } from '@app/shared/internal';
 
@@ -42,7 +42,7 @@ const ImageTypes = [
     providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RichEditorComponent extends ExternalControlComponent<string> implements AfterViewInit, OnDestroy {
+export class RichEditorComponent extends StatefulControlComponent<any, string> implements AfterViewInit, OnDestroy {
     private tinyEditor: any;
     private tinyInitTimer: any;
     private value: string;
@@ -62,7 +62,7 @@ export class RichEditorComponent extends ExternalControlComponent<string> implem
         private readonly authState: AuthService,
         private readonly resourceLoader: ResourceLoaderService
     ) {
-        super(changeDetector);
+        super(changeDetector, {});
     }
 
     public ngOnDestroy() {
@@ -83,6 +83,8 @@ export class RichEditorComponent extends ExternalControlComponent<string> implem
 
     private showSelector = () => {
         this.assetsDialog.show();
+
+        this.detectChanges();
     }
 
     private getEditorOptions() {

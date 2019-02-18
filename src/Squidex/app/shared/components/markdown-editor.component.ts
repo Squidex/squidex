@@ -83,6 +83,8 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
 
     private showSelector = () => {
         this.assetsDialog.show();
+
+        this.detectChanges();
     }
 
     public ngAfterViewInit() {

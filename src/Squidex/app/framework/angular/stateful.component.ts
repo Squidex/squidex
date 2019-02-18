@@ -65,6 +65,10 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
         this.subscriptions.ngOnDestroy();
     }
 
+    public detectChanges() {
+        this.changeDetector.detectChanges();
+    }
+
     public own<R>(subscription: Subscription | UnsubscribeFunction | Observable<R>) {
         this.subscriptions.own(subscription);
     }
