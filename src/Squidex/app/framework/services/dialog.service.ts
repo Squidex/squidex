@@ -34,6 +34,15 @@ export class DialogRequest {
     }
 }
 
+export class Tooltip {
+    constructor(
+        public readonly target: any,
+        public readonly text: string | null,
+        public readonly position: string
+    ) {
+    }
+}
+
 export class Notification {
     constructor(
         public readonly message: string,
@@ -55,9 +64,14 @@ export class Notification {
 export class DialogService {
     private readonly requestStream$ = new Subject<DialogRequest>();
     private readonly notificationsStream$ = new Subject<Notification>();
+    private readonly tooltipStream$ = new Subject<Tooltip>();
 
     public get dialogs(): Observable<DialogRequest> {
         return this.requestStream$;
+    }
+
+    public get tooltips(): Observable<Tooltip> {
+        return this.tooltipStream$;
     }
 
     public get notifications(): Observable<Notification> {
@@ -80,6 +94,10 @@ export class DialogService {
 
     public notify(notification: Notification) {
         this.notificationsStream$.next(notification);
+    }
+
+    public tooltip(tooltip: Tooltip) {
+        this.tooltipStream$.next(tooltip);
     }
 
     public confirm(title: string, text: string): Observable<boolean> {

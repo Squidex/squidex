@@ -5,35 +5,37 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, Renderer2 } from '@angular/core';
 import { timer } from 'rxjs';
 
 import { ResourceOwner } from '@app/framework/internal';
-
-const POSITION_TOPLEFT = 'topLeft';
-const POSITION_TOPRIGHT = 'topRight';
-const POSITION_BOTTOMLEFT = 'bottomLeft';
-const POSITION_BOTTOMRIGHT = 'bottomRight';
-const POSITION_LEFTTOP = 'leftTop';
-const POSITION_LEFTBOTTOM = 'leftBottom';
-const POSITION_RIGHTTOP = 'rightTop';
-const POSITION_RIGHTBOTTOM = 'rightBottom';
-const POSITION_FULL = 'full';
+import { positionModal } from '@app/shared';
 
 @Directive({
     selector: '[sqxModalTarget]'
 })
-export class ModalTargetDirective extends ResourceOwner implements AfterViewInit, OnDestroy, OnInit {
+export class ModalTargetDirective extends ResourceOwner implements AfterViewInit, OnDestroy {
     private targetElement: any;
 
     @Input('sqxModalTarget')
-    public target: any;
+    public set target(element: any) {
+        if (element !== this.targetElement) {
+            this.ngOnDestroy();
+
+            this.targetElement = element;
+
+            if (element) {
+                this.subscribe(element);
+                this.updatePosition();
+            }
+        }
+    }
 
     @Input()
     public offset = 2;
 
     @Input()
-    public position = POSITION_BOTTOMRIGHT;
+    public position = 'bottom-right';
 
     @Input()
     public autoPosition = true;
@@ -45,22 +47,18 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
         super();
     }
 
-    public ngOnInit() {
-        if (this.target) {
-            this.targetElement = this.target;
+    private subscribe(element: any) {
+        this.own(
+            this.renderer.listen(element, 'resize', () => {
+                this.updatePosition();
+            }));
 
-            this.own(
-                this.renderer.listen(this.targetElement, 'resize', () => {
-                    this.updatePosition();
-                }));
+        this.own(
+            this.renderer.listen(this.element.nativeElement, 'resize', () => {
+                this.updatePosition();
+            }));
 
-            this.own(
-                this.renderer.listen(this.element.nativeElement, 'resize', () => {
-                    this.updatePosition();
-                }));
-
-            this.own(timer(100, 100).subscribe(() => this.updatePosition()));
-        }
+        this.own(timer(100, 100).subscribe(() => this.updatePosition()));
     }
 
     public ngAfterViewInit() {
@@ -77,110 +75,35 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
             return;
         }
 
-        const viewportHeight = document.documentElement!.clientHeight;
-        const viewportWidth = document.documentElement!.clientWidth;
-
         const modalRef = this.element.nativeElement;
         const modalRect = this.element.nativeElement.getBoundingClientRect();
 
         const targetRect: ClientRect = this.targetElement.getBoundingClientRect();
 
-        const fix = this.autoPosition;
+        let y = 0;
+        let x = 0;
 
-        let t = 0;
-        let l = 0;
+        if (this.position === 'full') {
+            x = -this.offset + targetRect.left;
+            y = -this.offset + targetRect.top;
 
-        switch (this.position) {
-            case POSITION_LEFTTOP:
-            case POSITION_RIGHTTOP: {
-                t = targetRect.top;
-                break;
-            }
-            case POSITION_LEFTBOTTOM:
-            case POSITION_RIGHTBOTTOM: {
-                t = targetRect.bottom - modalRect.height;
-                break;
-            }
-            case POSITION_BOTTOMLEFT:
-            case POSITION_BOTTOMRIGHT: {
-                t = targetRect.bottom + this.offset;
-
-                if (fix && t + modalRect.height > viewportHeight) {
-                    const candidate = targetRect.top - modalRect.height - this.offset;
-
-                    if (candidate > 0) {
-                        t = candidate;
-                    }
-                }
-                break;
-            }
-            case POSITION_TOPLEFT:
-            case POSITION_TOPRIGHT: {
-                t = targetRect.top - modalRect.height - this.offset;
-
-                if (fix && t < 0) {
-                    const candidate = targetRect.bottom + this.offset;
-
-                    if (candidate + modalRect.height > viewportHeight) {
-                        t = candidate;
-                    }
-                }
-                break;
-            }
-        }
-
-        switch (this.position) {
-            case POSITION_TOPLEFT:
-            case POSITION_BOTTOMLEFT: {
-                l = targetRect.left;
-                break;
-            }
-            case POSITION_TOPRIGHT:
-            case POSITION_BOTTOMRIGHT: {
-                l = targetRect.right - modalRect.width;
-                break;
-            }
-            case POSITION_RIGHTTOP:
-            case POSITION_RIGHTBOTTOM: {
-                l = targetRect.right + this.offset;
-
-                if (fix && l + modalRect.width > viewportWidth) {
-                    const candidate = targetRect.right - modalRect.width - this.offset;
-
-                    if (candidate > 0) {
-                        l = candidate;
-                    }
-                }
-                break;
-            }
-            case POSITION_LEFTTOP:
-            case POSITION_LEFTBOTTOM: {
-                l = targetRect.left - modalRect.width - this.offset;
-
-                if (this.autoPosition && l < 0) {
-                    const candidate = targetRect.right + this.offset;
-
-                    if (candidate + modalRect.width > viewportWidth) {
-                        l = candidate;
-                    }
-                }
-                break;
-            }
-        }
-
-        if (this.position === POSITION_FULL) {
-            t = targetRect.top - this.offset;
-            l = targetRect.left - this.offset;
-
-            const w = targetRect.width + 2 * this.offset;
-            const h = targetRect.height + 2 * this.offset;
+            const w = 2 * this.offset + targetRect.width;
+            const h = 2 * this.offset + targetRect.height;
 
             this.renderer.setStyle(modalRef, 'width', `${w}px`);
             this.renderer.setStyle(modalRef, 'height', `${h}px`);
+        } else {
+            const viewH = document.documentElement!.clientHeight;
+            const viewW = document.documentElement!.clientWidth;
+
+            const position = positionModal(targetRect, modalRect, this.position, this.offset, this.autoPosition, viewW, viewH);
+
+            x = position.x;
+            y = position.y;
         }
 
-        this.renderer.setStyle(modalRef, 'top', `${t}px`);
-        this.renderer.setStyle(modalRef, 'left', `${l}px`);
+        this.renderer.setStyle(modalRef, 'top', `${y}px`);
+        this.renderer.setStyle(modalRef, 'left', `${x}px`);
         this.renderer.setStyle(modalRef, 'right', 'auto');
         this.renderer.setStyle(modalRef, 'bottom', 'auto');
         this.renderer.setStyle(modalRef, 'margin', '0');

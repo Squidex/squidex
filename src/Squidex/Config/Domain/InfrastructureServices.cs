@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.News.Service;
@@ -18,6 +19,8 @@ using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Diagnostics;
+using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared.Users;
 
@@ -27,8 +30,21 @@ namespace Squidex.Config.Domain
 {
     public static class InfrastructureServices
     {
-        public static void AddMyInfrastructureServices(this IServiceCollection services)
+        public static void AddMyInfrastructureServices(this IServiceCollection services, IConfiguration config)
         {
+            var deeplAuthKey = config.GetValue<string>("translations:deeplAuthKey");
+
+            if (!string.IsNullOrWhiteSpace(deeplAuthKey))
+            {
+                services.AddSingletonAs(c => new DeepLTranslator(deeplAuthKey, c.GetRequiredService<IJsonSerializer>()))
+                    .As<ITranslator>();
+            }
+            else
+            {
+                services.AddSingletonAs<NoopTranslator>()
+                    .As<ITranslator>();
+            }
+
             services.AddHealthChecks()
                 .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" })
                 .AddCheck<OrleansHealthCheck>("Orleans", tags: new[] { "cluster" })

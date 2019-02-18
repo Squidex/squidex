@@ -132,6 +132,14 @@ export class RootFieldDto extends FieldDto {
         return this.properties.fieldType === 'Array';
     }
 
+    public get isString() {
+        return this.properties.fieldType === 'String';
+    }
+
+    public get isTranslateable() {
+        return this.isLocalizable && this.isString && (this.properties.editor === 'Input' || this.properties.editor === 'Textarea');
+    }
+
     constructor(fieldId: number, name: string, properties: FieldPropertiesDto,
         public readonly partitioning: string,
         isLocked: boolean = false,

@@ -48,11 +48,11 @@
             </div>
         </div>
 
-        <sqx-onboarding-tooltip helpId="history" [for]="buttonOptions" position="bottomRight" after="60000">
+        <sqx-onboarding-tooltip helpId="history" [for]="buttonOptions" position="bottom-right" after="60000">
             Open the context menu to delete the schema or to create some scripts for content changes.
         </sqx-onboarding-tooltip>
 
-        <sqx-onboarding-tooltip helpId="history" [for]="buttonPublish" position="bottomRight" after="240000">
+        <sqx-onboarding-tooltip helpId="history" [for]="buttonPublish" position="bottom-right" after="240000">
             Note, that you have to publish the schema before you can add content to it.
         </sqx-onboarding-tooltip>
     </ng-container>
@@ -82,10 +82,8 @@
     </ng-container>
 
     <ng-container sidebar>
-        <div class="panel-nav">
-            <sqx-tooltip position="leftTop" [target]="helpLink">Help</sqx-tooltip>
-        
-            <a class="panel-link" routerLink="help" routerLinkActive="active" #helpLink>
+        <div class="panel-nav">        
+            <a class="panel-link" routerLink="help" routerLinkActive="active" title="Help" titlePosition="left">
                 <i class="icon-help"></i>
             </a>
         </div>

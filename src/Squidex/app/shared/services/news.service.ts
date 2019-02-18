@@ -10,11 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import {
-    ApiUrlConfig,
-    HTTP,
-    pretifyError
-} from '@app/framework';
+import { ApiUrlConfig, pretifyError } from '@app/framework';
 
 export class FeatureDto {
     constructor(
@@ -43,11 +39,9 @@ export class NewsService {
     public getFeatures(version: number): Observable<FeaturesDto> {
         const url = this.apiUrl.buildUrl(`api/news/features?version=${version}`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return this.http.get<any>(url).pipe(
                 map(response => {
-                    const body = response.payload.body;
-
-                    const items: any[] = body.features;
+                    const items: any[] = response.features;
 
                     return new FeaturesDto(
                         items.map(item => {
@@ -56,7 +50,7 @@ export class NewsService {
                                 item.text
                             );
                         }),
-                        body.version
+                        response.version
                     );
                 }),
                 pretifyError('Failed to load features. Please reload.'));

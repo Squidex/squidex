@@ -79,10 +79,8 @@
     </ng-container>
 
     <ng-container sidebar>
-        <div class="panel-nav">
-            <sqx-tooltip position="leftTop" [target]="historyLink">History</sqx-tooltip>
-        
-            <a class="panel-link" routerLink="history" routerLinkActive="active" #historyLink>
+        <div class="panel-nav">        
+            <a class="panel-link" routerLink="history" routerLinkActive="active" title="History" titlePosition="left">
                 <i class="icon-time"></i>
             </a>
         </div>

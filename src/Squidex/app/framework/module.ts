@@ -80,7 +80,7 @@ import {
     TitleComponent,
     TitleService,
     ToggleComponent,
-    TooltipComponent,
+    TooltipDirective,
     TransformInputDirective,
     UserReportComponent
 } from './declarations';
@@ -148,7 +148,7 @@ import {
         TemplateWrapperDirective,
         TitleComponent,
         ToggleComponent,
-        TooltipComponent,
+        TooltipDirective,
         TransformInputDirective,
         UserReportComponent
     ],
@@ -212,7 +212,7 @@ import {
         TemplateWrapperDirective,
         TitleComponent,
         ToggleComponent,
-        TooltipComponent,
+        TooltipDirective,
         TransformInputDirective,
         UserReportComponent
     ]
