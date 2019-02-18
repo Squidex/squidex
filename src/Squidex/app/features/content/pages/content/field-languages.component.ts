@@ -24,7 +24,7 @@ import { AppLanguageDto, RootFieldDto } from '@app/shared';
                     [languages]="languages">
                 </sqx-language-selector>
 
-                <sqx-onboarding-tooltip helpId="languages" [for]="buttonLanguages" position="topRight" after="120000">
+                <sqx-onboarding-tooltip helpId="languages" [for]="buttonLanguages" position="top-right" after="120000">
                     Please remember to check all languages when you see validation errors.
                 </sqx-onboarding-tooltip>
             </ng-container>

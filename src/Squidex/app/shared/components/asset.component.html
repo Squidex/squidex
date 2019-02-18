@@ -113,7 +113,7 @@
                     <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
                 </td>
                 <td class="col-user" *ngIf="!isCompact">
-                    <img class="user-picture" [attr.title]="asset.lastModifiedBy | sqxUserNameRef" [attr.src]="asset.lastModifiedBy | sqxUserPictureRef" />
+                    <img class="user-picture" title="{{asset.lastModifiedBy | sqxUserNameRef}}" [attr.src]="asset.lastModifiedBy | sqxUserPictureRef" />
                 </td>
                 <td class="col-actions text-right" *ngIf="!isCompact">
                     <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl" sqxExternalLink="noicon" (click)="$event.stopPropagation()">

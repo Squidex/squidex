@@ -12,12 +12,15 @@ import { combineLatest } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
+    AppsState,
     EditContentForm,
     fieldInvariant,
     invalid$,
     LocalStoreService,
     RootFieldDto,
     SchemaDto,
+    TranslateDto,
+    TranslationsService,
     Types,
     value$
 } from '@app/shared';
@@ -59,15 +62,26 @@ export class ContentFieldComponent implements OnChanges {
 
     public isInvalid: Observable<boolean>;
     public isDifferent: Observable<boolean>;
+    public isTranslateable: boolean;
 
     constructor(
-        private readonly localStore: LocalStoreService
+        private readonly appsState: AppsState,
+        private readonly localStore: LocalStoreService,
+        private readonly translations: TranslationsService
     ) {
     }
 
     public ngOnChanges(changes: SimpleChanges) {
+        if (changes['field']) {
+            this.showAllControls = this.localStore.getBoolean(this.configKey());
+        }
+
         if (changes['fieldForm']) {
             this.isInvalid = invalid$(this.fieldForm);
+        }
+
+        if (changes['fieldForm'] || changes['field'] || changes['languages']) {
+            this.isTranslateable = this.field.isTranslateable;
         }
 
         if ((changes['fieldForm'] || changes['fieldFormCompare']) && this.fieldFormCompare) {
@@ -75,10 +89,6 @@ export class ContentFieldComponent implements OnChanges {
                 value$(this.fieldForm).pipe(
                     combineLatest(value$(this.fieldFormCompare),
                         (lhs, rhs) => !Types.jsJsonEquals(lhs, rhs)));
-        }
-
-        if (changes['field']) {
-            this.showAllControls = this.localStore.getBoolean(this.configKey());
         }
 
         const control = this.findControl(this.fieldForm);
@@ -120,6 +130,46 @@ export class ContentFieldComponent implements OnChanges {
         }
     }
 
+    public translate() {
+        const master = this.languages.find(x => x.isMaster);
+
+        if (master) {
+            const masterCode = master.iso2Code;
+            const masterValue = this.fieldForm.get(masterCode)!.value;
+
+            if (masterValue) {
+                if (this.showAllControls) {
+                    for (let language of this.languages) {
+                        if (!language.isMaster) {
+                            this.translateValue(masterValue, masterCode, language.iso2Code);
+                        }
+                    }
+                } else {
+                    this.translateValue(masterValue, masterCode, this.language.iso2Code);
+                }
+            }
+        }
+    }
+
+    private translateValue(text: string, sourceLanguage: string, targetLanguage: string) {
+        const control = this.fieldForm.get(targetLanguage);
+
+        if (control) {
+            const value = control.value;
+
+            if (!value) {
+                const request = new TranslateDto(text, sourceLanguage, targetLanguage);
+
+                this.translations.translate(this.appsState.appName, request)
+                    .subscribe(result => {
+                        if (result.text) {
+                            control.setValue(result.text);
+                        }
+                    });
+            }
+        }
+    }
+
     private findControl(form: FormGroup) {
         if (this.field.isLocalizable) {
             return form.controls[this.language.iso2Code];
@@ -129,7 +179,7 @@ export class ContentFieldComponent implements OnChanges {
     }
 
     public prefix(language: AppLanguageDto) {
-        return `(${language.iso2Code}`;
+        return `(${language.iso2Code})`;
     }
 
     public trackByLanguage(index: number, language: AppLanguageDto) {

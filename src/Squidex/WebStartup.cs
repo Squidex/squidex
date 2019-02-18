@@ -58,7 +58,7 @@ namespace Squidex
             services.AddMyEventPublishersServices(config);
             services.AddMyEventStoreServices(config);
             services.AddMyIdentityServer();
-            services.AddMyInfrastructureServices();
+            services.AddMyInfrastructureServices(config);
             services.AddMyLoggingServices(config);
             services.AddMyMigrationServices();
             services.AddMyMvc();

@@ -23,7 +23,7 @@
             spellcheck="false">
     </div>
 
-    <div *ngIf="snapshot.suggestedItems.length > 0" [sqxModalTarget]="form" class="control-dropdown" #container position="bottomLeft">
+    <div *ngIf="snapshot.suggestedItems.length > 0" [sqxModalTarget]="form" class="control-dropdown" #container position="bottom-left">
         <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
             [class.active]="i === snapshot.suggestedIndex"
             [container]="container"

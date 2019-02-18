@@ -26,7 +26,7 @@
                     <tbody *ngFor="let contributorInfo of contributors; trackBy: trackByContributor">
                         <tr>
                             <td class="cell-user">
-                                <img class="user-picture" [attr.title]="contributorInfo.contributor.contributorId | sqxUserName" [attr.src]="contributorInfo.contributor.contributorId | sqxUserPicture" />
+                                <img class="user-picture" title="{{contributorInfo.contributor.contributorId | sqxUserName}}" [attr.src]="contributorInfo.contributor.contributorId | sqxUserPicture" />
                             </td>
                             <td class="cell-auto">
                                 <span class="user-name table-cell">{{contributorInfo.contributor.contributorId | sqxUserName}}</span>
@@ -74,15 +74,11 @@
 
     <ng-container sidebar>
         <div class="panel-nav">
-            <sqx-tooltip position="leftTop" [target]="historyLink">History</sqx-tooltip>
-
-            <a class="panel-link" routerLink="history" routerLinkActive="active" #historyLink>
+            <a class="panel-link" routerLink="history" routerLinkActive="active" title="History" titlePosition="left">
                 <i class="icon-time"></i>
             </a>
 
-            <sqx-tooltip position="leftTop" [target]="helpLink">Help</sqx-tooltip>
-
-            <a class="panel-link" routerLink="help" routerLinkActive="active" #helpLink>
+            <a class="panel-link" routerLink="help" routerLinkActive="active" title="Help" titlePosition="left">
                 <i class="icon-help"></i>
             </a>
         </div>

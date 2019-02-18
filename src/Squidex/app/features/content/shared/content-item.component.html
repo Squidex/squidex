@@ -32,7 +32,7 @@
 </td>
 
 <td class="cell-user" *ngIf="!isCompact && patchForm.form.pristine" (click)="shouldStop($event)">
-    <img class="user-picture" [attr.title]="content.lastModifiedBy | sqxUserNameRef" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
+    <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
 </td>
 
 <ng-container *ngIf="patchForm.form.dirty">

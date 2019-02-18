@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <summary>
         /// Get schemas.
         /// </summary>
-        /// <param name="app">The name of the app to get the schemas for.</param>
+        /// <param name="app">The name of the app.</param>
         /// <returns>
         /// 200 => Schemas returned.
         /// 404 => App not found.

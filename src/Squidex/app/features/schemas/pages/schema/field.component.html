@@ -7,7 +7,7 @@
                 <span class="field-name">
                     <i class="field-icon icon-type-{{field.properties.fieldType}}"></i> 
 
-                    <span [class.field-hidden]="field.isHidden" [attr.title]="field.isHidden ? 'Hidden Field' : 'Visible Field'">{{field.displayName}}</span>
+                    <span [class.field-hidden]="field.isHidden" title="{{field.isHidden ? 'Hidden Field' : 'Visible Field'}}">{{field.displayName}}</span>
                     <span class="field-partitioning ml-2" *ngIf="field['isLocalizable']">localizable</span>
                 </span>
             </div>

@@ -126,19 +126,15 @@
 
         <ng-container sidebar>
             <div class="panel-nav">
-                <sqx-tooltip position="leftTop" [target]="historyLink">commentsLink</sqx-tooltip>
-
-                <a class="panel-link" routerLink="comments" routerLinkActive="active" #commentsLink>
+                <a class="panel-link" routerLink="comments" routerLinkActive="active" title="Comments" titlePosition="left">
                     <i class="icon-comments"></i>
                 </a>
 
-                <sqx-tooltip position="leftTop" [target]="historyLink">History</sqx-tooltip>
-
-                <a class="panel-link" routerLink="history" routerLinkActive="active" #historyLink>
+                <a class="panel-link" routerLink="history" routerLinkActive="active" title="History" titlePosition="left" #historyLink>
                     <i class="icon-time"></i>
                 </a>
 
-                <sqx-onboarding-tooltip helpId="history" [for]="historyLink" position="leftTop" after="120000">
+                <sqx-onboarding-tooltip helpId="history" [for]="historyLink" position="left-top" after="120000">
                     The sidebar navigation contains useful context specific links. Here you can view the history how this schema has changed over time.
                 </sqx-onboarding-tooltip>
             </div>

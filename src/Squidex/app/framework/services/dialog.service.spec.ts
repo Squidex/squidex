@@ -9,7 +9,8 @@ import {
     DialogRequest,
     DialogService,
     DialogServiceFactory,
-    Notification
+    Notification,
+    Tooltip
 } from './dialog.service';
 
 describe('DialogService', () => {
@@ -66,8 +67,25 @@ describe('DialogService', () => {
         expect(isNext).toBeTruthy();
     });
 
+    it('should publish tooltip', () => {
+        const dialogService = new DialogService();
+
+        const tooltip = new Tooltip('target', 'text', 'topLeft');
+
+        let publishedTooltip: Tooltip;
+
+        dialogService.tooltips.subscribe(result => {
+            publishedTooltip = result;
+        });
+
+        dialogService.tooltip(tooltip);
+
+        expect(publishedTooltip!).toBe(tooltip);
+    });
+
     it('should publish notification', () => {
         const dialogService = new DialogService();
+
         const notification = Notification.error('Message');
 
         let publishedNotification: Notification;

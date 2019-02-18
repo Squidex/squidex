@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
 
 import {
@@ -16,11 +16,14 @@ import {
     Notification,
     StatefulComponent
 } from '@app/framework/internal';
+import { Tooltip } from '@app/shared';
 
 interface State {
     dialogRequest?: DialogRequest | null;
 
     notifications: Notification[];
+
+    tooltip?: Tooltip | null;
 }
 
 @Component({
@@ -33,9 +36,6 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
-    @Input()
-    public position = 'bottomright';
-
     public dialogView = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
@@ -74,6 +74,16 @@ export class DialogRendererComponent extends StatefulComponent<State> implements
                     this.dialogView.show();
 
                     this.next(s => ({ ...s, dialogRequest }));
+                }));
+
+        this.own(
+            this.dialogs.tooltips
+                .subscribe(tooltip => {
+                    if (tooltip.text) {
+                        this.next(s => ({ ...s, tooltip }));
+                    } else if (!this.snapshot.tooltip || tooltip.target === this.snapshot.tooltip.target) {
+                        this.next(s => ({ ...s, tooltip: null }));
+                    }
                 }));
     }
 

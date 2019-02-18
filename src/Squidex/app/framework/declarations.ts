@@ -35,7 +35,7 @@ export * from './angular/modals/modal-dialog.component';
 export * from './angular/modals/modal-target.directive';
 export * from './angular/modals/modal-view.directive';
 export * from './angular/modals/onboarding-tooltip.component';
-export * from './angular/modals/tooltip.component';
+export * from './angular/modals/tooltip.directive';
 export * from './angular/modals/root-view.component';
 
 export * from './angular/pipes/colors.pipes';

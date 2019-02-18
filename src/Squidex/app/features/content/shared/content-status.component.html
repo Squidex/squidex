@@ -1,17 +1,13 @@
 <ng-container *ngIf="!scheduledTo">
-    <span class="content-status content-status-{{displayStatus | lowercase}} mr-1" [class.middle]="alignMiddle" #statusIcon>
+    <span class="content-status content-status-{{displayStatus | lowercase}} mr-1" [class.middle]="alignMiddle" title="{{displayStatus}}" titlePosition="top">
         <i class="icon-circle"></i>
     </span>
-
-    <sqx-tooltip [target]="statusIcon">{{displayStatus}}</sqx-tooltip>
 </ng-container>
 
 <ng-container *ngIf="scheduledTo">
-    <span class="content-status content-status-{{scheduledTo | lowercase}} mr-1" [class.middle]="alignMiddle" #statusIcon>
+    <span class="content-status content-status-{{scheduledTo | lowercase}} mr-1" [class.middle]="alignMiddle" title="{{displayStatus}}" titlePosition="top">
         <i class="icon-clock"></i>
     </span>
-
-    <sqx-tooltip position="topRight" [target]="statusIcon">Will be set to '{{scheduledTo}}' at {{scheduledAt | sqxFullDateTime}}</sqx-tooltip>
 </ng-container>
 
 <span class="content-status-label" *ngIf="showLabel">{{displayStatus}}</span>
