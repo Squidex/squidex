@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, Directive, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, HostListener, OnInit, Renderer2 } from '@angular/core';
 import { timer } from 'rxjs';
 
 import { ResourceOwner } from '@app/framework/internal';
@@ -24,15 +24,13 @@ export class IgnoreScrollbarDirective extends ResourceOwner implements OnInit, A
         super();
     }
 
-    public ngOnInit() {
-        if (!this.parent) {
-            this.parent = this.renderer.parentNode(this.element.nativeElement);
-        }
+    @HostListener('resize)')
+    public onResize() {
+        this.reposition();
+    }
 
-        this.own(
-            this.renderer.listen(this.element.nativeElement, 'resize', () => {
-                this.reposition();
-            }));
+    public ngOnInit() {
+        this.parent = this.renderer.parentNode(this.element.nativeElement);
 
         this.own(timer(100, 100).subscribe(() => this.reposition));
     }

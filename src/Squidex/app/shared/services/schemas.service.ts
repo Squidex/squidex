@@ -136,7 +136,7 @@ export class RootFieldDto extends FieldDto {
         return this.properties.fieldType === 'String';
     }
 
-    public get isTranslateable() {
+    public get isTranslatable() {
         return this.isLocalizable && this.isString && (this.properties.editor === 'Input' || this.properties.editor === 'Textarea');
     }
 

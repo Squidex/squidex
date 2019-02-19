@@ -83,8 +83,6 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
 
     private showSelector = () => {
         this.assetsDialog.show();
-
-        this.detectChanges();
     }
 
     private getEditorOptions() {

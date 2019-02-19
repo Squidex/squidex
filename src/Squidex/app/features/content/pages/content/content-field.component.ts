@@ -62,7 +62,7 @@ export class ContentFieldComponent implements OnChanges {
 
     public isInvalid: Observable<boolean>;
     public isDifferent: Observable<boolean>;
-    public isTranslateable: boolean;
+    public isTranslatable: boolean;
 
     constructor(
         private readonly appsState: AppsState,
@@ -81,7 +81,7 @@ export class ContentFieldComponent implements OnChanges {
         }
 
         if (changes['fieldForm'] || changes['field'] || changes['languages']) {
-            this.isTranslateable = this.field.isTranslateable;
+            this.isTranslatable = this.field.isTranslatable;
         }
 
         if ((changes['fieldForm'] || changes['fieldFormCompare']) && this.fieldFormCompare) {

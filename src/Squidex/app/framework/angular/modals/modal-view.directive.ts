@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import {
@@ -37,10 +37,11 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     public closeAlways = false;
 
     constructor(
-        private readonly templateRef: TemplateRef<any>,
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2,
-        private readonly viewContainer: ViewContainerRef,
-        private readonly rootView: RootViewComponent
+        private readonly rootView: RootViewComponent,
+        private readonly templateRef: TemplateRef<any>,
+        private readonly viewContainer: ViewContainerRef
     ) {
     }
 
@@ -87,6 +88,8 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             setTimeout(() => {
                 this.startListening();
             });
+
+            this.changeDetector.detectChanges();
         } else if (!isOpen && this.renderedView) {
             const container = this.getContainer();
             const containerIndex = container.indexOf(this.renderedView);
@@ -96,6 +99,8 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             this.renderedView = null;
 
             this.unsubscribeToClick();
+
+            this.changeDetector.detectChanges();
         }
     }
 

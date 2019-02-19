@@ -7,15 +7,15 @@
 
 // tslint:disable:directive-selector
 
-import { Directive, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
 
-import { DialogService, ResourceOwner } from '@app/framework/internal';
+import { DialogService } from '@app/framework/internal';
 import { Tooltip } from '@app/shared';
 
 @Directive({
     selector: '[title]'
 })
-export class TooltipDirective extends ResourceOwner implements OnInit {
+export class TooltipDirective {
     private titleText: string;
 
     @Input()
@@ -33,23 +33,20 @@ export class TooltipDirective extends ResourceOwner implements OnInit {
         private readonly element: ElementRef,
         private readonly renderer: Renderer2
     ) {
-        super();
     }
 
-    public ngOnInit() {
-        const target = this.element.nativeElement;
+    @HostListener('mouseenter')
+    public onMouseEnter() {
+        if (this.titleText) {
+            this.dialogs.tooltip(new Tooltip(this.element.nativeElement, this.titleText, this.titlePosition));
+        }
+    }
 
-        this.own(
-            this.renderer.listen(target, 'mouseenter', () => {
-                if (this.titleText) {
-                    this.dialogs.tooltip(new Tooltip(target, this.titleText, this.titlePosition));
-                }
-            }));
-
-        this.own(
-            this.renderer.listen(this.element.nativeElement, 'mouseleave', () => {
-                this.dialogs.tooltip(new Tooltip(target, null, this.titlePosition));
-            }));
+    @HostListener('mouseleave')
+    public onMouseLeave() {
+        if (this.titleText) {
+            this.dialogs.tooltip(new Tooltip(this.element.nativeElement, null, this.titlePosition));
+        }
     }
 
     private unsetAttribute() {

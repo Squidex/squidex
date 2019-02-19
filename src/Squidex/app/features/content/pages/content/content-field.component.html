@@ -2,7 +2,7 @@
     <div [class.col-12]="!fieldFormCompare" [class.col-6]="fieldFormCompare">
         <div class="table-items-row" [class.field-invalid]="isInvalid | async">
             <div class="languages-buttons">
-                <button *ngIf="isTranslateable" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="translate()" title="Autotranslate from master language">
+                <button *ngIf="isTranslatable" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="translate()" title="Autotranslate from master language">
                     <i class="icon-translate"></i>
                 </button>
 
