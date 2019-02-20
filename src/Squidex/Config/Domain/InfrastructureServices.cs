@@ -62,10 +62,10 @@ namespace Squidex.Config.Domain
                 .As<IActionContextAccessor>();
 
             services.AddSingletonAs<DefaultUserResolver>()
-                .As<IUserResolver>();
+                .AsOptional<IUserResolver>();
 
             services.AddSingletonAs<AssetUserPictureStore>()
-                .As<IUserPictureStore>();
+                .AsOptional<IUserPictureStore>();
 
             services.AddSingletonAs<DefaultXmlRepository>()
                 .As<IXmlRepository>();

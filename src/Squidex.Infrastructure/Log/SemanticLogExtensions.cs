@@ -126,8 +126,16 @@ namespace Squidex.Infrastructure.Log
             return writer.WriteObject(nameof(exception), exception, (ctx, w) =>
             {
                 w.WriteProperty("type", ctx.GetType().FullName);
-                w.WriteProperty("message", ctx.Message);
-                w.WriteProperty("stackTrace", ctx.StackTrace);
+
+                if (ctx.Message != null)
+                {
+                    w.WriteProperty("message", ctx.Message);
+                }
+
+                if (ctx.StackTrace != null)
+                {
+                    w.WriteProperty("stackTrace", ctx.StackTrace);
+                }
             });
         }
 

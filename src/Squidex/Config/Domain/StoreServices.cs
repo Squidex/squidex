@@ -78,32 +78,32 @@ namespace Squidex.Config.Domain
                         .As<IMigration>();
 
                     services.AddSingletonAs<MongoUsageRepository>()
-                        .As<IUsageRepository>();
+                        .AsOptional<IUsageRepository>();
 
                     services.AddSingletonAs<MongoRuleEventRepository>()
-                        .As<IRuleEventRepository>();
+                        .AsOptional<IRuleEventRepository>();
 
                     services.AddSingletonAs<MongoHistoryEventRepository>()
-                        .As<IHistoryEventRepository>();
+                        .AsOptional<IHistoryEventRepository>();
 
                     services.AddSingletonAs<MongoPersistedGrantStore>()
-                        .As<IPersistedGrantStore>();
+                        .AsOptional<IPersistedGrantStore>();
 
                     services.AddSingletonAs<MongoRoleStore>()
-                        .As<IRoleStore<IdentityRole>>();
+                        .AsOptional<IRoleStore<IdentityRole>>();
 
                     services.AddSingletonAs<MongoUserStore>()
-                        .As<IUserStore<IdentityUser>>()
-                        .As<IUserFactory>();
+                        .AsOptional<IUserStore<IdentityUser>>()
+                        .AsOptional<IUserFactory>();
 
                     services.AddSingletonAs<MongoAssetRepository>()
-                        .As<IAssetRepository>()
-                        .As<ISnapshotStore<AssetState, Guid>>();
+                        .AsOptional<IAssetRepository>()
+                        .AsOptional<ISnapshotStore<AssetState, Guid>>();
 
                     services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetRequiredService<IAppProvider>(), c.GetRequiredService<IJsonSerializer>()))
-                        .As<IContentRepository>()
-                        .As<ISnapshotStore<ContentState, Guid>>()
-                        .As<IEventConsumer>();
+                        .AsOptional<IContentRepository>()
+                        .AsOptional<ISnapshotStore<ContentState, Guid>>()
+                        .AsOptional<IEventConsumer>();
                 }
             });
 

@@ -16,6 +16,9 @@ namespace Squidex.Extensions.Actions.Twitter
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<TwitterOptions>(
+                configuration.GetSection("twitter"));
+
             RuleActionRegistry.Add<TweetAction>();
         }
     }

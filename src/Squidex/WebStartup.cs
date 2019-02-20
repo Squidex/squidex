@@ -78,8 +78,6 @@ namespace Squidex
                 config.GetSection("translations:deepL"));
             services.Configure<ReadonlyOptions>(
                 config.GetSection("mode"));
-            services.Configure<TwitterOptions>(
-                config.GetSection("twitter"));
             services.Configure<RobotsTxtOptions>(
                 config.GetSection("robots"));
             services.Configure<GCHealthCheckOptions>(
@@ -100,9 +98,10 @@ namespace Squidex
             services.Configure<MyNewsOptions>(
                 config.GetSection("news"));
 
+            services.AddHostedService<InitializerHost>();
+
             var provider = services.AddAndBuildOrleans(configuration, afterServices =>
             {
-                afterServices.AddHostedService<InitializerHost>();
                 afterServices.AddHostedService<MigratorHost>();
             });
 

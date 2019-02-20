@@ -6,13 +6,15 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using McMaster.NETCore.Plugins;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Extensions;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Pipeline.Plugins
@@ -29,43 +31,80 @@ namespace Squidex.Pipeline.Plugins
 
             if (options.Plugins != null)
             {
-                foreach (var pluginPath in options.Plugins)
+                foreach (var path in options.Plugins)
                 {
-                    PluginLoader plugin = null;
-
-                    if (pluginPath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
-                    {
-                        plugin = PluginLoader.CreateFromAssemblyFile(pluginPath, SharedTypes);
-                    }
-                    else
-                    {
-                        plugin = PluginLoader.CreateFromConfigFile(pluginPath, SharedTypes);
-                    }
+                    var plugin = LoadPlugin(path);
 
                     if (plugin != null)
                     {
-                        var pluginAssembly = plugin.LoadDefaultAssembly();
-
-                        AddParts(mvcBuilder, pluginAssembly);
-
-                        var relatedAssemblies = pluginAssembly.GetCustomAttributes<RelatedAssemblyAttribute>();
-
-                        foreach (var relatedAssembly in relatedAssemblies)
+                        try
                         {
-                            var assembly = plugin.LoadAssembly(relatedAssembly.AssemblyFileName);
+                            var pluginAssembly = plugin.LoadDefaultAssembly();
 
-                            AddParts(mvcBuilder, assembly);
+                            AddParts(mvcBuilder, pluginAssembly);
+
+                            foreach (var relatedAssembly in RelatedAssemblyAttribute.GetRelatedAssemblies(pluginAssembly, false))
+                            {
+                                AddParts(mvcBuilder, relatedAssembly);
+                            }
+
+                            pluginManager.Add(path, pluginAssembly);
                         }
-
-                        pluginManager.Add(pluginAssembly);
+                        catch (Exception ex)
+                        {
+                            pluginManager.LogException(path, "LoadingAssembly", ex);
+                        }
+                    }
+                    else
+                    {
+                        pluginManager.LogException(path, "LoadingPlugin", new FileNotFoundException($"Cannot find plugin at {path}"));
                     }
                 }
             }
 
-            pluginManager.Add(SquidexExtensions.Assembly);
             pluginManager.ConfigureServices(mvcBuilder.Services, configuration);
 
             mvcBuilder.Services.AddSingleton(pluginManager);
+        }
+
+        private static PluginLoader LoadPlugin(string pluginPath)
+        {
+            var fullPath = GetPaths(pluginPath);
+
+            foreach (var candidate in GetPaths(pluginPath))
+            {
+                if (candidate.Extension.Equals(".dll", StringComparison.OrdinalIgnoreCase))
+                {
+                    return PluginLoader.CreateFromAssemblyFile(candidate.FullName, SharedTypes);
+                }
+
+                if (candidate.Extension.Equals(".json", StringComparison.OrdinalIgnoreCase))
+                {
+                    return PluginLoader.CreateFromConfigFile(candidate.FullName, SharedTypes);
+                }
+            }
+
+            return null;
+        }
+
+        private static IEnumerable<FileInfo> GetPaths(string pluginPath)
+        {
+            var candidate = new FileInfo(Path.GetFullPath(pluginPath));
+
+            if (candidate.Exists)
+            {
+                yield return candidate;
+            }
+
+            if (!Path.IsPathRooted(pluginPath))
+            {
+                candidate = new FileInfo(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), pluginPath));
+
+                if (candidate.Exists)
+                {
+                    yield return candidate;
+                }
+            }
         }
 
         public static void UsePlugins(this IApplicationBuilder app)
@@ -73,6 +112,13 @@ namespace Squidex.Pipeline.Plugins
             var pluginManager = app.ApplicationServices.GetRequiredService<PluginManager>();
 
             pluginManager.Configure(app);
+
+            var log = app.ApplicationServices.GetService<ISemanticLog>();
+
+            if (log != null)
+            {
+                pluginManager.Log(log);
+            }
         }
 
         private static void AddParts(IMvcBuilder mvcBuilder, Assembly assembly)

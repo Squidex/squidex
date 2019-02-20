@@ -114,7 +114,7 @@ namespace Squidex.Config.Domain
                 .As<ITagGenerator<CreateAsset>>();
 
             services.AddSingletonAs<JintScriptEngine>()
-                .As<IScriptEngine>();
+                .AsOptional<IScriptEngine>();
 
             services.AddCommandPipeline();
             services.AddBackupHandlers();

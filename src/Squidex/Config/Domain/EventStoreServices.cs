@@ -39,7 +39,7 @@ namespace Squidex.Config.Domain
 
                             return new MongoEventStore(mongDatabase, c.GetRequiredService<IEventNotifier>());
                         })
-                        .As<IEventStore>();
+                        .AsOptional<IEventStore>();
                 },
                 ["GetEventStore"] = () =>
                 {
@@ -53,7 +53,7 @@ namespace Squidex.Config.Domain
                         .As<IEventStoreConnection>();
 
                     services.AddSingletonAs(c => new GetEventStore(connection, c.GetRequiredService<IJsonSerializer>(), eventStorePrefix, eventStoreProjectionHost))
-                        .As<IEventStore>();
+                        .AsOptional<IEventStore>();
 
                     services.AddHealthChecks()
                         .AddCheck<GetEventStoreHealthCheck>("EventStore", tags: new[] { "node" });

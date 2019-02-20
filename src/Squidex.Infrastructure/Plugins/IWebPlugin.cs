@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Builder;
 
 namespace Squidex.Infrastructure.Plugins
 {
-    public interface IWebPlugin
+    public interface IWebPlugin : I
     {
         void Configure(IApplicationBuilder app);
     }

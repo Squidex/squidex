@@ -62,7 +62,7 @@ namespace Squidex.Config.Domain
                 .As<IAppLogStore>();
 
             services.AddSingletonAs<NoopLogStore>()
-                .As<ILogStore>();
+                .AsOptional<ILogStore>();
         }
     }
 }

@@ -61,9 +61,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Algolia.Search" Version="5.3.1" />
     <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="2.0.1" />
-    <PackageReference Include="Ben.BlockingDetector" Version="0.0.3" />
     <PackageReference Include="EventStore.ClientAPI.NetCore" Version="4.1.0.23" />
     <PackageReference Include="IdentityServer4" Version="2.3.2" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.7.0" />
@@ -96,7 +94,6 @@
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="4.0.12" />
     <PackageReference Include="Squidex.ClientLibrary" Version="2.8.0" />
-    <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />

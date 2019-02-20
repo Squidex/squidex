@@ -23,13 +23,13 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs(c => c.GetRequiredService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
 
             services.AddSingletonAs<ConfigAppPlansProvider>()
-                .As<IAppPlansProvider>();
+                .AsOptional<IAppPlansProvider>();
 
             services.AddSingletonAs<NoopAppPlanBillingManager>()
-                .As<IAppPlanBillingManager>();
+                .AsOptional<IAppPlanBillingManager>();
 
             services.AddSingletonAs<NoopUserEvents>()
-                .As<IUserEvents>();
+                .AsOptional<IUserEvents>();
         }
     }
 }
