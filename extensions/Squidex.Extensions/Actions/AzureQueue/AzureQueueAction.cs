@@ -25,10 +25,14 @@ namespace Squidex.Extensions.Actions.AzureQueue
     {
         [Required]
         [Display(Name = "Connection String", Description = "The connection string to the storage account.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string ConnectionString { get; set; }
 
         [Required]
         [Display(Name = "Queue", Description = "The name of the queue.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string Queue { get; set; }
 
         protected override IEnumerable<ValidationError> CustomValidate()

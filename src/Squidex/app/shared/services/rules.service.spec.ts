@@ -77,45 +77,8 @@ describe('RulesService', () => {
         });
 
         expect(actions!).toEqual({
-            'action1': new RuleElementDto('display1', 'description1', '#111', '<svg path="1" />', 'link1'),
-            'action2': new RuleElementDto('display2', 'description2', '#222', '<svg path="2" />', 'link2')
-        });
-    }));
-
-    it('should make get request to get triggers',
-        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-
-        let triggers: { [ name: string ]: RuleElementDto };
-
-        rulesService.getTriggers().subscribe(result => {
-            triggers = result;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/rules/triggers');
-
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({
-            'trigger2': {
-                display: 'display2',
-                description: 'description2',
-                iconColor: '#222',
-                iconImage: '<svg path="2" />',
-                readMore: 'link2'
-            },
-            'trigger1': {
-                display: 'display1',
-                description: 'description1',
-                iconColor: '#111',
-                iconImage: '<svg path="1" />',
-                readMore: 'link1'
-            }
-        });
-
-        expect(triggers!).toEqual({
-            'trigger1': new RuleElementDto('display1', 'description1', '#111', '<svg path="1" />', 'link1'),
-            'trigger2': new RuleElementDto('display2', 'description2', '#222', '<svg path="2" />', 'link2')
+            'action1': new RuleElementDto('display1', 'description1', '#111', '<svg path="1" />', null, 'link1'),
+            'action2': new RuleElementDto('display2', 'description2', '#222', '<svg path="2" />', null, 'link2')
         });
     }));
 

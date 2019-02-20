@@ -9,6 +9,7 @@ import { Component, OnInit } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
+    ALL_TRIGGERS,
     AppsState,
     DialogModel,
     RuleDto,
@@ -30,7 +31,7 @@ export class RulesPageComponent implements OnInit {
     public wizardRule: RuleDto | null;
 
     public ruleActions: { [name: string]: RuleElementDto };
-    public ruleTriggers: { [name: string]: RuleElementDto };
+    public ruleTriggers = ALL_TRIGGERS;
 
     constructor(
         public readonly appsState: AppsState,
@@ -46,11 +47,6 @@ export class RulesPageComponent implements OnInit {
         this.rulesService.getActions()
             .subscribe(actions => {
                 this.ruleActions = actions;
-            });
-
-        this.rulesService.getTriggers()
-            .subscribe(triggers => {
-                this.ruleTriggers = triggers;
             });
 
         this.schemasState.load().pipe(onErrorResumeNext()).subscribe();

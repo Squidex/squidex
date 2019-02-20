@@ -22,10 +22,12 @@ namespace Squidex.Extensions.Actions.Fastly
     {
         [Required]
         [Display(Name = "Api Key", Description = "The API key to grant access to Squidex.")]
+        [DataType(DataType.Text)]
         public string ApiKey { get; set; }
 
         [Required]
         [Display(Name = "Service Id", Description = "The ID of the fastly service.")]
+        [DataType(DataType.Text)]
         public string ServiceId { get; set; }
     }
 }

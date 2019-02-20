@@ -22,14 +22,20 @@ namespace Squidex.Extensions.Actions.Algolia
     {
         [Required]
         [Display(Name = "Application Id", Description = "The application ID.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string AppId { get; set; }
 
         [Required]
         [Display(Name = "Api Key", Description = "The API key to grant access to Squidex.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string ApiKey { get; set; }
 
         [Required]
         [Display(Name = "Index Name", Description = "The name of the index.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string IndexName { get; set; }
     }
 }

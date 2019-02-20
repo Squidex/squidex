@@ -24,28 +24,37 @@ namespace Squidex.Extensions.Actions.Discourse
     {
         [AbsoluteUrl]
         [Required]
-        [Display(Name = "Url", Description = "he url to the discourse server.")]
+        [Display(Name = "Url", Description = "The url to the discourse server.")]
+        [DataType(DataType.Url)]
         public Uri Url { get; set; }
 
         [Required]
         [Display(Name = "Api Key", Description = "The api key to authenticate to your discourse server.")]
+        [DataType(DataType.Text)]
         public string ApiKey { get; set; }
 
         [Required]
         [Display(Name = "Api Username", Description = "The api username to authenticate to your discourse server.")]
+        [DataType(DataType.Text)]
         public string ApiUsername { get; set; }
 
         [Required]
         [Display(Name = "Text", Description = "The text as markdown.")]
+        [DataType(DataType.MultilineText)]
+        [Formattable]
         public string Text { get; set; }
 
         [Display(Name = "Title", Description = "The optional title when creating new topics.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string Title { get; set; }
 
         [Display(Name = "Topic", Description = "The optional topic id.")]
+        [DataType(DataType.Custom)]
         public int? Topic { get; set; }
 
         [Display(Name = "Category", Description = "The optional category id.")]
+        [DataType(DataType.Custom)]
         public int? Category { get; set; }
     }
 }

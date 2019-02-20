@@ -25,20 +25,29 @@ namespace Squidex.Extensions.Actions.ElasticSearch
         [AbsoluteUrl]
         [Required]
         [Display(Name = "Host", Description = "The hostname of the elastic search instance or cluster.")]
+        [DataType(DataType.Url)]
         public Uri Host { get; set; }
 
         [Required]
         [Display(Name = "Index Name", Description = "The name of the index.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string IndexName { get; set; }
 
         [Required]
         [Display(Name = "Index Type", Description = "The name of the index type.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string IndexType { get; set; }
 
         [Display(Name = "Username", Description = "The optional username.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string Username { get; set; }
 
         [Display(Name = "Password", Description = "The optional password.")]
+        [DataType(DataType.Password)]
+        [Formattable]
         public string Password { get; set; }
     }
 }

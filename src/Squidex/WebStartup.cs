@@ -31,6 +31,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.Translations;
 using Squidex.Pipeline;
+using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
 
 namespace Squidex
@@ -62,7 +63,7 @@ namespace Squidex
             services.AddMyInfrastructureServices(config);
             services.AddMyLoggingServices(config);
             services.AddMyMigrationServices();
-            services.AddMyMvc();
+            services.AddMyMvc(config);
             services.AddMyRuleServices();
             services.AddMySerializers();
             services.AddMyStoreServices(config);
@@ -124,6 +125,8 @@ namespace Squidex
             app.ConfigureOrleansDashboard();
             app.ConfigureIdentityServer();
             app.ConfigureFrontend();
+
+            app.UsePlugins();
         }
     }
 }

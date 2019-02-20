@@ -27,6 +27,10 @@
         height: 3rem;
     }
 
+    .icon {
+        font-size: 20px;
+    }
+
     .svg-icon {
         width: 20px;
     }
@@ -56,11 +60,16 @@
     }
 
     &-icon {
+        color: $color-dark-foreground;
         display: inline-block;
         margin-right: .5rem;
         position: relative;
         padding: 1rem;
         line-height: 1px;
+    }
+
+    .icon {
+        font-size: 30px;
     }
 
     .svg-icon {

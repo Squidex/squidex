@@ -25,10 +25,14 @@ namespace Squidex.Extensions.Actions.Slack
         [AbsoluteUrl]
         [Required]
         [Display(Name = "Webhook Url", Description = "The slack webhook url.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public Uri WebhookUrl { get; set; }
 
         [Required]
         [Display(Name = "Text", Description = "The text that is sent as message to slack.")]
+        [DataType(DataType.MultilineText)]
+        [Formattable]
         public string Text { get; set; }
     }
 }

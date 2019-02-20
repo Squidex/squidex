@@ -22,14 +22,17 @@ namespace Squidex.Extensions.Actions.Twitter
     {
         [Required]
         [Display(Name = "Access Token", Description = " The generated access token.")]
+        [DataType(DataType.Text)]
         public string AccessToken { get; set; }
 
         [Required]
         [Display(Name = "Access Secret", Description = " The generated access secret.")]
+        [DataType(DataType.Text)]
         public string AccessSecret { get; set; }
 
         [Required]
         [Display(Name = "Text", Description = "The text that is sent as tweet to twitter.")]
+        [DataType(DataType.MultilineText)]
         public string Text { get; set; }
     }
 }

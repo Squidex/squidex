@@ -24,10 +24,13 @@ namespace Squidex.Extensions.Actions.Webhook
     {
         [AbsoluteUrl]
         [Required]
-        [Display(Name = "Url", Description = "he url to the webhook.")]
+        [Display(Name = "Url", Description = "The url to the webhook.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public Uri Url { get; set; }
 
         [Display(Name = "Shared Secret", Description = "The shared secret that is used to calculate the signature.")]
+        [DataType(DataType.Text)]
         public string SharedSecret { get; set; }
     }
 }

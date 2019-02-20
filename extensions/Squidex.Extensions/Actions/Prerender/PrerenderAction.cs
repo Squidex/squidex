@@ -22,10 +22,13 @@ namespace Squidex.Extensions.Actions.Prerender
     {
         [Required]
         [Display(Name = "Token", Description = "The prerender token from your account.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string Token { get; set; }
 
         [Required]
         [Display(Name = "Url", Description = "The url to recache.")]
+        [DataType(DataType.Text)]
         public string Url { get; set; }
     }
 }

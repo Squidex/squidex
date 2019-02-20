@@ -22,26 +22,36 @@ namespace Squidex.Extensions.Actions.Medium
     {
         [Required]
         [Display(Name = "Access Token", Description = "The self issued access token.")]
+        [DataType(DataType.Text)]
         public string AccessToken { get; set; }
 
         [Required]
         [Display(Name = "Title", Description = "The title, used for the url.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string Title { get; set; }
 
         [Required]
         [Display(Name = "Content", Description = "The content, either html or markdown.")]
+        [DataType(DataType.MultilineText)]
+        [Formattable]
         public string Content { get; set; }
 
         [Display(Name = "Canonical Url", Description = "The original home of this content, if it was originally published elsewhere.")]
+        [DataType(DataType.Text)]
+        [Formattable]
         public string CanonicalUrl { get; set; }
 
         [Display(Name = "PublicationId", Description = "Optional publication id.")]
+        [DataType(DataType.Text)]
         public string PublicationId { get; set; }
 
         [Display(Name = "Tags", Description = "The optional comma separated list of tags.")]
+        [DataType(DataType.Text)]
         public string Tags { get; set; }
 
         [Display(Name = "Is Html", Description = "Indicates whether the content is markdown or html.")]
+        [DataType(DataType.Custom)]
         public bool IsHtml { get; set; }
     }
 }

@@ -21,12 +21,39 @@ import {
     Versioned
 } from '@app/framework';
 
+export const ALL_TRIGGERS = {
+    'ContentChanged': {
+        description: 'For content changes like created, updated, published, unpublished...',
+        display: 'Content changed',
+        iconColor: '#3389ff',
+        iconCode: 'contents'
+    },
+    'AssetChanged': {
+        description: 'For asset changes like uploaded, updated (reuploaded), renamed, deleted...',
+        display: 'Asset changed',
+        iconColor: '#3389ff',
+        iconCode: 'assets'
+    },
+    'SchemaChanged': {
+        description: 'When a schema definition has been created, updated, published or deleted...',
+        display: 'Schema changed',
+        iconColor: '#3389ff',
+        iconCode: 'schemas'},
+    'Usage': {
+        description: 'When monthly API calls exceed a specified limit for one time a month...',
+        display: 'Usage exceeded',
+        iconColor: '#3389ff',
+        iconCode: 'dashboard'
+    }
+};
+
 export class RuleElementDto {
     constructor(
         public readonly display: string,
         public readonly description: string,
         public readonly iconColor: string,
         public readonly iconImage: string,
+        public readonly iconCode: string | null,
         public readonly readMore: string
     ) {
     }
@@ -120,27 +147,7 @@ export class RulesService {
                 for (let key of Object.keys(items).sort()) {
                     const value = items[key];
 
-                    result[key] = new RuleElementDto(value.display, value.description, value.iconColor, value.iconImage, value.readMore);
-                }
-
-                return result;
-            }),
-            pretifyError('Failed to load Rules. Please reload.'));
-    }
-
-    public getTriggers(): Observable<{ [name: string]: RuleElementDto }> {
-        const url = this.apiUrl.buildUrl('api/rules/triggers');
-
-        return HTTP.getVersioned<any>(this.http, url).pipe(
-            map(response => {
-                const items: { [name: string]: any } = response.payload.body;
-
-                const result: { [name: string]: RuleElementDto } = {};
-
-                for (let key of Object.keys(items).sort()) {
-                    const value = items[key];
-
-                    result[key] = new RuleElementDto(value.display, value.description, value.iconColor, value.iconImage, value.readMore);
+                    result[key] = new RuleElementDto(value.display, value.description, value.iconColor, value.iconImage, null, value.readMore);
                 }
 
                 return result;

@@ -1,7 +1,11 @@
 <ng-container *ngIf="isSmall; else large">
     <div class="row no-gutters align-items-center small" *ngIf="element" [style.background]="element.iconColor" [sqxHoverBackground]="element.iconColor | sqxDarken:5">
         <div class="col-auto small-icon" [style.background]="element.iconColor | sqxDarken:5">
-            <i class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></i>
+            <i *ngIf="element.iconCode; else svgIcon" class="icon icon-{{element.iconCode}}"></i>
+
+            <ng-template #svgIcon>
+                <i class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></i>
+            </ng-template>
         </div>
         <div class="col align-items-center">
             <div class="small-text">
@@ -14,7 +18,11 @@
     <div class="row no-gutters large">
         <div class="col-auto">
             <div class="large-icon" [style.background]="element.iconColor | sqxDarken:5">
-                <div class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></div>
+                <i *ngIf="element.iconCode; else svgIcon" class="icon icon-{{element.iconCode}}"></i>
+
+                <ng-template #svgIcon>
+                    <i class="svg-icon" [innerHtml]="element.iconImage | sqxSafeHtml"></i>
+                </ng-template>
             </div>
         </div>
         <div class="col">

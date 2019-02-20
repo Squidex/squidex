@@ -8,9 +8,11 @@
 using System;
 using System.Reflection;
 using McMaster.NETCore.Plugins;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Extensions;
 using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Pipeline.Plugins
@@ -19,14 +21,14 @@ namespace Squidex.Pipeline.Plugins
     {
         private static readonly Type[] SharedTypes = { typeof(IPlugin) };
 
-        public static void AddPlugins(IMvcBuilder mvcBuilder, IConfiguration configuration)
+        public static void AddMyPlugins(this IMvcBuilder mvcBuilder, IConfiguration configuration)
         {
+            var pluginManager = new PluginManager();
+
             var options = configuration.Get<PluginOptions>();
 
             if (options.Plugins != null)
             {
-                var pluginManager = new PluginManager();
-
                 foreach (var pluginPath in options.Plugins)
                 {
                     PluginLoader plugin = null;
@@ -58,9 +60,19 @@ namespace Squidex.Pipeline.Plugins
                         pluginManager.Add(pluginAssembly);
                     }
                 }
-
-                mvcBuilder.Services.AddSingleton(pluginManager);
             }
+
+            pluginManager.Add(SquidexExtensions.Assembly);
+            pluginManager.ConfigureServices(mvcBuilder.Services, configuration);
+
+            mvcBuilder.Services.AddSingleton(pluginManager);
+        }
+
+        public static void UsePlugins(this IApplicationBuilder app)
+        {
+            var pluginManager = app.ApplicationServices.GetRequiredService<PluginManager>();
+
+            pluginManager.Configure(app);
         }
 
         private static void AddParts(IMvcBuilder mvcBuilder, Assembly assembly)
