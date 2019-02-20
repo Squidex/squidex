@@ -9,12 +9,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
     Form,
-    hasValue$,
+    hasNoValue$,
     ValidatorsEx
 } from '@app/framework';
 
 export class RestoreForm extends Form<FormGroup> {
-    public hasNoUrl = hasValue$(this.form.controls['url']);
+    public hasNoUrl = hasNoValue$(this.form.controls['url']);
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
