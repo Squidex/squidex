@@ -42,6 +42,8 @@ using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Configuration;
+using Squidex.Infrastructure.DependencyInjection;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Pipeline;

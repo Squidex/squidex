@@ -27,6 +27,8 @@ using Squidex.Domain.Users;
 using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Configuration;
+using Squidex.Infrastructure.DependencyInjection;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;

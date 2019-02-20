@@ -12,21 +12,16 @@ using System.Reflection;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 
-namespace Squidex.Extensions.Actions
+namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public static class RuleElementRegistry
+    public static class RuleActionRegistry
     {
         private const string ActionSuffix = "Action";
         private const string ActionSuffixV2 = "Action";
         private static readonly HashSet<Type> ActionHandlerTypes = new HashSet<Type>();
-        private static readonly Dictionary<string, RuleElement> ActionTypes = new Dictionary<string, RuleElement>();
+        private static readonly Dictionary<string, RuleActionDefinition> ActionTypes = new Dictionary<string, RuleActionDefinition>();
 
-        public static IReadOnlyDictionary<string, RuleElement> Triggers
-        {
-            get { return TriggerTypes.All; }
-        }
-
-        public static IReadOnlyDictionary<string, RuleElement> Actions
+        public static IReadOnlyDictionary<string, RuleActionDefinition> Actions
         {
             get { return ActionTypes; }
         }
@@ -36,10 +31,10 @@ namespace Squidex.Extensions.Actions
             get { return ActionHandlerTypes; }
         }
 
-        static RuleElementRegistry()
+        static RuleActionRegistry()
         {
             var actionTypes =
-                typeof(RuleElementRegistry).Assembly
+                typeof(RuleActionRegistry).Assembly
                     .GetTypes()
                         .Where(x => typeof(RuleAction).IsAssignableFrom(x))
                         .Where(x => x.GetCustomAttribute<RuleActionAttribute>() != null)
@@ -48,23 +43,45 @@ namespace Squidex.Extensions.Actions
 
             foreach (var actionType in actionTypes)
             {
-                var name = GetActionName(actionType);
-
-                var metadata = actionType.GetCustomAttribute<RuleActionAttribute>();
-
-                ActionTypes[name] =
-                    new RuleElement
-                    {
-                        Type = actionType,
-                        Display = metadata.Display,
-                        Description = metadata.Description,
-                        IconColor = metadata.IconColor,
-                        IconImage = metadata.IconImage,
-                        ReadMore = metadata.ReadMore
-                    };
-
-                ActionHandlerTypes.Add(actionType.GetCustomAttribute<RuleActionHandlerAttribute>().HandlerType);
+                Add(actionType);
             }
+        }
+
+        public static void Add<T>() where T : RuleAction
+        {
+            Add(typeof(T));
+        }
+
+        private static void Add(Type actionType)
+        {
+            var metadata = actionType.GetCustomAttribute<RuleActionAttribute>();
+
+            if (metadata == null)
+            {
+                return;
+            }
+
+            var handlerAttribute = actionType.GetCustomAttribute<RuleActionHandlerAttribute>();
+
+            if (handlerAttribute == null)
+            {
+                return;
+            }
+
+            var name = GetActionName(actionType);
+
+            ActionTypes[name] =
+                new RuleActionDefinition
+                {
+                    Type = actionType,
+                    Display = metadata.Display,
+                    Description = metadata.Description,
+                    IconColor = metadata.IconColor,
+                    IconImage = metadata.IconImage,
+                    ReadMore = metadata.ReadMore
+                };
+
+            ActionHandlerTypes.Add(actionType.GetCustomAttribute<RuleActionHandlerAttribute>().HandlerType);
         }
 
         public static TypeNameRegistry MapRuleActions(this TypeNameRegistry typeNameRegistry)

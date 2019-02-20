@@ -1,20 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 
-namespace Squidex.Config
+namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public sealed class Options : Dictionary<string, Action>
+    [AttributeUsage(AttributeTargets.Property)]
+    public sealed class FormattableAttribute : Attribute
     {
-        public Options()
-            : base(StringComparer.OrdinalIgnoreCase)
-        {
-        }
     }
 }

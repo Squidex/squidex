@@ -6,10 +6,9 @@
 // ==========================================================================
 
 using System;
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Infrastructure;
 
-namespace Squidex.Extensions.Actions
+namespace Squidex.Domain.Apps.Core.HandleRules
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class RuleActionHandlerAttribute : Attribute

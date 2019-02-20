@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Extensions.Actions;
+using Squidex.Infrastructure.DependencyInjection;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Config.Domain
@@ -45,7 +46,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleService>()
                 .AsSelf();
 
-            foreach (var actionHandler in RuleElementRegistry.ActionHandlers)
+            foreach (var actionHandler in RuleActionRegistry.ActionHandlers)
             {
                 services.AddSingleton(typeof(IRuleActionHandler), actionHandler);
             }

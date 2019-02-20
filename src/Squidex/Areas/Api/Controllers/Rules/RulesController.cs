@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
@@ -31,8 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
     [ApiExplorerSettings(GroupName = nameof(Rules))]
     public sealed class RulesController : ApiController
     {
-        private static readonly string RuleActionsEtag = string.Join(";", RuleElementRegistry.Actions.Select(x => x.Key)).Sha256Base64();
-        private static readonly string RuleTriggersEtag = string.Join(";", RuleElementRegistry.Triggers.Select(x => x.Key)).Sha256Base64();
+        private static readonly string RuleActionsEtag = string.Join(";", RuleActionRegistry.Actions.Select(x => x.Key)).Sha256Base64();
         private readonly IAppProvider appProvider;
         private readonly IRuleEventRepository ruleEventsRepository;
 
@@ -58,29 +58,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public IActionResult GetActions()
         {
-            var response = RuleElementRegistry.Actions.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
+            var response = RuleActionRegistry.Actions.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
 
             Response.Headers[HeaderNames.ETag] = RuleActionsEtag;
-
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Get the supported rule triggers.
-        /// </summary>
-        /// <returns>
-        /// 200 => Rule triggers returned.
-        /// </returns>
-        [HttpGet]
-        [Route("rules/triggers/")]
-        [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), 200)]
-        [ApiPermission]
-        [ApiCosts(0)]
-        public IActionResult GetTriggers()
-        {
-            var response = RuleElementRegistry.Triggers.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
-
-            Response.Headers[HeaderNames.ETag] = RuleTriggersEtag;
 
             return Ok(response);
         }

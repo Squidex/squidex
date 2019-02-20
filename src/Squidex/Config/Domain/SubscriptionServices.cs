@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.DependencyInjection;
 
 namespace Squidex.Config.Domain
 {

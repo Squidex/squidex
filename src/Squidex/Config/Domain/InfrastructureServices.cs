@@ -18,8 +18,8 @@ using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.DependencyInjection;
 using Squidex.Infrastructure.Diagnostics;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared.Users;
@@ -32,19 +32,6 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyInfrastructureServices(this IServiceCollection services, IConfiguration config)
         {
-            var deeplAuthKey = config.GetValue<string>("translations:deeplAuthKey");
-
-            if (!string.IsNullOrWhiteSpace(deeplAuthKey))
-            {
-                services.AddSingletonAs(c => new DeepLTranslator(deeplAuthKey, c.GetRequiredService<IJsonSerializer>()))
-                    .As<ITranslator>();
-            }
-            else
-            {
-                services.AddSingletonAs<NoopTranslator>()
-                    .As<ITranslator>();
-            }
-
             services.AddHealthChecks()
                 .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" })
                 .AddCheck<OrleansHealthCheck>("Orleans", tags: new[] { "cluster" })
@@ -58,6 +45,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<BackgroundUsageTracker>()
                 .AsSelf();
+
+            services.AddSingletonAs<DeepLTranslator>()
+                .As<ITranslator>();
 
             services.AddSingletonAs(c => new CachingUsageTracker(c.GetRequiredService<BackgroundUsageTracker>(), c.GetRequiredService<IMemoryCache>()))
                 .As<IUsageTracker>();

@@ -29,6 +29,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Extensions.Actions.Twitter;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
+using Squidex.Infrastructure.Translations;
 using Squidex.Pipeline;
 using Squidex.Pipeline.Robots;
 
@@ -72,6 +73,8 @@ namespace Squidex
                 config.GetSection("contents"));
             services.Configure<AssetOptions>(
                 config.GetSection("assets"));
+            services.Configure<DeepLTranslatorOptions>(
+                config.GetSection("translations:deepL"));
             services.Configure<ReadonlyOptions>(
                 config.GetSection("mode"));
             services.Configure<TwitterOptions>(

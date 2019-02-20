@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 
 namespace Squidex.Extensions.Actions.Algolia
@@ -28,7 +29,7 @@ namespace Squidex.Extensions.Actions.Algolia
         public string ApiKey { get; set; }
 
         [Required]
-        [Display(Name = "Index Name", Description = "THe name of the index.")]
+        [Display(Name = "Index Name", Description = "The name of the index.")]
         public string IndexName { get; set; }
     }
 }

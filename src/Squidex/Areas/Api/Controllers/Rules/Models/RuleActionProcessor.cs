@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using NJsonSchema;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Extensions.Actions;
 
@@ -36,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                         Type = JsonObjectType.String, IsRequired = true
                     };
 
-                    foreach (var derived in RuleElementRegistry.Actions)
+                    foreach (var derived in RuleActionRegistry.Actions)
                     {
                         var derivedSchema = await context.SchemaGenerator.GenerateAsync(derived.Value.Type, context.SchemaResolver);
 

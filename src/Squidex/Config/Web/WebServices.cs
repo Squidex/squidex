@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Config.Domain;
+using Squidex.Infrastructure.DependencyInjection;
 using Squidex.Pipeline;
 using Squidex.Pipeline.Robots;
 

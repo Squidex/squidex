@@ -5,22 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Microsoft.AspNetCore.Builder;
 
-namespace Squidex.Extensions.Actions
+namespace Squidex.Infrastructure.Plugins
 {
-    public sealed class RuleElement
+    public interface IWebPlugin
     {
-        public Type Type { get; set; }
-
-        public string ReadMore { get; set; }
-
-        public string IconImage { get; set; }
-
-        public string IconColor { get; set; }
-
-        public string Display { get; set; }
-
-        public string Description { get; set; }
+        void Configure(IApplicationBuilder app);
     }
 }

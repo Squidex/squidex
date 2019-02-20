@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Infrastructure.Translations
@@ -18,7 +19,7 @@ namespace Squidex.Infrastructure.Translations
     {
         private const string Url = "https://api.deepl.com/v2/translate";
         private readonly HttpClient httpClient = new HttpClient();
-        private readonly string authKey;
+        private readonly DeepLTranslatorOptions deepLOptions;
         private readonly IJsonSerializer jsonSerializer;
 
         private sealed class Response
@@ -31,12 +32,12 @@ namespace Squidex.Infrastructure.Translations
             public string Text { get; set; }
         }
 
-        public DeepLTranslator(string authKey, IJsonSerializer jsonSerializer)
+        public DeepLTranslator(IOptions<DeepLTranslatorOptions> deepLOptions, IJsonSerializer jsonSerializer)
         {
-            Guard.NotNull(authKey, nameof(authKey));
+            Guard.NotNull(deepLOptions, nameof(deepLOptions));
             Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
 
-            this.authKey = authKey;
+            this.deepLOptions = deepLOptions.Value;
 
             this.jsonSerializer = jsonSerializer;
         }
@@ -48,9 +49,14 @@ namespace Squidex.Infrastructure.Translations
                 return new Translation(TranslationResult.NotTranslated, sourceText);
             }
 
+            if (string.IsNullOrWhiteSpace(deepLOptions.AuthKey))
+            {
+                return new Translation(TranslationResult.NotImplemented);
+            }
+
             var parameters = new Dictionary<string, string>
             {
-                ["auth_key"] = authKey,
+                ["auth_key"] = deepLOptions.AuthKey,
                 ["text"] = sourceText,
                 ["target_lang"] = GetLanguageCode(targetLanguage)
             };
