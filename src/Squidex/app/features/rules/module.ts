@@ -15,26 +15,16 @@ import {
 } from '@app/shared';
 
 import {
-    AlgoliaActionComponent,
     AssetChangedTriggerComponent,
-    AzureQueueActionComponent,
     ContentChangedTriggerComponent,
-    DiscourseActionComponent,
-    ElasticSearchActionComponent,
-    EmailActionComponent,
-    FastlyActionComponent,
-    MediumActionComponent,
-    PrerenderActionComponent,
+    GenericActionComponent,
     RuleElementComponent,
     RuleEventBadgeClassPipe,
     RuleEventsPageComponent,
     RulesPageComponent,
     RuleWizardComponent,
     SchemaChangedTriggerComponent,
-    SlackActionComponent,
-    TweetActionComponent,
-    UsageTriggerComponent,
-    WebhookActionComponent
+    UsageTriggerComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -64,26 +54,16 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
-        AlgoliaActionComponent,
         AssetChangedTriggerComponent,
-        AzureQueueActionComponent,
         ContentChangedTriggerComponent,
-        DiscourseActionComponent,
-        EmailActionComponent,
-        ElasticSearchActionComponent,
-        FastlyActionComponent,
-        MediumActionComponent,
-        PrerenderActionComponent,
+        GenericActionComponent,
         RuleElementComponent,
         RuleEventBadgeClassPipe,
         RuleEventsPageComponent,
         RulesPageComponent,
         RuleWizardComponent,
         SchemaChangedTriggerComponent,
-        SlackActionComponent,
-        TweetActionComponent,
-        UsageTriggerComponent,
-        WebhookActionComponent
+        UsageTriggerComponent
     ]
 })
 export class SqxFeatureRulesModule { }

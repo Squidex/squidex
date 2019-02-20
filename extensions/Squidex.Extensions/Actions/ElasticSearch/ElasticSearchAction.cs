@@ -42,12 +42,10 @@ namespace Squidex.Extensions.Actions.ElasticSearch
 
         [Display(Name = "Username", Description = "The optional username.")]
         [DataType(DataType.Text)]
-        [Formattable]
         public string Username { get; set; }
 
         [Display(Name = "Password", Description = "The optional password.")]
-        [DataType(DataType.Password)]
-        [Formattable]
+        [DataType(DataType.Text)]
         public string Password { get; set; }
     }
 }

@@ -54,7 +54,20 @@ export class RuleElementDto {
         public readonly iconColor: string,
         public readonly iconImage: string,
         public readonly iconCode: string | null,
-        public readonly readMore: string
+        public readonly readMore: string,
+        public readonly properties: RuleElementPropertyDto[]
+    ) {
+    }
+}
+
+export class RuleElementPropertyDto {
+    constructor(
+        public readonly name: string,
+        public readonly editor: string,
+        public readonly display: string,
+        public readonly description: string,
+        public readonly isFormattable: boolean,
+        public readonly isRequired: boolean
     ) {
     }
 }
@@ -147,7 +160,23 @@ export class RulesService {
                 for (let key of Object.keys(items).sort()) {
                     const value = items[key];
 
-                    result[key] = new RuleElementDto(value.display, value.description, value.iconColor, value.iconImage, null, value.readMore);
+                    const properties = value.properties.map((property: any) =>
+                        new RuleElementPropertyDto(
+                            property.name,
+                            property.editor,
+                            property.display,
+                            property.description,
+                            property.isFormattable,
+                            property.isRequired
+                        ));
+
+                    result[key] = new RuleElementDto(
+                        value.display,
+                        value.description,
+                        value.iconColor,
+                        value.iconImage, null,
+                        value.readMore,
+                        properties);
                 }
 
                 return result;

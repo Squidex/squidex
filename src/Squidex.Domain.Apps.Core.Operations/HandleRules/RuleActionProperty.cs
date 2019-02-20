@@ -5,13 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Squidex.Infrastructure.Plugins
+namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public interface IPlugin
+    public sealed class RuleActionProperty
     {
-        void ConfigureServices(IServiceCollection services, IConfiguration configuration);
+        public RuleActionPropertyEditor Editor { get; set; }
+
+        public string Name { get; set; }
+
+        public string Display { get; set; }
+
+        public string Description { get; set; }
+
+        public bool IsFormattable { get; set; }
+
+        public bool IsRequired { get; set; }
     }
 }

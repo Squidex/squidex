@@ -17,10 +17,8 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
-using Squidex.Extensions.Actions;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Pipeline;
 using Squidex.Shared;
 
@@ -58,7 +56,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public IActionResult GetActions()
         {
-            var response = RuleActionRegistry.Actions.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
+            var response = RuleActionRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDefinition(x.Value));
 
             Response.Headers[HeaderNames.ETag] = RuleActionsEtag;
 

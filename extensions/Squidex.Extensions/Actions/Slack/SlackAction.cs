@@ -26,7 +26,6 @@ namespace Squidex.Extensions.Actions.Slack
         [Required]
         [Display(Name = "Webhook Url", Description = "The slack webhook url.")]
         [DataType(DataType.Text)]
-        [Formattable]
         public Uri WebhookUrl { get; set; }
 
         [Required]

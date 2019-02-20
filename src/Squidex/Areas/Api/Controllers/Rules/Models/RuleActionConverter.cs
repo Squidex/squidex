@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Extensions.Actions;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {

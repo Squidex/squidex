@@ -5,13 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Squidex.Infrastructure.Plugins
+namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public interface IPlugin
+    public enum RuleActionPropertyEditor
     {
-        void ConfigureServices(IServiceCollection services, IConfiguration configuration);
+        Checkbox,
+        Email,
+        Number,
+        Password,
+        Text,
+        TextArea,
+        Url
     }
 }

@@ -6,6 +6,9 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
@@ -37,5 +40,20 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// The optional link to the product that is integrated.
         /// </summary>
         public string ReadMore { get; set; }
+
+        /// <summary>
+        /// The properties.
+        /// </summary>
+        [Required]
+        public RuleElementPropertyDto[] Properties { get; set; }
+
+        public static RuleElementDto FromDefinition(RuleActionDefinition definition)
+        {
+            var result = SimpleMapper.Map(definition, new RuleElementDto());
+
+            result.Properties = definition.Properties.Select(x => SimpleMapper.Map(x, new RuleElementPropertyDto())).ToArray();
+
+            return result;
+        }
     }
 }

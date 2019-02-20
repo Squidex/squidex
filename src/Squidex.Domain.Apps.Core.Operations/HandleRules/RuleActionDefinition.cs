@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
@@ -22,5 +23,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
         public string Display { get; set; }
 
         public string Description { get; set; }
+
+        public List<RuleActionProperty> Properties { get; } = new List<RuleActionProperty>();
     }
 }

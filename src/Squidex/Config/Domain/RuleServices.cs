@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Extensions.Actions;
 using Squidex.Infrastructure.DependencyInjection;
 using Squidex.Infrastructure.EventSourcing;
 

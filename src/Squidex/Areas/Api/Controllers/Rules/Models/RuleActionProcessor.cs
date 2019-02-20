@@ -13,7 +13,6 @@ using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Extensions.Actions;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
