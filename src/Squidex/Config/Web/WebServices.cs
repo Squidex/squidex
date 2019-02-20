@@ -18,7 +18,7 @@ namespace Squidex.Config.Web
 {
     public static class WebServices
     {
-        public static void AddMyMvc(this IServiceCollection services, IConfiguration config)
+        public static void AddMyMvcWithPlugins(this IServiceCollection services, IConfiguration config)
         {
             services.AddSingletonAs<FileCallbackResultExecutor>()
                 .AsSelf();
@@ -50,8 +50,8 @@ namespace Squidex.Config.Web
                 options.Filters.Add<AppResolver>();
                 options.Filters.Add<MeasureResultFilter>();
             })
-            .AddMySerializers()
-            .AddMyPlugins(config);
+            .AddMyPlugins(config)
+            .AddMySerializers();
 
             services.AddCors();
             services.AddRouting();

@@ -54,6 +54,8 @@ namespace Squidex
             services.AddMemoryCache();
             services.AddOptions();
 
+            services.AddMyMvcWithPlugins(config);
+
             services.AddMyAssetServices(config);
             services.AddMyAuthentication(config);
             services.AddMyEntitiesServices(config);
@@ -63,7 +65,6 @@ namespace Squidex
             services.AddMyInfrastructureServices(config);
             services.AddMyLoggingServices(config);
             services.AddMyMigrationServices();
-            services.AddMyMvc(config);
             services.AddMyRuleServices();
             services.AddMySerializers();
             services.AddMyStoreServices(config);

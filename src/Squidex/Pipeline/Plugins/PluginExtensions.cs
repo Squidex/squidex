@@ -14,6 +14,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Events;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Plugins;
 
@@ -21,9 +25,17 @@ namespace Squidex.Pipeline.Plugins
 {
     public static class PluginExtensions
     {
-        private static readonly Type[] SharedTypes = { typeof(IPlugin) };
+        private static readonly Type[] SharedTypes =
+        {
+            typeof(IPlugin),
+            typeof(SquidexCoreModel),
+            typeof(SquidexCoreOperations),
+            typeof(SquidexEntities),
+            typeof(SquidexEvents),
+            typeof(SquidexInfrastructure)
+        };
 
-        public static void AddMyPlugins(this IMvcBuilder mvcBuilder, IConfiguration configuration)
+        public static IMvcBuilder AddMyPlugins(this IMvcBuilder mvcBuilder, IConfiguration configuration)
         {
             var pluginManager = new PluginManager();
 
@@ -65,6 +77,8 @@ namespace Squidex.Pipeline.Plugins
             pluginManager.ConfigureServices(mvcBuilder.Services, configuration);
 
             mvcBuilder.Services.AddSingleton(pluginManager);
+
+            return mvcBuilder;
         }
 
         private static PluginLoader LoadPlugin(string pluginPath)

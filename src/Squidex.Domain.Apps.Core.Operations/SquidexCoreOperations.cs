@@ -1,16 +1,16 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Builder;
+using System.Reflection;
 
-namespace Squidex.Infrastructure.Plugins
+namespace Squidex.Domain.Apps.Core
 {
-    public interface IWebPlugin : IPlugin
+    public static class SquidexCoreOperations
     {
-        void Configure(IApplicationBuilder app);
+        public static readonly Assembly Assembly = typeof(SquidexCoreOperations).Assembly;
     }
 }
