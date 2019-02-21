@@ -7,7 +7,6 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Extensions.Actions.Twitter
@@ -19,7 +18,7 @@ namespace Squidex.Extensions.Actions.Twitter
             services.Configure<TwitterOptions>(
                 configuration.GetSection("twitter"));
 
-            RuleActionRegistry.Add<TweetAction>();
+            services.AddRuleAction<TweetAction, TweetActionHandler>();
         }
     }
 }

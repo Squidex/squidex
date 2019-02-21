@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Core.Rules;
 
 namespace Squidex.Extensions.Actions.Medium
 {
-    [RuleActionHandler(typeof(MediumActionHandler))]
     [RuleAction(
         IconImage = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M3.795 8.48a1.239 1.239 0 0 0-.404-1.045l-2.987-3.6v-.537H9.68l7.171 15.727 6.304-15.727H32v.537l-2.556 2.449a.749.749 0 0 0-.284.717v18a.749.749 0 0 0 .284.716l2.493 2.449v.537H19.39v-.537l2.583-2.509c.253-.253.253-.328.253-.717V10.392l-7.187 18.251h-.969L5.703 10.392v12.232a1.69 1.69 0 0 0 .463 1.404l3.36 4.08v.536H-.001v-.537l3.36-4.08c.36-.371.52-.893.435-1.403V8.48z'/></svg>",
         IconColor = "#00ab6c",

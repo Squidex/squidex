@@ -27,13 +27,10 @@ using Squidex.Domain.Users;
 using Squidex.Domain.Users.MongoDb;
 using Squidex.Domain.Users.MongoDb.Infrastructure;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Configuration;
-using Squidex.Infrastructure.DependencyInjection;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -47,23 +44,20 @@ namespace Squidex.Config.Domain
             {
                 ["MongoDB"] = () =>
                 {
-                    BsonJsonConvention.Register(SerializationServices.DefaultJsonSerializer);
-
                     var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
                     var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
                     var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName);
 
-                    var mongoClient = Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s));
-                    var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
-                    var mongoContentDatabase = mongoClient.GetDatabase(mongoContentDatabaseName);
-
                     services.AddSingleton(typeof(ISnapshotStore<,>), typeof(MongoSnapshotStore<,>));
 
-                    services.AddSingletonAs(mongoDatabase)
+                    services.AddSingletonAs(c => Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s)))
+                        .As<IMongoClient>();
+
+                    services.AddSingletonAs(c => c.GetRequiredService<IMongoClient>().GetDatabase(mongoDatabaseName))
                         .As<IMongoDatabase>();
 
-                    services.AddHealthChecks()
-                        .AddCheck<MongoDBHealthCheck>("MongoDB", tags: new[] { "node" });
+                    services.AddTransientAs(c => new DeleteContentCollections(c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName)))
+                        .As<IMigration>();
 
                     services.AddSingletonAs<MongoMigrationStatus>()
                         .As<IMigrationStatus>();
@@ -74,8 +68,8 @@ namespace Squidex.Config.Domain
                     services.AddTransientAs<ConvertRuleEventsJson>()
                         .As<IMigration>();
 
-                    services.AddTransientAs(c => new DeleteContentCollections(mongoContentDatabase))
-                        .As<IMigration>();
+                    services.AddHealthChecks()
+                        .AddCheck<MongoDBHealthCheck>("MongoDB", tags: new[] { "node" });
 
                     services.AddSingletonAs<MongoUsageRepository>()
                         .AsOptional<IUsageRepository>();
@@ -100,7 +94,10 @@ namespace Squidex.Config.Domain
                         .AsOptional<IAssetRepository>()
                         .AsOptional<ISnapshotStore<AssetState, Guid>>();
 
-                    services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetRequiredService<IAppProvider>(), c.GetRequiredService<IJsonSerializer>()))
+                    services.AddSingletonAs(c => new MongoContentRepository(
+                            c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName),
+                            c.GetRequiredService<IAppProvider>(),
+                            c.GetRequiredService<IJsonSerializer>()))
                         .AsOptional<IContentRepository>()
                         .AsOptional<ISnapshotStore<ContentState, Guid>>()
                         .AsOptional<IEventConsumer>();

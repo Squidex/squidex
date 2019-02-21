@@ -15,7 +15,6 @@ using Orleans.Hosting;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
-using Squidex.Infrastructure.Configuration;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Orleans;
 

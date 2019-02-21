@@ -1,16 +1,14 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Reflection;
-
 namespace Squidex.Infrastructure
 {
-    public sealed class SquidexInfrastructure
+    public interface ITypeProvider
     {
-        public static readonly Assembly Assembly = typeof(SquidexInfrastructure).Assembly;
+        void Map(TypeNameRegistry typeNameRegistry);
     }
 }

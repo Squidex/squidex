@@ -31,8 +31,8 @@ namespace Squidex.Domain.Apps.Core
         {
             var typeNameRegistry =
                 new TypeNameRegistry()
-                    .MapFields()
-                    .MapRules()
+                    .Map(new FieldRegistry())
+                    .Map(new RuleRegistry())
                     .MapUnmapped(typeof(TestUtils).Assembly);
 
             var serializerSettings = new JsonSerializerSettings
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Core
             foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
             {
                 var value =
-                    property.PropertyType.GetTypeInfo().IsValueType ?
+                    property.PropertyType.IsValueType ?
                         Activator.CreateInstance(property.PropertyType) :
                         null;
 
@@ -139,7 +139,7 @@ namespace Squidex.Domain.Apps.Core
             foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
             {
                 var value =
-                    property.PropertyType.GetTypeInfo().IsValueType ?
+                    property.PropertyType.IsValueType ?
                         Activator.CreateInstance(property.PropertyType) :
                         null;
 

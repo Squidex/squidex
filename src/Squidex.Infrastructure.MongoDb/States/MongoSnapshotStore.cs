@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
 
@@ -16,9 +18,12 @@ namespace Squidex.Infrastructure.States
 {
     public class MongoSnapshotStore<T, TKey> : MongoRepositoryBase<MongoState<T, TKey>>, ISnapshotStore<T, TKey>
     {
-        public MongoSnapshotStore(IMongoDatabase database)
+        public MongoSnapshotStore(IMongoDatabase database, JsonSerializer jsonSerializer)
             : base(database)
         {
+            Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+
+            BsonJsonConvention.Register(jsonSerializer);
         }
 
         protected override string CollectionName()
@@ -55,7 +60,7 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task ReadAllAsync(System.Func<T, long, Task> callback)
+        public async Task ReadAllAsync(Func<T, long, Task> callback)
         {
             using (Profiler.TraceMethod<MongoSnapshotStore<T, TKey>>())
             {

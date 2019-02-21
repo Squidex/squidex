@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace Squidex.Domain.Apps.Core
 {
-    public static class SquidexCoreModel
+    public sealed class SquidexCoreModel
     {
         public static readonly Assembly Assembly = typeof(SquidexCoreModel).Assembly;
     }

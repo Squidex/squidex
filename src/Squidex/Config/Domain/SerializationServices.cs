@@ -11,7 +11,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps.Json;
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
@@ -24,23 +23,8 @@ namespace Squidex.Config.Domain
 {
     public static class SerializationServices
     {
-        private static readonly TypeNameRegistry TypeNameRegistry =
-            new TypeNameRegistry()
-                .MapFields()
-                .MapRules()
-                .MapRuleActions()
-                .MapUnmapped(SquidexCoreModel.Assembly)
-                .MapUnmapped(SquidexEvents.Assembly)
-                .MapUnmapped(SquidexInfrastructure.Assembly)
-                .MapUnmapped(SquidexMigrations.Assembly);
-
-        public static readonly JsonSerializerSettings DefaultJsonSettings = new JsonSerializerSettings();
-        public static readonly JsonSerializer DefaultJsonSerializer;
-
-        private static void ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
+        private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
-            settings.SerializationBinder = new TypeNameSerializationBinder(TypeNameRegistry);
-
             settings.ContractResolver = new ConverterContractResolver(
                 new AppClientsConverter(),
                 new AppContributorsConverter(),
@@ -66,22 +50,52 @@ namespace Squidex.Config.Domain
             settings.DateParseHandling = DateParseHandling.None;
 
             settings.TypeNameHandling = typeNameHandling;
-        }
 
-        static SerializationServices()
-        {
-            ConfigureJson(DefaultJsonSettings, TypeNameHandling.Auto);
-
-            DefaultJsonSerializer = JsonSerializer.Create(DefaultJsonSettings);
+            return settings;
         }
 
         public static IServiceCollection AddMySerializers(this IServiceCollection services)
         {
-            services.AddSingleton(DefaultJsonSettings);
-            services.AddSingleton(DefaultJsonSerializer);
-            services.AddSingleton(TypeNameRegistry);
+            services.AddSingletonAs<AutoAssembyTypeProvider<SquidexCoreModel>>()
+                .As<ITypeProvider>();
 
-            services.AddSingleton<IJsonSerializer>(new NewtonsoftJsonSerializer(DefaultJsonSettings));
+            services.AddSingletonAs<AutoAssembyTypeProvider<SquidexEvents>>()
+                .As<ITypeProvider>();
+
+            services.AddSingletonAs<AutoAssembyTypeProvider<SquidexInfrastructure>>()
+                .As<ITypeProvider>();
+
+            services.AddSingletonAs<AutoAssembyTypeProvider<SquidexMigrations>>()
+                .As<ITypeProvider>();
+
+            services.AddSingletonAs<FieldRegistry>()
+                .As<ITypeProvider>();
+
+            services.AddSingletonAs<NewtonsoftJsonSerializer>()
+                .As<IJsonSerializer>();
+
+            services.AddSingletonAs<SerializationInitializer>()
+                .AsSelf();
+
+            services.AddSingletonAs<TypeNameRegistry>()
+                .AsSelf();
+
+            services.AddSingletonAs(c => JsonSerializer.Create(c.GetRequiredService<JsonSerializerSettings>()))
+                .AsSelf();
+
+            services.AddSingletonAs(c =>
+                {
+                    var serializerSettings = ConfigureJson(new JsonSerializerSettings(), TypeNameHandling.Auto);
+
+                    var typeNameRegistry = c.GetService<TypeNameRegistry>();
+
+                    if (typeNameRegistry != null)
+                    {
+                        serializerSettings.SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry);
+                    }
+
+                    return serializerSettings;
+                }).As<JsonSerializerSettings>();
 
             return services;
         }

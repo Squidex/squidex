@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace Squidex.Domain.Apps.Events
 {
-    public static class SquidexEvents
+    public sealed class SquidexEvents
     {
         public static readonly Assembly Assembly = typeof(SquidexEvents).Assembly;
     }

@@ -13,11 +13,21 @@ using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
     public sealed class RuleActionProcessor : IDocumentProcessor
     {
+        private readonly RuleRegistry ruleRegistry;
+
+        public RuleActionProcessor(RuleRegistry ruleRegistry)
+        {
+            Guard.NotNull(ruleRegistry, nameof(ruleRegistry));
+
+            this.ruleRegistry = ruleRegistry;
+        }
+
         public async Task ProcessAsync(DocumentProcessorContext context)
         {
             try
@@ -36,16 +46,16 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                         Type = JsonObjectType.String, IsRequired = true
                     };
 
-                    foreach (var derived in RuleActionRegistry.Actions)
+                    foreach (var action in ruleRegistry.Actions)
                     {
-                        var derivedSchema = await context.SchemaGenerator.GenerateAsync(derived.Value.Type, context.SchemaResolver);
+                        var derivedSchema = await context.SchemaGenerator.GenerateAsync(action.Value.Type, context.SchemaResolver);
 
                         var oldName = context.Document.Definitions.FirstOrDefault(x => x.Value == derivedSchema).Key;
 
                         if (oldName != null)
                         {
                             context.Document.Definitions.Remove(oldName);
-                            context.Document.Definitions.Add(derived.Key, derivedSchema);
+                            context.Document.Definitions.Add(action.Key, derivedSchema);
                         }
                     }
 

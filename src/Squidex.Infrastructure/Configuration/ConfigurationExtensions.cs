@@ -7,9 +7,9 @@
 
 using System.Globalization;
 using System.Linq;
-using Microsoft.Extensions.Configuration;
+using Squidex.Infrastructure;
 
-namespace Squidex.Infrastructure.Configuration
+namespace Microsoft.Extensions.Configuration
 {
     public static class ConfigurationExtensions
     {

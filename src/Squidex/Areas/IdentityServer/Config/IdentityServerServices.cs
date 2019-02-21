@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using IdentityModel;
 using IdentityServer4.Models;
@@ -29,7 +28,7 @@ namespace Squidex.Areas.IdentityServer.Config
         {
             X509Certificate2 certificate;
 
-            var assembly = typeof(IdentityServerServices).GetTypeInfo().Assembly;
+            var assembly = typeof(IdentityServerServices).Assembly;
 
             using (var certStream = assembly.GetManifestResourceStream("Squidex.Areas.IdentityServer.Config.Cert.IdentityCert.pfx"))
             {

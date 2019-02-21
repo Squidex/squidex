@@ -12,8 +12,6 @@ using MongoDB.Driver.GridFS;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Assets.ImageSharp;
-using Squidex.Infrastructure.Configuration;
-using Squidex.Infrastructure.DependencyInjection;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Config.Domain

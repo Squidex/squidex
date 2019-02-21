@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -128,7 +127,7 @@ namespace Squidex.Pipeline.Squid
 
         private static string LoadSvg(string name)
         {
-            var assembly = typeof(SquidMiddleware).GetTypeInfo().Assembly;
+            var assembly = typeof(SquidMiddleware).Assembly;
 
             using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Pipeline.Squid.icon-{name}.svg"))
             {

@@ -26,7 +26,6 @@ using Squidex.Config.Startup;
 using Squidex.Config.Web;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Extensions.Actions.Twitter;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.Translations;

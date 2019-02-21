@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NJsonSchema;
@@ -23,7 +22,7 @@ namespace Squidex.Pipeline.Swagger
     {
         public static string LoadDocs(string name)
         {
-            var assembly = typeof(NSwagHelper).GetTypeInfo().Assembly;
+            var assembly = typeof(NSwagHelper).Assembly;
 
             using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Docs.{name}.md"))
             {

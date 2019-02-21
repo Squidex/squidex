@@ -5,17 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure.Plugins;
+using System;
+using Squidex.Infrastructure;
 
-namespace Squidex.Extensions.Actions.AzureQueue
+namespace Squidex.Domain.Apps.Core.HandleRules
 {
-    public sealed class AzureQueuePlugin : IPlugin
+    public sealed class RuleActionRegistration
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public Type ActionType { get; }
+
+        internal RuleActionRegistration(Type actionType)
         {
-            services.AddRuleAction<AzureQueueAction, AzureQueueActionHandler>();
+            Guard.NotNull(actionType, nameof(actionType));
+
+            ActionType = actionType;
         }
     }
 }

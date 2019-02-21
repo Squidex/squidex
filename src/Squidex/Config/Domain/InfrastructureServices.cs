@@ -18,7 +18,6 @@ using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
-using Squidex.Infrastructure.DependencyInjection;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;

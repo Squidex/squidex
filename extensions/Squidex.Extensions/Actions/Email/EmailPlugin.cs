@@ -7,7 +7,6 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Extensions.Actions.Email
@@ -16,7 +15,7 @@ namespace Squidex.Extensions.Actions.Email
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            RuleActionRegistry.Add<EmailAction>();
+            services.AddRuleAction<EmailAction, EmailActionHandler>();
         }
     }
 }

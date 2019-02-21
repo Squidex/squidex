@@ -30,17 +30,18 @@ namespace Squidex.Areas.Api.Controllers.Rules
     [ApiExplorerSettings(GroupName = nameof(Rules))]
     public sealed class RulesController : ApiController
     {
-        private static readonly string RuleActionsEtag = string.Join(";", RuleActionRegistry.Actions.Select(x => x.Key)).Sha256Base64();
         private readonly IAppProvider appProvider;
         private readonly IRuleEventRepository ruleEventsRepository;
+        private readonly RuleRegistry ruleRegistry;
 
         public RulesController(ICommandBus commandBus, IAppProvider appProvider,
-            IRuleEventRepository ruleEventsRepository)
+            IRuleEventRepository ruleEventsRepository, RuleRegistry ruleRegistry)
             : base(commandBus)
         {
             this.appProvider = appProvider;
 
             this.ruleEventsRepository = ruleEventsRepository;
+            this.ruleRegistry = ruleRegistry;
         }
 
         /// <summary>
@@ -56,9 +57,11 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public IActionResult GetActions()
         {
-            var response = RuleActionRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDefinition(x.Value));
+            var etag = string.Join(";", ruleRegistry.Actions.Select(x => x.Key)).Sha256Base64();
 
-            Response.Headers[HeaderNames.ETag] = RuleActionsEtag;
+            var response = ruleRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDefinition(x.Value));
+
+            Response.Headers[HeaderNames.ETag] = etag;
 
             return Ok(response);
         }

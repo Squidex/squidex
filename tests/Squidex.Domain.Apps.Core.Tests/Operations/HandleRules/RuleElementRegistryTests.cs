@@ -15,8 +15,10 @@ using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 {
-    public class RuleElementRegistry
+    public class RuleElementRegistryTests
     {
+        private readonly RuleRegistry sut = new RuleRegistry();
+
         private abstract class MyRuleActionHandler : RuleActionHandler<MyRuleAction, string>
         {
             protected MyRuleActionHandler(RuleEventFormatter formatter)
@@ -25,7 +27,6 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             }
         }
 
-        [RuleActionHandler(typeof(MyRuleActionHandler))]
         [RuleAction(
            IconImage = "<svg></svg>",
            IconColor = "#1e5470",
@@ -52,12 +53,16 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
+            [DataType(DataType.Custom)]
             public bool Boolean { get; set; }
 
+            [DataType(DataType.Custom)]
             public bool? BooleanOptional { get; set; }
 
+            [DataType(DataType.Custom)]
             public int Number { get; set; }
 
+            [DataType(DataType.Custom)]
             public int? NumberOptional { get; set; }
         }
 
@@ -156,9 +161,9 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
                 IsRequired = false
             });
 
-            RuleActionRegistry.Add<MyRuleAction>();
+            sut.Add<MyRuleAction>();
 
-            var currentDefinition = RuleActionRegistry.Actions.Values.First();
+            var currentDefinition = sut.Actions.Values.First();
 
             currentDefinition.Should().BeEquivalentTo(expected);
         }

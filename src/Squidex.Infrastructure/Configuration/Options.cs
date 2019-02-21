@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Squidex.Infrastructure.Configuration
+namespace Microsoft.Extensions.Configuration
 {
     public sealed class Options : Dictionary<string, Action>
     {

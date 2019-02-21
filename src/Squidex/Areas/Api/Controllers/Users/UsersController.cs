@@ -9,7 +9,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Users.Models;
@@ -34,7 +33,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
         static UsersController()
         {
-            var assembly = typeof(UsersController).GetTypeInfo().Assembly;
+            var assembly = typeof(UsersController).Assembly;
 
             using (var avatarStream = assembly.GetManifestResourceStream("Squidex.Areas.Api.Controllers.Users.Assets.Avatar.png"))
             {

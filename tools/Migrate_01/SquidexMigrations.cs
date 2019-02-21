@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace Migrate_01
 {
-    public static class SquidexMigrations
+    public sealed class SquidexMigrations
     {
         public static readonly Assembly Assembly = typeof(SquidexMigrations).Assembly;
     }

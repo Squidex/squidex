@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.CQRS.Events;
-using Squidex.Infrastructure.DependencyInjection;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 
