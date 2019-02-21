@@ -72,15 +72,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return new InterfaceRegistrator<T>(services);
         }
 
-        public static InterfaceRegistrator<T> AddSingletonAs<T>(this IServiceCollection services, T instance) where T : class
-        {
-            services.AddSingleton(typeof(T), instance);
-
-            RegisterDefaults<T>(services);
-
-            return new InterfaceRegistrator<T>(services);
-        }
-
         public static InterfaceRegistrator<T> AddSingletonAs<T>(this IServiceCollection services) where T : class
         {
             services.AddSingleton<T, T>();

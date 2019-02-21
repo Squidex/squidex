@@ -40,11 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public Task<bool> ReserveAppAsync(Guid appId, string name)
         {
-            var canReserve =
-                !State.Apps.ContainsKey(name) &&
-                !State.Apps.Any(x => x.Value == appId) &&
-                !reservedIds.Contains(appId) &&
-                !reservedNames.Contains(name);
+            var canReserve = !IsInUse(appId, name) && !IsReserved(appId, name);
 
             if (canReserve)
             {
@@ -53,6 +49,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
 
             return Task.FromResult(canReserve);
+        }
+
+        private bool IsInUse(Guid appId, string name)
+        {
+            return State.Apps.ContainsKey(name) || State.Apps.All(x => x.Value == appId);
+        }
+
+        private bool IsReserved(Guid appId, string name)
+        {
+            return reservedIds.Contains(appId) || reservedNames.Contains(name);
         }
 
         public Task RemoveReservationAsync(Guid appId, string name)

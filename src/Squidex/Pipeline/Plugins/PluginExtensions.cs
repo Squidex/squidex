@@ -83,8 +83,6 @@ namespace Squidex.Pipeline.Plugins
 
         private static PluginLoader LoadPlugin(string pluginPath)
         {
-            var fullPath = GetPaths(pluginPath);
-
             foreach (var candidate in GetPaths(pluginPath))
             {
                 if (candidate.Extension.Equals(".dll", StringComparison.OrdinalIgnoreCase))

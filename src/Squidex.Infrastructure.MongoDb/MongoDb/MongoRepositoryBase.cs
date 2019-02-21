@@ -44,6 +44,7 @@ namespace Squidex.Infrastructure.MongoDb
         static MongoRepositoryBase()
         {
             RefTokenSerializer.Register();
+
             InstantSerializer.Register();
         }
 

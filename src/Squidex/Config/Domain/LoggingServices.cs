@@ -20,12 +20,12 @@ namespace Squidex.Config.Domain
         {
             if (config.GetValue<bool>("logging:human"))
             {
-                services.AddSingletonAs(JsonLogWriterFactory.Readable())
+                services.AddSingletonAs(_ => JsonLogWriterFactory.Readable())
                     .As<IObjectWriterFactory>();
             }
             else
             {
-                services.AddSingletonAs(JsonLogWriterFactory.Default())
+                services.AddSingletonAs(_ => JsonLogWriterFactory.Default())
                     .As<IObjectWriterFactory>();
             }
 
@@ -33,16 +33,16 @@ namespace Squidex.Config.Domain
 
             if (!string.IsNullOrWhiteSpace(loggingFile))
             {
-                services.AddSingletonAs(new FileChannel(loggingFile))
+                services.AddSingletonAs(_ => new FileChannel(loggingFile))
                     .As<ILogChannel>();
             }
 
             var useColors = config.GetValue<bool>("logging:colors");
 
-            services.AddSingletonAs(new ConsoleLogChannel(useColors))
+            services.AddSingletonAs(_ => new ConsoleLogChannel(useColors))
                 .As<ILogChannel>();
 
-            services.AddSingletonAs(c => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))
+            services.AddSingletonAs(_ => new ApplicationInfoLogAppender(typeof(Program).Assembly, Guid.NewGuid()))
                 .As<ILogAppender>();
 
             services.AddSingletonAs<ActionContextLogAppender>()

@@ -36,7 +36,12 @@ namespace Squidex.Config.Domain
                 .AddCheck<OrleansHealthCheck>("Orleans", tags: new[] { "cluster" })
                 .AddCheck<OrleansAppsHealthCheck>("Orleans App", tags: new[] { "cluster" });
 
-            services.AddSingletonAs(SystemClock.Instance)
+            services.AddSingletonAs(c => new CachingUsageTracker(
+                    c.GetRequiredService<BackgroundUsageTracker>(),
+                    c.GetRequiredService<IMemoryCache>()))
+                .As<IUsageTracker>();
+
+            services.AddSingletonAs(_ => SystemClock.Instance)
                 .As<IClock>();
 
             services.AddSingletonAs<FeaturesService>()
@@ -47,9 +52,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<DeepLTranslator>()
                 .As<ITranslator>();
-
-            services.AddSingletonAs(c => new CachingUsageTracker(c.GetRequiredService<BackgroundUsageTracker>(), c.GetRequiredService<IMemoryCache>()))
-                .As<IUsageTracker>();
 
             services.AddSingletonAs<AsyncLocalCache>()
                 .As<ILocalCache>();
@@ -68,8 +70,6 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<DefaultXmlRepository>()
                 .As<IXmlRepository>();
-
-            services.AddTransient(typeof(Lazy<>), typeof(Lazier<>));
         }
     }
 }

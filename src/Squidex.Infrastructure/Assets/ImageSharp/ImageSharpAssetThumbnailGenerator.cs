@@ -19,8 +19,8 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
     {
         public ImageSharpAssetThumbnailGenerator()
         {
-            SixLabors.ImageSharp.Configuration.Default.ImageFormatsManager.AddImageFormat(ImageFormats.Jpeg);
-            SixLabors.ImageSharp.Configuration.Default.ImageFormatsManager.AddImageFormat(ImageFormats.Png);
+            Configuration.Default.ImageFormatsManager.AddImageFormat(ImageFormats.Jpeg);
+            Configuration.Default.ImageFormatsManager.AddImageFormat(ImageFormats.Png);
         }
 
         public Task CreateThumbnailAsync(Stream source, Stream destination, int? width, int? height, string mode)

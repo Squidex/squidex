@@ -50,7 +50,7 @@ namespace Squidex.Config.Domain
 
                     services.AddSingleton(typeof(ISnapshotStore<,>), typeof(MongoSnapshotStore<,>));
 
-                    services.AddSingletonAs(c => Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s)))
+                    services.AddSingletonAs(_ => Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s)))
                         .As<IMongoClient>();
 
                     services.AddSingletonAs(c => c.GetRequiredService<IMongoClient>().GetDatabase(mongoDatabaseName))

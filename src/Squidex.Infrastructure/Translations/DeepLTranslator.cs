@@ -87,7 +87,7 @@ namespace Squidex.Infrastructure.Translations
             return new Translation(TranslationResult.Failed, resultText: responseString);
         }
 
-        private string GetLanguageCode(Language language)
+        private static string GetLanguageCode(Language language)
         {
             return language.Iso2Code.Substring(0, 2).ToUpperInvariant();
         }

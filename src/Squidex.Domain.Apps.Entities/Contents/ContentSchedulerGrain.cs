@@ -22,15 +22,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentSchedulerGrain : Grain, IContentSchedulerGrain, IRemindable
     {
-        private readonly Lazy<IContentRepository> contentRepository;
-        private readonly Lazy<ICommandBus> commandBus;
+        private readonly IContentRepository contentRepository;
+        private readonly ICommandBus commandBus;
         private readonly IClock clock;
         private readonly ISemanticLog log;
         private TaskScheduler scheduler;
 
         public ContentSchedulerGrain(
-            Lazy<IContentRepository> contentRepository,
-            Lazy<ICommandBus> commandBus,
+            IContentRepository contentRepository,
+            ICommandBus commandBus,
             IClock clock,
             ISemanticLog log)
         {
@@ -39,9 +39,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Guard.NotNull(clock, nameof(clock));
             Guard.NotNull(log, nameof(log));
 
-            this.contentRepository = contentRepository;
-            this.commandBus = commandBus;
             this.clock = clock;
+
+            this.commandBus = commandBus;
+            this.contentRepository = contentRepository;
+
             this.log = log;
         }
 
@@ -66,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var now = clock.GetCurrentInstant();
 
-            return contentRepository.Value.QueryScheduledWithoutDataAsync(now, content =>
+            return contentRepository.QueryScheduledWithoutDataAsync(now, content =>
             {
                 return Dispatch(async () =>
                 {
@@ -78,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             var command = new ChangeContentStatus { ContentId = content.Id, Status = job.Status, Actor = job.ScheduledBy, JobId = job.Id };
 
-                            await commandBus.Value.PublishAsync(command);
+                            await commandBus.PublishAsync(command);
                         }
                     }
                     catch (Exception ex)
