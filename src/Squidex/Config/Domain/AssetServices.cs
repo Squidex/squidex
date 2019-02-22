@@ -22,6 +22,11 @@ namespace Squidex.Config.Domain
         {
             config.ConfigureByOption("assetStore:type", new Options
             {
+                ["Default"] = () =>
+                {
+                    services.AddSingletonAs<NoopAssetStore>()
+                        .AsOptional<IAssetStore>();
+                },
                 ["Folder"] = () =>
                 {
                     var path = config.GetRequiredValue("assetStore:folder:path");

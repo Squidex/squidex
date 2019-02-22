@@ -54,6 +54,10 @@ namespace Microsoft.Extensions.Configuration
             {
                 action();
             }
+            else if (options.TryGetValue("default", out action))
+            {
+                action();
+            }
             else
             {
                 throw new ConfigurationException($"Unsupported value '{value}' for '{path}', supported: {string.Join(" ", options.Keys)}.");

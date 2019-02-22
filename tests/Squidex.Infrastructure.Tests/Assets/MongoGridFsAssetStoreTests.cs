@@ -13,11 +13,11 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Assets
 {
-    internal class MongoGridFSAssetStoreTests : AssetStoreTests<MongoGridFsAssetStore>
+    internal class MongoGridFsAssetStoreTests : AssetStoreTests<MongoGridFsAssetStore>
     {
         private static readonly IGridFSBucket<string> GridFSBucket;
 
-        static MongoGridFSAssetStoreTests()
+        static MongoGridFsAssetStoreTests()
         {
             var mongoClient = new MongoClient("mongodb://localhost");
             var mongoDatabase = mongoClient.GetDatabase("Test");
