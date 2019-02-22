@@ -32,6 +32,10 @@ export class ResourceOwner implements OnDestroy {
     }
 
     public ngOnDestroy() {
+        this.unsubscribeAll();
+    }
+
+    public unsubscribeAll() {
         try {
             for (let subscription of this.subscriptions) {
                 if (Types.isFunction(subscription)) {
@@ -48,6 +52,7 @@ export class ResourceOwner implements OnDestroy {
 
 export abstract class StatefulComponent<T = any> extends State<T> implements OnDestroy {
     private readonly subscriptions = new ResourceOwner();
+    private subscription: Subscription;
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
@@ -55,17 +60,23 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
     ) {
         super(state);
 
-        this.own(
+        this.subscription =
             this.changes.pipe(skip(1)).subscribe(() => {
                 this.changeDetector.detectChanges();
-            }));
+            });
     }
 
     public ngOnDestroy() {
-        this.subscriptions.ngOnDestroy();
+        this.subscription.unsubscribe();
+
+        this.unsubscribeAll();
     }
 
-    public detectChanges() {
+    protected unsubscribeAll() {
+        this.subscriptions.unsubscribeAll();
+    }
+
+    protected detectChanges() {
         this.changeDetector.detectChanges();
     }
 

@@ -20,7 +20,7 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
     @Input('sqxModalTarget')
     public set target(element: any) {
         if (element !== this.targetElement) {
-            this.ngOnDestroy();
+            this.unsubscribeAll();
 
             this.targetElement = element;
 

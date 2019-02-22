@@ -86,7 +86,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         }
 
         if (this.control !== control) {
-            this.ngOnDestroy();
+            this.unsubscribeAll();
 
             this.control = control;
 
