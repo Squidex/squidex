@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -16,7 +15,6 @@ using NodaTime;
 using Squidex.Areas.Api.Controllers.News.Service;
 using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
 using Squidex.Domain.Users;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.Translations;

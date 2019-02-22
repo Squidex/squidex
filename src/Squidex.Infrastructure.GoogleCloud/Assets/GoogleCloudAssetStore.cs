@@ -7,7 +7,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -141,7 +140,7 @@ namespace Squidex.Infrastructure.Assets
 
         private static string GetFileName(string id, long version, string suffix)
         {
-            return string.Join("_", new[] { id, version.ToString(), suffix }.Where(x => !string.IsNullOrWhiteSpace(x)));
+            return StringExtensions.JoinNonEmpty("_", id, version.ToString(), suffix);
         }
     }
 }

@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { ExternalControlComponent, Types } from '@app/framework/internal';
 
@@ -22,50 +21,42 @@ export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IFrameEditorComponent extends ExternalControlComponent<any> implements AfterViewInit,  OnInit {
+export class IFrameEditorComponent extends ExternalControlComponent<any> implements OnChanges, OnInit {
     private value: any;
     private isDisabled = false;
     private isInitialized = false;
-    private plugin: HTMLIFrameElement;
 
     @ViewChild('iframe')
     public iframe: ElementRef<HTMLIFrameElement>;
 
     @Input()
-    public set url(value: string) {
-        this.sanitizedUrl = this.sanitizer.bypassSecurityTrustResourceUrl(value);
-    }
-
-    public sanitizedUrl: SafeResourceUrl;
+    public url: string;
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly sanitizer: DomSanitizer,
         private readonly renderer: Renderer2
     ) {
         super(changeDetector);
     }
 
-    public ngAfterViewInit() {
-        this.plugin = this.iframe.nativeElement;
+    public ngOnChanges() {
+        this.iframe.nativeElement.src = this.url;
     }
 
     public ngOnInit(): void {
         this.own(
             this.renderer.listen('window', 'message', (event: MessageEvent) => {
-                if (event.source === this.plugin.contentWindow) {
+                if (event.source === this.iframe.nativeElement.contentWindow) {
                     const { type } = event.data;
 
                     if (type === 'started') {
                         this.isInitialized = true;
 
-                        if (this.plugin.contentWindow && Types.isFunction(this.plugin.contentWindow.postMessage)) {
-                            this.plugin.contentWindow.postMessage({ type: 'disabled', isDisabled: this.isDisabled }, '*');
-                            this.plugin.contentWindow.postMessage({ type: 'valueChanged', value: this.value }, '*');
-                        }
+                        this.sendMessage({ type: 'disabled', isDisabled: this.isDisabled });
+                        this.sendMessage({ type: 'valueChanged', value: this.value });
                     } else if (type === 'resize') {
                         const { height } = event.data;
 
-                        this.plugin.height = height + 'px';
+                        this.iframe.nativeElement.height = height + 'px';
                     } else if (type === 'valueChanged') {
                         const { value } = event.data;
 
@@ -84,16 +75,20 @@ export class IFrameEditorComponent extends ExternalControlComponent<any> impleme
     public writeValue(obj: any) {
         this.value = obj;
 
-        if (this.isInitialized && this.plugin.contentWindow && Types.isFunction(this.plugin.contentWindow.postMessage)) {
-            this.plugin.contentWindow.postMessage({ type: 'valueChanged', value: this.value }, '*');
-        }
+        this.sendMessage({ type: 'valueChanged', value: this.value });
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
 
-        if (this.isInitialized && this.plugin.contentWindow && Types.isFunction(this.plugin.contentWindow.postMessage)) {
-            this.plugin.contentWindow.postMessage({ type: 'disabled', isDisabled: this.isDisabled }, '*');
+        this.sendMessage({ type: 'disabled', isDisabled: this.isDisabled });
+    }
+
+    private sendMessage(message: any) {
+        const iframe = this.iframe.nativeElement;
+
+        if (this.isInitialized && iframe.contentWindow && Types.isFunction(iframe.contentWindow.postMessage)) {
+            iframe.contentWindow.postMessage(message, '*');
         }
     }
 }

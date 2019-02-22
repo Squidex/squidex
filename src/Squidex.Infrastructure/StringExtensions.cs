@@ -16,9 +16,11 @@ namespace Squidex.Infrastructure
     public static class StringExtensions
     {
         private const char NullChar = (char)0;
+
         private static readonly Regex SlugRegex = new Regex("^[a-z0-9]+(\\-[a-z0-9]+)*$", RegexOptions.Compiled);
         private static readonly Regex EmailRegex = new Regex("^[a-zA-Z0-9.!#$%&’*+\\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$", RegexOptions.Compiled);
         private static readonly Regex PropertyNameRegex = new Regex("^[a-zA-Z0-9]+(\\-[a-zA-Z0-9]+)*$", RegexOptions.Compiled);
+
         private static readonly Dictionary<char, string> LowerCaseDiacritics;
         private static readonly Dictionary<char, string> Diacritics = new Dictionary<char, string>
         {
@@ -555,6 +557,8 @@ namespace Squidex.Infrastructure
 
         public static string BuildFullUrl(this string baseUrl, string path, bool trailingSlash = false)
         {
+            Guard.NotNull(path, nameof(path));
+
             var url = $"{baseUrl.TrimEnd('/')}/{path.Trim('/')}";
 
             if (trailingSlash &&
@@ -566,6 +570,35 @@ namespace Squidex.Infrastructure
             }
 
             return url;
+        }
+
+        public static string JoinNonEmpty(string separator, params string[] parts)
+        {
+            Guard.NotNull(separator, nameof(separator));
+
+            if (parts == null || parts.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            var sb = new StringBuilder();
+
+            for (var i = 0; i < parts.Length; i++)
+            {
+                var part = parts[i];
+
+                if (!string.IsNullOrWhiteSpace(part))
+                {
+                    sb.Append(part);
+
+                    if (i < parts.Length - 1)
+                    {
+                        sb.Append(separator);
+                    }
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }

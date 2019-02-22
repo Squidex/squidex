@@ -23,7 +23,10 @@ namespace Squidex.Infrastructure.Assets
         {
             sut = new Lazy<T>(CreateStore);
 
-            ((IInitializable)Sut).InitializeAsync().Wait();
+            if (Sut is IInitializable initializable)
+            {
+                initializable.InitializeAsync().Wait();
+            }
         }
 
         protected T Sut

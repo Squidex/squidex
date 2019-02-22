@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
                 SchemaDef = SchemaDef.AddField(field);
             }
 
-            SchemaFieldsTotal++;
+            SchemaFieldsTotal = Math.Max(SchemaFieldsTotal, @event.FieldId.Id);
         }
 
         protected void On(SchemaCategoryChanged @event)

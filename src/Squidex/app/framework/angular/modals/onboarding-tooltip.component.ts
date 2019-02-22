@@ -100,12 +100,12 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
     public hideThis() {
         this.onboardingService.disable(this.helpId);
 
-        this.ngOnDestroy();
+        this.unsubscribeAll();
     }
 
     public hideAll() {
         this.onboardingService.disableAll();
 
-        this.ngOnDestroy();
+        this.unsubscribeAll();
     }
 }

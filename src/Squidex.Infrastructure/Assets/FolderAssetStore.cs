@@ -7,7 +7,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
@@ -159,7 +158,7 @@ namespace Squidex.Infrastructure.Assets
 
         private string GetPath(string id, long version, string suffix)
         {
-            return Path.Combine(directory.FullName, string.Join("_", new[] { id, version.ToString(), suffix }.Where(x => !string.IsNullOrWhiteSpace(x))));
+            return Path.Combine(directory.FullName, StringExtensions.JoinNonEmpty("_", id, version.ToString(), suffix));
         }
     }
 }
