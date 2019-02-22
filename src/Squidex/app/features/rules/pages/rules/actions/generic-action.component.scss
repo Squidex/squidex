@@ -2,5 +2,9 @@
 @import '_mixins';
 
 .form-check {
-    padding-top: .5rem;
+    margin-bottom: -.25rem;
+}
+
+textarea {
+    height: 15rem;
 }

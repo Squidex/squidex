@@ -9,7 +9,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Infrastructure;
 
 namespace Squidex.Extensions.Actions.Webhook
 {
@@ -21,7 +20,6 @@ namespace Squidex.Extensions.Actions.Webhook
         ReadMore = "https://en.wikipedia.org/wiki/Webhook")]
     public sealed class WebhookAction : RuleAction
     {
-        [AbsoluteUrl]
         [Required]
         [Display(Name = "Url", Description = "The url to the webhook.")]
         [DataType(DataType.Text)]

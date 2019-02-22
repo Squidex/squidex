@@ -34,7 +34,6 @@ namespace Squidex.Extensions.Actions.Discourse
 
             var json = new Dictionary<string, object>
             {
-                ["raw"] = Format(action.Text, @event),
                 ["title"] = Format(action.Title, @event)
             };
 
@@ -55,6 +54,8 @@ namespace Squidex.Extensions.Actions.Discourse
                 RequestUrl = url,
                 RequestBody = requestBody
             };
+
+            json["raw"] = Format(action.Text, @event);
 
             var description =
                 action.Topic.HasValue ?

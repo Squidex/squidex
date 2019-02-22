@@ -14,12 +14,15 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="patternsState.patterns | async; let patterns">
+        <ng-container *ngIf="(patternsState.isLoaded | async) && (patternsState.patterns | async); let patterns">
             <div class="table-items-row table-items-row-empty" *ngIf="patterns.length === 0">
                 No pattern created yet.
             </div>
             
-            <sqx-pattern *ngFor="let pattern of patterns; trackBy: trackByPattern" [pattern]="pattern"></sqx-pattern>
+            <sqx-pattern *ngFor="let pattern of patterns; trackBy: trackByPattern" 
+                [pattern]="pattern">
+            </sqx-pattern>
+            
             <sqx-pattern></sqx-pattern>
         </ng-container>
     </ng-container>

@@ -20,50 +20,51 @@ namespace Squidex.Extensions.Actions.Email
     public sealed class EmailAction : RuleAction
     {
         [Required]
-        [Display(Name = "ServerHost", Description = "The IP address or host to the SMTP server.")]
+        [Display(Name = "Server Host", Description = "The IP address or host to the SMTP server.")]
         [DataType(DataType.Text)]
         public string ServerHost { get; set; }
 
         [Required]
-        [Display(Name = "ServerPort", Description = "The port to the SMTP server.")]
+        [Display(Name = "Server Port", Description = "The port to the SMTP server.")]
         [DataType(DataType.Custom)]
         public int ServerPort { get; set; }
 
         [Required]
-        [Display(Name = "ServerUseSsl", Description = "Specify whether the SMPT client uses Secure Sockets Layer (SSL) to encrypt the connection.")]
+        [Display(Name = "Use SSL", Description = "Specify whether the SMPT client uses Secure Sockets Layer (SSL) to encrypt the connection.")]
         [DataType(DataType.Custom)]
         public bool ServerUseSsl { get; set; }
 
         [Required]
-        [Display(Name = "ServerUsername", Description = "The username for the SMTP server.")]
-        [DataType(DataType.Text)]
-        public string ServerUsername { get; set; }
-
-        [Required]
-        [Display(Name = "ServerPassword", Description = "The password for the SMTP server.")]
+        [Display(Name = "Password", Description = "The password for the SMTP server.")]
         [DataType(DataType.Password)]
         public string ServerPassword { get; set; }
 
         [Required]
-        [Display(Name = "MessageFrom", Description = "The email sending address.")]
+        [Display(Name = "Username", Description = "The username for the SMTP server.")]
+        [DataType(DataType.Text)]
+        [Formattable]
+        public string ServerUsername { get; set; }
+
+        [Required]
+        [Display(Name = "From Address", Description = "The email sending address.")]
         [DataType(DataType.Text)]
         [Formattable]
         public string MessageFrom { get; set; }
 
         [Required]
-        [Display(Name = "MessageTo", Description = "The email message will be sent to.")]
+        [Display(Name = "To Address", Description = "The email message will be sent to.")]
         [DataType(DataType.Text)]
         [Formattable]
         public string MessageTo { get; set; }
 
         [Required]
-        [Display(Name = "MessageSubject", Description = "The subject line for this email message.")]
+        [Display(Name = "Subject", Description = "The subject line for this email message.")]
         [DataType(DataType.Text)]
         [Formattable]
         public string MessageSubject { get; set; }
 
         [Required]
-        [Display(Name = "MessageBody", Description = "The message body.")]
+        [Display(Name = "Body", Description = "The message body.")]
         [DataType(DataType.MultilineText)]
         [Formattable]
         public string MessageBody { get; set; }

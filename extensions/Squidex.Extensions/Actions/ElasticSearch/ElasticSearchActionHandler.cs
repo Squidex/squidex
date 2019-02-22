@@ -45,9 +45,9 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                 var ruleJob = new ElasticSearchJob
                 {
                     Host = action.Host.ToString(),
-                    ContentId = contentId,
                     IndexName = Format(action.IndexName, @event),
-                    IndexType = Format(action.IndexType, @event)
+                    IndexType = Format(action.IndexType, @event),
+                    ContentId = contentId
                 };
 
                 if (contentEvent.Type == EnrichedContentEventType.Deleted ||

@@ -23,7 +23,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
     {
         [AbsoluteUrl]
         [Required]
-        [Display(Name = "Host", Description = "The hostname of the elastic search instance or cluster.")]
+        [Display(Name = "Server Url", Description = "The url to the elastic search instance or cluster.")]
         [DataType(DataType.Url)]
         public Uri Host { get; set; }
 

@@ -41,13 +41,14 @@ namespace Squidex.Extensions.Actions.Medium
         [Formattable]
         public string CanonicalUrl { get; set; }
 
-        [Display(Name = "PublicationId", Description = "Optional publication id.")]
-        [DataType(DataType.Text)]
-        public string PublicationId { get; set; }
-
         [Display(Name = "Tags", Description = "The optional comma separated list of tags.")]
         [DataType(DataType.Text)]
+        [Formattable]
         public string Tags { get; set; }
+
+        [Display(Name = "Publication Id", Description = "Optional publication id.")]
+        [DataType(DataType.Text)]
+        public string PublicationId { get; set; }
 
         [Display(Name = "Is Html", Description = "Indicates whether the content is markdown or html.")]
         [DataType(DataType.Custom)]

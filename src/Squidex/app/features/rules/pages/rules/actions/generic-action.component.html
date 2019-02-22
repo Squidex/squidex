@@ -1,6 +1,8 @@
 <div [formGroup]="actionForm" class="form-horizontal">
     <div class="form-group row" *ngFor="let property of definition.properties">
-        <label class="col-3 col-form-label" [for]="property.name">{{property.display}}</label>
+        <label class="col-3 col-form-label" [for]="property.name">
+            <span *ngIf="property.editor !== 'Checkbox'">{{property.display}}</span>
+        </label>
 
         <div class="col-9">
             <sqx-control-errors [for]="property.name" [submitted]="actionFormSubmitted"></sqx-control-errors>

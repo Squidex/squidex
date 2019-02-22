@@ -32,6 +32,7 @@ namespace Squidex.Extensions.Actions.Twitter
         [Required]
         [Display(Name = "Text", Description = "The text that is sent as tweet to twitter.")]
         [DataType(DataType.MultilineText)]
+        [Formattable]
         public string Text { get; set; }
     }
 }

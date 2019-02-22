@@ -6,6 +6,7 @@
 // 
 .form-control {
     &.ng-invalid {
+        &.ng-touched,
         &.ng-dirty {
             & {
                 border-color: $color-theme-error;
@@ -199,6 +200,7 @@ input {
         }
 
         &.ng-invalid {
+            &.ng-touched,
             &.ng-dirty {
                 & {
                     @include box-shadow-none;

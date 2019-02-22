@@ -23,7 +23,7 @@ namespace Squidex.Extensions.Actions.AzureQueue
     public sealed class AzureQueueAction : RuleAction
     {
         [Required]
-        [Display(Name = "Connection String", Description = "The connection string to the storage account.")]
+        [Display(Name = "Connection", Description = "The connection string to the storage account.")]
         [DataType(DataType.Text)]
         [Formattable]
         public string ConnectionString { get; set; }

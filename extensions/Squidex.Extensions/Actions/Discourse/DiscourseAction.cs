@@ -23,7 +23,7 @@ namespace Squidex.Extensions.Actions.Discourse
     {
         [AbsoluteUrl]
         [Required]
-        [Display(Name = "Url", Description = "The url to the discourse server.")]
+        [Display(Name = "Server Url", Description = "The url to the discourse server.")]
         [DataType(DataType.Url)]
         public Uri Url { get; set; }
 
@@ -33,7 +33,7 @@ namespace Squidex.Extensions.Actions.Discourse
         public string ApiKey { get; set; }
 
         [Required]
-        [Display(Name = "Api Username", Description = "The api username to authenticate to your discourse server.")]
+        [Display(Name = "Api User", Description = "The api username to authenticate to your discourse server.")]
         [DataType(DataType.Text)]
         public string ApiUsername { get; set; }
 
