@@ -30,6 +30,7 @@
 
                 <sqx-shortcut keys="ctrl+s" (trigger)="saveAndPublish()"></sqx-shortcut>
             </ng-container>
+
             <ng-template #notNew>
                 <div class="dropdown dropdown-options ml-1" *ngIf="content">
                     <sqx-preview-button [schema]="schema" [content]="content"></sqx-preview-button>

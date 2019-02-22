@@ -12,6 +12,7 @@
             (mousedown)="selectItem(item)"
             (mouseover)="selectIndex(i)"
             [sqxScrollActive]="i === snapshot.suggestedIndex">
+
             <ng-container *ngIf="!itemTemplate">{{item}}</ng-container>
 
             <ng-template *ngIf="itemTemplate" [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>

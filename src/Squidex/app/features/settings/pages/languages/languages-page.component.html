@@ -14,14 +14,12 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="languagesState.isLoaded | async">
-            <ng-container *ngIf="languagesState.languages | async; let languages">
-                <sqx-language *ngFor="let languageInfo of languages; trackBy: trackByLanguage"
-                    [language]="languageInfo.language" 
-                    [fallbackLanguages]="languageInfo.fallbackLanguages"
-                    [fallbackLanguagesNew]="languageInfo.fallbackLanguagesNew">
-                </sqx-language>
-            </ng-container>
+        <ng-container *ngIf="(languagesState.isLoaded | async) && (languagesState.languages | async); let languages">
+            <sqx-language *ngFor="let languageInfo of languages; trackBy: trackByLanguage"
+                [language]="languageInfo.language" 
+                [fallbackLanguages]="languageInfo.fallbackLanguages"
+                [fallbackLanguagesNew]="languageInfo.fallbackLanguagesNew">
+            </sqx-language>
 
             <ng-container *ngIf="languagesState.newLanguages | async; let newLanguages">
                 <div class="table-items-footer">

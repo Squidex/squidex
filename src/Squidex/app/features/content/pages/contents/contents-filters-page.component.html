@@ -16,6 +16,7 @@
 
             <a class="sidebar-item" *ngFor="let query of schemaQueries.queries | async; trackByQuery" (click)="search(query.filter)"
                 [class.active]="isSelectedQuery(query.filter)">
+                
                 {{query.name}}
                 
                 <a class="sidebar-item-remove float-right" (click)="schemaQueries.remove(query.name)">

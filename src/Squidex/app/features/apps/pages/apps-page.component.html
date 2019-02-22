@@ -100,9 +100,13 @@
 </ng-container>
 
 <ng-container *sqxModalView="onboardingDialog;onRoot:true;closeAuto:false">
-    <sqx-onboarding-dialog (closed)="onboardingDialog.hide()"></sqx-onboarding-dialog>
+    <sqx-onboarding-dialog
+        (closed)="onboardingDialog.hide()">
+    </sqx-onboarding-dialog>
 </ng-container>
 
 <ng-container *sqxModalView="newsDialog;onRoot:true;closeAuto:false">
-    <sqx-news-dialog [features]="newsFeatures" (closed)="newsDialog.hide()"></sqx-news-dialog>
+    <sqx-news-dialog [features]="newsFeatures"
+        (closed)="newsDialog.hide()">
+    </sqx-news-dialog>
 </ng-container>

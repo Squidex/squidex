@@ -31,7 +31,10 @@
         <h3>Saved queries</h3>
 
         <a class="sidebar-item" *ngFor="let query of queries.queries | async; trackBy: trackByQuery" (click)="search(query.filter)"
-            [class.active]="isSelectedQuery(query.filter)">                
+            [class.active]="isSelectedQuery(query.filter)">
+            
+            {{query.name}}
+
             <a class="sidebar-item-remove float-right" (click)="queries.remove(query.name)">
                 <i class="icon-close"></i>
             </a>

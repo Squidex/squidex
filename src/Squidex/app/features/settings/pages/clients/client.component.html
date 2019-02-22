@@ -2,7 +2,7 @@
     <div class="card-header">
         <div class="row no-gutters">
             <div class="col col-name">
-                <form *ngIf="isRenaming" class="form-inline" [formGroup]="renameForm.form" (ngSubmit)="rename()">
+                <form *ngIf="isRenaming; else noRenaming" class="form-inline" [formGroup]="renameForm.form" (ngSubmit)="rename()">
                     <div class="form-group mr-1">
                         <sqx-control-errors for="name"></sqx-control-errors>
                         
@@ -16,13 +16,13 @@
                     </button>
                 </form>
 
-                <ng-container *ngIf="!isRenaming">
+                <ng-template #noRenaming>
                     <h3 class="client-name" (dblclick)="toggleRename()">
                         {{client.name}}
                     </h3>
 
                     <i class="client-edit icon-pencil" (click)="toggleRename()"></i>
-                </ng-container>
+                </ng-template>
             </div>
             <div class="col-auto">
                 <button type="button" class="btn btn-primary" (click)="connect()">Connect</button>

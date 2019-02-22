@@ -64,9 +64,12 @@
             </table>
 
             <ng-container *sqxModalView="addRuleDialog;onRoot:true;closeAuto:false">
-                <sqx-rule-wizard [schemas]="schemasState.schemas | async" [rule]="wizardRule" [mode]="wizardMode"
+                <sqx-rule-wizard 
+                    [schemas]="schemasState.schemas | async"
+                    [rule]="wizardRule"
                     [ruleActions]="ruleActions"
                     [ruleTriggers]="ruleTriggers"
+                    [mode]="wizardMode"
                     (completed)="addRuleDialog.hide()">
                 </sqx-rule-wizard>
             </ng-container>

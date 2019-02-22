@@ -1,13 +1,15 @@
 <div class="stars-container">
-    <div *ngIf="maximumStars === 0 || maximumStars > 15" class="many-stars">
-        Must not have more more than 15 stars
-    </div>
-
-    <ng-container *ngIf="maximumStars > 0 && maximumStars <= 15">
+    <ng-container *ngIf="maximumStars > 0 && maximumStars <= 15; else noStars">
         <span class="stars" (mouseleave)="stopPreview()" [class.disabled]="snapshot.isDisabled">
             <span class="star" *ngFor="let star of snapshot.starsArray" (mouseenter)="setPreview(star)" (click)="setValue(star)" [class.selected]="star <= snapshot.stars"></span>
         </span>
 
         <button type="button" class="btn btn-text" [class.hidden]="!value" (click)="reset()">Clear</button>
     </ng-container>
+
+    <ng-template #noStars>
+        <div class="many-stars">
+            Must not have more more than 15 stars
+        </div>
+    </ng-template>
 </div>
