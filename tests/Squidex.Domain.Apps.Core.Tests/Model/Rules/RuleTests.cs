@@ -37,6 +37,19 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             }
         }
 
+        public sealed class MigratedTrigger : RuleTrigger, IMigrated<RuleTrigger>
+        {
+            public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
+            {
+                throw new NotSupportedException();
+            }
+
+            public RuleTrigger Migrate()
+            {
+                return new OtherTrigger();
+            }
+        }
+
         [TypeName(nameof(TestAction1))]
         public sealed class TestAction1 : RuleAction
         {
@@ -125,6 +138,16 @@ namespace Squidex.Domain.Apps.Core.Model.Rules
             var serialized = rule_1.SerializeAndDeserialize();
 
             serialized.Should().BeEquivalentTo(rule_1);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_and_migrate_trigger()
+        {
+            var rule_X = new Rule(new MigratedTrigger(), new TestAction1());
+
+            var serialized = rule_X.SerializeAndDeserialize();
+
+            Assert.IsType<OtherTrigger>(serialized.Trigger);
         }
 
         [Theory]

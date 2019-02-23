@@ -26,7 +26,7 @@ if ($all -Or $infrastructure) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[Squidex.Infrastructure*]*CodeGen*" `
+	-filter:"+[Squidex.*]* -[Squidex.Infrastructure*]*CodeGen* -[Squidex.Infrastructure*]*OrleansGeneratedCode*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Infrastructure.xml" `
 	-oldStyle
@@ -48,7 +48,7 @@ if ($all -Or $appsEntities) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[Squidex.Domain.Apps.Entities*]*CodeGen*" `
+	-filter:"+[Squidex.*]* -[Squidex.Domain.Apps.Entities*]*CodeGen* -[Squidex.Domain.Apps.Entities*]*OrleansGeneratedCode*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Entities.xml" `
 	-oldStyle
