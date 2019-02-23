@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private bool IsInUse(Guid appId, string name)
         {
-            return State.Apps.ContainsKey(name) || State.Apps.All(x => x.Value == appId);
+            return State.Apps.ContainsKey(name) || State.Apps.Any(x => x.Value == appId);
         }
 
         private bool IsReserved(Guid appId, string name)
