@@ -30,7 +30,7 @@ namespace Squidex.Config.Domain
                     throw new ConfigurationException($"Configure EventPublisher type with 'eventPublishers:{child.Key}:type'.");
                 }
 
-                var eventsFilter = config.GetValue<string>("eventsFilter");
+                var eventsFilter = child.GetValue<string>("eventsFilter");
 
                 var enabled = child.GetValue<bool>("enabled");
 
