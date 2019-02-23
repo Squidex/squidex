@@ -1,5 +1,33 @@
 # Changelog
 
+## v1.16.0 - 2019-02-23
+
+
+### Features
+
+* **CLI**: New commands for schema synchronization.
+* **UI**: Imroved validation messages.
+* **UI**: Integrate CLI documentation to client UI.
+* **UI**: Side by side view for content differences.
+* **UI**: Drag and drop assets to markdown editor.
+* **UI**: Drag and drop assets to rich text editor.
+* **UI**: Copy assets from clipboard to asset views.
+* **UI**: Copy assets from clipboard to markdown editor.
+* **UI**: Copy assets from clipboard to rich text editor.
+* **UI**: Performance improvements and refactoring of components.
+* **Schemas**: New endpoint to synchronize schemas.
+* **Server**: Log all requests for cloud version and provide endpoint to download logs.
+* **Server**: Improved logging for http requests.
+* **Rules**: Generate event and trigger when the app consumed almost all resources.
+
+### Bugfixes
+
+(Mostly due to UI refactoring :( )
+
+* **UI**: Fixed custom editors.
+* **UI**: Fixed disable state of restore button.
+* **UI**: Fixes for addition button states.
+
 ## v1.15.0 - 2019-01-05
 
 ### Features
