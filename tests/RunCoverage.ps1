@@ -25,7 +25,7 @@ if ($all -Or $infrastructure) {
 	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj --filter Category!=Dependencies" `
+	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
 	-filter:"+[Squidex.*]* -[Squidex.Infrastructure*]*CodeGen* -[Squidex.Infrastructure*]*OrleansGeneratedCode*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Infrastructure.xml" `
