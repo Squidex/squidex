@@ -5,15 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Bson;
-
 namespace Squidex.Infrastructure.EventSourcing
 {
     internal sealed class StreamPosition
     {
-        private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
-
-        public BsonTimestamp Timestamp { get; }
+        public long Timestamp { get; }
 
         public long CommitOffset { get; }
 
@@ -24,7 +20,7 @@ namespace Squidex.Infrastructure.EventSourcing
             get { return CommitOffset == CommitSize - 1; }
         }
 
-        public StreamPosition(BsonTimestamp timestamp, long commitOffset, long commitSize)
+        public StreamPosition(long timestamp, long commitOffset, long commitSize)
         {
             Timestamp = timestamp;
 
@@ -36,8 +32,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var parts = new object[]
             {
-                position.Timestamp.Timestamp,
-                position.Timestamp.Increment,
+                position.Timestamp,
                 position.CommitOffset,
                 position.CommitSize
             };
@@ -51,10 +46,10 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var parts = position.Split('-');
 
-                return new StreamPosition(new BsonTimestamp(int.Parse(parts[0]), int.Parse(parts[1])), long.Parse(parts[2]), long.Parse(parts[3]));
+                return new StreamPosition(long.Parse(parts[0]), long.Parse(parts[1]), long.Parse(parts[2]));
             }
 
-            return new StreamPosition(EmptyTimestamp, -1, -1);
+            return new StreamPosition(0, -1, -1);
         }
     }
 }

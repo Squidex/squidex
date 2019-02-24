@@ -7,22 +7,25 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
-using MongoDB.Bson;
-using MongoDB.Driver;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using NodaTime;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public partial class MongoEventStore
+    public partial class CosmosDbEventStore
     {
-        private const int MaxCommitSize = 10;
         private const int MaxWriteAttempts = 20;
-        private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
+        private const int MaxCommitSize = 10;
+        private static readonly FeedOptions TakeOne = new FeedOptions { MaxItemCount = 1 };
 
         public Task DeleteStreamAsync(string streamName)
         {
-            return Collection.DeleteManyAsync(x => x.EventStream == streamName);
+            return Task.CompletedTask;
         }
 
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)
@@ -37,14 +40,14 @@ namespace Squidex.Infrastructure.EventSourcing
             Guard.NotNull(events, nameof(events));
             Guard.LessThan(events.Count, MaxCommitSize, "events.Count");
 
-            using (Profiler.TraceMethod<MongoEventStore>())
+            using (Profiler.TraceMethod<CosmosDbEventStore>())
             {
                 if (events.Count == 0)
                 {
                     return;
                 }
 
-                var currentVersion = await GetEventStreamOffsetAsync(streamName);
+                var currentVersion = GetEventStreamOffset(streamName);
 
                 if (expectedVersion != EtagVersion.Any && expectedVersion != currentVersion)
                 {
@@ -57,17 +60,15 @@ namespace Squidex.Infrastructure.EventSourcing
                 {
                     try
                     {
-                        await Collection.InsertOneAsync(commit);
-
-                        notifier.NotifyEventsStored(streamName);
+                        await documentClient.CreateDocumentAsync(collectionUri, commit);
 
                         return;
                     }
-                    catch (MongoWriteException ex)
+                    catch (DocumentClientException ex)
                     {
-                        if (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
+                        if (ex.StatusCode == HttpStatusCode.Conflict)
                         {
-                            currentVersion = await GetEventStreamOffsetAsync(streamName);
+                            currentVersion = GetEventStreamOffset(streamName);
 
                             if (expectedVersion != EtagVersion.Any)
                             {
@@ -92,45 +93,43 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private async Task<long> GetEventStreamOffsetAsync(string streamName)
+        private long GetEventStreamOffset(string streamName)
         {
-            var document =
-                await Collection.Find(Filter.Eq(EventStreamField, streamName))
-                    .Project<BsonDocument>(Projection
-                        .Include(EventStreamOffsetField)
-                        .Include(EventsCountField))
-                    .Sort(Sort.Descending(EventStreamOffsetField)).Limit(1)
-                    .FirstOrDefaultAsync();
+            var query =
+                documentClient.CreateDocumentQuery<CosmosDbEventCommit>(collectionUri,
+                    FilterBuilder.LastPosition(streamName));
+
+            var document = query.ToList().FirstOrDefault();
 
             if (document != null)
             {
-                return document[nameof(MongoEventCommit.EventStreamOffset)].ToInt64() + document[nameof(MongoEventCommit.EventsCount)].ToInt64();
+                return document.EventStreamOffset + document.EventsCount;
             }
 
             return EtagVersion.Empty;
         }
 
-        private static MongoEventCommit BuildCommit(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
+        private static CosmosDbEventCommit BuildCommit(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            var commitEvents = new MongoEvent[events.Count];
+            var commitEvents = new CosmosDbEvent[events.Count];
 
             var i = 0;
 
             foreach (var e in events)
             {
-                var mongoEvent = MongoEvent.FromEventData(e);
+                var mongoEvent = CosmosDbEvent.FromEventData(e);
 
                 commitEvents[i++] = mongoEvent;
             }
 
-            var mongoCommit = new MongoEventCommit
+            var mongoCommit = new CosmosDbEventCommit
             {
                 Id = commitId,
                 Events = commitEvents,
                 EventsCount = events.Count,
                 EventStream = streamName,
                 EventStreamOffset = expectedVersion,
-                Timestamp = EmptyTimestamp
+                Timestamp = SystemClock.Instance.GetCurrentInstant().ToUnixTimeTicks()
             };
 
             return mongoCommit;
