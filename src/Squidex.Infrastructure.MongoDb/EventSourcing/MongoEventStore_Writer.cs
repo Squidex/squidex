@@ -17,6 +17,7 @@ namespace Squidex.Infrastructure.EventSourcing
     public partial class MongoEventStore
     {
         private const int MaxWriteAttempts = 20;
+        private const int MaxCommitSize = 10;
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
 
         public Task DeleteStreamAsync(string streamName)
@@ -32,13 +33,12 @@ namespace Squidex.Infrastructure.EventSourcing
         public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
             Guard.LessThan(events.Count, MaxCommitSize, "events.Count");
+            Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNull(events, nameof(events));
 
             using (Profiler.TraceMethod<MongoEventStore>())
             {
-                Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
-                Guard.NotNullOrEmpty(streamName, nameof(streamName));
-                Guard.NotNull(events, nameof(events));
-
                 if (events.Count == 0)
                 {
                     return;
