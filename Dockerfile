@@ -20,7 +20,7 @@ RUN cp -a /tmp/node_modules src/Squidex/ \
  
 # Test Backend
 RUN dotnet restore \
- && dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj \ 
+ && dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj --filter TraitName!=TraitValue \ 
  && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj \ 
  && dotnet test tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj \
  && dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj \
