@@ -15,6 +15,7 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
+        private const int MaxCommitSize = 10;
         private static readonly FieldDefinition<MongoEventCommit, BsonTimestamp> TimestampField = Fields.Build(x => x.Timestamp);
         private static readonly FieldDefinition<MongoEventCommit, long> EventsCountField = Fields.Build(x => x.EventsCount);
         private static readonly FieldDefinition<MongoEventCommit, long> EventStreamOffsetField = Fields.Build(x => x.EventStreamOffset);

@@ -1,27 +1,25 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Xunit;
+using System;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public class MemoryAssetStoreTests : AssetStoreTests<MemoryAssetStore>
+    public sealed class GoogleCloudAssetStoreFixture : IDisposable
     {
-        public override MemoryAssetStore CreateStore()
+        public GoogleCloudAssetStore AssetStore { get; }
+
+        public GoogleCloudAssetStoreFixture()
         {
-            return new MemoryAssetStore();
+            AssetStore = new GoogleCloudAssetStore("squidex-test");
         }
 
-        [Fact]
-        public void Should_not_calculate_source_url()
+        public void Dispose()
         {
-            var url = Sut.GeneratePublicUrl(AssetId, 1, null);
-
-            Assert.Null(url);
         }
     }
 }

@@ -24,11 +24,6 @@ namespace Squidex.Infrastructure.EventSourcing
             return Collection.DeleteManyAsync(x => x.EventStream == streamName);
         }
 
-        public Task DeleteManyAsync(string property, object value)
-        {
-            return Collection.DeleteManyAsync(Filter.Eq(CreateIndexPath(property), value));
-        }
-
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)
         {
             return AppendAsync(commitId, streamName, EtagVersion.Any, events);
@@ -36,6 +31,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
+            Guard.LessThan(events.Count, MaxCommitSize, "events.Count");
+
             using (Profiler.TraceMethod<MongoEventStore>())
             {
                 Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));

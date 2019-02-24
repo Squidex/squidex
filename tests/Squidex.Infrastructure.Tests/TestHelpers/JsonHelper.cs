@@ -19,7 +19,14 @@ namespace Squidex.Infrastructure.TestHelpers
 
         public static IJsonSerializer CreateSerializer(TypeNameRegistry typeNameRegistry = null)
         {
-            var serializerSettings = new JsonSerializerSettings
+            var serializerSettings = DefaultSettings(typeNameRegistry);
+
+            return new NewtonsoftJsonSerializer(serializerSettings);
+        }
+
+        public static JsonSerializerSettings DefaultSettings(TypeNameRegistry typeNameRegistry = null)
+        {
+            return new JsonSerializerSettings
             {
                 SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry ?? new TypeNameRegistry()),
 
@@ -37,8 +44,6 @@ namespace Squidex.Infrastructure.TestHelpers
 
                 TypeNameHandling = TypeNameHandling.Auto
             };
-
-            return new NewtonsoftJsonSerializer(serializerSettings);
         }
 
         public static T SerializeAndDeserialize<T>(this T value)

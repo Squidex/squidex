@@ -10,11 +10,15 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.MongoDb;
+using EventFilter = MongoDB.Driver.FilterDefinition<Squidex.Infrastructure.EventSourcing.MongoEventCommit>;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
+    public delegate bool EventPredicate(EventData data);
+
     public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
     {
         public Task CreateIndexAsync(string property)
@@ -39,7 +43,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     await Collection.Find(
                         Filter.And(
                             Filter.Eq(EventStreamField, streamName),
-                            Filter.Gte(EventStreamOffsetField, streamPosition - 1)))
+                            Filter.Gte(EventStreamOffsetField, streamPosition - MaxCommitSize)))
                         .Sort(Sort.Ascending(TimestampField)).ToListAsync();
 
                 var result = new List<StoredEvent>();
@@ -75,9 +79,10 @@ namespace Squidex.Infrastructure.EventSourcing
 
             StreamPosition lastPosition = position;
 
-            var filter = CreateFilter(property, value, lastPosition);
+            var filterDefinition = CreateFilter(property, value, lastPosition);
+            var filterExpression = CreateFilterExpression(property, value);
 
-            return QueryAsync(callback, lastPosition, filter, ct);
+            return QueryAsync(callback, lastPosition, filterDefinition, filterExpression, ct);
         }
 
         public Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default)
@@ -86,16 +91,17 @@ namespace Squidex.Infrastructure.EventSourcing
 
             StreamPosition lastPosition = position;
 
-            var filter = CreateFilter(streamFilter, lastPosition);
+            var filterDefinition = CreateFilter(streamFilter, lastPosition);
+            var filterExpression = CreateFilterExpression(null, null);
 
-            return QueryAsync(callback, lastPosition, filter, ct);
+            return QueryAsync(callback, lastPosition, filterDefinition, filterExpression, ct);
         }
 
-        private async Task QueryAsync(Func<StoredEvent, Task> callback, StreamPosition lastPosition, FilterDefinition<MongoEventCommit> filter, CancellationToken ct = default)
+        private async Task QueryAsync(Func<StoredEvent, Task> callback, StreamPosition lastPosition, EventFilter filterDefinition, EventPredicate filterExpression, CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoEventStore>())
             {
-                await Collection.Find(filter).Sort(Sort.Ascending(TimestampField)).ForEachPipelineAsync(async commit =>
+                await Collection.Find(filterDefinition).Sort(Sort.Ascending(TimestampField)).ForEachPipelineAsync(async commit =>
                 {
                     var eventStreamOffset = (int)commit.EventStreamOffset;
 
@@ -109,43 +115,47 @@ namespace Squidex.Infrastructure.EventSourcing
                         if (commitOffset > lastPosition.CommitOffset || commitTimestamp > lastPosition.Timestamp)
                         {
                             var eventData = e.ToEventData();
-                            var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
 
-                            await callback(new StoredEvent(commit.EventStream, eventToken, eventStreamOffset, eventData));
+                            if (filterExpression(eventData))
+                            {
+                                var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
 
-                            commitOffset++;
+                                await callback(new StoredEvent(commit.EventStream, eventToken, eventStreamOffset, eventData));
+                            }
                         }
+
+                        commitOffset++;
                     }
                 }, ct);
             }
         }
 
-        private static FilterDefinition<MongoEventCommit> CreateFilter(string property, object value, StreamPosition streamPosition)
+        private static EventFilter CreateFilter(string property, object value, StreamPosition streamPosition)
         {
-            var filters = new List<FilterDefinition<MongoEventCommit>>();
+            var filters = new List<EventFilter>();
 
-            FilterByPosition(streamPosition, filters);
-            FilterByProperty(property, value, filters);
+            AppendByPosition(streamPosition, filters);
+            AppendByProperty(property, value, filters);
 
             return Filter.And(filters);
         }
 
-        private static FilterDefinition<MongoEventCommit> CreateFilter(string streamFilter, StreamPosition streamPosition)
+        private static EventFilter CreateFilter(string streamFilter, StreamPosition streamPosition)
         {
-            var filters = new List<FilterDefinition<MongoEventCommit>>();
+            var filters = new List<EventFilter>();
 
-            FilterByPosition(streamPosition, filters);
-            FilterByStream(streamFilter, filters);
+            AppendByPosition(streamPosition, filters);
+            AppendByStream(streamFilter, filters);
 
             return Filter.And(filters);
         }
 
-        private static void FilterByProperty(string property, object value, List<FilterDefinition<MongoEventCommit>> filters)
+        private static void AppendByProperty(string property, object value, List<EventFilter> filters)
         {
             filters.Add(Filter.Eq(CreateIndexPath(property), value));
         }
 
-        private static void FilterByStream(string streamFilter, List<FilterDefinition<MongoEventCommit>> filters)
+        private static void AppendByStream(string streamFilter, List<EventFilter> filters)
         {
             if (!string.IsNullOrWhiteSpace(streamFilter) && !string.Equals(streamFilter, ".*", StringComparison.OrdinalIgnoreCase))
             {
@@ -160,7 +170,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private static void FilterByPosition(StreamPosition streamPosition, List<FilterDefinition<MongoEventCommit>> filters)
+        private static void AppendByPosition(StreamPosition streamPosition, List<EventFilter> filters)
         {
             if (streamPosition.IsEndOfCommit)
             {
@@ -169,6 +179,20 @@ namespace Squidex.Infrastructure.EventSourcing
             else
             {
                 filters.Add(Filter.Gte(TimestampField, streamPosition.Timestamp));
+            }
+        }
+
+        private static EventPredicate CreateFilterExpression(string property, object value)
+        {
+            if (!string.IsNullOrWhiteSpace(property))
+            {
+                var jsonValue = JsonValue.Create(value);
+
+                return x => x.Headers.TryGetValue(property, out var p) && p.Equals(jsonValue);
+            }
+            else
+            {
+                return x => true;
             }
         }
 

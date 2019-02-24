@@ -189,11 +189,6 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        public Task DeleteManyAsync(string property, object value)
-        {
-            throw new NotSupportedException();
-        }
-
         private string GetStreamName(string streamName)
         {
             return $"{prefix}-{streamName}";

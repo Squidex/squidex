@@ -5,36 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Driver;
-using MongoDB.Driver.GridFS;
 using Xunit;
-
-#pragma warning disable xUnit1000 // Test classes must be public
 
 namespace Squidex.Infrastructure.Assets
 {
-    internal class MongoGridFsAssetStoreTests : AssetStoreTests<MongoGridFsAssetStore>
+    [Trait("Dependency", "MongoDB")]
+    public class MongoGridFsAssetStoreTests : AssetStoreTests<MongoGridFsAssetStore>, IClassFixture<MongoGridFSAssetStoreFixture>
     {
-        private static readonly IGridFSBucket<string> GridFSBucket;
+        private readonly MongoGridFSAssetStoreFixture fixture;
 
-        static MongoGridFsAssetStoreTests()
+        public MongoGridFsAssetStoreTests(MongoGridFSAssetStoreFixture fixture)
         {
-            var mongoClient = new MongoClient("mongodb://localhost");
-            var mongoDatabase = mongoClient.GetDatabase("Test");
-
-            GridFSBucket = new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
-            {
-                BucketName = "fs"
-            });
+            this.fixture = fixture;
         }
 
         public override MongoGridFsAssetStore CreateStore()
         {
-            return new MongoGridFsAssetStore(GridFSBucket);
-        }
-
-        public override void Dispose()
-        {
+            return fixture.AssetStore;
         }
 
         [Fact]
