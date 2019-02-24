@@ -16,27 +16,25 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class MongoEventStoreFixture : IDisposable
     {
+        private readonly IMongoClient mongoClient = new MongoClient("mongodb://localhost");
+        private readonly IMongoDatabase mongoDatabase;
+        private readonly IEventNotifier notifier = A.Fake<IEventNotifier>();
+
         public MongoEventStore EventStore { get; }
-
-        public IMongoClient MongoClient { get; } = new MongoClient("mongodb://localhost");
-
-        public IMongoDatabase MongoDatabase { get; }
-
-        public IEventNotifier Notifier { get; } = A.Fake<IEventNotifier>();
 
         public MongoEventStoreFixture()
         {
-            MongoDatabase = MongoClient.GetDatabase("EventStoreTest");
+            mongoDatabase = mongoClient.GetDatabase("EventStoreTest");
 
             BsonJsonConvention.Register(JsonSerializer.Create(JsonHelper.DefaultSettings()));
 
-            EventStore = new MongoEventStore(MongoDatabase, Notifier);
+            EventStore = new MongoEventStore(mongoDatabase, notifier);
             EventStore.InitializeAsync().Wait();
         }
 
         public void Dispose()
         {
-            MongoClient.DropDatabase("EventStoreTest");
+            mongoClient.DropDatabase("EventStoreTest");
         }
     }
 }

@@ -18,6 +18,7 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly IEventStoreConnection connection;
         private readonly IEventSubscriber subscriber;
         private readonly IJsonSerializer serializer;
+        private readonly string prefix;
         private readonly EventStoreCatchUpSubscription subscription;
         private readonly long? position;
 
@@ -27,6 +28,7 @@ namespace Squidex.Infrastructure.EventSourcing
             IJsonSerializer serializer,
             ProjectionClient projectionClient,
             string position,
+            string prefix,
             string streamFilter)
         {
             Guard.NotNull(subscriber, nameof(subscriber));
@@ -34,6 +36,7 @@ namespace Squidex.Infrastructure.EventSourcing
             this.connection = connection;
 
             this.position = projectionClient.ParsePositionOrNull(position);
+            this.prefix = prefix;
 
             var streamName = projectionClient.CreateProjectionAsync(streamFilter).Result;
 
@@ -61,7 +64,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return connection.SubscribeToStreamFrom(streamName, position, settings,
                 (s, e) =>
                 {
-                    var storedEvent = Formatter.Read(e, serializer);
+                    var storedEvent = Formatter.Read(e, prefix, serializer);
 
                     subscriber.OnEventAsync(this, storedEvent).Wait();
                 }, null,

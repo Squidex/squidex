@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Assets
 {
-    [Trait("Dependency", "GC")]
+    [Trait("Category", "Dependencies")]
     public class GoogleCloudAssetStoreTests : AssetStoreTests<GoogleCloudAssetStore>, IClassFixture<GoogleCloudAssetStoreFixture>
     {
         private readonly GoogleCloudAssetStoreFixture fixture;

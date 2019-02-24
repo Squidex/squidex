@@ -13,17 +13,16 @@ namespace Squidex.Infrastructure.Assets
 {
     public sealed class MongoGridFSAssetStoreFixture : IDisposable
     {
+        private readonly IMongoClient mongoClient = new MongoClient("mongodb://localhost");
+        private readonly IMongoDatabase mongoDatabase;
+
         public MongoGridFsAssetStore AssetStore { get; }
-
-        public IMongoClient MongoClient { get; } = new MongoClient("mongodb://localhost");
-
-        public IMongoDatabase MongoDatabase { get; }
 
         public MongoGridFSAssetStoreFixture()
         {
-            MongoDatabase = MongoClient.GetDatabase("GridFSTest");
+            mongoDatabase = mongoClient.GetDatabase("GridFSTest");
 
-            var gridFSBucket = new GridFSBucket<string>(MongoDatabase, new GridFSBucketOptions
+            var gridFSBucket = new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
             {
                 BucketName = "fs"
             });
@@ -34,7 +33,7 @@ namespace Squidex.Infrastructure.Assets
 
         public void Dispose()
         {
-            MongoClient.DropDatabase("GridFSTest");
+            mongoClient.DropDatabase("GridFSTest");
         }
     }
 }

@@ -16,6 +16,7 @@ namespace Squidex.Infrastructure.Assets
         public GoogleCloudAssetStoreFixture()
         {
             AssetStore = new GoogleCloudAssetStore("squidex-test");
+            AssetStore.InitializeAsync().Wait();
         }
 
         public void Dispose()

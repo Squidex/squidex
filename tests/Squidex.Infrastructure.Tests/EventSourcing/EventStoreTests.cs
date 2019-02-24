@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Squidex.Infrastructure.Tasks;
@@ -88,7 +89,7 @@ namespace Squidex.Infrastructure.EventSourcing
             var events = new EventData[]
             {
                 new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2"),
+                new EventData("Type2", new EnvelopeHeaders(), "2")
             };
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
@@ -117,31 +118,18 @@ namespace Squidex.Infrastructure.EventSourcing
                 new EventData("Type2", new EnvelopeHeaders(), "2"),
             };
 
-            var subscriber = new EventSubscriber();
-
-            IEventSubscription subscription = null;
-            try
+            var readEvents = await QueryWithSubscriptionAsync(streamName, async () =>
             {
-                subscription = Sut.CreateSubscription(subscriber, streamName);
-
                 await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
+            });
 
-                subscription.WakeUp();
-
-                await Task.Delay(SubscriptionDelayInMs);
-
-                var expected = new StoredEvent[]
-                {
-                    new StoredEvent(streamName, "Position", 0, events[0]),
-                    new StoredEvent(streamName, "Position", 1, events[1])
-                };
-
-                ShouldBeEquivalentTo(subscriber.Events, expected);
-            }
-            finally
+            var expected = new StoredEvent[]
             {
-                await subscription.StopAsync();
-            }
+                new StoredEvent(streamName, "Position", 0, events[0]),
+                new StoredEvent(streamName, "Position", 1, events[1])
+            };
+
+            ShouldBeEquivalentTo(readEvents, expected);
         }
 
         [Fact]
@@ -183,13 +171,12 @@ namespace Squidex.Infrastructure.EventSourcing
             };
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
+
             await Sut.DeleteStreamAsync(streamName);
 
-            var readEvents1 = await QueryAsync(streamName);
-            var readEvents2 = await QueryWithCallbackAsync(streamName);
+            var readEvents = await QueryAsync(streamName);
 
-            Assert.Empty(readEvents1);
-            Assert.Empty(readEvents2);
+            Assert.Empty(readEvents);
         }
 
         [Fact]
@@ -198,8 +185,8 @@ namespace Squidex.Infrastructure.EventSourcing
             var keyed1 = new EnvelopeHeaders();
             var keyed2 = new EnvelopeHeaders();
 
-            keyed1.Add("key", "1");
-            keyed2.Add("key", "2");
+            keyed1.Add("key", Guid.NewGuid().ToString());
+            keyed2.Add("key", Guid.NewGuid().ToString());
 
             var streamName1 = $"test-{Guid.NewGuid()}";
             var streamName2 = $"test-{Guid.NewGuid()}";
@@ -221,7 +208,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await Sut.AppendAsync(Guid.NewGuid(), streamName1, events1);
             await Sut.AppendAsync(Guid.NewGuid(), streamName2, events2);
 
-            var readEvents = await QueryWithFilterAsync("key", "2");
+            var readEvents = await QueryWithFilterAsync("key", keyed2["key"].ToString());
 
             var expected = new StoredEvent[]
             {
@@ -239,20 +226,86 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private async Task<IReadOnlyList<StoredEvent>> QueryWithFilterAsync(string property, object value)
         {
-            var readEvents = new List<StoredEvent>();
+            using (var cts = new CancellationTokenSource(30000))
+            {
+                while (!cts.IsCancellationRequested)
+                {
+                    var readEvents = new List<StoredEvent>();
 
-            await Sut.QueryAsync(x => { readEvents.Add(x); return TaskHelper.Done; }, property, value);
+                    await Sut.QueryAsync(x => { readEvents.Add(x); return TaskHelper.Done; }, property, value, null, cts.Token);
 
-            return readEvents;
+                    await Task.Delay(500, cts.Token);
+
+                    if (readEvents.Count > 0)
+                    {
+                        return readEvents;
+                    }
+                }
+
+                cts.Token.ThrowIfCancellationRequested();
+
+                return null;
+            }
         }
 
         private async Task<IReadOnlyList<StoredEvent>> QueryWithCallbackAsync(string streamFilter = null, string position = null)
         {
-            var readEvents = new List<StoredEvent>();
+            using (var cts = new CancellationTokenSource(30000))
+            {
+                while (!cts.IsCancellationRequested)
+                {
+                    var readEvents = new List<StoredEvent>();
 
-            await Sut.QueryAsync(x => { readEvents.Add(x); return TaskHelper.Done; }, streamFilter, position);
+                    await Sut.QueryAsync(x => { readEvents.Add(x); return TaskHelper.Done; }, streamFilter, position, cts.Token);
 
-            return readEvents;
+                    await Task.Delay(500, cts.Token);
+
+                    if (readEvents.Count > 0)
+                    {
+                        return readEvents;
+                    }
+                }
+
+                cts.Token.ThrowIfCancellationRequested();
+
+                return null;
+            }
+        }
+
+        private async Task<IReadOnlyList<StoredEvent>> QueryWithSubscriptionAsync(string streamFilter, Func<Task> action)
+        {
+            var subscriber = new EventSubscriber();
+
+            IEventSubscription subscription = null;
+            try
+            {
+                subscription = Sut.CreateSubscription(subscriber, streamFilter);
+
+                await action();
+
+                using (var cts = new CancellationTokenSource(30000))
+                {
+                    while (!cts.IsCancellationRequested)
+                    {
+                        subscription.WakeUp();
+
+                        await Task.Delay(500, cts.Token);
+
+                        if (subscriber.Events.Count > 0)
+                        {
+                            return subscriber.Events;
+                        }
+                    }
+
+                    cts.Token.ThrowIfCancellationRequested();
+
+                    return null;
+                }
+            }
+            finally
+            {
+                await subscription.StopAsync();
+            }
         }
 
         private void ShouldBeEquivalentTo(IEnumerable<StoredEvent> actual, params StoredEvent[] expected)

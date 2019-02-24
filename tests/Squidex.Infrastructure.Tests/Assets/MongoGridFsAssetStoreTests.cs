@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Assets
 {
-    [Trait("Dependency", "MongoDB")]
+    [Trait("Category", "Dependencies")]
     public class MongoGridFsAssetStoreTests : AssetStoreTests<MongoGridFsAssetStore>, IClassFixture<MongoGridFSAssetStoreFixture>
     {
         private readonly MongoGridFSAssetStoreFixture fixture;

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EventStore.ClientAPI;
+using EventStore.ClientAPI.Exceptions;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 
@@ -54,7 +55,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
         {
-            return new GetEventStoreSubscription(connection, subscriber, serializer, projectionClient, position, streamFilter);
+            return new GetEventStoreSubscription(connection, subscriber, serializer, projectionClient, position, prefix, streamFilter);
         }
 
         public Task CreateIndexAsync(string property)
@@ -91,7 +92,7 @@ namespace Squidex.Infrastructure.EventSourcing
             StreamEventsSlice currentSlice;
             do
             {
-                currentSlice = await connection.ReadStreamEventsForwardAsync(streamName, sliceStart, ReadPageSize, false);
+                currentSlice = await connection.ReadStreamEventsForwardAsync(streamName, sliceStart, ReadPageSize, true);
 
                 if (currentSlice.Status == SliceReadStatus.Success)
                 {
@@ -99,7 +100,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                     foreach (var resolved in currentSlice.Events)
                     {
-                        var storedEvent = Formatter.Read(resolved, serializer);
+                        var storedEvent = Formatter.Read(resolved, prefix, serializer);
 
                         await callback(storedEvent);
                     }
@@ -114,12 +115,12 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 var result = new List<StoredEvent>();
 
-                var sliceStart = streamPosition;
+                var sliceStart = streamPosition >= 0 ? streamPosition : StreamPosition.Start;
 
                 StreamEventsSlice currentSlice;
                 do
                 {
-                    currentSlice = await connection.ReadStreamEventsForwardAsync(streamName, sliceStart, ReadPageSize, false);
+                    currentSlice = await connection.ReadStreamEventsForwardAsync(GetStreamName(streamName), sliceStart, ReadPageSize, true);
 
                     if (currentSlice.Status == SliceReadStatus.Success)
                     {
@@ -127,7 +128,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
                         foreach (var resolved in currentSlice.Events)
                         {
-                            var storedEvent = Formatter.Read(resolved, serializer);
+                            var storedEvent = Formatter.Read(resolved, prefix, serializer);
 
                             result.Add(storedEvent);
                         }
@@ -141,7 +142,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task DeleteStreamAsync(string streamName)
         {
-            return connection.DeleteStreamAsync(streamName, ExpectedVersion.Any);
+            return connection.DeleteStreamAsync(GetStreamName(streamName), ExpectedVersion.Any);
         }
 
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)
@@ -168,25 +169,37 @@ namespace Squidex.Infrastructure.EventSourcing
                     return;
                 }
 
-                var eventsToSave = events.Select(x => Formatter.Write(x, serializer)).ToList();
+                try
+                {
+                    var eventsToSave = events.Select(x => Formatter.Write(x, serializer)).ToList();
 
-                if (eventsToSave.Count < WritePageSize)
-                {
-                    await connection.AppendToStreamAsync(GetStreamName(streamName), expectedVersion, eventsToSave);
-                }
-                else
-                {
-                    using (var transaction = await connection.StartTransactionAsync(GetStreamName(streamName), expectedVersion))
+                    if (eventsToSave.Count < WritePageSize)
                     {
-                        for (var p = 0; p < eventsToSave.Count; p += WritePageSize)
+                        await connection.AppendToStreamAsync(GetStreamName(streamName), expectedVersion, eventsToSave);
+                    }
+                    else
+                    {
+                        using (var transaction = await connection.StartTransactionAsync(GetStreamName(streamName), expectedVersion))
                         {
-                            await transaction.WriteAsync(eventsToSave.Skip(p).Take(WritePageSize));
-                        }
+                            for (var p = 0; p < eventsToSave.Count; p += WritePageSize)
+                            {
+                                await transaction.WriteAsync(eventsToSave.Skip(p).Take(WritePageSize));
+                            }
 
-                        await transaction.CommitAsync();
+                            await transaction.CommitAsync();
+                        }
                     }
                 }
+                catch (WrongExpectedVersionException ex)
+                {
+                    throw new WrongEventVersionException(ParseVersion(ex.Message), expectedVersion);
+                }
             }
+        }
+
+        private static int ParseVersion(string message)
+        {
+            return int.Parse(message.Substring(message.LastIndexOf(':') + 1));
         }
 
         private string GetStreamName(string streamName)

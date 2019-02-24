@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Assets
 {
-    [Trait("Dependency", "Azure")]
+    [Trait("Category", "Dependencies")]
     public class AzureBlobAssetStoreTests : AssetStoreTests<AzureBlobAssetStore>, IClassFixture<AzureBlobAssetStoreFixture>
     {
         private readonly AzureBlobAssetStoreFixture fixture;
