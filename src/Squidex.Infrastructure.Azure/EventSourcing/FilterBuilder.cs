@@ -92,7 +92,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static void ForProperty(this List<string> filters, SqlParameterCollection parameters, string property, object value)
         {
-            filters.Add($"e.events.headers.{property} = @value");
+            filters.Add($"ARRAY_CONTAINS(e.events, {{ \"headers\": {{ \"{property}\": @value }} }}, true)");
 
             parameters.Add(new SqlParameter("@value", value));
         }

@@ -7,7 +7,6 @@
 
 using System;
 using Newtonsoft.Json;
-using NodaTime;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
