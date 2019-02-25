@@ -24,6 +24,10 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task DeleteStreamAsync(string streamName)
         {
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+
+            ThrowIfDisposed();
+
             var query = FilterBuilder.AllIds(streamName);
 
             return documentClient.QueryAsync(collectionUri, query, commit =>
@@ -41,10 +45,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
-            Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
+            Guard.NotEmpty(commitId, nameof(commitId));
             Guard.NotNullOrEmpty(streamName, nameof(streamName));
             Guard.NotNull(events, nameof(events));
             Guard.LessThan(events.Count, MaxCommitSize, "events.Count");
+
+            ThrowIfDisposed();
 
             using (Profiler.TraceMethod<CosmosDbEventStore>())
             {

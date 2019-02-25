@@ -15,12 +15,11 @@ using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed partial class CosmosDbEventStore : IEventStore, IInitializable
+    public sealed partial class CosmosDbEventStore : DisposableObjectBase, IEventStore, IInitializable
     {
         private readonly DocumentClient documentClient;
-        private readonly Uri databaseUri;
         private readonly Uri collectionUri;
-        private readonly Uri serviceUri;
+        private readonly Uri databaseUri;
         private readonly string masterKey;
         private readonly string databaseId;
         private readonly JsonSerializerSettings serializerSettings;
@@ -42,28 +41,34 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Uri ServiceUri
         {
-            get { return serviceUri; }
+            get { return documentClient.ServiceEndpoint; }
         }
 
-        public CosmosDbEventStore(Uri uri, string masterKey, JsonSerializerSettings serializerSettings, string database)
+        public CosmosDbEventStore(DocumentClient documentClient, string masterKey, string database, JsonSerializerSettings serializerSettings)
         {
-            Guard.NotNull(uri, nameof(uri));
+            Guard.NotNull(documentClient, nameof(documentClient));
             Guard.NotNull(serializerSettings, nameof(serializerSettings));
             Guard.NotNullOrEmpty(masterKey, nameof(masterKey));
             Guard.NotNullOrEmpty(database, nameof(database));
 
-            documentClient = new DocumentClient(uri, masterKey, serializerSettings);
+            this.documentClient = documentClient;
 
             databaseUri = UriFactory.CreateDatabaseUri(database);
             databaseId = database;
 
             collectionUri = UriFactory.CreateDocumentCollectionUri(database, Constants.Collection);
 
-            serviceUri = uri;
-
             this.masterKey = masterKey;
 
             this.serializerSettings = serializerSettings;
+        }
+
+        protected override void DisposeObject(bool disposing)
+        {
+            if (disposing)
+            {
+                documentClient.Dispose();
+            }
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)

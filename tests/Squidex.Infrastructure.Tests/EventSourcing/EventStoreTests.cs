@@ -19,10 +19,13 @@ namespace Squidex.Infrastructure.EventSourcing
     public abstract class EventStoreTests<T> where T : IEventStore
     {
         private readonly Lazy<T> sut;
+        private string subscriptionPosition;
 
         public sealed class EventSubscriber : IEventSubscriber
         {
             public List<StoredEvent> Events { get; } = new List<StoredEvent>();
+
+            public string LastPosition { get; set; }
 
             public Task OnErrorAsync(IEventSubscription subscription, Exception exception)
             {
@@ -31,6 +34,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
             public Task OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
             {
+                LastPosition = storedEvent.EventPosition;
+
                 Events.Add(storedEvent);
 
                 return TaskHelper.Done;
@@ -130,6 +135,54 @@ namespace Squidex.Infrastructure.EventSourcing
             };
 
             ShouldBeEquivalentTo(readEvents, expected);
+        }
+
+        [Fact]
+        public async Task Should_subscribe_to_next_events()
+        {
+            var streamName = $"test-{Guid.NewGuid()}";
+
+            var events1 = new EventData[]
+            {
+                new EventData("Type1", new EnvelopeHeaders(), "1"),
+                new EventData("Type2", new EnvelopeHeaders(), "2"),
+            };
+
+            await QueryWithSubscriptionAsync(streamName, async () =>
+            {
+                await Sut.AppendAsync(Guid.NewGuid(), streamName, events1);
+            });
+
+            var events2 = new EventData[]
+            {
+                new EventData("Type1", new EnvelopeHeaders(), "1"),
+                new EventData("Type2", new EnvelopeHeaders(), "2"),
+            };
+
+            var readEventsFromPosition = await QueryWithSubscriptionAsync(streamName, async () =>
+            {
+                await Sut.AppendAsync(Guid.NewGuid(), streamName, events2);
+            });
+
+            var expectedFromPosition = new StoredEvent[]
+            {
+                new StoredEvent(streamName, "Position", 2, events2[0]),
+                new StoredEvent(streamName, "Position", 3, events2[1])
+            };
+
+            var readEventsFromBeginning = await QueryWithSubscriptionAsync(streamName, fromBeginning: true);
+
+            var expectedFromBeginning = new StoredEvent[]
+            {
+                new StoredEvent(streamName, "Position", 0, events1[0]),
+                new StoredEvent(streamName, "Position", 1, events1[1]),
+                new StoredEvent(streamName, "Position", 2, events2[0]),
+                new StoredEvent(streamName, "Position", 3, events2[1])
+            };
+
+            ShouldBeEquivalentTo(readEventsFromPosition, expectedFromPosition);
+
+            ShouldBeEquivalentTo(readEventsFromBeginning, expectedFromBeginning);
         }
 
         [Fact]
@@ -272,16 +325,19 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private async Task<IReadOnlyList<StoredEvent>> QueryWithSubscriptionAsync(string streamFilter, Func<Task> action)
+        private async Task<IReadOnlyList<StoredEvent>> QueryWithSubscriptionAsync(string streamFilter, Func<Task> action = null, bool fromBeginning = false)
         {
             var subscriber = new EventSubscriber();
 
             IEventSubscription subscription = null;
             try
             {
-                subscription = Sut.CreateSubscription(subscriber, streamFilter);
+                subscription = Sut.CreateSubscription(subscriber, streamFilter, fromBeginning ? null : subscriptionPosition);
 
-                await action();
+                if (action != null)
+                {
+                    await action();
+                }
 
                 using (var cts = new CancellationTokenSource(30000))
                 {
@@ -293,6 +349,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
                         if (subscriber.Events.Count > 0)
                         {
+                            subscriptionPosition = subscriber.LastPosition;
+
                             return subscriber.Events;
                         }
                     }

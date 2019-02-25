@@ -31,8 +31,6 @@ namespace Squidex.Infrastructure.EventSourcing
             string prefix,
             string streamFilter)
         {
-            Guard.NotNull(subscriber, nameof(subscriber));
-
             this.connection = connection;
 
             this.position = projectionClient.ParsePositionOrNull(position);

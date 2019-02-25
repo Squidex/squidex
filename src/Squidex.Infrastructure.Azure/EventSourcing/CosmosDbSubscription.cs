@@ -32,6 +32,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public CosmosDbSubscription(CosmosDbEventStore store, IEventSubscriber subscriber, string streamFilter, string position = null)
         {
+            this.store = store;
+
             var fromBeginning = string.IsNullOrWhiteSpace(position);
 
             if (fromBeginning)
@@ -47,8 +49,6 @@ namespace Squidex.Infrastructure.EventSourcing
             {
                 regex = new Regex(streamFilter);
             }
-
-            this.store = store;
 
             this.subscriber = subscriber;
 
@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.EventSourcing
                             .WithFeedCollection(CreateCollection(Constants.Collection))
                             .WithLeaseCollection(CreateCollection(Constants.LeaseCollection))
                             .WithHostName(hostName)
-                            .WithProcessorOptions(new Options { StartFromBeginning = fromBeginning })
+                            .WithProcessorOptions(new Options { StartFromBeginning = fromBeginning, LeasePrefix = hostName })
                             .WithObserverFactory(this)
                             .BuildAsync();
 

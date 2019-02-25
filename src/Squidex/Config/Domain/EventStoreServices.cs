@@ -5,11 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using EventStore.ClientAPI;
+using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
@@ -38,6 +41,25 @@ namespace Squidex.Config.Domain
                             return new MongoEventStore(mongDatabase, c.GetRequiredService<IEventNotifier>());
                         })
                         .AsOptional<IEventStore>();
+                },
+                ["CosmosDb"] = () =>
+                {
+                    var cosmosDbConfiguration = config.GetRequiredValue("eventStore:cosmosDB:configuration");
+                    var cosmosDbMasterKey = config.GetRequiredValue("eventStore:cosmosDB:masterKey");
+                    var cosmosDbDatabase = config.GetRequiredValue("eventStore:cosmosDB:database");
+
+                    services.AddSingletonAs(c => new DocumentClient(new Uri(cosmosDbConfiguration), cosmosDbMasterKey, c.GetRequiredService<JsonSerializerSettings>()))
+                        .AsSelf();
+
+                    services.AddSingletonAs(c => new CosmosDbEventStore(
+                            c.GetRequiredService<DocumentClient>(),
+                            cosmosDbMasterKey,
+                            cosmosDbDatabase,
+                            c.GetRequiredService<JsonSerializerSettings>()))
+                        .AsOptional<IEventStore>();
+
+                    services.AddHealthChecks()
+                        .AddCheck<CosmosDbHealthCheck>("CosmosDB", tags: new[] { "node" });
                 },
                 ["GetEventStore"] = () =>
                 {

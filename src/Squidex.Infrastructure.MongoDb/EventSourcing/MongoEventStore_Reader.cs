@@ -23,20 +23,23 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         public Task CreateIndexAsync(string property)
         {
+            Guard.NotNullOrEmpty(property, nameof(property));
+
             return Collection.Indexes.CreateOneAsync(
                 new CreateIndexModel<MongoEventCommit>(Index.Ascending(CreateIndexPath(property))));
         }
 
-        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
+        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter = null, string position = null)
         {
             Guard.NotNull(subscriber, nameof(subscriber));
-            Guard.NotNullOrEmpty(streamFilter, nameof(streamFilter));
 
             return new PollingSubscription(this, subscriber, streamFilter, position);
         }
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
         {
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+
             using (Profiler.TraceMethod<MongoEventStore>())
             {
                 var commits =
@@ -76,6 +79,8 @@ namespace Squidex.Infrastructure.EventSourcing
         public Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
+            Guard.NotNullOrEmpty(property, nameof(property));
+            Guard.NotNull(value, nameof(value));
 
             StreamPosition lastPosition = position;
 

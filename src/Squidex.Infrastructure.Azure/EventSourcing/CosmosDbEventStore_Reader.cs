@@ -19,20 +19,30 @@ namespace Squidex.Infrastructure.EventSourcing
 
     public partial class CosmosDbEventStore : IEventStore, IInitializable
     {
-        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
+        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter = null, string position = null)
         {
             Guard.NotNull(subscriber, nameof(subscriber));
+
+            ThrowIfDisposed();
 
             return new CosmosDbSubscription(this, subscriber, streamFilter, position);
         }
 
         public Task CreateIndexAsync(string property)
         {
+            Guard.NotNullOrEmpty(property, nameof(property));
+
+            ThrowIfDisposed();
+
             return Task.CompletedTask;
         }
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
         {
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+
+            ThrowIfDisposed();
+
             using (Profiler.TraceMethod<CosmosDbEventStore>())
             {
                 var query = FilterBuilder.ByStreamName(streamName, streamPosition - MaxCommitSize);
@@ -69,6 +79,10 @@ namespace Squidex.Infrastructure.EventSourcing
         public Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
+            Guard.NotNullOrEmpty(property, nameof(property));
+            Guard.NotNull(value, nameof(value));
+
+            ThrowIfDisposed();
 
             StreamPosition lastPosition = position;
 
@@ -81,6 +95,8 @@ namespace Squidex.Infrastructure.EventSourcing
         public Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
+
+            ThrowIfDisposed();
 
             StreamPosition lastPosition = position;
 
