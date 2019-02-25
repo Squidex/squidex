@@ -21,7 +21,6 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         private const int MaxWriteAttempts = 20;
         private const int MaxCommitSize = 10;
-        private static readonly FeedOptions TakeOne = new FeedOptions { MaxItemCount = 1 };
 
         public Task DeleteStreamAsync(string streamName)
         {
@@ -29,7 +28,9 @@ namespace Squidex.Infrastructure.EventSourcing
 
             return documentClient.QueryAsync(collectionUri, query, commit =>
             {
-                return documentClient.DeleteDocumentAsync(UriFactory.CreateDocumentUri(databaseId, collectionId, commit.Id.ToString()));
+                var documentUri = UriFactory.CreateDocumentUri(databaseId, Constants.Collection, commit.Id.ToString());
+
+                return documentClient.DeleteDocumentAsync(documentUri);
             });
         }
 

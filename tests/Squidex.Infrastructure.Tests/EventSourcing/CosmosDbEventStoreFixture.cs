@@ -13,20 +13,23 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public sealed class CosmosDbEventStoreFixture : IDisposable
     {
+        private const string EmulatorKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+        private const string EmulatorUri = "https://localhost:8081";
         private readonly DocumentClient client;
 
         public CosmosDbEventStore EventStore { get; }
 
         public CosmosDbEventStoreFixture()
         {
-            client = new DocumentClient(new Uri("https://localhost:8081"), "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==", JsonHelper.DefaultSettings());
+            client = new DocumentClient(new Uri(EmulatorUri), EmulatorKey);
 
-            EventStore = new CosmosDbEventStore(client, "Test");
+            EventStore = new CosmosDbEventStore(new Uri(EmulatorUri), EmulatorKey, JsonHelper.DefaultSettings(), "Test");
             EventStore.InitializeAsync().Wait();
         }
 
         public void Dispose()
         {
+            client.DeleteDatabaseAsync(UriFactory.CreateDatabaseUri("Test")).Wait();
         }
     }
 }

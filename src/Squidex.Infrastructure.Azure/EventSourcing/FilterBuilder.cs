@@ -18,14 +18,6 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     internal static class FilterBuilder
     {
-        public const string Collection = "Events";
-
-        public static readonly string CommitId = nameof(CosmosDbEventCommit.Id).ToCamelCase();
-        public static readonly string EventsCountField = nameof(CosmosDbEventCommit.EventsCount).ToCamelCase();
-        public static readonly string EventStreamOffsetField = nameof(CosmosDbEventCommit.EventStreamOffset).ToCamelCase();
-        public static readonly string EventStreamField = nameof(CosmosDbEventCommit.EventStream).ToCamelCase();
-        public static readonly string TimestampField = nameof(CosmosDbEventCommit.Timestamp).ToCamelCase();
-
         public static async Task QueryAsync(this DocumentClient documentClient, Uri collectionUri, SqlQuerySpec querySpec, Func<CosmosDbEventCommit, Task> handler, CancellationToken ct = default)
         {
             var query =
@@ -52,12 +44,12 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var query =
                 $"SELECT TOP 1 " +
-                $"  e.{CommitId}," +
-                $"  e.{EventsCountField} " +
-                $"FROM {Collection} e " +
+                $"  e.id," +
+                $"  e.eventsCount " +
+                $"FROM {Constants.Collection} e " +
                 $"WHERE " +
-                $"    e.{EventStreamField} = @name " +
-                $"ORDER BY e.{EventStreamOffsetField} DESC";
+                $"    e.eventStream = @name " +
+                $"ORDER BY e.eventStreamOffset DESC";
 
             var parameters = new SqlParameterCollection
             {
@@ -71,12 +63,12 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var query =
                 $"SELECT TOP 1 " +
-                $"  e.{EventStreamOffsetField}," +
-                $"  e.{EventsCountField} " +
-                $"FROM {Collection} e " +
+                $"  e.eventStreamOffset," +
+                $"  e.eventsCount " +
+                $"FROM {Constants.Collection} e " +
                 $"WHERE " +
-                $"    e.{EventStreamField} = @name " +
-                $"ORDER BY e.{EventStreamOffsetField} DESC";
+                $"    e.eventStream = @name " +
+                $"ORDER BY e.eventStreamOffset DESC";
 
             var parameters = new SqlParameterCollection
             {
@@ -90,11 +82,11 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var query =
                 $"SELECT * " +
-                $"FROM {Collection} e " +
+                $"FROM {Constants.Collection} e " +
                 $"WHERE " +
-                $"    e.{EventStreamField} = @name " +
-                $"AND e.{EventStreamOffsetField} >= @position " +
-                $"ORDER BY e.{EventStreamOffsetField} ASC";
+                $"    e.eventStream = @name " +
+                $"AND e.eventStreamOffset >= @position " +
+                $"ORDER BY e.eventStreamOffset ASC";
 
             var parameters = new SqlParameterCollection
             {
@@ -131,7 +123,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static SqlQuerySpec BuildQuery(List<string> filters, SqlParameterCollection parameters)
         {
-            var query = $"SELECT * FROM {Collection} e WHERE {string.Join(" AND ", filters)} ORDER BY e.{TimestampField}";
+            var query = $"SELECT * FROM {Constants.Collection} e WHERE {string.Join(" AND ", filters)} ORDER BY e.timestamp";
 
             return new SqlQuerySpec(query, parameters);
         }
@@ -145,15 +137,15 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static void ForRegex(this List<string> filters, SqlParameterCollection parameters, string streamFilter)
         {
-            if (!string.IsNullOrWhiteSpace(streamFilter) && !string.Equals(streamFilter, ".*", StringComparison.OrdinalIgnoreCase))
+            if (!StreamFilter.IsAll(streamFilter))
             {
                 if (streamFilter.Contains("^"))
                 {
-                    filters.Add($"STARTSWITH(e.{EventStreamField}, @filter)");
+                    filters.Add($"STARTSWITH(e.eventStream, @filter)");
                 }
                 else
                 {
-                    filters.Add($"e.{EventStreamField} = @filter");
+                    filters.Add($"e.eventStream = @filter");
                 }
 
                 parameters.Add(new SqlParameter("@filter", streamFilter));
@@ -164,11 +156,11 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             if (streamPosition.IsEndOfCommit)
             {
-                filters.Add($"e.{TimestampField} > @time");
+                filters.Add($"e.timestamp > @time");
             }
             else
             {
-                filters.Add($"e.{TimestampField} >= @time");
+                filters.Add($"e.timestamp >= @time");
             }
 
             parameters.Add(new SqlParameter("@time", streamPosition.Timestamp));

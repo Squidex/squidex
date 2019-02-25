@@ -22,9 +22,8 @@ namespace Squidex.Infrastructure.EventSourcing
         public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
         {
             Guard.NotNull(subscriber, nameof(subscriber));
-            Guard.NotNullOrEmpty(streamFilter, nameof(streamFilter));
 
-            throw new NotSupportedException();
+            return new CosmosDbSubscription(this, subscriber, streamFilter, position);
         }
 
         public Task CreateIndexAsync(string property)
@@ -47,13 +46,13 @@ namespace Squidex.Infrastructure.EventSourcing
                     var commitTimestamp = commit.Timestamp;
                     var commitOffset = 0;
 
-                    foreach (var e in commit.Events)
+                    foreach (var @event in commit.Events)
                     {
                         eventStreamOffset++;
 
                         if (eventStreamOffset >= streamPosition)
                         {
-                            var eventData = e.ToEventData();
+                            var eventData = @event.ToEventData();
                             var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
 
                             result.Add(new StoredEvent(streamName, eventToken, eventStreamOffset, eventData));
@@ -102,13 +101,13 @@ namespace Squidex.Infrastructure.EventSourcing
                     var commitTimestamp = commit.Timestamp;
                     var commitOffset = 0;
 
-                    foreach (var e in commit.Events)
+                    foreach (var @event in commit.Events)
                     {
                         eventStreamOffset++;
 
                         if (commitOffset > lastPosition.CommitOffset || commitTimestamp > lastPosition.Timestamp)
                         {
-                            var eventData = e.ToEventData();
+                            var eventData = @event.ToEventData();
 
                             if (filterExpression(eventData))
                             {

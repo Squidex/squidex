@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Newtonsoft.Json;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
@@ -19,26 +20,61 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly DocumentClient documentClient;
         private readonly Uri databaseUri;
         private readonly Uri collectionUri;
+        private readonly Uri serviceUri;
+        private readonly string masterKey;
         private readonly string databaseId;
-        private readonly string collectionId;
+        private readonly JsonSerializerSettings serializerSettings;
 
-        public CosmosDbEventStore(DocumentClient documentClient, string database)
+        public JsonSerializerSettings SerializerSettings
         {
-            Guard.NotNull(documentClient, nameof(documentClient));
+            get { return serializerSettings; }
+        }
+
+        public string DatabaseId
+        {
+            get { return databaseId; }
+        }
+
+        public string MasterKey
+        {
+            get { return masterKey; }
+        }
+
+        public Uri ServiceUri
+        {
+            get { return serviceUri; }
+        }
+
+        public CosmosDbEventStore(Uri uri, string masterKey, JsonSerializerSettings serializerSettings, string database)
+        {
+            Guard.NotNull(uri, nameof(uri));
+            Guard.NotNull(serializerSettings, nameof(serializerSettings));
+            Guard.NotNullOrEmpty(masterKey, nameof(masterKey));
             Guard.NotNullOrEmpty(database, nameof(database));
 
-            this.documentClient = documentClient;
+            documentClient = new DocumentClient(uri, masterKey, serializerSettings);
 
             databaseUri = UriFactory.CreateDatabaseUri(database);
             databaseId = database;
 
-            collectionUri = UriFactory.CreateDocumentCollectionUri(database, FilterBuilder.Collection);
-            collectionId = FilterBuilder.Collection;
+            collectionUri = UriFactory.CreateDocumentCollectionUri(database, Constants.Collection);
+
+            serviceUri = uri;
+
+            this.masterKey = masterKey;
+
+            this.serializerSettings = serializerSettings;
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)
         {
             await documentClient.CreateDatabaseIfNotExistsAsync(new Database { Id = databaseId });
+
+            await documentClient.CreateDocumentCollectionIfNotExistsAsync(databaseUri,
+                new DocumentCollection
+                {
+                    Id = Constants.LeaseCollection,
+                });
 
             await documentClient.CreateDocumentCollectionIfNotExistsAsync(databaseUri,
                 new DocumentCollection
@@ -51,17 +87,17 @@ namespace Squidex.Infrastructure.EventSourcing
                             {
                                 Paths = new Collection<string>
                                 {
-                                    $"/{FilterBuilder.EventStreamField}",
-                                    $"/{FilterBuilder.EventStreamOffsetField}"
+                                    $"/eventStream",
+                                    $"/eventStreamOffset"
                                 }
                             }
                         }
                     },
-                    Id = FilterBuilder.Collection,
+                    Id = Constants.Collection,
                 },
                 new RequestOptions
                 {
-                    PartitionKey = new PartitionKey($"/{FilterBuilder.EventStreamField}")
+                    PartitionKey = new PartitionKey($"/eventStream")
                 });
         }
     }
