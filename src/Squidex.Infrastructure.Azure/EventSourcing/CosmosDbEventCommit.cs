@@ -12,22 +12,22 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     internal sealed class CosmosDbEventCommit
     {
-        [JsonProperty]
+        [JsonProperty("id")]
         public Guid Id { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("events")]
         public CosmosDbEvent[] Events { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("eventStreamOffset")]
         public long EventStreamOffset { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("eventsCount")]
         public long EventsCount { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("eventStream")]
         public string EventStream { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("timestamp")]
         public long Timestamp { get; set; }
     }
 }

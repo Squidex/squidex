@@ -25,7 +25,12 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task DeleteStreamAsync(string streamName)
         {
-            return Task.CompletedTask;
+            var query = FilterBuilder.AllIds(streamName);
+
+            return documentClient.QueryAsync(collectionUri, query, commit =>
+            {
+                return documentClient.DeleteDocumentAsync(UriFactory.CreateDocumentUri(databaseId, collectionId, commit.Id.ToString()));
+            });
         }
 
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)

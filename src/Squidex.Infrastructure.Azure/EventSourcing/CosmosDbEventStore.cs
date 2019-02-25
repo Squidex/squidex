@@ -19,7 +19,8 @@ namespace Squidex.Infrastructure.EventSourcing
         private readonly DocumentClient documentClient;
         private readonly Uri databaseUri;
         private readonly Uri collectionUri;
-        private readonly string database;
+        private readonly string databaseId;
+        private readonly string collectionId;
 
         public CosmosDbEventStore(DocumentClient documentClient, string database)
         {
@@ -28,15 +29,16 @@ namespace Squidex.Infrastructure.EventSourcing
 
             this.documentClient = documentClient;
 
-            this.databaseUri = UriFactory.CreateDatabaseUri(database);
-            this.database = database;
+            databaseUri = UriFactory.CreateDatabaseUri(database);
+            databaseId = database;
 
             collectionUri = UriFactory.CreateDocumentCollectionUri(database, FilterBuilder.Collection);
+            collectionId = FilterBuilder.Collection;
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)
         {
-            await documentClient.CreateDatabaseIfNotExistsAsync(new Database { Id = database });
+            await documentClient.CreateDatabaseIfNotExistsAsync(new Database { Id = databaseId });
 
             await documentClient.CreateDocumentCollectionIfNotExistsAsync(databaseUri,
                 new DocumentCollection

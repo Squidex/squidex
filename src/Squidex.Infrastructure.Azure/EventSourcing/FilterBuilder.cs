@@ -7,7 +7,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Infrastructure.EventSourcing
@@ -16,10 +20,52 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         public const string Collection = "Events";
 
+        public static readonly string CommitId = nameof(CosmosDbEventCommit.Id).ToCamelCase();
         public static readonly string EventsCountField = nameof(CosmosDbEventCommit.EventsCount).ToCamelCase();
         public static readonly string EventStreamOffsetField = nameof(CosmosDbEventCommit.EventStreamOffset).ToCamelCase();
         public static readonly string EventStreamField = nameof(CosmosDbEventCommit.EventStream).ToCamelCase();
         public static readonly string TimestampField = nameof(CosmosDbEventCommit.Timestamp).ToCamelCase();
+
+        public static async Task QueryAsync(this DocumentClient documentClient, Uri collectionUri, SqlQuerySpec querySpec, Func<CosmosDbEventCommit, Task> handler, CancellationToken ct = default)
+        {
+            var query =
+                documentClient.CreateDocumentQuery<CosmosDbEventCommit>(collectionUri, querySpec)
+                    .AsDocumentQuery();
+
+            using (query)
+            {
+                var result = new List<StoredEvent>();
+
+                while (query.HasMoreResults && !ct.IsCancellationRequested)
+                {
+                    var commits = await query.ExecuteNextAsync<CosmosDbEventCommit>(ct);
+
+                    foreach (var commit in commits)
+                    {
+                        await handler(commit);
+                    }
+                }
+            }
+        }
+
+        public static SqlQuerySpec AllIds(string streamName)
+        {
+            var query =
+                $"SELECT TOP 1 " +
+                $"  e.{CommitId}," +
+                $"  e.{EventsCountField} " +
+                $"FROM {Collection} e " +
+                $"WHERE " +
+                $"    e.{EventStreamField} = @name " +
+                $"ORDER BY e.{EventStreamOffsetField} DESC";
+
+            var parameters = new SqlParameterCollection
+            {
+                new SqlParameter("@name", streamName)
+            };
+
+            return new SqlQuerySpec(query, parameters);
+        }
 
         public static SqlQuerySpec LastPosition(string streamName)
         {
@@ -59,7 +105,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return new SqlQuerySpec(query, parameters);
         }
 
-        public static SqlQuerySpec ByProperty(string property, object value, StreamPosition streamPosition)
+        public static SqlQuerySpec CreateByProperty(string property, object value, StreamPosition streamPosition)
         {
             var filters = new List<string>();
 
@@ -71,7 +117,7 @@ namespace Squidex.Infrastructure.EventSourcing
             return BuildQuery(filters, parameters);
         }
 
-        public static SqlQuerySpec ByFilter(string streamFilter, StreamPosition streamPosition)
+        public static SqlQuerySpec CreateByFilter(string streamFilter, StreamPosition streamPosition)
         {
             var filters = new List<string>();
 
@@ -92,7 +138,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static void ForProperty(this List<string> filters, SqlParameterCollection parameters, string property, object value)
         {
-            filters.Add($"ARRAY_CONTAINS(e.events, {{ \"headers\": {{ \"{property}\": @value }} }}, true)");
+            filters.Add($"ARRAY_CONTAINS(e.events, {{ \"header\": {{ \"{property}\": @value }} }}, true)");
 
             parameters.Add(new SqlParameter("@value", value));
         }
@@ -128,7 +174,7 @@ namespace Squidex.Infrastructure.EventSourcing
             parameters.Add(new SqlParameter("@time", streamPosition.Timestamp));
         }
 
-        public static EventPredicate CreateFilterExpression(string property, object value)
+        public static EventPredicate CreateExpression(string property, object value)
         {
             if (!string.IsNullOrWhiteSpace(property))
             {

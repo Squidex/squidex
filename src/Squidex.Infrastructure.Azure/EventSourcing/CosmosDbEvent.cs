@@ -11,13 +11,13 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     internal sealed class CosmosDbEvent
     {
-        [JsonProperty]
+        [JsonProperty("type")]
         public string Type { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("payload")]
         public string Payload { get; set; }
 
-        [JsonProperty]
+        [JsonProperty("header")]
         public EnvelopeHeaders Headers { get; set; }
 
         public static CosmosDbEvent FromEventData(EventData data)
