@@ -22,15 +22,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             new Schema("test")
                 .AddString(1, "test", Partitioning.Invariant)
                 .AddString(2, "localized", Partitioning.Language);
-        private readonly List<string> languages = new List<string> { "de", "en" };
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly List<Guid> ids1 = new List<Guid> { Guid.NewGuid() };
         private readonly List<Guid> ids2 = new List<Guid> { Guid.NewGuid() };
+        private readonly SearchContext context;
         private readonly IAssetStore assetStore = new MemoryAssetStore();
         private readonly TextIndexerGrain sut;
 
         public TextIndexerGrainTests()
         {
+            context = new SearchContext
+            {
+                AppVersion = 1,
+                Schema = schema,
+                SchemaVersion = 1,
+                Languages = new List<string> { "de", "en" }
+            };
+
             sut = new TextIndexerGrain(assetStore);
             sut.ActivateAsync(schemaId).Wait();
         }
@@ -52,11 +60,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 await other.ActivateAsync(schemaId);
 
-                var helloIds = await other.SearchAsync("Hello", 0, 0, schema, languages);
+                var helloIds = await other.SearchAsync("Hello", context);
 
                 Assert.Equal(ids1, helloIds);
 
-                var worldIds = await other.SearchAsync("World", 0, 0, schema, languages);
+                var worldIds = await other.SearchAsync("World", context);
 
                 Assert.Equal(ids2, worldIds);
             }
@@ -71,11 +79,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             await AddInvariantContent();
 
-            var helloIds = await sut.SearchAsync("Hello", 0, 0, schema, languages);
+            var helloIds = await sut.SearchAsync("Hello", context);
 
             Assert.Equal(ids1, helloIds);
 
-            var worldIds = await sut.SearchAsync("World", 0, 0, schema, languages);
+            var worldIds = await sut.SearchAsync("World", context);
 
             Assert.Equal(ids2, worldIds);
         }
@@ -85,14 +93,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             await AddInvariantContent();
 
-            await sut.DeleteContentAsync(ids1[0]);
+            await sut.DeleteAsync(ids1[0]);
             await sut.FlushAsync();
 
-            var helloIds = await sut.SearchAsync("Hello", 0, 0, schema, languages);
+            var helloIds = await sut.SearchAsync("Hello", context);
 
             Assert.Empty(helloIds);
 
-            var worldIds = await sut.SearchAsync("World", 0, 0, schema, languages);
+            var worldIds = await sut.SearchAsync("World", context);
 
             Assert.Equal(ids2, worldIds);
         }
@@ -102,20 +110,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             await AddLocalizedContent();
 
-            var german1 = await sut.SearchAsync("Stadt", 0, 0, schema, languages);
-            var german2 = await sut.SearchAsync("and", 0, 0, schema, languages);
+            var german1 = await sut.SearchAsync("Stadt", context);
+            var german2 = await sut.SearchAsync("and", context);
 
-            var germanStopwordsIds = await sut.SearchAsync("und", 0, 0, schema, languages);
+            var germanStopwordsIds = await sut.SearchAsync("und", context);
 
             Assert.Equal(ids1, german1);
             Assert.Equal(ids1, german2);
 
             Assert.Equal(ids2, germanStopwordsIds);
 
-            var english1 = await sut.SearchAsync("City", 0, 0, schema, languages);
-            var english2 = await sut.SearchAsync("und", 0, 0, schema, languages);
+            var english1 = await sut.SearchAsync("City", context);
+            var english2 = await sut.SearchAsync("und", context);
 
-            var englishStopwordsIds = await sut.SearchAsync("and", 0, 0, schema, languages);
+            var englishStopwordsIds = await sut.SearchAsync("and", context);
 
             Assert.Equal(ids2, english1);
             Assert.Equal(ids2, english2);
@@ -137,8 +145,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         new ContentFieldData()
                             .AddValue("en", "City and Surroundings und sonstiges"));
 
-            await sut.AddContentAsync(ids1[0], germanData, false, false);
-            await sut.AddContentAsync(ids2[0], englishData, false, false);
+            await sut.IndexAsync(ids1[0], new IndexData { Data = germanData });
+            await sut.IndexAsync(ids2[0], new IndexData { Data = englishData });
             await sut.FlushAsync();
         }
 
@@ -156,8 +164,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         new ContentFieldData()
                             .AddValue("iv", "World"));
 
-            await sut.AddContentAsync(ids1[0], data1, false, false);
-            await sut.AddContentAsync(ids2[0], data2, false, false);
+            await sut.IndexAsync(ids1[0], new IndexData { Data = data1 });
+            await sut.IndexAsync(ids2[0], new IndexData { Data = data2 });
 
             await sut.FlushAsync();
         }

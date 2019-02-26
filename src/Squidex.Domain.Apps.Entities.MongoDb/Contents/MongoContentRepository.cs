@@ -9,18 +9,17 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
@@ -30,28 +29,26 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly IMongoDatabase database;
         private readonly IAppProvider appProvider;
         private readonly IJsonSerializer serializer;
-        private readonly MongoContentDraftCollection contentsDraft;
-        private readonly MongoContentPublishedCollection contentsPublished;
+        private readonly ITextIndexer indexer;
+        private readonly MongoContentCollection contents;
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, IOptions<MongoDbOptions> options)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(serializer, nameof(serializer));
-            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(indexer, nameof(ITextIndexer));
 
             this.appProvider = appProvider;
-
+            this.database = database;
+            this.indexer = indexer;
             this.serializer = serializer;
 
-            contentsDraft = new MongoContentDraftCollection(database, serializer, options);
-            contentsPublished = new MongoContentPublishedCollection(database, serializer, options);
-
-            this.database = database;
+            contents = new MongoContentCollection(database, serializer);
         }
 
         public Task InitializeAsync(CancellationToken ct = default)
         {
-            return Task.WhenAll(contentsDraft.InitializeAsync(ct), contentsPublished.InitializeAsync(ct));
+            return contents.InitializeAsync(ct);
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, Query query)
@@ -60,11 +57,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 if (RequiresPublished(status))
                 {
-                    return await contentsPublished.QueryAsync(app, schema, query);
+                    var ids = await indexer.SearchAsync(query.FullText, app, schema);
+
+                    return await contents.QueryAsync(app, schema, query, ids);
                 }
                 else
                 {
-                    return await contentsDraft.QueryAsync(app, schema, query, status, true);
+                    var ids = await indexer.SearchAsync(query.FullText, app, schema, true);
+
+                    return await contents.QueryAsync(app, schema, query, ids, status, true);
                 }
             }
         }
@@ -75,11 +76,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 if (RequiresPublished(status))
                 {
-                    return await contentsPublished.QueryAsync(app, schema, ids);
+                    return await contents.QueryAsync(app, schema, ids);
                 }
                 else
                 {
-                    return await contentsDraft.QueryAsync(app, schema, ids, status);
+                    return await contents.QueryAsync(app, schema, ids, status);
                 }
             }
         }
@@ -90,11 +91,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 if (RequiresPublished(status))
                 {
-                    return await contentsPublished.FindContentAsync(app, schema, id);
+                    return await contents.FindContentAsync(app, schema, id);
                 }
                 else
                 {
-                    return await contentsDraft.FindContentAsync(app, schema, id);
+                    return await contents.FindContentAsync(app, schema, id, status);
                 }
             }
         }
@@ -103,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await contentsDraft.QueryIdsAsync(appId, await appProvider.GetSchemaAsync(appId, schemaId), filterNode);
+                return await contents.QueryIdsAsync(appId, await appProvider.GetSchemaAsync(appId, schemaId), filterNode);
             }
         }
 
@@ -111,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await contentsDraft.QueryIdsAsync(appId);
+                return await contents.QueryIdsAsync(appId);
             }
         }
 
@@ -119,22 +120,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                await contentsDraft.QueryScheduledWithoutDataAsync(now, callback);
+                await contents.QueryScheduledWithoutDataAsync(now, callback);
             }
-        }
-
-        public Task RemoveAsync(Guid appId)
-        {
-            return Task.WhenAll(
-                contentsDraft.RemoveAsync(appId),
-                contentsPublished.RemoveAsync(appId));
         }
 
         public Task ClearAsync()
         {
-            return Task.WhenAll(
-                contentsDraft.ClearAsync(),
-                contentsPublished.ClearAsync());
+            return contents.ClearAsync();
         }
 
         public Task DeleteArchiveAsync()

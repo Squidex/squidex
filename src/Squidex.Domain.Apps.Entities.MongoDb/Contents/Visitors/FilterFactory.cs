@@ -19,7 +19,7 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 {
-    public static class FindExtensions
+    public static class FilterFactory
     {
         private static readonly FilterDefinitionBuilder<MongoContentEntity> Filter = Builders<MongoContentEntity>.Filter;
 
@@ -109,7 +109,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             return cursor.Skip(query);
         }
 
-        public static FilterDefinition<MongoContentEntity> ToFilter(this Query query, Guid schemaId, Status[] status)
+        public static FilterDefinition<MongoContentEntity> Build(Guid schemaId, Guid id, Status[] status)
+        {
+            return CreateFilter(schemaId, new List<Guid> { id }, status, null);
+        }
+
+        public static FilterDefinition<MongoContentEntity> Build(Guid schemaId, ICollection<Guid> ids, Status[] status)
+        {
+            return CreateFilter(schemaId, ids, status, null);
+        }
+
+        public static FilterDefinition<MongoContentEntity> ToFilter(this Query query, Guid schemaId, ICollection<Guid> ids, Status[] status)
+        {
+            return CreateFilter(schemaId, ids, status, query);
+        }
+
+        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid schemaId, ICollection<Guid> ids, Status[] status, Query query)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {
@@ -117,23 +132,26 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                 Filter.Ne(x => x.IsDeleted, true)
             };
 
+            if (ids != null && ids.Count > 0)
+            {
+                if (ids.Count > 1)
+                {
+                    filters.Add(Filter.In(x => x.Id, ids));
+                }
+                else
+                {
+                    filters.Add(Filter.Eq(x => x.Id, ids.First()));
+                }
+            }
+
             if (status != null)
             {
                 filters.Add(Filter.In(x => x.Status, status));
             }
 
-            var filter = query.BuildFilter<MongoContentEntity>();
-
-            if (filter.Filter != null)
+            if (query.Filter != null)
             {
-                if (filter.Last)
-                {
-                    filters.Add(filter.Filter);
-                }
-                else
-                {
-                    filters.Insert(0, filter.Filter);
-                }
+                filters.Add(query.Filter.BuildFilter<MongoContentEntity>());
             }
 
             return Filter.And(filters);

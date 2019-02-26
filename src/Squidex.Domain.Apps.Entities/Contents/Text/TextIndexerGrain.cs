@@ -8,18 +8,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Lucene.Net.Analysis;
-using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Json.Objects;
@@ -27,7 +25,7 @@ using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class TextIndexerGrain : GrainOfGuid
+    public sealed class TextIndexerGrain : GrainOfGuid, ITextIndexerGrain
     {
         private const LuceneVersion Version = LuceneVersion.LUCENE_48;
         private const int MaxResults = 2000;
@@ -39,9 +37,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private IndexWriter indexWriter;
         private IndexReader indexReader;
         private QueryParser queryParser;
-        private int currentAppVersion;
-        private int currentSchemaVersion;
-        private int updates;
+        private long currentAppVersion;
+        private long currentSchemaVersion;
+        private long updates;
 
         public TextIndexerGrain(IAssetStore assetStore)
         {
@@ -72,52 +70,56 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             indexReader = indexWriter.GetReader(true);
         }
 
-        public Task DeleteContentAsync(Guid id)
+        public Task DeleteAsync(Guid id)
         {
             indexWriter.DeleteDocuments(new Term("id", id.ToString()));
 
             return TryFlushAsync();
         }
 
-        public Task AddContentAsync(Guid id, NamedContentData data, bool isUpdate, bool isDraft)
+        public Task IndexAsync(Guid id, J<IndexData> data)
         {
-            var idString = id.ToString();
+            string idString = id.ToString(), draft = data.Value.IsDraft.ToString();
 
-            if (isUpdate)
-            {
-                indexWriter.DeleteDocuments(new Term("id", idString));
-            }
+            indexWriter.DeleteDocuments(
+                new Term("id", idString),
+                new Term("dd", draft));
 
             var document = new Document();
 
             document.AddStringField("id", idString, Field.Store.YES);
-            document.AddInt32Field("draft", isDraft ? 1 : 0, Field.Store.YES);
+            document.AddStringField("dd", draft, Field.Store.YES);
 
-            foreach (var field in data)
+            var languages = new Dictionary<string, StringBuilder>();
+
+            void AppendText(string language, string text)
+            {
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    var sb = languages.GetOrAddNew(language);
+
+                    if (sb.Length > 0)
+                    {
+                        sb.Append(" ");
+                    }
+
+                    sb.Append(text);
+                }
+            }
+
+            foreach (var field in data.Value.Data)
             {
                 foreach (var fieldValue in field.Value)
                 {
-                    var value = fieldValue.Value;
+                    var appendText = new Action<string>(text => AppendText(fieldValue.Key, text));
 
-                    if (value.Type == JsonValueType.String)
-                    {
-                        var fieldName = BuildFieldName(fieldValue.Key, field.Key);
-
-                        document.AddTextField(fieldName, fieldValue.Value.ToString(), Field.Store.YES);
-                    }
-                    else if (value.Type == JsonValueType.Object)
-                    {
-                        foreach (var property in (JsonObject)value)
-                        {
-                            if (property.Value.Type == JsonValueType.String)
-                            {
-                                var fieldName = BuildFieldName(fieldValue.Key, field.Key, property.Key);
-
-                                document.AddTextField(fieldName, property.Value.ToString(), Field.Store.YES);
-                            }
-                        }
-                    }
+                    AppendJsonText(fieldValue.Value, appendText);
                 }
+            }
+
+            foreach (var field in languages)
+            {
+                document.AddTextField(field.Key, field.Value.ToString(), Field.Store.NO);
             }
 
             indexWriter.AddDocument(document);
@@ -125,92 +127,74 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return TryFlushAsync();
         }
 
-        public Task<List<Guid>> SearchAsync(string term, int appVersion, int schemaVersion, J<Schema> schema, List<string> languages)
+        private static void AppendJsonText(IJsonValue value, Action<string> appendText)
         {
-            var query = BuildQuery(term, appVersion, schemaVersion, schema, languages);
-
-            var result = new List<Guid>();
-
-            if (indexReader != null)
+            if (value.Type == JsonValueType.String)
             {
-                var hits = new IndexSearcher(indexReader).Search(query, MaxResults).ScoreDocs;
+                var text = value.ToString();
 
-                foreach (var hit in hits)
+                appendText(text);
+            }
+            else if (value is JsonArray array)
+            {
+                foreach (var item in array)
                 {
-                    var document = indexReader.Document(hit.Doc);
+                    AppendJsonText(item, appendText);
+                }
+            }
+            else if (value is JsonObject obj)
+            {
+                foreach (var item in obj.Values)
+                {
+                    AppendJsonText(item, appendText);
+                }
+            }
+        }
 
-                    var idField = document.GetField("id")?.GetStringValue();
+        public Task<List<Guid>> SearchAsync(string queryText, J<SearchContext> context)
+        {
+            var result = new HashSet<Guid>();
 
-                    if (idField != null && Guid.TryParse(idField, out var guid))
+            if (!string.IsNullOrWhiteSpace(queryText))
+            {
+                var query = BuildQuery(queryText, context);
+
+                if (indexReader != null)
+                {
+                    var filter = new QueryWrapperFilter(new TermQuery(new Term("dd", context.Value.IsDraft.ToString())));
+
+                    var hits = new IndexSearcher(indexReader).Search(query, MaxResults).ScoreDocs;
+
+                    foreach (var hit in hits)
                     {
-                        result.Add(guid);
+                        var document = indexReader.Document(hit.Doc);
+
+                        var idField = document.GetField("id")?.GetStringValue();
+
+                        if (idField != null && Guid.TryParse(idField, out var guid))
+                        {
+                            result.Add(guid);
+                        }
                     }
                 }
             }
 
-            return Task.FromResult(result);
+            return Task.FromResult(result.ToList());
         }
 
-        private Query BuildQuery(string query, int appVersion, int schemaVersion, J<Schema> schema, List<string> language)
+        private Query BuildQuery(string query, SearchContext context)
         {
-            if (queryParser == null || currentAppVersion != appVersion || currentSchemaVersion != schemaVersion)
+            if (queryParser == null || currentAppVersion != context.AppVersion || currentSchemaVersion != context.SchemaVersion)
             {
-                var fields = BuildFields(schema, language);
+                var fields = context.Languages.Select(BuildFieldName).ToArray();
 
                 queryParser = new MultiFieldQueryParser(Version, fields, Analyzer);
 
-                currentAppVersion = appVersion;
-                currentSchemaVersion = schemaVersion;
+                currentAppVersion = context.AppVersion;
+                currentSchemaVersion = context.SchemaVersion;
             }
 
             return queryParser.Parse(query);
-        }
-
-        private string[] BuildFields(Schema schema, IEnumerable<string> languages)
-        {
-            var fieldNames = new List<string>();
-
-            var iv = InvariantPartitioning.Instance.Master.Key;
-
-            foreach (var field in schema.Fields)
-            {
-                if (field.RawProperties is StringFieldProperties)
-                {
-                    if (field.Partitioning.Equals(Partitioning.Invariant))
-                    {
-                        fieldNames.Add(BuildFieldName(iv, field.Name));
-                    }
-                    else
-                    {
-                        foreach (var language in languages)
-                        {
-                            fieldNames.Add(BuildFieldName(language, field.Name));
-                        }
-                    }
-                }
-                else if (field is IArrayField arrayField)
-                {
-                    foreach (var nested in arrayField.Fields)
-                    {
-                        if (nested.RawProperties is StringFieldProperties)
-                        {
-                            if (field.Partitioning.Equals(Partitioning.Invariant))
-                            {
-                                fieldNames.Add(BuildFieldName(iv, field.Name, nested.Name));
-                            }
-                            else
-                            {
-                                foreach (var language in languages)
-                                {
-                                    fieldNames.Add(BuildFieldName(language, field.Name, nested.Name));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return fieldNames.ToArray();
         }
 
         private async Task TryFlushAsync()
@@ -255,14 +239,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private static string BuildFieldName(string language, string name)
+        private static string BuildFieldName(string language)
         {
-            return $"{language}_{name}";
-        }
-
-        private static string BuildFieldName(string language, string name, string nested)
-        {
-            return $"{language}_{name}_{nested}";
+            return $"field_{language}";
         }
     }
 }
