@@ -5,41 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.Documents.Linq;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
     internal static class FilterBuilder
     {
-        public static async Task QueryAsync(this DocumentClient documentClient, Uri collectionUri, SqlQuerySpec querySpec, Func<CosmosDbEventCommit, Task> handler, CancellationToken ct = default)
-        {
-            var query =
-                documentClient.CreateDocumentQuery<CosmosDbEventCommit>(collectionUri, querySpec)
-                    .AsDocumentQuery();
-
-            using (query)
-            {
-                var result = new List<StoredEvent>();
-
-                while (query.HasMoreResults && !ct.IsCancellationRequested)
-                {
-                    var commits = await query.ExecuteNextAsync<CosmosDbEventCommit>(ct);
-
-                    foreach (var commit in commits)
-                    {
-                        await handler(commit);
-                    }
-                }
-            }
-        }
-
         public static SqlQuerySpec AllIds(string streamName)
         {
             var query =

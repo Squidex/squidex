@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -19,6 +20,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
@@ -31,17 +33,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly MongoContentDraftCollection contentsDraft;
         private readonly MongoContentPublishedCollection contentsPublished;
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, IOptions<MongoDbOptions> options)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(options, nameof(options));
 
             this.appProvider = appProvider;
 
             this.serializer = serializer;
 
-            contentsDraft = new MongoContentDraftCollection(database, serializer);
-            contentsPublished = new MongoContentPublishedCollection(database, serializer);
+            contentsDraft = new MongoContentDraftCollection(database, serializer, options);
+            contentsPublished = new MongoContentPublishedCollection(database, serializer, options);
 
             this.database = database;
         }

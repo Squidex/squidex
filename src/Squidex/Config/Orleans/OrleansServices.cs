@@ -58,7 +58,7 @@ namespace Squidex.Config.Orleans
 
             var siloPort = config.GetOptionalValue("orleans:siloPort", 11111);
 
-            config.ConfigureByOption("orleans:clustering", new Options
+            config.ConfigureByOption("orleans:clustering", new Alternatives
             {
                 ["MongoDB"] = () =>
                 {
@@ -81,7 +81,7 @@ namespace Squidex.Config.Orleans
                 }
             });
 
-            config.ConfigureByOption("store:type", new Options
+            config.ConfigureByOption("store:type", new Alternatives
             {
                 ["MongoDB"] = () =>
                 {

@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     return;
                 }
 
-                var currentVersion = GetEventStreamOffset(streamName);
+                var currentVersion = await GetEventStreamOffsetAsync(streamName);
 
                 if (expectedVersion != EtagVersion.Any && expectedVersion != currentVersion)
                 {
@@ -80,7 +80,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         if (ex.StatusCode == HttpStatusCode.Conflict)
                         {
-                            currentVersion = GetEventStreamOffset(streamName);
+                            currentVersion = await GetEventStreamOffsetAsync(streamName);
 
                             if (expectedVersion != EtagVersion.Any)
                             {
@@ -105,13 +105,13 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private long GetEventStreamOffset(string streamName)
+        private async Task<long> GetEventStreamOffsetAsync(string streamName)
         {
             var query =
                 documentClient.CreateDocumentQuery<CosmosDbEventCommit>(collectionUri,
                     FilterBuilder.LastPosition(streamName));
 
-            var document = query.ToList().FirstOrDefault();
+            var document = await query.FirstOrDefaultAsync();
 
             if (document != null)
             {

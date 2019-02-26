@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.ConvertContent;
@@ -29,28 +30,33 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     internal sealed class MongoContentDraftCollection : MongoContentCollection
     {
-        public MongoContentDraftCollection(IMongoDatabase database, IJsonSerializer serializer)
+        private readonly MongoDbOptions options;
+
+        public MongoContentDraftCollection(IMongoDatabase database, IJsonSerializer serializer, IOptions<MongoDbOptions> options)
             : base(database, serializer, "State_Content_Draft")
         {
+            this.options = options.Value;
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
         {
-            await collection.Indexes.CreateManyAsync(
-                new[]
-                {
-                    new CreateIndexModel<MongoContentEntity>(
-                        Index
-                            .Ascending(x => x.IndexedSchemaId)
-                            .Ascending(x => x.Id)
-                            .Ascending(x => x.IsDeleted)),
+            await collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoContentEntity>(
+                    Index
+                        .Ascending(x => x.IndexedSchemaId)
+                        .Ascending(x => x.Id)
+                        .Ascending(x => x.IsDeleted)), null, ct);
+
+            if (!options.IsCosmosDb)
+            {
+                await collection.Indexes.CreateOneAsync(
                     new CreateIndexModel<MongoContentEntity>(
                         Index
                             .Text(x => x.DataText)
                             .Ascending(x => x.IndexedSchemaId)
                             .Ascending(x => x.IsDeleted)
-                            .Ascending(x => x.Status))
-                }, ct);
+                            .Ascending(x => x.Status)), null, ct);
+            }
 
             await base.SetupCollectionAsync(collection, ct);
         }

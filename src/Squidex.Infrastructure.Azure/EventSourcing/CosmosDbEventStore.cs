@@ -84,6 +84,21 @@ namespace Squidex.Infrastructure.EventSourcing
             await documentClient.CreateDocumentCollectionIfNotExistsAsync(databaseUri,
                 new DocumentCollection
                 {
+                    IndexingPolicy = new IndexingPolicy
+                    {
+                        IncludedPaths = new Collection<IncludedPath>
+                        {
+                            new IncludedPath
+                            {
+                                Path = "/*",
+                                Indexes = new Collection<Index>
+                                {
+                                    Index.Range(DataType.Number),
+                                    Index.Range(DataType.String),
+                                }
+                            }
+                        }
+                    },
                     UniqueKeyPolicy = new UniqueKeyPolicy
                     {
                         UniqueKeys = new Collection<UniqueKey>

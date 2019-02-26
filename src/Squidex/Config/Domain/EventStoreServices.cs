@@ -26,7 +26,7 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyEventStoreServices(this IServiceCollection services, IConfiguration config)
         {
-            config.ConfigureByOption("eventStore:type", new Options
+            config.ConfigureByOption("eventStore:type", new Alternatives
             {
                 ["MongoDb"] = () =>
                 {

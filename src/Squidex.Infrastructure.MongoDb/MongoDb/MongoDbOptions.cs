@@ -5,16 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Collections.Generic;
-
-namespace Microsoft.Extensions.Configuration
+namespace Squidex.Infrastructure.MongoDb
 {
-    public sealed class Options : Dictionary<string, Action>
+    public sealed class MongoDbOptions
     {
-        public Options()
-            : base(StringComparer.OrdinalIgnoreCase)
-        {
-        }
+        public bool IsCosmosDb { get; set; }
     }
 }

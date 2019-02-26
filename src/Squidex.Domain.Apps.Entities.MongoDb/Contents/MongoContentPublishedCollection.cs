@@ -8,6 +8,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -20,19 +21,24 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     internal sealed class MongoContentPublishedCollection : MongoContentCollection
     {
-        public MongoContentPublishedCollection(IMongoDatabase database, IJsonSerializer serializer)
+        private readonly MongoDbOptions options;
+
+        public MongoContentPublishedCollection(IMongoDatabase database, IJsonSerializer serializer, IOptions<MongoDbOptions> options)
             : base(database, serializer, "State_Content_Published")
         {
+            this.options = options.Value;
         }
 
         protected override async Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
         {
-            await collection.Indexes.CreateManyAsync(
-                new[]
-                {
-                    new CreateIndexModel<MongoContentEntity>(Index.Text(x => x.DataText).Ascending(x => x.IndexedSchemaId)),
-                    new CreateIndexModel<MongoContentEntity>(Index.Ascending(x => x.IndexedSchemaId).Ascending(x => x.Id))
-                }, ct);
+            await collection.Indexes.CreateOneAsync(
+                new CreateIndexModel<MongoContentEntity>(Index.Ascending(x => x.IndexedSchemaId).Ascending(x => x.Id)), null, ct);
+
+            if (!options.IsCosmosDb)
+            {
+                await collection.Indexes.CreateOneAsync(
+                    new CreateIndexModel<MongoContentEntity>(Index.Text(x => x.DataText).Ascending(x => x.IndexedSchemaId)), null, ct);
+            }
 
             await base.SetupCollectionAsync(collection, ct);
         }
