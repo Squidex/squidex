@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 AppVersion = 1,
                 Schema = schema,
                 SchemaVersion = 1,
-                Languages = new List<string> { "de", "en" }
+                AppLanguages = new List<string> { "de", "en" }
             };
 
             sut = new TextIndexerGrain(assetStore);

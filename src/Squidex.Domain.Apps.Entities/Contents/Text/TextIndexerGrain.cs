@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (queryParser == null || currentAppVersion != context.AppVersion || currentSchemaVersion != context.SchemaVersion)
             {
-                var fields = context.Languages.Select(BuildFieldName).ToArray();
+                var fields = context.AppLanguages.Select(BuildFieldName).ToArray();
 
                 queryParser = new MultiFieldQueryParser(Version, fields, Analyzer);
 

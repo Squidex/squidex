@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
@@ -18,6 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public long SchemaVersion { get; set; }
 
-        public List<string> Languages { get; set; }
+        public List<string> AppLanguages { get; set; }
     }
 }

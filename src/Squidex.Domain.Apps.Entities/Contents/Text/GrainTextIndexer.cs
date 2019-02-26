@@ -64,9 +64,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             var context = new SearchContext
             {
                 AppVersion = app.Version,
-                Schema = schema.SchemaDef,
+                AppLanguages = languages,
                 SchemaVersion = schema.Version,
-                Languages = languages,
                 IsDraft = useDraft
             };
 
