@@ -36,7 +36,7 @@ namespace Squidex.Infrastructure.Assets
 
             using (await readerLock.LockAsync())
             {
-                await UploadAsync(id, version, suffix, sourceStream, ct);
+                await UploadAsync(id, version, suffix, sourceStream, false, ct);
             }
         }
 
@@ -64,18 +64,23 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(string id, long version, string suffix, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(id, nameof(id));
 
-            return UploadAsync(GetFileName(id, version, suffix), stream, ct);
+            return UploadCoreAsync(GetFileName(id, version, suffix), stream, overwrite, ct);
         }
 
-        public async Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
+        {
+            return UploadCoreAsync(fileName, stream, false);
+        }
+
+        private async Task UploadCoreAsync(string fileName, Stream stream, bool overwrite, CancellationToken ct = default)
         {
             var memoryStream = new MemoryStream();
 
-            if (streams.TryAdd(fileName, memoryStream))
+            async Task CopyAsync()
             {
                 using (await writerLock.LockAsync())
                 {
@@ -88,6 +93,17 @@ namespace Squidex.Infrastructure.Assets
                         memoryStream.Position = 0;
                     }
                 }
+            }
+
+            if (overwrite)
+            {
+                await CopyAsync();
+
+                streams[fileName] = memoryStream;
+            }
+            else if (streams.TryAdd(fileName, memoryStream))
+            {
+                await CopyAsync();
             }
             else
             {

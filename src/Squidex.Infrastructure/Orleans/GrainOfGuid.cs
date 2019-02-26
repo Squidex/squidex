@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure.Orleans
     {
         public Guid Key { get; private set; }
 
-        public sealed override Task OnActivateAsync()
+        public override Task OnActivateAsync()
         {
             return ActivateAsync(this.GetPrimaryKey());
         }

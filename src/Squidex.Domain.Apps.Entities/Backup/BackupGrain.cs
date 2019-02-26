@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     currentTask.Token.ThrowIfCancellationRequested();
 
-                    await assetStore.UploadAsync(job.Id.ToString(), 0, null, stream, currentTask.Token);
+                    await assetStore.UploadAsync(job.Id.ToString(), 0, null, stream, false, currentTask.Token);
                 }
 
                 job.Status = JobStatus.Completed;

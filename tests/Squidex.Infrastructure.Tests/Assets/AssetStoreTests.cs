@@ -61,6 +61,19 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
+        public async Task Should_read_and_override_file()
+        {
+            await Sut.UploadAsync(assetId, 1, "suffix", new MemoryStream(new byte[] { 0x3, 0x4, 0x5, 0x6 }));
+            await Sut.UploadAsync(assetId, 1, "suffix", assetData, true);
+
+            var readData = new MemoryStream();
+
+            await Sut.DownloadAsync(assetId, 1, "suffix", readData);
+
+            Assert.Equal(assetData.ToArray(), readData.ToArray());
+        }
+
+        [Fact]
         public async Task Should_throw_exception_when_file_to_write_already_exists()
         {
             await Sut.UploadAsync(assetId, 1, "suffix", assetData);

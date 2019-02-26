@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Assets
             throw new NotSupportedException();
         }
 
-        public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(string id, long version, string suffix, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
             throw new NotSupportedException();
         }
