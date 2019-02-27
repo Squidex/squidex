@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Lucene.Net.Analysis;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
+using Lucene.Net.Queries;
 using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
@@ -30,15 +31,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const LuceneVersion Version = LuceneVersion.LUCENE_48;
         private const int MaxResults = 2000;
         private const int MaxUpdates = 100;
-        private static readonly HashSet<string> IdFields = new HashSet<string>();
+        private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(30);
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
         private readonly IAssetStore assetStore;
+        private IDisposable timer;
         private DirectoryInfo directory;
         private IndexWriter indexWriter;
         private IndexReader indexReader;
         private QueryParser queryParser;
-        private long currentAppVersion;
-        private long currentSchemaVersion;
+        private HashSet<string> currentLanguages;
         private long updates;
 
         public TextIndexerGrain(IAssetStore assetStore)
@@ -46,13 +47,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             Guard.NotNull(assetStore, nameof(assetStore));
 
             this.assetStore = assetStore;
-        }
-
-        public override Task OnActivateAsync()
-        {
-            RegisterTimer(_ => FlushAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(10));
-
-            return base.OnActivateAsync();
         }
 
         public override async Task OnDeactivateAsync()
@@ -79,16 +73,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public Task IndexAsync(Guid id, J<IndexData> data)
         {
-            string idString = id.ToString(), draft = data.Value.IsDraft.ToString();
+            var docId = id.ToString();
+            var docDraft = data.Value.IsDraft.ToString();
+            var docKey = $"{docId}_{docDraft}";
 
-            indexWriter.DeleteDocuments(
-                new Term("id", idString),
-                new Term("dd", draft));
+            var query = new BooleanQuery();
 
-            var document = new Document();
-
-            document.AddStringField("id", idString, Field.Store.YES);
-            document.AddStringField("dd", draft, Field.Store.YES);
+            indexWriter.DeleteDocuments(new Term("key", docKey));
 
             var languages = new Dictionary<string, StringBuilder>();
 
@@ -117,12 +108,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 }
             }
 
-            foreach (var field in languages)
+            if (languages.Count > 0)
             {
-                document.AddTextField(field.Key, field.Value.ToString(), Field.Store.NO);
-            }
+                var document = new Document();
 
-            indexWriter.AddDocument(document);
+                document.AddStringField("id", docId, Field.Store.YES);
+                document.AddStringField("key", docKey, Field.Store.YES);
+                document.AddStringField("draft", docDraft, Field.Store.YES);
+
+                foreach (var field in languages)
+                {
+                    var fieldName = BuildFieldName(field.Key);
+
+                    document.AddTextField(fieldName, field.Value.ToString(), Field.Store.NO);
+                }
+
+                indexWriter.AddDocument(document);
+            }
 
             return TryFlushAsync();
         }
@@ -131,9 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (value.Type == JsonValueType.String)
             {
-                var text = value.ToString();
-
-                appendText(text);
+                appendText(value.ToString());
             }
             else if (value is JsonArray array)
             {
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        public Task<List<Guid>> SearchAsync(string queryText, J<SearchContext> context)
+        public Task<List<Guid>> SearchAsync(string queryText, SearchContext context)
         {
             var result = new HashSet<Guid>();
 
@@ -161,9 +161,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 if (indexReader != null)
                 {
-                    var filter = new QueryWrapperFilter(new TermQuery(new Term("dd", context.Value.IsDraft.ToString())));
+                    var filter = new TermsFilter(new Term("draft", context.IsDraft.ToString()));
 
-                    var hits = new IndexSearcher(indexReader).Search(query, MaxResults).ScoreDocs;
+                    var hits = new IndexSearcher(indexReader).Search(query, filter, MaxResults).ScoreDocs;
 
                     foreach (var hit in hits)
                     {
@@ -184,17 +184,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private Query BuildQuery(string query, SearchContext context)
         {
-            if (queryParser == null || currentAppVersion != context.AppVersion || currentSchemaVersion != context.SchemaVersion)
+            if (queryParser == null || !currentLanguages.SetEquals(context.Languages))
             {
-                var fields = context.AppLanguages.Select(BuildFieldName).ToArray();
+                var fields =
+                    context.Languages.Select(BuildFieldName)
+                        .Union(Enumerable.Repeat(BuildFieldName("iv"), 1)).ToArray();
 
                 queryParser = new MultiFieldQueryParser(Version, fields, Analyzer);
 
-                currentAppVersion = context.AppVersion;
-                currentSchemaVersion = context.SchemaVersion;
+                currentLanguages = context.Languages;
             }
 
-            return queryParser.Parse(query);
+            try
+            {
+                return queryParser.Parse(query);
+            }
+            catch (ParseException ex)
+            {
+                throw new ValidationException(ex.Message);
+            }
         }
 
         private async Task TryFlushAsync()
@@ -204,6 +212,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             if (updates >= MaxUpdates)
             {
                 await FlushAsync();
+            }
+            else
+            {
+                timer?.Dispose();
+
+                try
+                {
+                    timer = RegisterTimer(_ => FlushAsync(), null, CommitDelay, CommitDelay);
+                }
+                catch (InvalidOperationException)
+                {
+                    return;
+                }
             }
         }
 
@@ -220,6 +241,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 await assetStore.UploadDirectoryAsync(directory);
 
                 updates = 0;
+            }
+            else
+            {
+                timer?.Dispose();
             }
         }
 
@@ -241,7 +266,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private static string BuildFieldName(string language)
         {
-            return $"field_{language}";
+            return $"{language}_field";
         }
     }
 }

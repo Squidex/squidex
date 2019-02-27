@@ -20,6 +20,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         Task IndexAsync(Guid schemaId, Guid id, NamedContentData data, NamedContentData dataDraft);
 
-        Task<List<Guid>> SearchAsync(string queryText, IAppEntity appEntity, ISchemaEntity schemaEntity, bool useDraft = false);
+        Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, ISchemaEntity schema, bool useDraft = false);
     }
 }

@@ -13,10 +13,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         public bool IsDraft { get; set; }
 
-        public long AppVersion { get; set; }
-
-        public long SchemaVersion { get; set; }
-
-        public List<string> AppLanguages { get; set; }
+        public HashSet<string> Languages { get; set; }
     }
 }

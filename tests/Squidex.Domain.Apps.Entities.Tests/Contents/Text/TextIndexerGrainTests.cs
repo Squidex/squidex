@@ -8,9 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Xunit;
 
@@ -18,10 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public class TextIndexerGrainTests : IDisposable
     {
-        private readonly Schema schema =
-            new Schema("test")
-                .AddString(1, "test", Partitioning.Invariant)
-                .AddString(2, "localized", Partitioning.Language);
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly List<Guid> ids1 = new List<Guid> { Guid.NewGuid() };
         private readonly List<Guid> ids2 = new List<Guid> { Guid.NewGuid() };
@@ -33,10 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             context = new SearchContext
             {
-                AppVersion = 1,
-                Schema = schema,
-                SchemaVersion = 1,
-                AppLanguages = new List<string> { "de", "en" }
+                Languages = new HashSet<string> { "de", "en" }
             };
 
             sut = new TextIndexerGrain(assetStore);
@@ -60,13 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 await other.ActivateAsync(schemaId);
 
-                var helloIds = await other.SearchAsync("Hello", context);
+                var foundHello = await other.SearchAsync("Hello", context);
+                var foundWorld = await other.SearchAsync("World", context);
 
-                Assert.Equal(ids1, helloIds);
-
-                var worldIds = await other.SearchAsync("World", context);
-
-                Assert.Equal(ids2, worldIds);
+                Assert.Equal(ids1, foundHello);
+                Assert.Equal(ids2, foundWorld);
             }
             finally
             {
@@ -79,13 +69,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             await AddInvariantContent();
 
-            var helloIds = await sut.SearchAsync("Hello", context);
+            var foundHello = await sut.SearchAsync("Hello", context);
+            var foundWorld = await sut.SearchAsync("World", context);
 
-            Assert.Equal(ids1, helloIds);
+            Assert.Equal(ids1, foundHello);
+            Assert.Equal(ids2, foundWorld);
+        }
 
-            var worldIds = await sut.SearchAsync("World", context);
+        [Fact]
+        public async Task Should_index_invariant_content_and_retrieve_with_fuzzy()
+        {
+            await AddInvariantContent();
 
-            Assert.Equal(ids2, worldIds);
+            var foundHello = await sut.SearchAsync("helo~", context);
+            var foundWorld = await sut.SearchAsync("wold~", context);
+
+            Assert.Equal(ids1, foundHello);
+            Assert.Equal(ids2, foundWorld);
         }
 
         [Fact]
@@ -98,10 +98,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             var helloIds = await sut.SearchAsync("Hello", context);
 
-            Assert.Empty(helloIds);
-
             var worldIds = await sut.SearchAsync("World", context);
 
+            Assert.Empty(helloIds);
             Assert.Equal(ids2, worldIds);
         }
 
@@ -117,7 +116,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             Assert.Equal(ids1, german1);
             Assert.Equal(ids1, german2);
-
             Assert.Equal(ids2, germanStopwordsIds);
 
             var english1 = await sut.SearchAsync("City", context);
@@ -127,8 +125,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             Assert.Equal(ids2, english1);
             Assert.Equal(ids2, english2);
-
             Assert.Equal(ids1, englishStopwordsIds);
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_for_invalid_query()
+        {
+            await AddInvariantContent();
+
+            await Assert.ThrowsAsync<ValidationException>(() => sut.SearchAsync("~hello", context));
         }
 
         private async Task AddLocalizedContent()

@@ -19,6 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         Task IndexAsync(Guid id, J<IndexData> data);
 
-        Task<List<Guid>> SearchAsync(string queryText, J<SearchContext> context);
+        Task<List<Guid>> SearchAsync(string queryText, SearchContext context);
     }
 }

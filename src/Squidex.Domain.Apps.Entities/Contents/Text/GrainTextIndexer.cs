@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
@@ -41,12 +42,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             if (data != null)
             {
-                await index.IndexAsync(id, new IndexData { });
+                await index.IndexAsync(id, new IndexData { Data = data });
             }
 
             if (dataDraft != null)
             {
-                await index.IndexAsync(id, new IndexData { IsDraft = true });
+                await index.IndexAsync(id, new IndexData { Data = dataDraft, IsDraft = true });
             }
         }
 
@@ -59,17 +60,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             var index = grainFactory.GetGrain<ITextIndexerGrain>(schema.Id);
 
-            var languages = app.LanguagesConfig.Select(x => x.Key).ToList();
-
-            var context = new SearchContext
+            using (Profiler.TraceMethod<GrainTextIndexer>("SearchAsync"))
             {
-                AppVersion = app.Version,
-                AppLanguages = languages,
-                SchemaVersion = schema.Version,
-                IsDraft = useDraft
-            };
+                var context = CreateContext(app, useDraft);
 
-            return await index.SearchAsync(queryText, context);
+                return await index.SearchAsync(queryText, context);
+            }
+        }
+
+        private static SearchContext CreateContext(IAppEntity app, bool useDraft)
+        {
+            var languages = new HashSet<string>(app.LanguagesConfig.Select(x => x.Key));
+
+            return new SearchContext { Languages = languages, IsDraft = useDraft };
         }
     }
 }

@@ -55,18 +55,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))
             {
-                if (RequiresPublished(status))
-                {
-                    var ids = await indexer.SearchAsync(query.FullText, app, schema);
+                var useDraft = RequiresPublished(status);
 
-                    return await contents.QueryAsync(app, schema, query, ids);
-                }
-                else
-                {
-                    var ids = await indexer.SearchAsync(query.FullText, app, schema, true);
+                var fullTextIds = await indexer.SearchAsync(query.FullText, app, schema, useDraft);
 
-                    return await contents.QueryAsync(app, schema, query, ids, status, true);
+                if (fullTextIds?.Count == 0)
+                {
+                    return ResultList.Create<IContentEntity>(0);
                 }
+
+                return await contents.QueryAsync(app, schema, query, fullTextIds, status, true);
             }
         }
 

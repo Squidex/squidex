@@ -34,7 +34,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     {
                         try
                         {
-                            if (!file.Name.Equals(ArchiveFile, StringComparison.OrdinalIgnoreCase) && !file.Name.Equals(LockFile, StringComparison.OrdinalIgnoreCase))
+                            if (!file.Name.Equals(ArchiveFile, StringComparison.OrdinalIgnoreCase) &&
+                                !file.Name.Equals(LockFile, StringComparison.OrdinalIgnoreCase))
                             {
                                 zipArchive.CreateEntryFromFile(file.FullName, file.Name);
                             }

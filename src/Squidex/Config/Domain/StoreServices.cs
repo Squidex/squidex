@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
@@ -104,7 +105,7 @@ namespace Squidex.Config.Domain
                             c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName),
                             c.GetRequiredService<IAppProvider>(),
                             c.GetRequiredService<IJsonSerializer>(),
-                            c.GetRequiredService<IOptions<MongoDbOptions>>()))
+                            c.GetRequiredService<ITextIndexer>()))
                         .AsOptional<IContentRepository>()
                         .AsOptional<ISnapshotStore<ContentState, Guid>>()
                         .AsOptional<IEventConsumer>();
