@@ -21,46 +21,74 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     public sealed class GrainTextIndexer : ITextIndexer
     {
         private readonly IGrainFactory grainFactory;
+        private readonly ISemanticLog log;
 
-        public GrainTextIndexer(IGrainFactory grainFactory)
+        public GrainTextIndexer(IGrainFactory grainFactory, ISemanticLog log)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(log, nameof(log));
 
             this.grainFactory = grainFactory;
+
+            this.log = log;
         }
 
-        public Task DeleteAsync(Guid schemaId, Guid id)
+        public async Task DeleteAsync(Guid schemaId, Guid id)
         {
             var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
 
-            return index.DeleteAsync(id);
+            using (Profiler.TraceMethod<GrainTextIndexer>())
+            {
+                try
+                {
+                    await index.DeleteAsync(id);
+                }
+                catch (Exception ex)
+                {
+                    log.LogError(ex, w => w
+                        .WriteProperty("action", "DeleteTextEntry")
+                        .WriteProperty("status", "Failed"));
+                }
+            }
         }
 
         public async Task IndexAsync(Guid schemaId, Guid id, NamedContentData data, NamedContentData dataDraft)
         {
             var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
 
-            if (data != null)
+            using (Profiler.TraceMethod<GrainTextIndexer>())
             {
-                await index.IndexAsync(id, new IndexData { Data = data });
-            }
+                try
+                {
+                    if (data != null)
+                    {
+                        await index.IndexAsync(id, new IndexData { Data = data });
+                    }
 
-            if (dataDraft != null)
-            {
-                await index.IndexAsync(id, new IndexData { Data = dataDraft, IsDraft = true });
+                    if (dataDraft != null)
+                    {
+                        await index.IndexAsync(id, new IndexData { Data = dataDraft, IsDraft = true });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.LogError(ex, w => w
+                        .WriteProperty("action", "UpdateTextEntry")
+                        .WriteProperty("status", "Failed"));
+                }
             }
         }
 
-        public async Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, ISchemaEntity schema, bool useDraft = false)
+        public async Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, Guid schemaId, bool useDraft = false)
         {
             if (string.IsNullOrWhiteSpace(queryText))
             {
                 return null;
             }
 
-            var index = grainFactory.GetGrain<ITextIndexerGrain>(schema.Id);
+            var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
 
-            using (Profiler.TraceMethod<GrainTextIndexer>("SearchAsync"))
+            using (Profiler.TraceMethod<GrainTextIndexer>())
             {
                 var context = CreateContext(app, useDraft);
 

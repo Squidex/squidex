@@ -59,7 +59,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 await contents.UpsertAsync(content, oldVersion);
 
-                await indexer.IndexAsync(value.SchemaId.Id, value.Id, value.Data, value.DataDraft);
+                if (value.IsDeleted)
+                {
+                    await indexer.DeleteAsync(value.SchemaId.Id, value.Id);
+                }
+                else
+                {
+                    await indexer.IndexAsync(value.SchemaId.Id, value.Id, value.Data, value.DataDraft);
+                }
             }
         }
 
