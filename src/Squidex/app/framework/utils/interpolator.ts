@@ -8,7 +8,7 @@
 import { DateTime } from './date-time';
 import { Types } from './types';
 
-const regex = /\${[^}]+}/;
+const regex = /\${[^}]+}/g;
 
 export function interpolate(pattern: string, value?: any, shortcut?: string, fallback = 'undefined'): string {
     const result = pattern.replace(regex, (match: string) => {

@@ -21,6 +21,12 @@ describe('interpolate', () => {
         expect(result).toEqual('hello world');
     });
 
+    it('should interpolate with multiple object values', () => {
+        const result = interpolate('hello ${string1}${string2}', { string1: 'world', string2: '!' });
+
+        expect(result).toEqual('hello world!');
+    });
+
     it('should interpolate with array value', () => {
         const result = interpolate('hello ${1}', ['my', 'world']);
 
