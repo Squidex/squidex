@@ -23,20 +23,23 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         public Task CreateIndexAsync(string property)
         {
+            Guard.NotNullOrEmpty(property, nameof(property));
+
             return Collection.Indexes.CreateOneAsync(
                 new CreateIndexModel<MongoEventCommit>(Index.Ascending(CreateIndexPath(property))));
         }
 
-        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
+        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter = null, string position = null)
         {
             Guard.NotNull(subscriber, nameof(subscriber));
-            Guard.NotNullOrEmpty(streamFilter, nameof(streamFilter));
 
             return new PollingSubscription(this, subscriber, streamFilter, position);
         }
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
         {
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+
             using (Profiler.TraceMethod<MongoEventStore>())
             {
                 var commits =
@@ -55,13 +58,13 @@ namespace Squidex.Infrastructure.EventSourcing
                     var commitTimestamp = commit.Timestamp;
                     var commitOffset = 0;
 
-                    foreach (var e in commit.Events)
+                    foreach (var @event in commit.Events)
                     {
                         eventStreamOffset++;
 
                         if (eventStreamOffset >= streamPosition)
                         {
-                            var eventData = e.ToEventData();
+                            var eventData = @event.ToEventData();
                             var eventToken = new StreamPosition(commitTimestamp, commitOffset, commit.Events.Length);
 
                             result.Add(new StoredEvent(streamName, eventToken, eventStreamOffset, eventData));
@@ -76,6 +79,8 @@ namespace Squidex.Infrastructure.EventSourcing
         public Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default)
         {
             Guard.NotNull(callback, nameof(callback));
+            Guard.NotNullOrEmpty(property, nameof(property));
+            Guard.NotNull(value, nameof(value));
 
             StreamPosition lastPosition = position;
 
@@ -108,13 +113,13 @@ namespace Squidex.Infrastructure.EventSourcing
                     var commitTimestamp = commit.Timestamp;
                     var commitOffset = 0;
 
-                    foreach (var e in commit.Events)
+                    foreach (var @event in commit.Events)
                     {
                         eventStreamOffset++;
 
                         if (commitOffset > lastPosition.CommitOffset || commitTimestamp > lastPosition.Timestamp)
                         {
-                            var eventData = e.ToEventData();
+                            var eventData = @event.ToEventData();
 
                             if (filterExpression(eventData))
                             {
@@ -157,7 +162,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private static void AppendByStream(string streamFilter, List<EventFilter> filters)
         {
-            if (!string.IsNullOrWhiteSpace(streamFilter) && !string.Equals(streamFilter, ".*", StringComparison.OrdinalIgnoreCase))
+            if (!StreamFilter.IsAll(streamFilter))
             {
                 if (streamFilter.Contains("^"))
                 {

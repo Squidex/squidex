@@ -15,7 +15,7 @@ namespace Squidex.Infrastructure.Orleans
     {
         public string Key { get; private set; }
 
-        public sealed override Task OnActivateAsync()
+        public override Task OnActivateAsync()
         {
             return ActivateAsync(this.GetPrimaryKeyString());
         }

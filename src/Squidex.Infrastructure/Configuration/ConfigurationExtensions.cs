@@ -46,7 +46,7 @@ namespace Microsoft.Extensions.Configuration
             return value;
         }
 
-        public static string ConfigureByOption(this IConfiguration config, string path, Options options)
+        public static string ConfigureByOption(this IConfiguration config, string path, Alternatives options)
         {
             var value = config.GetRequiredValue(path);
 

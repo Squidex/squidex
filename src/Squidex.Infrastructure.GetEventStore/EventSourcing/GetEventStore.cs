@@ -53,18 +53,26 @@ namespace Squidex.Infrastructure.EventSourcing
             await projectionClient.ConnectAsync(ct);
         }
 
-        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null)
+        public IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter = null, string position = null)
         {
+            Guard.NotNull(streamFilter, nameof(streamFilter));
+
             return new GetEventStoreSubscription(connection, subscriber, serializer, projectionClient, position, prefix, streamFilter);
         }
 
         public Task CreateIndexAsync(string property)
         {
+            Guard.NotNullOrEmpty(property, nameof(property));
+
             return projectionClient.CreateProjectionAsync(property, string.Empty);
         }
 
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string property, object value, string position = null, CancellationToken ct = default)
         {
+            Guard.NotNull(callback, nameof(callback));
+            Guard.NotNullOrEmpty(property, nameof(property));
+            Guard.NotNull(value, nameof(value));
+
             using (Profiler.TraceMethod<GetEventStore>())
             {
                 var streamName = await projectionClient.CreateProjectionAsync(property, value);
@@ -77,6 +85,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task QueryAsync(Func<StoredEvent, Task> callback, string streamFilter = null, string position = null, CancellationToken ct = default)
         {
+            Guard.NotNull(callback, nameof(callback));
+
             using (Profiler.TraceMethod<GetEventStore>())
             {
                 var streamName = await projectionClient.CreateProjectionAsync(streamFilter);
@@ -111,6 +121,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)
         {
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+
             using (Profiler.TraceMethod<GetEventStore>())
             {
                 var result = new List<StoredEvent>();
@@ -142,6 +154,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task DeleteStreamAsync(string streamName)
         {
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+
             return connection.DeleteStreamAsync(GetStreamName(streamName), ExpectedVersion.Any);
         }
 
@@ -159,11 +173,11 @@ namespace Squidex.Infrastructure.EventSourcing
 
         private async Task AppendEventsInternalAsync(string streamName, long expectedVersion, ICollection<EventData> events)
         {
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNull(events, nameof(events));
+
             using (Profiler.TraceMethod<GetEventStore>(nameof(AppendAsync)))
             {
-                Guard.NotNullOrEmpty(streamName, nameof(streamName));
-                Guard.NotNull(events, nameof(events));
-
                 if (events.Count == 0)
                 {
                     return;

@@ -49,8 +49,8 @@ namespace Squidex.Infrastructure.CQRS.Events
 
             this.exchange = exchange;
             this.eventsFilter = eventsFilter;
-            this.jsonSerializer = jsonSerializer;
             this.eventPublisherName = eventPublisherName;
+            this.jsonSerializer = jsonSerializer;
         }
 
         protected override void DisposeObject(bool disposing)

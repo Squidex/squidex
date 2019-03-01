@@ -95,14 +95,14 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(string id, long version, string suffix, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            return UploadCoreAsync(GetFile(id, version, suffix), stream, ct);
+            return UploadCoreAsync(GetFile(id, version, suffix), stream, overwrite, ct);
         }
 
         public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
-            return UploadCoreAsync(GetFile(fileName), stream, ct);
+            return UploadCoreAsync(GetFile(fileName), stream, false, ct);
         }
 
         public Task DeleteAsync(string id, long version, string suffix)
@@ -122,11 +122,11 @@ namespace Squidex.Infrastructure.Assets
             return TaskHelper.Done;
         }
 
-        private static async Task UploadCoreAsync(FileInfo file, Stream stream, CancellationToken ct = default)
+        private static async Task UploadCoreAsync(FileInfo file, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
             try
             {
-                using (var fileStream = file.Open(FileMode.CreateNew, FileAccess.Write))
+                using (var fileStream = file.Open(overwrite ? FileMode.Create : FileMode.CreateNew, FileAccess.Write))
                 {
                     await stream.CopyToAsync(fileStream, BufferSize, ct);
                 }

@@ -33,16 +33,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         protected Task On(AssetDeleted @event)
         {
-            return Task.WhenAll(
-                contentsDraft.CleanupAsync(@event.AssetId),
-                contentsPublished.CleanupAsync(@event.AssetId));
+            return contents.CleanupAsync(@event.AssetId);
         }
 
         protected Task On(ContentDeleted @event)
         {
-            return Task.WhenAll(
-                contentsDraft.CleanupAsync(@event.ContentId),
-                contentsPublished.CleanupAsync(@event.ContentId));
+            return contents.CleanupAsync(@event.ContentId);
         }
 
         Task IEventConsumer.ClearAsync()

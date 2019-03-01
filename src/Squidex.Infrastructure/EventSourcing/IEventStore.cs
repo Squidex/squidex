@@ -28,6 +28,6 @@ namespace Squidex.Infrastructure.EventSourcing
 
         Task DeleteStreamAsync(string streamName);
 
-        IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter, string position = null);
+        IEventSubscription CreateSubscription(IEventSubscriber subscriber, string streamFilter = null, string position = null);
     }
 }

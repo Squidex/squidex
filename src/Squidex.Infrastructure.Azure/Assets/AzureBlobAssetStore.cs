@@ -110,14 +110,14 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(string id, long version, string suffix, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            return UploadCoreAsync(GetObjectName(id, version, suffix), stream, ct);
+            return UploadCoreAsync(GetObjectName(id, version, suffix), stream, overwrite, ct);
         }
 
         public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
-            return UploadCoreAsync(fileName, stream, ct);
+            return UploadCoreAsync(fileName, stream, false, ct);
         }
 
         public Task DeleteAsync(string id, long version, string suffix)
@@ -137,13 +137,13 @@ namespace Squidex.Infrastructure.Assets
             return blob.DeleteIfExistsAsync();
         }
 
-        private async Task UploadCoreAsync(string blobName, Stream stream, CancellationToken ct = default)
+        private async Task UploadCoreAsync(string blobName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
             try
             {
                 var tempBlob = blobContainer.GetBlockBlobReference(blobName);
 
-                await tempBlob.UploadFromStreamAsync(stream, AccessCondition.GenerateIfNotExistsCondition(), null, null, ct);
+                await tempBlob.UploadFromStreamAsync(stream, overwrite ? null : AccessCondition.GenerateIfNotExistsCondition(), null, null, ct);
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 409)
             {

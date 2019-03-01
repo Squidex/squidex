@@ -80,14 +80,14 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(string id, long version, string suffix, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            return UploadCoreAsync(GetObjectName(id, version, suffix), stream, ct);
+            return UploadCoreAsync(GetObjectName(id, version, suffix), stream, overwrite, ct);
         }
 
         public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
-            return UploadCoreAsync(fileName, stream, ct);
+            return UploadCoreAsync(fileName, stream, false, ct);
         }
 
         public Task DeleteAsync(string id, long version, string suffix)
@@ -100,11 +100,11 @@ namespace Squidex.Infrastructure.Assets
             return DeleteCoreAsync(fileName);
         }
 
-        private async Task UploadCoreAsync(string objectName, Stream stream, CancellationToken ct = default)
+        private async Task UploadCoreAsync(string objectName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
             try
             {
-                await storageClient.UploadObjectAsync(bucketName, objectName, "application/octet-stream", stream, IfNotExists, ct);
+                await storageClient.UploadObjectAsync(bucketName, objectName, "application/octet-stream", stream, overwrite ? null : IfNotExists, ct);
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.PreconditionFailed)
             {

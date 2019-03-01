@@ -5,16 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 
-namespace Microsoft.Extensions.Configuration
+namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class Options : Dictionary<string, Action>
+    public sealed class SearchContext
     {
-        public Options()
-            : base(StringComparer.OrdinalIgnoreCase)
-        {
-        }
+        public bool IsDraft { get; set; }
+
+        public HashSet<string> Languages { get; set; }
     }
 }

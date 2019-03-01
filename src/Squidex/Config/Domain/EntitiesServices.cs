@@ -31,6 +31,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
@@ -104,6 +105,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<GrainTagService>()
                 .As<ITagService>();
+
+            services.AddSingletonAs<GrainTextIndexer>()
+                .As<ITextIndexer>();
 
             services.AddSingletonAs<FileTypeTagGenerator>()
                 .As<ITagGenerator<CreateAsset>>();

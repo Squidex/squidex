@@ -10,6 +10,7 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Migrate_01.Migrations;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities;
@@ -17,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
@@ -31,6 +33,7 @@ using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -40,13 +43,17 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyStoreServices(this IServiceCollection services, IConfiguration config)
         {
-            config.ConfigureByOption("store:type", new Options
+            config.ConfigureByOption("store:type", new Alternatives
             {
                 ["MongoDB"] = () =>
                 {
                     var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
                     var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
                     var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName);
+
+                    var isCosmosDb = config.GetOptionalValue<bool>("store:mongoDB:isCosmosDB");
+
+                    services.Configure<MongoDbOptions>(config.GetSection("store:mongoDB"));
 
                     services.AddSingleton(typeof(ISnapshotStore<,>), typeof(MongoSnapshotStore<,>));
 
@@ -97,7 +104,8 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs(c => new MongoContentRepository(
                             c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName),
                             c.GetRequiredService<IAppProvider>(),
-                            c.GetRequiredService<IJsonSerializer>()))
+                            c.GetRequiredService<IJsonSerializer>(),
+                            c.GetRequiredService<ITextIndexer>()))
                         .AsOptional<IContentRepository>()
                         .AsOptional<ISnapshotStore<ContentState, Guid>>()
                         .AsOptional<IEventConsumer>();

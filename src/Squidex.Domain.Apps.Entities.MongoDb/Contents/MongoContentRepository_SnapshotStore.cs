@@ -7,7 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -23,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await contentsDraft.ReadAsync(key, GetSchemaAsync);
+                return await contents.ReadAsync(key, GetSchemaAsync);
             }
         }
 
@@ -58,15 +57,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     Version = newVersion
                 });
 
-                await contentsDraft.UpsertAsync(content, oldVersion);
+                await contents.UpsertAsync(content, oldVersion);
 
-                if (value.Status == Status.Published && !value.IsDeleted)
+                if (value.IsDeleted)
                 {
-                    await contentsPublished.UpsertAsync(content);
+                    await indexer.DeleteAsync(value.SchemaId.Id, value.Id);
                 }
                 else
                 {
-                    await contentsPublished.RemoveAsync(content.Id);
+                    await indexer.IndexAsync(value.SchemaId.Id, value.Id, value.Data, value.DataDraft);
                 }
             }
         }

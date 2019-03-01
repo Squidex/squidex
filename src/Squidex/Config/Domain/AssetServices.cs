@@ -20,7 +20,7 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyAssetServices(this IServiceCollection services, IConfiguration config)
         {
-            config.ConfigureByOption("assetStore:type", new Options
+            config.ConfigureByOption("assetStore:type", new Alternatives
             {
                 ["Default"] = () =>
                 {

@@ -35,7 +35,7 @@ namespace Squidex.Domain.Users
 
             await sut.UploadAsync(userId, stream);
 
-            A.CallTo(() => assetStore.UploadAsync(userId, 0, "picture", stream, CancellationToken.None)).MustHaveHappened();
+            A.CallTo(() => assetStore.UploadAsync(userId, 0, "picture", stream, false, CancellationToken.None)).MustHaveHappened();
         }
 
         [Fact]
