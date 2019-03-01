@@ -19,6 +19,7 @@ using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
+using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Json.Objects;
@@ -31,6 +32,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const LuceneVersion Version = LuceneVersion.LUCENE_48;
         private const int MaxResults = 2000;
         private const int MaxUpdates = 100;
+        private const string MetaId = "_id";
+        private const string MetaKey = "_key";
+        private const string MetaDraft = "_dd";
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(30);
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
         private readonly IAssetStore assetStore;
@@ -66,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public Task DeleteAsync(Guid id)
         {
-            indexWriter.DeleteDocuments(new Term("id", id.ToString()));
+            indexWriter.DeleteDocuments(new Term(MetaId, id.ToString()));
 
             return TryFlushAsync();
         }
@@ -79,7 +83,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             var query = new BooleanQuery();
 
-            indexWriter.DeleteDocuments(new Term("key", docKey));
+            indexWriter.DeleteDocuments(new Term(MetaKey, docKey));
 
             var languages = new Dictionary<string, StringBuilder>();
 
@@ -112,9 +116,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 var document = new Document();
 
-                document.AddStringField("id", docId, Field.Store.YES);
-                document.AddStringField("key", docKey, Field.Store.YES);
-                document.AddStringField("draft", docDraft, Field.Store.YES);
+                document.AddStringField(MetaId, docId, Field.Store.YES);
+                document.AddStringField(MetaKey, docKey, Field.Store.YES);
+                document.AddStringField(MetaDraft, docDraft, Field.Store.YES);
 
                 foreach (var field in languages)
                 {
@@ -161,7 +165,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 if (indexReader != null)
                 {
-                    var filter = new TermsFilter(new Term("draft", context.IsDraft.ToString()));
+                    var filter = new TermsFilter(new Term(MetaDraft, context.IsDraft.ToString()));
 
                     var hits = new IndexSearcher(indexReader).Search(query, filter, MaxResults).ScoreDocs;
 
@@ -169,7 +173,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     {
                         var document = indexReader.Document(hit.Doc);
 
-                        var idField = document.GetField("id")?.GetStringValue();
+                        var idField = document.GetField(MetaId)?.GetStringValue();
 
                         if (idField != null && Guid.TryParse(idField, out var guid))
                         {
@@ -188,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 var fields =
                     context.Languages.Select(BuildFieldName)
-                        .Union(Enumerable.Repeat(BuildFieldName("iv"), 1)).ToArray();
+                        .Union(Enumerable.Repeat(BuildFieldName(InvariantPartitioning.Instance.Master.Key), 1)).ToArray();
 
                 queryParser = new MultiFieldQueryParser(Version, fields, Analyzer);
 
@@ -266,7 +270,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private static string BuildFieldName(string language)
         {
-            return $"{language}_field";
+            return language;
         }
     }
 }

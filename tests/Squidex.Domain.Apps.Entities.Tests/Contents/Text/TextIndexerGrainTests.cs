@@ -105,6 +105,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
+        public async Task Should_search_by_field()
+        {
+            await AddLocalizedContent();
+
+            var emptyGerman = await sut.SearchAsync("de:City", context);
+            var emptyEnglish = await sut.SearchAsync("en:Stadt", context);
+
+            Assert.Empty(emptyGerman);
+            Assert.Empty(emptyEnglish);
+        }
+
+        [Fact]
         public async Task Should_index_localized_content_and_retrieve()
         {
             await AddLocalizedContent();

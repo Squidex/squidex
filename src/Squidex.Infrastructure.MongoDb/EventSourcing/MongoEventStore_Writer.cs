@@ -18,7 +18,6 @@ namespace Squidex.Infrastructure.EventSourcing
     {
         private const int MaxCommitSize = 10;
         private const int MaxWriteAttempts = 20;
-        private const int MaxCommitSize = 10;
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
 
         public Task DeleteStreamAsync(string streamName)
