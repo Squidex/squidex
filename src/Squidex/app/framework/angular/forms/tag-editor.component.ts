@@ -152,7 +152,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                         this.resetSize();
                     }),
                     map(query => <string>query),
-                    map(query => query ? query.trim() : query),
+                    map(query => query ? query.trim().toLowerCase() : query),
                     tap(query => {
                         if (!query) {
                             this.resetAutocompletion();
@@ -161,7 +161,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                     distinctUntilChanged(),
                     map(query => {
                         if (Types.isArray(this.suggestions) && query && query.length > 0) {
-                            return this.suggestions.filter(s => s.indexOf(query) >= 0 && this.snapshot.items.indexOf(s) < 0);
+                            return this.suggestions.filter(s => s.toLowerCase().indexOf(query) >= 0 && this.snapshot.items.indexOf(s) < 0);
                         } else {
                             return [];
                         }
