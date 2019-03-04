@@ -96,7 +96,11 @@ namespace Migrate_01
         {
             var handledIds = new HashSet<Guid>();
 
-            var worker = new ActionBlock<Guid>(action, new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 32 });
+            var worker = new ActionBlock<Guid>(action,
+                new ExecutionDataflowBlockOptions
+                {
+                    MaxDegreeOfParallelism = 32
+                });
 
             await eventStore.QueryAsync(async storedEvent =>
             {

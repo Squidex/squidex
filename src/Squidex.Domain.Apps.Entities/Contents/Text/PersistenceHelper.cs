@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
+using Lucene.Net.Index;
 using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
@@ -18,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const string ArchiveFile = "Archive.zip";
         private const string LockFile = "write.lock";
 
-        public static async Task UploadDirectoryAsync(this IAssetStore assetStore, DirectoryInfo directory)
+        public static async Task UploadDirectoryAsync(this IAssetStore assetStore, DirectoryInfo directory, IndexCommit commit)
         {
             using (var fileStream = new FileStream(
                    Path.Combine(directory.FullName, ArchiveFile),
@@ -30,8 +31,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 using (var zipArchive = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
                 {
-                    foreach (var file in directory.GetFiles())
+                    foreach (var fileName in commit.FileNames)
                     {
+                        var file = new FileInfo(Path.Combine(directory.FullName, fileName));
+
                         try
                         {
                             if (!file.Name.Equals(ArchiveFile, StringComparison.OrdinalIgnoreCase) &&

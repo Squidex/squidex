@@ -24,6 +24,8 @@ namespace Migrate_01.Migrations
         {
             await database.DropCollectionAsync("States_Contents");
             await database.DropCollectionAsync("States_Contents_Archive");
+            await database.DropCollectionAsync("State_Content_Draft");
+            await database.DropCollectionAsync("State_Content_Published");
         }
     }
 }

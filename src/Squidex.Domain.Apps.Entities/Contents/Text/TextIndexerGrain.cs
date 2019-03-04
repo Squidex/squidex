@@ -37,11 +37,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const string MetaDraft = "_dd";
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(30);
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
+        private static readonly TermsFilter DraftFilter = new TermsFilter(new Term(MetaDraft, "1"));
+        private static readonly TermsFilter NoDraftFilter = new TermsFilter(new Term(MetaDraft, "0"));
+        private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
         private readonly IAssetStore assetStore;
         private IDisposable timer;
         private DirectoryInfo directory;
         private IndexWriter indexWriter;
         private IndexReader indexReader;
+        private IndexSearcher indexSearcher;
         private QueryParser queryParser;
         private HashSet<string> currentLanguages;
         private long updates;
@@ -64,8 +68,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await assetStore.DownloadAsync(directory);
 
-            indexWriter = new IndexWriter(FSDirectory.Open(directory), new IndexWriterConfig(Version, Analyzer));
-            indexReader = indexWriter.GetReader(true);
+            var config = new IndexWriterConfig(Version, Analyzer)
+            {
+                IndexDeletionPolicy = snapshotter
+            };
+
+            indexWriter = new IndexWriter(FSDirectory.Open(directory), config);
+
+            if (indexWriter.NumDocs > 0)
+            {
+                indexReader = indexWriter.GetReader(false);
+                indexSearcher = new IndexSearcher(indexReader);
+            }
         }
 
         public Task DeleteAsync(Guid id)
@@ -78,10 +92,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         public Task IndexAsync(Guid id, J<IndexData> data)
         {
             var docId = id.ToString();
-            var docDraft = data.Value.IsDraft.ToString();
+            var docDraft = data.Value.IsDraft ? "1" : "0";
             var docKey = $"{docId}_{docDraft}";
-
-            var query = new BooleanQuery();
 
             indexWriter.DeleteDocuments(new Term(MetaKey, docKey));
 
@@ -165,9 +177,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 if (indexReader != null)
                 {
-                    var filter = new TermsFilter(new Term(MetaDraft, context.IsDraft.ToString()));
+                    var filter = context.IsDraft ? DraftFilter : NoDraftFilter;
 
-                    var hits = new IndexSearcher(indexReader).Search(query, filter, MaxResults).ScoreDocs;
+                    var hits = indexSearcher.Search(query, filter, MaxResults).ScoreDocs;
 
                     foreach (var hit in hits)
                     {
@@ -236,13 +248,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (updates > 0 && indexWriter != null)
             {
-                indexWriter.Flush(true, true);
                 indexWriter.Commit();
+                indexWriter.Flush(true, true);
 
                 indexReader?.Dispose();
-                indexReader = indexWriter.GetReader(true);
+                indexReader = indexWriter.GetReader(false);
+                indexSearcher = new IndexSearcher(indexReader);
 
-                await assetStore.UploadDirectoryAsync(directory);
+                var commit = snapshotter.Snapshot();
+                try
+                {
+                    await assetStore.UploadDirectoryAsync(directory, commit);
+                }
+                finally
+                {
+                    snapshotter.Release(commit);
+                }
 
                 updates = 0;
             }

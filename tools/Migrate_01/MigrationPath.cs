@@ -16,7 +16,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 14;
+        private const int CurrentVersion = 15;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -72,7 +72,8 @@ namespace Migrate_01
             }
 
             // Version 11: Introduce content drafts.
-            if (version < 11)
+            // Version 15: Introduce custom full text search actors.
+            if (version < 15)
             {
                 yield return serviceProvider.GetService<DeleteContentCollections>();
                 yield return serviceProvider.GetRequiredService<RebuildContents>();
