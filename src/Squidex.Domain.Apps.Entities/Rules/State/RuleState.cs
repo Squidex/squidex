@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.State
             IsDeleted = true;
         }
 
-        public RuleState Apply(Envelope<IEvent> @event)
+        public override RuleState Apply(Envelope<IEvent> @event)
         {
             var payload = (SquidexEvent)@event.Payload;
 

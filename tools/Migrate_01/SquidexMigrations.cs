@@ -7,6 +7,8 @@
 
 using System.Reflection;
 
+#pragma warning disable RECS0014 // If all fields, properties and methods members are static, the class can be made static.
+
 namespace Migrate_01
 {
     public sealed class SquidexMigrations

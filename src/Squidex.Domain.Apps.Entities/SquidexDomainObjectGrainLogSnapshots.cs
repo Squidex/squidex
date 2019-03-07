@@ -14,7 +14,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities
 {
-    public abstract class SquidexDomainObjectGrainLogSnapshots<T> : LogSnapshotDomainObjectGrain<T> where T : IDomainState, new()
+    public abstract class SquidexDomainObjectGrainLogSnapshots<T> : LogSnapshotDomainObjectGrain<T> where T : IDomainState<T>, new()
     {
         protected SquidexDomainObjectGrainLogSnapshots(IStore<Guid> store, ISemanticLog log)
             : base(store, log)

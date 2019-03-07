@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Tasks;
 
-namespace Migrate_01.Migrations
+namespace Migrate_01.Migrations.MongoDb
 {
     public sealed class ConvertOldSnapshotStores : IMigration
     {

@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 
@@ -25,11 +24,6 @@ namespace Squidex.Infrastructure.TestHelpers
         protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             return Task.FromResult<object>(null);
-        }
-
-        protected override MyDomainState OnEvent(Envelope<IEvent> @event)
-        {
-            return Snapshot;
         }
     }
 }

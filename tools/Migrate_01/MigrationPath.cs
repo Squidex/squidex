@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Migrate_01.Migrations;
+using Migrate_01.Migrations.MongoDb;
 using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01
@@ -72,8 +73,7 @@ namespace Migrate_01
             }
 
             // Version 11: Introduce content drafts.
-            // Version 15: Introduce custom full text search actors.
-            if (version < 15)
+            if (version < 11)
             {
                 yield return serviceProvider.GetService<DeleteContentCollections>();
                 yield return serviceProvider.GetRequiredService<RebuildContents>();
@@ -95,6 +95,13 @@ namespace Migrate_01
             if (version < 1)
             {
                 yield return serviceProvider.GetRequiredService<AddPatterns>();
+            }
+
+            // Version 15: Introduce custom full text search actors.
+            if (version < 15)
+            {
+                yield return serviceProvider.GetService<RestructureContentCollection>();
+                yield return serviceProvider.GetService<BuildFullTextIndices>();
             }
 
             yield return serviceProvider.GetRequiredService<StartEventConsumers>();

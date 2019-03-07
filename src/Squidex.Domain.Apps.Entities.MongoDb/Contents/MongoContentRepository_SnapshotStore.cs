@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -18,7 +19,23 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : ISnapshotStore<ContentState, Guid>
     {
-        public async Task<(ContentState Value, long Version)> ReadAsync(Guid key)
+        async Task ISnapshotStore<ContentState, Guid>.RemoveAsync(Guid key)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                await contents.RemoveAsync(key);
+            }
+        }
+
+        async Task ISnapshotStore<ContentState, Guid>.ReadAllAsync(Func<ContentState, long, Task> callback, CancellationToken ct)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                await contents.ReadAllAsync(callback, GetSchemaAsync, ct);
+            }
+        }
+
+        async Task<(ContentState Value, long Version)> ISnapshotStore<ContentState, Guid>.ReadAsync(Guid key)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -26,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task WriteAsync(Guid key, ContentState value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<ContentState, Guid>.WriteAsync(Guid key, ContentState value, long oldVersion, long newVersion)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -80,16 +97,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
 
             return schema;
-        }
-
-        Task ISnapshotStore<ContentState, Guid>.RemoveAsync(Guid key)
-        {
-            throw new NotSupportedException();
-        }
-
-        Task ISnapshotStore<ContentState, Guid>.ReadAllAsync(Func<ContentState, long, Task> callback)
-        {
-            throw new NotSupportedException();
         }
     }
 }

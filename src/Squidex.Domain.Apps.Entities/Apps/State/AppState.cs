@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
             IsArchived = true;
         }
 
-        public AppState Apply(Envelope<IEvent> @event)
+        public override AppState Apply(Envelope<IEvent> @event)
         {
             var payload = (SquidexEvent)@event.Payload;
 

@@ -296,11 +296,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        protected override ContentState OnEvent(Envelope<IEvent> @event)
-        {
-            return Snapshot.Apply(@event);
-        }
-
         private async Task<ContentOperationContext> CreateContext(Guid appId, Guid schemaId, Guid contentId, Func<string> message)
         {
             var operationContext =

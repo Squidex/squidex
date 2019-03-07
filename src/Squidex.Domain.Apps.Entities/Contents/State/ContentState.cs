@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             IsDeleted = true;
         }
 
-        public ContentState Apply(Envelope<IEvent> @event)
+        public override ContentState Apply(Envelope<IEvent> @event)
         {
             var payload = (SquidexEvent)@event.Payload;
 

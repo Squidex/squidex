@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.States;
 
@@ -17,31 +16,6 @@ namespace Squidex.Infrastructure.TestHelpers
 {
     public sealed class MyDomainObject : DomainObjectGrain<MyDomainState>
     {
-        public sealed class ValueChanged : IEvent
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class CreateAuto : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class CreateCustom : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class UpdateAuto : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class UpdateCustom : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
         public MyDomainObject(IStore<Guid> store)
            : base(store, A.Dummy<ISemanticLog>())
         {
@@ -82,10 +56,25 @@ namespace Squidex.Infrastructure.TestHelpers
 
             return Task.FromResult<object>(null);
         }
+    }
 
-        protected override MyDomainState OnEvent(Envelope<IEvent> @event)
-        {
-            return new MyDomainState { Value = ((ValueChanged)@event.Payload).Value };
-        }
+    public sealed class CreateAuto : MyCommand
+    {
+        public int Value { get; set; }
+    }
+
+    public sealed class CreateCustom : MyCommand
+    {
+        public int Value { get; set; }
+    }
+
+    public sealed class UpdateAuto : MyCommand
+    {
+        public int Value { get; set; }
+    }
+
+    public sealed class UpdateCustom : MyCommand
+    {
+        public int Value { get; set; }
     }
 }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Squidex.Infrastructure.States
@@ -20,6 +21,6 @@ namespace Squidex.Infrastructure.States
 
         Task RemoveAsync(TKey key);
 
-        Task ReadAllAsync(Func<T, long, Task> callback);
+        Task ReadAllAsync(Func<T, long, Task> callback, CancellationToken ct = default);
     }
 }

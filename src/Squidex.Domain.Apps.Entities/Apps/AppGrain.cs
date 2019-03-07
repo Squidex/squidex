@@ -369,11 +369,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner };
         }
 
-        protected override AppState OnEvent(Envelope<IEvent> @event)
-        {
-            return Snapshot.Apply(@event);
-        }
-
         public Task<J<IAppEntity>> GetStateAsync()
         {
             return J.AsTask<IAppEntity>(Snapshot);

@@ -10,8 +10,7 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Migrate_01.Migrations;
+using Migrate_01.Migrations.MongoDb;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -64,6 +63,9 @@ namespace Squidex.Config.Domain
                         .As<IMongoDatabase>();
 
                     services.AddTransientAs(c => new DeleteContentCollections(c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName)))
+                        .As<IMigration>();
+
+                    services.AddTransientAs(c => new RestructureContentCollection(c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName)))
                         .As<IMigration>();
 
                     services.AddSingletonAs<MongoMigrationStatus>()

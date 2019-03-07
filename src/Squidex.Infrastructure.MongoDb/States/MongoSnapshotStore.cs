@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -60,11 +61,11 @@ namespace Squidex.Infrastructure.States
             }
         }
 
-        public async Task ReadAllAsync(Func<T, long, Task> callback)
+        public async Task ReadAllAsync(Func<T, long, Task> callback, CancellationToken ct = default)
         {
             using (Profiler.TraceMethod<MongoSnapshotStore<T, TKey>>())
             {
-                await Collection.Find(new BsonDocument()).ForEachAsync(x => callback(x.Doc, x.Version));
+                await Collection.Find(new BsonDocument()).ForEachPipelineAsync(x => callback(x.Doc, x.Version), ct);
             }
         }
 

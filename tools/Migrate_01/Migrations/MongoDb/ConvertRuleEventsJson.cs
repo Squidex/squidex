@@ -10,7 +10,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
 
-namespace Migrate_01.Migrations
+namespace Migrate_01.Migrations.MongoDb
 {
     public sealed class ConvertRuleEventsJson : IMigration
     {

@@ -26,38 +26,6 @@ namespace Squidex.Infrastructure.Commands
         private readonly Guid id = Guid.NewGuid();
         private readonly MyDomainObject sut;
 
-        public sealed class MyDomainState : IDomainState
-        {
-            public long Version { get; set; }
-
-            public int Value { get; set; }
-        }
-
-        public sealed class ValueChanged : IEvent
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class CreateAuto : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class CreateCustom : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class UpdateAuto : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class UpdateCustom : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
         public sealed class MyDomainObject : DomainObjectGrain<MyDomainState>
         {
             public MyDomainObject(IStore<Guid> store)
@@ -99,11 +67,6 @@ namespace Squidex.Infrastructure.Commands
                 }
 
                 return Task.FromResult<object>(null);
-            }
-
-            protected override MyDomainState OnEvent(Envelope<IEvent> @event)
-            {
-                return new MyDomainState { Value = ((ValueChanged)@event.Payload).Value };
             }
         }
 

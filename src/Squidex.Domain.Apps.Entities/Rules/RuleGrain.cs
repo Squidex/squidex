@@ -123,11 +123,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             }
         }
 
-        protected override RuleState OnEvent(Envelope<IEvent> @event)
-        {
-            return Snapshot.Apply(@event);
-        }
-
         public Task<J<IRuleEntity>> GetStateAsync()
         {
             return J.AsTask<IRuleEntity>(Snapshot);

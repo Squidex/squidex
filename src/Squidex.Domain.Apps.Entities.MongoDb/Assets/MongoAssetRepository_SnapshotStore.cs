@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets.State;
@@ -18,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : ISnapshotStore<AssetState, Guid>
     {
-        public async Task<(AssetState Value, long Version)> ReadAsync(Guid key)
+        async Task<(AssetState Value, long Version)> ISnapshotStore<AssetState, Guid>.ReadAsync(Guid key)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -35,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<AssetState, Guid>.WriteAsync(Guid key, AssetState value, long oldVersion, long newVersion)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        Task ISnapshotStore<AssetState, Guid>.ReadAllAsync(Func<AssetState, long, Task> callback)
+        Task ISnapshotStore<AssetState, Guid>.ReadAllAsync(Func<AssetState, long, Task> callback, CancellationToken ct)
         {
             throw new NotSupportedException();
         }

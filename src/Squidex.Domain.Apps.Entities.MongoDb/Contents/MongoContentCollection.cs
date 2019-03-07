@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -168,6 +169,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
 
             return (null, EtagVersion.NotFound);
+        }
+
+        public Task ReadAllAsync(Func<ContentState, long, Task> callback, Func<Guid, Guid, Task<ISchemaEntity>> getSchema, CancellationToken ct = default)
+        {
+            return Collection.Find(new BsonDocument()).ForEachPipelineAsync(async contentEntity =>
+            {
+                var schema = await getSchema(contentEntity.IndexedAppId, contentEntity.IndexedSchemaId);
+
+                contentEntity.ParseData(schema.SchemaDef, Serializer);
+
+                await callback(SimpleMapper.Map(contentEntity, new ContentState()), contentEntity.Version);
+            }, ct);
         }
 
         public Task CleanupAsync(Guid id)

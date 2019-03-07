@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectGrainBase<T> : GrainOfGuid, IDomainObjectGrain where T : IDomainState, new()
+    public abstract class DomainObjectGrainBase<T> : GrainOfGuid, IDomainObjectGrain where T : IDomainState<T>, new()
     {
         private readonly List<Envelope<IEvent>> uncomittedEvents = new List<Envelope<IEvent>>();
         private readonly ISemanticLog log;

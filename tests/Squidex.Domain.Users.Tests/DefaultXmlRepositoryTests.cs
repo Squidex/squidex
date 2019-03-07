@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using FakeItEasy;
@@ -38,8 +39,8 @@ namespace Squidex.Domain.Users
         [Fact]
         public void Should_return_items_from_store()
         {
-            A.CallTo(() => store.ReadAllAsync(A<Func<DefaultXmlRepository.State, long, Task>>.Ignored))
-                .Invokes((Func<DefaultXmlRepository.State, long, Task> callback) =>
+            A.CallTo(() => store.ReadAllAsync(A<Func<DefaultXmlRepository.State, long, Task>>.Ignored, A<CancellationToken>.Ignored))
+                .Invokes((Func<DefaultXmlRepository.State, long, Task> callback, CancellationToken ct) =>
                 {
                     callback(new DefaultXmlRepository.State { Xml = "<a />" }, EtagVersion.Any);
                     callback(new DefaultXmlRepository.State { Xml = "<b />" }, EtagVersion.Any);
