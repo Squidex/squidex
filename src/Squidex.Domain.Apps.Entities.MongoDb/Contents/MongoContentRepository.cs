@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))
             {
-                var useDraft = RequiresPublished(status);
+                var useDraft = UseDraft(status);
 
                 var fullTextIds = await indexer.SearchAsync(query.FullText, app, schema.Id, useDraft);
 
@@ -72,14 +72,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIds"))
             {
-                if (RequiresPublished(status))
-                {
-                    return await contents.QueryAsync(app, schema, ids);
-                }
-                else
-                {
-                    return await contents.QueryAsync(app, schema, ids, status);
-                }
+                var useDraft = UseDraft(status);
+
+                return await contents.QueryAsync(app, schema, ids, status, useDraft);
             }
         }
 
@@ -87,14 +82,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                if (RequiresPublished(status))
-                {
-                    return await contents.FindContentAsync(app, schema, id);
-                }
-                else
-                {
-                    return await contents.FindContentAsync(app, schema, id, status);
-                }
+                var useDraft = UseDraft(status);
+
+                return await contents.FindContentAsync(app, schema, id, status, useDraft);
             }
         }
 
@@ -132,9 +122,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return database.DropCollectionAsync("States_Contents_Archive");
         }
 
-        private static bool RequiresPublished(Status[] status)
+        private static bool UseDraft(Status[] status)
         {
-            return status?.Length == 1 && status[0] == Status.Published;
+            return !(status?.Length == 1 && status[0] == Status.Published);
         }
     }
 }

@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return "State_Contents";
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Query query, List<Guid> ids, Status[] status = null, bool useDraft = false)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Query query, List<Guid> ids, Status[] status, bool useDraft)
         {
             try
             {
@@ -67,6 +67,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 var contentCount = Collection.Find(filter).CountDocumentsAsync();
                 var contentItems =
                     Collection.Find(filter)
+                        .WithoutDraft(useDraft)
                         .ContentTake(query)
                         .ContentSkip(query)
                         .ContentSort(query)
@@ -94,11 +95,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<Guid> ids, Status[] status = null)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<Guid> ids, Status[] status, bool useDraft)
         {
             var find = Collection.Find(FilterFactory.Build(schema.Id, ids, status));
 
-            var contentItems = find.ToListAsync();
+            var contentItems = find.WithoutDraft(useDraft).ToListAsync();
             var contentCount = find.CountDocumentsAsync();
 
             await Task.WhenAll(contentItems, contentCount);
@@ -111,11 +112,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
         }
 
-        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, Status[] status = null)
+        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Guid id, Status[] status, bool useDraft)
         {
             var find = Collection.Find(FilterFactory.Build(schema.Id, id, status));
 
-            var contentEntity = await find.FirstOrDefaultAsync();
+            var contentEntity = await find.WithoutDraft(useDraft).FirstOrDefaultAsync();
 
             contentEntity?.ParseData(schema.SchemaDef, Serializer);
 

@@ -14,6 +14,7 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 
@@ -107,6 +108,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
         public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSkip(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, Query query)
         {
             return cursor.Skip(query);
+        }
+
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> WithoutDraft(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, bool useDraft)
+        {
+            return !useDraft ? cursor.Not(x => x.DataDraftByIds, x => x.IsDeleted) : cursor;
         }
 
         public static FilterDefinition<MongoContentEntity> Build(Guid schemaId, Guid id, Status[] status)
