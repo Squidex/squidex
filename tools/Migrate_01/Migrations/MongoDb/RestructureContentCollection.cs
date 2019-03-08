@@ -29,8 +29,11 @@ namespace Migrate_01.Migrations.MongoDb
                 await contentDatabase.DropCollectionAsync("State_Contents");
                 await contentDatabase.DropCollectionAsync("State_Content_Published");
                 await contentDatabase.RenameCollectionAsync("State_Content_Draft", "State_Contents");
+            }
 
-                var collection = contentDatabase.GetCollection<BsonDocument>("State_Content");
+            if (await contentDatabase.CollectionExistsAsync("State_Contents"))
+            {
+                var collection = contentDatabase.GetCollection<BsonDocument>("State_Contents");
 
                 await collection.UpdateManyAsync(new BsonDocument(), Builders<BsonDocument>.Update.Unset("dt"));
             }

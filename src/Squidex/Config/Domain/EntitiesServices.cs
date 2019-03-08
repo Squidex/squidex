@@ -44,7 +44,9 @@ using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Pipeline;
 using Squidex.Pipeline.CommandMiddlewares;
 
@@ -63,12 +65,10 @@ namespace Squidex.Config.Domain
                 .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>().As<IAssetUrlGenerator>();
 
             services.AddSingletonAs<HistoryService>()
-                .As<IEventConsumer>()
-                .As<IHistoryService>();
+                .As<IEventConsumer>().As<IHistoryService>();
 
             services.AddSingletonAs<AssetUsageTracker>()
-                .As<IEventConsumer>()
-                .As<IAssetUsageTracker>();
+                .As<IEventConsumer>().As<IAssetUsageTracker>();
 
             services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();
@@ -117,6 +117,12 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<JintScriptEngine>()
                 .AsOptional<IScriptEngine>();
+
+            services.AddSingletonAs<GrainBootstrap<IContentSchedulerGrain>>()
+                .AsSelf();
+
+            services.AddSingletonAs<GrainBootstrap<IRuleDequeuerGrain>>()
+                .AsSelf();
 
             services.AddCommandPipeline();
             services.AddBackupHandlers();

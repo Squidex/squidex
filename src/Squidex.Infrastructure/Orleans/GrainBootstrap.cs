@@ -12,19 +12,19 @@ using Orleans.Runtime;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public sealed class Bootstrap<T> : IStartupTask where T : IBackgroundGrain
+    public sealed class GrainBootstrap<T> : IBackgroundProcess where T : IBackgroundGrain
     {
         private const int NumTries = 10;
         private readonly IGrainFactory grainFactory;
 
-        public Bootstrap(IGrainFactory grainFactory)
+        public GrainBootstrap(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }
 
-        public async Task Execute(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken ct)
         {
             for (var i = 1; i <= NumTries; i++)
             {

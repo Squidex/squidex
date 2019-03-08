@@ -12,10 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
-using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Config.Orleans
@@ -45,10 +41,6 @@ namespace Squidex.Config.Orleans
                 .UseDashboardEx()
                 .EnableDirectClient()
                 .AddIncomingGrainCallFilter<LocalCacheFilter>()
-                .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
-                .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
-                .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()
-                .AddStartupTask<Bootstrap<IUsageTrackerGrain>>()
                 .ConfigureApplicationParts(builder =>
                 {
                     builder.AddMyParts();

@@ -19,13 +19,13 @@ namespace Squidex.Infrastructure.Orleans
     public class BootstrapTests
     {
         private readonly IBackgroundGrain grain = A.Fake<IBackgroundGrain>();
-        private readonly Bootstrap<IBackgroundGrain> sut;
+        private readonly GrainBootstrap<IBackgroundGrain> sut;
 
         public BootstrapTests()
         {
             var factory = A.Fake<IGrainFactory>();
 
-            sut = new Bootstrap<IBackgroundGrain>(factory);
+            sut = new GrainBootstrap<IBackgroundGrain>(factory);
 
             A.CallTo(() => factory.GetGrain<IBackgroundGrain>("Default", null))
                 .Returns(grain);

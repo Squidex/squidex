@@ -103,6 +103,7 @@ namespace Squidex
             var provider = services.AddAndBuildOrleans(configuration, afterServices =>
             {
                 afterServices.AddHostedService<MigratorHost>();
+                afterServices.AddHostedService<BackgroundHost>();
             });
 
             return provider;

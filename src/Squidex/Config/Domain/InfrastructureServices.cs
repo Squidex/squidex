@@ -14,9 +14,12 @@ using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.News.Service;
 using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
+using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Diagnostics;
+using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared.Users;
@@ -46,6 +49,12 @@ namespace Squidex.Config.Domain
                 .AsSelf();
 
             services.AddSingletonAs<BackgroundUsageTracker>()
+                .AsSelf();
+
+            services.AddSingletonAs<GrainBootstrap<IEventConsumerManagerGrain>>()
+                .AsSelf();
+
+            services.AddSingletonAs<GrainBootstrap<IUsageTrackerGrain>>()
                 .AsSelf();
 
             services.AddSingletonAs<DeepLTranslator>()

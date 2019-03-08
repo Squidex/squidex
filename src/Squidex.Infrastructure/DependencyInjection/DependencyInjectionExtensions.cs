@@ -83,9 +83,16 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static void RegisterDefaults<T>(IServiceCollection services) where T : class
         {
-            if (typeof(T).GetInterfaces().Contains(typeof(IInitializable)))
+            var interfaces = typeof(T).GetInterfaces();
+
+            if (interfaces.Contains(typeof(IInitializable)))
             {
                 services.AddSingleton(typeof(IInitializable), c => c.GetRequiredService<T>());
+            }
+
+            if (interfaces.Contains(typeof(IBackgroundProcess)))
+            {
+                services.AddSingleton(typeof(IBackgroundProcess), c => c.GetRequiredService<T>());
             }
         }
     }
