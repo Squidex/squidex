@@ -45,7 +45,7 @@ Please create issues to report bugs, suggest new functionalities, ask questions 
 
 ## Cloud Version
 
-Although Squidex is free we are also working on a Saas version on [https://cloud.squidex.io](https://cloud.squidex.io) (More information coming soon). We have also have plans to sell a premium version with first class support and some exlusive features. But don't be afraid, our first priority is to deliver a state of the art, stable, fast and free content management hub to make the life for developers a little bit easier.
+Although Squidex is free it is also available as a Saas version on [https://cloud.squidex.io](https://cloud.squidex.io).
 
 ## License
 
