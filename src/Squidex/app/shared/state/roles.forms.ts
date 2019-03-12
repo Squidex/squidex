@@ -7,7 +7,11 @@
 
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { Form, hasValue$ } from '@app/framework';
+import {
+    Form,
+    hasNoValue$,
+    hasValue$
+} from '@app/framework';
 
 export class EditPermissionsForm extends Form<FormArray> {
     constructor() {
@@ -50,7 +54,7 @@ export class AddPermissionForm extends Form<FormGroup> {
 }
 
 export class AddRoleForm extends Form<FormGroup> {
-    public hasNoName = hasValue$(this.form.controls['name']);
+    public hasNoName = hasNoValue$(this.form.controls['name']);
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({

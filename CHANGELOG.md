@@ -1,7 +1,13 @@
 # Changelog
 
-## v1.16.0 - 2019-02-23
+## v1.16.1 - 2019-03-08
 
+### Bugfixes
+
+* **UI**: Multiple placeholders for interpolation.
+* **UI**: Fix for button activation when adding rules.
+
+## v1.16.0 - 2019-02-23
 
 ### Features
 
