@@ -7,7 +7,6 @@
 // ==========================================================================
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
@@ -34,7 +33,7 @@ namespace Squidex.Infrastructure.Orleans
         [Fact]
         public async Task Should_activate_grain_on_run()
         {
-            await sut.Execute(CancellationToken.None);
+            await sut.StartAsync();
 
             A.CallTo(() => grain.ActivateAsync())
                 .MustHaveHappened();
@@ -46,7 +45,7 @@ namespace Squidex.Infrastructure.Orleans
             A.CallTo(() => grain.ActivateAsync())
                 .Throws(new InvalidOperationException());
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.Execute(CancellationToken.None));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.StartAsync());
         }
 
         [Fact]
@@ -55,7 +54,7 @@ namespace Squidex.Infrastructure.Orleans
             A.CallTo(() => grain.ActivateAsync())
                 .Throws(new OrleansException()).Once();
 
-            await sut.Execute(CancellationToken.None);
+            await sut.StartAsync();
 
             A.CallTo(() => grain.ActivateAsync())
                 .MustHaveHappened(2, Times.Exactly);
@@ -67,7 +66,7 @@ namespace Squidex.Infrastructure.Orleans
             A.CallTo(() => grain.ActivateAsync())
                 .Throws(new OrleansException());
 
-            await Assert.ThrowsAsync<OrleansException>(() => sut.Execute(CancellationToken.None));
+            await Assert.ThrowsAsync<OrleansException>(() => sut.StartAsync());
 
             A.CallTo(() => grain.ActivateAsync())
                 .MustHaveHappened(10, Times.Exactly);

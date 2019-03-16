@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Orleans
             this.grainFactory = grainFactory;
         }
 
-        public async Task StartAsync(CancellationToken ct)
+        public async Task StartAsync(CancellationToken ct = CancellationToken.None)
         {
             for (var i = 1; i <= NumTries; i++)
             {
