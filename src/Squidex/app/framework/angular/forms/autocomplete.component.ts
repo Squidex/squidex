@@ -21,6 +21,8 @@ const KEY_ESCAPE = 27;
 const KEY_UP = 38;
 const KEY_DOWN = 40;
 
+const NO_EMIT = { emitEvent: false };
+
 export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AutocompleteComponent), multi: true
 };
@@ -118,9 +120,9 @@ export class AutocompleteComponent extends StatefulControlComponent<State, any[]
             this.resetForm();
         } else {
             if (this.displayProperty && this.displayProperty.length > 0) {
-                this.queryInput.setValue(obj[this.displayProperty]);
+                this.queryInput.setValue(obj[this.displayProperty], NO_EMIT);
             } else {
-                this.queryInput.setValue(obj.toString());
+                this.queryInput.setValue(obj.toString(), NO_EMIT);
             }
         }
 
@@ -130,9 +132,9 @@ export class AutocompleteComponent extends StatefulControlComponent<State, any[]
     public setDisabledState(isDisabled: boolean): void {
         if (isDisabled) {
             this.reset();
-            this.queryInput.disable();
+            this.queryInput.disable(NO_EMIT);
         } else {
-            this.queryInput.enable();
+            this.queryInput.enable(NO_EMIT);
         }
     }
 
@@ -165,9 +167,9 @@ export class AutocompleteComponent extends StatefulControlComponent<State, any[]
         if (selection) {
             try {
                 if (this.displayProperty && this.displayProperty.length > 0) {
-                    this.queryInput.setValue(selection[this.displayProperty], { emitEvent: false });
+                    this.queryInput.setValue(selection[this.displayProperty], NO_EMIT);
                 } else {
-                    this.queryInput.setValue(selection.toString(), { emitEvent: false });
+                    this.queryInput.setValue(selection.toString(), NO_EMIT);
                 }
                 this.callChange(selection);
             } finally {
@@ -201,7 +203,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, any[]
     }
 
     private resetForm() {
-        this.queryInput.setValue('');
+        this.queryInput.setValue('', NO_EMIT);
     }
 
     private reset() {
