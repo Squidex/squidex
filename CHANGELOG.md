@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.16.2 - 2019-03-16
+
+### Bugfixes
+
+* **UI**: Corrections for auto completions.
+* **UI**: Correctly close onboarding tooltips.
+
 ## v1.16.1 - 2019-03-08
 
 ### Bugfixes
