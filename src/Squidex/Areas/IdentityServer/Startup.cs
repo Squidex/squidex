@@ -34,7 +34,6 @@ namespace Squidex.Areas.IdentityServer
 
                 identityApp.UseMyIdentityServer();
 
-                identityApp.UseStaticFiles();
                 identityApp.UseMvc();
             });
         }
