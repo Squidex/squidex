@@ -58,6 +58,13 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         }
 
         [HttpGet]
+        [Route("account/error/")]
+        public IActionResult LoginError()
+        {
+            throw new InvalidOperationException();
+        }
+
+        [HttpGet]
         [Route("account/forbidden/")]
         public IActionResult Forbidden()
         {

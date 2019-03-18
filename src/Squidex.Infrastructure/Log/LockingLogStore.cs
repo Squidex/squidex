@@ -56,13 +56,13 @@ namespace Squidex.Infrastructure.Log
                     {
                         await Task.Delay(2000, cts.Token);
                     }
-                    catch (OperationCanceledException)
+                    catch (TaskCanceledException)
                     {
                         break;
                     }
                 }
 
-                if (!cts.IsCancellationRequested)
+                if (releaseToken != null)
                 {
                     try
                     {

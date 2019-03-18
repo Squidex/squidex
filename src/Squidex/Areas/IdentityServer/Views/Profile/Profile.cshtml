@@ -26,7 +26,7 @@
     
 <div class="row profile-section">
     <div class="col profile-picture-col">
-        <img class="profile-picture" src="@Url.Content($"~/../api/users/{Model.Id}/picture/")" />
+        <img class="profile-picture" src="@Url.RootContentUrl($"~/api/users/{Model.Id}/picture/")" />
     </div>
     <div class="col">
         <form id="pictureForm" class="profile-picture-form" asp-controller="Profile" asp-action="UploadPicture" method="post" enctype="multipart/form-data">

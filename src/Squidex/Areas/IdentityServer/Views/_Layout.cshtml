@@ -9,7 +9,7 @@
     <title>@ViewBag.Title - Squidex Headless CMS</title>
 
     <environment names="Production">
-        <link rel="stylesheet" asp-append-version="true" href="~/build/app.css" />
+        <link rel="stylesheet" asp-append-version="true" href="@Url.RootContentUrl("~/build/app.css")" />
     </environment>
     
     @if (IsSectionDefined("header"))
@@ -19,7 +19,7 @@
 </head>
 <body class="white">
     <div class="profile @ViewBag.Class">
-        <img class="profile-logo" src="~/images/logo-small.png" />
+        <img class="profile-logo" src="@Url.RootContentUrl("~/images/logo-small.png")" />
 
         @RenderBody()
     </div>
