@@ -23,6 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public NamedId<Guid> SchemaId { get; set; }
 
         public long Version { get; set; }
+        public long? OrderNo { get; set; }
 
         public Instant Created { get; set; }
 
@@ -55,6 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 CreatedBy = command.Actor,
                 LastModified = now,
                 LastModifiedBy = command.Actor,
+                OrderNo = null,
                 Status = command.Publish ? Status.Published : Status.Draft
             };
 

@@ -32,6 +32,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         public NamedContentData DataDraft { get; set; }
 
         [DataMember]
+        public long? OrderNo { get; set; }
+
+        [DataMember]
         public ScheduleJob ScheduleJob { get; set; }
 
         [DataMember]

@@ -16,6 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Commands
 
         public NamedId<Guid> SchemaId { get; set; }
 
+        //public long? OrderNo { get; set; }
+
         public bool Publish { get; set; }
 
         public bool DoNotValidate { get; set; }

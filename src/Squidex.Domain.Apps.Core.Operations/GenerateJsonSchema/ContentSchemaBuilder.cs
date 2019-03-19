@@ -30,6 +30,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                     ["created"] = CreateProperty($"The date and time when the {schemaName} content has been created.", "date-time"),
                     ["createdBy"] = CreateProperty($"The user that has created the {schemaName} content."),
                     ["lastModified"] = CreateProperty($"The date and time when the {schemaName} content has been modified last.", "date-time"),
+                    ["orderNo"] = CreateProperty($"OrderNo of the content item for {schemaName}.", JsonObjectType.Number),
                     ["lastModifiedBy"] = CreateProperty($"The user that has updated the {schemaName} content last.")
                 },
                 Type = JsonObjectType.Object

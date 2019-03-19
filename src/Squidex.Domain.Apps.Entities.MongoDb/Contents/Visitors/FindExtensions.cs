@@ -86,7 +86,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                     }
                     else
                     {
-                        result[0] = PropertyMap[propertyNames[0]];
+                        if (propertyNames[0] == "on")
+                            result[0] = "on";
+                        else
+                            result[0] = PropertyMap[propertyNames[0]];
                     }
                 }
 

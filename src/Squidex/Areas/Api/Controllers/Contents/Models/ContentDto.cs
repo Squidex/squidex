@@ -28,6 +28,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public Guid Id { get; set; }
 
         /// <summary>
+        /// Sorting field of content item
+        /// </summary>
+        public long? OrderNo { get; set; }
+
+        /// <summary>
         /// The user that has created the content item.
         /// </summary>
         [Required]
@@ -93,6 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 CreatedBy = command.Actor,
                 LastModified = now,
                 LastModifiedBy = command.Actor,
+                OrderNo = null,
                 Status = command.Publish ? Status.Published : Status.Draft
             };
 

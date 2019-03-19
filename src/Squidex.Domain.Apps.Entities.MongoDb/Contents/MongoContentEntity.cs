@@ -85,6 +85,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonElement("sa")]
         public Instant? ScheduledAt { get; set; }
 
+        [BsonIgnoreIfNull]
+        [BsonElement("on")]
+        public long? OrderNo { get; set; }
+
         [BsonRequired]
         [BsonElement("ct")]
         public Instant Created { get; set; }
