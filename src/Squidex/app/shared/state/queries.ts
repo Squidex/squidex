@@ -20,7 +20,9 @@ export class Queries {
     public queries: Observable<Query[]>;
 
     public defaultQueries: Query[] = [{
-        name: 'All (newest first)', filter: ''
+        name: 'All (by order no)', filter: ''
+    }, {
+        name: 'All (newest first)', filter: '$orderby=lastModified desc'
     }, {
         name: 'All (oldest first)', filter: '$orderby=lastModified asc'
     }];

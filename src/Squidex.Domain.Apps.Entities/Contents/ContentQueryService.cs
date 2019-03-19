@@ -231,7 +231,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                     if (result.Sort.Count == 0)
                     {
-                        result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
+                        //changed default sorting by order no instead of lastModified so that ordering mechanism would work.
+                        result.Sort.Add(new SortNode(new List<string> { "orderNo" }, SortOrder.Descending));
                     }
 
                     if (result.Take > options.MaxResults)
