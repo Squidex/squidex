@@ -55,8 +55,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         }),
             distinctUntilChanged());
 
-    public contentsArray:ContentDto[] = [];
-        
+    public contentsArray: ContentDto[] = [];
+
     public contentsPager =
         this.changes.pipe(map(x => x.contentsPager),
             distinctUntilChanged());
@@ -232,7 +232,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     public updateOrderNo(contents: ContentDto[]): Observable<any> {
         const data: { id: string; orderNo: Number; }[] = [];
-        contents.forEach((c,i)=> data.push({id: c.id, orderNo: c.orderNo}));
+        contents.forEach((c, i) => data.push({id: c.id, orderNo: c.orderNo}));
         // return this.contentsService.updateOrderNo(this.appName, this.schemaName, data).pipe(
         //     tap(dto => {
         //         this.dialogs.notifyInfo('Orders updated successfully.');
@@ -243,7 +243,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             contents.map(c =>
                 this.contentsService.updateOrderNo(this.appName, this.schemaName, c.id, c.orderNo, c.version).pipe(
                     catchError(error => of(error))))).pipe(
-            tap(results => { 
+            tap(results => {
                 const error = results.find(x => x instanceof ErrorDto);
 
                 if (error) {

@@ -29,3 +29,4 @@ node_modules/
 appsettings.Development.json
 appsettings.Production.json
 launchSettings.json
+/_ReSharper.Caches

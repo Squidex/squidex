@@ -209,10 +209,10 @@ export class ContentsService {
                 }),
                 pretifyError('Failed to delete content. Please reload.'));
     }
-    
-    public updateOrderNo(appName: string, schemaName: string, id:string, order:Number,version: Version): Observable<Versioned<any>> {
+
+    public updateOrderNo(appName: string, schemaName: string, id: string, order: Number, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/updateOrderNo/${id}/${order}`);
-        return HTTP.postVersioned(this.http, url,version).pipe(
+        return HTTP.postVersioned(this.http, url, version).pipe(
                 tap(() => {
                     this.analytics.trackEvent('Content', 'OrderNoUpdate', appName);
                 }),
@@ -257,8 +257,6 @@ export class ContentsService {
                 }),
                 pretifyError('Failed to discard changes. Please reload.'));
     }
-
-    
 
     public changeContentStatus(appName: string, schemaName: string, id: string, action: string, dueTime: string | null, version: Version): Observable<Versioned<any>> {
         let url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${action}`);

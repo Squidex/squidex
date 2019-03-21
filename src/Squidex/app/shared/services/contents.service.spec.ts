@@ -97,7 +97,7 @@ describe('ContentsService', () => {
                     true,
                     {},
                     {},
-                    new Version('11')),
+                    new Version('11'), 0),
                 new ContentDto('id2', 'Published',
                     DateTime.parseISO_UTC('2016-10-12T10:10'), 'Created2',
                     DateTime.parseISO_UTC('2017-10-12T10:10'), 'LastModifiedBy2',
@@ -105,7 +105,7 @@ describe('ContentsService', () => {
                     false,
                     {},
                     {},
-                    new Version('22'))
+                    new Version('22'), 0)
         ]));
     }));
 
@@ -191,7 +191,7 @@ describe('ContentsService', () => {
                 true,
                 {},
                 {},
-                new Version('2')));
+                new Version('2'), 0));
     }));
 
     it('should make post request to create content',
@@ -233,7 +233,7 @@ describe('ContentsService', () => {
                 false,
                 null,
                 {},
-                new Version('2')));
+                new Version('2'), 0));
     }));
 
     it('should make get request to get versioned content data',
