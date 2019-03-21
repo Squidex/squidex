@@ -63,6 +63,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             }
         }
 
+        protected void On(ContentOrderChanged @event)
+        {
+            OrderNo = @event.NewOrderNo;
+        }
+
         protected void On(ContentUpdateProposed @event)
         {
             DataDraft = @event.Data;

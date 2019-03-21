@@ -316,11 +316,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var command = new UpdateContentOrderNo { ContentId = id, NewOrderNo = order };
             var context = await CommandBus.PublishAsync(command);
-
-            var result = context.Result<ContentDataChangedResult>();
-            var response = result.Data;
-
-            return Ok(response);
+            return Ok();
         }
 
         /// <summary>

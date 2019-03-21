@@ -204,13 +204,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         return content.id;
     }
 
-    public onDrop($event:any){
+    public onDrop($event:any) {
         let newItems  = JSON.parse(JSON.stringify(this.contentsState.contentsArray));
-        for(var i=0; i< newItems.length; i++){
+        for(let i=0; i< newItems.length; i++){
             newItems[i].orderNo = this.contentsState.snapshot.contents.values[i].orderNo;
         }
         // var request = newItems.map((item, index) => { id:item.id, orderNo: this.contentsState.snapshot.contents.values[i].orderNo })
-        this.contentsState.updateOrderNo(newItems).pipe(onErrorResumeNext()).subscribe();        
+        this.contentsState.updateOrderNo(newItems).pipe(onErrorResumeNext()).subscribe();
     }
 
     private updateSelectionSummary() {
