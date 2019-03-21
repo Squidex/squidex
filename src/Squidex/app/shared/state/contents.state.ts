@@ -49,9 +49,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             distinctUntilChanged(sameContent));
 
     public contents =
-        this.changes.pipe(map(x => x.contents),
+        this.changes.pipe(map(x => {
+            this.contentsArray = x.contents.values;
+            return x.contents;
+        }),
             distinctUntilChanged());
 
+    public contentsArray:ContentDto[] = [];
+        
     public contentsPager =
         this.changes.pipe(map(x => x.contentsPager),
             distinctUntilChanged());
@@ -223,6 +228,31 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 }
             }),
             notify(this.dialogs));
+    }
+
+    public updateOrderNo(contents: ContentDto[]): Observable<any> {
+        const data: { id: string; orderNo: Number; }[] = [];
+        contents.forEach((c,i)=> data.push({id: c.id, orderNo: c.orderNo}));
+        // return this.contentsService.updateOrderNo(this.appName, this.schemaName, data).pipe(
+        //     tap(dto => {
+        //         this.dialogs.notifyInfo('Orders updated successfully.');
+        //     }),
+        //     notify(this.dialogs));
+
+        return forkJoin(
+            contents.map(c =>
+                this.contentsService.updateOrderNo(this.appName, this.schemaName, c.id, c.orderNo, c.version).pipe(
+                    catchError(error => of(error))))).pipe(
+            tap(results => { 
+                const error = results.find(x => x instanceof ErrorDto);
+
+                if (error) {
+                    this.dialogs.notifyError(error);
+                }
+
+                return of(error);
+            }),
+            switchMap(() => this.loadInternal()));
     }
 
     public proposeUpdate(content: ContentDto, request: any, now?: DateTime): Observable<any> {

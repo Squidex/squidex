@@ -98,20 +98,21 @@
         </div>
 
         <div class="grid-content">
-            <div sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed">
-                    <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent">
-                        <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
+            <div sqxIgnoreScrollbar *ngIf="{ contents: contentsState.contentsArray  } as mydata">
+                <table class="table table-items table-fixed" dnd-sortable-container [sortableData]="mydata.contents">
+                    <tbody *ngFor="let i = index; let item of mydata.contents; trackBy: trackByContent" dnd-sortable [sortableIndex]="i" 
+                    (onDropSuccess)="onDrop($event)">
+                        <tr [sqxContent]="item" [routerLink]="[item.id]" routerLinkActive="active"
                             [language]="language"
                             [schema]="schema"
-                            [selected]="isItemSelected(content)"
-                            (selectedChange)="selectItem(content, $event)"
-                            (unpublishing)="unpublish(content)"
-                            (publishing)="publish(content)"
-                            (archiving)="archive(content)"
-                            (restoring)="restore(content)"
-                            (deleting)="delete(content)"
-                            (cloning)="clone(content)">
+                            [selected]="isItemSelected(item)"                            
+                            (selectedChange)="selectItem(item, $event)"
+                            (unpublishing)="unpublish(item)"
+                            (publishing)="publish(item)"
+                            (archiving)="archive(item)"
+                            (restoring)="restore(item)"
+                            (deleting)="delete(item)"
+                            (cloning)="clone(item)">
                         </tr>
                         <tr class="spacer"></tr>
                     </tbody>

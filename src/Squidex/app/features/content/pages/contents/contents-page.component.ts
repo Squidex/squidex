@@ -27,7 +27,7 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
 
 @Component({
     selector: 'sqx-contents-page',
-    styleUrls: ['./contents-page.component.scss'],
+    styleUrls: [ './contents-page.component.scss' ],
     templateUrl: './contents-page.component.html'
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
@@ -202,6 +202,15 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public trackByContent(index: number, content: ContentDto): string {
         return content.id;
+    }
+
+    public onDrop($event:any){
+        let newItems  = JSON.parse(JSON.stringify(this.contentsState.contentsArray));
+        for(var i=0; i< newItems.length; i++){
+            newItems[i].orderNo = this.contentsState.snapshot.contents.values[i].orderNo;
+        }
+        // var request = newItems.map((item, index) => { id:item.id, orderNo: this.contentsState.snapshot.contents.values[i].orderNo })
+        this.contentsState.updateOrderNo(newItems).pipe(onErrorResumeNext()).subscribe();        
     }
 
     private updateSelectionSummary() {

@@ -57,7 +57,8 @@ export class ContentDto extends Model {
         public readonly isPending: boolean,
         public readonly data: object | any,
         public readonly dataDraft: object,
-        public readonly version: Version
+        public readonly version: Version,
+        public orderNo: Number
     ) {
         super();
     }
@@ -130,7 +131,8 @@ export class ContentsService {
                             item.isPending === true,
                             item.data,
                             item.dataDraft,
-                            new Version(item.version.toString()));
+                            new Version(item.version.toString()),
+                            item.orderNo);
                     }));
                 }),
                 pretifyError('Failed to load contents. Please reload.'));
@@ -157,7 +159,8 @@ export class ContentsService {
                         body.isPending === true,
                         body.data,
                         body.dataDraft,
-                        response.version);
+                        response.version,
+                        body.orderNo);
                 }),
                 pretifyError('Failed to load content. Please reload.'));
     }
@@ -188,7 +191,8 @@ export class ContentsService {
                         body.isPending,
                         null,
                         body.data,
-                        response.version);
+                        response.version,
+                        body.orderNo);
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Content', 'Created', appName);
@@ -196,6 +200,24 @@ export class ContentsService {
                 pretifyError('Failed to create content. Please reload.'));
     }
 
+    public deleteContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
+
+        return HTTP.deleteVersioned(this.http, url, version).pipe(
+                tap(() => {
+                    this.analytics.trackEvent('Content', 'Deleted', appName);
+                }),
+                pretifyError('Failed to delete content. Please reload.'));
+    }
+    
+    public updateOrderNo(appName: string, schemaName: string, id:string, order:Number,version: Version): Observable<Versioned<any>> {
+        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/updateOrderNo/${id}/${order}`);
+        return HTTP.postVersioned(this.http, url,version).pipe(
+                tap(() => {
+                    this.analytics.trackEvent('Content', 'OrderNoUpdate', appName);
+                }),
+                pretifyError('Failed to update orders of contents. Please reload.'));
+     }
     public putContent(appName: string, schemaName: string, id: string, dto: any, asDraft: boolean, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}?asDraft=${asDraft}`);
 
@@ -236,15 +258,7 @@ export class ContentsService {
                 pretifyError('Failed to discard changes. Please reload.'));
     }
 
-    public deleteContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
-
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
-                tap(() => {
-                    this.analytics.trackEvent('Content', 'Deleted', appName);
-                }),
-                pretifyError('Failed to delete content. Please reload.'));
-    }
+    
 
     public changeContentStatus(appName: string, schemaName: string, id: string, action: string, dueTime: string | null, version: Version): Observable<Versioned<any>> {
         let url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${action}`);
