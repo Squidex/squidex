@@ -87,7 +87,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
 
             setTimeout(() => {
                 this.startListening();
-            });
+            }, 1000);
 
             this.changeDetector.detectChanges();
         } else if (!isOpen && this.renderedView) {

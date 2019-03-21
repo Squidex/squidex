@@ -15,10 +15,10 @@ import { positionModal } from '@app/shared';
     selector: '[sqxModalTarget]'
 })
 export class ModalTargetDirective extends ResourceOwner implements AfterViewInit, OnDestroy {
-    private targetElement: any;
+    private targetElement: Element;
 
     @Input('sqxModalTarget')
-    public set target(element: any) {
+    public set target(element: Element) {
         if (element !== this.targetElement) {
             this.unsubscribeAll();
 
@@ -42,7 +42,7 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
 
     constructor(
         private readonly renderer: Renderer2,
-        private readonly element: ElementRef
+        private readonly element: ElementRef<Element>
     ) {
         super();
     }
@@ -78,7 +78,11 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
         const modalRef = this.element.nativeElement;
         const modalRect = this.element.nativeElement.getBoundingClientRect();
 
-        const targetRect: ClientRect = this.targetElement.getBoundingClientRect();
+        if (modalRect.width === 0 || modalRect.height === 0) {
+            return;
+        }
+
+        const targetRect = this.targetElement.getBoundingClientRect();
 
         let y = 0;
         let x = 0;

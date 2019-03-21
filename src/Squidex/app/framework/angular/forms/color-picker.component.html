@@ -1,0 +1,17 @@
+<input class="form-control" type="text" #input 
+    [style.background]="snapshot.value"
+    [style.color]="snapshot.foreground"
+    [placeholder]="placeholder"
+    [ngModel]="snapshot.value"
+    (ngModelChange)="writeValue($event)"
+    (focus)="modal.show()" (blur)="blur()" />
+
+<div *sqxModalView="modal" [sqxModalTarget]="input" position="bottom-left">
+    <div [style.background]="snapshot.value"
+        [cpToggle]="true"
+        [cpDialogDisplay]="'inline'"
+        [cpCancelButton]="false"
+        [colorPicker]="snapshot.value"
+        (colorPickerChange)="writeValue($event)">
+    </div>
+</div>

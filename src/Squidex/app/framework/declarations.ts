@@ -8,6 +8,7 @@
 export * from './angular/forms/autocomplete.component';
 export * from './angular/forms/checkbox-group.component';
 export * from './angular/forms/code-editor.component';
+export * from './angular/forms/color-picker.component';
 export * from './angular/forms/confirm-click.directive';
 export * from './angular/forms/control-errors.component';
 export * from './angular/forms/copy.directive';
