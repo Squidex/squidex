@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ColorPickerModule  } from 'ngx-color-picker';
 
 import {
     AnalyticsService,
@@ -19,6 +20,7 @@ import {
     ClipboardService,
     CodeComponent,
     CodeEditorComponent,
+    ColorPickerComponent,
     ConfirmClickDirective,
     ControlErrorsComponent,
     CopyDirective,
@@ -89,11 +91,13 @@ import {
     imports: [
         FormsModule,
         CommonModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        ColorPickerModule
     ],
     declarations: [
         AutocompleteComponent,
         CheckboxGroupComponent,
+        ColorPickerComponent,
         ConfirmClickDirective,
         ControlErrorsComponent,
         CodeComponent,
@@ -158,6 +162,7 @@ import {
         CodeEditorComponent,
         CommonModule,
         CodeComponent,
+        ColorPickerComponent,
         ConfirmClickDirective,
         ControlErrorsComponent,
         CopyDirective,

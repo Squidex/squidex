@@ -171,6 +171,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("apps/{app}/assets/")]
         [ProducesResponseType(typeof(AssetCreatedDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostAsset(string app, [SwaggerIgnore] List<IFormFile> file)
@@ -233,6 +234,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [HttpPut]
         [Route("apps/{app}/assets/{id}/")]
         [ProducesResponseType(typeof(ErrorDto), 400)]
+        [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] UpdateAssetDto request)

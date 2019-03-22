@@ -71,4 +71,49 @@ describe('MathHelper', () => {
         expect(MathHelper.roundToMultipleOfTwo(13)).toBe(14);
         expect(MathHelper.roundToMultipleOfTwo(12.2)).toBe(12);
     });
+
+    it('should create color from long string', () => {
+        const color = MathHelper.parseColor('#336699')!;
+
+        expect(color.r).toBe(0.2);
+        expect(color.g).toBe(0.4);
+        expect(color.b).toBe(0.6);
+        expect(color.a).toBe(1.0);
+    });
+
+    it('should create color from short string', () => {
+        const color = MathHelper.parseColor('#369')!;
+
+        expect(color.r).toBe(0.2);
+        expect(color.g).toBe(0.4);
+        expect(color.b).toBe(0.6);
+        expect(color.a).toBe(1.0);
+    });
+
+    it('should create color from rgb string', () => {
+        const color = MathHelper.parseColor('rgb(51, 102, 153)')!;
+
+        expect(color.r).toBe(0.2);
+        expect(color.g).toBe(0.4);
+        expect(color.b).toBe(0.6);
+        expect(color.a).toBe(1.0);
+    });
+
+    it('should create color from rgba string', () => {
+        const color = MathHelper.parseColor('rgba(51, 102, 153, 0.5)')!;
+
+        expect(color.r).toBe(0.2);
+        expect(color.g).toBe(0.4);
+        expect(color.b).toBe(0.6);
+        expect(color.a).toBe(0.5);
+    });
+
+    it('should convert to luminance', () => {
+        expect(MathHelper.toLuminance(undefined!)).toBe(1);
+
+        expect(MathHelper.toLuminance({ r: 0, g: 0, b: 0, a: 1 })).toBe(0);
+        expect(MathHelper.toLuminance({ r: 1, g: 1, b: 1, a: 1 })).toBe(1);
+
+        expect(MathHelper.toLuminance({ r: 0.5, g: 0.5, b: 0.5, a: 1 })).toBe(0.5);
+    });
 });

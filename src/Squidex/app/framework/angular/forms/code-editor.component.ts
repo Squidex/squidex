@@ -18,7 +18,7 @@ import {
 
 declare var ace: any;
 
-export const SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
+export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CodeEditorComponent), multi: true
 };
 
@@ -26,7 +26,7 @@ export const SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     selector: 'sqx-code-editor',
     styleUrls: ['./code-editor.component.scss'],
     templateUrl: './code-editor.component.html',
-    providers: [SQX_JSCRIPT_EDITOR_CONTROL_VALUE_ACCESSOR],
+    providers: [SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CodeEditorComponent extends ExternalControlComponent<string> implements AfterViewInit {

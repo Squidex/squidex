@@ -247,8 +247,10 @@ export class AssetsService {
                         return throwError(error);
                     }
                 }),
-                tap(() => {
-                    this.analytics.trackEvent('Asset', 'Uploaded', appName);
+                tap(value => {
+                    if (!Types.isNumber(value)) {
+                        this.analytics.trackEvent('Asset', 'Uploaded', appName);
+                    }
                 }),
                 pretifyError('Failed to upload asset. Please reload.'));
     }
@@ -320,8 +322,10 @@ export class AssetsService {
                         return throwError(error);
                     }
                 }),
-                tap(() => {
-                    this.analytics.trackEvent('Analytics', 'Replaced', appName);
+                tap(value => {
+                    if (!Types.isNumber(value)) {
+                        this.analytics.trackEvent('Analytics', 'Replaced', appName);
+                    }
                 }),
                 pretifyError('Failed to replace asset. Please reload.'));
     }
