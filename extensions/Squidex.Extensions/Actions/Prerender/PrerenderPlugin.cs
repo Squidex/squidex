@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.Prerender
 {
     public sealed class PrerenderPlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddRuleAction<PrerenderAction, PrerenderActionHandler>();
         }

@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.Email
 {
     public sealed class EmailPlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddRuleAction<EmailAction, EmailActionHandler>();
         }

@@ -15,9 +15,9 @@ namespace Squidex.Extensions.Samples
 {
     public sealed class MemoryAssetStorePlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
-            var storeType = configuration.GetValue<string>("assetStore:type");
+            var storeType = config.GetValue<string>("assetStore:type");
 
             if (string.Equals(storeType, "Memory", StringComparison.OrdinalIgnoreCase))
             {

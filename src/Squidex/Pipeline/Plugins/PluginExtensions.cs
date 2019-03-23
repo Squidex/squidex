@@ -35,11 +35,11 @@ namespace Squidex.Pipeline.Plugins
             typeof(SquidexInfrastructure)
         };
 
-        public static IMvcBuilder AddMyPlugins(this IMvcBuilder mvcBuilder, IConfiguration configuration)
+        public static IMvcBuilder AddMyPlugins(this IMvcBuilder mvcBuilder, IConfiguration config)
         {
             var pluginManager = new PluginManager();
 
-            var options = configuration.Get<PluginOptions>();
+            var options = config.Get<PluginOptions>();
 
             if (options.Plugins != null)
             {
@@ -74,7 +74,7 @@ namespace Squidex.Pipeline.Plugins
                 }
             }
 
-            pluginManager.ConfigureServices(mvcBuilder.Services, configuration);
+            pluginManager.ConfigureServices(mvcBuilder.Services, config);
 
             mvcBuilder.Services.AddSingleton(pluginManager);
 

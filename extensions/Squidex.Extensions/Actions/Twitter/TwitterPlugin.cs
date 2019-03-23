@@ -13,10 +13,10 @@ namespace Squidex.Extensions.Actions.Twitter
 {
     public sealed class TwitterPlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.Configure<TwitterOptions>(
-                configuration.GetSection("twitter"));
+                config.GetSection("twitter"));
 
             services.AddRuleAction<TweetAction, TweetActionHandler>();
         }

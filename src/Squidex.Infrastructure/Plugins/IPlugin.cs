@@ -12,6 +12,6 @@ namespace Squidex.Infrastructure.Plugins
 {
     public interface IPlugin
     {
-        void ConfigureServices(IServiceCollection services, IConfiguration configuration);
+        void ConfigureServices(IServiceCollection services, IConfiguration config);
     }
 }

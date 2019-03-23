@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.AzureQueue
 {
     public sealed class AzureQueuePlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddRuleAction<AzureQueueAction, AzureQueueActionHandler>();
         }

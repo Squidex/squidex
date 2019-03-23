@@ -5,20 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
+using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Squidex.Config.Orleans
 {
     public static class OrleansServices
     {
-        public static IServiceProvider AddAndBuildOrleans(this IServiceCollection services, IConfiguration config, Action<IServiceCollection> afterServices)
+        public static IServiceCollection AddOrleans(this IServiceCollection services, IConfiguration config, IWebHostEnvironment environment)
         {
             services.Configure<ClusterOptions>(options =>
             {
@@ -35,16 +37,20 @@ namespace Squidex.Config.Orleans
                 options.HideTrace = true;
             });
 
-            services.AddHostedService<SiloHost>();
+            services.AddSingleton<IIncomingGrainCallFilter, LocalCacheFilter>();
 
-            var hostBuilder = new SiloHostBuilder()
-                .UseDashboardEx()
-                .EnableDirectClient()
-                .AddIncomingGrainCallFilter<LocalCacheFilter>()
-                .ConfigureApplicationParts(builder =>
-                {
-                    builder.AddMyParts();
-                });
+            var hostBuilder = new SiloServiceBuilder(config, environment);
+
+            hostBuilder.UseDashboard(options =>
+            {
+                options.HostSelf = false;
+            });
+
+            hostBuilder.ConfigureApplicationParts(builder =>
+            {
+                builder.AddApplicationPart(SquidexEntities.Assembly);
+                builder.AddApplicationPart(SquidexInfrastructure.Assembly);
+            });
 
             var gatewayPort = config.GetOptionalValue("orleans:gatewayPort", 40000);
 
@@ -89,23 +95,15 @@ namespace Squidex.Config.Orleans
                 }
             });
 
-            IServiceProvider provider = null;
+            hostBuilder.Build(services);
 
-            hostBuilder.UseServiceProviderFactory((siloServices) =>
-            {
-                foreach (var descriptor in services)
-                {
-                    siloServices.Add(descriptor);
-                }
+            return services;
+        }
 
-                afterServices(siloServices);
-
-                provider = siloServices.BuildServiceProvider();
-
-                return provider;
-            }).Build();
-
-            return provider;
+        public static void Configure(this ClusterOptions options)
+        {
+            options.ClusterId = Constants.OrleansClusterId;
+            options.ServiceId = Constants.OrleansClusterId;
         }
     }
 }

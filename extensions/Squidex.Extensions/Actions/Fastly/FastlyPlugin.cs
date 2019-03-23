@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.Fastly
 {
     public sealed class FastlyPlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddRuleAction<FastlyAction, FastlyActionHandler>();
         }

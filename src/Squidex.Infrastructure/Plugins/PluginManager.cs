@@ -59,14 +59,14 @@ namespace Squidex.Infrastructure.Plugins
             exceptions.Add((plugin, action, exception));
         }
 
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             Guard.NotNull(services, nameof(services));
-            Guard.NotNull(configuration, nameof(configuration));
+            Guard.NotNull(config, nameof(config));
 
             foreach (var plugin in loadedPlugins)
             {
-                plugin.ConfigureServices(services, configuration);
+                plugin.ConfigureServices(services, config);
             }
         }
 

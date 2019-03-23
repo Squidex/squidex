@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.Slack
 {
     public sealed class SlackPlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddRuleAction<SlackAction, SlackActionHandler>();
         }

@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.Webhook
 {
     public sealed class WebhookPlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddRuleAction<WebhookAction, WebhookActionHandler>();
         }

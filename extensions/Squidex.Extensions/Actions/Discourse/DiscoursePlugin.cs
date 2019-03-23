@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.Discourse
 {
     public sealed class DiscoursePlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddRuleAction<DiscourseAction, DiscourseActionHandler>();
         }

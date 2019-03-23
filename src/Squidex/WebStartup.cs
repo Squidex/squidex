@@ -7,6 +7,7 @@
 
 using System;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Areas.Api;
@@ -37,17 +38,18 @@ namespace Squidex
 {
     public sealed class WebStartup
     {
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration config;
+        private readonly IHostingEnvironment environment;
 
-        public WebStartup(IConfiguration configuration)
+        public WebStartup(IConfiguration config, IHostingEnvironment environment)
         {
-            this.configuration = configuration;
+            this.config = config;
+
+            this.environment = environment;
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var config = configuration;
-
             services.AddHttpClient();
             services.AddLogging();
             services.AddMemoryCache();
@@ -100,13 +102,12 @@ namespace Squidex
 
             services.AddHostedService<InitializerHost>();
 
-            var provider = services.AddAndBuildOrleans(configuration, afterServices =>
-            {
-                afterServices.AddHostedService<MigratorHost>();
-                afterServices.AddHostedService<BackgroundHost>();
-            });
+            services.AddOrleans(config, environment);
 
-            return provider;
+            services.AddHostedService<MigratorHost>();
+            services.AddHostedService<BackgroundHost>();
+
+            return services.BuildServiceProvider();
         }
 
         public void Configure(IApplicationBuilder app)

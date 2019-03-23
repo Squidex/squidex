@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.Algolia
 {
     public sealed class AlgoliaPlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddRuleAction<AlgoliaAction, AlgoliaActionHandler>();
         }

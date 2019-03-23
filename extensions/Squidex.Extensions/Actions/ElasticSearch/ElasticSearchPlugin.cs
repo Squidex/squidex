@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.ElasticSearch
 {
     public sealed class ElasticSearchPlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddRuleAction<ElasticSearchAction, ElasticSearchActionHandler>();
         }

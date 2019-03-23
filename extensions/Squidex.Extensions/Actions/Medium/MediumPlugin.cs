@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.Medium
 {
     public sealed class MediumPlugin : IPlugin
     {
-        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
             services.AddRuleAction<MediumAction, MediumActionHandler>();
         }
