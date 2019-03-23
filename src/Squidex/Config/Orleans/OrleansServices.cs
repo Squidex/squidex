@@ -8,9 +8,11 @@
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using OrleansDashboard;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
@@ -22,80 +24,82 @@ namespace Squidex.Config.Orleans
     {
         public static IServiceCollection AddOrleans(this IServiceCollection services, IConfiguration config, IWebHostEnvironment environment)
         {
-            services.Configure<ClusterOptions>(options =>
+            services.AddOrleans(config, environment, builder =>
             {
-                options.Configure();
-            });
-
-            services.Configure<ProcessExitHandlingOptions>(options =>
-            {
-                options.FastKillOnProcessExit = false;
-            });
-
-            services.AddServicesForSelfHostedDashboard(null, options =>
-            {
-                options.HideTrace = true;
-            });
-
-            services.AddSingleton<IIncomingGrainCallFilter, LocalCacheFilter>();
-
-            var hostBuilder = new SiloServiceBuilder(config, environment);
-
-            hostBuilder.UseDashboard(options =>
-            {
-                options.HostSelf = false;
-            });
-
-            hostBuilder.ConfigureApplicationParts(builder =>
-            {
-                builder.AddApplicationPart(SquidexEntities.Assembly);
-                builder.AddApplicationPart(SquidexInfrastructure.Assembly);
-            });
-
-            var gatewayPort = config.GetOptionalValue("orleans:gatewayPort", 40000);
-
-            var siloPort = config.GetOptionalValue("orleans:siloPort", 11111);
-
-            config.ConfigureByOption("orleans:clustering", new Alternatives
-            {
-                ["MongoDB"] = () =>
+                builder.ConfigureServices(siloServices =>
                 {
-                    hostBuilder.ConfigureEndpoints(Dns.GetHostName(), siloPort, gatewayPort, listenOnAnyHostAddress: true);
-
-                    var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
-                    var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
-
-                    hostBuilder.UseMongoDBClustering(options =>
+                    siloServices.Configure<ClusterOptions>(options =>
                     {
-                        options.ConnectionString = mongoConfiguration;
-                        options.CollectionPrefix = "Orleans_";
-                        options.DatabaseName = mongoDatabaseName;
+                        options.Configure();
                     });
-                },
-                ["Development"] = () =>
-                {
-                    hostBuilder.UseLocalhostClustering(siloPort, gatewayPort, null, Constants.OrleansClusterId, Constants.OrleansClusterId);
-                    hostBuilder.Configure<ClusterMembershipOptions>(options => options.ExpectedClusterSize = 1);
-                }
-            });
 
-            config.ConfigureByOption("store:type", new Alternatives
-            {
-                ["MongoDB"] = () =>
-                {
-                    var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
-                    var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
-
-                    hostBuilder.UseMongoDBReminders(options =>
+                    siloServices.Configure<ProcessExitHandlingOptions>(options =>
                     {
-                        options.ConnectionString = mongoConfiguration;
-                        options.CollectionPrefix = "Orleans_";
-                        options.DatabaseName = mongoDatabaseName;
+                        options.FastKillOnProcessExit = false;
                     });
-                }
-            });
 
-            hostBuilder.Build(services);
+                    siloServices.Configure<DashboardOptions>(options =>
+                    {
+                        options.HideTrace = true;
+                    });
+
+                    siloServices.AddSingleton<IIncomingGrainCallFilter, LocalCacheFilter>();
+                });
+
+                builder.ConfigureApplicationParts(parts =>
+                {
+                    parts.AddApplicationPart(SquidexEntities.Assembly);
+                    parts.AddApplicationPart(SquidexInfrastructure.Assembly);
+                });
+
+                builder.UseDashboard(options =>
+                {
+                    options.HostSelf = false;
+                });
+
+                var gatewayPort = config.GetOptionalValue("orleans:gatewayPort", 40000);
+
+                var siloPort = config.GetOptionalValue("orleans:siloPort", 11111);
+
+                config.ConfigureByOption("orleans:clustering", new Alternatives
+                {
+                    ["MongoDB"] = () =>
+                    {
+                        builder.ConfigureEndpoints(Dns.GetHostName(), siloPort, gatewayPort, listenOnAnyHostAddress: true);
+
+                        var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
+                        var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
+
+                        builder.UseMongoDBClustering(options =>
+                        {
+                            options.ConnectionString = mongoConfiguration;
+                            options.CollectionPrefix = "Orleans_";
+                            options.DatabaseName = mongoDatabaseName;
+                        });
+                    },
+                    ["Development"] = () =>
+                    {
+                        builder.UseLocalhostClustering(siloPort, gatewayPort, null, Constants.OrleansClusterId, Constants.OrleansClusterId);
+                        builder.Configure<ClusterMembershipOptions>(options => options.ExpectedClusterSize = 1);
+                    }
+                });
+
+                config.ConfigureByOption("store:type", new Alternatives
+                {
+                    ["MongoDB"] = () =>
+                    {
+                        var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
+                        var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
+
+                        builder.UseMongoDBReminders(options =>
+                        {
+                            options.ConnectionString = mongoConfiguration;
+                            options.CollectionPrefix = "Orleans_";
+                            options.DatabaseName = mongoDatabaseName;
+                        });
+                    }
+                });
+            });
 
             return services;
         }
