@@ -49,7 +49,11 @@ namespace Squidex.Web
                         id = id.Replace($"{{{routeParam.Key}}}", routeParam.Value?.ToString());
                     }
 
-                    hasPermission |= set.Allows(new Permission(id));
+                    if (set.Allows(new Permission(id)))
+                    {
+                        hasPermission = true;
+                        break;
+                    }
                 }
 
                 if (!hasPermission)

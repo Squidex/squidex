@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace Squidex.Web.Pipeline
         {
             var identity = principal.Identities.First();
 
-            if (string.Equals(identity.FindFirst(identity.RoleClaimType)?.Value, AdministratorRole))
+            if (string.Equals(identity.FindFirst(identity.RoleClaimType)?.Value, AdministratorRole, StringComparison.OrdinalIgnoreCase))
             {
                 identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.Admin));
             }
