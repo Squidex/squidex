@@ -61,17 +61,6 @@ namespace Squidex.Web.Pipeline
                     (role, permissions) = FindByOpenIdClient(app, user);
                 }
 
-                if (permissions == null || permissions.Count == 0)
-                {
-                    var set = user.Permissions();
-
-                    if (!set.Includes(Permissions.ForApp(Permissions.App, appName)) && !AllowAnonymous(context))
-                    {
-                        context.Result = new NotFoundResult();
-                        return;
-                    }
-                }
-
                 if (permissions != null)
                 {
                     var identity = user.Identities.First();
@@ -82,6 +71,14 @@ namespace Squidex.Web.Pipeline
                     {
                         identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, permission.Id));
                     }
+                }
+
+                var set = user.Permissions();
+
+                if (!set.Includes(Permissions.ForApp(Permissions.App, appName))&& !AllowAnonymous(context))
+                {
+                    context.Result = new NotFoundResult();
+                    return;
                 }
 
                 context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
