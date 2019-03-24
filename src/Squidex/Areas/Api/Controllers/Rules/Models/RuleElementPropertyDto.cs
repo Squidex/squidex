@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.HandleRules;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
