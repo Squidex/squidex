@@ -15,8 +15,8 @@ using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
-using Squidex.Pipeline;
 using Squidex.Shared.Users;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Users
 {

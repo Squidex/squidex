@@ -10,11 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Orleans;
 using Squidex.Areas.Api.Controllers.UI.Models;
-using Squidex.Config;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Pipeline;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.UI
 {

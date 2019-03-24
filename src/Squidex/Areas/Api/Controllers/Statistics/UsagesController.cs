@@ -13,14 +13,13 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
-using Squidex.Config;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.UsageTracking;
-using Squidex.Pipeline;
 using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Statistics
 {
@@ -35,7 +34,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
         private readonly IAppPlansProvider appPlansProvider;
         private readonly IAssetUsageTracker assetStatsRepository;
         private readonly IDataProtector dataProtector;
-        private readonly MyUrlsOptions urlsOptions;
+        private readonly UrlsOptions urlsOptions;
 
         public UsagesController(
             ICommandBus commandBus,
@@ -44,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Statistics
             IAppPlansProvider appPlansProvider,
             IAssetUsageTracker assetStatsRepository,
             IDataProtectionProvider dataProtection,
-            IOptions<MyUrlsOptions> urlsOptions)
+            IOptions<UrlsOptions> urlsOptions)
             : base(commandBus)
         {
             this.usageTracker = usageTracker;

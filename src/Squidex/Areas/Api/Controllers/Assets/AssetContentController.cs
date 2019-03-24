@@ -15,7 +15,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
-using Squidex.Pipeline;
+using Squidex.Web;
 
 #pragma warning disable 1573
 

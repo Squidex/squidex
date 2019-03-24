@@ -23,8 +23,8 @@ using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
-using Squidex.Pipeline;
 using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Assets
 {

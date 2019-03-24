@@ -9,9 +9,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Config.Domain;
-using Squidex.Pipeline;
 using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
+using Squidex.Web;
+using Squidex.Web.Pipeline;
 
 namespace Squidex.Config.Web
 {

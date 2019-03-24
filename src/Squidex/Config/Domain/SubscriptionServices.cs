@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
+using Squidex.Web;
 
 namespace Squidex.Config.Domain
 {
@@ -19,7 +20,7 @@ namespace Squidex.Config.Domain
     {
         public static void AddMySubscriptionServices(this IServiceCollection services, IConfiguration config)
         {
-            services.AddSingletonAs(c => c.GetRequiredService<IOptions<MyUsageOptions>>()?.Value?.Plans.OrEmpty());
+            services.AddSingletonAs(c => c.GetRequiredService<IOptions<UsageOptions>>()?.Value?.Plans.OrEmpty());
 
             services.AddSingletonAs<ConfigAppPlansProvider>()
                 .AsOptional<IAppPlansProvider>();

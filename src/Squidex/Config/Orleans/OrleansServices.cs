@@ -15,6 +15,7 @@ using OrleansDashboard;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Web;
 using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Squidex.Config.Orleans

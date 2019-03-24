@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {

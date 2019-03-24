@@ -15,8 +15,8 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Pipeline;
 using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas
 {

@@ -11,8 +11,8 @@ using Squidex.Areas.Api.Controllers.History.Models;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Pipeline;
 using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.History
 {

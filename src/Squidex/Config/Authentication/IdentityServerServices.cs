@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure;
+using Squidex.Web;
 
 namespace Squidex.Config.Authentication
 {
@@ -20,7 +21,7 @@ namespace Squidex.Config.Authentication
         {
             var apiScope = Constants.ApiScope;
 
-            var urlsOptions = config.GetSection("urls").Get<MyUrlsOptions>();
+            var urlsOptions = config.GetSection("urls").Get<UrlsOptions>();
 
             if (!string.IsNullOrWhiteSpace(urlsOptions.BaseUrl))
             {

@@ -13,9 +13,8 @@ using Microsoft.AspNetCore.Authorization;
 using NSwag;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
-using Squidex.Config;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Pipeline;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {

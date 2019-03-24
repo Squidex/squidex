@@ -11,7 +11,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Pipeline;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {

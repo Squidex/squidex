@@ -38,6 +38,7 @@
     <ProjectReference Include="..\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.Redis\Squidex.Infrastructure.Redis.csproj" />
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
+    <ProjectReference Include="..\Squidex.Web\Squidex.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

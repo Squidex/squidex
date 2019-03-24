@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Commands;
-using Squidex.Pipeline;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {

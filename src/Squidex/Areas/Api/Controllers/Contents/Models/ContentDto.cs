@@ -16,7 +16,7 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Pipeline;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {

@@ -14,7 +14,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Pipeline;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {

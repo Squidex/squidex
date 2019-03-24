@@ -7,7 +7,7 @@
 
 using Microsoft.AspNetCore.Builder;
 using Squidex.Areas.Portal.Middlewares;
-using Squidex.Config;
+using Squidex.Web;
 
 namespace Squidex.Areas.Portal
 {

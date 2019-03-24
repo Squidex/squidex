@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Http;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using NSwag;
-using Squidex.Config;
+using Squidex.Web;
 
 namespace Squidex.Pipeline.Swagger
 {
@@ -33,7 +33,7 @@ namespace Squidex.Pipeline.Swagger
             }
         }
 
-        public static SwaggerDocument CreateApiDocument(HttpContext context, MyUrlsOptions urlOptions, string appName)
+        public static SwaggerDocument CreateApiDocument(HttpContext context, UrlsOptions urlOptions, string appName)
         {
             var scheme =
                 string.Equals(context.Request.Scheme, "http", StringComparison.OrdinalIgnoreCase) ?

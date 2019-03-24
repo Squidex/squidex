@@ -13,8 +13,8 @@ using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Security;
-using Squidex.Pipeline;
 using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Backups
 {

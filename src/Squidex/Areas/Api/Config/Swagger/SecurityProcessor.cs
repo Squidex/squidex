@@ -9,19 +9,19 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using NSwag;
 using NSwag.SwaggerGeneration.Processors.Security;
-using Squidex.Config;
 using Squidex.Pipeline.Swagger;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
     public class SecurityProcessor : SecurityDefinitionAppender
     {
-        public SecurityProcessor(IOptions<MyUrlsOptions> urlOptions)
+        public SecurityProcessor(IOptions<UrlsOptions> urlOptions)
             : base(Constants.SecurityDefinition, CreateOAuthSchema(urlOptions.Value))
         {
         }
 
-        private static SwaggerSecurityScheme CreateOAuthSchema(MyUrlsOptions urlOptions)
+        private static SwaggerSecurityScheme CreateOAuthSchema(UrlsOptions urlOptions)
         {
             var securityScheme = new SwaggerSecurityScheme();
 

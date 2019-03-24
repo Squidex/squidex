@@ -17,9 +17,9 @@ using Squidex.Config;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
-using Squidex.Pipeline;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
+using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Config
 {
@@ -29,7 +29,7 @@ namespace Squidex.Areas.IdentityServer.Config
         private readonly Dictionary<string, Client> staticClients = new Dictionary<string, Client>(StringComparer.OrdinalIgnoreCase);
 
         public LazyClientStore(
-            IOptions<MyUrlsOptions> urlsOptions,
+            IOptions<UrlsOptions> urlsOptions,
             IOptions<MyIdentityOptions> identityOptions,
             IAppProvider appProvider)
         {
@@ -89,7 +89,7 @@ namespace Squidex.Areas.IdentityServer.Config
             };
         }
 
-        private void CreateStaticClients(IOptions<MyUrlsOptions> urlsOptions, IOptions<MyIdentityOptions> identityOptions)
+        private void CreateStaticClients(IOptions<UrlsOptions> urlsOptions, IOptions<MyIdentityOptions> identityOptions)
         {
             foreach (var client in CreateStaticClients(urlsOptions.Value, identityOptions.Value))
             {
@@ -97,7 +97,7 @@ namespace Squidex.Areas.IdentityServer.Config
             }
         }
 
-        private static IEnumerable<Client> CreateStaticClients(MyUrlsOptions urlsOptions, MyIdentityOptions identityOptions)
+        private static IEnumerable<Client> CreateStaticClients(UrlsOptions urlsOptions, MyIdentityOptions identityOptions)
         {
             var frontendId = Constants.FrontendClient;
 

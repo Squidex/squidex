@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
-using Squidex.Config;
 using Squidex.Infrastructure.Tasks;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
@@ -21,7 +21,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 
         private readonly string url;
 
-        public ThemeProcessor(IOptions<MyUrlsOptions> urlOptions)
+        public ThemeProcessor(IOptions<UrlsOptions> urlOptions)
         {
             url = urlOptions.Value.BuildUrl("images/logo-white.png", false);
         }

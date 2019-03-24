@@ -14,6 +14,7 @@ using Squidex.Areas.Api;
 using Squidex.Areas.Api.Config.Swagger;
 using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Areas.Api.Controllers.News;
+using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer;
 using Squidex.Areas.IdentityServer.Config;
@@ -30,9 +31,9 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.Translations;
-using Squidex.Pipeline;
 using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
+using Squidex.Web;
 
 namespace Squidex
 {
@@ -86,17 +87,17 @@ namespace Squidex
                 config.GetSection("healthz:gc"));
             services.Configure<ETagOptions>(
                 config.GetSection("etags"));
+            services.Configure<UrlsOptions>(
+                config.GetSection("urls"));
+            services.Configure<UsageOptions>(
+                config.GetSection("usage"));
 
             services.Configure<MyContentsControllerOptions>(
                 config.GetSection("contentsController"));
-            services.Configure<MyUrlsOptions>(
-                config.GetSection("urls"));
             services.Configure<MyIdentityOptions>(
                 config.GetSection("identity"));
             services.Configure<MyUIOptions>(
                 config.GetSection("ui"));
-            services.Configure<MyUsageOptions>(
-                config.GetSection("usage"));
             services.Configure<MyNewsOptions>(
                 config.GetSection("news"));
 

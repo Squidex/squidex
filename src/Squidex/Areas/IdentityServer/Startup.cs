@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Areas.IdentityServer.Config;
-using Squidex.Config;
+using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer
 {

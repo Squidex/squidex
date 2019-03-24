@@ -10,13 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema;
 using NSwag;
-using Squidex.Config;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
 using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {

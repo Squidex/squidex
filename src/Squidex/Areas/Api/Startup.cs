@@ -7,7 +7,7 @@
 
 using Microsoft.AspNetCore.Builder;
 using Squidex.Areas.Api.Config.Swagger;
-using Squidex.Config;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api
 {

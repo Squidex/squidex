@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {

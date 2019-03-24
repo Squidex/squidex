@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Migrate_01;
 using Migrate_01.Migrations;
 using Orleans;
+using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -44,11 +45,11 @@ using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Pipeline;
-using Squidex.Pipeline.CommandMiddlewares;
+using Squidex.Web;
+using Squidex.Web.CommandMiddlewares;
+using Squidex.Web.Services;
 
 namespace Squidex.Config.Domain
 {
@@ -59,7 +60,7 @@ namespace Squidex.Config.Domain
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
 
             services.AddSingletonAs(c => new UrlGenerator(
-                    c.GetRequiredService<IOptions<MyUrlsOptions>>(),
+                    c.GetRequiredService<IOptions<UrlsOptions>>(),
                     c.GetRequiredService<IAssetStore>(),
                     exposeSourceUrl))
                 .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>().As<IAssetUrlGenerator>();
