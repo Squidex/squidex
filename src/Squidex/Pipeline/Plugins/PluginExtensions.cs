@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Plugins;
+using Squidex.Web;
 
 namespace Squidex.Pipeline.Plugins
 {
@@ -32,7 +33,8 @@ namespace Squidex.Pipeline.Plugins
             typeof(SquidexCoreOperations),
             typeof(SquidexEntities),
             typeof(SquidexEvents),
-            typeof(SquidexInfrastructure)
+            typeof(SquidexInfrastructure),
+            typeof(SquidexWeb)
         };
 
         public static IMvcBuilder AddMyPlugins(this IMvcBuilder mvcBuilder, IConfiguration config)
