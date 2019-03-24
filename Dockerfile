@@ -24,7 +24,7 @@ RUN dotnet restore \
  && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj \ 
  && dotnet test tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj \
  && dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj \
- && dotnet test tests/Squidex.Tests/Squidex.Tests.csproj
+ && dotnet test tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj
 
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64

@@ -9,10 +9,10 @@ using System.Reflection;
 
 #pragma warning disable RECS0014 // If all fields, properties and methods members are static, the class can be made static.
 
-namespace Squidex.Infrastructure
+namespace Squidex.Web
 {
-    public sealed class SquidexInfrastructure
+    public sealed class SquidexWeb
     {
-        public static readonly Assembly Assembly = typeof(SquidexInfrastructure).Assembly;
+        public static readonly Assembly Assembly = typeof(SquidexWeb).Assembly;
     }
 }

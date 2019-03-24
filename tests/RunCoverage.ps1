@@ -69,8 +69,8 @@ if ($all -Or $web) {
 	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test $folderWorking\Squidex.Tests\Squidex.Tests.csproj" `
-	-filter:"+[Squidex]Squidex.Pipeline*" `
+	-targetargs:"test $folderWorking\Squidex.Web.Tests\Squidex.Web.Tests.csproj" `
+	-filter:"+[Squidex]Squidex.Web*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Web.xml" `
 	-oldStyle
