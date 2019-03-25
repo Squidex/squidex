@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -60,7 +61,7 @@ namespace Squidex.Web
 
         private static IActionResult OnValidationException(ValidationException ex)
         {
-            return ErrorResult(400, new ErrorDto { Message = ex.Summary, Details = ex.Errors?.ToArray(e => e.Message) });
+            return ErrorResult(400, new ErrorDto { Message = ex.Summary, Details = ToDetails(ex) });
         }
 
         private static IActionResult ErrorResult(int statusCode, ErrorDto error)
@@ -88,6 +89,21 @@ namespace Squidex.Web
             {
                 context.Result = result;
             }
+        }
+
+        private static string[] ToDetails(ValidationException ex)
+        {
+            return ex.Errors?.ToArray(e =>
+            {
+                if (e.PropertyNames?.Any() == true)
+                {
+                    return $"{string.Join(", ", e.PropertyNames)}: {e.Message}";
+                }
+                else
+                {
+                    return e.Message;
+                }
+            });
         }
     }
 }

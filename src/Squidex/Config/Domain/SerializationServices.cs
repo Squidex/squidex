@@ -25,6 +25,8 @@ namespace Squidex.Config.Domain
     {
         private static JsonSerializerSettings ConfigureJson(JsonSerializerSettings settings, TypeNameHandling typeNameHandling)
         {
+            settings.Converters.Add(new StringEnumConverter());
+
             settings.ContractResolver = new ConverterContractResolver(
                 new AppClientsConverter(),
                 new AppContributorsConverter(),
