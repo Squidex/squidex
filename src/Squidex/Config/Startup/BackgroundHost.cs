@@ -32,7 +32,7 @@ namespace Squidex.Config.Startup
             {
                 await target.StartAsync(ct);
 
-                log.LogInformation(w => w.WriteProperty("backgroundSystem", target.GetType().Name));
+                log.LogInformation(w => w.WriteProperty("backgroundSystem", target.ToString()));
             }
         }
     }

@@ -45,5 +45,10 @@ namespace Squidex.Infrastructure.Orleans
                 }
             }
         }
+
+        public override string ToString()
+        {
+            return typeof(T).ToString();
+        }
     }
 }
