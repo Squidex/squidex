@@ -14,29 +14,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Plugins;
-using Squidex.Web;
 
 namespace Squidex.Pipeline.Plugins
 {
     public static class PluginExtensions
     {
-        private static readonly Type[] SharedTypes =
-        {
-            typeof(IPlugin),
-            typeof(SquidexCoreModel),
-            typeof(SquidexCoreOperations),
-            typeof(SquidexEntities),
-            typeof(SquidexEvents),
-            typeof(SquidexInfrastructure),
-            typeof(SquidexWeb)
-        };
-
         public static IMvcBuilder AddMyPlugins(this IMvcBuilder mvcBuilder, IConfiguration config)
         {
             var pluginManager = new PluginManager();
@@ -89,12 +73,7 @@ namespace Squidex.Pipeline.Plugins
             {
                 if (candidate.Extension.Equals(".dll", StringComparison.OrdinalIgnoreCase))
                 {
-                    return PluginLoader.CreateFromAssemblyFile(candidate.FullName, SharedTypes);
-                }
-
-                if (candidate.Extension.Equals(".json", StringComparison.OrdinalIgnoreCase))
-                {
-                    return PluginLoader.CreateFromConfigFile(candidate.FullName, SharedTypes);
+                    return PluginLoader.CreateFromAssemblyFile(candidate.FullName, PluginLoaderOptions.PreferSharedTypes);
                 }
             }
 
