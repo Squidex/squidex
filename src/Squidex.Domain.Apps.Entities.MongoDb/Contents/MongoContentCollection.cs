@@ -25,14 +25,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     internal class MongoContentCollection : MongoRepositoryBase<MongoContentEntity>
     {
+        private readonly IAppProvider appProvider;
         private readonly string collectionName;
 
         protected IJsonSerializer Serializer { get; }
 
-        public MongoContentCollection(IMongoDatabase database, IJsonSerializer serializer, string collectionName)
+        public MongoContentCollection(IMongoDatabase database, IJsonSerializer serializer, IAppProvider appProvider, string collectionName)
             : base(database)
         {
             this.collectionName = collectionName;
+
+            this.appProvider = appProvider;
 
             Serializer = serializer;
         }
@@ -85,6 +88,35 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     throw;
                 }
             }
+        }
+
+        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<Guid> ids, Status[] status = null)
+        {
+            var find =
+                status != null && status.Length > 0 ?
+                    Collection.Find(x => x.IndexedAppId == app.Id && ids.Contains(x.Id) && x.IsDeleted != true && status.Contains(x.Status)) :
+                    Collection.Find(x => x.IndexedAppId == app.Id && ids.Contains(x.Id));
+
+            var contentItems = await find.Not(x => x.DataText).ToListAsync();
+
+            var schemaIds = contentItems.Select(x => x.IndexedSchemaId).ToList();
+            var schemas = await Task.WhenAll(schemaIds.Select(x => appProvider.GetSchemaAsync(app.Id, x)));
+
+            var result = new List<(IContentEntity Content, ISchemaEntity Schema)>();
+
+            foreach (var entity in contentItems)
+            {
+                var schema = schemas.FirstOrDefault(x => x.Id == entity.IndexedSchemaId);
+
+                if (schema != null)
+                {
+                    entity.ParseData(schema.SchemaDef, Serializer);
+
+                    result.Add((entity, schema));
+                }
+            }
+
+            return result;
         }
 
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<Guid> ids, Status[] status = null)

@@ -20,8 +20,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     internal sealed class MongoContentPublishedCollection : MongoContentCollection
     {
-        public MongoContentPublishedCollection(IMongoDatabase database, IJsonSerializer serializer)
-            : base(database, serializer, "State_Content_Published")
+        public MongoContentPublishedCollection(IMongoDatabase database, IJsonSerializer serializer, IAppProvider appProvider)
+            : base(database, serializer, appProvider, "State_Content_Published")
         {
         }
 
@@ -30,8 +30,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collection.Indexes.CreateManyAsync(
                 new[]
                 {
-                    new CreateIndexModel<MongoContentEntity>(Index.Text(x => x.DataText).Ascending(x => x.IndexedSchemaId)),
-                    new CreateIndexModel<MongoContentEntity>(Index.Ascending(x => x.IndexedSchemaId).Ascending(x => x.Id))
+                    new CreateIndexModel<MongoContentEntity>(
+                        Index
+                            .Ascending(x => x.IndexedAppId)
+                            .Ascending(x => x.Id)),
+                    new CreateIndexModel<MongoContentEntity>(
+                        Index
+                            .Ascending(x => x.IndexedSchemaId)
+                            .Ascending(x => x.Id)),
+                    new CreateIndexModel<MongoContentEntity>(
+                        Index
+                            .Text(x => x.DataText)
+                            .Ascending(x => x.IndexedSchemaId))
                 }, ct);
 
             await base.SetupCollectionAsync(collection, ct);

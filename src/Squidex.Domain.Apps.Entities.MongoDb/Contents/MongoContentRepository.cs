@@ -40,8 +40,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             this.serializer = serializer;
 
-            contentsDraft = new MongoContentDraftCollection(database, serializer);
-            contentsPublished = new MongoContentPublishedCollection(database, serializer);
+            contentsDraft = new MongoContentDraftCollection(database, serializer, appProvider);
+            contentsPublished = new MongoContentPublishedCollection(database, serializer, appProvider);
 
             this.database = database;
         }
@@ -77,6 +77,21 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 else
                 {
                     return await contentsDraft.QueryAsync(app, schema, ids, status);
+                }
+            }
+        }
+
+        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, Status[] status, HashSet<Guid> ids)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIdsWithoutSchema"))
+            {
+                if (RequiresPublished(status))
+                {
+                    return await contentsPublished.QueryAsync(app, ids);
+                }
+                else
+                {
+                    return await contentsDraft.QueryAsync(app, ids, status);
                 }
             }
         }

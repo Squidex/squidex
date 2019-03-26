@@ -358,7 +358,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         [Theory]
         [MemberData(nameof(ManyIdDataApi))]
-        public async Task Should_query_contents_by_id_from_repository_and_transform(bool archive, bool unpublished, params Status[] status)
+        public async Task Should_query_contents_by_id_for_api_and_transform(bool archive, bool unpublished, params Status[] status)
         {
             const int count = 5, total = 200;
 
@@ -378,6 +378,86 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
                 .MustHaveHappened(count, Times.Exactly);
+        }
+
+        [Theory]
+        [MemberData(nameof(ManyIdDataFrontend))]
+        public async Task Should_query_all_contents_by_id_for_frontend_and_transform(bool archive, bool unpublished, params Status[] status)
+        {
+            const int count = 5;
+
+            var ids = Enumerable.Range(0, count).Select(x => Guid.NewGuid()).ToList();
+
+            SetupClaims(true);
+            SetupSchema();
+            SetupScripting(ids.ToArray());
+            SetupContents(status, ids);
+
+            var ctx = context.WithArchived(archive).WithUnpublished(unpublished);
+
+            var result = await sut.QueryAsync(ctx, ids);
+
+            Assert.Equal(ids, result.Select(x => x.Id).ToList());
+
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Theory]
+        [MemberData(nameof(ManyIdDataApi))]
+        public async Task Should_query_all_contents_by_id_for_api_and_transform(bool archive, bool unpublished, params Status[] status)
+        {
+            const int count = 5;
+
+            var ids = Enumerable.Range(0, count).Select(x => Guid.NewGuid()).ToList();
+
+            SetupClaims();
+            SetupSchema();
+            SetupScripting(ids.ToArray());
+            SetupContents(status, ids);
+
+            var ctx = context.WithArchived(archive).WithUnpublished(unpublished);
+
+            var result = await sut.QueryAsync(ctx, ids);
+
+            Assert.Equal(ids, result.Select(x => x.Id).ToList());
+
+            A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
+                .MustHaveHappened(count, Times.Exactly);
+        }
+
+        [Fact]
+        public async Task Should_skip_contents_when_user_has_no_permission()
+        {
+            var ids = Enumerable.Range(0, 1).Select(x => Guid.NewGuid()).ToList();
+
+            SetupClaims(false, false);
+            SetupSchema();
+            SetupContents(new Status[0], ids);
+
+            var ctx = context;
+
+            var result = await sut.QueryAsync(ctx, ids);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task Should_not_call_repository_if_no_id_defined()
+        {
+            var ids = new List<Guid>();
+
+            SetupClaims(false, false);
+            SetupSchema();
+
+            var ctx = context;
+
+            var result = await sut.QueryAsync(ctx, ids);
+
+            Assert.Empty(result);
+
+            A.CallTo(() => contentRepository.QueryAsync(app, A<Status[]>.Ignored, A<HashSet<Guid>>.Ignored))
+                .MustNotHaveHappened();
         }
 
         private void SetupClaims(bool isFrontend = false, bool allowSchema = true)
@@ -412,6 +492,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.IsSameSequenceAs(status), A<HashSet<Guid>>.Ignored))
                 .Returns(ResultList.Create(total, ids.Select(x => CreateContent(x)).Shuffle()));
+        }
+
+        private void SetupContents(Status[] status, List<Guid> ids)
+        {
+            A.CallTo(() => contentRepository.QueryAsync(app, A<Status[]>.That.IsSameSequenceAs(status), A<HashSet<Guid>>.Ignored))
+                .Returns(ids.Select(x => (CreateContent(x), schema)).ToList());
         }
 
         private void SetupSchema()

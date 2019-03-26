@@ -23,6 +23,7 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 
@@ -81,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var schema = await GetSchemaAsync(context, schemaIdOrName);
 
-            CheckPermission(schema, context.User);
+            CheckPermission(context.User, schema);
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
@@ -99,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
                 }
 
-                return Transform(context, schema, true, content);
+                return Transform(context, schema, content);
             }
         }
 
@@ -109,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var schema = await GetSchemaAsync(context, schemaIdOrName);
 
-            CheckPermission(schema, context.User);
+            CheckPermission(context.User, schema);
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
@@ -120,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 if (query.Ids?.Count > 0)
                 {
                     contents = await contentRepository.QueryAsync(context.App, schema, status, new HashSet<Guid>(query.Ids));
-                    contents = Sort(contents, query.Ids);
+                    contents = SortSet(contents, query.Ids);
                 }
                 else
                 {
@@ -129,34 +130,67 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     contents = await contentRepository.QueryAsync(context.App, schema, status, parsedQuery);
                 }
 
-                return Transform(context, schema, true, contents);
+                return Transform(context, schema, contents);
             }
         }
 
-        private IContentEntity Transform(QueryContext context, ISchemaEntity schema, bool checkType, IContentEntity content)
+        public async Task<IList<IContentEntity>> QueryAsync(QueryContext context, IReadOnlyList<Guid> ids)
         {
-            return TransformCore(context, schema, checkType, Enumerable.Repeat(content, 1)).FirstOrDefault();
+            Guard.NotNull(context, nameof(context));
+
+            using (Profiler.TraceMethod<ContentQueryService>())
+            {
+                var status = GetQueryStatus(context);
+
+                List<IContentEntity> result;
+
+                if (ids?.Count > 0)
+                {
+                    var contents = await contentRepository.QueryAsync(context.App, status, new HashSet<Guid>(ids));
+
+                    var permissions = context.User.Permissions();
+
+                    contents = contents.Where(x => HasPermission(permissions, x.Schema)).ToList();
+
+                    result = contents.Select(x => Transform(context, x.Schema, x.Content)).ToList();
+                    result = SortList(result, ids).ToList();
+                }
+                else
+                {
+                    result = new List<IContentEntity>();
+                }
+
+                return result;
+            }
         }
 
-        private IResultList<IContentEntity> Transform(QueryContext context, ISchemaEntity schema, bool checkType, IResultList<IContentEntity> contents)
+        private IResultList<IContentEntity> Transform(QueryContext context, ISchemaEntity schema, IResultList<IContentEntity> contents)
         {
-            var transformed = TransformCore(context, schema, checkType, contents);
+            var transformed = TransformCore(context, schema, contents);
 
             return ResultList.Create(contents.Total, transformed);
         }
 
-        private static IResultList<IContentEntity> Sort(IResultList<IContentEntity> contents, IReadOnlyList<Guid> ids)
+        private IContentEntity Transform(QueryContext context, ISchemaEntity schema, IContentEntity content)
         {
-            var sorted = ids.Select(id => contents.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
-
-            return ResultList.Create(contents.Total, sorted);
+            return TransformCore(context, schema, Enumerable.Repeat(content, 1)).FirstOrDefault();
         }
 
-        private IEnumerable<IContentEntity> TransformCore(QueryContext context, ISchemaEntity schema, bool checkType, IEnumerable<IContentEntity> contents)
+        private static IResultList<IContentEntity> SortSet(IResultList<IContentEntity> contents, IReadOnlyList<Guid> ids)
+        {
+            return ResultList.Create(contents.Total, SortList(contents, ids));
+        }
+
+        private static IEnumerable<IContentEntity> SortList(IEnumerable<IContentEntity> contents, IReadOnlyList<Guid> ids)
+        {
+            return ids.Select(id => contents.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
+        }
+
+        private IEnumerable<IContentEntity> TransformCore(QueryContext context, ISchemaEntity schema, IEnumerable<IContentEntity> contents)
         {
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var converters = GenerateConverters(context, checkType).ToArray();
+                var converters = GenerateConverters(context).ToArray();
 
                 var scriptText = schema.SchemaDef.Scripts.Query;
 
@@ -170,7 +204,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         if (!context.IsFrontendClient && isScripting)
                         {
-                            result.Data = scriptEngine.Transform(new ScriptContext { User = context.User, Data = content.Data, ContentId = content.Id }, scriptText);
+                            var ctx = new ScriptContext { User = context.User, Data = content.Data, ContentId = content.Id };
+
+                            result.Data = scriptEngine.Transform(ctx, scriptText);
                         }
 
                         result.Data = result.Data.ConvertName2Name(schema.SchemaDef, converters);
@@ -186,7 +222,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private IEnumerable<FieldConverter> GenerateConverters(QueryContext context, bool checkType)
+        private IEnumerable<FieldConverter> GenerateConverters(QueryContext context)
         {
             if (!context.IsFrontendClient)
             {
@@ -194,11 +230,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeHidden());
             }
 
-            if (checkType)
-            {
-                yield return FieldConverters.ExcludeChangedTypes();
-                yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeChangedTypes());
-            }
+            yield return FieldConverters.ExcludeChangedTypes();
+            yield return FieldConverters.ForNestedName2Name(ValueConverters.ExcludeChangedTypes());
 
             yield return FieldConverters.ResolveInvariant(context.App.LanguagesConfig);
             yield return FieldConverters.ResolveLanguages(context.App.LanguagesConfig);
@@ -274,15 +307,24 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return schema;
         }
 
-        private static void CheckPermission(ISchemaEntity schema, ClaimsPrincipal user)
+        private static void CheckPermission(ClaimsPrincipal user, params ISchemaEntity[] schemas)
         {
             var permissions = user.Permissions();
+
+            foreach (var schema in schemas)
+            {
+                if (!HasPermission(permissions, schema))
+                {
+                    throw new DomainForbiddenException("You do not have permission for this schema.");
+                }
+            }
+        }
+
+        private static bool HasPermission(PermissionSet permissions, ISchemaEntity schema)
+        {
             var permission = Permissions.ForApp(Permissions.AppContentsRead, schema.AppId.Name, schema.SchemaDef.Name);
 
-            if (!permissions.Allows(permission))
-            {
-                throw new DomainForbiddenException("You do not have permission for this schema.");
-            }
+            return permissions.Allows(permission);
         }
 
         private static Status[] GetFindStatus(QueryContext context)

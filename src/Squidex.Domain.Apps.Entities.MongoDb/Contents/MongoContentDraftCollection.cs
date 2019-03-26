@@ -29,8 +29,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     internal sealed class MongoContentDraftCollection : MongoContentCollection
     {
-        public MongoContentDraftCollection(IMongoDatabase database, IJsonSerializer serializer)
-            : base(database, serializer, "State_Content_Draft")
+        public MongoContentDraftCollection(IMongoDatabase database, IJsonSerializer serializer, IAppProvider appProvider)
+            : base(database, serializer, appProvider, "State_Content_Draft")
         {
         }
 
@@ -39,6 +39,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             await collection.Indexes.CreateManyAsync(
                 new[]
                 {
+                    new CreateIndexModel<MongoContentEntity>(
+                        Index
+                            .Ascending(x => x.IndexedAppId)
+                            .Ascending(x => x.Id)
+                            .Ascending(x => x.IsDeleted)),
                     new CreateIndexModel<MongoContentEntity>(
                         Index
                             .Ascending(x => x.IndexedSchemaId)

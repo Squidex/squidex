@@ -110,6 +110,45 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// Queries contents.
         /// </summary>
         /// <param name="app">The name of the app.</param>
+        /// <param name="ids">The optional ids of the content to fetch.</param>
+        /// <param name="archived">Indicates whether to query content items from the archive.</param>
+        /// <returns>
+        /// 200 => Contents retrieved.
+        /// 404 => App not found.
+        /// </returns>
+        /// <remarks>
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// </remarks>
+        [HttpGet]
+        [Route("content/{app}/")]
+        [ApiPermission]
+        [ApiCosts(1)]
+        public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids, [FromQuery] bool archived = false)
+        {
+            var context = Context().WithArchived(archived);
+
+            var result = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).Ids);
+
+            var response = new ContentsDto
+            {
+                Total = result.Count,
+                Items = result.Take(200).Select(x => ContentDto.FromContent(x, context)).ToArray()
+            };
+
+            if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
+            {
+                Response.Headers["Surrogate-Key"] = response.Items.ToSurrogateKeys();
+            }
+
+            Response.Headers[HeaderNames.ETag] = response.Items.ToManyEtag();
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Queries contents.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="ids">The optional ids of the content to fetch.</param>
         /// <param name="archived">Indicates whether to query content items from the archive.</param>
@@ -124,7 +163,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/{name}/")]
         [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] bool archived = false, [FromQuery] string ids = null)
+        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null, [FromQuery] bool archived = false)
         {
             var context = Context().WithArchived(archived);
 
