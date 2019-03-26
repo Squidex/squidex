@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -20,7 +21,14 @@ namespace Squidex.Areas.IdentityServer.Controllers
         {
             var externalLogin = await signInManager.GetExternalLoginInfoAsync(expectedXsrf);
 
-            externalLogin.ProviderDisplayName = externalLogin.Principal.FindFirst(ClaimTypes.Email).Value;
+            var email = externalLogin.Principal.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new InvalidOperationException("External provider does not provide email claim.");
+            }
+
+            externalLogin.ProviderDisplayName = email;
 
             return externalLogin;
         }
@@ -28,6 +36,7 @@ namespace Squidex.Areas.IdentityServer.Controllers
         public static async Task<List<ExternalProvider>> GetExternalProvidersAsync(this SignInManager<IdentityUser> signInManager)
         {
             var externalSchemes = await signInManager.GetExternalAuthenticationSchemesAsync();
+
             var externalProviders =
                 externalSchemes.Where(x => x.Name != OpenIdConnectDefaults.AuthenticationScheme)
                     .Select(x => new ExternalProvider(x.Name, x.DisplayName)).ToList();
