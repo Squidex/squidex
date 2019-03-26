@@ -7,6 +7,65 @@
 
 /* tslint:disable: no-bitwise */
 
+import { Types } from './types';
+
+interface IColorDefinition {
+    regex: RegExp;
+
+    process(bots: RegExpExecArray): Color;
+}
+
+export interface Color {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+}
+
+const ColorDefinitions: IColorDefinition[] = [
+    {
+        regex: /^rgba\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*([\d\.]{1,})\)$/,
+        process: (bits) => {
+            return {
+                r: parseInt(bits[1], 10) / 255,
+                g: parseInt(bits[2], 10) / 255,
+                b: parseInt(bits[3], 10) / 255,
+                a: parseFloat(bits[4])
+            };
+        }
+    }, {
+        regex: /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/,
+        process: (bits) => {
+            return {
+                r: parseInt(bits[1], 10) / 255,
+                g: parseInt(bits[2], 10) / 255,
+                b: parseInt(bits[3], 10) / 255,
+                a: 1
+            };
+        }
+    }, {
+        regex: /^(\w{2})(\w{2})(\w{2})$/,
+        process: (bits) => {
+            return {
+                r: parseInt(bits[1], 16) / 255,
+                g: parseInt(bits[2], 16) / 255,
+                b: parseInt(bits[3], 16) / 255,
+                a: 1
+            };
+        }
+    }, {
+        regex: /^(\w{1})(\w{1})(\w{1})$/,
+        process: (bits) => {
+            return {
+                r: parseInt(bits[1] + bits[1], 16) / 255,
+                g: parseInt(bits[2] + bits[2], 16) / 255,
+                b: parseInt(bits[3] + bits[3], 16) / 255,
+                a: 1
+            };
+        }
+    }
+];
+
 export module MathHelper {
     export const EMPTY_GUID = '00000000-0000-0000-0000-000000000000';
 
@@ -82,5 +141,35 @@ export module MathHelper {
         }
 
         return degree;
+    }
+
+    export function parseColor(value: string): Color | undefined {
+        if (!Types.isString(value)) {
+            return undefined;
+        }
+
+        if (value.charAt(0) === '#') {
+            value = value.substr(1, 6);
+        }
+
+        value = value.replace(/ /g, '').toLowerCase();
+
+        for (let colorDefinition of ColorDefinitions) {
+            const bits = colorDefinition.regex.exec(value);
+
+            if (bits) {
+                return colorDefinition.process(bits);
+            }
+        }
+
+        return undefined;
+    }
+
+    export function toLuminance(color: Color) {
+        if (!color) {
+            return 1;
+        }
+
+        return (0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b) / color.a;
     }
 }

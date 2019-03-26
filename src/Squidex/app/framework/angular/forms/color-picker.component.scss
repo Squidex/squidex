@@ -1,0 +1,18 @@
+@import '_mixins';
+@import '_vars';
+
+:host /deep/ {
+    .color-picker {
+        & {
+            border-color: $color-border;
+        }
+
+        .hex-text {
+            .box {
+                input {
+                    border-color: $color-input;
+                }
+            }
+        }
+    }
+}

@@ -44,7 +44,7 @@ namespace Squidex.Domain.Users
 
             if (Hidden.HasValue)
             {
-                yield return new Claim(SquidexClaimTypes.Consent, Hidden.ToString());
+                yield return new Claim(SquidexClaimTypes.Hidden, Hidden.ToString());
             }
 
             if (Consent.HasValue)

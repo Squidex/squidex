@@ -73,11 +73,7 @@
 							</div>
 						</ng-container>
 						<ng-container *ngSwitchCase="'Color'">
-                            <input class="form-control" type="text" [style.background]="control.value" [formControl]="control" [placeholder]="field.displayPlaceholder"
-                                cpPosition="bottom"
-                                cpOutputFormat="hex"
-                                [colorPicker]="control.value"
-                                (colorPickerChange)="control.setValue($event)" />
+                            <sqx-color-picker [formControl]="control" [placeholder]="field.displayPlaceholder"></sqx-color-picker>
 						</ng-container>
 					</ng-container>
 				</ng-container>

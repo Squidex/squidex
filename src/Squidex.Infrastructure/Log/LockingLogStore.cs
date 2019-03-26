@@ -52,10 +52,17 @@ namespace Squidex.Infrastructure.Log
                         break;
                     }
 
-                    await Task.Delay(2000, cts.Token);
+                    try
+                    {
+                        await Task.Delay(2000, cts.Token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
                 }
 
-                if (!cts.IsCancellationRequested)
+                if (releaseToken != null)
                 {
                     try
                     {

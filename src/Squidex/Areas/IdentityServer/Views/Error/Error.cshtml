@@ -1,11 +1,10 @@
 ﻿@model Squidex.Areas.IdentityServer.Controllers.Error.ErrorViewModel
 
 @{
-    ViewBag.Theme = "white";
-    ViewBag.Title = "Operation failed";
+    ViewBag.Title = "Error";
 }
 
-<img class="splash-image" src="~/../squid.svg?title=OH%20DAMN&text=I%20am%20sorry%2C%20that%20something%20went%20wrong" />
+<img class="splash-image" src="@Url.RootContentUrl("~/squid.svg?title=OH%20DAMN&text=I%20am%20sorry%2C%20that%20something%20went%20wrong")" />
 
 <h1 class="splash-h1">Operation failed</h1>
 

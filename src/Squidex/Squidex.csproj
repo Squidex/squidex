@@ -15,26 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Docs\*.md" />
-    <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\*.*" />
-    <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
-    <EmbeddedResource Include="Pipeline\Squid\*.svg" />
-
-    <Compile Remove="Assets\**" />
-
-    <Content Remove="Assets\**" />
-    <Content Remove="package-lock.json" />
-    <Content Remove="package.json" />
-    <Content Remove="tsconfig.json" />
-    <Content Remove="tslint.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Pipeline\Squid\icon-happy-sm.svg" />
-    <None Remove="Pipeline\Squid\icon-sad-sm.svg" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
@@ -118,6 +98,57 @@
 
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Areas\Api\Controllers\Users\Assets\Avatar.png" />
+    <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\IdentityCert.pfx" />
+    <EmbeddedResource Include="Areas\IdentityServer\Config\Cert\IdentityCert.snk" />
+    <EmbeddedResource Include="Docs\schemabody.md" />
+    <EmbeddedResource Include="Docs\schemaquery.md" />
+    <EmbeddedResource Include="Docs\security.md" />
+    <EmbeddedResource Include="Pipeline\Squid\icon-happy-sm.svg" />
+    <EmbeddedResource Include="Pipeline\Squid\icon-happy.svg" />
+    <EmbeddedResource Include="Pipeline\Squid\icon-sad-sm.svg" />
+    <EmbeddedResource Include="Pipeline\Squid\icon-sad.svg" />
+    <EmbeddedResource Remove="Assets\**" />
+    <EmbeddedResource Remove="_test-output\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Assets\**" />
+    <Compile Remove="_test-output\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Assets\**" />
+    <Content Remove="package-lock.json" />
+    <Content Remove="package.json" />
+    <Content Remove="tsconfig.json" />
+    <Content Remove="tslint.json" />
+    <Content Remove="_test-output\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Areas\Api\Controllers\Users\Assets\Avatar.png" />
+    <None Remove="Areas\IdentityServer\Config\Cert\IdentityCert.pfx" />
+    <None Remove="Areas\IdentityServer\Config\Cert\IdentityCert.snk" />
+    <None Remove="Docs\schemabody.md" />
+    <None Remove="Docs\schemaquery.md" />
+    <None Remove="Docs\security.md" />
+    <None Remove="Pipeline\Squid\icon-happy-sm.svg" />
+    <None Remove="Pipeline\Squid\icon-happy.svg" />
+    <None Remove="Pipeline\Squid\icon-sad-sm.svg" />
+    <None Remove="Pipeline\Squid\icon-sad.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\**" />
+    <None Include="package-lock.json" />
+    <None Include="package.json" />
+    <None Include="tsconfig.json" />
+    <None Include="tslint.json" />
+    <None Remove="_test-output\**" />
   </ItemGroup>
 
   <PropertyGroup>

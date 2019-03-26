@@ -2,7 +2,7 @@
     ViewBag.Title = "Account locked";
 }
 
-<img class="splash-image" src="~/../squid.svg?title=STOP HERE&text=You%20shall%20not%20pass!" />
+<img class="splash-image" src="@Url.RootContentUrl("~/squid.svg?title=STOP HERE&text=You%20shall%20not%20pass!")" />
 
 <h1 class="splash-h1">Account locked</h1>
 
@@ -11,5 +11,5 @@
 </p>
 
 <p class="splash-text">
-    <a href="~/account/logout-redirect">Logout</a>
+    <a asp-controller="Account" asp-action="LogoutRedirect">Logout</a>
 </p>

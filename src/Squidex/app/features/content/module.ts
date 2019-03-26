@@ -8,7 +8,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DndModule } from 'ng2-dnd';
-import { ColorPickerModule  } from 'ngx-color-picker';
 
 import {
     CanDeactivateGuard,
@@ -100,7 +99,6 @@ const routes: Routes = [
 
 @NgModule({
     imports: [
-        ColorPickerModule,
         DndModule,
         SqxFrameworkModule,
         SqxSharedModule,

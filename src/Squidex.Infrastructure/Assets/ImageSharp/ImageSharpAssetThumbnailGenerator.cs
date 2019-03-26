@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Transforms;
 using SixLabors.Primitives;
@@ -17,49 +18,59 @@ namespace Squidex.Infrastructure.Assets.ImageSharp
 {
     public sealed class ImageSharpAssetThumbnailGenerator : IAssetThumbnailGenerator
     {
-        public ImageSharpAssetThumbnailGenerator()
-        {
-            Configuration.Default.ImageFormatsManager.AddImageFormat(ImageFormats.Jpeg);
-            Configuration.Default.ImageFormatsManager.AddImageFormat(ImageFormats.Png);
-        }
-
-        public Task CreateThumbnailAsync(Stream source, Stream destination, int? width, int? height, string mode)
+        public Task CreateThumbnailAsync(Stream source, Stream destination, int? width = null, int? height = null, string mode = null, int? quality = null)
         {
             return Task.Run(() =>
             {
-                if (width == null && height == null)
+                if (!width.HasValue && !height.HasValue && !quality.HasValue)
                 {
                     source.CopyTo(destination);
 
                     return;
                 }
 
-                var isCropUpsize = string.Equals("CropUpsize", mode, StringComparison.OrdinalIgnoreCase);
-
-                if (!Enum.TryParse<ResizeMode>(mode, true, out var resizeMode))
-                {
-                    resizeMode = ResizeMode.Max;
-                }
-
-                if (isCropUpsize)
-                {
-                    resizeMode = ResizeMode.Crop;
-                }
-
-                var w = width ?? 0;
-                var h = height ?? 0;
-
                 using (var sourceImage = Image.Load(source, out var format))
                 {
-                    if (w >= sourceImage.Width && h >= sourceImage.Height && resizeMode == ResizeMode.Crop && !isCropUpsize)
+                    var encoder = Configuration.Default.ImageFormatsManager.FindEncoder(format);
+
+                    if (quality.HasValue)
                     {
-                        resizeMode = ResizeMode.BoxPad;
+                        encoder = new JpegEncoder { Quality = quality.Value };
                     }
 
-                    var options = new ResizeOptions { Size = new Size(w, h), Mode = resizeMode };
+                    if (encoder == null)
+                    {
+                        throw new NotSupportedException();
+                    }
 
-                    sourceImage.Mutate(x => x.Resize(options));
-                    sourceImage.Save(destination, format);
+                    if (width.HasValue || height.HasValue)
+                    {
+                        var isCropUpsize = string.Equals("CropUpsize", mode, StringComparison.OrdinalIgnoreCase);
+
+                        if (!Enum.TryParse<ResizeMode>(mode, true, out var resizeMode))
+                        {
+                            resizeMode = ResizeMode.Max;
+                        }
+
+                        if (isCropUpsize)
+                        {
+                            resizeMode = ResizeMode.Crop;
+                        }
+
+                        var resizeWidth = width ?? 0;
+                        var resizeHeight = height ?? 0;
+
+                        if (resizeWidth >= sourceImage.Width && resizeHeight >= sourceImage.Height && resizeMode == ResizeMode.Crop && !isCropUpsize)
+                        {
+                            resizeMode = ResizeMode.BoxPad;
+                        }
+
+                        var options = new ResizeOptions { Size = new Size(resizeWidth, resizeHeight), Mode = resizeMode };
+
+                        sourceImage.Mutate(x => x.Resize(options));
+                    }
+
+                    sourceImage.Save(destination, encoder);
                 }
             });
         }
