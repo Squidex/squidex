@@ -81,7 +81,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             {
                 var assetId = entity.Id.ToString();
 
-                if (entity.IsImage && (width.HasValue || height.HasValue))
+                if (entity.IsImage && (width.HasValue || height.HasValue || quality.HasValue))
                 {
                     var assetSuffix = $"{width}_{height}_{mode}";
 
