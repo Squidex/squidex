@@ -239,6 +239,9 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<Rebuilder>()
                 .AsSelf();
 
+            services.AddTransientAs<RebuildRunner>()
+                .AsSelf();
+
             services.AddTransientAs<MigrationPath>()
                 .As<IMigrationPath>();
 

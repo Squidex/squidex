@@ -9,6 +9,7 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Migrate_01;
 using Squidex.Areas.Api;
 using Squidex.Areas.Api.Config.Swagger;
 using Squidex.Areas.Api.Controllers.Contents;
@@ -82,6 +83,8 @@ namespace Squidex
                 config.GetSection("healthz:gc"));
             services.Configure<ETagOptions>(
                 config.GetSection("etags"));
+            services.Configure<RebuildOptions>(
+                config.GetSection("rebuild"));
 
             services.Configure<MyContentsControllerOptions>(
                 config.GetSection("contentsController"));
@@ -100,6 +103,7 @@ namespace Squidex
             {
                 afterServices.AddHostedService<InitializerHost>();
                 afterServices.AddHostedService<MigratorHost>();
+                afterServices.AddHostedService<RebuilderHost>();
             });
 
             return provider;

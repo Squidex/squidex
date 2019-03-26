@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Migrate_01.Migrations;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01
@@ -21,6 +22,8 @@ namespace Migrate_01
 
         public MigrationPath(IServiceProvider serviceProvider)
         {
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
+
             this.serviceProvider = serviceProvider;
         }
 
