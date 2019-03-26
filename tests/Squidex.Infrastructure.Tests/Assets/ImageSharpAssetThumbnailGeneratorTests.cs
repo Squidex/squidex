@@ -15,16 +15,15 @@ namespace Squidex.Infrastructure.Assets
 {
     public class ImageSharpAssetThumbnailGeneratorTests
     {
-        private const string Image = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTM0A1t6AAAADElEQVQYV2P4//8/AAX+Av6nNYGEAAAAAElFTkSuQmCC";
         private readonly ImageSharpAssetThumbnailGenerator sut = new ImageSharpAssetThumbnailGenerator();
+        private readonly MemoryStream target = new MemoryStream();
 
         [Fact]
         public async Task Should_return_same_image_if_no_size_is_passed_for_thumbnail()
         {
-            var source = new MemoryStream(Convert.FromBase64String(Image));
-            var target = new MemoryStream();
+            var source = GetPng();
 
-            await sut.CreateThumbnailAsync(source, target, null, null, "resize");
+            await sut.CreateThumbnailAsync(source, target);
 
             Assert.Equal(target.Length, source.Length);
         }
@@ -32,23 +31,42 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public async Task Should_resize_image_to_target()
         {
-            var source = new MemoryStream(Convert.FromBase64String(Image));
-            var target = new MemoryStream();
+            var source = GetPng();
 
-            await sut.CreateThumbnailAsync(source, target, 100, 100, "resize");
+            await sut.CreateThumbnailAsync(source, target, 1000, 1000, "resize");
 
             Assert.True(target.Length > source.Length);
         }
 
         [Fact]
+        public async Task Should_change_jpeg_quality_and_write_to_target()
+        {
+            var source = GetJpeg();
+
+            await sut.CreateThumbnailAsync(source, target, quality: 10);
+
+            Assert.True(target.Length < source.Length);
+        }
+
+        [Fact]
+        public async Task Should_change_png_quality_and_write_to_target()
+        {
+            var source = GetPng();
+
+            await sut.CreateThumbnailAsync(source, target, quality: 10);
+
+            Assert.True(target.Length < source.Length);
+        }
+
+        [Fact]
         public async Task Should_return_image_information_if_image_is_valid()
         {
-            var source = new MemoryStream(Convert.FromBase64String(Image));
+            var source = GetPng();
 
             var imageInfo = await sut.GetImageInfoAsync(source);
 
-            Assert.Equal(1, imageInfo.PixelHeight);
-            Assert.Equal(1, imageInfo.PixelWidth);
+            Assert.Equal(600, imageInfo.PixelHeight);
+            Assert.Equal(600, imageInfo.PixelWidth);
         }
 
         [Fact]
@@ -59,6 +77,16 @@ namespace Squidex.Infrastructure.Assets
             var imageInfo = await sut.GetImageInfoAsync(source);
 
             Assert.Null(imageInfo);
+        }
+
+        private Stream GetPng()
+        {
+            return GetType().Assembly.GetManifestResourceStream("Squidex.Infrastructure.Assets.Images.logo.png");
+        }
+
+        private Stream GetJpeg()
+        {
+            return GetType().Assembly.GetManifestResourceStream("Squidex.Infrastructure.Assets.Images.logo.jpg");
         }
     }
 }
