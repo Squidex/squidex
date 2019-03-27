@@ -23,6 +23,8 @@ namespace Squidex.Web
 
         public static readonly string PortalPrefix = "/portal";
 
+        public static readonly string EmailScope = "email";
+
         public static readonly string RoleScope = "role";
 
         public static readonly string PermissionsScope = "permissions";

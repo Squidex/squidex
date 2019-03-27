@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -43,32 +44,32 @@ namespace Migrate_01
             this.store = store;
         }
 
-        public Task RebuildAppsAsync()
+        public Task RebuildAppsAsync(CancellationToken ct = default)
         {
-            return RebuildManyAsync<AppState, AppGrain>("^app\\-");
+            return RebuildManyAsync<AppState, AppGrain>("^app\\-", ct);
         }
 
-        public Task RebuildSchemasAsync()
+        public Task RebuildSchemasAsync(CancellationToken ct = default)
         {
-            return RebuildManyAsync<SchemaState, SchemaGrain>("^schema\\-");
+            return RebuildManyAsync<SchemaState, SchemaGrain>("^schema\\-", ct);
         }
 
-        public Task RebuildRulesAsync()
+        public Task RebuildRulesAsync(CancellationToken ct = default)
         {
-            return RebuildManyAsync<RuleState, RuleGrain>("^rule\\-");
+            return RebuildManyAsync<RuleState, RuleGrain>("^rule\\-", ct);
         }
 
-        public Task RebuildAssetsAsync()
+        public Task RebuildAssetsAsync(CancellationToken ct = default)
         {
-            return RebuildManyAsync<AssetState, AssetGrain>("^asset\\-");
+            return RebuildManyAsync<AssetState, AssetGrain>("^asset\\-", ct);
         }
 
-        public Task RebuildContentAsync()
+        public Task RebuildContentAsync(CancellationToken ct = default)
         {
-            return RebuildManyAsync<ContentState, ContentGrain>("^content\\-");
+            return RebuildManyAsync<ContentState, ContentGrain>("^content\\-", ct);
         }
 
-        private async Task RebuildManyAsync<TState, TGrain>(string filter) where TState : IDomainState<TState>, new()
+        private async Task RebuildManyAsync<TState, TGrain>(string filter, CancellationToken ct) where TState : IDomainState<TState>, new()
         {
             var handledIds = new HashSet<Guid>();
 
@@ -113,7 +114,7 @@ namespace Migrate_01
                     {
                         await worker.SendAsync(id);
                     }
-                }, filter);
+                }, filter, ct);
 
                 worker.Complete();
 

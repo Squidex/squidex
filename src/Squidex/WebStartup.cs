@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Migrate_01;
 using Squidex.Areas.Api;
 using Squidex.Areas.Api.Config.Swagger;
 using Squidex.Areas.Api.Controllers.Contents;
@@ -91,6 +92,8 @@ namespace Squidex
                 config.GetSection("urls"));
             services.Configure<UsageOptions>(
                 config.GetSection("usage"));
+            services.Configure<RebuildOptions>(
+                config.GetSection("rebuild"));
 
             services.Configure<MyContentsControllerOptions>(
                 config.GetSection("contentsController"));
@@ -107,6 +110,7 @@ namespace Squidex
 
             services.AddHostedService<MigratorHost>();
             services.AddHostedService<BackgroundHost>();
+            services.AddHostedService<RebuilderHost>();
 
             return services.BuildServiceProvider();
         }

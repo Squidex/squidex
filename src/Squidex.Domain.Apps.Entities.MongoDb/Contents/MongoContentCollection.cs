@@ -30,12 +30,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     internal class MongoContentCollection : MongoRepositoryBase<MongoContentEntity>
     {
-        protected IJsonSerializer Serializer { get; }
+        private readonly IAppProvider appProvider;
+        private readonly IJsonSerializer serializer;
 
-        public MongoContentCollection(IMongoDatabase database, IJsonSerializer serializer)
+        public MongoContentCollection(IMongoDatabase database, IJsonSerializer serializer, IAppProvider appProvider)
             : base(database)
         {
-            Serializer = serializer;
+            this.appProvider = appProvider;
+
+            this.serializer = serializer;
         }
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoContentEntity> collection, CancellationToken ct = default)
@@ -43,9 +46,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return collection.Indexes.CreateManyAsync(new[]
             {
                 new CreateIndexModel<MongoContentEntity>(Index
-                    .Ascending(x => x.IndexedSchemaId).Ascending(x => x.Id).Ascending(x => x.Status)),
+                    .Ascending(x => x.IndexedAppId)
+                    .Ascending(x => x.IsDeleted)
+                    .Ascending(x => x.Status)
+                    .Ascending(x => x.Id)),
                 new CreateIndexModel<MongoContentEntity>(Index
-                    .Ascending(x => x.ScheduledAt).Ascending(x => x.IsDeleted)),
+                    .Ascending(x => x.IndexedSchemaId)
+                    .Ascending(x => x.IsDeleted)
+                    .Ascending(x => x.Status)
+                    .Ascending(x => x.Id)),
+                new CreateIndexModel<MongoContentEntity>(Index
+                    .Ascending(x => x.ScheduledAt)
+                    .Ascending(x => x.IsDeleted)),
                 new CreateIndexModel<MongoContentEntity>(Index
                     .Ascending(x => x.ReferencedIds))
             }, ct);
@@ -77,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 foreach (var entity in contentItems.Result)
                 {
-                    entity.ParseData(schema.SchemaDef, Serializer);
+                    entity.ParseData(schema.SchemaDef, serializer);
                 }
 
                 return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
@@ -95,9 +107,35 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
+        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, HashSet<Guid> ids, Status[] status, bool useDraft)
+        {
+            var find = Collection.Find(FilterFactory.IdsByApp(app.Id, ids, status));
+
+            var contentItems = await find.WithoutDraft(useDraft).ToListAsync();
+
+            var schemaIds = contentItems.Select(x => x.IndexedSchemaId).ToList();
+            var schemas = await Task.WhenAll(schemaIds.Select(x => appProvider.GetSchemaAsync(app.Id, x)));
+
+            var result = new List<(IContentEntity Content, ISchemaEntity Schema)>();
+
+            foreach (var entity in contentItems)
+            {
+                var schema = schemas.FirstOrDefault(x => x.Id == entity.IndexedSchemaId);
+
+                if (schema != null)
+                {
+                    entity.ParseData(schema.SchemaDef, serializer);
+
+                    result.Add((entity, schema));
+                }
+            }
+
+            return result;
+        }
+
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, HashSet<Guid> ids, Status[] status, bool useDraft)
         {
-            var find = Collection.Find(FilterFactory.Build(schema.Id, ids, status));
+            var find = Collection.Find(FilterFactory.IdsBySchema(schema.Id, ids, status));
 
             var contentItems = find.WithoutDraft(useDraft).ToListAsync();
             var contentCount = find.CountDocumentsAsync();
@@ -106,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             foreach (var entity in contentItems.Result)
             {
-                entity.ParseData(schema.SchemaDef, Serializer);
+                entity.ParseData(schema.SchemaDef, serializer);
             }
 
             return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
@@ -118,7 +156,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             var contentEntity = await find.WithoutDraft(useDraft).FirstOrDefaultAsync();
 
-            contentEntity?.ParseData(schema.SchemaDef, Serializer);
+            contentEntity?.ParseData(schema.SchemaDef, serializer);
 
             return contentEntity;
         }
@@ -164,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 var schema = await getSchema(contentEntity.IndexedAppId, contentEntity.IndexedSchemaId);
 
-                contentEntity.ParseData(schema.SchemaDef, Serializer);
+                contentEntity.ParseData(schema.SchemaDef, serializer);
 
                 return (SimpleMapper.Map(contentEntity, new ContentState()), contentEntity.Version);
             }
@@ -178,7 +216,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 var schema = await getSchema(contentEntity.IndexedAppId, contentEntity.IndexedSchemaId);
 
-                contentEntity.ParseData(schema.SchemaDef, Serializer);
+                contentEntity.ParseData(schema.SchemaDef, serializer);
 
                 await callback(SimpleMapper.Map(contentEntity, new ContentState()), contentEntity.Version);
             }, ct);

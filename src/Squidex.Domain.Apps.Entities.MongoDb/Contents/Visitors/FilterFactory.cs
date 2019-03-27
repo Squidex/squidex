@@ -117,26 +117,40 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
 
         public static FilterDefinition<MongoContentEntity> Build(Guid schemaId, Guid id, Status[] status)
         {
-            return CreateFilter(schemaId, new List<Guid> { id }, status, null);
+            return CreateFilter(null, schemaId, new List<Guid> { id }, status, null);
         }
 
-        public static FilterDefinition<MongoContentEntity> Build(Guid schemaId, ICollection<Guid> ids, Status[] status)
+        public static FilterDefinition<MongoContentEntity> IdsByApp(Guid appId, ICollection<Guid> ids, Status[] status)
         {
-            return CreateFilter(schemaId, ids, status, null);
+            return CreateFilter(appId, null, ids, status, null);
+        }
+
+        public static FilterDefinition<MongoContentEntity> IdsBySchema(Guid schemaId, ICollection<Guid> ids, Status[] status)
+        {
+            return CreateFilter(null, schemaId, ids, status, null);
         }
 
         public static FilterDefinition<MongoContentEntity> ToFilter(this Query query, Guid schemaId, ICollection<Guid> ids, Status[] status)
         {
-            return CreateFilter(schemaId, ids, status, query);
+            return CreateFilter(null, schemaId, ids, status, query);
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid schemaId, ICollection<Guid> ids, Status[] status, Query query)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid? appId, Guid? schemaId, ICollection<Guid> ids, Status[] status, Query query)
         {
-            var filters = new List<FilterDefinition<MongoContentEntity>>
+            var filters = new List<FilterDefinition<MongoContentEntity>>();
+
+            if (appId.HasValue)
             {
-                Filter.Eq(x => x.IndexedSchemaId, schemaId),
-                Filter.Ne(x => x.IsDeleted, true)
-            };
+                filters.Add(Filter.Eq(x => x.IndexedAppId, appId.Value));
+            }
+
+            if (schemaId.HasValue)
+            {
+                filters.Add(Filter.Eq(x => x.IndexedSchemaId, schemaId.Value));
+            }
+
+            filters.Add(Filter.Ne(x => x.IsDeleted, true));
+            filters.Add(Filter.In(x => x.Status, status));
 
             if (ids != null && ids.Count > 0)
             {
@@ -148,11 +162,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                 {
                     filters.Add(Filter.Eq(x => x.Id, ids.First()));
                 }
-            }
-
-            if (status != null)
-            {
-                filters.Add(Filter.In(x => x.Status, status));
             }
 
             if (query.Filter != null)

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Squidex.Domain.Apps.Entities.Contents.State;
@@ -27,7 +28,12 @@ namespace Migrate_01.Migrations
             this.store = store;
         }
 
-        public async Task UpdateAsync()
+        public Task UpdateAsync()
+        {
+            return UpdateAsync();
+        }
+
+        public async Task UpdateAsync(CancellationToken ct)
         {
             var snapshotStore = store.GetSnapshotStore<ContentState>();
 
@@ -40,7 +46,7 @@ namespace Migrate_01.Migrations
                     MaxDegreeOfParallelism = Environment.ProcessorCount * 2
                 });
 
-            await snapshotStore.ReadAllAsync((state, version) => worker.SendAsync(state));
+            await snapshotStore.ReadAllAsync((state, version) => worker.SendAsync(state), ct);
 
             worker.Complete();
 

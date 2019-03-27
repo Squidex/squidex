@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EnrichContent
                 Fields.Json(1, "1", Partitioning.Invariant,
                     new JsonFieldProperties());
 
-            Assert.Equal(JsonValue.Object(), DefaultValueFactory.CreateDefaultValue(field, now));
+            Assert.Equal(JsonValue.Null, DefaultValueFactory.CreateDefaultValue(field, now));
         }
 
         [Fact]

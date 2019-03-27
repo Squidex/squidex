@@ -83,13 +83,16 @@ namespace Squidex.Pipeline.Squid
                 svg = svg.Replace("{{TEXT3}}", l3);
                 svg = svg.Replace("[COLOR]", background);
 
+                context.Response.StatusCode = 200;
                 context.Response.ContentType = "image/svg+xml";
                 context.Response.Headers["Cache-Control"] = "public, max-age=604800";
 
                 await context.Response.WriteAsync(svg);
             }
-
-            await next(context);
+            else
+            {
+                await next(context);
+            }
         }
 
         private static (string, string, string) SplitText(string text)
