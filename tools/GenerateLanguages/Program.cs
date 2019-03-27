@@ -83,9 +83,6 @@ namespace GenerateLanguages
             return CultureInfo.GetCultures(CultureTypes.SpecificCultures)
                 .Where(x => x.ToString().Length == 5)
                 .Where(x => languages.Any(l => l.Iso2Code.Equals(x.TwoLetterISOLanguageName, StringComparison.OrdinalIgnoreCase)))
-                .GroupBy(x => x.TwoLetterISOLanguageName)
-                .Where(x => x.Count() > 1)
-                .SelectMany(x => x)
                 .Select(x => (x.ToString(), x.EnglishName));
         }
 
