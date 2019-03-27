@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
 
         public IJsonValue Visit(IField<JsonFieldProperties> field)
         {
-            return JsonValue.Object();
+            return JsonValue.Null;
         }
 
         public IJsonValue Visit(IField<NumberFieldProperties> field)
