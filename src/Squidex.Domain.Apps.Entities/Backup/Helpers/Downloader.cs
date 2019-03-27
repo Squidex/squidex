@@ -17,26 +17,46 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
     {
         public static async Task DownloadAsync(this IBackupArchiveLocation backupArchiveLocation, Uri url, Guid id)
         {
-            HttpResponseMessage response = null;
-            try
+            if (string.Equals(url.Scheme, "file"))
             {
-                using (var client = new HttpClient())
+                try
                 {
-                    response = await client.GetAsync(url);
-                    response.EnsureSuccessStatusCode();
-
-                    using (var sourceStream = await response.Content.ReadAsStreamAsync())
+                    using (var targetStream = await backupArchiveLocation.OpenStreamAsync(id))
                     {
-                        using (var targetStream = await backupArchiveLocation.OpenStreamAsync(id))
+                        using (var sourceStream = new FileStream(url.LocalPath, FileMode.Open, FileAccess.Read))
                         {
                             await sourceStream.CopyToAsync(targetStream);
                         }
                     }
                 }
+                catch (IOException ex)
+                {
+                    throw new BackupRestoreException($"Cannot download the archive: {ex.Message}.", ex);
+                }
             }
-            catch (HttpRequestException ex)
+            else
             {
-                throw new BackupRestoreException($"Cannot download the archive. Got status code: {response?.StatusCode}.", ex);
+                HttpResponseMessage response = null;
+                try
+                {
+                    using (var client = new HttpClient())
+                    {
+                        response = await client.GetAsync(url);
+                        response.EnsureSuccessStatusCode();
+
+                        using (var sourceStream = await response.Content.ReadAsStreamAsync())
+                        {
+                            using (var targetStream = await backupArchiveLocation.OpenStreamAsync(id))
+                            {
+                                await sourceStream.CopyToAsync(targetStream);
+                            }
+                        }
+                    }
+                }
+                catch (HttpRequestException ex)
+                {
+                    throw new BackupRestoreException($"Cannot download the archive. Got status code: {response?.StatusCode}.", ex);
+                }
             }
         }
 
