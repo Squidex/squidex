@@ -30,7 +30,7 @@ namespace Migrate_01.Migrations
 
         public Task UpdateAsync()
         {
-            return UpdateAsync();
+            return UpdateAsync(CancellationToken.None);
         }
 
         public async Task UpdateAsync(CancellationToken ct)

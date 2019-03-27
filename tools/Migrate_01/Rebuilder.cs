@@ -114,7 +114,7 @@ namespace Migrate_01
                     {
                         await worker.SendAsync(id);
                     }
-                }, filter, ct);
+                }, filter, ct: ct);
 
                 worker.Complete();
 
