@@ -32,13 +32,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const LuceneVersion Version = LuceneVersion.LUCENE_48;
         private const int MaxResults = 2000;
         private const int MaxUpdates = 100;
-        private const string MetaId = "_id";
-        private const string MetaKey = "_key";
-        private const string MetaDraft = "_dd";
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(30);
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
-        private static readonly TermsFilter DraftFilter = new TermsFilter(new Term(MetaDraft, "1"));
-        private static readonly TermsFilter NoDraftFilter = new TermsFilter(new Term(MetaDraft, "0"));
+        private static readonly TermsFilter DraftFilter = new TermsFilter(new Term(TextIndexContent.MetaDraft, "1"));
+        private static readonly TermsFilter NoDraftFilter = new TermsFilter(new Term(TextIndexContent.MetaDraft, "0"));
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
         private readonly IAssetStore assetStore;
         private IDisposable timer;
@@ -84,63 +81,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public Task DeleteAsync(Guid id)
         {
-            indexWriter.DeleteDocuments(new Term(MetaId, id.ToString()));
+            var content = new TextIndexContent(indexWriter, indexSearcher, id);
+
+            content.Delete();
 
             return TryFlushAsync();
         }
 
         public Task IndexAsync(Guid id, J<IndexData> data)
         {
-            var docId = id.ToString();
-            var docDraft = data.Value.IsDraft ? "1" : "0";
-            var docKey = $"{docId}_{docDraft}";
+            var content = new TextIndexContent(indexWriter, indexSearcher, id);
 
-            indexWriter.DeleteDocuments(new Term(MetaKey, docKey));
-
-            var languages = new Dictionary<string, StringBuilder>();
-
-            void AppendText(string language, string text)
-            {
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    var sb = languages.GetOrAddNew(language);
-
-                    if (sb.Length > 0)
-                    {
-                        sb.Append(" ");
-                    }
-
-                    sb.Append(text);
-                }
-            }
-
-            foreach (var field in data.Value.Data)
-            {
-                foreach (var fieldValue in field.Value)
-                {
-                    var appendText = new Action<string>(text => AppendText(fieldValue.Key, text));
-
-                    AppendJsonText(fieldValue.Value, appendText);
-                }
-            }
-
-            if (languages.Count > 0)
-            {
-                var document = new Document();
-
-                document.AddStringField(MetaId, docId, Field.Store.YES);
-                document.AddStringField(MetaKey, docKey, Field.Store.YES);
-                document.AddStringField(MetaDraft, docDraft, Field.Store.YES);
-
-                foreach (var field in languages)
-                {
-                    var fieldName = BuildFieldName(field.Key);
-
-                    document.AddTextField(fieldName, field.Value.ToString(), Field.Store.NO);
-                }
-
-                indexWriter.AddDocument(document);
-            }
+            content.Index(data.Value.Data, data.Value.IsDraft);
 
             return TryFlushAsync();
         }
@@ -185,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     {
                         var document = indexReader.Document(hit.Doc);
 
-                        var idField = document.GetField(MetaId)?.GetStringValue();
+                        var idField = document.GetField(TextIndexContent.MetaId)?.GetStringValue();
 
                         if (idField != null && Guid.TryParse(idField, out var guid))
                         {
@@ -203,8 +155,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             if (queryParser == null || !currentLanguages.SetEquals(context.Languages))
             {
                 var fields =
-                    context.Languages.Select(BuildFieldName)
-                        .Union(Enumerable.Repeat(BuildFieldName(InvariantPartitioning.Instance.Master.Key), 1)).ToArray();
+                    context.Languages
+                        .Union(Enumerable.Repeat(InvariantPartitioning.Instance.Master.Key, 1)).ToArray();
 
                 queryParser = new MultiFieldQueryParser(Version, fields, Analyzer);
 
@@ -287,11 +239,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 directory.Delete(true);
             }
-        }
-
-        private static string BuildFieldName(string language)
-        {
-            return language;
         }
     }
 }
