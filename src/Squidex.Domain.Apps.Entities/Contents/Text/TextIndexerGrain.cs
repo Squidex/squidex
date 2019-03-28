@@ -9,10 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Lucene.Net.Analysis;
-using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Queries;
 using Lucene.Net.QueryParsers.Classic;
@@ -22,7 +20,6 @@ using Lucene.Net.Util;
 using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
-using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
@@ -34,8 +31,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const int MaxUpdates = 100;
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(30);
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
-        private static readonly TermsFilter DraftFilter = new TermsFilter(new Term(TextIndexContent.MetaDraft, "1"));
-        private static readonly TermsFilter NoDraftFilter = new TermsFilter(new Term(TextIndexContent.MetaDraft, "0"));
+        private static readonly TermsFilter DraftFilter = new TermsFilter(new Term(TextIndexContent.MetaDraft, true.ToString()));
+        private static readonly TermsFilter NoDraftFilter = new TermsFilter(new Term(TextIndexContent.MetaDraft, false.ToString()));
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
         private readonly IAssetStore assetStore;
         private IDisposable timer;
@@ -88,35 +85,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return TryFlushAsync();
         }
 
-        public Task IndexAsync(Guid id, J<IndexData> data)
+        public Task IndexAsync(Guid id, J<IndexData> data, bool onlyDraft)
         {
             var content = new TextIndexContent(indexWriter, indexSearcher, id);
 
-            content.Index(data.Value.Data, data.Value.IsDraft);
+            content.Index(data.Value.Data, onlyDraft);
 
             return TryFlushAsync();
         }
 
-        private static void AppendJsonText(IJsonValue value, Action<string> appendText)
+        public Task CopyAsync(Guid id, bool fromDraft)
         {
-            if (value.Type == JsonValueType.String)
-            {
-                appendText(value.ToString());
-            }
-            else if (value is JsonArray array)
-            {
-                foreach (var item in array)
-                {
-                    AppendJsonText(item, appendText);
-                }
-            }
-            else if (value is JsonObject obj)
-            {
-                foreach (var item in obj.Values)
-                {
-                    AppendJsonText(item, appendText);
-                }
-            }
+            var content = new TextIndexContent(indexWriter, indexSearcher, id);
+
+            content.Copy(fromDraft);
+
+            return TryFlushAsync();
         }
 
         public Task<List<Guid>> SearchAsync(string queryText, SearchContext context)

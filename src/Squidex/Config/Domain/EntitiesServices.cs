@@ -108,7 +108,7 @@ namespace Squidex.Config.Domain
                 .As<ITagService>();
 
             services.AddSingletonAs<GrainTextIndexer>()
-                .As<ITextIndexer>();
+                .As<ITextIndexer>().As<IEventConsumer>();
 
             services.AddSingletonAs<FileTypeTagGenerator>()
                 .As<ITagGenerator<CreateAsset>>();

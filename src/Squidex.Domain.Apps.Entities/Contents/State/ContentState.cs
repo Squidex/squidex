@@ -86,6 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         protected void On(ContentStatusChanged @event)
         {
             ScheduleJob = null;
+
             Status = @event.Status;
 
             if (@event.Status == Status.Published)

@@ -12,15 +12,29 @@ using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class GrainTextIndexer : ITextIndexer
+    public sealed class GrainTextIndexer : ITextIndexer, IEventConsumer
     {
+        private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly IGrainFactory grainFactory;
         private readonly ISemanticLog log;
+
+        public string Name
+        {
+            get { return "TextIndexer"; }
+        }
+
+        public string EventsFilter
+        {
+            get { return "^content-"; }
+        }
 
         public GrainTextIndexer(IGrainFactory grainFactory, ISemanticLog log)
         {
@@ -32,50 +46,63 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             this.log = log;
         }
 
-        public async Task DeleteAsync(Guid schemaId, Guid id)
+        public Task ClearAsync()
         {
-            var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
+            return Task.CompletedTask;
+        }
 
-            using (Profiler.TraceMethod<GrainTextIndexer>())
+        public async Task On(Envelope<IEvent> @event)
+        {
+            try
             {
-                try
+                if (@event.Payload is ContentEvent contentEvent)
                 {
-                    await index.DeleteAsync(id);
+                    var index = grainFactory.GetGrain<ITextIndexerGrain>(contentEvent.SchemaId.Id);
+
+                    var id = contentEvent.ContentId;
+
+                    switch (@event.Payload)
+                    {
+                        case ContentDeleted contentDeleted:
+                            await index.DeleteAsync(id);
+                            break;
+                        case ContentCreated contentCreated:
+                            await index.IndexAsync(id, Data(contentCreated.Data), true);
+                            break;
+                        case ContentUpdateProposed contentCreated:
+                            await index.IndexAsync(id, Data(contentCreated.Data), true);
+                            break;
+                        case ContentUpdated contentUpdated:
+                            await index.IndexAsync(id, Data(contentUpdated.Data), false);
+                            break;
+                        case ContentChangesPublished contentChangesPublished:
+                            await index.CopyAsync(id, false);
+                            break;
+                        case ContentChangesDiscarded contentChangesDiscarded:
+                        case ContentStatusChanged contentStatusChanged when contentStatusChanged.Status == Status.Published:
+                            await index.CopyAsync(id, true);
+                            break;
+                    }
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                if (retryWindow.CanRetryAfterFailure())
                 {
                     log.LogError(ex, w => w
                         .WriteProperty("action", "DeleteTextEntry")
                         .WriteProperty("status", "Failed"));
                 }
+                else
+                {
+                    throw;
+                }
             }
         }
 
-        public async Task IndexAsync(Guid schemaId, Guid id, NamedContentData data, NamedContentData dataDraft)
+        private J<IndexData> Data(NamedContentData data)
         {
-            var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
-
-            using (Profiler.TraceMethod<GrainTextIndexer>())
-            {
-                try
-                {
-                    if (data != null)
-                    {
-                        await index.IndexAsync(id, new IndexData { Data = data });
-                    }
-
-                    if (dataDraft != null)
-                    {
-                        await index.IndexAsync(id, new IndexData { Data = dataDraft, IsDraft = true });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    log.LogError(ex, w => w
-                        .WriteProperty("action", "UpdateTextEntry")
-                        .WriteProperty("status", "Failed"));
-                }
-            }
+            return new IndexData { Data = data };
         }
 
         public async Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, Guid schemaId, bool useDraft = false)

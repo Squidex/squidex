@@ -8,17 +8,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public interface ITextIndexer
     {
-        Task DeleteAsync(Guid schemaId, Guid id);
-
-        Task IndexAsync(Guid schemaId, Guid id, NamedContentData data, NamedContentData dataDraft);
-
         Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, Guid schemaId, bool useDraft = false);
     }
 }

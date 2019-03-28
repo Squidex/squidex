@@ -101,7 +101,6 @@ namespace Migrate_01
             if (version < 15)
             {
                 yield return serviceProvider.GetService<RestructureContentCollection>();
-                yield return serviceProvider.GetService<BuildFullTextIndices>();
             }
 
             yield return serviceProvider.GetRequiredService<StartEventConsumers>();

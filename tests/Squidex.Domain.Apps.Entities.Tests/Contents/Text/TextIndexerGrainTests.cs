@@ -28,7 +28,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             context = new SearchContext
             {
-                Languages = new HashSet<string> { "de", "en" }
+                Languages = new HashSet<string> { "de", "en" },
+                IsDraft = true
             };
 
             sut = new TextIndexerGrain(assetStore);
@@ -148,6 +149,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await Assert.ThrowsAsync<ValidationException>(() => sut.SearchAsync("~hello", context));
         }
 
+        [Fact]
+        public async Task Should_also_retrieve_published_content_after_copy()
+        {
+            await AddLocalizedContent();
+
+            context.IsDraft = false;
+
+            var foundHello1 = await sut.SearchAsync("Hello", context);
+
+            Assert.Empty(foundHello1);
+
+            await sut.CopyAsync(ids1[0], true);
+            await sut.FlushAsync();
+
+            var foundHello2 = await sut.SearchAsync("Hello", context);
+
+            Assert.Equal(ids1, foundHello2);
+        }
+
         private async Task AddLocalizedContent()
         {
             var germanData =
@@ -162,8 +182,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         new ContentFieldData()
                             .AddValue("en", "City and Surroundings und sonstiges"));
 
-            await sut.IndexAsync(ids1[0], new IndexData { Data = germanData });
-            await sut.IndexAsync(ids2[0], new IndexData { Data = englishData });
+            await sut.IndexAsync(ids1[0], new IndexData { Data = germanData }, false);
+            await sut.IndexAsync(ids2[0], new IndexData { Data = englishData }, false);
             await sut.FlushAsync();
         }
 
@@ -181,8 +201,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         new ContentFieldData()
                             .AddValue("iv", "World"));
 
-            await sut.IndexAsync(ids1[0], new IndexData { Data = data1 });
-            await sut.IndexAsync(ids2[0], new IndexData { Data = data2 });
+            await sut.IndexAsync(ids1[0], new IndexData { Data = data1 }, false);
+            await sut.IndexAsync(ids2[0], new IndexData { Data = data2 }, false);
 
             await sut.FlushAsync();
         }

@@ -17,7 +17,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         Task DeleteAsync(Guid id);
 
-        Task IndexAsync(Guid id, J<IndexData> data);
+        Task IndexAsync(Guid id, J<IndexData> data, bool onlyDraft);
+
+        Task CopyAsync(Guid id, bool fromDraft);
 
         Task<List<Guid>> SearchAsync(string queryText, SearchContext context);
     }

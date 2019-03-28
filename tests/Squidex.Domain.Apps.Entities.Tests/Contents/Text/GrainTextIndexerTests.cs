@@ -13,7 +13,9 @@ using Orleans;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
@@ -37,64 +39,78 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
-        public async Task Should_call_grain_when_deleting_entry()
+        public async Task Should_call_grain_when_content_deleted()
         {
-            await sut.DeleteAsync(schemaId, contentId);
+            await sut.On(E(new ContentDeleted()));
 
             A.CallTo(() => grain.DeleteAsync(contentId))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_catch_exception_when_deleting_failed()
-        {
-            A.CallTo(() => grain.DeleteAsync(contentId))
-                .Throws(new InvalidOperationException());
-
-            await sut.DeleteAsync(schemaId, contentId);
-        }
-
-        [Fact]
-        public async Task Should_call_grain_when_indexing_data()
-        {
-            var data = new NamedContentData();
-            var dataDraft = new NamedContentData();
-
-            await sut.IndexAsync(schemaId, contentId, data, dataDraft);
-
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data && !x.Value.IsDraft)))
-                .MustHaveHappened();
-
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == dataDraft && x.Value.IsDraft)))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_not_call_grain_when_data_is_null()
-        {
-            var dataDraft = new NamedContentData();
-
-            await sut.IndexAsync(schemaId, contentId, null, dataDraft);
-
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => !x.Value.IsDraft)))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == dataDraft && x.Value.IsDraft)))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_not_call_grain_when_data_draft_is_null()
+        public async Task Should_call_grain_when_content_created()
         {
             var data = new NamedContentData();
 
-            await sut.IndexAsync(schemaId, contentId, data, null);
+            await sut.On(E(new ContentCreated { Data = data }));
 
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data && !x.Value.IsDraft)))
+            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), true))
                 .MustHaveHappened();
+        }
 
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.IsDraft)))
-                .MustNotHaveHappened();
+        [Fact]
+        public async Task Should_call_grain_when_content_updated()
+        {
+            var data = new NamedContentData();
+
+            await sut.On(E(new ContentUpdated { Data = data }));
+
+            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), false))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_call_grain_when_content_change_proposed()
+        {
+            var data = new NamedContentData();
+
+            await sut.On(E(new ContentUpdateProposed { Data = data }));
+
+            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), true))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_call_grain_when_content_change_published()
+        {
+            var data = new NamedContentData();
+
+            await sut.On(E(new ContentChangesPublished()));
+
+            A.CallTo(() => grain.CopyAsync(contentId, false))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_call_grain_when_content_change_discarded()
+        {
+            var data = new NamedContentData();
+
+            await sut.On(E(new ContentChangesDiscarded()));
+
+            A.CallTo(() => grain.CopyAsync(contentId, true))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_call_grain_when_content_published()
+        {
+            var data = new NamedContentData();
+
+            await sut.On(E(new ContentStatusChanged { Status = Status.Published }));
+
+            A.CallTo(() => grain.CopyAsync(contentId, true))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -102,10 +118,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var data = new NamedContentData();
 
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.Ignored))
+            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.Ignored, false))
                 .Throws(new InvalidOperationException());
 
-            await sut.IndexAsync(schemaId, contentId, data, null);
+            await sut.On(E(new ContentCreated { Data = data }));
+        }
+
+        [Fact]
+        public async Task Should_not_catch_exception_when_indexing_failed_often()
+        {
+            var data = new NamedContentData();
+
+            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.Ignored, A<bool>.Ignored))
+                .Throws(new InvalidOperationException());
+
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            {
+                for (var i = 0; i < 10; i++)
+                {
+                    await sut.On(E(new ContentCreated { Data = data }));
+                }
+            });
         }
 
         [Fact]
@@ -139,6 +172,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.Build(Language.EN, Language.DE));
 
             return app;
+        }
+
+        private Envelope<IEvent> E(ContentEvent contentEvent)
+        {
+            contentEvent.ContentId = contentId;
+            contentEvent.SchemaId = NamedId.Of(schemaId, "my-schema");
+
+            return new Envelope<IEvent>(contentEvent);
         }
     }
 }
