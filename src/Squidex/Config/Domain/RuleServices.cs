@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Extensions.Actions;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Config.Domain
@@ -39,16 +39,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<RuleEnqueuer>()
                 .As<IEventConsumer>();
 
+            services.AddSingletonAs<RuleRegistry>()
+                .As<ITypeProvider>().AsSelf();
+
             services.AddSingletonAs<RuleEventFormatter>()
                 .AsSelf();
 
             services.AddSingletonAs<RuleService>()
                 .AsSelf();
-
-            foreach (var actionHandler in RuleElementRegistry.ActionHandlers)
-            {
-                services.AddSingleton(typeof(IRuleActionHandler), actionHandler);
-            }
         }
     }
 }

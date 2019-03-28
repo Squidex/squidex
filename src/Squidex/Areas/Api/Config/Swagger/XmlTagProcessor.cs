@@ -22,7 +22,7 @@ namespace Squidex.Areas.Api.Config.Swagger
         {
             foreach (var controllerType in context.ControllerTypes)
             {
-                var attribute = controllerType.GetTypeInfo().GetCustomAttribute<ApiExplorerSettingsAttribute>();
+                var attribute = controllerType.GetCustomAttribute<ApiExplorerSettingsAttribute>();
 
                 if (attribute != null)
                 {

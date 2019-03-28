@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.State
             IsDeleted = true;
         }
 
-        public SchemaState Apply(Envelope<IEvent> @event)
+        public override SchemaState Apply(Envelope<IEvent> @event)
         {
             var payload = (SquidexEvent)@event.Payload;
 

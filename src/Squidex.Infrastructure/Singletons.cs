@@ -18,10 +18,5 @@ namespace Squidex.Infrastructure
         {
             return Instances.GetOrAdd(key, factory);
         }
-
-        public static Lazy<T> GetOrAddLazy(string key, Func<string, T> factory)
-        {
-            return new Lazy<T>(() => Instances.GetOrAdd(key, factory));
-        }
     }
 }

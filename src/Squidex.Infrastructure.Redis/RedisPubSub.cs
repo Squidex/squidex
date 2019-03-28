@@ -19,22 +19,19 @@ namespace Squidex.Infrastructure
     public sealed class RedisPubSub : IPubSub, IInitializable
     {
         private readonly ConcurrentDictionary<string, object> subscriptions = new ConcurrentDictionary<string, object>();
-        private readonly Lazy<IConnectionMultiplexer> redisClient;
+        private readonly IConnectionMultiplexer redis;
         private readonly IJsonSerializer serializer;
-        private readonly Lazy<ISubscriber> redisSubscriber;
         private readonly ISemanticLog log;
+        private ISubscriber redisSubscriber;
 
-        public RedisPubSub(Lazy<IConnectionMultiplexer> redis, IJsonSerializer serializer, ISemanticLog log)
+        public RedisPubSub(IConnectionMultiplexer redis, IJsonSerializer serializer, ISemanticLog log)
         {
             Guard.NotNull(serializer, nameof(serializer));
             Guard.NotNull(redis, nameof(redis));
             Guard.NotNull(log, nameof(log));
 
             this.log = log;
-
-            redisClient = redis;
-            redisSubscriber = new Lazy<ISubscriber>(() => redis.Value.GetSubscriber());
-
+            this.redis = redis;
             this.serializer = serializer;
         }
 
@@ -42,13 +39,15 @@ namespace Squidex.Infrastructure
         {
             try
             {
-                redisClient.Value.GetStatus();
+                redisSubscriber = redis.GetSubscriber();
+
+                redis.GetStatus();
 
                 return TaskHelper.Done;
             }
             catch (Exception ex)
             {
-                throw new ConfigurationException($"Redis connection failed to connect to database {redisClient.Value.Configuration}", ex);
+                throw new ConfigurationException($"Redis connection failed to connect to database {redis.Configuration}", ex);
             }
         }
 
@@ -66,7 +65,7 @@ namespace Squidex.Infrastructure
         {
             var typeName = typeof(T).FullName;
 
-            return (RedisSubscription<T>)subscriptions.GetOrAdd(typeName, this, (k, c) => new RedisSubscription<T>(c.redisSubscriber.Value, serializer, k, c.log));
+            return (RedisSubscription<T>)subscriptions.GetOrAdd(typeName, this, (k, c) => new RedisSubscription<T>(c.redisSubscriber, serializer, k, c.log));
         }
     }
 }

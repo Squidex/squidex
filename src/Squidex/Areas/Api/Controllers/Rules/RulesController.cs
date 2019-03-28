@@ -13,15 +13,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
-using Squidex.Extensions.Actions;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Reflection;
-using Squidex.Pipeline;
 using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules
 {
@@ -31,18 +30,18 @@ namespace Squidex.Areas.Api.Controllers.Rules
     [ApiExplorerSettings(GroupName = nameof(Rules))]
     public sealed class RulesController : ApiController
     {
-        private static readonly string RuleActionsEtag = string.Join(";", RuleElementRegistry.Actions.Select(x => x.Key)).Sha256Base64();
-        private static readonly string RuleTriggersEtag = string.Join(";", RuleElementRegistry.Triggers.Select(x => x.Key)).Sha256Base64();
         private readonly IAppProvider appProvider;
         private readonly IRuleEventRepository ruleEventsRepository;
+        private readonly RuleRegistry ruleRegistry;
 
         public RulesController(ICommandBus commandBus, IAppProvider appProvider,
-            IRuleEventRepository ruleEventsRepository)
+            IRuleEventRepository ruleEventsRepository, RuleRegistry ruleRegistry)
             : base(commandBus)
         {
             this.appProvider = appProvider;
 
             this.ruleEventsRepository = ruleEventsRepository;
+            this.ruleRegistry = ruleRegistry;
         }
 
         /// <summary>
@@ -58,29 +57,11 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public IActionResult GetActions()
         {
-            var response = RuleElementRegistry.Actions.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
+            var etag = string.Join(";", ruleRegistry.Actions.Select(x => x.Key)).Sha256Base64();
 
-            Response.Headers[HeaderNames.ETag] = RuleActionsEtag;
+            var response = ruleRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDefinition(x.Value));
 
-            return Ok(response);
-        }
-
-        /// <summary>
-        /// Get the supported rule triggers.
-        /// </summary>
-        /// <returns>
-        /// 200 => Rule triggers returned.
-        /// </returns>
-        [HttpGet]
-        [Route("rules/triggers/")]
-        [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), 200)]
-        [ApiPermission]
-        [ApiCosts(0)]
-        public IActionResult GetTriggers()
-        {
-            var response = RuleElementRegistry.Triggers.ToDictionary(x => x.Key, x => SimpleMapper.Map(x.Value, new RuleElementDto()));
-
-            Response.Headers[HeaderNames.ETag] = RuleTriggersEtag;
+            Response.Headers[HeaderNames.ETag] = etag;
 
             return Ok(response);
         }

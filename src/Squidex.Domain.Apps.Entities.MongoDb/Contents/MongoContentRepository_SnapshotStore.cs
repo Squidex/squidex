@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.State;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -19,15 +19,31 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : ISnapshotStore<ContentState, Guid>
     {
-        public async Task<(ContentState Value, long Version)> ReadAsync(Guid key)
+        async Task ISnapshotStore<ContentState, Guid>.RemoveAsync(Guid key)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await contentsDraft.ReadAsync(key, GetSchemaAsync);
+                await contents.RemoveAsync(key);
             }
         }
 
-        public async Task WriteAsync(Guid key, ContentState value, long oldVersion, long newVersion)
+        async Task ISnapshotStore<ContentState, Guid>.ReadAllAsync(Func<ContentState, long, Task> callback, CancellationToken ct)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                await contents.ReadAllAsync(callback, GetSchemaAsync, ct);
+            }
+        }
+
+        async Task<(ContentState Value, long Version)> ISnapshotStore<ContentState, Guid>.ReadAsync(Guid key)
+        {
+            using (Profiler.TraceMethod<MongoContentRepository>())
+            {
+                return await contents.ReadAsync(key, GetSchemaAsync);
+            }
+        }
+
+        async Task ISnapshotStore<ContentState, Guid>.WriteAsync(Guid key, ContentState value, long oldVersion, long newVersion)
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
@@ -58,15 +74,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                     Version = newVersion
                 });
 
-                await contentsDraft.UpsertAsync(content, oldVersion);
+                await contents.UpsertAsync(content, oldVersion);
 
-                if (value.Status == Status.Published && !value.IsDeleted)
+                if (value.IsDeleted)
                 {
-                    await contentsPublished.UpsertAsync(content);
+                    await indexer.DeleteAsync(value.SchemaId.Id, value.Id);
                 }
                 else
                 {
-                    await contentsPublished.RemoveAsync(content.Id);
+                    await indexer.IndexAsync(value.SchemaId.Id, value.Id, value.Data, value.DataDraft);
                 }
             }
         }
@@ -81,16 +97,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
 
             return schema;
-        }
-
-        Task ISnapshotStore<ContentState, Guid>.RemoveAsync(Guid key)
-        {
-            throw new NotSupportedException();
-        }
-
-        Task ISnapshotStore<ContentState, Guid>.ReadAllAsync(Func<ContentState, long, Task> callback)
-        {
-            throw new NotSupportedException();
         }
     }
 }

@@ -26,36 +26,11 @@ namespace Squidex.Infrastructure.Commands
         private readonly ISnapshotStore<MyDomainState, Guid> snapshotStore = A.Fake<ISnapshotStore<MyDomainState, Guid>>();
         private readonly IPersistence persistence = A.Fake<IPersistence>();
         private readonly Guid id = Guid.NewGuid();
-        private readonly MyDomainObject sut;
+        private readonly MyLogDomainObject sut;
 
-        public sealed class ValueChanged : IEvent
+        public sealed class MyLogDomainObject : LogSnapshotDomainObjectGrain<MyDomainState>
         {
-            public int Value { get; set; }
-        }
-
-        public sealed class CreateAuto : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class CreateCustom : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class UpdateAuto : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class UpdateCustom : MyCommand
-        {
-            public int Value { get; set; }
-        }
-
-        public sealed class MyDomainObject : LogSnapshotDomainObjectGrain<MyDomainState>
-        {
-            public MyDomainObject(IStore<Guid> store)
+            public MyLogDomainObject(IStore<Guid> store)
                : base(store, A.Dummy<ISemanticLog>())
             {
             }
@@ -95,22 +70,17 @@ namespace Squidex.Infrastructure.Commands
 
                 return Task.FromResult<object>(null);
             }
-
-            protected override MyDomainState OnEvent(Envelope<IEvent> @event)
-            {
-                return new MyDomainState { Value = ((ValueChanged)@event.Payload).Value };
-            }
         }
 
         public LogSnapshotDomainObjectGrainTests()
         {
-            A.CallTo(() => store.WithEventSourcing(typeof(MyDomainObject), id, A<HandleEvent>.Ignored))
+            A.CallTo(() => store.WithEventSourcing(typeof(MyLogDomainObject), id, A<HandleEvent>.Ignored))
                 .Returns(persistence);
 
             A.CallTo(() => store.GetSnapshotStore<MyDomainState>())
                 .Returns(snapshotStore);
 
-            sut = new MyDomainObject(store);
+            sut = new MyLogDomainObject(store);
         }
 
         [Fact]

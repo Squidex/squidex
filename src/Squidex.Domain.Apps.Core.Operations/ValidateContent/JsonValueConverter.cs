@@ -179,7 +179,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
                 foreach (var item in array)
                 {
-                    if (item is JsonNull n)
+                    if (item is JsonNull)
                     {
                         result.Add(null);
                     }

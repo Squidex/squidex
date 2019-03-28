@@ -16,13 +16,11 @@
 
         <ng-container menu>
             <ng-container *ngIf="usersState.selectedUser | async; else noUserMenu">
-                <ng-container>
-                    <button type="submit" class="btn btn-primary" title="CTRL + S">
-                        Save
-                    </button>
-                    
-                    <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
-                </ng-container>
+                <button type="submit" class="btn btn-primary" title="CTRL + S">
+                    Save
+                </button>
+                
+                <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
             </ng-container>
 
             <ng-template #noUserMenu>

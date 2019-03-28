@@ -20,9 +20,9 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Infrastructure.Commands;
-using Squidex.Pipeline;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {

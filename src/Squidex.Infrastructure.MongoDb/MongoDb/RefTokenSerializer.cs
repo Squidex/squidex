@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Threading;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
@@ -13,16 +13,14 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public class RefTokenSerializer : ClassSerializerBase<RefToken>
     {
-        private static readonly Lazy<bool> Registerer = new Lazy<bool>(() =>
-        {
-            BsonSerializer.RegisterSerializer(new RefTokenSerializer());
+        private static volatile int isRegistered;
 
-            return true;
-        });
-
-        public static bool Register()
+        public static void Register()
         {
-            return !Registerer.IsValueCreated && Registerer.Value;
+            if (Interlocked.Increment(ref isRegistered) == 1)
+            {
+                BsonSerializer.RegisterSerializer(new RefTokenSerializer());
+            }
         }
 
         protected override RefToken DeserializeValue(BsonDeserializationContext context, BsonDeserializationArgs args)

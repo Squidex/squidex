@@ -20,21 +20,26 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyAssetServices(this IServiceCollection services, IConfiguration config)
         {
-            config.ConfigureByOption("assetStore:type", new Options
+            config.ConfigureByOption("assetStore:type", new Alternatives
             {
+                ["Default"] = () =>
+                {
+                    services.AddSingletonAs<NoopAssetStore>()
+                        .AsOptional<IAssetStore>();
+                },
                 ["Folder"] = () =>
                 {
                     var path = config.GetRequiredValue("assetStore:folder:path");
 
                     services.AddSingletonAs(c => new FolderAssetStore(path, c.GetRequiredService<ISemanticLog>()))
-                        .As<IAssetStore>();
+                        .AsOptional<IAssetStore>();
                 },
                 ["GoogleCloud"] = () =>
                 {
                     var bucketName = config.GetRequiredValue("assetStore:googleCloud:bucket");
 
                     services.AddSingletonAs(c => new GoogleCloudAssetStore(bucketName))
-                        .As<IAssetStore>();
+                        .AsOptional<IAssetStore>();
                 },
                 ["AzureBlob"] = () =>
                 {
@@ -42,7 +47,7 @@ namespace Squidex.Config.Domain
                     var containerName = config.GetRequiredValue("assetStore:azureBlob:containerName");
 
                     services.AddSingletonAs(c => new AzureBlobAssetStore(connectionString, containerName))
-                        .As<IAssetStore>();
+                        .AsOptional<IAssetStore>();
                 },
                 ["MongoDb"] = () =>
                 {
@@ -62,7 +67,7 @@ namespace Squidex.Config.Domain
 
                             return new MongoGridFsAssetStore(gridFsbucket);
                         })
-                        .As<IAssetStore>();
+                        .AsOptional<IAssetStore>();
                 }
             });
 

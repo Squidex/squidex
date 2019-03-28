@@ -6,16 +6,19 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Config.Domain;
-using Squidex.Pipeline;
+using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
+using Squidex.Web;
+using Squidex.Web.Pipeline;
 
 namespace Squidex.Config.Web
 {
     public static class WebServices
     {
-        public static void AddMyMvc(this IServiceCollection services)
+        public static void AddMyMvcWithPlugins(this IServiceCollection services, IConfiguration config)
         {
             services.AddSingletonAs<FileCallbackResultExecutor>()
                 .AsSelf();
@@ -46,7 +49,9 @@ namespace Squidex.Config.Web
                 options.Filters.Add<ETagFilter>();
                 options.Filters.Add<AppResolver>();
                 options.Filters.Add<MeasureResultFilter>();
-            }).AddMySerializers();
+            })
+            .AddMyPlugins(config)
+            .AddMySerializers();
 
             services.AddCors();
             services.AddRouting();

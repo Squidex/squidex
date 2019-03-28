@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Translations.Models;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Translations;
-using Squidex.Pipeline;
 using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Translations
 {

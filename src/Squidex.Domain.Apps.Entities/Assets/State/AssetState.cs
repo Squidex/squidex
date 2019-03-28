@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             IsDeleted = true;
         }
 
-        public AssetState Apply(Envelope<IEvent> @event)
+        public override AssetState Apply(Envelope<IEvent> @event)
         {
             var payload = (SquidexEvent)@event.Payload;
 

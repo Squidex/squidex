@@ -9,13 +9,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using NSwag;
-using Squidex.Config;
+using Squidex.Web;
 
 namespace Squidex.Pipeline.Swagger
 {
@@ -23,7 +22,7 @@ namespace Squidex.Pipeline.Swagger
     {
         public static string LoadDocs(string name)
         {
-            var assembly = typeof(NSwagHelper).GetTypeInfo().Assembly;
+            var assembly = typeof(NSwagHelper).Assembly;
 
             using (var resourceStream = assembly.GetManifestResourceStream($"Squidex.Docs.{name}.md"))
             {
@@ -34,7 +33,7 @@ namespace Squidex.Pipeline.Swagger
             }
         }
 
-        public static SwaggerDocument CreateApiDocument(HttpContext context, MyUrlsOptions urlOptions, string appName)
+        public static SwaggerDocument CreateApiDocument(HttpContext context, UrlsOptions urlOptions, string appName)
         {
             var scheme =
                 string.Equals(context.Request.Scheme, "http", StringComparison.OrdinalIgnoreCase) ?

@@ -5,9 +5,12 @@
     & {
         @include transition(background-color .4s ease);
         cursor: pointer;
+        height: 3rem;
+        position: relative;
     }
 
     &-text {
+        @include absolute(0, 0, 0, 3rem);
         @include truncate;
         color: $color-dark-foreground;
         line-height: 3rem;
@@ -17,14 +20,16 @@
     }
 
     &-icon {
+        @include absolute(0, auto, 0, 0);
+        color: $color-dark-foreground;
         line-height: 3.2rem;
         font-size: 1.2rem;
         font-weight: normal;
         padding: 0 .8rem;
     }
 
-    .col {
-        height: 3rem;
+    .icon {
+        font-size: 20px;
     }
 
     .svg-icon {
@@ -56,11 +61,16 @@
     }
 
     &-icon {
+        color: $color-dark-foreground;
         display: inline-block;
         margin-right: .5rem;
         position: relative;
         padding: 1rem;
         line-height: 1px;
+    }
+
+    .icon {
+        font-size: 30px;
     }
 
     .svg-icon {

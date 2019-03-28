@@ -5,11 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using EventStore.ClientAPI;
+using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
@@ -23,7 +26,7 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyEventStoreServices(this IServiceCollection services, IConfiguration config)
         {
-            config.ConfigureByOption("eventStore:type", new Options
+            config.ConfigureByOption("eventStore:type", new Alternatives
             {
                 ["MongoDb"] = () =>
                 {
@@ -37,7 +40,26 @@ namespace Squidex.Config.Domain
 
                             return new MongoEventStore(mongDatabase, c.GetRequiredService<IEventNotifier>());
                         })
-                        .As<IEventStore>();
+                        .AsOptional<IEventStore>();
+                },
+                ["CosmosDb"] = () =>
+                {
+                    var cosmosDbConfiguration = config.GetRequiredValue("eventStore:cosmosDB:configuration");
+                    var cosmosDbMasterKey = config.GetRequiredValue("eventStore:cosmosDB:masterKey");
+                    var cosmosDbDatabase = config.GetRequiredValue("eventStore:cosmosDB:database");
+
+                    services.AddSingletonAs(c => new DocumentClient(new Uri(cosmosDbConfiguration), cosmosDbMasterKey, c.GetRequiredService<JsonSerializerSettings>()))
+                        .AsSelf();
+
+                    services.AddSingletonAs(c => new CosmosDbEventStore(
+                            c.GetRequiredService<DocumentClient>(),
+                            cosmosDbMasterKey,
+                            cosmosDbDatabase,
+                            c.GetRequiredService<JsonSerializerSettings>()))
+                        .AsOptional<IEventStore>();
+
+                    services.AddHealthChecks()
+                        .AddCheck<CosmosDbHealthCheck>("CosmosDB", tags: new[] { "node" });
                 },
                 ["GetEventStore"] = () =>
                 {
@@ -45,13 +67,15 @@ namespace Squidex.Config.Domain
                     var eventStoreProjectionHost = config.GetRequiredValue("eventStore:getEventStore:projectionHost");
                     var eventStorePrefix = config.GetValue<string>("eventStore:getEventStore:prefix");
 
-                    var connection = EventStoreConnection.Create(eventStoreConfiguration);
-
-                    services.AddSingletonAs(connection)
+                    services.AddSingletonAs(_ => EventStoreConnection.Create(eventStoreConfiguration))
                         .As<IEventStoreConnection>();
 
-                    services.AddSingletonAs(c => new GetEventStore(connection, c.GetRequiredService<IJsonSerializer>(), eventStorePrefix, eventStoreProjectionHost))
-                        .As<IEventStore>();
+                    services.AddSingletonAs(c => new GetEventStore(
+                            c.GetRequiredService<IEventStoreConnection>(),
+                            c.GetRequiredService<IJsonSerializer>(),
+                            eventStorePrefix,
+                            eventStoreProjectionHost))
+                        .AsOptional<IEventStore>();
 
                     services.AddHealthChecks()
                         .AddCheck<GetEventStoreHealthCheck>("EventStore", tags: new[] { "node" });

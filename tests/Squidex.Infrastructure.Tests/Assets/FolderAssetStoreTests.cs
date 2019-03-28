@@ -13,21 +13,18 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public class FolderAssetStoreTests : AssetStoreTests<FolderAssetStore>
+    public class FolderAssetStoreTests : AssetStoreTests<FolderAssetStore>, IClassFixture<FolderAssetStoreFixture>
     {
-        private readonly string testFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        private readonly FolderAssetStoreFixture fixture;
+
+        public FolderAssetStoreTests(FolderAssetStoreFixture fixture)
+        {
+            this.fixture = fixture;
+        }
 
         public override FolderAssetStore CreateStore()
         {
-            return new FolderAssetStore(testFolder, A.Dummy<ISemanticLog>());
-        }
-
-        public override void Dispose()
-        {
-            if (Directory.Exists(testFolder))
-            {
-                Directory.Delete(testFolder, true);
-            }
+            return fixture.AssetStore;
         }
 
         [Fact]
@@ -39,7 +36,7 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public void Should_create_directory_when_connecting()
         {
-            Assert.True(Directory.Exists(testFolder));
+            Assert.True(Directory.Exists(fixture.TestFolder));
         }
 
         [Fact]

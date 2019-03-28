@@ -9,7 +9,7 @@ using MongoDB.Bson;
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public sealed class StreamPosition
+    internal sealed class StreamPosition
     {
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
 

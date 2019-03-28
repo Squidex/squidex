@@ -5,115 +5,109 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
-using Squidex.Infrastructure.EventSourcing.Grains;
+using OrleansDashboard;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Web;
+using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Squidex.Config.Orleans
 {
     public static class OrleansServices
     {
-        public static IServiceProvider AddAndBuildOrleans(this IServiceCollection services, IConfiguration config, Action<IServiceCollection> afterServices)
+        public static IServiceCollection AddOrleans(this IServiceCollection services, IConfiguration config, IWebHostEnvironment environment)
         {
-            services.Configure<ClusterOptions>(options =>
+            services.AddOrleans(config, environment, builder =>
             {
-                options.Configure();
-            });
-
-            services.Configure<ProcessExitHandlingOptions>(options =>
-            {
-                options.FastKillOnProcessExit = false;
-            });
-
-            services.AddServicesForSelfHostedDashboard(null, options =>
-            {
-                options.HideTrace = true;
-            });
-
-            services.AddHostedService<SiloHost>();
-
-            var hostBuilder = new SiloHostBuilder()
-                .UseDashboardEx()
-                .EnableDirectClient()
-                .AddIncomingGrainCallFilter<LocalCacheFilter>()
-                .AddStartupTask<Bootstrap<IContentSchedulerGrain>>()
-                .AddStartupTask<Bootstrap<IEventConsumerManagerGrain>>()
-                .AddStartupTask<Bootstrap<IRuleDequeuerGrain>>()
-                .AddStartupTask<Bootstrap<IUsageTrackerGrain>>()
-                .ConfigureApplicationParts(builder =>
+                builder.ConfigureServices(siloServices =>
                 {
-                    builder.AddMyParts();
+                    siloServices.Configure<ClusterOptions>(options =>
+                    {
+                        options.Configure();
+                    });
+
+                    siloServices.Configure<ProcessExitHandlingOptions>(options =>
+                    {
+                        options.FastKillOnProcessExit = false;
+                    });
+
+                    siloServices.Configure<DashboardOptions>(options =>
+                    {
+                        options.HideTrace = true;
+                    });
+
+                    siloServices.AddSingleton<IIncomingGrainCallFilter, LocalCacheFilter>();
                 });
 
-            var gatewayPort = config.GetOptionalValue("orleans:gatewayPort", 40000);
-
-            var siloPort = config.GetOptionalValue("orleans:siloPort", 11111);
-
-            config.ConfigureByOption("orleans:clustering", new Options
-            {
-                ["MongoDB"] = () =>
+                builder.ConfigureApplicationParts(parts =>
                 {
-                    hostBuilder.ConfigureEndpoints(Dns.GetHostName(), siloPort, gatewayPort, listenOnAnyHostAddress: true);
+                    parts.AddApplicationPart(SquidexEntities.Assembly);
+                    parts.AddApplicationPart(SquidexInfrastructure.Assembly);
+                });
 
-                    var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
-                    var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
+                builder.UseDashboard(options =>
+                {
+                    options.HostSelf = false;
+                });
 
-                    hostBuilder.UseMongoDBClustering(options =>
+                var gatewayPort = config.GetOptionalValue("orleans:gatewayPort", 40000);
+
+                var siloPort = config.GetOptionalValue("orleans:siloPort", 11111);
+
+                config.ConfigureByOption("orleans:clustering", new Alternatives
+                {
+                    ["MongoDB"] = () =>
                     {
-                        options.ConnectionString = mongoConfiguration;
-                        options.CollectionPrefix = "Orleans_";
-                        options.DatabaseName = mongoDatabaseName;
-                    });
-                },
-                ["Development"] = () =>
+                        builder.ConfigureEndpoints(Dns.GetHostName(), siloPort, gatewayPort, listenOnAnyHostAddress: true);
+
+                        var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
+                        var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
+
+                        builder.UseMongoDBClustering(options =>
+                        {
+                            options.ConnectionString = mongoConfiguration;
+                            options.CollectionPrefix = "Orleans_";
+                            options.DatabaseName = mongoDatabaseName;
+                        });
+                    },
+                    ["Development"] = () =>
+                    {
+                        builder.UseLocalhostClustering(siloPort, gatewayPort, null, Constants.OrleansClusterId, Constants.OrleansClusterId);
+                        builder.Configure<ClusterMembershipOptions>(options => options.ExpectedClusterSize = 1);
+                    }
+                });
+
+                config.ConfigureByOption("store:type", new Alternatives
                 {
-                    hostBuilder.UseLocalhostClustering(siloPort, gatewayPort, null, Constants.OrleansClusterId, Constants.OrleansClusterId);
-                    hostBuilder.Configure<ClusterMembershipOptions>(options => options.ExpectedClusterSize = 1);
-                }
+                    ["MongoDB"] = () =>
+                    {
+                        var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
+                        var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
+
+                        builder.UseMongoDBReminders(options =>
+                        {
+                            options.ConnectionString = mongoConfiguration;
+                            options.CollectionPrefix = "Orleans_";
+                            options.DatabaseName = mongoDatabaseName;
+                        });
+                    }
+                });
             });
 
-            config.ConfigureByOption("store:type", new Options
-            {
-                ["MongoDB"] = () =>
-                {
-                    var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
-                    var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
+            return services;
+        }
 
-                    hostBuilder.UseMongoDBReminders(options =>
-                    {
-                        options.ConnectionString = mongoConfiguration;
-                        options.CollectionPrefix = "Orleans_";
-                        options.DatabaseName = mongoDatabaseName;
-                    });
-                }
-            });
-
-            IServiceProvider provider = null;
-
-            hostBuilder.UseServiceProviderFactory((siloServices) =>
-            {
-                foreach (var descriptor in services)
-                {
-                    siloServices.Add(descriptor);
-                }
-
-                afterServices(siloServices);
-
-                provider = siloServices.BuildServiceProvider();
-
-                return provider;
-            }).Build();
-
-            return provider;
+        public static void Configure(this ClusterOptions options)
+        {
+            options.ClusterId = Constants.OrleansClusterId;
+            options.ServiceId = Constants.OrleansClusterId;
         }
     }
 }

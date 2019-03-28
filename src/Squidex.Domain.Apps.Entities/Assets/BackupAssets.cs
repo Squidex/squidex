@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             await RestoreTagsAsync(appId, reader);
 
-            await RebuildManyAsync(assetIds, id => RebuildAsync<AssetState, AssetGrain>(id, (e, s) => s.Apply(e)));
+            await RebuildManyAsync(assetIds, id => RebuildAsync<AssetState, AssetGrain>(id));
         }
 
         private async Task RestoreTagsAsync(Guid appId, BackupReader reader)
@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 try
                 {
-                    await assetStore.UploadAsync(assetId.ToString(), fileVersion, null, stream);
+                    await assetStore.UploadAsync(assetId.ToString(), fileVersion, null, stream, true);
                 }
                 catch (AssetAlreadyExistsException)
                 {

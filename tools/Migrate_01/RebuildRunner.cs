@@ -8,6 +8,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Migrate_01.Migrations;
 using Squidex.Infrastructure;
 
 namespace Migrate_01
@@ -15,15 +16,18 @@ namespace Migrate_01
     public sealed class RebuildRunner
     {
         private readonly Rebuilder rebuilder;
+        private readonly BuildFullTextIndices fullTextIndices;
         private readonly RebuildOptions rebuildOptions;
 
-        public RebuildRunner(Rebuilder rebuilder, IOptions<RebuildOptions> rebuildOptions)
+        public RebuildRunner(Rebuilder rebuilder, BuildFullTextIndices fullTextIndices, IOptions<RebuildOptions> rebuildOptions)
         {
             Guard.NotNull(rebuilder, nameof(rebuilder));
             Guard.NotNull(rebuildOptions, nameof(rebuildOptions));
+            Guard.NotNull(fullTextIndices, nameof(fullTextIndices));
 
             this.rebuilder = rebuilder;
             this.rebuildOptions = rebuildOptions.Value;
+            this.fullTextIndices = fullTextIndices;
         }
 
         public async Task RunAsync(CancellationToken ct)
@@ -51,6 +55,11 @@ namespace Migrate_01
             if (rebuildOptions.Contents)
             {
                 await rebuilder.RebuildContentAsync(ct);
+            }
+
+            if (rebuildOptions.Indices)
+            {
+                await fullTextIndices.UpdateAsync(ct);
             }
         }
     }

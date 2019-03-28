@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.News.Models;
 using Squidex.Areas.Api.Controllers.News.Service;
 using Squidex.Infrastructure.Commands;
-using Squidex.Pipeline;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.News
 {

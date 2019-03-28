@@ -10,30 +10,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Orleans;
 using Squidex.Areas.Api.Controllers.UI.Models;
-using Squidex.Config;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Extensions.Actions.Twitter;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Pipeline;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.UI
 {
     public sealed class UIController : ApiController
     {
         private readonly MyUIOptions uiOptions;
-        private readonly TwitterOptions twitterOptions;
         private readonly IGrainFactory grainFactory;
 
         public UIController(ICommandBus commandBus,
             IOptions<MyUIOptions> uiOptions,
-            IOptions<TwitterOptions> twitterOptions,
             IGrainFactory grainFactory)
             : base(commandBus)
         {
             this.uiOptions = uiOptions.Value;
+
             this.grainFactory = grainFactory;
-            this.twitterOptions = twitterOptions.Value;
         }
 
         /// <summary>
@@ -54,8 +50,6 @@ namespace Squidex.Areas.Api.Controllers.UI
 
             result.Value.Add("mapType", uiOptions.Map?.Type ?? "OSM");
             result.Value.Add("mapKey", uiOptions.Map?.GoogleMaps?.Key);
-
-            result.Value.Add("supportTwitterAction", twitterOptions.IsConfigured());
 
             return Ok(result.Value);
         }

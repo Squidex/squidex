@@ -13,8 +13,8 @@ using Squidex.Areas.Api.Controllers.EventConsumers.Models;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Pipeline;
 using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.EventConsumers
 {

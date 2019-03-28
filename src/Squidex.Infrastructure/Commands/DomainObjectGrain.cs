@@ -13,7 +13,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public abstract class DomainObjectGrain<T> : DomainObjectGrainBase<T> where T : IDomainState, new()
+    public abstract class DomainObjectGrain<T> : DomainObjectGrainBase<T> where T : IDomainState<T>, new()
     {
         private readonly IStore<Guid> store;
         private T snapshot = new T { Version = EtagVersion.Empty };
@@ -66,6 +66,9 @@ namespace Squidex.Infrastructure.Commands
             }
         }
 
-        protected abstract T OnEvent(Envelope<IEvent> @event);
+        protected T OnEvent(Envelope<IEvent> @event)
+        {
+            return Snapshot.Apply(@event);
+        }
     }
 }

@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Backup
@@ -39,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        protected async Task RebuildAsync<TState, TGrain>(Guid key, Func<Envelope<IEvent>, TState, TState> func) where TState : IDomainState, new()
+        protected async Task RebuildAsync<TState, TGrain>(Guid key) where TState : IDomainState<TState>, new()
         {
             var state = new TState
             {
@@ -48,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             var persistence = store.WithSnapshotsAndEventSourcing(typeof(TGrain), key, (TState s) => state = s, e =>
             {
-                state = func(e, state);
+                state = state.Apply(e);
 
                 state.Version++;
             });

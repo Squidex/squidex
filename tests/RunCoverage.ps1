@@ -25,8 +25,8 @@ if ($all -Or $infrastructure) {
 	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[Squidex.Infrastructure*]*CodeGen*" `
+	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
+	-filter:"+[Squidex.*]* -[Squidex.Infrastructure*]*CodeGen* -[Squidex.Infrastructure*]*OrleansGeneratedCode*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Infrastructure.xml" `
 	-oldStyle
@@ -48,7 +48,7 @@ if ($all -Or $appsEntities) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[Squidex.Domain.Apps.Entities*]*CodeGen*" `
+	-filter:"+[Squidex.*]* -[Squidex.Domain.Apps.Entities*]*CodeGen* -[Squidex.Domain.Apps.Entities*]*OrleansGeneratedCode*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Entities.xml" `
 	-oldStyle
@@ -69,13 +69,13 @@ if ($all -Or $web) {
 	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test $folderWorking\Squidex.Tests\Squidex.Tests.csproj" `
-	-filter:"+[Squidex]Squidex.Pipeline*" `
+	-targetargs:"test $folderWorking\Squidex.Web.Tests\Squidex.Web.Tests.csproj" `
+	-filter:"+[Squidex]Squidex.Web*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Web.xml" `
 	-oldStyle
 }
 
-&"$folderHome\.nuget\packages\ReportGenerator\4.0.9\tools\net47\ReportGenerator.exe" `
+&"$folderHome\.nuget\packages\ReportGenerator\4.0.13.1\tools\net47\ReportGenerator.exe" `
 -reports:"$folderWorking\$folderReports\*.xml" `
 -targetdir:"$folderWorking\$folderReports\Output"

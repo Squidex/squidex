@@ -10,11 +10,12 @@ using System.Runtime.Serialization;
 using NodaTime;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities
 {
     public abstract class DomainObjectState<T> : Cloneable<T>,
-        IDomainState,
+        IDomainState<T>,
         IEntity,
         IEntityWithCreatedBy,
         IEntityWithLastModifiedBy,
@@ -41,6 +42,8 @@ namespace Squidex.Domain.Apps.Entities
 
         [DataMember]
         public long Version { get; set; } = EtagVersion.Empty;
+
+        public abstract T Apply(Envelope<IEvent> @event);
 
         public T Clone()
         {

@@ -69,10 +69,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         [BsonJson]
         public ScheduleJob ScheduleJob { get; set; }
 
-        [BsonIgnoreIfDefault]
-        [BsonElement("dt")]
-        public string DataText { get; set; }
-
         [BsonRequired]
         [BsonElement("ai")]
         public NamedId<Guid> AppId { get; set; }

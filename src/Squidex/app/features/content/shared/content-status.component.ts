@@ -34,10 +34,16 @@ export class ContentStatusComponent {
     @Input()
     public alignMiddle = true;
 
-    public get displayStatus() {
+    public get tooltipText() {
         if (this.scheduledAt) {
             return `Will be set to '${this.scheduledTo}' at ${this.scheduledAt.toStringFormat('LLLL')}`;
-        } else if (this.isPending) {
+        } else {
+            return this.status;
+        }
+    }
+
+    public get displayStatus() {
+        if (this.isPending) {
             return 'Pending';
         } else {
             return this.status;

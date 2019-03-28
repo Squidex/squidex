@@ -16,17 +16,15 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     public partial class MongoEventStore
     {
+        private const int MaxCommitSize = 10;
         private const int MaxWriteAttempts = 20;
         private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
 
         public Task DeleteStreamAsync(string streamName)
         {
-            return Collection.DeleteManyAsync(x => x.EventStream == streamName);
-        }
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
 
-        public Task DeleteManyAsync(string property, object value)
-        {
-            return Collection.DeleteManyAsync(Filter.Eq(CreateIndexPath(property), value));
+            return Collection.DeleteManyAsync(x => x.EventStream == streamName);
         }
 
         public Task AppendAsync(Guid commitId, string streamName, ICollection<EventData> events)
@@ -36,18 +34,22 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public async Task AppendAsync(Guid commitId, string streamName, long expectedVersion, ICollection<EventData> events)
         {
+            Guard.NotEmpty(commitId, nameof(commitId));
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNull(events, nameof(events));
+            Guard.LessThan(events.Count, MaxCommitSize, "events.Count");
+            Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
+            Guard.NotNullOrEmpty(streamName, nameof(streamName));
+            Guard.NotNull(events, nameof(events));
+
             using (Profiler.TraceMethod<MongoEventStore>())
             {
-                Guard.GreaterEquals(expectedVersion, EtagVersion.Any, nameof(expectedVersion));
-                Guard.NotNullOrEmpty(streamName, nameof(streamName));
-                Guard.NotNull(events, nameof(events));
-
                 if (events.Count == 0)
                 {
                     return;
                 }
 
-                var currentVersion = await GetEventStreamOffset(streamName);
+                var currentVersion = await GetEventStreamOffsetAsync(streamName);
 
                 if (expectedVersion != EtagVersion.Any && expectedVersion != currentVersion)
                 {
@@ -70,7 +72,7 @@ namespace Squidex.Infrastructure.EventSourcing
                     {
                         if (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
                         {
-                            currentVersion = await GetEventStreamOffset(streamName);
+                            currentVersion = await GetEventStreamOffsetAsync(streamName);
 
                             if (expectedVersion != EtagVersion.Any)
                             {
@@ -95,7 +97,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private async Task<long> GetEventStreamOffset(string streamName)
+        private async Task<long> GetEventStreamOffsetAsync(string streamName)
         {
             var document =
                 await Collection.Find(Filter.Eq(EventStreamField, streamName))

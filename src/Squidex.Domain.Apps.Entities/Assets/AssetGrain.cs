@@ -165,11 +165,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        protected override AssetState OnEvent(Envelope<IEvent> @event)
-        {
-            return Snapshot.Apply(@event);
-        }
-
         public Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any)
         {
             return J.AsTask<IAssetEntity>(GetSnapshot(version));

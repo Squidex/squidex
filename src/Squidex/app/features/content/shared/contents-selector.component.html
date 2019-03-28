@@ -48,8 +48,8 @@
 
         <div class="grid-content">
             <div sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed">
-                    <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent">
+                <table class="table table-items table-fixed" *ngIf="contentsState.contents | async; let contents">
+                    <tbody *ngFor="let content of contents; trackBy: trackByContent">
                         <tr [sqxContent]="content"
                             [selected]="isItemSelected(content)"
                             (selectedChange)="selectContent(content)"

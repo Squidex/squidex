@@ -22,6 +22,7 @@ import {
     UpdateRuleDto,
     Version
 } from './../';
+import { RuleElementPropertyDto } from './rules.service';
 
 describe('RulesService', () => {
     const now = DateTime.now();
@@ -65,57 +66,43 @@ describe('RulesService', () => {
                 description: 'description2',
                 iconColor: '#222',
                 iconImage: '<svg path="2" />',
-                readMore: 'link2'
+                readMore: 'link2',
+                properties: [{
+                    name: 'property1',
+                    editor: 'Editor1',
+                    display: 'Display1',
+                    description: 'Description1',
+                    isRequired: true,
+                    isFormattable: false
+                }, {
+                    name: 'property2',
+                    editor: 'Editor2',
+                    display: 'Display2',
+                    description: 'Description2',
+                    isRequired: false,
+                    isFormattable: true
+                }]
             },
             'action1': {
                 display: 'display1',
                 description: 'description1',
                 iconColor: '#111',
                 iconImage: '<svg path="1" />',
-                readMore: 'link1'
+                readMore: 'link1',
+                properties: []
             }
         });
+
+        const action1 = new RuleElementDto('display1', 'description1', '#111', '<svg path="1" />', null, 'link1', []);
+
+        const action2 = new RuleElementDto('display2', 'description2', '#222', '<svg path="2" />', null, 'link2', [
+            new RuleElementPropertyDto('property1', 'Editor1', 'Display1', 'Description1', false, true),
+            new RuleElementPropertyDto('property2', 'Editor2', 'Display2', 'Description2', true, false)
+        ]);
 
         expect(actions!).toEqual({
-            'action1': new RuleElementDto('display1', 'description1', '#111', '<svg path="1" />', 'link1'),
-            'action2': new RuleElementDto('display2', 'description2', '#222', '<svg path="2" />', 'link2')
-        });
-    }));
-
-    it('should make get request to get triggers',
-        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-
-        let triggers: { [ name: string ]: RuleElementDto };
-
-        rulesService.getTriggers().subscribe(result => {
-            triggers = result;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/rules/triggers');
-
-        expect(req.request.method).toEqual('GET');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({
-            'trigger2': {
-                display: 'display2',
-                description: 'description2',
-                iconColor: '#222',
-                iconImage: '<svg path="2" />',
-                readMore: 'link2'
-            },
-            'trigger1': {
-                display: 'display1',
-                description: 'description1',
-                iconColor: '#111',
-                iconImage: '<svg path="1" />',
-                readMore: 'link1'
-            }
-        });
-
-        expect(triggers!).toEqual({
-            'trigger1': new RuleElementDto('display1', 'description1', '#111', '<svg path="1" />', 'link1'),
-            'trigger2': new RuleElementDto('display2', 'description2', '#222', '<svg path="2" />', 'link2')
+            'action1': action1,
+            'action2': action2
         });
     }));
 

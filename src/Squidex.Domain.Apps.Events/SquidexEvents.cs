@@ -7,9 +7,11 @@
 
 using System.Reflection;
 
+#pragma warning disable RECS0014 // If all fields, properties and methods members are static, the class can be made static.
+
 namespace Squidex.Domain.Apps.Events
 {
-    public static class SquidexEvents
+    public sealed class SquidexEvents
     {
         public static readonly Assembly Assembly = typeof(SquidexEvents).Assembly;
     }

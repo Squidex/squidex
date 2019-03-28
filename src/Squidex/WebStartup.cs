@@ -7,6 +7,7 @@
 
 using System;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Migrate_01;
@@ -14,6 +15,7 @@ using Squidex.Areas.Api;
 using Squidex.Areas.Api.Config.Swagger;
 using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Areas.Api.Controllers.News;
+using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer;
 using Squidex.Areas.IdentityServer.Config;
@@ -27,31 +29,35 @@ using Squidex.Config.Startup;
 using Squidex.Config.Web;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Extensions.Actions.Twitter;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
-using Squidex.Pipeline;
+using Squidex.Infrastructure.Translations;
+using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
+using Squidex.Web;
 
 namespace Squidex
 {
     public sealed class WebStartup
     {
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration config;
+        private readonly IHostingEnvironment environment;
 
-        public WebStartup(IConfiguration configuration)
+        public WebStartup(IConfiguration config, IHostingEnvironment environment)
         {
-            this.configuration = configuration;
+            this.config = config;
+
+            this.environment = environment;
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var config = configuration;
-
             services.AddHttpClient();
             services.AddLogging();
             services.AddMemoryCache();
             services.AddOptions();
+
+            services.AddMyMvcWithPlugins(config);
 
             services.AddMyAssetServices(config);
             services.AddMyAuthentication(config);
@@ -62,7 +68,6 @@ namespace Squidex
             services.AddMyInfrastructureServices(config);
             services.AddMyLoggingServices(config);
             services.AddMyMigrationServices();
-            services.AddMyMvc();
             services.AddMyRuleServices();
             services.AddMySerializers();
             services.AddMyStoreServices(config);
@@ -73,40 +78,41 @@ namespace Squidex
                 config.GetSection("contents"));
             services.Configure<AssetOptions>(
                 config.GetSection("assets"));
+            services.Configure<DeepLTranslatorOptions>(
+                config.GetSection("translations:deepL"));
             services.Configure<ReadonlyOptions>(
                 config.GetSection("mode"));
-            services.Configure<TwitterOptions>(
-                config.GetSection("twitter"));
             services.Configure<RobotsTxtOptions>(
                 config.GetSection("robots"));
             services.Configure<GCHealthCheckOptions>(
                 config.GetSection("healthz:gc"));
             services.Configure<ETagOptions>(
                 config.GetSection("etags"));
+            services.Configure<UrlsOptions>(
+                config.GetSection("urls"));
+            services.Configure<UsageOptions>(
+                config.GetSection("usage"));
             services.Configure<RebuildOptions>(
                 config.GetSection("rebuild"));
 
             services.Configure<MyContentsControllerOptions>(
                 config.GetSection("contentsController"));
-            services.Configure<MyUrlsOptions>(
-                config.GetSection("urls"));
             services.Configure<MyIdentityOptions>(
                 config.GetSection("identity"));
             services.Configure<MyUIOptions>(
                 config.GetSection("ui"));
-            services.Configure<MyUsageOptions>(
-                config.GetSection("usage"));
             services.Configure<MyNewsOptions>(
                 config.GetSection("news"));
 
-            var provider = services.AddAndBuildOrleans(configuration, afterServices =>
-            {
-                afterServices.AddHostedService<InitializerHost>();
-                afterServices.AddHostedService<MigratorHost>();
-                afterServices.AddHostedService<RebuilderHost>();
-            });
+            services.AddHostedService<InitializerHost>();
 
-            return provider;
+            services.AddOrleans(config, environment);
+
+            services.AddHostedService<MigratorHost>();
+            services.AddHostedService<BackgroundHost>();
+            services.AddHostedService<RebuilderHost>();
+
+            return services.BuildServiceProvider();
         }
 
         public void Configure(IApplicationBuilder app)
@@ -125,6 +131,8 @@ namespace Squidex
             app.ConfigureOrleansDashboard();
             app.ConfigureIdentityServer();
             app.ConfigureFrontend();
+
+            app.UsePlugins();
         }
     }
 }

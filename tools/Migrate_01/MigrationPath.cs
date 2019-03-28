@@ -10,20 +10,18 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Migrate_01.Migrations;
-using Squidex.Infrastructure;
+using Migrate_01.Migrations.MongoDb;
 using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 14;
+        private const int CurrentVersion = 15;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
         {
-            Guard.NotNull(serviceProvider, nameof(serviceProvider));
-
             this.serviceProvider = serviceProvider;
         }
 
@@ -97,6 +95,13 @@ namespace Migrate_01
             if (version < 1)
             {
                 yield return serviceProvider.GetRequiredService<AddPatterns>();
+            }
+
+            // Version 15: Introduce custom full text search actors.
+            if (version < 15)
+            {
+                yield return serviceProvider.GetService<RestructureContentCollection>();
+                yield return serviceProvider.GetService<BuildFullTextIndices>();
             }
 
             yield return serviceProvider.GetRequiredService<StartEventConsumers>();

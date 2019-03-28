@@ -12,12 +12,12 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
-    public static class FieldRegistry
+    public class FieldRegistry : ITypeProvider
     {
         private const string Suffix = "Properties";
         private const string SuffixOld = "FieldProperties";
 
-        public static TypeNameRegistry MapFields(this TypeNameRegistry typeNameRegistry)
+        public void Map(TypeNameRegistry typeNameRegistry)
         {
             var types = typeof(FieldRegistry).Assembly.GetTypes().Where(x => typeof(FieldProperties).IsAssignableFrom(x) && !x.IsAbstract);
 
@@ -32,8 +32,6 @@ namespace Squidex.Domain.Apps.Core.Schemas
                     typeNameRegistry.MapObsolete(type, type.TypeName(false, SuffixOld));
                 }
             }
-
-            return typeNameRegistry;
         }
     }
 }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -15,11 +14,12 @@ using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.News.Service;
 using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
+using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Users;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Diagnostics;
-using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.EventSourcing.Grains;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared.Users;
@@ -32,25 +32,17 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyInfrastructureServices(this IServiceCollection services, IConfiguration config)
         {
-            var deeplAuthKey = config.GetValue<string>("translations:deeplAuthKey");
-
-            if (!string.IsNullOrWhiteSpace(deeplAuthKey))
-            {
-                services.AddSingletonAs(c => new DeepLTranslator(deeplAuthKey, c.GetRequiredService<IJsonSerializer>()))
-                    .As<ITranslator>();
-            }
-            else
-            {
-                services.AddSingletonAs<NoopTranslator>()
-                    .As<ITranslator>();
-            }
-
             services.AddHealthChecks()
                 .AddCheck<GCHealthCheck>("GC", tags: new[] { "node" })
                 .AddCheck<OrleansHealthCheck>("Orleans", tags: new[] { "cluster" })
                 .AddCheck<OrleansAppsHealthCheck>("Orleans App", tags: new[] { "cluster" });
 
-            services.AddSingletonAs(SystemClock.Instance)
+            services.AddSingletonAs(c => new CachingUsageTracker(
+                    c.GetRequiredService<BackgroundUsageTracker>(),
+                    c.GetRequiredService<IMemoryCache>()))
+                .As<IUsageTracker>();
+
+            services.AddSingletonAs(_ => SystemClock.Instance)
                 .As<IClock>();
 
             services.AddSingletonAs<FeaturesService>()
@@ -59,8 +51,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<BackgroundUsageTracker>()
                 .AsSelf();
 
-            services.AddSingletonAs(c => new CachingUsageTracker(c.GetRequiredService<BackgroundUsageTracker>(), c.GetRequiredService<IMemoryCache>()))
-                .As<IUsageTracker>();
+            services.AddSingletonAs<GrainBootstrap<IEventConsumerManagerGrain>>()
+                .AsSelf();
+
+            services.AddSingletonAs<GrainBootstrap<IUsageTrackerGrain>>()
+                .AsSelf();
+
+            services.AddSingletonAs<DeepLTranslator>()
+                .As<ITranslator>();
 
             services.AddSingletonAs<AsyncLocalCache>()
                 .As<ILocalCache>();
@@ -72,15 +70,13 @@ namespace Squidex.Config.Domain
                 .As<IActionContextAccessor>();
 
             services.AddSingletonAs<DefaultUserResolver>()
-                .As<IUserResolver>();
+                .AsOptional<IUserResolver>();
 
             services.AddSingletonAs<AssetUserPictureStore>()
-                .As<IUserPictureStore>();
+                .AsOptional<IUserPictureStore>();
 
             services.AddSingletonAs<DefaultXmlRepository>()
                 .As<IXmlRepository>();
-
-            services.AddTransient(typeof(Lazy<>), typeof(Lazier<>));
         }
     }
 }

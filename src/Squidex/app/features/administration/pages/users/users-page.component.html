@@ -47,8 +47,8 @@
         
         <div class="grid-content">
             <div sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed">
-                    <tbody *ngFor="let userInfo of usersState.users | async; trackBy: trackByUser">
+                <table class="table table-items table-fixed" *ngIf="usersState.users | async; let users">
+                    <tbody *ngFor="let userInfo of users; trackBy: trackByUser">
                         <tr [routerLink]="userInfo.user.id" routerLinkActive="active">
                             <td class="cell-user">
                                 <img class="user-picture" title="{{userInfo.user.name}}" [attr.src]="userInfo.user | sqxUserDtoPicture" />
@@ -60,7 +60,7 @@
                                 <span class="user-email table-cell">{{userInfo.user.email}}</span>
                             </td>
                             <td class="cell-actions">
-                                <ng-container *ngIf="!userInfo.isCurrentUser">
+                                <ng-container *ngIf="!userInfo.isCurrentUser; else self">
                                     <button type="button" class="btn btn-text" (click)="lock(userInfo.user)" *ngIf="!userInfo.user.isLocked" title="Lock User">
                                         <i class="icon icon-unlocked"></i>
                                     </button>
@@ -68,10 +68,12 @@
                                         <i class="icon icon-lock"></i>
                                     </button>
                                 </ng-container>
-
-                                <button *ngIf="userInfo.isCurrentUser" class="btn btn-text invisible">
-                                    &nbsp;
-                                </button>
+                                
+                                <ng-template #self>
+                                    <button class="btn btn-text invisible">
+                                        &nbsp;
+                                    </button>
+                                </ng-template>
                             </td>
                         </tr>
                         <tr class="spacer"></tr>

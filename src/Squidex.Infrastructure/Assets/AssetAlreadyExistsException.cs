@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.Assets
         {
             Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
-            return $"An asset with name '{fileName}' already not exists.";
+            return $"An asset with name '{fileName}' already exists.";
         }
     }
 }

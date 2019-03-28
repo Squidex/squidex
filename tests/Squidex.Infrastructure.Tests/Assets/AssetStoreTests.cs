@@ -12,19 +12,12 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public abstract class AssetStoreTests<T> : IDisposable where T : IAssetStore
+    public abstract class AssetStoreTests<T> where T : IAssetStore
     {
         private readonly MemoryStream assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
         private readonly string assetId = Guid.NewGuid().ToString();
         private readonly string tempId = Guid.NewGuid().ToString();
         private readonly Lazy<T> sut;
-
-        protected AssetStoreTests()
-        {
-            sut = new Lazy<T>(CreateStore);
-
-            ((IInitializable)Sut).InitializeAsync().Wait();
-        }
 
         protected T Sut
         {
@@ -36,9 +29,12 @@ namespace Squidex.Infrastructure.Assets
             get { return assetId; }
         }
 
-        public abstract T CreateStore();
+        protected AssetStoreTests()
+        {
+            sut = new Lazy<T>(CreateStore);
+        }
 
-        public abstract void Dispose();
+        public abstract T CreateStore();
 
         [Fact]
         public virtual Task Should_throw_exception_if_asset_to_download_is_not_found()
@@ -56,6 +52,19 @@ namespace Squidex.Infrastructure.Assets
         public async Task Should_read_and_write_file()
         {
             await Sut.UploadAsync(assetId, 1, "suffix", assetData);
+
+            var readData = new MemoryStream();
+
+            await Sut.DownloadAsync(assetId, 1, "suffix", readData);
+
+            Assert.Equal(assetData.ToArray(), readData.ToArray());
+        }
+
+        [Fact]
+        public async Task Should_read_and_override_file()
+        {
+            await Sut.UploadAsync(assetId, 1, "suffix", new MemoryStream(new byte[] { 0x3, 0x4, 0x5, 0x6 }));
+            await Sut.UploadAsync(assetId, 1, "suffix", assetData, true);
 
             var readData = new MemoryStream();
 

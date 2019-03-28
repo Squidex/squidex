@@ -6,7 +6,8 @@
 // ==========================================================================
 
 using System;
-using System.Reflection;
+using System.Linq;
+using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
 using Xunit;
 
@@ -24,6 +25,28 @@ namespace Squidex.Infrastructure
         [EventType(nameof(MyAdded), 2)]
         public sealed class MyAdded
         {
+        }
+
+        [Fact]
+        public void Should_call_provider_from_constructor()
+        {
+            var provider = A.Fake<ITypeProvider>();
+
+            var registry = new TypeNameRegistry(Enumerable.Repeat(provider, 1));
+
+            A.CallTo(() => provider.Map(registry))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public void Should_call_provider()
+        {
+            var provider = A.Fake<ITypeProvider>();
+
+            sut.Map(provider);
+
+            A.CallTo(() => provider.Map(sut))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -51,9 +74,21 @@ namespace Squidex.Infrastructure
         }
 
         [Fact]
+        public void Should_register_with_provider_from_assembly()
+        {
+            sut.Map(new AutoAssembyTypeProvider<TypeNameRegistryTests>());
+
+            Assert.Equal("my", sut.GetName<MyType>());
+            Assert.Equal("my", sut.GetName(typeof(MyType)));
+
+            Assert.Equal(typeof(MyType), sut.GetType("my"));
+            Assert.Equal(typeof(MyType), sut.GetType("My"));
+        }
+
+        [Fact]
         public void Should_register_from_assembly()
         {
-            sut.MapUnmapped(typeof(TypeNameRegistryTests).GetTypeInfo().Assembly);
+            sut.MapUnmapped(typeof(TypeNameRegistryTests).Assembly);
 
             Assert.Equal("my", sut.GetName<MyType>());
             Assert.Equal("my", sut.GetName(typeof(MyType)));
@@ -65,7 +100,7 @@ namespace Squidex.Infrastructure
         [Fact]
         public void Should_register_event_type_from_assembly()
         {
-            sut.MapUnmapped(typeof(TypeNameRegistryTests).GetTypeInfo().Assembly);
+            sut.MapUnmapped(typeof(TypeNameRegistryTests).Assembly);
 
             Assert.Equal("MyAddedEventV2", sut.GetName<MyAdded>());
             Assert.Equal("MyAddedEventV2", sut.GetName(typeof(MyAdded)));

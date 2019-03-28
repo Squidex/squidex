@@ -381,11 +381,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             }
         }
 
-        protected override SchemaState OnEvent(Envelope<IEvent> @event)
-        {
-            return Snapshot.Apply(@event);
-        }
-
         public Task<J<ISchemaEntity>> GetStateAsync()
         {
             return J.AsTask<ISchemaEntity>(Snapshot);

@@ -17,8 +17,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Net.Http.Headers;
 using Squidex.Infrastructure.Json;
-using Squidex.Pipeline;
 using Squidex.Pipeline.Robots;
+using Squidex.Web.Pipeline;
 
 namespace Squidex.Config.Web
 {

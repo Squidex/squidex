@@ -18,23 +18,23 @@ using NSwag.SwaggerGeneration;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Areas.Api.Config.Swagger;
-using Squidex.Config;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.Swagger;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemasSwaggerGenerator
     {
-        private readonly MyUrlsOptions urlOptions;
+        private readonly UrlsOptions urlOptions;
         private readonly SwaggerDocumentSettings settings = new SwaggerDocumentSettings();
         private SwaggerJsonSchemaGenerator schemaGenerator;
         private SwaggerDocument document;
         private JsonSchemaResolver schemaResolver;
 
-        public SchemasSwaggerGenerator(IOptions<MyUrlsOptions> urlOptions, IEnumerable<IDocumentProcessor> documentProcessors)
+        public SchemasSwaggerGenerator(IOptions<UrlsOptions> urlOptions, IEnumerable<IDocumentProcessor> documentProcessors)
         {
             this.urlOptions = urlOptions.Value;
 

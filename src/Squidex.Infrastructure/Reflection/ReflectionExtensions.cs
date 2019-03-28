@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Reflection
                 BindingFlags.Public |
                 BindingFlags.Instance;
 
-            if (!type.GetTypeInfo().IsInterface)
+            if (!type.IsInterface)
             {
                 return type.GetProperties(bindingFlags);
             }

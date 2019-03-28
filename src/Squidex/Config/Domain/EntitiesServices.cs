@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Migrate_01;
 using Migrate_01.Migrations;
 using Orleans;
+using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -31,6 +32,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
@@ -44,8 +46,10 @@ using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Pipeline;
-using Squidex.Pipeline.CommandMiddlewares;
+using Squidex.Infrastructure.Orleans;
+using Squidex.Web;
+using Squidex.Web.CommandMiddlewares;
+using Squidex.Web.Services;
 
 namespace Squidex.Config.Domain
 {
@@ -56,18 +60,16 @@ namespace Squidex.Config.Domain
             var exposeSourceUrl = config.GetOptionalValue("assetStore:exposeSourceUrl", true);
 
             services.AddSingletonAs(c => new UrlGenerator(
-                    c.GetRequiredService<IOptions<MyUrlsOptions>>(),
+                    c.GetRequiredService<IOptions<UrlsOptions>>(),
                     c.GetRequiredService<IAssetStore>(),
                     exposeSourceUrl))
                 .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>().As<IAssetUrlGenerator>();
 
             services.AddSingletonAs<HistoryService>()
-                .As<IEventConsumer>()
-                .As<IHistoryService>();
+                .As<IEventConsumer>().As<IHistoryService>();
 
             services.AddSingletonAs<AssetUsageTracker>()
-                .As<IEventConsumer>()
-                .As<IAssetUsageTracker>();
+                .As<IEventConsumer>().As<IAssetUsageTracker>();
 
             services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();
@@ -105,6 +107,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<GrainTagService>()
                 .As<ITagService>();
 
+            services.AddSingletonAs<GrainTextIndexer>()
+                .As<ITextIndexer>();
+
             services.AddSingletonAs<FileTypeTagGenerator>()
                 .As<ITagGenerator<CreateAsset>>();
 
@@ -112,7 +117,13 @@ namespace Squidex.Config.Domain
                 .As<ITagGenerator<CreateAsset>>();
 
             services.AddSingletonAs<JintScriptEngine>()
-                .As<IScriptEngine>();
+                .AsOptional<IScriptEngine>();
+
+            services.AddSingletonAs<GrainBootstrap<IContentSchedulerGrain>>()
+                .AsSelf();
+
+            services.AddSingletonAs<GrainBootstrap<IRuleDequeuerGrain>>()
+                .AsSelf();
 
             services.AddCommandPipeline();
             services.AddBackupHandlers();
@@ -246,6 +257,9 @@ namespace Squidex.Config.Domain
                 .As<IMigrationPath>();
 
             services.AddTransientAs<AddPatterns>()
+                .As<IMigration>();
+
+            services.AddTransientAs<BuildFullTextIndices>()
                 .As<IMigration>();
 
             services.AddTransientAs<ConvertEventStore>()

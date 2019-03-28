@@ -7,19 +7,21 @@
 
 using Xunit;
 
-#pragma warning disable xUnit1000 // Test classes must be public
-
 namespace Squidex.Infrastructure.Assets
 {
-    internal class AzureBlobAssetStoreTests : AssetStoreTests<AzureBlobAssetStore>
+    [Trait("Category", "Dependencies")]
+    public class AzureBlobAssetStoreTests : AssetStoreTests<AzureBlobAssetStore>, IClassFixture<AzureBlobAssetStoreFixture>
     {
-        public override AzureBlobAssetStore CreateStore()
+        private readonly AzureBlobAssetStoreFixture fixture;
+
+        public AzureBlobAssetStoreTests(AzureBlobAssetStoreFixture fixture)
         {
-            return new AzureBlobAssetStore("UseDevelopmentStorage=true", "squidex-test-container");
+            this.fixture = fixture;
         }
 
-        public override void Dispose()
+        public override AzureBlobAssetStore CreateStore()
         {
+            return fixture.AssetStore;
         }
 
         [Fact]

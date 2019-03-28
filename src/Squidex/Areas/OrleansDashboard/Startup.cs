@@ -8,7 +8,7 @@
 using Microsoft.AspNetCore.Builder;
 using Orleans;
 using Squidex.Areas.OrleansDashboard.Middlewares;
-using Squidex.Config;
+using Squidex.Web;
 
 namespace Squidex.Areas.OrleansDashboard
 {

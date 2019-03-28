@@ -14,7 +14,7 @@
     </ng-container>
     
     <ng-container content>
-        <ng-container *ngIf="clientsState.clients | async; let clients">
+        <ng-container *ngIf="(clientsState.isLoaded | async) && (clientsState.clients | async); let clients">
             <div class="table-items-row table-items-row-empty" *ngIf="clients.length === 0">
                 No client created yet.
             </div>

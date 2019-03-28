@@ -10,13 +10,14 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Migrate_01.Migrations;
+using Migrate_01.Migrations.MongoDb;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.State;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.Domain.Apps.Entities.MongoDb.Contents;
@@ -41,27 +42,31 @@ namespace Squidex.Config.Domain
     {
         public static void AddMyStoreServices(this IServiceCollection services, IConfiguration config)
         {
-            config.ConfigureByOption("store:type", new Options
+            config.ConfigureByOption("store:type", new Alternatives
             {
                 ["MongoDB"] = () =>
                 {
-                    BsonJsonConvention.Register(SerializationServices.DefaultJsonSerializer);
-
                     var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
                     var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
                     var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName);
 
-                    var mongoClient = Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s));
-                    var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
-                    var mongoContentDatabase = mongoClient.GetDatabase(mongoContentDatabaseName);
+                    var isCosmosDb = config.GetOptionalValue<bool>("store:mongoDB:isCosmosDB");
+
+                    services.Configure<MongoDbOptions>(config.GetSection("store:mongoDB"));
 
                     services.AddSingleton(typeof(ISnapshotStore<,>), typeof(MongoSnapshotStore<,>));
 
-                    services.AddSingletonAs(mongoDatabase)
+                    services.AddSingletonAs(_ => Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s)))
+                        .As<IMongoClient>();
+
+                    services.AddSingletonAs(c => c.GetRequiredService<IMongoClient>().GetDatabase(mongoDatabaseName))
                         .As<IMongoDatabase>();
 
-                    services.AddHealthChecks()
-                        .AddCheck<MongoDBHealthCheck>("MongoDB", tags: new[] { "node" });
+                    services.AddTransientAs(c => new DeleteContentCollections(c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName)))
+                        .As<IMigration>();
+
+                    services.AddTransientAs(c => new RestructureContentCollection(c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName)))
+                        .As<IMigration>();
 
                     services.AddSingletonAs<MongoMigrationStatus>()
                         .As<IMigrationStatus>();
@@ -72,36 +77,40 @@ namespace Squidex.Config.Domain
                     services.AddTransientAs<ConvertRuleEventsJson>()
                         .As<IMigration>();
 
-                    services.AddTransientAs(c => new DeleteContentCollections(mongoContentDatabase))
-                        .As<IMigration>();
+                    services.AddHealthChecks()
+                        .AddCheck<MongoDBHealthCheck>("MongoDB", tags: new[] { "node" });
 
                     services.AddSingletonAs<MongoUsageRepository>()
-                        .As<IUsageRepository>();
+                        .AsOptional<IUsageRepository>();
 
                     services.AddSingletonAs<MongoRuleEventRepository>()
-                        .As<IRuleEventRepository>();
+                        .AsOptional<IRuleEventRepository>();
 
                     services.AddSingletonAs<MongoHistoryEventRepository>()
-                        .As<IHistoryEventRepository>();
+                        .AsOptional<IHistoryEventRepository>();
 
                     services.AddSingletonAs<MongoPersistedGrantStore>()
-                        .As<IPersistedGrantStore>();
+                        .AsOptional<IPersistedGrantStore>();
 
                     services.AddSingletonAs<MongoRoleStore>()
-                        .As<IRoleStore<IdentityRole>>();
+                        .AsOptional<IRoleStore<IdentityRole>>();
 
                     services.AddSingletonAs<MongoUserStore>()
-                        .As<IUserStore<IdentityUser>>()
-                        .As<IUserFactory>();
+                        .AsOptional<IUserStore<IdentityUser>>()
+                        .AsOptional<IUserFactory>();
 
                     services.AddSingletonAs<MongoAssetRepository>()
-                        .As<IAssetRepository>()
-                        .As<ISnapshotStore<AssetState, Guid>>();
+                        .AsOptional<IAssetRepository>()
+                        .AsOptional<ISnapshotStore<AssetState, Guid>>();
 
-                    services.AddSingletonAs(c => new MongoContentRepository(mongoContentDatabase, c.GetRequiredService<IAppProvider>(), c.GetRequiredService<IJsonSerializer>()))
-                        .As<IContentRepository>()
-                        .As<ISnapshotStore<ContentState, Guid>>()
-                        .As<IEventConsumer>();
+                    services.AddSingletonAs(c => new MongoContentRepository(
+                            c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName),
+                            c.GetRequiredService<IAppProvider>(),
+                            c.GetRequiredService<IJsonSerializer>(),
+                            c.GetRequiredService<ITextIndexer>()))
+                        .AsOptional<IContentRepository>()
+                        .AsOptional<ISnapshotStore<ContentState, Guid>>()
+                        .AsOptional<IEventConsumer>();
                 }
             });
 

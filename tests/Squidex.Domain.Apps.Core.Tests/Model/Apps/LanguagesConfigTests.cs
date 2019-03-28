@@ -216,5 +216,23 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
             Assert.NotNull(((IEnumerable)config_0).GetEnumerator());
             Assert.NotNull(((IEnumerable<IFieldPartitionItem>)config_0).GetEnumerator());
         }
+
+        [Fact]
+        public void Should_resolve_language_by_string()
+        {
+            var config_0 = LanguagesConfig.Build(Language.DE);
+
+            Assert.True(config_0.TryGetItem("de", out var item));
+            Assert.NotNull(item);
+        }
+
+        [Fact]
+        public void Should_not_resolve_language_fór_invalid_language()
+        {
+            var config_0 = LanguagesConfig.Build(Language.DE);
+
+            Assert.False(config_0.TryGetItem("invalid", out var item));
+            Assert.Null(item);
+        }
     }
 }

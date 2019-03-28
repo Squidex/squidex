@@ -22,6 +22,16 @@ namespace Squidex.Infrastructure.MongoDb
     {
         private static readonly UpdateOptions Upsert = new UpdateOptions { IsUpsert = true };
 
+        public static async Task<bool> CollectionExistsAsync(this IMongoDatabase database, string collectionName)
+        {
+            var options = new ListCollectionNamesOptions
+            {
+                Filter = new BsonDocument("name", collectionName)
+            };
+
+            return (await database.ListCollectionNamesAsync(options)).Any();
+        }
+
         public static async Task<bool> InsertOneIfNotExistsAsync<T>(this IMongoCollection<T> collection, T document)
         {
             try

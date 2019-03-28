@@ -16,6 +16,17 @@ namespace Squidex.Infrastructure
         private readonly Dictionary<Type, string> namesByType = new Dictionary<Type, string>();
         private readonly Dictionary<string, Type> typesByName = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
+        public TypeNameRegistry(IEnumerable<ITypeProvider> providers = null)
+        {
+            if (providers != null)
+            {
+                foreach (var provider in providers)
+                {
+                    Map(provider);
+                }
+            }
+        }
+
         public TypeNameRegistry MapObsolete(Type type, string name)
         {
             Guard.NotNull(type, nameof(type));
@@ -36,11 +47,20 @@ namespace Squidex.Infrastructure
             return this;
         }
 
+        public TypeNameRegistry Map(ITypeProvider provider)
+        {
+            Guard.NotNull(provider, nameof(provider));
+
+            provider.Map(this);
+
+            return this;
+        }
+
         public TypeNameRegistry Map(Type type)
         {
             Guard.NotNull(type, nameof(type));
 
-            var typeNameAttribute = type.GetTypeInfo().GetCustomAttribute<TypeNameAttribute>();
+            var typeNameAttribute = type.GetCustomAttribute<TypeNameAttribute>();
 
             if (!string.IsNullOrWhiteSpace(typeNameAttribute?.TypeName))
             {

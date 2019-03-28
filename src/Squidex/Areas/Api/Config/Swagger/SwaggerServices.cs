@@ -14,7 +14,6 @@ using NSwag.SwaggerGeneration;
 using NSwag.SwaggerGeneration.Processors;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.Rules.Models;
-using Squidex.Config;
 using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Config.Swagger

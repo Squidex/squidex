@@ -52,7 +52,7 @@ namespace Squidex.Infrastructure.Assets
 
                 using (var readStream = await bucket.OpenDownloadStreamAsync(sourceFileName, cancellationToken: ct))
                 {
-                    await UploadFileCoreAsync(target, readStream, ct);
+                    await UploadFileCoreAsync(target, readStream, false, ct);
                 }
             }
             catch (GridFSFileNotFoundException ex)
@@ -78,14 +78,14 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task UploadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
+        public Task UploadAsync(string id, long version, string suffix, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            return UploadFileCoreAsync(GetFileName(id, version, suffix), stream, ct);
+            return UploadFileCoreAsync(GetFileName(id, version, suffix), stream, overwrite, ct);
         }
 
         public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
-            return UploadFileCoreAsync(fileName, stream, ct);
+            return UploadFileCoreAsync(fileName, stream, false, ct);
         }
 
         public Task DeleteAsync(string id, long version, string suffix)
@@ -110,10 +110,15 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        private async Task UploadFileCoreAsync(string id, Stream stream, CancellationToken ct = default)
+        private async Task UploadFileCoreAsync(string id, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
             try
             {
+                if (overwrite)
+                {
+                    await bucket.DeleteAsync(id, ct);
+                }
+
                 await bucket.UploadFromStreamAsync(id, id, stream, cancellationToken: ct);
             }
             catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
@@ -128,7 +133,7 @@ namespace Squidex.Infrastructure.Assets
 
         private static string GetFileName(string id, long version, string suffix)
         {
-            return string.Join("_", new[] { id, version.ToString(), suffix }.Where(x => !string.IsNullOrWhiteSpace(x)));
+            return StringExtensions.JoinNonEmpty("_", id, version.ToString(), suffix);
         }
     }
 }

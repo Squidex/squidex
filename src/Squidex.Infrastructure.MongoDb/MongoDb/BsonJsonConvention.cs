@@ -8,6 +8,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using Newtonsoft.Json;
@@ -17,36 +18,41 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public static class BsonJsonConvention
     {
+        private static volatile int isRegistered;
+
         public static void Register(JsonSerializer serializer)
         {
-            var pack = new ConventionPack();
-
-            pack.AddMemberMapConvention("JsonBson", memberMap =>
+            if (Interlocked.Increment(ref isRegistered) == 1)
             {
-                var attributes = memberMap.MemberInfo.GetCustomAttributes();
+                var pack = new ConventionPack();
 
-                if (attributes.OfType<BsonJsonAttribute>().Any())
+                pack.AddMemberMapConvention("JsonBson", memberMap =>
                 {
-                    var bsonSerializerType = typeof(BsonJsonSerializer<>).MakeGenericType(memberMap.MemberType);
-                    var bsonSerializer = Activator.CreateInstance(bsonSerializerType, serializer);
+                    var attributes = memberMap.MemberInfo.GetCustomAttributes();
 
-                    memberMap.SetSerializer((IBsonSerializer)bsonSerializer);
-                }
-                else if (memberMap.MemberType == typeof(JToken))
-                {
-                    memberMap.SetSerializer(JTokenSerializer<JToken>.Instance);
-                }
-                else if (memberMap.MemberType == typeof(JObject))
-                {
-                    memberMap.SetSerializer(JTokenSerializer<JObject>.Instance);
-                }
-                else if (memberMap.MemberType == typeof(JValue))
-                {
-                    memberMap.SetSerializer(JTokenSerializer<JValue>.Instance);
-                }
-            });
+                    if (attributes.OfType<BsonJsonAttribute>().Any())
+                    {
+                        var bsonSerializerType = typeof(BsonJsonSerializer<>).MakeGenericType(memberMap.MemberType);
+                        var bsonSerializer = Activator.CreateInstance(bsonSerializerType, serializer);
 
-            ConventionRegistry.Register("json", pack, t => true);
+                        memberMap.SetSerializer((IBsonSerializer)bsonSerializer);
+                    }
+                    else if (memberMap.MemberType == typeof(JToken))
+                    {
+                        memberMap.SetSerializer(JTokenSerializer<JToken>.Instance);
+                    }
+                    else if (memberMap.MemberType == typeof(JObject))
+                    {
+                        memberMap.SetSerializer(JTokenSerializer<JObject>.Instance);
+                    }
+                    else if (memberMap.MemberType == typeof(JValue))
+                    {
+                        memberMap.SetSerializer(JTokenSerializer<JValue>.Instance);
+                    }
+                });
+
+                ConventionRegistry.Register("json", pack, t => true);
+            }
         }
     }
 }
