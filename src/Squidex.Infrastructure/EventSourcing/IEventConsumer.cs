@@ -17,6 +17,8 @@ namespace Squidex.Infrastructure.EventSourcing
 
         string EventsFilter { get; }
 
+        bool Handles(StoredEvent @event);
+
         Task ClearAsync();
 
         Task On(Envelope<IEvent> @event);

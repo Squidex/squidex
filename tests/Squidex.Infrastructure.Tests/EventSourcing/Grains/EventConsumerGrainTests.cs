@@ -76,6 +76,9 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             A.CallTo(() => eventConsumer.Name)
                 .Returns(consumerName);
 
+            A.CallTo(() => eventConsumer.Handles(A<StoredEvent>.Ignored))
+                .Returns(true);
+
             A.CallTo(() => persistence.ReadAsync(EtagVersion.Any))
                 .Invokes(new Action<long>(s => apply(state)));
 
@@ -191,6 +194,28 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             A.CallTo(() => eventConsumer.On(envelope))
                 .MustHaveHappened(1, Times.Exactly);
+        }
+
+        [Fact]
+        public async Task Should_not_invoke_but_update_position_when_consumer_does_not_want_to_handle()
+        {
+            var @event = new StoredEvent("Stream", Guid.NewGuid().ToString(), 123, eventData);
+
+            A.CallTo(() => eventConsumer.Handles(@event))
+                .Returns(false);
+
+            await sut.ActivateAsync(consumerName);
+            await sut.ActivateAsync();
+
+            await OnEventAsync(eventSubscription, @event);
+
+            state.Should().BeEquivalentTo(new EventConsumerState { IsStopped = false, Position = @event.EventPosition, Error = null });
+
+            A.CallTo(() => persistence.WriteSnapshotAsync(A<EventConsumerState>.Ignored))
+                .MustHaveHappened(1, Times.Exactly);
+
+            A.CallTo(() => eventConsumer.On(envelope))
+                .MustNotHaveHappened();
         }
 
         [Fact]

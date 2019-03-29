@@ -56,6 +56,11 @@ namespace Squidex.Infrastructure.EventSourcing
             EventsFilter = string.Join("|", innerFilters);
         }
 
+        public bool Handles(StoredEvent @event)
+        {
+            return inners.Any(x => x.Handles(@event));
+        }
+
         public Task ClearAsync()
         {
             return Task.WhenAll(inners.Select(i => i.ClearAsync()));

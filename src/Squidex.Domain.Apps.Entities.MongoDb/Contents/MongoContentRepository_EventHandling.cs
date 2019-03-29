@@ -26,6 +26,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             get { return "^(content-)|(asset-)"; }
         }
 
+        public bool Handles(StoredEvent @event)
+        {
+            return @event.Data.Type == typeAssetDeleted || @event.Data.Type == typeContentDeleted;
+        }
+
         public Task On(Envelope<IEvent> @event)
         {
             return this.DispatchActionAsync(@event.Payload);

@@ -50,6 +50,16 @@ namespace Squidex.Domain.Apps.Entities.History
             this.repository = repository;
         }
 
+        public bool Handles(StoredEvent @event)
+        {
+            return true;
+        }
+
+        public Task ClearAsync()
+        {
+            return repository.ClearAsync();
+        }
+
         public async Task On(Envelope<IEvent> @event)
         {
             foreach (var creator in creators)
@@ -68,11 +78,6 @@ namespace Squidex.Domain.Apps.Entities.History
                     await repository.InsertAsync(historyEvent);
                 }
             }
-        }
-
-        public Task ClearAsync()
-        {
-            return repository.ClearAsync();
         }
 
         public async Task<IReadOnlyList<ParsedHistoryEvent>> QueryByChannelAsync(Guid appId, string channelPrefix, int count)
