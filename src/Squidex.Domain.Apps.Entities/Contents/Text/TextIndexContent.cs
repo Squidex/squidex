@@ -11,6 +11,7 @@ using System.Text;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
+using Lucene.Net.Util;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -19,10 +20,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     internal sealed class TextIndexContent
     {
-        public const string MetaId = "_id";
-        public const string MetaKey = "_key";
-        public const string MetaDraft = "_dd";
-
+        private const string MetaId = "_id";
+        private const string MetaKey = "_key";
+        private const string MetaFor = "_fd";
+        private const int ForDraftIndex = 0;
+        private const int ForPublishedIndex = 1;
         private readonly IndexWriter indexWriter;
         private readonly IndexSearcher indexSearcher;
         private readonly Guid id;
@@ -35,11 +37,67 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             this.id = id;
         }
 
-        public void Index(NamedContentData data, bool isDraft)
+        public static BinaryDocValues CreateValues(IndexReader indexReader)
+        {
+            return MultiDocValues.GetBinaryValues(indexReader, MetaFor);
+        }
+
+        public static bool TryGetId(int docId, bool forDraft, IndexReader reader, BinaryDocValues values, out Guid result)
+        {
+            result = Guid.Empty;
+
+            var forValue = new BytesRef();
+
+            values.Get(docId, forValue);
+
+            if (forValue.Bytes.Length != 2)
+            {
+                return false;
+            }
+
+            if (forDraft && forValue.Bytes[ForDraftIndex] != 1)
+            {
+                return false;
+            }
+
+            if (!forDraft && forValue.Bytes[ForPublishedIndex] != 1)
+            {
+                return false;
+            }
+
+            var document = reader.Document(docId);
+
+            var id = document.Get(MetaId);
+
+            if (!Guid.TryParse(id, out result))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public void Index(NamedContentData data, bool onlyDraft)
         {
             var converted = CreateDocument(data);
 
-            Upsert(converted, isDraft);
+            Upsert(converted, 1, 1, 0);
+
+            var existing = GetDocument(1);
+
+            if (IsForPublished(existing))
+            {
+                Upsert(converted, 0, 0, 1);
+            }
+            else if (existing == null)
+            {
+                Upsert(converted, 0, 0, 0);
+            }
+        }
+
+        private static bool IsForPublished(Document existing)
+        {
+            return existing?.GetField(MetaFor)?.GetBinaryValue().Bytes[ForPublishedIndex] == 1;
         }
 
         public void Delete()
@@ -49,9 +107,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public void Copy(bool fromDraft)
         {
-            var published = GetDocument(fromDraft);
-
-            Upsert(published, !fromDraft);
+            if (fromDraft)
+            {
+                Update(1, 1, 0);
+                Update(0, 0, 1);
+            }
+            else
+            {
+                Update(1, 1, 1);
+                Update(0, 0, 0);
+            }
         }
 
         private Document CreateDocument(NamedContentData data)
@@ -98,14 +163,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return document;
         }
 
-        private Document GetDocument(bool draft)
+        private void Update(byte draft, byte forDraft, byte forPublished)
+        {
+            var term = new Term(MetaKey, BuildKey(draft));
+
+            indexWriter.UpdateBinaryDocValue(term, MetaFor, GetValue(forDraft, forPublished));
+        }
+
+        private Document GetDocument(byte draft)
         {
             if (indexSearcher == null)
             {
                 return null;
             }
 
-            var docs = indexSearcher.Search(new TermQuery(new Term(MetaKey, BuildKey(BuildValue(draft)))), 1);
+            var docs = indexSearcher.Search(new TermQuery(new Term(MetaKey, BuildKey(draft))), 1);
 
             if (docs.ScoreDocs.Length > 0)
             {
@@ -115,36 +187,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return null;
         }
 
-        private void Upsert(Document document, bool draft)
+        private void Upsert(Document document, byte draft, byte forDraft, byte forPublished)
         {
             if (document != null)
             {
                 document.RemoveField(MetaId);
                 document.RemoveField(MetaKey);
-                document.RemoveField(MetaDraft);
-
-                var docDraft = BuildValue(draft);
+                document.RemoveField(MetaFor);
 
                 var docId = id.ToString();
-                var docKey = BuildKey(docDraft);
+                var docKey = BuildKey(draft);
 
                 document.AddStringField(MetaId, docId, Field.Store.YES);
                 document.AddStringField(MetaKey, docKey, Field.Store.YES);
-                document.AddStringField(MetaDraft, docDraft, Field.Store.YES);
+
+                document.AddBinaryDocValuesField(MetaFor, GetValue(forDraft, forPublished));
 
                 indexWriter.DeleteDocuments(new Term(MetaKey, docKey));
                 indexWriter.AddDocument(document);
             }
-        }
-
-        private static string BuildValue(bool draft)
-        {
-            return draft ? "1" : "0";
-        }
-
-        private string BuildKey(string draft)
-        {
-            return $"{id}_{draft}";
         }
 
         private static void AppendJsonText(IJsonValue value, Action<string> appendText)
@@ -167,6 +228,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     AppendJsonText(item, appendText);
                 }
             }
+        }
+
+        private static BytesRef GetValue(byte forDraft, byte forPublished)
+        {
+            return new BytesRef(new byte[] { forDraft, forPublished });
+        }
+
+        private string BuildKey(byte draft)
+        {
+            return $"{id}_{draft}";
         }
     }
 }

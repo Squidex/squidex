@@ -60,10 +60,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     new NamedContentData()
                         .AddField("title",
                             new ContentFieldData()
-                                .AddValue("iv", "My first post with Squidex"))
+                                .AddValue("My first post with Squidex"))
                         .AddField("text",
                             new ContentFieldData()
-                                .AddValue("iv", "Just created a blog with Squidex. I love it!")),
+                                .AddValue("Just created a blog with Squidex. I love it!")),
                 Publish = true
             });
         }
@@ -79,10 +79,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     new NamedContentData()
                         .AddField("title",
                             new ContentFieldData()
-                                .AddValue("iv", "About Me"))
+                                .AddValue("About Me"))
                         .AddField("text",
                             new ContentFieldData()
-                                .AddValue("iv", "I love Squidex and SciFi!")),
+                                .AddValue("I love Squidex and SciFi!")),
                 Publish = true
             });
         }

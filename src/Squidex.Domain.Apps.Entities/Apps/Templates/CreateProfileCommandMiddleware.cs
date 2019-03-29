@@ -64,13 +64,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
                     new NamedContentData()
                         .AddField("firstName",
                             new ContentFieldData()
-                                .AddValue("iv", "John"))
+                                .AddValue("John"))
                         .AddField("lastName",
                             new ContentFieldData()
-                                .AddValue("iv", "Doe"))
+                                .AddValue("Doe"))
                         .AddField("profession",
                             new ContentFieldData()
-                                .AddValue("iv", "Software Developer")),
+                                .AddValue("Software Developer")),
                 Publish = true
             });
         }

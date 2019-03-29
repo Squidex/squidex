@@ -31,8 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const int MaxUpdates = 100;
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(30);
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
-        private static readonly TermsFilter DraftFilter = new TermsFilter(new Term(TextIndexContent.MetaDraft, true.ToString()));
-        private static readonly TermsFilter NoDraftFilter = new TermsFilter(new Term(TextIndexContent.MetaDraft, false.ToString()));
+        private static readonly string[] Invariant = { InvariantPartitioning.Instance.Master.Key };
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
         private readonly IAssetStore assetStore;
         private IDisposable timer;
@@ -40,6 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private IndexWriter indexWriter;
         private IndexReader indexReader;
         private IndexSearcher indexSearcher;
+        private BinaryDocValues indexValues;
         private QueryParser queryParser;
         private HashSet<string> currentLanguages;
         private long updates;
@@ -73,6 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 indexReader = indexWriter.GetReader(false);
                 indexSearcher = new IndexSearcher(indexReader);
+                indexValues = TextIndexContent.CreateValues(indexReader);
             }
         }
 
@@ -113,19 +114,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                 if (indexReader != null)
                 {
-                    var filter = context.IsDraft ? DraftFilter : NoDraftFilter;
-
-                    var hits = indexSearcher.Search(query, filter, MaxResults).ScoreDocs;
+                    var hits = indexSearcher.Search(query, MaxResults).ScoreDocs;
 
                     foreach (var hit in hits)
                     {
-                        var document = indexReader.Document(hit.Doc);
-
-                        var idField = document.GetField(TextIndexContent.MetaId)?.GetStringValue();
-
-                        if (idField != null && Guid.TryParse(idField, out var guid))
+                        if (TextIndexContent.TryGetId(hit.Doc, context.IsDraft, indexReader, indexValues, out var id))
                         {
-                            result.Add(guid);
+                            result.Add(id);
                         }
                     }
                 }
@@ -138,9 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (queryParser == null || !currentLanguages.SetEquals(context.Languages))
             {
-                var fields =
-                    context.Languages
-                        .Union(Enumerable.Repeat(InvariantPartitioning.Instance.Master.Key, 1)).ToArray();
+                var fields = context.Languages.Union(Invariant).ToArray();
 
                 queryParser = new MultiFieldQueryParser(Version, fields, Analyzer);
 
@@ -190,6 +183,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 indexReader?.Dispose();
                 indexReader = indexWriter.GetReader(false);
                 indexSearcher = new IndexSearcher(indexReader);
+                indexValues = TextIndexContent.CreateValues(indexReader);
 
                 var commit = snapshotter.Snapshot();
                 try

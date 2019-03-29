@@ -152,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_also_retrieve_published_content_after_copy()
         {
-            await AddLocalizedContent();
+            await AddInvariantContent();
 
             context.IsDraft = false;
 
@@ -182,8 +182,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         new ContentFieldData()
                             .AddValue("en", "City and Surroundings und sonstiges"));
 
-            await sut.IndexAsync(ids1[0], new IndexData { Data = germanData }, false);
-            await sut.IndexAsync(ids2[0], new IndexData { Data = englishData }, false);
+            await sut.IndexAsync(ids1[0], new IndexData { Data = germanData }, true);
+            await sut.IndexAsync(ids2[0], new IndexData { Data = englishData }, true);
             await sut.FlushAsync();
         }
 
@@ -201,8 +201,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         new ContentFieldData()
                             .AddValue("iv", "World"));
 
-            await sut.IndexAsync(ids1[0], new IndexData { Data = data1 }, false);
-            await sut.IndexAsync(ids2[0], new IndexData { Data = data2 }, false);
+            await sut.IndexAsync(ids1[0], new IndexData { Data = data1 }, true);
+            await sut.IndexAsync(ids2[0], new IndexData { Data = data2 }, true);
 
             await sut.FlushAsync();
         }
