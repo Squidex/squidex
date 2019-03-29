@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Task.CompletedTask;
         }
 
-        public async Task IndexAsync(Guid schemaId, Guid id, NamedContentData data, NamedContentData dataDraft)
+        public async Task IndexAsync(Guid schemaId, Guid id, NamedContentData dataDraft, NamedContentData data)
         {
             var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
 
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 try
                 {
-                    await index.IndexAsync(id, new IndexData { Data = data, DataDraft = dataDraft }, false);
+                    await index.IndexAsync(id, new IndexData { DataDraft = dataDraft, Data = data }, false);
                 }
                 catch (Exception ex)
                 {
@@ -126,10 +126,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private J<IndexData> Data(NamedContentData data)
         {
-            return new IndexData { Data = data };
+            return new IndexData { DataDraft = data };
         }
 
-        public async Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, Guid schemaId, bool useDraft = false)
+        public async Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, Guid schemaId, Scope scope = Scope.Published)
         {
             if (string.IsNullOrWhiteSpace(queryText))
             {
@@ -140,17 +140,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             using (Profiler.TraceMethod<GrainTextIndexer>())
             {
-                var context = CreateContext(app, useDraft);
+                var context = CreateContext(app, scope);
 
                 return await index.SearchAsync(queryText, context);
             }
         }
 
-        private static SearchContext CreateContext(IAppEntity app, bool useDraft)
+        private static SearchContext CreateContext(IAppEntity app, Scope scope)
         {
             var languages = new HashSet<string>(app.LanguagesConfig.Select(x => x.Key));
 
-            return new SearchContext { Languages = languages, IsDraft = useDraft };
+            return new SearchContext { Languages = languages, Scope = scope };
         }
     }
 }

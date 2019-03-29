@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             {
                 var useDraft = UseDraft(status);
 
-                var fullTextIds = await indexer.SearchAsync(query.FullText, app, schema.Id, useDraft);
+                var fullTextIds = await indexer.SearchAsync(query.FullText, app, schema.Id, useDraft ? Scope.Draft : Scope.Published);
 
                 if (fullTextIds?.Count == 0)
                 {

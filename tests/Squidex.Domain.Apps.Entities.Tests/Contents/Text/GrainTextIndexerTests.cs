@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             var data = new NamedContentData();
             var dataDraft = new NamedContentData();
 
-            await sut.IndexAsync(schemaId, contentId, data, dataDraft);
+            await sut.IndexAsync(schemaId, contentId, dataDraft, data);
 
             A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data && x.Value.DataDraft == dataDraft), false))
                 .MustHaveHappened();
@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await sut.On(E(new ContentCreated { Data = data }));
 
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), true))
+            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.DataDraft == data), true))
                 .MustHaveHappened();
         }
 
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await sut.On(E(new ContentUpdated { Data = data }));
 
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), false))
+            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.DataDraft == data), false))
                 .MustHaveHappened();
         }
 
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await sut.On(E(new ContentUpdateProposed { Data = data }));
 
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), true))
+            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.DataDraft == data), true))
                 .MustHaveHappened();
         }
 
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             A.CallTo(() => grain.SearchAsync("Search", A<SearchContext>.Ignored))
                 .Returns(foundIds);
 
-            var ids = await sut.SearchAsync("Search", GetApp(), schemaId, true);
+            var ids = await sut.SearchAsync("Search", GetApp(), schemaId, Scope.Draft);
 
             Assert.Equal(foundIds, ids);
         }
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_not_call_grain_when_input_is_empty()
         {
-            var ids = await sut.SearchAsync(string.Empty, GetApp(), schemaId, false);
+            var ids = await sut.SearchAsync(string.Empty, GetApp(), schemaId, Scope.Published);
 
             Assert.Null(ids);
 

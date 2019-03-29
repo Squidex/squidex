@@ -17,6 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         Task IndexAsync(Guid schemaId, Guid contentId, NamedContentData draftData, NamedContentData data);
 
-        Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, Guid schemaId, bool useDraft = false);
+        Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, Guid schemaId, Scope scope = Scope.Published);
     }
 }

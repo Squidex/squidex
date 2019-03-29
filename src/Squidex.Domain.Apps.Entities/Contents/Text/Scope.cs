@@ -5,14 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
-    public sealed class SearchContext
+    public enum Scope
     {
-        public Scope Scope { get; set; }
-
-        public HashSet<string> Languages { get; set; }
+        Draft,
+        Published
     }
 }

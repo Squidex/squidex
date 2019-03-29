@@ -39,7 +39,7 @@ namespace Migrate_01.Migrations
 
             var worker = new ActionBlock<ContentState>(state =>
                 {
-                    return textIndexer.IndexAsync(state.SchemaId.Id, state.Id, state.Data, state.DataDraft);
+                    return textIndexer.IndexAsync(state.SchemaId.Id, state.Id, state.DataDraft, state.Data);
                 },
                 new ExecutionDataflowBlockOptions
                 {

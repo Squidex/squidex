@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Lucene.Net.Analysis;
 using Lucene.Net.Index;
-using Lucene.Net.Queries;
 using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
@@ -43,6 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private QueryParser queryParser;
         private HashSet<string> currentLanguages;
         private long updates;
+        private long updatesNotWritten;
 
         public TextIndexerGrain(IAssetStore assetStore)
         {
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public Task DeleteAsync(Guid id)
         {
-            var content = new TextIndexContent(indexWriter, indexSearcher, id);
+            var content = new TextIndexContent(indexWriter, indexSearcher, indexValues, id);
 
             content.Delete();
 
@@ -88,16 +88,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public Task IndexAsync(Guid id, J<IndexData> data, bool onlyDraft)
         {
-            var content = new TextIndexContent(indexWriter, indexSearcher, id);
+            var content = new TextIndexContent(indexWriter, indexSearcher, indexValues, id);
 
-            content.Index(data.Value.Data, data.Value.DataDraft, onlyDraft);
+            content.Index(data.Value.DataDraft, data.Value.Data, indexValues, onlyDraft);
 
             return TryFlushAsync();
         }
 
         public Task CopyAsync(Guid id, bool fromDraft)
         {
-            var content = new TextIndexContent(indexWriter, indexSearcher, id);
+            var content = new TextIndexContent(indexWriter, indexSearcher, indexValues, id);
 
             content.Copy(fromDraft);
 
@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                     foreach (var hit in hits)
                     {
-                        if (TextIndexContent.TryGetId(hit.Doc, context.IsDraft, indexReader, indexValues, out var id))
+                        if (TextIndexContent.TryGetId(hit.Doc, context.Scope, indexReader, indexValues, out var id))
                         {
                             result.Add(id);
                         }
@@ -153,18 +153,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private async Task TryFlushAsync()
         {
             updates++;
+            updatesNotWritten++;
 
             if (updates >= MaxUpdates)
             {
-                await FlushAsync();
+                await FlushAsync(true);
             }
             else
             {
+                await FlushAsync();
+
                 timer?.Dispose();
 
                 try
                 {
-                    timer = RegisterTimer(_ => FlushAsync(), null, CommitDelay, CommitDelay);
+                    timer = RegisterTimer(_ => FlushAsync(true), null, CommitDelay, CommitDelay);
                 }
                 catch (InvalidOperationException)
                 {
@@ -173,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        public async Task FlushAsync()
+        public async Task FlushAsync(bool write = false)
         {
             if (updates > 0 && indexWriter != null)
             {
@@ -185,6 +188,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 indexSearcher = new IndexSearcher(indexReader);
                 indexValues = TextIndexContent.CreateValues(indexReader);
 
+                updates = 0;
+            }
+
+            if (updatesNotWritten > 0 && write)
+            {
                 var commit = snapshotter.Snapshot();
                 try
                 {
@@ -195,17 +203,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     snapshotter.Release(commit);
                 }
 
-                updates = 0;
+                updatesNotWritten = 0;
             }
-            else
-            {
-                timer?.Dispose();
-            }
+
+            timer?.Dispose();
         }
 
         public async Task DeactivateAsync(bool deleteFolder = false)
         {
-            await TryFlushAsync();
+            await FlushAsync(true);
 
             indexWriter?.Dispose();
             indexWriter = null;
