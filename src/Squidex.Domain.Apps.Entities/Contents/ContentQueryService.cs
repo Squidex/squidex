@@ -212,9 +212,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         result.Data = result.Data.ConvertName2Name(schema.SchemaDef, converters);
                     }
 
-                    if (result.DataDraft != null)
+                    if (result.DataDraft != null && (context.Unpublished || context.IsFrontendClient))
                     {
                         result.DataDraft = result.DataDraft.ConvertName2Name(schema.SchemaDef, converters);
+                    }
+                    else
+                    {
+                        result.DataDraft = null;
                     }
 
                     yield return result;

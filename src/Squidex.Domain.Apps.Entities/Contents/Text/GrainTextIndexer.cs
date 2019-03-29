@@ -46,9 +46,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             this.log = log;
         }
 
+        public bool Handles(StoredEvent @event)
+        {
+            return true;
+        }
+
         public Task ClearAsync()
         {
             return Task.CompletedTask;
+        }
+
+        public async Task IndexAsync(Guid schemaId, Guid id, NamedContentData data, NamedContentData dataDraft)
+        {
+            var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
+
+            using (Profiler.TraceMethod<GrainTextIndexer>())
+            {
+                try
+                {
+                    await index.IndexAsync(id, new IndexData { Data = data, DataDraft = dataDraft }, false);
+                }
+                catch (Exception ex)
+                {
+                    log.LogError(ex, w => w
+                        .WriteProperty("action", "UpdateTextEntry")
+                        .WriteProperty("status", "Failed"));
+                }
+            }
         }
 
         public async Task On(Envelope<IEvent> @event)
@@ -75,10 +99,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         case ContentUpdated contentUpdated:
                             await index.IndexAsync(id, Data(contentUpdated.Data), false);
                             break;
-                        case ContentChangesPublished contentChangesPublished:
+                        case ContentChangesDiscarded contentChangesDiscarded:
                             await index.CopyAsync(id, false);
                             break;
-                        case ContentChangesDiscarded contentChangesDiscarded:
+                        case ContentChangesPublished contentChangesPublished:
                         case ContentStatusChanged contentStatusChanged when contentStatusChanged.Status == Status.Published:
                             await index.CopyAsync(id, true);
                             break;

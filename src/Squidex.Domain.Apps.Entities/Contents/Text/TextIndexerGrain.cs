@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const LuceneVersion Version = LuceneVersion.LUCENE_48;
         private const int MaxResults = 2000;
         private const int MaxUpdates = 100;
-        private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(30);
+        private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(10);
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
         private static readonly string[] Invariant = { InvariantPartitioning.Instance.Master.Key };
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
@@ -90,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var content = new TextIndexContent(indexWriter, indexSearcher, id);
 
-            content.Index(data.Value.Data, onlyDraft);
+            content.Index(data.Value.Data, data.Value.DataDraft, onlyDraft);
 
             return TryFlushAsync();
         }
