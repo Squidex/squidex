@@ -60,27 +60,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             }
         }
 
-        protected void On(ContentUpdateProposed @event)
-        {
-            DataDraft = @event.Data;
-
-            IsPending = true;
-        }
-
-        protected void On(ContentChangesDiscarded @event)
-        {
-            DataDraft = Data;
-
-            IsPending = false;
-        }
-
         protected void On(ContentChangesPublished @event)
         {
             ScheduleJob = null;
 
-            Data = DataDraft;
-
-            IsPending = false;
+            UpdatePublished();
         }
 
         protected void On(ContentStatusChanged @event)
@@ -91,10 +75,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
             if (@event.Status == Status.Published)
             {
-                Data = DataDraft;
+                UpdatePublished();
             }
+        }
 
-            IsPending = false;
+        protected void On(ContentUpdateProposed @event)
+        {
+            UpdateDraft(@event.Data, true);
+        }
+
+        protected void On(ContentChangesDiscarded @event)
+        {
+            UpdateDraft(Data, false);
         }
 
         protected void On(ContentSchedulingCancelled @event)
@@ -117,6 +109,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             var payload = (SquidexEvent)@event.Payload;
 
             return Clone().Update(payload, @event.Headers, r => r.DispatchAction(payload));
+        }
+
+        private void UpdateDraft(NamedContentData data, bool isPending)
+        {
+            DataDraft = data;
+
+            IsPending = isPending;
+        }
+
+        private void UpdatePublished()
+        {
+            Data = DataDraft;
+
+            IsPending = false;
         }
     }
 }
