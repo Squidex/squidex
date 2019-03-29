@@ -70,11 +70,14 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             return DoAndUpdateStateAsync(async () =>
             {
-                var @event = ParseKnownEvent(storedEvent.Value);
-
-                if (@event != null)
+                if (eventConsumer.Handles(storedEvent.Value))
                 {
-                    await DispatchConsumerAsync(@event);
+                    var @event = ParseKnownEvent(storedEvent.Value);
+
+                    if (@event != null)
+                    {
+                        await DispatchConsumerAsync(@event);
+                    }
                 }
 
                 State = State.Handled(storedEvent.Value.EventPosition);

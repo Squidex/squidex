@@ -17,6 +17,8 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Events.Assets;
+using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
@@ -30,18 +32,25 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly IAppProvider appProvider;
         private readonly IJsonSerializer serializer;
         private readonly ITextIndexer indexer;
+        private readonly string typeAssetDeleted;
+        private readonly string typeContentDeleted;
         private readonly MongoContentCollection contents;
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer, TypeNameRegistry typeNameRegistry)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(database, nameof(database));
             Guard.NotNull(serializer, nameof(serializer));
-            Guard.NotNull(indexer, nameof(ITextIndexer));
+            Guard.NotNull(indexer, nameof(indexer));
+            Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
 
             this.appProvider = appProvider;
             this.database = database;
             this.indexer = indexer;
             this.serializer = serializer;
+
+            typeAssetDeleted = typeNameRegistry.GetName<AssetDeleted>();
+            typeContentDeleted = typeNameRegistry.GetName<ContentDeleted>();
 
             contents = new MongoContentCollection(database, serializer, appProvider);
         }

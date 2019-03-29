@@ -91,5 +91,41 @@ namespace Squidex.Infrastructure.EventSourcing
             A.CallTo(() => consumer1.On(@event)).MustHaveHappened();
             A.CallTo(() => consumer2.On(@event)).MustHaveHappened();
         }
+
+        [Fact]
+        public void Should_handle_if_any_consumer_handles()
+        {
+            var stored = new StoredEvent("Stream", "1", 1, new EventData("Type", new EnvelopeHeaders(), "Payload"));
+
+            A.CallTo(() => consumer1.Handles(stored))
+                .Returns(false);
+
+            A.CallTo(() => consumer2.Handles(stored))
+                .Returns(true);
+
+            var sut = new CompoundEventConsumer("consumer-name", consumer1, consumer2);
+
+            var result = sut.Handles(stored);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void Should_no_handle_if_no_consumer_handles()
+        {
+            var stored = new StoredEvent("Stream", "1", 1, new EventData("Type", new EnvelopeHeaders(), "Payload"));
+
+            A.CallTo(() => consumer1.Handles(stored))
+                .Returns(false);
+
+            A.CallTo(() => consumer2.Handles(stored))
+                .Returns(false);
+
+            var sut = new CompoundEventConsumer("consumer-name", consumer1, consumer2);
+
+            var result = sut.Handles(stored);
+
+            Assert.False(result);
+        }
     }
 }

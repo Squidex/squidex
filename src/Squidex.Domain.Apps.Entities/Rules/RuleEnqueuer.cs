@@ -52,6 +52,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
             this.ruleService = ruleService;
         }
 
+        public bool Handles(StoredEvent @event)
+        {
+            return true;
+        }
+
         public Task ClearAsync()
         {
             return TaskHelper.Done;

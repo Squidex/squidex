@@ -81,6 +81,11 @@ namespace Squidex.Infrastructure.CQRS.Events
             }
         }
 
+        public bool Handles(StoredEvent @event)
+        {
+            return true;
+        }
+
         public Task ClearAsync()
         {
             return TaskHelper.Done;
