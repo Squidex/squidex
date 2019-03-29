@@ -38,11 +38,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private IndexWriter indexWriter;
         private IndexReader indexReader;
         private IndexSearcher indexSearcher;
-        private BinaryDocValues indexValues;
+        private IndexState indexState;
         private QueryParser queryParser;
         private HashSet<string> currentLanguages;
         private long updates;
-        private long updatesNotWritten;
 
         public TextIndexerGrain(IAssetStore assetStore)
         {
@@ -71,15 +70,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             if (indexWriter.NumDocs > 0)
             {
-                indexReader = indexWriter.GetReader(false);
-                indexSearcher = new IndexSearcher(indexReader);
-                indexValues = TextIndexContent.CreateValues(indexReader);
+                OpenReader();
+            }
+            else
+            {
+                indexState = new IndexState(indexReader, indexWriter);
             }
         }
 
         public Task DeleteAsync(Guid id)
         {
-            var content = new TextIndexContent(indexWriter, indexSearcher, indexValues, id);
+            var content = new TextIndexContent(indexWriter, indexSearcher, indexState, id);
 
             content.Delete();
 
@@ -88,16 +89,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public Task IndexAsync(Guid id, J<IndexData> data, bool onlyDraft)
         {
-            var content = new TextIndexContent(indexWriter, indexSearcher, indexValues, id);
+            var content = new TextIndexContent(indexWriter, indexSearcher, indexState, id);
 
-            content.Index(data.Value.DataDraft, data.Value.Data, indexValues, onlyDraft);
+            content.Index(data.Value.DataDraft, data.Value.Data, onlyDraft);
 
             return TryFlushAsync();
         }
 
         public Task CopyAsync(Guid id, bool fromDraft)
         {
-            var content = new TextIndexContent(indexWriter, indexSearcher, indexValues, id);
+            var content = new TextIndexContent(indexWriter, indexSearcher, indexState, id);
 
             content.Copy(fromDraft);
 
@@ -118,7 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                     foreach (var hit in hits)
                     {
-                        if (TextIndexContent.TryGetId(hit.Doc, context.Scope, indexReader, indexValues, out var id))
+                        if (TextIndexContent.TryGetId(hit.Doc, context.Scope, indexReader, indexState, out var id))
                         {
                             result.Add(id);
                         }
@@ -153,21 +154,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private async Task TryFlushAsync()
         {
             updates++;
-            updatesNotWritten++;
 
             if (updates >= MaxUpdates)
             {
-                await FlushAsync(true);
+                await FlushAsync();
             }
             else
             {
-                await FlushAsync();
+                OpenReader();
 
                 timer?.Dispose();
 
                 try
                 {
-                    timer = RegisterTimer(_ => FlushAsync(true), null, CommitDelay, CommitDelay);
+                    timer = RegisterTimer(_ => FlushAsync(), null, CommitDelay, CommitDelay);
                 }
                 catch (InvalidOperationException)
                 {
@@ -176,23 +176,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        public async Task FlushAsync(bool write = false)
+        public async Task FlushAsync()
         {
             if (updates > 0 && indexWriter != null)
             {
                 indexWriter.Commit();
                 indexWriter.Flush(true, true);
 
-                indexReader?.Dispose();
-                indexReader = indexWriter.GetReader(false);
-                indexSearcher = new IndexSearcher(indexReader);
-                indexValues = TextIndexContent.CreateValues(indexReader);
+                OpenReader();
 
-                updates = 0;
-            }
-
-            if (updatesNotWritten > 0 && write)
-            {
                 var commit = snapshotter.Snapshot();
                 try
                 {
@@ -203,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     snapshotter.Release(commit);
                 }
 
-                updatesNotWritten = 0;
+                updates = 0;
             }
 
             timer?.Dispose();
@@ -211,7 +203,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public async Task DeactivateAsync(bool deleteFolder = false)
         {
-            await FlushAsync(true);
+            await FlushAsync();
 
             indexWriter?.Dispose();
             indexWriter = null;
@@ -223,6 +215,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 directory.Delete(true);
             }
+        }
+
+        private void OpenReader()
+        {
+            indexReader?.Dispose();
+            indexReader = indexWriter.GetReader(true);
+            indexSearcher = new IndexSearcher(indexReader);
+            indexState = new IndexState(indexReader, indexWriter);
         }
     }
 }

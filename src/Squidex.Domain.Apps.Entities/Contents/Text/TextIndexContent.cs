@@ -12,7 +12,6 @@ using System.Text;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
-using Lucene.Net.Util;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -23,26 +22,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private const string MetaId = "_id";
         private const string MetaKey = "_key";
-        private const string MetaFor = "_fd";
         private const int ForDraftIndex = 0;
         private const int ForPublishedIndex = 1;
         private readonly IndexWriter indexWriter;
         private readonly IndexSearcher indexSearcher;
-        private readonly BinaryDocValues indexValues;
+        private readonly IndexState indexState;
         private readonly Guid id;
 
-        public TextIndexContent(IndexWriter indexWriter, IndexSearcher indexSearcher, BinaryDocValues indexValues, Guid id)
+        public TextIndexContent(IndexWriter indexWriter, IndexSearcher indexSearcher, IndexState indexState, Guid id)
         {
             this.indexWriter = indexWriter;
             this.indexSearcher = indexSearcher;
-            this.indexValues = indexValues;
+            this.indexState = indexState;
 
             this.id = id;
-        }
-
-        public static BinaryDocValues CreateValues(IndexReader indexReader)
-        {
-            return MultiDocValues.GetBinaryValues(indexReader, MetaFor);
         }
 
         public void Delete()
@@ -50,21 +43,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             indexWriter.DeleteDocuments(new Term(MetaId, id.ToString()));
         }
 
-        public static bool TryGetId(int docId, Scope scope, IndexReader reader, BinaryDocValues values, out Guid result)
+        public static bool TryGetId(int docId, Scope scope, IndexReader reader, IndexState indexState, out Guid result)
         {
             result = Guid.Empty;
 
-            if (!TryGet(docId, values, out var @for))
+            if (!indexState.TryGet(docId, out var draft, out var published))
             {
                 return false;
             }
 
-            if (scope == Scope.Draft && @for[ForDraftIndex] != 1)
+            if (scope == Scope.Draft && draft != 1)
             {
                 return false;
             }
 
-            if (scope == Scope.Published && @for[ForPublishedIndex] != 1)
+            if (scope == Scope.Published && published != 1)
             {
                 return false;
             }
@@ -81,7 +74,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return true;
         }
 
-        public void Index(NamedContentData dataDraft, NamedContentData data, BinaryDocValues values, bool onlyDraft)
+        public void Index(NamedContentData dataDraft, NamedContentData data, bool onlyDraft)
         {
             var converted = CreateDocument(dataDraft);
 
@@ -95,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
             else
             {
-                var isPublished = IsForPublished(docId, values);
+                var isPublished = IsForPublished(docId);
 
                 if (!onlyDraft && docId > 0 && isPublished)
                 {
@@ -174,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var term = new Term(MetaKey, BuildKey(draft));
 
-            indexWriter.UpdateBinaryDocValue(term, MetaFor, GetValue(forDraft, forPublished));
+            indexState.Index(term, id, draft, forDraft, forPublished);
         }
 
         private int GetPublishedDocument()
@@ -190,18 +183,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 document.RemoveField(MetaId);
                 document.RemoveField(MetaKey);
-                document.RemoveField(MetaFor);
 
-                var docId = id.ToString();
-                var docKey = BuildKey(draft);
+                var contentId = id.ToString();
+                var contentKey = BuildKey(draft);
 
-                document.AddStringField(MetaId, docId, Field.Store.YES);
-                document.AddStringField(MetaKey, docKey, Field.Store.YES);
+                document.AddStringField(MetaId, contentId, Field.Store.YES);
+                document.AddStringField(MetaKey, contentKey, Field.Store.YES);
 
-                document.AddBinaryDocValuesField(MetaFor, GetValue(forDraft, forPublished));
+                indexState.Index(document, forDraft, forPublished);
 
-                // indexWriter.DeleteDocuments(new Term(MetaKey, docKey));
-                indexWriter.UpdateDocument(new Term(MetaKey, docKey), document);
+                indexWriter.UpdateDocument(new Term(MetaKey, contentKey), document);
             }
         }
 
@@ -227,32 +218,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private static bool IsForPublished(int docId, BinaryDocValues values)
+        private bool IsForPublished(int docId)
         {
-            return TryGet(docId, values, out var @for) && @for[1] == 1;
-        }
-
-        private static bool TryGet(int docId, BinaryDocValues values, out byte[] result)
-        {
-            var forValue = new BytesRef();
-
-            values?.Get(docId, forValue);
-
-            if (forValue.Bytes.Length == 2)
-            {
-                result = forValue.Bytes;
-                return true;
-            }
-            else
-            {
-                result = null;
-                return false;
-            }
-        }
-
-        private static BytesRef GetValue(byte forDraft, byte forPublished)
-        {
-            return new BytesRef(new byte[] { forDraft, forPublished });
+            return indexState.TryGet(docId, out _, out var p) && p == 1;
         }
 
         private string BuildKey(byte draft)

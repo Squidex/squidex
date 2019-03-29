@@ -213,7 +213,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await sut.IndexAsync(ids1[0], new IndexData { DataDraft = germanData }, true);
             await sut.IndexAsync(ids2[0], new IndexData { DataDraft = englishData }, true);
-            await sut.FlushAsync();
         }
 
         private async Task AddInvariantContent(string text1, string text2, bool onlyDraft = false)
