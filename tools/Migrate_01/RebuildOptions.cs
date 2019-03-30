@@ -15,8 +15,6 @@ namespace Migrate_01
 
         public bool Contents { get; set; }
 
-        public bool Indices { get; set; }
-
         public bool Rules { get; set; }
 
         public bool Schemas { get; set; }

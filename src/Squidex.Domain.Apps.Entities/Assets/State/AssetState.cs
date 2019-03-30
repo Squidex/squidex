@@ -63,8 +63,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             SimpleMapper.Map(@event, this);
 
             TotalSize += @event.FileSize;
-
-            AppId = @event.AppId;
         }
 
         protected void On(AssetUpdated @event)

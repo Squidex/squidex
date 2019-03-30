@@ -211,8 +211,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         new ContentFieldData()
                             .AddValue("en", "City and Surroundings und sonstiges"));
 
-            await sut.IndexAsync(ids1[0], new IndexData { DataDraft = germanData }, true);
-            await sut.IndexAsync(ids2[0], new IndexData { DataDraft = englishData }, true);
+            await sut.IndexAsync(ids1[0], new IndexData { Data = germanData }, true);
+            await sut.IndexAsync(ids2[0], new IndexData { Data = englishData }, true);
         }
 
         private async Task AddInvariantContent(string text1, string text2, bool onlyDraft = false)
@@ -229,8 +229,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         new ContentFieldData()
                             .AddValue("iv", text2));
 
-            await sut.IndexAsync(ids1[0], new IndexData { DataDraft = data1 }, onlyDraft);
-            await sut.IndexAsync(ids2[0], new IndexData { DataDraft = data2 }, onlyDraft);
+            await sut.IndexAsync(ids1[0], new IndexData { Data = data1 }, onlyDraft);
+            await sut.IndexAsync(ids2[0], new IndexData { Data = data2 }, onlyDraft);
         }
 
         private async Task DeleteAsync(Guid id)

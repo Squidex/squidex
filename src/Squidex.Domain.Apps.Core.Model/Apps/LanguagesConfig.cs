@@ -96,6 +96,14 @@ namespace Squidex.Domain.Apps.Core.Apps
         }
 
         [Pure]
+        public LanguagesConfig Set(Language language, bool isOptional = false, IEnumerable<Language> fallback = null)
+        {
+            Guard.NotNull(language, nameof(language));
+
+            return Set(new LanguageConfig(language, isOptional, fallback));
+        }
+
+        [Pure]
         public LanguagesConfig Set(LanguageConfig config)
         {
             Guard.NotNull(config, nameof(config));

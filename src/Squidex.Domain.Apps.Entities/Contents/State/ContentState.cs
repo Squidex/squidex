@@ -47,40 +47,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         {
             SimpleMapper.Map(@event, this);
 
-            DataDraft = @event.Data;
-        }
-
-        protected void On(ContentUpdated @event)
-        {
-            DataDraft = @event.Data;
-
-            if (Data != null)
-            {
-                Data = @event.Data;
-            }
-        }
-
-        protected void On(ContentUpdateProposed @event)
-        {
-            DataDraft = @event.Data;
-
-            IsPending = true;
-        }
-
-        protected void On(ContentChangesDiscarded @event)
-        {
-            DataDraft = Data;
-
-            IsPending = false;
+            UpdateData(null, @event.Data, false);
         }
 
         protected void On(ContentChangesPublished @event)
         {
             ScheduleJob = null;
 
-            Data = DataDraft;
-
-            IsPending = false;
+            UpdateData(DataDraft, null, false);
         }
 
         protected void On(ContentStatusChanged @event)
@@ -91,10 +65,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
             if (@event.Status == Status.Published)
             {
-                Data = DataDraft;
-
-                IsPending = false;
+                UpdateData(DataDraft, null, false);
             }
+        }
+
+        protected void On(ContentUpdated @event)
+        {
+            UpdateData(@event.Data, @event.Data, false);
+        }
+
+        protected void On(ContentUpdateProposed @event)
+        {
+            UpdateData(null, @event.Data, true);
+        }
+
+        protected void On(ContentChangesDiscarded @event)
+        {
+            UpdateData(null, Data, false);
         }
 
         protected void On(ContentSchedulingCancelled @event)
@@ -117,6 +104,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
             var payload = (SquidexEvent)@event.Payload;
 
             return Clone().Update(payload, @event.Headers, r => r.DispatchAction(payload));
+        }
+
+        private void UpdateData(NamedContentData data, NamedContentData dataDraft, bool isPending)
+        {
+            if (data != null)
+            {
+                Data = data;
+            }
+
+            if (dataDraft != null)
+            {
+                DataDraft = dataDraft;
+            }
+
+            IsPending = isPending;
         }
     }
 }

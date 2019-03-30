@@ -56,25 +56,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return Task.CompletedTask;
         }
 
-        public async Task IndexAsync(Guid schemaId, Guid id, NamedContentData dataDraft, NamedContentData data)
-        {
-            var index = grainFactory.GetGrain<ITextIndexerGrain>(schemaId);
-
-            using (Profiler.TraceMethod<GrainTextIndexer>())
-            {
-                try
-                {
-                    await index.IndexAsync(id, new IndexData { DataDraft = dataDraft, Data = data }, false);
-                }
-                catch (Exception ex)
-                {
-                    log.LogError(ex, w => w
-                        .WriteProperty("action", "UpdateTextEntry")
-                        .WriteProperty("status", "Failed"));
-                }
-            }
-        }
-
         public async Task On(Envelope<IEvent> @event)
         {
             try
@@ -126,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private J<IndexData> Data(NamedContentData data)
         {
-            return new IndexData { DataDraft = data };
+            return new IndexData { Data = data };
         }
 
         public async Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, Guid schemaId, Scope scope = Scope.Published)

@@ -74,34 +74,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return true;
         }
 
-        public void Index(NamedContentData dataDraft, NamedContentData data, bool onlyDraft)
+        public void Index(NamedContentData data, bool onlyDraft)
         {
-            var converted = CreateDocument(dataDraft);
+            var converted = CreateDocument(data);
 
             Upsert(converted, 1, 1, 0);
 
             var docId = GetPublishedDocument();
 
-            if (data != null)
+            var isPublished = IsForPublished(docId);
+
+            if (!onlyDraft && docId > 0 && isPublished)
             {
-                Upsert(CreateDocument(data), 0, 0, 1);
+                Upsert(converted, 0, 0, 1);
+            }
+            else if (!onlyDraft)
+            {
+                Upsert(converted, 0, 0, 0);
             }
             else
             {
-                var isPublished = IsForPublished(docId);
-
-                if (!onlyDraft && docId > 0 && isPublished)
-                {
-                    Upsert(converted, 0, 0, 1);
-                }
-                else if (!onlyDraft)
-                {
-                    Upsert(converted, 0, 0, 0);
-                }
-                else
-                {
-                    Update(0, 0, isPublished ? (byte)1 : (byte)0);
-                }
+                Update(0, 0, isPublished ? (byte)1 : (byte)0);
             }
         }
 

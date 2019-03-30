@@ -15,8 +15,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public interface ITextIndexer
     {
-        Task IndexAsync(Guid schemaId, Guid contentId, NamedContentData draftData, NamedContentData data);
-
         Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, Guid schemaId, Scope scope = Scope.Published);
     }
 }

@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var content = new TextIndexContent(indexWriter, indexSearcher, indexState, id);
 
-            content.Index(data.Value.DataDraft, data.Value.Data, onlyDraft);
+            content.Index(data.Value.Data, onlyDraft);
 
             return TryFlushAsync();
         }

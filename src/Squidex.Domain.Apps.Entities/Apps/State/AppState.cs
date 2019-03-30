@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         protected void On(AppPlanChanged @event)
         {
-            Plan = @event.PlanId == null ? null : new AppPlan(@event.Actor, @event.PlanId);
+            Plan = AppPlan.Build(@event.Actor, @event.PlanId);
         }
 
         protected void On(AppContributorAssigned @event)
@@ -117,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         protected void On(AppLanguageAdded @event)
         {
-            LanguagesConfig = LanguagesConfig.Set(new LanguageConfig(@event.Language));
+            LanguagesConfig = LanguagesConfig.Set(@event.Language);
         }
 
         protected void On(AppLanguageRemoved @event)
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         protected void On(AppLanguageUpdated @event)
         {
-            LanguagesConfig = LanguagesConfig.Set(new LanguageConfig(@event.Language, @event.IsOptional, @event.Fallback));
+            LanguagesConfig = LanguagesConfig.Set(@event.Language, @event.IsOptional, @event.Fallback);
 
             if (@event.IsMaster)
             {

@@ -12,7 +12,5 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     public sealed class IndexData
     {
         public NamedContentData Data { get; set; }
-
-        public NamedContentData DataDraft { get; set; }
     }
 }

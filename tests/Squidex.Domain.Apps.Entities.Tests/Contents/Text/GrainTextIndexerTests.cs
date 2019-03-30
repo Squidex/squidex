@@ -39,18 +39,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
-        public async Task Should_call_grain_when_indexing_data()
-        {
-            var data = new NamedContentData();
-            var dataDraft = new NamedContentData();
-
-            await sut.IndexAsync(schemaId, contentId, dataDraft, data);
-
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data && x.Value.DataDraft == dataDraft), false))
-                .MustHaveHappened();
-        }
-
-        [Fact]
         public async Task Should_call_grain_when_content_deleted()
         {
             await sut.On(E(new ContentDeleted()));
@@ -66,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await sut.On(E(new ContentCreated { Data = data }));
 
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.DataDraft == data), true))
+            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), true))
                 .MustHaveHappened();
         }
 
@@ -77,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await sut.On(E(new ContentUpdated { Data = data }));
 
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.DataDraft == data), false))
+            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), false))
                 .MustHaveHappened();
         }
 
@@ -88,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             await sut.On(E(new ContentUpdateProposed { Data = data }));
 
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.DataDraft == data), true))
+            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), true))
                 .MustHaveHappened();
         }
 
