@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                 }
             }
 
-            if (query.Filter != null)
+            if (query?.Filter != null)
             {
                 filters.Add(query.Filter.BuildFilter<MongoContentEntity>());
             }

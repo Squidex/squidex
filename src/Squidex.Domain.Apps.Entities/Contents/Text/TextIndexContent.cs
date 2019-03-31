@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 Upsert(converted, 0, 0, 1);
             }
-            else if (!onlyDraft)
+            else if (!onlyDraft || docId == 0)
             {
                 Upsert(converted, 0, 0, 0);
             }
