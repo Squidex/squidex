@@ -112,7 +112,7 @@ namespace Migrate_01
 
                     if (handledIds.Add(id))
                     {
-                        await worker.SendAsync(id);
+                        await worker.SendAsync(id, ct);
                     }
                 }, filter, ct: ct);
 

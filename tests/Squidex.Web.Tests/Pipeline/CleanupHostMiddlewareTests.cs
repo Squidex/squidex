@@ -14,20 +14,19 @@ namespace Squidex.Web.Pipeline
 {
     public class CleanupHostMiddlewareTests
     {
-        private readonly RequestDelegate next;
         private readonly CleanupHostMiddleware sut;
         private bool isNextCalled;
 
         public CleanupHostMiddlewareTests()
         {
-            next = context =>
+            Task Next(HttpContext context)
             {
                 isNextCalled = true;
 
                 return TaskHelper.Done;
-            };
+            }
 
-            sut = new CleanupHostMiddleware(next);
+            sut = new CleanupHostMiddleware(Next);
         }
 
         [Fact]

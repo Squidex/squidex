@@ -94,21 +94,21 @@ namespace Squidex.Infrastructure.EventSourcing
             return BuildQuery(filters, parameters);
         }
 
-        private static SqlQuerySpec BuildQuery(List<string> filters, SqlParameterCollection parameters)
+        private static SqlQuerySpec BuildQuery(IEnumerable<string> filters, SqlParameterCollection parameters)
         {
             var query = $"SELECT * FROM {Constants.Collection} e WHERE {string.Join(" AND ", filters)} ORDER BY e.timestamp";
 
             return new SqlQuerySpec(query, parameters);
         }
 
-        private static void ForProperty(this List<string> filters, SqlParameterCollection parameters, string property, object value)
+        private static void ForProperty(this ICollection<string> filters, SqlParameterCollection parameters, string property, object value)
         {
             filters.Add($"ARRAY_CONTAINS(e.events, {{ \"header\": {{ \"{property}\": @value }} }}, true)");
 
             parameters.Add(new SqlParameter("@value", value));
         }
 
-        private static void ForRegex(this List<string> filters, SqlParameterCollection parameters, string streamFilter)
+        private static void ForRegex(this ICollection<string> filters, SqlParameterCollection parameters, string streamFilter)
         {
             if (!StreamFilter.IsAll(streamFilter))
             {
@@ -125,7 +125,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private static void ForPosition(this List<string> filters, SqlParameterCollection parameters, StreamPosition streamPosition)
+        private static void ForPosition(this ICollection<string> filters, SqlParameterCollection parameters, StreamPosition streamPosition)
         {
             if (streamPosition.IsEndOfCommit)
             {

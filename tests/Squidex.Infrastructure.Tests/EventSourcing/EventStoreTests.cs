@@ -61,10 +61,10 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new EventData[]
+            var events = new[]
             {
                 new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2"),
+                new EventData("Type2", new EnvelopeHeaders(), "2")
             };
 
             await Assert.ThrowsAsync<WrongEventVersionException>(() => Sut.AppendAsync(Guid.NewGuid(), streamName, 0, events));
@@ -75,10 +75,10 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new EventData[]
+            var events = new[]
             {
                 new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2"),
+                new EventData("Type2", new EnvelopeHeaders(), "2")
             };
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
@@ -91,7 +91,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new EventData[]
+            var events = new[]
             {
                 new EventData("Type1", new EnvelopeHeaders(), "1"),
                 new EventData("Type2", new EnvelopeHeaders(), "2")
@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure.EventSourcing
             var readEvents1 = await QueryAsync(streamName);
             var readEvents2 = await QueryWithCallbackAsync(streamName);
 
-            var expected = new StoredEvent[]
+            var expected = new[]
             {
                 new StoredEvent(streamName, "Position", 0, events[0]),
                 new StoredEvent(streamName, "Position", 1, events[1])
@@ -117,10 +117,10 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new EventData[]
+            var events = new[]
             {
                 new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2"),
+                new EventData("Type2", new EnvelopeHeaders(), "2")
             };
 
             var readEvents = await QueryWithSubscriptionAsync(streamName, async () =>
@@ -128,7 +128,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
             });
 
-            var expected = new StoredEvent[]
+            var expected = new[]
             {
                 new StoredEvent(streamName, "Position", 0, events[0]),
                 new StoredEvent(streamName, "Position", 1, events[1])
@@ -142,10 +142,10 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events1 = new EventData[]
+            var events1 = new[]
             {
                 new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2"),
+                new EventData("Type2", new EnvelopeHeaders(), "2")
             };
 
             await QueryWithSubscriptionAsync(streamName, async () =>
@@ -153,10 +153,10 @@ namespace Squidex.Infrastructure.EventSourcing
                 await Sut.AppendAsync(Guid.NewGuid(), streamName, events1);
             });
 
-            var events2 = new EventData[]
+            var events2 = new[]
             {
                 new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2"),
+                new EventData("Type2", new EnvelopeHeaders(), "2")
             };
 
             var readEventsFromPosition = await QueryWithSubscriptionAsync(streamName, async () =>
@@ -164,7 +164,7 @@ namespace Squidex.Infrastructure.EventSourcing
                 await Sut.AppendAsync(Guid.NewGuid(), streamName, events2);
             });
 
-            var expectedFromPosition = new StoredEvent[]
+            var expectedFromPosition = new[]
             {
                 new StoredEvent(streamName, "Position", 2, events2[0]),
                 new StoredEvent(streamName, "Position", 3, events2[1])
@@ -172,7 +172,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var readEventsFromBeginning = await QueryWithSubscriptionAsync(streamName, fromBeginning: true);
 
-            var expectedFromBeginning = new StoredEvent[]
+            var expectedFromBeginning = new[]
             {
                 new StoredEvent(streamName, "Position", 0, events1[0]),
                 new StoredEvent(streamName, "Position", 1, events1[1]),
@@ -190,10 +190,10 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new EventData[]
+            var events = new[]
             {
                 new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2"),
+                new EventData("Type2", new EnvelopeHeaders(), "2")
             };
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
@@ -203,7 +203,7 @@ namespace Squidex.Infrastructure.EventSourcing
             var readEvents1 = await QueryAsync(streamName, 1);
             var readEvents2 = await QueryWithCallbackAsync(streamName, firstRead[0].EventPosition);
 
-            var expected = new StoredEvent[]
+            var expected = new[]
             {
                 new StoredEvent(streamName, "Position", 1, events[1])
             };
@@ -217,10 +217,10 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             var streamName = $"test-{Guid.NewGuid()}";
 
-            var events = new EventData[]
+            var events = new[]
             {
                 new EventData("Type1", new EnvelopeHeaders(), "1"),
-                new EventData("Type2", new EnvelopeHeaders(), "2"),
+                new EventData("Type2", new EnvelopeHeaders(), "2")
             };
 
             await Sut.AppendAsync(Guid.NewGuid(), streamName, events);
@@ -244,16 +244,16 @@ namespace Squidex.Infrastructure.EventSourcing
             var streamName1 = $"test-{Guid.NewGuid()}";
             var streamName2 = $"test-{Guid.NewGuid()}";
 
-            var events1 = new EventData[]
+            var events1 = new[]
             {
                 new EventData("Type1", keyed1, "1"),
-                new EventData("Type2", keyed2, "2"),
+                new EventData("Type2", keyed2, "2")
             };
 
-            var events2 = new EventData[]
+            var events2 = new[]
             {
                 new EventData("Type3", keyed2, "3"),
-                new EventData("Type4", keyed1, "4"),
+                new EventData("Type4", keyed1, "4")
             };
 
             await Sut.CreateIndexAsync("key");
@@ -263,7 +263,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             var readEvents = await QueryWithFilterAsync("key", keyed2["key"].ToString());
 
-            var expected = new StoredEvent[]
+            var expected = new[]
             {
                 new StoredEvent(streamName1, "Position", 1, events1[1]),
                 new StoredEvent(streamName2, "Position", 0, events2[0])
@@ -366,7 +366,7 @@ namespace Squidex.Infrastructure.EventSourcing
             }
         }
 
-        private void ShouldBeEquivalentTo(IEnumerable<StoredEvent> actual, params StoredEvent[] expected)
+        private static void ShouldBeEquivalentTo(IEnumerable<StoredEvent> actual, params StoredEvent[] expected)
         {
             var actualArray = actual.Select(x => new StoredEvent(x.StreamName, "Position", x.EventStreamNumber, x.Data)).ToArray();
 

@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
 
         protected void On(ContentStatusScheduled @event)
         {
-            ScheduleJob = new ScheduleJob(Guid.NewGuid(), @event.Status, @event.Actor, @event.DueTime);
+            ScheduleJob = ScheduleJob.Build(@event.Status, @event.Actor, @event.DueTime);
         }
 
         protected void On(ContentDeleted @event)

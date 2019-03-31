@@ -259,9 +259,6 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<AddPatterns>()
                 .As<IMigration>();
 
-            services.AddTransientAs<BuildFullTextIndices>()
-                .As<IMigration>();
-
             services.AddTransientAs<ConvertEventStore>()
                 .As<IMigration>();
 

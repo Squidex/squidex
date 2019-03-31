@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
                     switch (@event.Payload)
                     {
-                        case ContentDeleted contentDeleted:
+                        case ContentDeleted _:
                             await index.DeleteAsync(id);
                             break;
                         case ContentCreated contentCreated:
@@ -80,10 +80,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         case ContentUpdated contentUpdated:
                             await index.IndexAsync(id, Data(contentUpdated.Data), false);
                             break;
-                        case ContentChangesDiscarded contentChangesDiscarded:
+                        case ContentChangesDiscarded _:
                             await index.CopyAsync(id, false);
                             break;
-                        case ContentChangesPublished contentChangesPublished:
+                        case ContentChangesPublished _:
                         case ContentStatusChanged contentStatusChanged when contentStatusChanged.Status == Status.Published:
                             await index.CopyAsync(id, true);
                             break;
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private J<IndexData> Data(NamedContentData data)
+        private static J<IndexData> Data(NamedContentData data)
         {
             return new IndexData { Data = data };
         }

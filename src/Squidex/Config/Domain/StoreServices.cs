@@ -50,8 +50,6 @@ namespace Squidex.Config.Domain
                     var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
                     var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName);
 
-                    var isCosmosDb = config.GetOptionalValue<bool>("store:mongoDB:isCosmosDB");
-
                     services.Configure<MongoDbOptions>(config.GetSection("store:mongoDB"));
 
                     services.AddSingleton(typeof(ISnapshotStore<,>), typeof(MongoSnapshotStore<,>));

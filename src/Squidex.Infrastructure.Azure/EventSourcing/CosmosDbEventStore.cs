@@ -78,7 +78,7 @@ namespace Squidex.Infrastructure.EventSourcing
             await documentClient.CreateDocumentCollectionIfNotExistsAsync(databaseUri,
                 new DocumentCollection
                 {
-                    Id = Constants.LeaseCollection,
+                    Id = Constants.LeaseCollection
                 });
 
             await documentClient.CreateDocumentCollectionIfNotExistsAsync(databaseUri,
@@ -94,7 +94,7 @@ namespace Squidex.Infrastructure.EventSourcing
                                 Indexes = new Collection<Index>
                                 {
                                     Index.Range(DataType.Number),
-                                    Index.Range(DataType.String),
+                                    Index.Range(DataType.String)
                                 }
                             }
                         }
@@ -107,17 +107,17 @@ namespace Squidex.Infrastructure.EventSourcing
                             {
                                 Paths = new Collection<string>
                                 {
-                                    $"/eventStream",
-                                    $"/eventStreamOffset"
+                                    "/eventStream",
+                                    "/eventStreamOffset"
                                 }
                             }
                         }
                     },
-                    Id = Constants.Collection,
+                    Id = Constants.Collection
                 },
                 new RequestOptions
                 {
-                    PartitionKey = new PartitionKey($"/eventStream")
+                    PartitionKey = new PartitionKey("/eventStream")
                 });
         }
     }

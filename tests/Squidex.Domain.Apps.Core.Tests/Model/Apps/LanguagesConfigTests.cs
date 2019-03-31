@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         public void Should_add_language()
         {
             var config_0 = LanguagesConfig.Build(Language.DE);
-            var config_1 = config_0.Set(new LanguageConfig(Language.IT));
+            var config_1 = config_0.Set(Language.IT);
 
             config_1.OfType<LanguageConfig>().ToList().Should().BeEquivalentTo(
                 new List<LanguageConfig>
@@ -102,7 +102,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var config_0 = LanguagesConfig.Build(Language.DE);
 
-            config_0.Set(new LanguageConfig(Language.DE));
+            config_0.Set(Language.DE);
         }
 
         [Fact]
@@ -110,8 +110,8 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var config_0 = LanguagesConfig.Build(Language.DE);
 
-            var config_1 = config_0.Set(new LanguageConfig(Language.UK));
-            var config_2 = config_1.Set(new LanguageConfig(Language.IT));
+            var config_1 = config_0.Set(Language.UK);
+            var config_2 = config_1.Set(Language.IT);
             var config_3 = config_2.MakeMaster(Language.IT);
 
             Assert.Equal(Language.IT, config_3.Master.Language);

@@ -28,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private readonly ITextIndexerGrain grain = A.Fake<ITextIndexerGrain>();
         private readonly Guid schemaId = Guid.NewGuid();
         private readonly Guid contentId = Guid.NewGuid();
+        private readonly NamedContentData data = new NamedContentData();
         private readonly GrainTextIndexer sut;
 
         public GrainTextIndexerTests()
@@ -50,8 +51,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_call_grain_when_content_created()
         {
-            var data = new NamedContentData();
-
             await sut.On(E(new ContentCreated { Data = data }));
 
             A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), true))
@@ -61,8 +60,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_call_grain_when_content_updated()
         {
-            var data = new NamedContentData();
-
             await sut.On(E(new ContentUpdated { Data = data }));
 
             A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), false))
@@ -72,8 +69,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_call_grain_when_content_change_proposed()
         {
-            var data = new NamedContentData();
-
             await sut.On(E(new ContentUpdateProposed { Data = data }));
 
             A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.That.Matches(x => x.Value.Data == data), true))
@@ -83,8 +78,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_call_grain_when_content_change_published()
         {
-            var data = new NamedContentData();
-
             await sut.On(E(new ContentChangesPublished()));
 
             A.CallTo(() => grain.CopyAsync(contentId, true))
@@ -94,8 +87,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_call_grain_when_content_change_discarded()
         {
-            var data = new NamedContentData();
-
             await sut.On(E(new ContentChangesDiscarded()));
 
             A.CallTo(() => grain.CopyAsync(contentId, false))
@@ -105,8 +96,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_call_grain_when_content_published()
         {
-            var data = new NamedContentData();
-
             await sut.On(E(new ContentStatusChanged { Status = Status.Published }));
 
             A.CallTo(() => grain.CopyAsync(contentId, true))
@@ -116,8 +105,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_catch_exception_when_indexing_failed()
         {
-            var data = new NamedContentData();
-
             A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.Ignored, false))
                 .Throws(new InvalidOperationException());
 
@@ -127,8 +114,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_not_catch_exception_when_indexing_failed_often()
         {
-            var data = new NamedContentData();
-
             A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.Ignored, A<bool>.Ignored))
                 .Throws(new InvalidOperationException());
 

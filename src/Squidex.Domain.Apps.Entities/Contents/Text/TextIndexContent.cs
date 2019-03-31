@@ -22,8 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     {
         private const string MetaId = "_id";
         private const string MetaKey = "_key";
-        private const int ForDraftIndex = 0;
-        private const int ForPublishedIndex = 1;
         private readonly IndexWriter indexWriter;
         private readonly IndexSearcher indexSearcher;
         private readonly IndexState indexState;
@@ -112,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private Document CreateDocument(NamedContentData data)
+        private static Document CreateDocument(NamedContentData data)
         {
             var languages = new Dictionary<string, StringBuilder>();
 

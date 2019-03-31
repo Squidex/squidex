@@ -54,8 +54,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            var schemaGrain = A.Fake<ISchemaGrain>();
-
             var result = await sut.CreateEnrichedEventAsync(envelope);
 
             Assert.Equal(type, ((EnrichedSchemaEvent)result).Type);

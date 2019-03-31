@@ -15,13 +15,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     internal sealed class IndexState
     {
         private const string MetaFor = "_fd";
-        private readonly IndexReader indexReader;
         private readonly IndexWriter indexWriter;
         private readonly BinaryDocValues binaryValues;
 
         public IndexState(IndexReader indexReader, IndexWriter indexWriter)
         {
-            this.indexReader = indexReader;
             this.indexWriter = indexWriter;
 
             if (indexReader != null)
@@ -63,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         private static BytesRef GetValue(byte forDraft, byte forPublished)
         {
-            return new BytesRef(new byte[] { forDraft, forPublished });
+            return new BytesRef(new[] { forDraft, forPublished });
         }
     }
 }

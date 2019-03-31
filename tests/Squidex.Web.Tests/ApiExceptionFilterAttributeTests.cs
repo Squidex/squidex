@@ -51,7 +51,7 @@ namespace Squidex.Web
 
             Assert.Equal(ex.Summary, (result.Value as ErrorDto).Message);
 
-            Assert.Equal(new string[] { "Error1", "P: Error2", "P1, P2: Error3" }, (result.Value as ErrorDto).Details);
+            Assert.Equal(new[] { "Error1", "P: Error2", "P1, P2: Error3" }, (result.Value as ErrorDto).Details);
         }
 
         [Fact]

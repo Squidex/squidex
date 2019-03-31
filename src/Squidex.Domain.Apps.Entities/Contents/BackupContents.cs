@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var contentIds = contentIdsBySchemaId.Values.SelectMany(x => x);
 
-            return RebuildManyAsync(contentIds, id => RebuildAsync<ContentState, ContentGrain>(id));
+            return RebuildManyAsync(contentIds, RebuildAsync<ContentState, ContentGrain>);
         }
     }
 }

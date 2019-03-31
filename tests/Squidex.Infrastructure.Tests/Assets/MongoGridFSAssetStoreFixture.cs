@@ -14,13 +14,12 @@ namespace Squidex.Infrastructure.Assets
     public sealed class MongoGridFSAssetStoreFixture : IDisposable
     {
         private readonly IMongoClient mongoClient = new MongoClient("mongodb://localhost");
-        private readonly IMongoDatabase mongoDatabase;
 
         public MongoGridFsAssetStore AssetStore { get; }
 
         public MongoGridFSAssetStoreFixture()
         {
-            mongoDatabase = mongoClient.GetDatabase("GridFSTest");
+            var mongoDatabase = mongoClient.GetDatabase("GridFSTest");
 
             var gridFSBucket = new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
             {

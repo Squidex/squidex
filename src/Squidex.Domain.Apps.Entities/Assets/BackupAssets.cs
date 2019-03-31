@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             await RestoreTagsAsync(appId, reader);
 
-            await RebuildManyAsync(assetIds, id => RebuildAsync<AssetState, AssetGrain>(id));
+            await RebuildManyAsync(assetIds, RebuildAsync<AssetState, AssetGrain>);
         }
 
         private async Task RestoreTagsAsync(Guid appId, BackupReader reader)

@@ -8,26 +8,22 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Xunit;
 
 #pragma warning disable IDE0017 // Simplify object initialization
 
-namespace Squidex.Web.Pipeline
+namespace Squidex.Web
 {
     public class ApiPermissionAttributeTests
     {
-        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly HttpContext httpContext = new DefaultHttpContext();
-        private readonly ActionContext actionContext;
         private readonly ActionExecutingContext actionExecutingContext;
         private readonly ActionExecutionDelegate next;
         private readonly ClaimsIdentity user = new ClaimsIdentity();
@@ -35,7 +31,7 @@ namespace Squidex.Web.Pipeline
 
         public ApiPermissionAttributeTests()
         {
-            actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
+            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
             {
                 FilterDescriptors = new List<FilterDescriptor>()
             });

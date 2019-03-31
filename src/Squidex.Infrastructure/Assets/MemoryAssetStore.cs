@@ -73,7 +73,7 @@ namespace Squidex.Infrastructure.Assets
 
         public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
-            return UploadCoreAsync(fileName, stream, false);
+            return UploadCoreAsync(fileName, stream, false, ct);
         }
 
         private async Task UploadCoreAsync(string fileName, Stream stream, bool overwrite, CancellationToken ct = default)
@@ -127,7 +127,7 @@ namespace Squidex.Infrastructure.Assets
             return TaskHelper.Done;
         }
 
-        private string GetFileName(string id, long version, string suffix)
+        private static string GetFileName(string id, long version, string suffix)
         {
             return StringExtensions.JoinNonEmpty("_", id, version.ToString(), suffix);
         }

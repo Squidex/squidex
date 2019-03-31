@@ -9,7 +9,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.Commands
 {
-    public interface IDomainState<T>
+    public interface IDomainState<out T>
     {
         long Version { get; set; }
 
