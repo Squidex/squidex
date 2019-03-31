@@ -26,6 +26,7 @@ using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
+using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Account
 {
@@ -164,6 +165,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         [HttpGet]
         [Route("account/login/")]
+        [ClearCookies]
         public Task<IActionResult> Login(string returnUrl = null)
         {
             return LoginViewAsync(returnUrl, true, false);
@@ -242,7 +244,11 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             UserWithClaims user = null;
 
-            if (!isLoggedIn)
+            if (isLoggedIn)
+            {
+                user = await userManager.FindByLoginWithClaimsAsync(externalLogin.LoginProvider, externalLogin.ProviderKey);
+            }
+            else
             {
                 var email = externalLogin.Principal.FindFirst(ClaimTypes.Email).Value;
 

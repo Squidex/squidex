@@ -26,6 +26,7 @@ namespace Squidex.Config.Authentication
                     options.ClientId = identityOptions.OidcClient;
                     options.ClientSecret = identityOptions.OidcSecret;
                     options.Scope.Add(Constants.EmailScope);
+                    options.Scope.Add(Constants.PermissionsScope);
                     options.RequireHttpsMetadata = false;
                 });
             }

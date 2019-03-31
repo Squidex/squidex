@@ -65,6 +65,18 @@ namespace Squidex.Domain.Users
             return await userManager.ResolveUserAsync(user);
         }
 
+        public static async Task<UserWithClaims> FindByLoginWithClaimsAsync(this UserManager<IdentityUser> userManager, string loginProvider, string providerKey)
+        {
+            if (loginProvider == null || providerKey == null)
+            {
+                return null;
+            }
+
+            var user = await userManager.FindByLoginAsync(loginProvider, providerKey);
+
+            return await userManager.ResolveUserAsync(user);
+        }
+
         public static Task<long> CountByEmailAsync(this UserManager<IdentityUser> userManager, string email = null)
         {
             var count = QueryUsers(userManager, email).LongCount();

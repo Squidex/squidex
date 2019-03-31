@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,12 +18,22 @@ namespace Squidex.Config.Authentication
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
 
             services.AddAuthentication()
+                .AddMyCookie()
                 .AddMyExternalGithubAuthentication(identityOptions)
                 .AddMyExternalGoogleAuthentication(identityOptions)
                 .AddMyExternalMicrosoftAuthentication(identityOptions)
                 .AddMyExternalOdic(identityOptions)
-                .AddMyIdentityServerAuthentication(identityOptions, config)
-                .AddCookie();
+                .AddMyIdentityServerAuthentication(identityOptions, config);
+        }
+
+        public static AuthenticationBuilder AddMyCookie(this AuthenticationBuilder builder)
+        {
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.Name = ".sq.auth";
+            });
+
+            return builder.AddCookie();
         }
     }
 }
