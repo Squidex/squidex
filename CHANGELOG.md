@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.0.0 - 2018-04-01
+
+### Features
+
+* **UI**: Automatic generation of UI for rule actions.
+* **Content**: Improved full text engine with `Lucene.NET`.
+* **Server**: Plugin system.
+* **Server**: Performance improvement for event handling.
+
+The major feature of this release is the improved full text search. Content will be added to separate indices, which gives the following advantages:
+
+* Each language is added to one field with individual stop words.
+* Fuzzy search, e.g. `awsome~` to search for `awesome`.
+* Search in one language only, e.g. `en:Home`
+
+The full text index is populated in the background and it can therefore take a few seconds until you see the change. As ad admin you can restart the process in the admin section.
+
 ## v1.16.2 - 2019-03-16
 
 ### Bugfixes
@@ -99,13 +116,13 @@
 
 ### Refactorings
 
-* Migration to .NET Core 2.2
-* Migration to ASP.NET Core 2.2
-* Migration to ASP.NET Core Health System
+* Migration to `.NET Core 2.2`
+* Migration to `ASP.NET Core 2.2`
+* Migration to `ASP.NET Core` Health System
 * Performance improvements in logging system.
 * Performance improvements for json serialization.
 * Unificiation of storage implementations.
-* Custom JSON structures to replace JSON.NET with faster serializer at later point of time.
+* Custom JSON structures to replace `JSON.NET` with faster serializer at later point of time.
 
 ## v1.12.0 - 2018-11-06
 
