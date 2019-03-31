@@ -38,8 +38,6 @@ namespace Squidex.Config
                     return level >= LogLevel.Warning;
                 }
 
-                return true;
-
                 if (category.StartsWith("Microsoft.AspNetCore.", StringComparison.OrdinalIgnoreCase))
                 {
                     return level > LogLevel.Information;
