@@ -15,7 +15,8 @@ import {
     FeatureDto,
     LocalStoreService,
     NewsService,
-    OnboardingService
+    OnboardingService,
+    UIState
 } from '@app/shared';
 
 @Component({
@@ -35,6 +36,7 @@ export class AppsPageComponent implements OnInit {
     constructor(
         public readonly appsState: AppsState,
         public readonly authState: AuthService,
+        public readonly uiState: UIState,
         private readonly localStore: LocalStoreService,
         private readonly newsService: NewsService,
         private readonly onboardingService: OnboardingService

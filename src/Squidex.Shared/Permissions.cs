@@ -34,6 +34,8 @@ namespace Squidex.Shared
         public const string Admin = "squidex.admin.*";
         public const string AdminOrleans = "squidex.admin.orleans";
 
+        public const string AdminAppCreate = "squidex.admin.apps.create";
+
         public const string AdminRestore = "squidex.admin.restore";
         public const string AdminRestoreRead = "squidex.admin.restore.read";
         public const string AdminRestoreCreate = "squidex.admin.restore.create";

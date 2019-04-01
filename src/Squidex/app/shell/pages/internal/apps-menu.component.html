@@ -17,21 +17,24 @@
                     <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>
                 </a>
     
-                <div class="dropdown-divider"></div>
     
                 <ng-container *ngIf="apps.length > 0">
+                    <div class="dropdown-divider"></div>
+
                     <div class="apps-list">
                         <a class="dropdown-item" *ngFor="let app of apps" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.name}}</a>
                     </div>
-    
-                    <div class="dropdown-divider"></div>
                 </ng-container>
+
+                <ng-container *ngIf="(uiState.settings | async).canCreateApps">
+                    <div class="dropdown-divider"></div>
     
-                <div class="dropdown-button">
-                    <button type="button" class="btn btn-block btn-success" (click)="createApp()">
-                        <i class="icon-plus"></i> Create New App
-                    </button>
-                </div>
+                    <div class="dropdown-button">
+                        <button type="button" class="btn btn-block btn-success" (click)="createApp()">
+                            <i class="icon-plus"></i> Create New App
+                        </button>
+                    </div>
+                </ng-container>
             </div>
         </ng-container>
     </li>

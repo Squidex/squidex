@@ -31,16 +31,56 @@ describe('UIService', () => {
         httpMock.verify();
     }));
 
-    it('should make get request to get settings',
+    it('should make get request to get common settings',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
         let settings: UISettingsDto;
+
+        uiService.getCommonSettings().subscribe(result => {
+            settings = result;
+        });
+
+        const response: UISettingsDto = { mapType: 'OSM', mapKey: '', canCreateApps: true };
+
+        const req = httpMock.expectOne('http://service/p/api/ui/settings');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush(response);
+
+        expect(settings!).toEqual(response);
+    }));
+
+    it('should return default common settings when error occurs',
+        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+
+        let settings: object;
+
+        uiService.getCommonSettings().subscribe(result => {
+            settings = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/ui/settings');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.error(new ErrorEvent('500'));
+
+        expect(settings!).toEqual({ mapType: 'OSM', mapKey: '', canCreateApps: true });
+    }));
+
+    it('should make get request to get settings',
+        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+
+        let settings: object;
 
         uiService.getSettings('my-app').subscribe(result => {
             settings = result;
         });
 
-        const response: UISettingsDto = { mapType: 'OSM', mapKey: '' };
+        const response = { mapType: 'OSM', mapKey: '' };
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings');
 
@@ -55,7 +95,7 @@ describe('UIService', () => {
     it('should return default settings when error occurs',
         inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
 
-        let settings: UISettingsDto;
+        let settings: object;
 
         uiService.getSettings('my-app').subscribe(result => {
             settings = result;

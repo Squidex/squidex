@@ -16,8 +16,16 @@ import { UIState } from './ui.state';
 describe('UIState', () => {
     const app = 'my-app';
 
-    const oldSettings = {
-        mapType: 'OSM'
+    const appSettings = {
+        mapType: 'GM',
+        mapSize: 1024,
+        canCreateApps: true
+    };
+
+    const commonSettings = {
+        mapType: 'OSM',
+        mapKey: 'Key',
+        canCreateApps: true
     };
 
     let appsState: IMock<AppsState>;
@@ -30,10 +38,16 @@ describe('UIState', () => {
         appsState.setup(x => x.appName)
             .returns(() => app);
 
+        appsState.setup(x => x.selectedApp)
+            .returns(() => of(<any>{ name: app }));
+
         uiService = Mock.ofType<UIService>();
 
         uiService.setup(x => x.getSettings(app))
-            .returns(() => of(oldSettings));
+            .returns(() => of(appSettings));
+
+        uiService.setup(x => x.getCommonSettings())
+            .returns(() => of(commonSettings));
 
         uiService.setup(x => x.putSetting(app, It.isAnyString(), It.isAny()))
             .returns(() => of({}));
@@ -45,17 +59,25 @@ describe('UIState', () => {
     });
 
     it('should load settings', () => {
-        expect(uiState.snapshot.settings).toEqual(oldSettings);
+        expect(uiState.snapshot.settings).toEqual({
+            mapType: 'GM',
+            mapKey: 'Key',
+            mapSize: 1024,
+            canCreateApps: true
+        });
     });
 
     it('should add value to snapshot when set', () => {
         uiState.set('root.nested', 123);
 
         expect(uiState.snapshot.settings).toEqual({
-            mapType: 'OSM',
+            mapType: 'GM',
+            mapKey: 'Key',
+            mapSize: 1024,
             root: {
                 nested: 123
-            }
+            },
+            canCreateApps: true
         });
 
         uiState.get('root', {}).subscribe(x => {
@@ -79,10 +101,13 @@ describe('UIState', () => {
         uiState.remove('root.nested1');
 
         expect(uiState.snapshot.settings).toEqual({
-            mapType: 'OSM',
+            mapType: 'GM',
+            mapKey: 'Key',
+            mapSize: 1024,
             root: {
                 nested2: 123
-            }
+            },
+            canCreateApps: true
         });
 
         uiState.get('root', {}).subscribe(x => {

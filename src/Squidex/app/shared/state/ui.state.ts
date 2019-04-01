@@ -15,6 +15,8 @@ import { AppsState } from './apps.state';
 import { UIService, UISettingsDto } from './../services/ui.service';
 
 interface Snapshot {
+    settingsCommon: object & any;
+    settingsApp: object & any;
     settings: object & any;
 }
 
@@ -33,27 +35,30 @@ export class UIState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly uiService: UIService
     ) {
-        super({ settings: { mapType: 'OSM' } });
+        super({ settings: { }, settingsCommon: { }, settingsApp: { } });
 
-        if (appsState.selectedApp && Types.isFunction(appsState.selectedApp.subscribe)) {
-            appsState.selectedApp.subscribe(app => {
-                if (app) {
-                    this.load(true);
-                }
-            });
-        } else {
-            this.load(true);
-        }
+        this.loadCommon();
+
+        appsState.selectedApp.subscribe(app => {
+            if (app) {
+                this.load();
+            }
+        });
     }
 
-    public load(reset = false) {
-        if (!reset) {
-            this.resetState();
-        }
+    private load() {
+        this.next(s => updateAppSettings(s, {}));
 
         this.uiService.getSettings(this.appName)
             .subscribe(dtos => {
-                return this.next(s => ({ ...s, settings: dtos }));
+                this.next(s => updateAppSettings(s, dtos));
+            });
+    }
+
+    private loadCommon() {
+        this.uiService.getCommonSettings()
+            .subscribe(dtos => {
+                this.next(s => updateCommonSettings(s, dtos));
             });
     }
 
@@ -65,7 +70,7 @@ export class UIState extends State<Snapshot> {
 
             current[key] = value;
 
-            this.next(s => ({ ...s, settings: root }));
+            this.next(s => updateAppSettings(s, root));
         }
     }
 
@@ -77,14 +82,14 @@ export class UIState extends State<Snapshot> {
 
             delete current[key];
 
-            this.next(s => ({ ...s, settings: root }));
+            this.next(s => updateAppSettings(s, root));
         }
     }
 
     private getContainer(path: string) {
         const segments = path.split('.');
 
-        let current = { ...this.snapshot.settings };
+        let current = { ...this.snapshot.settingsApp };
 
         const root = current;
 
@@ -136,4 +141,16 @@ export class UIState extends State<Snapshot> {
     private get appName() {
         return this.appsState.appName;
     }
+}
+
+function updateAppSettings(state: Snapshot, settingsApp: object & any) {
+    const { settingsCommon } = state;
+
+    return { settings: { ...settingsCommon, ...settingsApp }, settingsApp, settingsCommon };
+}
+
+function updateCommonSettings(state: Snapshot, settingsCommon: object & any) {
+    const { settingsApp } = state;
+
+    return { settings: { ...settingsCommon, ...settingsApp }, settingsApp, settingsCommon };
 }

@@ -24,8 +24,8 @@ namespace Squidex.Areas.Api.Controllers.UI.Models
         public string MapKey { get; set; }
 
         /// <summary>
-        /// Indicates whether twitter actions are supported.
+        /// True when the user can create apps.
         /// </summary>
-        public bool SupportsTwitterActions { get; set; }
+        public bool CanCreateApps { get; set; }
     }
 }

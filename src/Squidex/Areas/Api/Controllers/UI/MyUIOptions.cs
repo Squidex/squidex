@@ -15,6 +15,8 @@ namespace Squidex.Areas.Api.Controllers.UI
 
         public MapOptions Map { get; set; }
 
+        public bool OnlyAdminsCanCreateApps { get; set; }
+
         public sealed class MapOptions
         {
             public string Type { get; set; }

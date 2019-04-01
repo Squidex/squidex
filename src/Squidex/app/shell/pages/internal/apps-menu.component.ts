@@ -11,7 +11,8 @@ import {
     AppsState,
     DialogModel,
     fadeAnimation,
-    ModalModel
+    ModalModel,
+    UIState
 } from '@app/shared';
 
 @Component({
@@ -29,7 +30,8 @@ export class AppsMenuComponent {
     public appsMenu = new ModalModel();
 
     constructor(
-        public readonly appsState: AppsState
+        public readonly appsState: AppsState,
+        public readonly uiState: UIState
     ) {
     }
 

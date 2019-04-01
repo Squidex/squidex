@@ -15,6 +15,8 @@ import { ApiUrlConfig } from '@app/framework';
 export interface UISettingsDto {
     mapType: string;
     mapKey?: string;
+
+    canCreateApps: boolean;
 }
 
 @Injectable()
@@ -25,12 +27,21 @@ export class UIService {
     ) {
     }
 
-    public getSettings(appName: string): Observable<UISettingsDto & object> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings`);
+    public getCommonSettings(): Observable<UISettingsDto> {
+        const url = this.apiUrl.buildUrl(`api/ui/settings`);
 
         return this.http.get<UISettingsDto>(url).pipe(
             catchError(_ => {
-                return of({ regexSuggestions: [], mapType: 'OSM', mapKey: '' });
+                return of({ mapType: 'OSM', mapKey: '', canCreateApps: true });
+            }));
+    }
+
+    public getSettings(appName: string): Observable<object> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings`);
+
+        return this.http.get<object>(url).pipe(
+            catchError(_ => {
+                return of({ });
             }));
     }
 
