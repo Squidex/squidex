@@ -103,30 +103,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
-        public async Task Should_catch_exception_when_indexing_failed()
-        {
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.Ignored, false))
-                .Throws(new InvalidOperationException());
-
-            await sut.On(E(new ContentCreated { Data = data }));
-        }
-
-        [Fact]
-        public async Task Should_not_catch_exception_when_indexing_failed_often()
-        {
-            A.CallTo(() => grain.IndexAsync(contentId, A<J<IndexData>>.Ignored, A<bool>.Ignored))
-                .Throws(new InvalidOperationException());
-
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            {
-                for (var i = 0; i < 10; i++)
-                {
-                    await sut.On(E(new ContentCreated { Data = data }));
-                }
-            });
-        }
-
-        [Fact]
         public async Task Should_call_grain_when_searching()
         {
             var foundIds = new List<Guid> { Guid.NewGuid() };

@@ -22,7 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public sealed class GrainTextIndexer : ITextIndexer, IEventConsumer
     {
-        private readonly RetryWindow retryWindow = new RetryWindow(TimeSpan.FromMinutes(5), 5);
         private readonly IGrainFactory grainFactory;
         private readonly ISemanticLog log;
 
@@ -58,49 +57,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public async Task On(Envelope<IEvent> @event)
         {
-            try
+            if (@event.Payload is ContentEvent contentEvent)
             {
-                if (@event.Payload is ContentEvent contentEvent)
-                {
-                    var index = grainFactory.GetGrain<ITextIndexerGrain>(contentEvent.SchemaId.Id);
+                var index = grainFactory.GetGrain<ITextIndexerGrain>(contentEvent.SchemaId.Id);
 
-                    var id = contentEvent.ContentId;
+                var id = contentEvent.ContentId;
 
-                    switch (@event.Payload)
-                    {
-                        case ContentDeleted _:
-                            await index.DeleteAsync(id);
-                            break;
-                        case ContentCreated contentCreated:
-                            await index.IndexAsync(id, Data(contentCreated.Data), true);
-                            break;
-                        case ContentUpdateProposed contentCreated:
-                            await index.IndexAsync(id, Data(contentCreated.Data), true);
-                            break;
-                        case ContentUpdated contentUpdated:
-                            await index.IndexAsync(id, Data(contentUpdated.Data), false);
-                            break;
-                        case ContentChangesDiscarded _:
-                            await index.CopyAsync(id, false);
-                            break;
-                        case ContentChangesPublished _:
-                        case ContentStatusChanged contentStatusChanged when contentStatusChanged.Status == Status.Published:
-                            await index.CopyAsync(id, true);
-                            break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (retryWindow.CanRetryAfterFailure())
+                switch (@event.Payload)
                 {
-                    log.LogError(ex, w => w
-                        .WriteProperty("action", "DeleteTextEntry")
-                        .WriteProperty("status", "Failed"));
-                }
-                else
-                {
-                    throw;
+                    case ContentDeleted _:
+                        await index.DeleteAsync(id);
+                        break;
+                    case ContentCreated contentCreated:
+                        await index.IndexAsync(id, Data(contentCreated.Data), true);
+                        break;
+                    case ContentUpdateProposed contentCreated:
+                        await index.IndexAsync(id, Data(contentCreated.Data), true);
+                        break;
+                    case ContentUpdated contentUpdated:
+                        await index.IndexAsync(id, Data(contentUpdated.Data), false);
+                        break;
+                    case ContentChangesDiscarded _:
+                        await index.CopyAsync(id, false);
+                        break;
+                    case ContentChangesPublished _:
+                    case ContentStatusChanged contentStatusChanged when contentStatusChanged.Status == Status.Published:
+                        await index.CopyAsync(id, true);
+                        break;
                 }
             }
         }
