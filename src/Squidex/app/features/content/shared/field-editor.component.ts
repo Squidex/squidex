@@ -11,7 +11,8 @@ import { FormControl } from '@angular/forms';
 import {
     AppLanguageDto,
     EditContentForm,
-    FieldDto
+    FieldDto,
+    MathHelper
 } from '@app/shared';
 
 @Component({
@@ -40,4 +41,6 @@ export class FieldEditorComponent {
 
     @Input()
     public displaySuffix: string;
+
+    public uniqueId = MathHelper.guid();
 }

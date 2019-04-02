@@ -26,21 +26,21 @@
 
         <div class="col-9">
             <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Tags'">
-                <input type="radio" class="radio-input" formControlName="editor" value="Tags" />
+                <input type="radio" class="radio-input" formControlName="editor" value="Tags" name="editor" />
 
                 <i class="icon-control-Tags"></i>
 
                 <span class="radio-label">Tags</span>
             </label>
             <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Dropdown'">
-                <input type="radio" class="radio-input" formControlName="editor" value="Dropdown" />
+                <input type="radio" class="radio-input" formControlName="editor" value="Dropdown" name="editor" />
 
                 <i class="icon-control-Dropdown"></i>
 
                 <span class="radio-label" clas>Dropdown</span>
             </label>
             <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Checkboxes'">
-                <input type="radio" class="radio-input" formControlName="editor" value="Checkboxes" />
+                <input type="radio" class="radio-input" formControlName="editor" value="Checkboxes" name="editor" />
 
                 <i class="icon-control-Checkboxes"></i>
 

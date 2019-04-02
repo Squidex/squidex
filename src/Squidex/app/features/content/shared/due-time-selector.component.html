@@ -5,14 +5,14 @@
 
     <ng-container content>
         <div class="form-check">
-            <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Immediately" id="immediately">
+            <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Immediately" id="immediately" name="dueTimeMode">
             <label class="form-check-label" for="immediately">
                 {{dueTimeAction}} content item(s) immediately.
             </label>
         </div>
 
         <div class="form-check">
-            <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Scheduled" id="scheduled">
+            <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Scheduled" id="scheduled" name="dueTimeMode">
             <label class="form-check-label" for="scheduled">
                 {{dueTimeAction}} content item(s) at a later point date and time.
             </label>
