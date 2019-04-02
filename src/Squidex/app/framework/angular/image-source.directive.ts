@@ -112,7 +112,7 @@ export class ImageSourceDirective extends ResourceOwner implements OnChanges, On
         const h = Math.round(this.size.height);
 
         if (w > 0 && h > 0) {
-            let source = `${this.imageSource}&width=${w}&height=${h}&mode=Crop`;
+            let source = `${this.imageSource}&width=${w}&height=${h}&mode=Pad`;
 
             if (this.loadQuery) {
                 source += `&q=${this.loadQuery}`;
