@@ -37,10 +37,11 @@ FROM microsoft/dotnet:2.2-runtime-deps-alpine
 # Default AspNetCore directory
 WORKDIR /app
 
-# add libuv
+# add libuv & curl
 RUN apk update \
  && apk add --no-cache libc6-compat \
  && apk add --no-cache libuv \
+ && apk add --no-cache curl \
  && ln -s /usr/lib/libuv.so.1 /usr/lib/libuv.so
 
 # Copy from build stage
