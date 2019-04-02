@@ -13,18 +13,14 @@ namespace Squidex.Infrastructure.Assets
 {
     public interface IAssetStore
     {
-        string GeneratePublicUrl(string id, long version, string suffix);
+        string GeneratePublicUrl(string fileName);
 
-        Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default);
+        Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default);
 
-        Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default);
+        Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default);
 
-        Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default);
-
-        Task UploadAsync(string id, long version, string suffix, Stream stream, bool overwrite = false, CancellationToken ct = default);
+        Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default);
 
         Task DeleteAsync(string fileName);
-
-        Task DeleteAsync(string id, long version, string suffix);
     }
 }

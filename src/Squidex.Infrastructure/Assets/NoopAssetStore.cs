@@ -14,37 +14,27 @@ namespace Squidex.Infrastructure.Assets
 {
     public sealed class NoopAssetStore : IAssetStore
     {
-        public string GeneratePublicUrl(string id, long version, string suffix)
+        public string GeneratePublicUrl(string fileName)
         {
             return null;
         }
 
-        public Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default)
+        public Task CopyAsync(string sourceFileName, string fileName, CancellationToken ct = default)
         {
             throw new NotSupportedException();
         }
 
-        public Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
+        public Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
             throw new NotSupportedException();
         }
 
-        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task UploadAsync(string id, long version, string suffix, Stream stream, bool overwrite = false, CancellationToken ct = default)
+        public Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
             throw new NotSupportedException();
         }
 
         public Task DeleteAsync(string fileName)
-        {
-            throw new NotSupportedException();
-        }
-
-        public Task DeleteAsync(string id, long version, string suffix)
         {
             throw new NotSupportedException();
         }

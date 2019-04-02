@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public void Should_calculate_source_url()
         {
-            var url = Sut.GeneratePublicUrl(AssetId, 1, null);
+            var url = Sut.GeneratePublicUrl(FileName);
 
             Assert.Null(url);
         }

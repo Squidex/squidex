@@ -108,9 +108,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private void AssertAssetHasBeenUploaded(long version, Guid commitId)
         {
-            A.CallTo(() => assetStore.UploadAsync(commitId.ToString(), stream, CancellationToken.None))
+            var fileName = AssetStoreExtensions.GetFileName(assetId.ToString(), version);
+
+            A.CallTo(() => assetStore.UploadAsync(commitId.ToString(), stream, false, CancellationToken.None))
                 .MustHaveHappened();
-            A.CallTo(() => assetStore.CopyAsync(commitId.ToString(), assetId.ToString(), version, null, CancellationToken.None))
+            A.CallTo(() => assetStore.CopyAsync(commitId.ToString(), fileName, CancellationToken.None))
                 .MustHaveHappened();
             A.CallTo(() => assetStore.DeleteAsync(commitId.ToString()))
                 .MustHaveHappened();

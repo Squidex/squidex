@@ -48,28 +48,31 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public string GeneratePublicUrl(string id, long version, string suffix)
+        public string GeneratePublicUrl(string fileName)
         {
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+
             if (blobContainer.Properties.PublicAccess != BlobContainerPublicAccessType.Blob)
             {
-                var sourceName = GetObjectName(id, version, suffix);
-                var sourceBlob = blobContainer.GetBlockBlobReference(sourceName);
+                var blob = blobContainer.GetBlockBlobReference(fileName);
 
-                return sourceBlob.Uri.ToString();
+                return blob.Uri.ToString();
             }
 
             return null;
         }
 
-        public async Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default)
+        public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
-            var targetName = GetObjectName(id, version, suffix);
-            var targetBlob = blobContainer.GetBlobReference(targetName);
-
-            var sourceBlob = blobContainer.GetBlockBlobReference(sourceFileName);
+            Guard.NotNullOrEmpty(sourceFileName, nameof(sourceFileName));
+            Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
 
             try
             {
+                var sourceBlob = blobContainer.GetBlockBlobReference(sourceFileName);
+
+                var targetBlob = blobContainer.GetBlobReference(targetFileName);
+
                 await targetBlob.StartCopyAsync(sourceBlob.Uri, null, AccessCondition.GenerateIfNotExistsCondition(), null, null, ct);
 
                 while (targetBlob.CopyState.Status == CopyStatus.Pending)
@@ -87,7 +90,7 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 409)
             {
-                throw new AssetAlreadyExistsException(targetName);
+                throw new AssetAlreadyExistsException(targetFileName);
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404)
             {
@@ -95,79 +98,45 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
-            var sourceName = GetObjectName(id, version, suffix);
-            var sourceBlob = blobContainer.GetBlockBlobReference(sourceName);
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
             try
             {
-                await sourceBlob.DownloadToStreamAsync(stream, null, null, null, ct);
+                var blob = blobContainer.GetBlockBlobReference(fileName);
+
+                await blob.DownloadToStreamAsync(stream, null, null, null, ct);
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 404)
             {
-                throw new AssetNotFoundException($"Id={id}, Version={version}", ex);
+                throw new AssetNotFoundException(fileName, ex);
             }
         }
 
-        public Task UploadAsync(string id, long version, string suffix, Stream stream, bool overwrite = false, CancellationToken ct = default)
+        public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            return UploadCoreAsync(GetObjectName(id, version, suffix), stream, overwrite, ct);
-        }
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
-        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
-        {
-            return UploadCoreAsync(fileName, stream, false, ct);
-        }
-
-        public Task DeleteAsync(string id, long version, string suffix)
-        {
-            return DeleteCoreAsync(GetObjectName(id, version, suffix));
-        }
-
-        public Task DeleteAsync(string fileName)
-        {
-            return DeleteCoreAsync(fileName);
-        }
-
-        private Task DeleteCoreAsync(string blobName)
-        {
-            var blob = blobContainer.GetBlockBlobReference(blobName);
-
-            return blob.DeleteIfExistsAsync();
-        }
-
-        private async Task UploadCoreAsync(string blobName, Stream stream, bool overwrite = false, CancellationToken ct = default)
-        {
             try
             {
-                var tempBlob = blobContainer.GetBlockBlobReference(blobName);
+                var tempBlob = blobContainer.GetBlockBlobReference(fileName);
 
                 await tempBlob.UploadFromStreamAsync(stream, overwrite ? null : AccessCondition.GenerateIfNotExistsCondition(), null, null, ct);
             }
             catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == 409)
             {
-                throw new AssetAlreadyExistsException(blobName);
+                throw new AssetAlreadyExistsException(fileName);
             }
         }
 
-        private string GetObjectName(string id, long version, string suffix)
+        public Task DeleteAsync(string fileName)
         {
-            Guard.NotNullOrEmpty(id, nameof(id));
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
-            if (blobContainer == null)
-            {
-                throw new InvalidOperationException("No connection established yet.");
-            }
+            var blob = blobContainer.GetBlockBlobReference(fileName);
 
-            var name = $"{id}_{version}";
-
-            if (!string.IsNullOrWhiteSpace(suffix))
-            {
-                name += "_" + suffix;
-            }
-
-            return name;
+            return blob.DeleteIfExistsAsync();
         }
     }
 }

@@ -43,18 +43,19 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public string GeneratePublicUrl(string id, long version, string suffix)
+        public string GeneratePublicUrl(string fileName)
         {
             return null;
         }
 
-        public async Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default)
+        public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
-            var objectName = GetObjectName(id, version, suffix);
+            Guard.NotNullOrEmpty(sourceFileName, nameof(sourceFileName));
+            Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
 
             try
             {
-                await storageClient.CopyObjectAsync(bucketName, sourceFileName, bucketName, objectName, IfNotExistsCopy, ct);
+                await storageClient.CopyObjectAsync(bucketName, sourceFileName, bucketName, targetFileName, IfNotExistsCopy, ct);
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {
@@ -62,85 +63,50 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.PreconditionFailed)
             {
-                throw new AssetAlreadyExistsException(objectName);
+                throw new AssetAlreadyExistsException(targetFileName);
             }
         }
 
-        public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
-            var objectName = GetObjectName(id, version, suffix);
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
             try
             {
-                await storageClient.DownloadObjectAsync(bucketName, objectName, stream, cancellationToken: ct);
+                await storageClient.DownloadObjectAsync(bucketName, fileName, stream, cancellationToken: ct);
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {
-                throw new AssetNotFoundException($"Id={id}, Version={version}", ex);
+                throw new AssetNotFoundException(fileName, ex);
             }
         }
 
-        public Task UploadAsync(string id, long version, string suffix, Stream stream, bool overwrite = false, CancellationToken ct = default)
+        public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            return UploadCoreAsync(GetObjectName(id, version, suffix), stream, overwrite, ct);
-        }
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
-        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
-        {
-            return UploadCoreAsync(fileName, stream, false, ct);
-        }
-
-        public Task DeleteAsync(string id, long version, string suffix)
-        {
-            return DeleteCoreAsync(GetObjectName(id, version, suffix));
-        }
-
-        public Task DeleteAsync(string fileName)
-        {
-            return DeleteCoreAsync(fileName);
-        }
-
-        private async Task UploadCoreAsync(string objectName, Stream stream, bool overwrite = false, CancellationToken ct = default)
-        {
             try
             {
-                await storageClient.UploadObjectAsync(bucketName, objectName, "application/octet-stream", stream, overwrite ? null : IfNotExists, ct);
+                await storageClient.UploadObjectAsync(bucketName, fileName, "application/octet-stream", stream, overwrite ? null : IfNotExists, ct);
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.PreconditionFailed)
             {
-                throw new AssetAlreadyExistsException(objectName);
+                throw new AssetAlreadyExistsException(fileName);
             }
         }
 
-        private async Task DeleteCoreAsync(string objectName)
+        public async Task DeleteAsync(string fileName)
         {
+            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+
             try
             {
-                await storageClient.DeleteObjectAsync(bucketName, objectName);
+                await storageClient.DeleteObjectAsync(bucketName, fileName);
             }
             catch (GoogleApiException ex) when (ex.HttpStatusCode == HttpStatusCode.NotFound)
             {
                 return;
             }
-        }
-
-        private string GetObjectName(string id, long version, string suffix)
-        {
-            Guard.NotNullOrEmpty(id, nameof(id));
-
-            if (storageClient == null)
-            {
-                throw new InvalidOperationException("No connection established yet.");
-            }
-
-            var name = GetFileName(id, version, suffix);
-
-            return name;
-        }
-
-        private static string GetFileName(string id, long version, string suffix)
-        {
-            return StringExtensions.JoinNonEmpty("_", id, version.ToString(), suffix);
         }
     }
 }

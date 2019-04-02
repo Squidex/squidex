@@ -39,20 +39,20 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public string GeneratePublicUrl(string id, long version, string suffix)
+        public string GeneratePublicUrl(string fileName)
         {
             return null;
         }
 
-        public async Task CopyAsync(string sourceFileName, string id, long version, string suffix, CancellationToken ct = default)
+        public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
             try
             {
-                var target = GetFileName(id, version, suffix);
+                var sourceName = GetFileName(sourceFileName, nameof(sourceFileName));
 
                 using (var readStream = await bucket.OpenDownloadStreamAsync(sourceFileName, cancellationToken: ct))
                 {
-                    await UploadFileCoreAsync(target, readStream, false, ct);
+                    await UploadAsync(targetFileName, readStream, false, ct);
                 }
             }
             catch (GridFSFileNotFoundException ex)
@@ -61,11 +61,11 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string id, long version, string suffix, Stream stream, CancellationToken ct = default)
+        public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
             try
             {
-                var name = GetFileName(id, version, suffix);
+                var name = GetFileName(fileName, nameof(fileName));
 
                 using (var readStream = await bucket.OpenDownloadStreamAsync(name, cancellationToken: ct))
                 {
@@ -74,35 +74,40 @@ namespace Squidex.Infrastructure.Assets
             }
             catch (GridFSFileNotFoundException ex)
             {
-                throw new AssetNotFoundException($"Id={id}, Version={version}", ex);
+                throw new AssetNotFoundException(fileName, ex);
             }
         }
 
-        public Task UploadAsync(string id, long version, string suffix, Stream stream, bool overwrite = false, CancellationToken ct = default)
-        {
-            return UploadFileCoreAsync(GetFileName(id, version, suffix), stream, overwrite, ct);
-        }
-
-        public Task UploadAsync(string fileName, Stream stream, CancellationToken ct = default)
-        {
-            return UploadFileCoreAsync(fileName, stream, false, ct);
-        }
-
-        public Task DeleteAsync(string id, long version, string suffix)
-        {
-            return DeleteCoreAsync(GetFileName(id, version, suffix));
-        }
-
-        public Task DeleteAsync(string fileName)
-        {
-            return DeleteCoreAsync(fileName);
-        }
-
-        private async Task DeleteCoreAsync(string id)
+        public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
             try
             {
-                await bucket.DeleteAsync(id);
+                var name = GetFileName(fileName, nameof(fileName));
+
+                if (overwrite)
+                {
+                    await DeleteAsync(fileName);
+                }
+
+                await bucket.UploadFromStreamAsync(fileName, fileName, stream, cancellationToken: ct);
+            }
+            catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+            {
+                throw new AssetAlreadyExistsException(fileName);
+            }
+            catch (MongoBulkWriteException<BsonDocument> ex) when (ex.WriteErrors.Any(x => x.Category == ServerErrorCategory.DuplicateKey))
+            {
+                throw new AssetAlreadyExistsException(fileName);
+            }
+        }
+
+        public async Task DeleteAsync(string fileName)
+        {
+            try
+            {
+                var name = GetFileName(fileName, nameof(fileName));
+
+                await bucket.DeleteAsync(name);
             }
             catch (GridFSFileNotFoundException)
             {
@@ -110,30 +115,11 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        private async Task UploadFileCoreAsync(string id, Stream stream, bool overwrite = false, CancellationToken ct = default)
+        private static string GetFileName(string fileName, string parameterName)
         {
-            try
-            {
-                if (overwrite)
-                {
-                    await bucket.DeleteAsync(id, ct);
-                }
+            Guard.NotNullOrEmpty(fileName, parameterName);
 
-                await bucket.UploadFromStreamAsync(id, id, stream, cancellationToken: ct);
-            }
-            catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-            {
-                throw new AssetAlreadyExistsException(id);
-            }
-            catch (MongoBulkWriteException<BsonDocument> ex) when (ex.WriteErrors.Any(x => x.Category == ServerErrorCategory.DuplicateKey))
-            {
-                throw new AssetAlreadyExistsException(id);
-            }
-        }
-
-        private static string GetFileName(string id, long version, string suffix)
-        {
-            return StringExtensions.JoinNonEmpty("_", id, version.ToString(), suffix);
+            return fileName;
         }
     }
 }
