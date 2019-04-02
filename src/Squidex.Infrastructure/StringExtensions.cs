@@ -510,11 +510,6 @@ namespace Squidex.Infrastructure
 
         public static string Slugify(this string value, ISet<char> preserveHash = null, bool singleCharDiactric = false, char separator = '-')
         {
-            if (value == null)
-            {
-                return null;
-            }
-
             var result = new StringBuilder(value.Length);
 
             var lastChar = (char)0;
@@ -586,24 +581,7 @@ namespace Squidex.Infrastructure
                 return string.Empty;
             }
 
-            var sb = new StringBuilder();
-
-            for (var i = 0; i < parts.Length; i++)
-            {
-                var part = parts[i];
-
-                if (!string.IsNullOrWhiteSpace(part))
-                {
-                    sb.Append(part);
-
-                    if (i < parts.Length - 1)
-                    {
-                        sb.Append(separator);
-                    }
-                }
-            }
-
-            return sb.ToString();
+            return string.Join(separator, parts.Where(x => !string.IsNullOrWhiteSpace(x)));
         }
     }
 }

@@ -153,5 +153,37 @@ namespace Squidex.Infrastructure
 
             Assert.Equal(output, result);
         }
+
+        [Fact]
+        public void Should_join_non_empty_when_all_are_valid()
+        {
+            var result = StringExtensions.JoinNonEmpty("_", "1", "2", "3");
+
+            Assert.Equal("1_2_3", result);
+        }
+
+        [Fact]
+        public void Should_join_non_empty_when_first_invalid()
+        {
+            var result = StringExtensions.JoinNonEmpty("_", null, "2", "3");
+
+            Assert.Equal("2_3", result);
+        }
+
+        [Fact]
+        public void Should_join_non_empty_when_middle_invalid()
+        {
+            var result = StringExtensions.JoinNonEmpty("_", "1", null, "3");
+
+            Assert.Equal("1_3", result);
+        }
+
+        [Fact]
+        public void Should_join_non_empty_when_last_invalid()
+        {
+            var result = StringExtensions.JoinNonEmpty("_", "1", "2", null);
+
+            Assert.Equal("1_2", result);
+        }
     }
 }
