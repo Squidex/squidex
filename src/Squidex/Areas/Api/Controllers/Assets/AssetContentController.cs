@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
@@ -61,14 +62,23 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("assets/{id}/{*more}")]
         [ProducesResponseType(typeof(FileResult), 200)]
         [ApiCosts(0.5)]
-        public async Task<IActionResult> GetAssetContent(Guid id, string more,
+        public async Task<IActionResult> GetAssetContent(string id, string more,
             [FromQuery] long version = EtagVersion.Any,
             [FromQuery] int? width = null,
             [FromQuery] int? height = null,
             [FromQuery] int? quality = null,
             [FromQuery] string mode = null)
         {
-            var entity = await assetRepository.FindAssetAsync(id);
+            IAssetEntity entity;
+
+            if (Guid.TryParse(id, out var guid))
+            {
+                entity = await assetRepository.FindAssetAsync(guid);
+            }
+            else
+            {
+                entity = await assetRepository.FindAssetAsync(id);
+            }
 
             if (entity == null || entity.FileVersion < version || width == 0 || height == 0 || quality == 0)
             {

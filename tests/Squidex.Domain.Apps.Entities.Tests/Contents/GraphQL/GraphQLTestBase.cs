@@ -170,6 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 LastModified = now,
                 LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
                 FileName = "MyFile.png",
+                FileNameSlug = "myfile.png",
                 FileSize = 1024,
                 FileVersion = 123,
                 MimeType = "image/png",

@@ -30,6 +30,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         public string MimeType { get; set; }
 
         [DataMember]
+        public string FileNameSlug { get; set; }
+
+        [DataMember]
         public long FileVersion { get; set; }
 
         [DataMember]
@@ -62,6 +65,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
         {
             SimpleMapper.Map(@event, this);
 
+            FileName = @event.FileName;
+            FileNameSlug = @event.FileName.ToAssetSlug();
+
             TotalSize += @event.FileSize;
         }
 
@@ -72,14 +78,15 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             TotalSize += @event.FileSize;
         }
 
-        protected void On(AssetTagged @event)
-        {
-            Tags = @event.Tags;
-        }
-
         protected void On(AssetRenamed @event)
         {
             FileName = @event.FileName;
+            FileNameSlug = @event.FileName.ToAssetSlug();
+        }
+
+        protected void On(AssetTagged @event)
+        {
+            Tags = @event.Tags;
         }
 
         protected void On(AssetDeleted @event)

@@ -101,6 +101,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             AddField(new FieldType
             {
+                Name = "fileNameSlug",
+                ResolvedType = AllTypes.NonNullString,
+                Resolver = Resolve(x => x.FileNameSlug),
+                Description = "The file name as slug."
+            });
+
+            AddField(new FieldType
+            {
                 Name = "fileType",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = Resolve(x => x.FileName.FileType()),

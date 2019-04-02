@@ -510,6 +510,11 @@ namespace Squidex.Infrastructure
 
         public static string Slugify(this string value, ISet<char> preserveHash = null, bool singleCharDiactric = false, char separator = '-')
         {
+            if (value == null)
+            {
+                return null;
+            }
+
             var result = new StringBuilder(value.Length);
 
             var lastChar = (char)0;

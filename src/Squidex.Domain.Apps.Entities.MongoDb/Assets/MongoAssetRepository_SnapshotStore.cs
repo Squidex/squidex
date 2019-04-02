@@ -8,10 +8,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
@@ -29,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
                 if (existing != null)
                 {
-                    return (SimpleMapper.Map(existing, new AssetState()), existing.Version);
+                    return (Map(existing), existing.Version);
                 }
 
                 return (null, EtagVersion.NotFound);
@@ -49,14 +51,25 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        Task ISnapshotStore<AssetState, Guid>.ReadAllAsync(Func<AssetState, long, Task> callback, CancellationToken ct)
+        async Task ISnapshotStore<AssetState, Guid>.ReadAllAsync(Func<AssetState, long, Task> callback, CancellationToken ct)
         {
-            throw new NotSupportedException();
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                await Collection.Find(new BsonDocument()).ForEachPipelineAsync(x => callback(Map(x), x.Version), ct);
+            }
         }
 
-        Task ISnapshotStore<AssetState, Guid>.RemoveAsync(Guid key)
+        async Task ISnapshotStore<AssetState, Guid>.RemoveAsync(Guid key)
         {
-            throw new NotSupportedException();
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                await Collection.DeleteOneAsync(x => x.Id == key);
+            }
+        }
+
+        private static AssetState Map(MongoAssetEntity existing)
+        {
+            return SimpleMapper.Map(existing, new AssetState());
         }
     }
 }

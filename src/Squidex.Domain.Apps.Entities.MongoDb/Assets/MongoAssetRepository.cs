@@ -35,15 +35,20 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<MongoAssetEntity>(
-                    Index
-                        .Ascending(x => x.AppId)
-                        .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.FileName)
-                        .Ascending(x => x.Tags)
-                        .Descending(x => x.LastModified)),
-                cancellationToken: ct);
+            return collection.Indexes.CreateManyAsync(
+                new[]
+                {
+                    new CreateIndexModel<MongoAssetEntity>(
+                        Index
+                            .Ascending(x => x.AppId)
+                            .Ascending(x => x.IsDeleted)
+                            .Ascending(x => x.FileName)
+                            .Ascending(x => x.Tags)
+                            .Descending(x => x.LastModified)),
+                    new CreateIndexModel<MongoAssetEntity>(
+                        Index.Ascending(x => x.FileNameSlug))
+                },
+                ct);
         }
 
         public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Query query)
@@ -94,6 +99,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 await Task.WhenAll(assetItems, assetCount);
 
                 return ResultList.Create(assetCount.Result, assetItems.Result.OfType<IAssetEntity>());
+            }
+        }
+
+        public async Task<IAssetEntity> FindAssetAsync(string slug)
+        {
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                var assetEntity =
+                    await Collection.Find(x => x.FileNameSlug == slug)
+                        .FirstOrDefaultAsync();
+
+                return assetEntity;
             }
         }
 

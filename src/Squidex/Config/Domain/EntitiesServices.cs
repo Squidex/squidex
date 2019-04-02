@@ -268,6 +268,9 @@ namespace Squidex.Config.Domain
             services.AddTransientAs<ClearSchemas>()
                 .As<IMigration>();
 
+            services.AddTransientAs<CreateAssetSlugs>()
+                .As<IMigration>();
+
             services.AddTransientAs<PopulateGrainIndexes>()
                 .As<IMigration>();
 

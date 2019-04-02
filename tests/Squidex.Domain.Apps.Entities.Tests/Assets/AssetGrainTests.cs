@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Rename_should_create_events()
         {
-            var command = new RenameAsset { FileName = "my-new-image.png" };
+            var command = new RenameAsset { FileName = "My New Image.png" };
 
             await ExecuteCreateAsync();
 
@@ -119,11 +119,12 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
-            Assert.Equal("my-new-image.png", sut.Snapshot.FileName);
+            Assert.Equal("My New Image.png", sut.Snapshot.FileName);
+            Assert.Equal("my-new-image.png", sut.Snapshot.FileNameSlug);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetRenamed { FileName = "my-new-image.png" })
+                    CreateAssetEvent(new AssetRenamed { FileName = "My New Image.png" })
                 );
         }
 

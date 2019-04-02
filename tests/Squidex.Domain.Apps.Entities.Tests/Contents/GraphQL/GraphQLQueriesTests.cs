@@ -51,6 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     sourceUrl
                     mimeType
                     fileName
+                    fileNameSlug
                     fileSize
                     fileVersion
                     isImage
@@ -85,6 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             sourceUrl = $"assets/source/{asset.Id}",
                             mimeType = "image/png",
                             fileName = "MyFile.png",
+                            fileNameSlug = "myfile.png",
                             fileSize = 1024,
                             fileVersion = 123,
                             isImage = true,
@@ -117,6 +119,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       sourceUrl
                       mimeType
                       fileName
+                      fileNameSlug
                       fileSize
                       fileVersion
                       isImage
@@ -155,6 +158,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 sourceUrl = $"assets/source/{asset.Id}",
                                 mimeType = "image/png",
                                 fileName = "MyFile.png",
+                                fileNameSlug = "myfile.png",
                                 fileSize = 1024,
                                 fileVersion = 123,
                                 isImage = true,
@@ -189,6 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     sourceUrl
                     mimeType
                     fileName
+                    fileNameSlug
                     fileSize
                     fileVersion
                     isImage
@@ -219,6 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         sourceUrl = $"assets/source/{asset.Id}",
                         mimeType = "image/png",
                         fileName = "MyFile.png",
+                        fileNameSlug = "myfile.png",
                         fileSize = 1024,
                         fileVersion = 123,
                         isImage = true,

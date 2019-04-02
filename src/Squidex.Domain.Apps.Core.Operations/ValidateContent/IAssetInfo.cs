@@ -22,5 +22,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         int? PixelHeight { get; }
 
         string FileName { get; }
+
+        string FileNameSlug { get; }
     }
 }
