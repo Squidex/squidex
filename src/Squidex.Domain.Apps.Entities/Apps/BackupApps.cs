@@ -150,7 +150,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             foreach (var kvp in usersWithEmail)
             {
-                var user = await userResolver.FindByIdOrEmailAsync(kvp.Value);
+                var email = kvp.Value;
+
+                var user = await userResolver.FindByIdOrEmailAsync(email);
+
+                if (user == null && await userResolver.CreateUserIfNotExists(kvp.Value))
+                {
+                    user = await userResolver.FindByIdOrEmailAsync(email);
+                }
 
                 if (user != null)
                 {
