@@ -450,7 +450,9 @@ export class EditContentForm extends Form<FormGroup> {
                             }
 
                             if (nested.isDisabled) {
-                                nestedForm.disable({ onlySelf: true });
+                                nestedForm.disable();
+                            } else {
+                                nestedForm.enable();
                             }
                         }
                     }
