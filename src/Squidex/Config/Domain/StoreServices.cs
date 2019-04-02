@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -87,9 +88,6 @@ namespace Squidex.Config.Domain
                     services.AddSingletonAs<MongoHistoryEventRepository>()
                         .AsOptional<IHistoryEventRepository>();
 
-                    services.AddSingletonAs<MongoPersistedGrantStore>()
-                        .AsOptional<IPersistedGrantStore>();
-
                     services.AddSingletonAs<MongoRoleStore>()
                         .AsOptional<IRoleStore<IdentityRole>>();
 
@@ -110,6 +108,14 @@ namespace Squidex.Config.Domain
                         .AsOptional<IContentRepository>()
                         .AsOptional<ISnapshotStore<ContentState, Guid>>()
                         .AsOptional<IEventConsumer>();
+
+                    var registration = services.FirstOrDefault(x => x.ServiceType == typeof(IPersistedGrantStore));
+
+                    if (registration == null || registration.ImplementationType == typeof(InMemoryPersistedGrantStore))
+                    {
+                        services.AddSingletonAs<MongoPersistedGrantStore>()
+                            .As<IPersistedGrantStore>();
+                    }
                 }
             });
 
