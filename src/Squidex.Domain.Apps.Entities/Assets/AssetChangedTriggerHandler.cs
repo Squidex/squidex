@@ -49,8 +49,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case AssetCreated _:
                     result.Type = EnrichedAssetEventType.Created;
                     break;
-                case AssetRenamed _:
-                    result.Type = EnrichedAssetEventType.Renamed;
+                case AssetAnnotated _:
+                    result.Type = EnrichedAssetEventType.Annotated;
                     break;
                 case AssetUpdated _:
                     result.Type = EnrichedAssetEventType.Updated;

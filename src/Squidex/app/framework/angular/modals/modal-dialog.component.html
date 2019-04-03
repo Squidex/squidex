@@ -8,7 +8,7 @@
                     <ng-content select="[title]"></ng-content>
                 </h4>
 
-                <button type="button" class="close" (click)="closed.emit()">
+                <button type="button" class="close" (click)="emitClose()">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -30,4 +30,4 @@
     </div>
 </div>
 
-<sqx-shortcut keys="escape" (trigger)="closed.emit()"></sqx-shortcut>
+<sqx-shortcut keys="escape" (trigger)="emitClose()"></sqx-shortcut>

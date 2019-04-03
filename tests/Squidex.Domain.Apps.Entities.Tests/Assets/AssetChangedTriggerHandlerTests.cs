@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             new object[] { new AssetCreated(), EnrichedAssetEventType.Created },
             new object[] { new AssetUpdated(), EnrichedAssetEventType.Updated },
-            new object[] { new AssetRenamed(), EnrichedAssetEventType.Renamed },
+            new object[] { new AssetAnnotated(), EnrichedAssetEventType.Annotated },
             new object[] { new AssetDeleted(), EnrichedAssetEventType.Deleted }
         };
 

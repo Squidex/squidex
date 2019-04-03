@@ -237,7 +237,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] UpdateAssetDto request)
+        public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AnnotateAssetDto request)
         {
             await CommandBus.PublishAsync(request.ToCommand(id));
 

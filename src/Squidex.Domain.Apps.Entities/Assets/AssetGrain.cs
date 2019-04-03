@@ -62,15 +62,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return new AssetSavedResult(Version, Snapshot.FileVersion);
                     });
-                case TagAsset tagAsset:
-                    return UpdateAsync(tagAsset, async c =>
-                    {
-                        GuardAsset.CanTag(c);
-
-                        c.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
-
-                        Tag(c);
-                    });
                 case DeleteAsset deleteAsset:
                     return UpdateAsync(deleteAsset, async c =>
                     {
@@ -80,12 +71,17 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         Delete(c);
                     });
-                case RenameAsset renameAsset:
-                    return UpdateAsync(renameAsset, c =>
+                case AnnotateAsset annotateAsset:
+                    return UpdateAsync(annotateAsset, async c =>
                     {
-                        GuardAsset.CanRename(c, Snapshot.FileName);
+                        GuardAsset.CanAnnotate(c, Snapshot.FileName, Snapshot.Slug);
 
-                        Rename(c);
+                        if (c.Tags != null)
+                        {
+                            c.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
+                        }
+
+                        Annotate(c);
                     });
                 default:
                     throw new NotSupportedException();
@@ -109,7 +105,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 MimeType = command.File.MimeType,
                 PixelWidth = command.ImageInfo?.PixelWidth,
                 PixelHeight = command.ImageInfo?.PixelHeight,
-                IsImage = command.ImageInfo != null
+                IsImage = command.ImageInfo != null,
+                Slug = command.File.FileName.ToAssetSlug()
             });
 
             RaiseEvent(@event);
@@ -137,14 +134,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize }));
         }
 
-        public void Rename(RenameAsset command)
+        public void Annotate(AnnotateAsset command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AssetRenamed()));
-        }
-
-        public void Tag(TagAsset command)
-        {
-            RaiseEvent(SimpleMapper.Map(command, new AssetTagged()));
+            RaiseEvent(SimpleMapper.Map(command, new AssetAnnotated()));
         }
 
         private void RaiseEvent(AppEvent @event)

@@ -49,7 +49,7 @@ export class ModalDialogComponent extends StatefulComponent<State> implements Af
     public contentClass = '';
 
     @Output()
-    public closed = new EventEmitter();
+    public close = new EventEmitter();
 
     @ViewChild('tabsElement')
     public tabsElement: ElementRef<ParentNode>;
@@ -69,5 +69,9 @@ export class ModalDialogComponent extends StatefulComponent<State> implements Af
         const hasFooter = this.footerElement.nativeElement.children.length > 0;
 
         this.next(() => ({ hasTabs, hasFooter }));
+    }
+
+    public emitClose() {
+        this.close.emit();
     }
 }

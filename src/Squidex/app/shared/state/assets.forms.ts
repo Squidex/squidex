@@ -7,14 +7,26 @@
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Form } from '@app/framework';
+import slugify from 'slugify';
+
+import { Form, Types } from '@app/framework';
 
 import { AssetDto } from './../services/assets.service';
 
-export class RenameAssetForm extends Form<FormGroup> {
+export class AnnotateAssetForm extends Form<FormGroup> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
-            name: ['',
+            fileName: ['',
+                [
+                    Validators.required
+                ]
+            ],
+            slug: ['',
+                [
+                    Validators.required
+                ]
+            ],
+            tags: ['',
                 [
                     Validators.required
                 ]
@@ -27,22 +39,56 @@ export class RenameAssetForm extends Form<FormGroup> {
 
         if (asset) {
             let index = asset.fileName.lastIndexOf('.');
+
             if (index > 0) {
-                result.name += asset.fileName.substr(index);
+                result.fileName += asset.fileName.substr(index);
+            }
+
+            if (result.fileName === asset.fileName) {
+                delete result.fileName;
+            }
+
+            if (result.slug === asset.slug) {
+                delete result.slug;
+            }
+
+            if (Types.jsJsonEquals(result.tags, asset.tags)) {
+                delete result.tags;
+            }
+
+            if (Object.keys(result).length === 0) {
+                return null;
             }
         }
 
         return result;
     }
 
-    public load(asset: AssetDto) {
-        let name = asset.fileName;
+    public generateSlug(asset: AssetDto) {
+        const fileName = this.form.get('fileName')!.value;
 
-        let index = name.lastIndexOf('.');
+        if (fileName) {
+            let slug = slugify(fileName, { lower: true });
+
+            let index = asset.fileName.lastIndexOf('.');
+
+            if (index > 0) {
+                slug += asset.fileName.substr(index);
+            }
+
+            this.form.get('slug')!.setValue(slug);
+        }
+    }
+
+    public load(asset: AssetDto) {
+        let fileName = asset.fileName;
+
+        let index = fileName.lastIndexOf('.');
+
         if (index > 0) {
-            name = name.substr(0, index);
+            fileName = fileName.substr(0, index);
         }
 
-        super.load({ name });
+        super.load({ fileName, slug: asset.slug, tags: asset.tags });
     }
 }

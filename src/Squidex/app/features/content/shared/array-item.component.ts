@@ -25,13 +25,13 @@ import {
 })
 export class ArrayItemComponent implements OnChanges {
     @Output()
-    public removing = new EventEmitter();
+    public remove = new EventEmitter();
 
     @Output()
-    public moving = new EventEmitter<number>();
+    public move = new EventEmitter<number>();
 
     @Output()
-    public cloning = new EventEmitter();
+    public clone = new EventEmitter();
 
     @Output()
     public toggle = new EventEmitter<boolean>();
@@ -77,19 +77,31 @@ export class ArrayItemComponent implements OnChanges {
         }
     }
 
-    public moveTop() {
-        this.moving.emit(0);
+    public emitToggle(value: boolean) {
+        this.toggle.emit(value);
     }
 
-    public moveUp() {
-        this.moving.emit(this.index - 1);
+    public emitClone() {
+        this.clone.emit();
     }
 
-    public moveDown() {
-        this.moving.emit(this.index + 1);
+    public emitRemove() {
+        this.remove.emit();
     }
 
-    public moveBottom() {
-        this.moving.emit(99999);
+    public emitMoveTop() {
+        this.move.emit(0);
+    }
+
+    public emitMoveUp() {
+        this.move.emit(this.index - 1);
+    }
+
+    public emitMoveDown() {
+        this.move.emit(this.index + 1);
+    }
+
+    public emitMoveBottom() {
+        this.move.emit(99999);
     }
 }

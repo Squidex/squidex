@@ -1,0 +1,44 @@
+<form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
+    <sqx-modal-dialog (close)="emitCancel()">
+        <ng-container title>
+            Update Asset
+        </ng-container>
+
+        <ng-container content>
+            <sqx-form-error [error]="annotateForm.error | async"></sqx-form-error>
+        
+            <div class="form-group">
+                <label for="fileName">Name</label>
+                
+                <sqx-control-errors for="fileName" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+        
+                <input type="text" class="form-control" id="fileName" formControlName="fileName" />
+            </div>
+        
+            <div class="form-group">
+                <label for="slug">Slug</label>
+                
+                <sqx-control-errors for="slug" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+        
+                <input type="text" class="form-control slug" id="slug" formControlName="slug" sqxTransformInput="Slugify" />
+
+                <button type="button" class="btn btn-text-secondary btn-sm btn-generate" (click)="generateSlug()">
+                    Generate
+                </button>
+            </div>
+        
+            <div class="form-group">
+                <label for="tags">Tags</label>
+                
+                <sqx-control-errors for="tags" [submitted]="annotateForm.submitted | async"></sqx-control-errors>
+
+                <sqx-tag-editor [suggestions]="allTags" [allowDuplicates]="false" [undefinedWhenEmpty]="false" formControlName="tags"></sqx-tag-editor>
+            </div>
+        </ng-container>
+
+        <ng-container footer>
+            <button type="reset" class="float-left btn btn-secondary" (click)="emitCancel()">Cancel</button>
+            <button type="submit" class="float-right btn btn-primary">Save</button>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

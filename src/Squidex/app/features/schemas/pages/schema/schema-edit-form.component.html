@@ -1,5 +1,5 @@
 <form [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
-    <sqx-modal-dialog (closed)="complete()">
+    <sqx-modal-dialog (close)="emitComplete()">
         <ng-container title>
             Edit Schema
         </ng-container>
@@ -29,7 +29,7 @@
         </ng-container>
     
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+            <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
             <button type="submit" class="float-right btn btn-primary">Save</button>
         </ng-container>
     </sqx-modal-dialog>

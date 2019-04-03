@@ -22,7 +22,7 @@ import {
 })
 export class SchemaPreviewUrlsFormComponent implements OnInit {
     @Output()
-    public completed = new EventEmitter();
+    public complete = new EventEmitter();
 
     @Input()
     public schema: SchemaDetailsDto;
@@ -41,8 +41,8 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
         this.editForm.load(this.schema.previewUrls);
     }
 
-    public complete() {
-        this.completed.emit();
+    public emitComplete() {
+        this.complete.emit();
     }
 
     public cancelAdd() {
@@ -65,7 +65,7 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
         if (value) {
             this.schemasState.configurePreviewUrls(this.schema, value)
                 .subscribe(() => {
-                    this.complete();
+                    this.emitComplete();
                 }, error => {
                     this.editForm.submitFailed(error);
                 });

@@ -27,7 +27,7 @@ namespace Migrate_01.Migrations
         {
             return stateForAssets.ReadAllAsync(async (state, version) =>
             {
-                state.FileNameSlug = state.FileName.ToAssetSlug();
+                state.Slug = state.FileName.ToAssetSlug();
 
                 await stateForAssets.WriteAsync(state.Id, state, version, version);
             });

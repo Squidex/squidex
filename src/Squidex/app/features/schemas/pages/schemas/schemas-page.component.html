@@ -25,7 +25,7 @@
             [name]="category"
             [schemas]="schemasState.schemas | async"
             [schemasFilter]="schemasFilter.valueChanges | async"
-            (removing)="removeCategory(category)">
+            (remove)="removeCategory(category)">
         </sqx-schema-category>
 
         <form [formGroup]="addCategoryForm.form" (ngSubmit)="addCategory()">
@@ -36,8 +36,8 @@
 
 <ng-container *sqxModalView="addSchemaDialog;onRoot:true">
     <sqx-schema-form [import]="import"
-        (cancelled)="addSchemaDialog.hide()"
-        (created)="redirectSchema($event)">
+        (cancel)="addSchemaDialog.hide()"
+        (create)="redirectSchema($event)">
     </sqx-schema-form>
 </ng-container>
 

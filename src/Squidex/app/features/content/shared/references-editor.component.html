@@ -8,7 +8,7 @@
         
         <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="snapshot.schema && snapshot.contentItems && snapshot.contentItems.length > 0"
             [sqxSortModel]="snapshot.contentItems.mutableValues" 
-            (sqxSorted)="sort($event)">
+            (sqxSort)="sort($event)">
             <tbody *ngFor="let content of snapshot.contentItems">
                 <tr [sqxContent]="content"
                     [language]="language"
@@ -16,7 +16,7 @@
                     [isReference]="true"
                     [isCompact]="isCompact"
                     [schema]="snapshot.schema"
-                    (deleting)="remove(content)"></tr>
+                    (delete)="remove(content)"></tr>
                 <tr class="spacer"></tr>
             </tbody>
         </table>
@@ -32,6 +32,6 @@
         [language]="language"
         [languages]="languages"
         [schema]="snapshot.schema"
-        (selected)="select($event)">
+        (select)="select($event)">
     </sqx-contents-selector>
 </ng-container>

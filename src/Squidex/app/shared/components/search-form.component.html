@@ -77,7 +77,7 @@
 
 <ng-container *sqxModalView="saveQueryDialog;onRoot:true">
     <form [formGroup]="saveQueryForm.form" (ngSubmit)="saveQueryComplete()">
-        <sqx-modal-dialog (closed)="saveQueryDialog.hide()">
+        <sqx-modal-dialog (close)="saveQueryDialog.hide()">
             <ng-container title>
                 Name your query
             </ng-container>

@@ -23,7 +23,7 @@ import {
 })
 export class AppFormComponent {
     @Output()
-    public completed = new EventEmitter();
+    public complete = new EventEmitter();
 
     @Input()
     public template = '';
@@ -37,8 +37,8 @@ export class AppFormComponent {
     ) {
     }
 
-    public complete() {
-        this.completed.emit();
+    public emitComplete() {
+        this.complete.emit();
     }
 
     public createApp() {
@@ -49,7 +49,7 @@ export class AppFormComponent {
 
             this.appsStore.create(request)
                 .subscribe(() => {
-                    this.complete();
+                    this.emitComplete();
                 }, error => {
                     this.createForm.submitFailed(error);
                 });

@@ -356,6 +356,15 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_filter_with_full_text_numbers()
+        {
+            var i = Q("$search=\"33k\"");
+            var o = C("FullText: '33k'");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
         public void Should_parse_filter_with_full_text()
         {
             var i = Q("$search=Duck");

@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
     {
         Created,
         Deleted,
-        Renamed,
+        Annotated,
         Updated
     }
 }

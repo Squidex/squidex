@@ -23,10 +23,10 @@ import {
 })
 export class SchemaFormComponent implements OnInit {
     @Output()
-    public created = new EventEmitter<SchemaDto>();
+    public complete = new EventEmitter<SchemaDto>();
 
     @Output()
-    public cancelled = new EventEmitter();
+    public cancel = new EventEmitter();
 
     @Input()
     public import: any;
@@ -55,12 +55,12 @@ export class SchemaFormComponent implements OnInit {
         return false;
     }
 
-    public complete(schema: SchemaDto) {
-        this.created.emit(schema);
+    public emitComplete(value: SchemaDto) {
+        this.complete.emit(value);
     }
 
-    public cancel() {
-        this.cancelled.emit();
+    public emitCancel() {
+        this.cancel.emit();
     }
 
     public createSchema() {
@@ -71,7 +71,7 @@ export class SchemaFormComponent implements OnInit {
 
             this.schemasState.create(schemaDto)
                 .subscribe(dto => {
-                    this.complete(dto);
+                    this.emitComplete(dto);
                 }, error => {
                     this.createForm.submitFailed(error);
                 });

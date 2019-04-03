@@ -1,4 +1,4 @@
-<sqx-modal-dialog (closed)="complete()" large="true" fullHeight="true">
+<sqx-modal-dialog (close)="emitComplete()" large="true" fullHeight="true">
     <ng-container title>
         Select assets
     </ng-container>
@@ -22,7 +22,7 @@
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="Search by asset name" fieldExample="fileSize"
-                            (queryChanged)="search($event)" 
+                            (queryChange)="search($event)" 
                             [query]="assetsState.assetsQuery | async"
                             enableShortcut="true">
                         </sqx-search-form>
@@ -45,14 +45,14 @@
     <ng-container content>
         <sqx-assets-list
             [isListView]="snapshot.isListView"
-            (selected)="selectAsset($event)"
+            (select)="selectAsset($event)"
             [selectedIds]="snapshot.selectedAssets"
             [state]="assetsState" isDisabled="true">
         </sqx-assets-list>
     </ng-container>
 
     <ng-container footer>
-        <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
-        <button type="submit" class="float-right btn btn-success" (click)="select()" [disabled]="snapshot.selectionCount === 0">Link selected assets ({{snapshot.selectionCount}})</button>
+        <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
+        <button type="submit" class="float-right btn btn-success" (click)="emitSelect()" [disabled]="snapshot.selectionCount === 0">Link selected assets ({{snapshot.selectionCount}})</button>
     </ng-container>
 </sqx-modal-dialog>

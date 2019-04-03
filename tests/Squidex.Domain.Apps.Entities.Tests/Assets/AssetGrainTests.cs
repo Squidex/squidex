@@ -76,7 +76,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         MimeType = file.MimeType,
                         PixelWidth = image.PixelWidth,
                         PixelHeight = image.PixelHeight,
-                        Tags = new HashSet<string>()
+                        Tags = new HashSet<string>(),
+                        Slug = file.FileName.ToAssetSlug()
                     })
                 );
         }
@@ -109,9 +110,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Rename_should_create_events()
+        public async Task AnnotateName_should_create_events()
         {
-            var command = new RenameAsset { FileName = "My New Image.png" };
+            var command = new AnnotateAsset { FileName = "My New Image.png" };
 
             await ExecuteCreateAsync();
 
@@ -120,18 +121,36 @@ namespace Squidex.Domain.Apps.Entities.Assets
             result.ShouldBeEquivalent(new EntitySavedResult(1));
 
             Assert.Equal("My New Image.png", sut.Snapshot.FileName);
-            Assert.Equal("my-new-image.png", sut.Snapshot.FileNameSlug);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetRenamed { FileName = "My New Image.png" })
+                    CreateAssetEvent(new AssetAnnotated { FileName = "My New Image.png" })
                 );
         }
 
         [Fact]
-        public async Task Tag_should_create_events()
+        public async Task AnnotateSlug_should_create_events()
         {
-            var command = new TagAsset();
+            var command = new AnnotateAsset { Slug = "my-new-image.png" };
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateAssetCommand(command));
+
+            result.ShouldBeEquivalent(new EntitySavedResult(1));
+
+            Assert.Equal("my-new-image.png", sut.Snapshot.Slug);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateAssetEvent(new AssetAnnotated { Slug = "my-new-image.png" })
+                );
+        }
+
+        [Fact]
+        public async Task AnnotateTag_should_create_events()
+        {
+            var command = new AnnotateAsset { Tags = new HashSet<string>() };
 
             await ExecuteCreateAsync();
 
@@ -141,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateAssetEvent(new AssetTagged { Tags = new HashSet<string>() })
+                    CreateAssetEvent(new AssetAnnotated { Tags = new HashSet<string>() })
                 );
         }
 

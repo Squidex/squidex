@@ -1,4 +1,4 @@
-<sqx-modal-dialog large="true" fullHeight="true" (closed)="complete()" [showFooter]="step === 2 || step === 4">
+<sqx-modal-dialog large="true" fullHeight="true" (close)="emitComplete()" [showFooter]="step === 2 || step === 4">
     <ng-container title>
         <ng-container *ngIf="mode === 'EditTrigger'">
             Edit Trigger
@@ -92,17 +92,17 @@
     <ng-container footer>
         <div>
             <ng-container *ngIf="mode === 'Wizard' && step === 2">
-                <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+                <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
                 <button type="submit" class="float-right btn btn-primary" (click)="saveTrigger()">Next</button>
             </ng-container>
             
             <ng-container *ngIf="mode !== 'Wizard' && step === 2">
-                <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+                <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
                 <button type="submit" class="float-right btn btn-primary" (click)="saveTrigger()">Save</button>
             </ng-container>
 
             <ng-container *ngIf="step === 4">
-                <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+                <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
                 <button type="submit" class="float-right btn btn-primary" (click)="saveAction()">Save</button>
             </ng-container>
         </div>

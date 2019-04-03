@@ -34,7 +34,7 @@ interface State {
 })
 export class AssetsSelectorComponent extends StatefulComponent<State> implements OnInit {
     @Output()
-    public selected = new EventEmitter<AssetDto[]>();
+    public select = new EventEmitter<AssetDto[]>();
 
     constructor(changeDector: ChangeDetectorRef,
         public readonly assetsState: AssetsDialogState,
@@ -59,12 +59,12 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
         this.assetsState.search(query).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public complete() {
-        this.selected.emit([]);
+    public emitComplete() {
+        this.select.emit([]);
     }
 
-    public select() {
-        this.selected.emit(Object.values(this.snapshot.selectedAssets));
+    public emitSelect() {
+        this.select.emit(Object.values(this.snapshot.selectedAssets));
     }
 
     public selectTags(tags: string[]) {

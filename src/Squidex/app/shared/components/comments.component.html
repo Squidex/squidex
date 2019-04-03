@@ -8,8 +8,8 @@
             <sqx-comment *ngFor="let comment of state.comments | async; trackBy: trackByComment"
                 [comment]="comment"
                 [userId]="userId"
-                (updated)="update(comment, $event)"
-                (deleting)="delete(comment)">
+                (update)="update(comment, $event)"
+                (delete)="delete(comment)">
             </sqx-comment>
         </div>
         

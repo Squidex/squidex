@@ -91,6 +91,12 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TagEditorComponent extends StatefulControlComponent<State, any[]> implements AfterViewInit, OnInit {
+    @ViewChild('form')
+    public formElement: ElementRef<HTMLElement>;
+
+    @ViewChild('input')
+    public inputElement: ElementRef<HTMLInputElement>;
+
     @Input()
     public converter: Converter = new StringConverter();
 
@@ -118,11 +124,10 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     @Input()
     public inputName = 'tag-editor';
 
-    @ViewChild('form')
-    public formElement: ElementRef<HTMLElement>;
-
-    @ViewChild('input')
-    public inputElement: ElementRef<HTMLInputElement>;
+    @Input()
+    public set disabled(value: boolean) {
+        this.setDisabledState(value);
+    }
 
     public addInput = new FormControl();
 

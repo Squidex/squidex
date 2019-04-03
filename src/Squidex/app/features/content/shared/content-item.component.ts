@@ -35,22 +35,22 @@ import {
 })
 export class ContentItemComponent implements OnChanges {
     @Output()
-    public cloning = new EventEmitter();
+    public clone = new EventEmitter();
 
     @Output()
-    public deleting = new EventEmitter();
+    public delete = new EventEmitter();
 
     @Output()
-    public archiving = new EventEmitter();
+    public archive = new EventEmitter();
 
     @Output()
-    public restoring = new EventEmitter();
+    public restore = new EventEmitter();
 
     @Output()
-    public publishing = new EventEmitter();
+    public publish = new EventEmitter();
 
     @Output()
-    public unpublishing = new EventEmitter();
+    public unpublish = new EventEmitter();
 
     @Output()
     public selectedChange = new EventEmitter();
@@ -126,6 +126,30 @@ export class ContentItemComponent implements OnChanges {
         this.patchForm.submitCompleted();
 
         this.updateValues();
+    }
+
+    public emitDelete() {
+        this.delete.emit();
+    }
+
+    public emitPublish() {
+        this.publish.emit();
+    }
+
+    public emitUnpublish() {
+        this.unpublish.emit();
+    }
+
+    public emitArchive() {
+        this.archive.emit();
+    }
+
+    public emitRestore() {
+        this.unpublish.emit();
+    }
+
+    public emitClone() {
+        this.clone.emit();
     }
 
     private updateValues() {

@@ -21,7 +21,7 @@ import {
 })
 export class SchemaEditFormComponent implements OnInit {
     @Output()
-    public completed = new EventEmitter();
+    public complete = new EventEmitter();
 
     @Input()
     public schema: SchemaDetailsDto;
@@ -38,8 +38,8 @@ export class SchemaEditFormComponent implements OnInit {
         this.editForm.load(this.schema.properties);
     }
 
-    public complete() {
-        this.completed.emit();
+    public emitComplete() {
+        this.complete.emit();
     }
 
     public saveSchema() {
@@ -48,7 +48,7 @@ export class SchemaEditFormComponent implements OnInit {
         if (value) {
             this.schemasState.update(this.schema, value)
                 .subscribe(() => {
-                    this.complete();
+                    this.emitComplete();
                 }, error => {
                     this.editForm.submitFailed(error);
                 });

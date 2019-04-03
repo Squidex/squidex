@@ -51,6 +51,7 @@ export class AssetDto extends Model {
         public readonly isImage: boolean,
         public readonly pixelWidth: number | null,
         public readonly pixelHeight: number | null,
+        public readonly slug: string,
         public readonly tags: string[],
         public readonly url: string,
         public readonly version: Version
@@ -58,8 +59,8 @@ export class AssetDto extends Model {
         super();
     }
 
-    public with(value: Partial<AssetDto>): AssetDto {
-        return this.clone(value);
+    public with(value: Partial<AssetDto>, validOnly = false): AssetDto {
+        return this.clone(value, validOnly);
     }
 
     public update(update: AssetReplacedDto, user: string, version: Version, now?: DateTime): AssetDto {
@@ -71,35 +72,21 @@ export class AssetDto extends Model {
         });
     }
 
-    public tag(tags: string[], user: string, version: Version, now?: DateTime): AssetDto {
+    public annnotate(update: AnnotateAssetDto, user: string, version: Version, now?: DateTime): AssetDto {
         return this.with({
-            tags,
+            ...<any>update,
             lastModified: now || DateTime.now(),
             lastModifiedBy: user,
             version
-        });
-    }
-
-    public rename(fileName: string, user: string, version: Version, now?: DateTime): AssetDto {
-        return this.with({
-            fileName,
-            lastModified: now || DateTime.now(),
-            lastModifiedBy: user,
-            version
-        });
+        }, true);
     }
 }
 
-export class RenameAssetDto {
+export class AnnotateAssetDto {
     constructor(
-        public readonly fileName: string
-    ) {
-    }
-}
-
-export class TagAssetDto {
-    constructor(
-        public readonly tags: string[]
+        public readonly fileName: string | null,
+        public readonly slug: string | null,
+        public readonly tags: string[] | null
     ) {
     }
 }
@@ -189,6 +176,7 @@ export class AssetsService {
                             item.isImage,
                             item.pixelWidth,
                             item.pixelHeight,
+                            item.slug,
                             item.tags || [],
                             assetUrl,
                             new Version(item.version.toString()));
@@ -231,6 +219,7 @@ export class AssetsService {
                             response.isImage,
                             response.pixelWidth,
                             response.pixelHeight,
+                            response.slug,
                             response.tags || [],
                             assetUrl,
                             new Version(event.headers.get('etag')!));
@@ -278,6 +267,7 @@ export class AssetsService {
                         body.isImage,
                         body.pixelWidth,
                         body.pixelHeight,
+                        body.slug,
                         body.tags || [],
                         assetUrl,
                         response.version);
@@ -340,7 +330,7 @@ export class AssetsService {
                 pretifyError('Failed to delete asset. Please reload.'));
     }
 
-    public putAsset(appName: string, id: string, dto: RenameAssetDto | TagAssetDto, version: Version): Observable<Versioned<any>> {
+    public putAsset(appName: string, id: string, dto: AnnotateAssetDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(

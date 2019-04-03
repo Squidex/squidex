@@ -26,13 +26,17 @@ export class CommentComponent {
     public userId: string;
 
     @Output()
-    public deleting = new EventEmitter();
+    public delete = new EventEmitter();
 
     @Output()
-    public updated = new EventEmitter<string>();
+    public update = new EventEmitter<string>();
 
     constructor(
         private readonly formBuilder: FormBuilder
     ) {
+    }
+
+    public emitDelete() {
+        this.delete.emit();
     }
 }

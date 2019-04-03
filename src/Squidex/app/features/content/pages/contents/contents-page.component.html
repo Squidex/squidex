@@ -22,10 +22,10 @@
             </div>
             <div class="col pl-1">
                 <sqx-search-form formClass="form" placeholder="Search for content" fieldExample="data/[MY_FIELD]/iv"
-                    (queryChanged)="search($event)" 
+                    (queryChange)="search($event)" 
                     [query]="contentsState.contentsQuery | async"
                     [queries]="schemaQueries"
-                    (archivedChanged)="goArchive($event)"
+                    (archivedChange)="goArchive($event)"
                     [archived]="contentsState.isArchive | async"
                     expandable="true"
                     enableArchive="true"
@@ -106,12 +106,12 @@
                             [schema]="schema"
                             [selected]="isItemSelected(content)"
                             (selectedChange)="selectItem(content, $event)"
-                            (unpublishing)="unpublish(content)"
-                            (publishing)="publish(content)"
-                            (archiving)="archive(content)"
-                            (restoring)="restore(content)"
-                            (deleting)="delete(content)"
-                            (cloning)="clone(content)">
+                            (unpublishe)="unpublish(content)"
+                            (publishe)="publish(content)"
+                            (archive)="archive(content)"
+                            (restore)="restore(content)"
+                            (delete)="delete(content)"
+                            (clone)="clone(content)">
                         </tr>
                         <tr class="spacer"></tr>
                     </tbody>

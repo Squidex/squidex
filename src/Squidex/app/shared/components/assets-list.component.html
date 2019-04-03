@@ -17,8 +17,8 @@
 <div class="row assets" [class.unrow]="isListView" *ngIf="state.tagsNames | async; let tags" (paste)="addFiles($event)">
     <sqx-asset *ngFor="let file of newFiles" [initFile]="file"
         [isListView]="isListView"
-        (failed)="remove(file)" 
-        (loaded)="add(file, $event)">
+        (loadError)="remove(file)" 
+        (load)="add(file, $event)">
     </sqx-asset>
 
     <ng-container *ngIf="state.assets | async; let assets">
@@ -28,9 +28,9 @@
             [isSelectable]="selectedIds"
             [isSelected]="isSelected(asset)"
             [allTags]="tags"
-            (updated)="update($event)"
-            (selected)="select($event)"
-            (deleting)="delete($event)">
+            (update)="update($event)"
+            (select)="emitSelect($event)"
+            (delete)="delete($event)">
         </sqx-asset>
     </ng-container>
 </div>
