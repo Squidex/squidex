@@ -22,9 +22,12 @@ namespace Squidex.Domain.Users
         private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
         private readonly AssetUserPictureStore sut;
         private readonly string userId = Guid.NewGuid().ToString();
+        private readonly string file;
 
         public AssetUserPictureStoreTests()
         {
+            file = AssetStoreExtensions.GetFileName(userId, 0, "picture");
+
             sut = new AssetUserPictureStore(assetStore);
         }
 
@@ -35,16 +38,17 @@ namespace Squidex.Domain.Users
 
             await sut.UploadAsync(userId, stream);
 
-            A.CallTo(() => assetStore.UploadAsync(userId, 0, "picture", stream, false, CancellationToken.None)).MustHaveHappened();
+            A.CallTo(() => assetStore.UploadAsync(file, stream, false, CancellationToken.None))
+                .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_invoke_asset_store_to_download_picture()
         {
-            A.CallTo(() => assetStore.DownloadAsync(userId, 0, "picture", A<Stream>.Ignored, CancellationToken.None))
+            A.CallTo(() => assetStore.DownloadAsync(file, A<Stream>.Ignored, CancellationToken.None))
                 .Invokes(async call =>
                 {
-                    var stream = call.GetArgument<Stream>(3);
+                    var stream = call.GetArgument<Stream>(1);
 
                     await stream.WriteAsync(new byte[] { 1, 2, 3, 4 }, 0, 4);
                 });
@@ -54,7 +58,8 @@ namespace Squidex.Domain.Users
             Assert.Equal(0, result.Position);
             Assert.Equal(4, result.Length);
 
-            A.CallTo(() => assetStore.DownloadAsync(userId, 0, "picture", A<Stream>.Ignored, CancellationToken.None)).MustHaveHappened();
+            A.CallTo(() => assetStore.DownloadAsync(file, A<Stream>.Ignored, CancellationToken.None))
+                .MustHaveHappened();
         }
     }
 }

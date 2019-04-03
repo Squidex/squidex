@@ -181,7 +181,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             cursor.AssetTake(query.AdjustToModel());
 
-            A.CallTo(() => cursor.Limit(3)).MustHaveHappened();
+            A.CallTo(() => cursor.Limit(3))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -192,7 +193,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
 
             cursor.AssetSkip(query.AdjustToModel());
 
-            A.CallTo(() => cursor.Skip(3)).MustHaveHappened();
+            A.CallTo(() => cursor.Skip(3))
+                .MustHaveHappened();
         }
 
         private static string C(string value)

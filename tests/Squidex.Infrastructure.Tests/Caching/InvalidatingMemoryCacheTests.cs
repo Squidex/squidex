@@ -44,7 +44,8 @@ namespace Squidex.Infrastructure.Caching
         {
             sut.Dispose();
 
-            A.CallTo(() => cache.Dispose()).MustHaveHappened();
+            A.CallTo(() => cache.Dispose())
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -52,7 +53,8 @@ namespace Squidex.Infrastructure.Caching
         {
             sut.Remove("a-key");
 
-            A.CallTo(() => cache.Remove("a-key")).MustHaveHappened();
+            A.CallTo(() => cache.Remove("a-key"))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -60,7 +62,8 @@ namespace Squidex.Infrastructure.Caching
         {
             sut.Invalidate(123);
 
-            A.CallTo(() => pubsub.Publish(A<InvalidateMessage>.That.Matches(x => x.CacheKey == "a-key"), true)).MustNotHaveHappened();
+            A.CallTo(() => pubsub.Publish(A<InvalidateMessage>.That.Matches(x => x.CacheKey == "a-key"), true))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -68,7 +71,8 @@ namespace Squidex.Infrastructure.Caching
         {
             sut.Invalidate("a-key");
 
-            A.CallTo(() => pubsub.Publish(A<InvalidateMessage>.That.Matches(x => x.CacheKey == "a-key"), true)).MustHaveHappened();
+            A.CallTo(() => pubsub.Publish(A<InvalidateMessage>.That.Matches(x => x.CacheKey == "a-key"), true))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -76,7 +80,8 @@ namespace Squidex.Infrastructure.Caching
         {
             ((IMemoryCache)sut).Invalidate("a-key");
 
-            A.CallTo(() => pubsub.Publish(A<InvalidateMessage>.That.Matches(x => x.CacheKey == "a-key"), true)).MustHaveHappened();
+            A.CallTo(() => pubsub.Publish(A<InvalidateMessage>.That.Matches(x => x.CacheKey == "a-key"), true))
+                .MustHaveHappened();
         }
 
         [Fact]

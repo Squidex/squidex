@@ -15,8 +15,8 @@ namespace Squidex.Infrastructure.Assets
     public abstract class AssetStoreTests<T> where T : IAssetStore
     {
         private readonly MemoryStream assetData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4 });
-        private readonly string assetId = Guid.NewGuid().ToString();
-        private readonly string tempId = Guid.NewGuid().ToString();
+        private readonly string fileName = Guid.NewGuid().ToString();
+        private readonly string sourceFile = Guid.NewGuid().ToString();
         private readonly Lazy<T> sut;
 
         protected T Sut
@@ -24,9 +24,9 @@ namespace Squidex.Infrastructure.Assets
             get { return sut.Value; }
         }
 
-        protected string AssetId
+        protected string FileName
         {
-            get { return assetId; }
+            get { return fileName; }
         }
 
         protected AssetStoreTests()
@@ -39,36 +39,50 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public virtual Task Should_throw_exception_if_asset_to_download_is_not_found()
         {
-            return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.DownloadAsync(assetId, 1, "suffix", new MemoryStream()));
+            return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.DownloadAsync(fileName, new MemoryStream()));
         }
 
         [Fact]
         public Task Should_throw_exception_if_asset_to_copy_is_not_found()
         {
-            return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.CopyAsync(tempId, assetId, 1, null));
+            return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.CopyAsync(fileName, sourceFile));
         }
 
         [Fact]
-        public async Task Should_read_and_write_file()
+        public async Task Should_write_and_read_file()
         {
-            await Sut.UploadAsync(assetId, 1, "suffix", assetData);
+            await Sut.UploadAsync(fileName, assetData);
 
             var readData = new MemoryStream();
 
-            await Sut.DownloadAsync(assetId, 1, "suffix", readData);
+            await Sut.DownloadAsync(fileName, readData);
 
             Assert.Equal(assetData.ToArray(), readData.ToArray());
         }
 
         [Fact]
-        public async Task Should_read_and_override_file()
+        public async Task Should_write_and_read_file_and_overwrite_non_existing()
         {
-            await Sut.UploadAsync(assetId, 1, "suffix", new MemoryStream(new byte[] { 0x3, 0x4, 0x5, 0x6 }));
-            await Sut.UploadAsync(assetId, 1, "suffix", assetData, true);
+            await Sut.UploadAsync(fileName, assetData, true);
 
             var readData = new MemoryStream();
 
-            await Sut.DownloadAsync(assetId, 1, "suffix", readData);
+            await Sut.DownloadAsync(fileName, readData);
+
+            Assert.Equal(assetData.ToArray(), readData.ToArray());
+        }
+
+        [Fact]
+        public async Task Should_write_and_read_overriding_file()
+        {
+            var oldData = new MemoryStream(new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5 });
+
+            await Sut.UploadAsync(fileName, oldData);
+            await Sut.UploadAsync(fileName, assetData, true);
+
+            var readData = new MemoryStream();
+
+            await Sut.DownloadAsync(fileName, readData);
 
             Assert.Equal(assetData.ToArray(), readData.ToArray());
         }
@@ -76,56 +90,26 @@ namespace Squidex.Infrastructure.Assets
         [Fact]
         public async Task Should_throw_exception_when_file_to_write_already_exists()
         {
-            await Sut.UploadAsync(assetId, 1, "suffix", assetData);
+            await Sut.UploadAsync(fileName, assetData);
 
-            await Assert.ThrowsAsync<AssetAlreadyExistsException>(() => Sut.UploadAsync(assetId, 1, "suffix", assetData));
-        }
-
-        [Fact]
-        public virtual async Task Should_read_and_write_temporary_file()
-        {
-            await Sut.UploadAsync(tempId, assetData);
-            await Sut.CopyAsync(tempId, assetId, 1, "suffix");
-
-            var readData = new MemoryStream();
-
-            await Sut.DownloadAsync(assetId, 1, "suffix", readData);
-
-            Assert.Equal(assetData.ToArray(), readData.ToArray());
-        }
-
-        [Fact]
-        public async Task Should_throw_exception_when_temporary_file_to_write_already_exists()
-        {
-            await Sut.UploadAsync(tempId, assetData);
-            await Sut.CopyAsync(tempId, assetId, 1, "suffix");
-
-            await Assert.ThrowsAsync<AssetAlreadyExistsException>(() => Sut.UploadAsync(tempId, assetData));
+            await Assert.ThrowsAsync<AssetAlreadyExistsException>(() => Sut.UploadAsync(fileName, assetData));
         }
 
         [Fact]
         public async Task Should_throw_exception_when_target_file_to_copy_to_already_exists()
         {
-            await Sut.UploadAsync(tempId, assetData);
-            await Sut.CopyAsync(tempId, assetId, 1, "suffix");
+            await Sut.UploadAsync(sourceFile, assetData);
+            await Sut.CopyAsync(sourceFile, fileName);
 
-            await Assert.ThrowsAsync<AssetAlreadyExistsException>(() => Sut.CopyAsync(tempId, assetId, 1, "suffix"));
+            await Assert.ThrowsAsync<AssetAlreadyExistsException>(() => Sut.CopyAsync(sourceFile, fileName));
         }
 
         [Fact]
-        public async Task Should_ignore_when_deleting_twice_by_name()
+        public async Task Should_ignore_when_deleting_not_existing_file()
         {
-            await Sut.UploadAsync(tempId, assetData);
-            await Sut.DeleteAsync(tempId);
-            await Sut.DeleteAsync(tempId);
-        }
-
-        [Fact]
-        public async Task Should_ignore_when_deleting_twice_by_id()
-        {
-            await Sut.UploadAsync(tempId, 0, null, assetData);
-            await Sut.DeleteAsync(tempId, 0, null);
-            await Sut.DeleteAsync(tempId, 0, null);
+            await Sut.UploadAsync(sourceFile, assetData);
+            await Sut.DeleteAsync(sourceFile);
+            await Sut.DeleteAsync(sourceFile);
         }
     }
 }
