@@ -7,6 +7,8 @@
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+import slugify from 'slugify';
+
 import { Form, Types } from '@app/framework';
 
 import { AssetDto } from './../services/assets.service';
@@ -60,6 +62,22 @@ export class AnnotateAssetForm extends Form<FormGroup> {
         }
 
         return result;
+    }
+
+    public generateSlug(asset: AssetDto) {
+        const fileName = this.form.get('fileName')!.value;
+
+        if (fileName) {
+            let slug = slugify(fileName, { lower: true });
+
+            let index = asset.fileName.lastIndexOf('.');
+
+            if (index > 0) {
+                slug += asset.fileName.substr(index);
+            }
+
+            this.form.get('slug')!.setValue(slug);
+        }
     }
 
     public load(asset: AssetDto) {

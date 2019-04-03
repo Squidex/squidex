@@ -76,6 +76,9 @@ namespace Squidex.Config.Domain
                     services.AddTransientAs<ConvertRuleEventsJson>()
                         .As<IMigration>();
 
+                    services.AddTransientAs<RenameSlugField>()
+                        .As<IMigration>();
+
                     services.AddHealthChecks()
                         .AddCheck<MongoDBHealthCheck>("MongoDB", tags: new[] { "node" });
 

@@ -63,7 +63,7 @@
                     </div>
                 </div>
                 <div class="file-tags tags">
-                    <sqx-tag-editor [disabled]="true" [ngModel]="asset.tags" class="blank"></sqx-tag-editor>
+                    <sqx-tag-editor [disabled]="true" [ngModel]="asset.tags" class="blank" placeholder="+Tag"></sqx-tag-editor>
                 </div>
                 <div class="file-info">
                     <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}

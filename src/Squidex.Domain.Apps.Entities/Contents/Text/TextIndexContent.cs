@@ -139,16 +139,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 }
             }
 
-            Document document = null;
+            var document = new Document();
 
-            if (languages.Count > 0)
+            foreach (var field in languages)
             {
-                document = new Document();
-
-                foreach (var field in languages)
-                {
-                    document.AddTextField(field.Key, field.Value.ToString(), Field.Store.NO);
-                }
+                document.AddTextField(field.Key, field.Value.ToString(), Field.Store.NO);
             }
 
             return document;
@@ -158,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             var term = new Term(MetaKey, BuildKey(draft));
 
-            indexState.Index(term, id, draft, forDraft, forPublished);
+            indexState.Index(term, forDraft, forPublished);
         }
 
         private int GetPublishedDocument()

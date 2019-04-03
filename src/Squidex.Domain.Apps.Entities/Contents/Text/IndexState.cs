@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             document.AddBinaryDocValuesField(MetaFor, GetValue(forDraft, forPublished));
         }
 
-        public void Index(Term term, Guid id, byte draft, byte forDraft, byte forPublished)
+        public void Index(Term term, byte forDraft, byte forPublished)
         {
             indexWriter.UpdateBinaryDocValue(term, MetaFor, GetValue(forDraft, forPublished));
         }

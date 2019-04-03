@@ -55,6 +55,10 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
         this.annotateForm.load(this.asset);
     }
 
+    public generateSlug() {
+        this.annotateForm.generateSlug(this.asset);
+    }
+
     public emitCancel() {
         this.cancel.emit();
     }
