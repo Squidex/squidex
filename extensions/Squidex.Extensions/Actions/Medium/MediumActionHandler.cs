@@ -8,6 +8,7 @@
 using System;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -78,7 +79,7 @@ namespace Squidex.Extensions.Actions.Medium
             }
         }
 
-        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(MediumJob job)
+        protected override async Task<Result> ExecuteJobAsync(MediumJob job, CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {
@@ -100,7 +101,7 @@ namespace Squidex.Extensions.Actions.Medium
                     var meRequest = BuildMeRequest(job);
                     try
                     {
-                        response = await httpClient.SendAsync(meRequest);
+                        response = await httpClient.SendAsync(meRequest, ct);
 
                         var responseString = await response.Content.ReadAsStringAsync();
                         var responseJson = serializer.Deserialize<UserResponse>(responseString);
@@ -113,11 +114,11 @@ namespace Squidex.Extensions.Actions.Medium
                     {
                         var requestDump = DumpFormatter.BuildDump(meRequest, response, ex.ToString());
 
-                        return (requestDump, ex);
+                        return Result.Failed(ex, requestDump);
                     }
                 }
 
-                return await httpClient.OneWayRequestAsync(BuildPostRequest(job, path), job.RequestBody);
+                return await httpClient.OneWayRequestAsync(BuildPostRequest(job, path), job.RequestBody, ct);
             }
         }
 

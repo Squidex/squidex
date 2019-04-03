@@ -7,6 +7,7 @@
 
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -42,7 +43,7 @@ namespace Squidex.Extensions.Actions.Fastly
             return (Description, ruleJob);
         }
 
-        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(FastlyJob job)
+        protected override async Task<Result> ExecuteJobAsync(FastlyJob job, CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {
@@ -53,7 +54,7 @@ namespace Squidex.Extensions.Actions.Fastly
 
                 request.Headers.Add("Fastly-Key", job.FastlyApiKey);
 
-                return await httpClient.OneWayRequestAsync(request);
+                return await httpClient.OneWayRequestAsync(request, ct: ct);
             }
         }
     }

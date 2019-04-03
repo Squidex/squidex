@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -34,7 +34,7 @@ namespace Squidex.Extensions.Actions.Prerender
             return ($"Recache {url}", new PrerenderJob { RequestBody = requestBody });
         }
 
-        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(PrerenderJob job)
+        protected override async Task<Result> ExecuteJobAsync(PrerenderJob job, CancellationToken ct = default)
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {
@@ -43,7 +43,7 @@ namespace Squidex.Extensions.Actions.Prerender
                     Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
                 };
 
-                return await httpClient.OneWayRequestAsync(request, job.RequestBody);
+                return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
             }
         }
     }

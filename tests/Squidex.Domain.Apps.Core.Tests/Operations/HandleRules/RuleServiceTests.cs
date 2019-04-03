@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
@@ -253,58 +254,58 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
         [Fact]
         public async Task Should_return_succeeded_job_with_full_dump_when_handler_returns_no_exception()
         {
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10)))
-                .Returns((actionDump, null));
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>.Ignored))
+                .Returns(Result.Success(actionDump));
 
             var result = await sut.InvokeAsync(actionName, actionData);
 
-            Assert.Equal(RuleResult.Success, result.Result);
+            Assert.Equal(RuleResult.Success, result.Result.Status);
 
             Assert.True(result.Elapsed >= TimeSpan.Zero);
-            Assert.True(result.Dump.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
+            Assert.True(result.Result.Dump.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
         }
 
         [Fact]
         public async Task Should_return_failed_job_with_full_dump_when_handler_returns_exception()
         {
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10)))
-                .Returns((actionDump, new InvalidOperationException()));
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>.Ignored))
+                .Returns(Result.Failed(new InvalidOperationException(), actionDump));
 
             var result = await sut.InvokeAsync(actionName, actionData);
 
-            Assert.Equal(RuleResult.Failed, result.Result);
+            Assert.Equal(RuleResult.Failed, result.Result.Status);
 
             Assert.True(result.Elapsed >= TimeSpan.Zero);
-            Assert.True(result.Dump.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
+            Assert.True(result.Result.Dump.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
         }
 
         [Fact]
         public async Task Should_return_timedout_job_with_full_dump_when_exception_from_handler_indicates_timeout()
         {
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10)))
-                .Returns((actionDump, new TimeoutException()));
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>.Ignored))
+                .Returns(Result.Failed(new TimeoutException(), actionDump));
 
             var result = await sut.InvokeAsync(actionName, actionData);
 
-            Assert.Equal(RuleResult.Timeout, result.Result);
+            Assert.Equal(RuleResult.Timeout, result.Result.Status);
 
             Assert.True(result.Elapsed >= TimeSpan.Zero);
-            Assert.True(result.Dump.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
+            Assert.True(result.Result.Dump.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
 
-            Assert.True(result.Dump.IndexOf("Action timed out.", StringComparison.OrdinalIgnoreCase) >= 0);
+            Assert.True(result.Result.Dump.IndexOf("Action timed out.", StringComparison.OrdinalIgnoreCase) >= 0);
         }
 
         [Fact]
         public async Task Should_create_exception_details_when_job_to_execute_failed()
         {
-            var ruleError = new InvalidOperationException();
+            var ex = new InvalidOperationException();
 
-            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10)))
-                .Throws(ruleError);
+            A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>.Ignored))
+                .Throws(ex);
 
             var result = await sut.InvokeAsync(actionName, actionData);
 
-            Assert.Equal((ruleError.ToString(), RuleResult.Failed, TimeSpan.Zero), result);
+            Assert.Equal(ex, result.Result.Exception);
         }
 
         private static Rule RuleInvalidAction()

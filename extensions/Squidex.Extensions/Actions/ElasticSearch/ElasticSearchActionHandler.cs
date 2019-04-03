@@ -6,17 +6,18 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 
+#pragma warning disable IDE0059 // Value assigned to symbol is never used
+
 namespace Squidex.Extensions.Actions.ElasticSearch
 {
     public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearchAction, ElasticSearchJob>
     {
-        private const string DescriptionIgnore = "Ignore";
-
         private readonly ClientPool<(Uri Host, string Username, string Password), ElasticLowLevelClient> clients;
 
         public ElasticSearchActionHandler(RuleEventFormatter formatter)
@@ -70,14 +71,14 @@ namespace Squidex.Extensions.Actions.ElasticSearch
                 return (ruleDescription, ruleJob);
             }
 
-            return (DescriptionIgnore, new ElasticSearchJob());
+            return ("Ignore", new ElasticSearchJob());
         }
 
-        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(ElasticSearchJob job)
+        protected override async Task<Result> ExecuteJobAsync(ElasticSearchJob job, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(job.Host))
             {
-                return (DescriptionIgnore, null);
+                return Result.Ignored();
             }
 
             var client = clients.GetClient((new Uri(job.Host, UriKind.Absolute), job.Username, job.Password));
@@ -86,20 +87,20 @@ namespace Squidex.Extensions.Actions.ElasticSearch
             {
                 if (job.Content != null)
                 {
-                    var response = await client.IndexAsync<StringResponse>(job.IndexName, job.IndexType, job.ContentId, job.Content);
+                    var response = await client.IndexAsync<StringResponse>(job.IndexName, job.IndexType, job.ContentId, job.Content, ctx: ct);
 
-                    return (response.Body, response.OriginalException);
+                    return Result.SuccessOrFailed(response.OriginalException, response.Body);
                 }
                 else
                 {
-                    var response = await client.DeleteAsync<StringResponse>(job.IndexName, job.IndexType, job.ContentId);
+                    var response = await client.DeleteAsync<StringResponse>(job.IndexName, job.IndexType, job.ContentId, ctx: ct);
 
-                    return (response.Body, response.OriginalException);
+                    return Result.SuccessOrFailed(response.OriginalException, response.Body);
                 }
             }
             catch (ElasticsearchClientException ex)
             {
-                return (ex.Message, ex);
+                return Result.Failed(ex);
             }
         }
     }

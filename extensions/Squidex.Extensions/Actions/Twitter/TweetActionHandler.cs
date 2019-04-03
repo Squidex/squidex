@@ -5,7 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using CoreTweet;
 using Microsoft.Extensions.Options;
@@ -41,7 +42,7 @@ namespace Squidex.Extensions.Actions.Twitter
             return (Description, ruleJob);
         }
 
-        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(TweetJob job)
+        protected override async Task<Result> ExecuteJobAsync(TweetJob job, CancellationToken ct = default)
         {
             var tokens = Tokens.Create(
                 twitterOptions.ClientId,
@@ -49,9 +50,14 @@ namespace Squidex.Extensions.Actions.Twitter
                 job.AccessToken,
                 job.AccessSecret);
 
-             await tokens.Statuses.UpdateAsync(status => job.Text);
+            var request = new Dictionary<string, object>
+            {
+                ["status"] = job.Text
+            };
 
-            return ($"Tweeted: {job.Text}", null);
+            await tokens.Statuses.UpdateAsync(request, ct);
+
+            return Result.Success($"Tweeted: {job.Text}");
         }
     }
 

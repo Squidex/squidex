@@ -54,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
             var requestDump = "Dump";
 
             A.CallTo(() => ruleService.InvokeAsync(@event.Job.ActionName, @event.Job.ActionData))
-                .Returns((requestDump, result, requestElapsed));
+                .Returns((Result.Create(requestDump, result), requestElapsed));
 
             Instant? nextCall = null;
 

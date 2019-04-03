@@ -8,6 +8,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Tasks;
 
 #pragma warning disable 4014
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
@@ -59,21 +60,9 @@ namespace Squidex.Infrastructure
 
                 Task.Run(() => pubsub.Publish(request, self));
 
-                using (var cts = new CancellationTokenSource())
+                using (var cts = new CancellationTokenSource(timeout))
                 {
-                    var delayTask = Task.Delay(timeout, cts.Token);
-
-                    var resultTask = await Task.WhenAny(receiveTask.Task, delayTask);
-                    if (resultTask == delayTask)
-                    {
-                        throw new TaskCanceledException();
-                    }
-                    else
-                    {
-                        cts.Cancel();
-
-                        return await receiveTask.Task;
-                    }
+                    return await receiveTask.Task.WithCancellation(cts.Token);
                 }
             }
             finally

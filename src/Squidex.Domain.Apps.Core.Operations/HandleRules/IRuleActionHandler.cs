@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
@@ -20,6 +21,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
         Task<(string Description, object Data)> CreateJobAsync(EnrichedEvent @event, RuleAction action);
 
-        Task<(string Dump, Exception Exception)> ExecuteJobAsync(object data);
+        Task<Result> ExecuteJobAsync(object data, CancellationToken ct = default);
     }
 }

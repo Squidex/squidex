@@ -84,9 +84,9 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return new ValidationContext(contentId, schemaId, checkContent, checkAsset, propertyPath.Enqueue(property), IsOptional);
         }
 
-        public Task<IReadOnlyList<Guid>> GetContentIdsAsync(Guid schemaId, FilterNode filter)
+        public Task<IReadOnlyList<Guid>> GetContentIdsAsync(Guid validatedSchemaId, FilterNode filter)
         {
-            return checkContent(schemaId, filter);
+            return checkContent(validatedSchemaId, filter);
         }
 
         public Task<IReadOnlyList<IAssetInfo>> GetAssetInfosAsync(IEnumerable<Guid> assetId)

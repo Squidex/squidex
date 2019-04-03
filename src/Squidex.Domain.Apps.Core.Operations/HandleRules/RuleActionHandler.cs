@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules;
@@ -63,11 +64,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             return (description, data);
         }
 
-        async Task<(string Dump, Exception Exception)> IRuleActionHandler.ExecuteJobAsync(object data)
+        async Task<Result> IRuleActionHandler.ExecuteJobAsync(object data, CancellationToken ct)
         {
             var typedData = (TData)data;
 
-            return await ExecuteJobAsync(typedData);
+            return await ExecuteJobAsync(typedData, ct);
         }
 
         protected virtual Task<(string Description, TData Data)> CreateJobAsync(EnrichedEvent @event, TAction action)
@@ -80,6 +81,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             throw new NotImplementedException();
         }
 
-        protected abstract Task<(string Dump, Exception Exception)> ExecuteJobAsync(TData job);
+        protected abstract Task<Result> ExecuteJobAsync(TData job, CancellationToken ct = default);
     }
 }

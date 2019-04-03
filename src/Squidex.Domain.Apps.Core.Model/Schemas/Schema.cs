@@ -142,20 +142,20 @@ namespace Squidex.Domain.Apps.Core.Schemas
         }
 
         [Pure]
-        public Schema ChangeCategory(string category)
+        public Schema ChangeCategory(string newCategory)
         {
             return Clone(clone =>
             {
-                clone.category = category;
+                clone.category = newCategory;
             });
         }
 
         [Pure]
-        public Schema ConfigurePreviewUrls(IReadOnlyDictionary<string, string> previewUrls)
+        public Schema ConfigurePreviewUrls(IReadOnlyDictionary<string, string> newPreviewUrls)
         {
             return Clone(clone =>
             {
-                clone.previewUrls = previewUrls ?? EmptyPreviewUrls;
+                clone.previewUrls = newPreviewUrls ?? EmptyPreviewUrls;
             });
         }
 

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
@@ -47,13 +47,13 @@ namespace Squidex.Extensions.Actions.AzureQueue
             return (ruleDescription, ruleJob);
         }
 
-        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(AzureQueueJob job)
+        protected override async Task<Result> ExecuteJobAsync(AzureQueueJob job, CancellationToken ct = default)
         {
             var queue = clients.GetClient((job.QueueConnectionString, job.QueueName));
 
-            await queue.AddMessageAsync(new CloudQueueMessage(job.MessageBodyV2));
+            await queue.AddMessageAsync(new CloudQueueMessage(job.MessageBodyV2), null, null, null, null, ct);
 
-            return ("Completed", null);
+            return Result.Complete();
         }
     }
 

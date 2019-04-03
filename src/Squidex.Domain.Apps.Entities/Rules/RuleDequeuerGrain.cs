@@ -98,12 +98,12 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 var job = @event.Job;
 
-                var response = await ruleService.InvokeAsync(job.ActionName, job.ActionData);
+                var (response, elapsed) = await ruleService.InvokeAsync(job.ActionName, job.ActionData);
 
-                var jobInvoke = ComputeJobInvoke(response.Result, @event, job);
-                var jobResult = ComputeJobResult(response.Result, jobInvoke);
+                var jobInvoke = ComputeJobInvoke(response.Status, @event, job);
+                var jobResult = ComputeJobResult(response.Status, jobInvoke);
 
-                await ruleEventRepository.MarkSentAsync(@event.Id, response.Dump, response.Result, jobResult, response.Elapsed, jobInvoke);
+                await ruleEventRepository.MarkSentAsync(@event.Id, response.Dump, response.Status, jobResult, elapsed, jobInvoke);
             }
             catch (Exception ex)
             {

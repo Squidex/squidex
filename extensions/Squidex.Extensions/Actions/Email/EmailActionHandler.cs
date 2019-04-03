@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Net;
 using System.Net.Mail;
+using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -41,7 +41,7 @@ namespace Squidex.Extensions.Actions.Email
             return (description, ruleJob);
         }
 
-        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(EmailJob job)
+        protected override async Task<Result> ExecuteJobAsync(EmailJob job, CancellationToken ct = default)
         {
             using (var client = new SmtpClient(job.ServerHost, job.ServerPort))
             {
@@ -53,11 +53,16 @@ namespace Squidex.Extensions.Actions.Email
                     message.Subject = job.MessageSubject;
                     message.Body = job.MessageBody;
 
-                    await client.SendMailAsync(message);
+                    var sendTask = client.SendMailAsync(message);
+
+                    using (ct.Register(client.SendAsyncCancel))
+                    {
+                        await client.SendMailAsync(message);
+                    }
                 }
             }
 
-            return ("Completed", null);
+            return Result.Complete();
         }
     }
 

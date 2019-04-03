@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Rules;
@@ -17,11 +17,13 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public class RuleService
     {
+        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(3);
         private readonly Dictionary<Type, IRuleActionHandler> ruleActionHandlers;
         private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers;
         private readonly TypeNameRegistry typeNameRegistry;
@@ -156,47 +158,34 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
         }
 
-        public virtual async Task<(string Dump, RuleResult Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job)
+        public virtual async Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job)
         {
+            var actionWatch = ValueStopwatch.StartNew();
+
+            Result result;
+
             try
             {
                 var actionType = typeNameRegistry.GetType(actionName);
-                var actionWatch = ValueStopwatch.StartNew();
-
                 var actionHandler = ruleActionHandlers[actionType];
 
                 var deserialized = jsonSerializer.Deserialize<object>(job, actionHandler.DataType);
 
-                var result = await actionHandler.ExecuteJobAsync(deserialized);
-
-                var elapsed = TimeSpan.FromMilliseconds(actionWatch.Stop());
-
-                var dumpBuilder = new StringBuilder(result.Dump);
-
-                dumpBuilder.AppendLine();
-                dumpBuilder.AppendFormat("Elapsed {0}.", elapsed);
-                dumpBuilder.AppendLine();
-
-                if (result.Exception is TimeoutException || result.Exception is OperationCanceledException)
+                using (var cts = new CancellationTokenSource(DefaultTimeout))
                 {
-                    dumpBuilder.AppendLine();
-                    dumpBuilder.AppendLine("Action timed out.");
-
-                    return (dumpBuilder.ToString(), RuleResult.Timeout, elapsed);
-                }
-                else if (result.Exception != null)
-                {
-                    return (dumpBuilder.ToString(), RuleResult.Failed, elapsed);
-                }
-                else
-                {
-                    return (dumpBuilder.ToString(), RuleResult.Success, elapsed);
+                    result = await actionHandler.ExecuteJobAsync(deserialized, cts.Token).WithCancellation(cts.Token);
                 }
             }
             catch (Exception ex)
             {
-                return (ex.ToString(), RuleResult.Failed, TimeSpan.Zero);
+                result = Result.Failed(ex);
             }
+
+            var elapsed = TimeSpan.FromMilliseconds(actionWatch.Stop());
+
+            result.Enrich(elapsed);
+
+            return (result, elapsed);
         }
     }
 }

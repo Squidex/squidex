@@ -7,38 +7,41 @@
 
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Infrastructure.Http;
 
 namespace Squidex.Extensions.Actions
 {
     public static class HttpHelper
     {
-        public static async Task<(string Dump, Exception Exception)> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string requestBody = null)
+        public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string requestBody = null, CancellationToken ct = default)
         {
             HttpResponseMessage response = null;
             try
             {
-                response = await client.SendAsync(request);
+                response = await client.SendAsync(request, ct);
 
                 var responseString = await response.Content.ReadAsStringAsync();
-
                 var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString);
-
-                Exception ex = null;
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    ex = new HttpRequestException($"Response code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}).");
-                }
+                    var ex = new HttpRequestException($"Response code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}).");
 
-                return (requestDump, ex);
+                    return Result.Failed(ex, requestDump);
+                }
+                else
+                {
+                    return Result.Success(requestDump);
+                }
             }
             catch (Exception ex)
             {
                 var requestDump = DumpFormatter.BuildDump(request, response, requestBody, ex.ToString());
 
-                return (requestDump, ex);
+                return Result.Failed(ex, requestDump);
             }
         }
     }

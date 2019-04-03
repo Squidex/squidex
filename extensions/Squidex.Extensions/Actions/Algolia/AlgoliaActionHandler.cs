@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Algolia.Search;
 using Newtonsoft.Json;
@@ -13,12 +13,12 @@ using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 
+#pragma warning disable IDE0059 // Value assigned to symbol is never used
+
 namespace Squidex.Extensions.Actions.Algolia
 {
     public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, AlgoliaJob>
     {
-        private const string DescriptionIgnore = "Ignore";
-
         private readonly ClientPool<(string AppId, string ApiKey, string IndexName), Index> clients;
 
         public AlgoliaActionHandler(RuleEventFormatter formatter)
@@ -65,14 +65,14 @@ namespace Squidex.Extensions.Actions.Algolia
                 return (ruleDescription, ruleJob);
             }
 
-            return (DescriptionIgnore, new AlgoliaJob());
+            return ("Ignore", new AlgoliaJob());
         }
 
-        protected override async Task<(string Dump, Exception Exception)> ExecuteJobAsync(AlgoliaJob job)
+        protected override async Task<Result> ExecuteJobAsync(AlgoliaJob job, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(job.AppId))
             {
-                return (DescriptionIgnore, null);
+                return Result.Ignored();
             }
 
             var index = clients.GetClient((job.AppId, job.ApiKey, job.IndexName));
@@ -81,20 +81,20 @@ namespace Squidex.Extensions.Actions.Algolia
             {
                 if (job.Content != null)
                 {
-                    var response = await index.PartialUpdateObjectAsync(job.Content);
+                    var response = await index.PartialUpdateObjectAsync(job.Content, true, ct);
 
-                    return (response.ToString(Formatting.Indented), null);
+                    return Result.Success(response.ToString(Formatting.Indented));
                 }
                 else
                 {
-                    var response = await index.DeleteObjectAsync(job.ContentId);
+                    var response = await index.DeleteObjectAsync(job.ContentId, ct);
 
-                    return (response.ToString(Formatting.Indented), null);
+                    return Result.Success(response.ToString(Formatting.Indented));
                 }
             }
             catch (AlgoliaException ex)
             {
-                return (ex.Message, ex);
+                return Result.Failed(ex);
             }
         }
     }
