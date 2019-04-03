@@ -30,10 +30,10 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string FileName { get; set; }
 
         /// <summary>
-        /// The file name as a slug.
+        /// The slug.
         /// </summary>
         [Required]
-        public string FileNameSlug { get; set; }
+        public string Slug { get; set; }
 
         /// <summary>
         /// The mime type.

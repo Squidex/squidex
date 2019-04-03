@@ -1,5 +1,5 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createSchema()">     
-    <sqx-modal-dialog (closed)="cancel()" [large]="false">
+    <sqx-modal-dialog (close)="emitCancel()" [large]="false">
         <ng-container title>
             <ng-container *ngIf="import; else noImport">
                 Clone Schema
@@ -84,7 +84,7 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="cancel()">Cancel</button>
+            <button type="reset" class="float-left btn btn-secondary" (click)="emitCancel()">Cancel</button>
             <button type="submit" class="float-right btn btn-success">Create</button>
         </ng-container>
     </sqx-modal-dialog>

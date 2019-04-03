@@ -38,9 +38,6 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SchemaCategoryComponent extends StatefulComponent<State> implements OnInit, OnChanges {
-    @Output()
-    public removing = new EventEmitter();
-
     @Input()
     public name: string;
 
@@ -55,6 +52,9 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
 
     @Input()
     public schemas: ImmutableArray<SchemaDto>;
+
+    @Output()
+    public remove = new EventEmitter();
 
     public allowDrop = (schema: any) => {
         return (Types.is(schema, SchemaDto) || Types.is(schema, SchemaDetailsDto)) && !this.isSameCategory(schema);
@@ -128,6 +128,10 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
 
     public changeCategory(schema: SchemaDto) {
         this.schemasState.changeCategory(schema, this.name).pipe(onErrorResumeNext()).subscribe();
+    }
+
+    public emitRemove() {
+        this.remove.emit();
     }
 
     public trackBySchema(index: number, schema: SchemaDto) {

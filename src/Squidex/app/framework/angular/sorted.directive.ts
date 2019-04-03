@@ -21,8 +21,8 @@ export class SortedDirective implements OnDestroy, OnInit {
     @Input('sqxSortModel')
     public sortModel: any[];
 
-    @Output('sqxSorted')
-    public sorted = new EventEmitter<any[]>();
+    @Output('sqxSort')
+    public sort = new EventEmitter<any[]>();
 
     constructor(
         private readonly elementRef: ElementRef
@@ -49,7 +49,7 @@ export class SortedDirective implements OnDestroy, OnInit {
                     newModel.splice(event.oldIndex, 1);
                     newModel.splice(event.newIndex, 0, item);
 
-                    this.sorted.emit(newModel);
+                    this.sort.emit(newModel);
                 }
             },
 

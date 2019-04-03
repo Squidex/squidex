@@ -1,5 +1,5 @@
  <ng-container *ngIf="!isListView; else listTemplate">
-    <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)" [noDrop]="true">
+    <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="emitSelect()" (sqxFileDrop)="updateFile($event)" [noDrop]="true">
         <div class="card-body">
             <div class="file-preview" *ngIf="asset && snapshot.progress === 0" @fade>
                 <span class="file-type" *ngIf="asset.fileType">
@@ -17,14 +17,16 @@
                     <div class="overlay-background"></div>
                     
                     <div class="overlay-menu">
-                        <a class="file-download" [href]="asset | sqxAssetUrl" sqxExternalLink="noicon" (click)="$event.stopPropagation()">
+                        <a class="file-edit ml-2" (click)="edit()" *ngIf="!isDisabled">
+                            <i class="icon-pencil"></i>
+                        </a>
+                        <a class="file-download ml-2" [href]="asset | sqxAssetUrl" sqxExternalLink="noicon" (click)="$event.stopPropagation()">
                             <i class="icon-download"></i>
                         </a>
-        
-                        <a class="file-delete ml-2" (click)="deleting.emit(asset)" *ngIf="!isDisabled && !removeMode">
+                        <a class="file-delete ml-2" (click)="emitDelete()" *ngIf="!isDisabled && !removeMode">
                             <i class="icon-delete"></i>
                         </a>
-                        <a class="file-delete ml-2" (click)="removing.emit(asset)" *ngIf="removeMode">
+                        <a class="file-delete ml-2" (click)="emitRemove()" *ngIf="removeMode">
                             <i class="icon-close"></i>
                         </a>
                     </div>
@@ -53,28 +55,15 @@
                 <div class="drop-overlay-text">Drop to update</div>
             </div>
         </div>
-        <div class="card-footer">
+        <div class="card-footer" (dblclick)="edit()">
             <ng-container *ngIf="asset">
                 <div>
-                    <div *ngIf="!snapshot.isRenaming" class="file-name editable" (dblclick)="renameStart()">
+                    <div class="file-name editable" (click)="edit()">
                         {{asset.fileName}}
-                    </div>
-                    <div *ngIf="snapshot.isRenaming">
-                        <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">                   
-                            <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
-
-                            <input type="text" class="form-control form-underlined editable" id="assetName" formControlName="name" autocomplete="off" spellcheck="false" sqxFocusOnInit (blur)="renameCancel()" />
-                        </form>
                     </div>
                 </div>
                 <div class="file-tags tags">
-                    <sqx-tag-editor
-                        [suggestions]="allTags" 
-                        [acceptEnter]="true"
-                        [allowDuplicates]="false"
-                        [undefinedWhenEmpty]="false" 
-                        [formControl]="tagInput" class="blank" placeholder="+Tag">
-                    </sqx-tag-editor>
+                    <sqx-tag-editor [disabled]="true" [ngModel]="asset.tags" class="blank"></sqx-tag-editor>
                 </div>
                 <div class="file-info">
                     <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
@@ -85,7 +74,7 @@
 </ng-container>
 
 <ng-template #listTemplate>
-    <div class="table-items-row" [class.selectable]="isSelectable" (click)="selected.emit(asset)" (sqxFileDrop)="updateFile($event)" [noDrop]="true">
+    <div class="table-items-row" [class.selectable]="isSelectable" (click)="emitSelect()" (sqxFileDrop)="updateFile($event)" [noDrop]="true">
         <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected" ></div>
 
         <div *ngIf="asset && asset.canPreview && snapshot.progress === 0" class="image drag-handle" [class.image-left]="!isSelectable" @fade>
@@ -98,15 +87,8 @@
         <table class="table-fixed" *ngIf="asset && snapshot.progress === 0" @fade>
             <tr>
                 <td class="col-name">
-                    <div *ngIf="!snapshot.isRenaming" class="file-name editable" (dblclick)="renameStart()">
+                    <div class="file-name editable" (click)="edit()">
                         {{asset.fileName}}
-                    </div>
-                    <div *ngIf="snapshot.isRenaming">
-                        <form [formGroup]="renameForm.form" (ngSubmit)="renameAsset()">                   
-                            <sqx-control-errors for="name" [submitted]="renameForm.submitted | async"></sqx-control-errors>
-
-                            <input type="text" class="form-control editable form-underlined" id="assetName" formControlName="name" autocomplete="off" spellcheck="false" sqxFocusOnInit (blur)="renameCancel()" />
-                        </form>
                     </div>
                 </td>
                 <td class="col-info" *ngIf="!isCompact">
@@ -121,10 +103,10 @@
                     </a>
                 </td>
                 <td class="col-actions text-right" *ngIf="!isDisabled || removeMode">
-                    <button type="button" class="btn btn-text-danger" (click)="deleting.emit(asset)" *ngIf="!isDisabled && !removeMode">
+                    <button type="button" class="btn btn-text-danger" (click)="emitDelete()" *ngIf="!isDisabled && !removeMode">
                         <i class="icon-bin2"></i>
                     </button>
-                    <button type="button" class="btn btn-text-secondary" (click)="removing.emit(asset)" *ngIf="removeMode">
+                    <button type="button" class="btn btn-text-secondary" (click)="emitRemove()" *ngIf="removeMode">
                         <i class="icon-close"></i>
                     </button>
                 </td>
@@ -141,3 +123,11 @@
         </div>
     </div>
 </ng-template>
+
+<ng-container *ngIf="asset">
+    <sqx-asset-dialog  *sqxModalView="editDialog;onRoot:true"
+        [asset]="asset" [allTags]="allTags"
+        (cancel)="cancelEdit()"
+        (complete)="updateAsset($event, true)">
+    </sqx-asset-dialog>
+</ng-container>

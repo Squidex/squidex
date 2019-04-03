@@ -40,13 +40,13 @@ export class SearchFormComponent implements OnChanges, OnInit {
     public query = '';
 
     @Output()
-    public queryChanged = new EventEmitter<string>();
+    public queryChange = new EventEmitter<string>();
 
     @Input()
     public archived = false;
 
     @Output()
-    public archivedChanged = new EventEmitter<boolean>();
+    public archivedChange = new EventEmitter<boolean>();
 
     @Input()
     public schemaName = '';
@@ -113,7 +113,7 @@ export class SearchFormComponent implements OnChanges, OnInit {
     public search() {
         this.invalidate(this.contentsFilter.value);
 
-        this.queryChanged.emit(this.contentsFilter.value);
+        this.queryChange.emit(this.contentsFilter.value);
     }
 
     private invalidate(query: string) {
@@ -186,7 +186,7 @@ export class SearchFormComponent implements OnChanges, OnInit {
         }
 
         if (query !== this.query) {
-            this.queryChanged.emit(query);
+            this.queryChange.emit(query);
         }
 
         this.contentsFilter.setValue(query);

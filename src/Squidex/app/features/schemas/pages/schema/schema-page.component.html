@@ -69,7 +69,7 @@
         <ng-container *ngIf="patternsState.patterns | async; let patterns">
             <div class="schemas"
                 [sqxSortModel]="schema.fields"
-                (sqxSorted)="sortFields($event)">
+                (sqxSort)="sortFields($event)">
                 <div *ngFor="let field of schema.fields; trackBy: trackByField.bind(this)">
                     <sqx-field [field]="field" [schema]="schema" [patterns]="patterns"></sqx-field>
                 </div>
@@ -94,30 +94,30 @@
 
 <ng-container *sqxModalView="editSchemaDialog;onRoot:true">
     <sqx-schema-edit-form [schema]="schema" 
-        (completed)="editSchemaDialog.hide()">
+        (complete)="editSchemaDialog.hide()">
     </sqx-schema-edit-form>
 </ng-container>
 
 <ng-container *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false">
     <sqx-field-wizard [schema]="schema"
-        (completed)="addFieldDialog.hide()">
+        (complete)="addFieldDialog.hide()">
     </sqx-field-wizard>
 </ng-container>
 
 <ng-container *sqxModalView="configureScriptsDialog;onRoot:true">
     <sqx-schema-scripts-form [schema]="schema"
-        (completed)="configureScriptsDialog.hide()">
+        (complete)="configureScriptsDialog.hide()">
     </sqx-schema-scripts-form>
 </ng-container>
 
 <ng-container *sqxModalView="configurePreviewUrlsDialog;onRoot:true">
     <sqx-schema-preview-urls-form [schema]="schema"
-        (completed)="configurePreviewUrlsDialog.hide()">
+        (complete)="configurePreviewUrlsDialog.hide()">
     </sqx-schema-preview-urls-form>
 </ng-container>
 
 <ng-container *sqxModalView="exportSchemaDialog;onRoot:true">
-    <sqx-modal-dialog (closed)="exportSchemaDialog.hide()" large="true">
+    <sqx-modal-dialog (close)="exportSchemaDialog.hide()" large="true">
         <ng-container title>
             Export Schema
         </ng-container>

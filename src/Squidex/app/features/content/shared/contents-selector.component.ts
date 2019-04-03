@@ -35,7 +35,7 @@ export class ContentsSelectorComponent implements OnInit {
     public schema: SchemaDetailsDto;
 
     @Output()
-    public selected = new EventEmitter<ContentDto[]>();
+    public select = new EventEmitter<ContentDto[]>();
 
     public searchModal = new ModalModel();
 
@@ -75,12 +75,12 @@ export class ContentsSelectorComponent implements OnInit {
         return this.selectedItems[content.id];
     }
 
-    public complete() {
-        this.selected.emit([]);
+    public emitComplete() {
+        this.select.emit([]);
     }
 
-    public select() {
-        this.selected.emit(Object.values(this.selectedItems));
+    public emitSelect() {
+        this.select.emit(Object.values(this.selectedItems));
     }
 
     public selectLanguage(language: LanguageDto) {

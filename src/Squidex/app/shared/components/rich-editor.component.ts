@@ -52,7 +52,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
     public editor: ElementRef;
 
     @Output()
-    public assetPluginClicked = new EventEmitter<any>();
+    public assetPluginClick = new EventEmitter<any>();
 
     public assetsDialog = new DialogModel();
 

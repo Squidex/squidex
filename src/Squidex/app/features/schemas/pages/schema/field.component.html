@@ -107,7 +107,7 @@
         <ng-container *ngIf="field['nested']; let nested">
             <span class="nested-field-line-v"></span>
 
-            <div [sqxSortModel]="nested" (sqxSorted)="sortFields($event)">
+            <div [sqxSortModel]="nested" (sqxSort)="sortFields($event)">
                 <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByField.bind(this)">
                     <span class="nested-field-line-h"></span>
     
@@ -125,7 +125,7 @@
                 
             <ng-container *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false;closeAlways:true">
                 <sqx-field-wizard [schema]="schema" [parent]="field"
-                    (completed)="addFieldDialog.hide()">
+                    (complete)="addFieldDialog.hide()">
                 </sqx-field-wizard>
             </ng-container>
         </ng-container>

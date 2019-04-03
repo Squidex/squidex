@@ -23,6 +23,6 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
         string FileName { get; }
 
-        string FileNameSlug { get; }
+        string Slug { get; }
     }
 }

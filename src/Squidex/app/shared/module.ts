@@ -23,6 +23,7 @@ import {
     AppsService,
     AppsState,
     AssetComponent,
+    AssetDialogComponent,
     AssetPreviewUrlPipe,
     AssetsDialogState,
     AssetsListComponent,
@@ -102,6 +103,7 @@ import {
     declarations: [
         AppFormComponent,
         AssetComponent,
+        AssetDialogComponent,
         AssetPreviewUrlPipe,
         AssetUrlPipe,
         AssetsListComponent,
@@ -131,6 +133,7 @@ import {
     exports: [
         AppFormComponent,
         AssetComponent,
+        AssetDialogComponent,
         AssetPreviewUrlPipe,
         AssetUrlPipe,
         AssetsListComponent,

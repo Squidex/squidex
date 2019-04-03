@@ -6,6 +6,7 @@
  */
 
 export * from './components/app-form.component';
+export * from './components/asset-dialog.component';
 export * from './components/asset.component';
 export * from './components/assets-list.component';
 export * from './components/assets-selector.component';

@@ -1,4 +1,4 @@
-<sqx-modal-dialog (closed)="complete()" large="true" fullHeight="true" contentClass="grid">
+<sqx-modal-dialog (close)="emitComplete()" large="true" fullHeight="true" contentClass="grid">
     <ng-container title>
         Select contents
     </ng-container>
@@ -13,7 +13,7 @@
             <div class="col pl-1">
                 <sqx-search-form formClass="form" placeholder="Search for content" fieldExample="data/[MY_FIELD]/iv"
                     [query]="contentsState.contentsQuery | async" 
-                    (queryChanged)="search($event)"
+                    (queryChange)="search($event)"
                     expandable="true">
                 </sqx-search-form>
             </div>
@@ -68,7 +68,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
-        <button type="submit" class="float-right btn btn-success" (click)="select()" [disabled]="selectionCount === 0">Link selected contents ({{selectionCount}})</button>
+        <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
+        <button type="submit" class="float-right btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0">Link selected contents ({{selectionCount}})</button>
     </ng-container>
 </sqx-modal-dialog>

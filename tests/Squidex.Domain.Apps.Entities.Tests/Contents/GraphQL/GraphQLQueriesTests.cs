@@ -51,12 +51,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     sourceUrl
                     mimeType
                     fileName
-                    fileNameSlug
                     fileSize
                     fileVersion
                     isImage
                     pixelWidth
                     pixelHeight
+                    slug
                   }
                 }";
 
@@ -86,12 +86,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             sourceUrl = $"assets/source/{asset.Id}",
                             mimeType = "image/png",
                             fileName = "MyFile.png",
-                            fileNameSlug = "myfile.png",
                             fileSize = 1024,
                             fileVersion = 123,
                             isImage = true,
                             pixelWidth = 800,
-                            pixelHeight = 600
+                            pixelHeight = 600,
+                            slug = "myfile.png"
                         }
                     }
                 }
@@ -119,12 +119,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       sourceUrl
                       mimeType
                       fileName
-                      fileNameSlug
                       fileSize
                       fileVersion
                       isImage
                       pixelWidth
                       pixelHeight
+                      slug
                     }   
                   }
                 }";
@@ -158,12 +158,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 sourceUrl = $"assets/source/{asset.Id}",
                                 mimeType = "image/png",
                                 fileName = "MyFile.png",
-                                fileNameSlug = "myfile.png",
                                 fileSize = 1024,
                                 fileVersion = 123,
                                 isImage = true,
                                 pixelWidth = 800,
-                                pixelHeight = 600
+                                pixelHeight = 600,
+                                slug = "myfile.png"
                             }
                         }
                     }
@@ -193,12 +193,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     sourceUrl
                     mimeType
                     fileName
-                    fileNameSlug
                     fileSize
                     fileVersion
                     isImage
                     pixelWidth
                     pixelHeight
+                    slug
                   }}
                 }}";
 
@@ -224,12 +224,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         sourceUrl = $"assets/source/{asset.Id}",
                         mimeType = "image/png",
                         fileName = "MyFile.png",
-                        fileNameSlug = "myfile.png",
                         fileSize = 1024,
                         fileVersion = 123,
                         isImage = true,
                         pixelWidth = 800,
-                        pixelHeight = 600
+                        pixelHeight = 600,
+                        slug = "myfile.png"
                     }
                 }
             };

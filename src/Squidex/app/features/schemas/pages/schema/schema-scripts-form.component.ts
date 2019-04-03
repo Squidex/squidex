@@ -21,7 +21,7 @@ import {
 })
 export class SchemaScriptsFormComponent implements OnInit {
     @Output()
-    public completed = new EventEmitter();
+    public complete = new EventEmitter();
 
     @Input()
     public schema: SchemaDetailsDto;
@@ -40,8 +40,8 @@ export class SchemaScriptsFormComponent implements OnInit {
         this.editForm.load(this.schema.scripts);
     }
 
-    public complete() {
-        this.completed.emit();
+    public emitComplete() {
+        this.complete.emit();
     }
 
     public selectField(field: string) {
@@ -54,7 +54,7 @@ export class SchemaScriptsFormComponent implements OnInit {
         if (value) {
             this.schemasState.configureScripts(this.schema, value)
                 .subscribe(() => {
-                    this.complete();
+                    this.emitComplete();
                 }, error => {
                     this.editForm.submitFailed(error);
                 });

@@ -1,4 +1,4 @@
-<sqx-modal-dialog (closed)="complete()" large="true">
+<sqx-modal-dialog (close)="emitComplete()" large="true">
     <ng-container title>
         <ng-container *ngIf="parent; else noParent">
             Add Nested Field
@@ -91,7 +91,7 @@
     </ng-container>
 
     <ng-container footer>
-        <button type="reset" class="float-left btn btn-secondary" (click)="complete()">Cancel</button>
+        <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
 
         <div class="float-right" *ngIf="!isEditing">
             <button type="button" class="btn btn-outline-success mr-1" (click)="addField(false, false)">Create and close</button>

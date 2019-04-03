@@ -39,7 +39,7 @@ export class RuleWizardComponent implements OnInit {
     public step = 1;
 
     @Output()
-    public completed = new EventEmitter();
+    public complete = new EventEmitter();
 
     @Input()
     public ruleActions: { [name: string]: RuleElementDto };
@@ -75,8 +75,8 @@ export class RuleWizardComponent implements OnInit {
         }
     }
 
-    public complete() {
-        this.completed.emit();
+    public emitComplete() {
+        this.complete.emit();
     }
 
     public selectTriggerType(type: string) {
@@ -122,7 +122,7 @@ export class RuleWizardComponent implements OnInit {
 
         this.rulesState.create(requestDto)
             .subscribe(() => {
-                this.complete();
+                this.emitComplete();
 
                 this.actionForm.submitCompleted();
                 this.triggerForm.submitCompleted();
@@ -135,7 +135,7 @@ export class RuleWizardComponent implements OnInit {
     private updateTrigger() {
         this.rulesState.updateTrigger(this.rule, this.trigger)
             .subscribe(() => {
-                this.complete();
+                this.emitComplete();
 
                 this.triggerForm.submitCompleted();
             }, error => {
@@ -146,7 +146,7 @@ export class RuleWizardComponent implements OnInit {
     private updateAction() {
         this.rulesState.updateAction(this.rule, this.action)
             .subscribe(() => {
-                this.complete();
+                this.emitComplete();
 
                 this.actionForm.submitCompleted();
             }, error => {

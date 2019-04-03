@@ -98,7 +98,7 @@ export class Form<T extends AbstractControl> {
 }
 
 export class Model {
-    protected clone(update: ((v: any) => object) | object): any {
+    protected clone(update: ((v: any) => object) | object, validOnly = false): any {
         let values: object;
         if (Types.isFunction(update)) {
             values = update(<any>this);
@@ -106,7 +106,17 @@ export class Model {
             values = update;
         }
 
-        const clone = Object.assign(Object.create(Object.getPrototypeOf(this)), this, values);
+        const clone = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+
+        for (let key in values) {
+            if (values.hasOwnProperty(key)) {
+                let value = values[key];
+
+                if (value || validOnly) {
+                    clone[key] = value;
+                }
+            }
+        }
 
         if (Types.isFunction(clone.onCloned)) {
             clone.onCloned();

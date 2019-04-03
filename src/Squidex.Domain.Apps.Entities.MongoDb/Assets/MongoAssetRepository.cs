@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             .Ascending(x => x.Tags)
                             .Descending(x => x.LastModified)),
                     new CreateIndexModel<MongoAssetEntity>(
-                        Index.Ascending(x => x.FileNameSlug))
+                        Index.Ascending(x => x.Slug))
                 },
                 ct);
         }
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntity =
-                    await Collection.Find(x => x.FileNameSlug == slug)
+                    await Collection.Find(x => x.Slug == slug)
                         .FirstOrDefaultAsync();
 
                 return assetEntity;

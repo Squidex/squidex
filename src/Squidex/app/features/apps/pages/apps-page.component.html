@@ -95,18 +95,18 @@
 
 <ng-container *sqxModalView="addAppDialog;onRoot:true">
     <sqx-app-form [template]="addAppTemplate"
-        (completed)="addAppDialog.hide()">
+        (complete)="addAppDialog.hide()">
     </sqx-app-form>
 </ng-container>
 
 <ng-container *sqxModalView="onboardingDialog;onRoot:true;closeAuto:false">
     <sqx-onboarding-dialog
-        (closed)="onboardingDialog.hide()">
+        (close)="onboardingDialog.hide()">
     </sqx-onboarding-dialog>
 </ng-container>
 
 <ng-container *sqxModalView="newsDialog;onRoot:true;closeAuto:false">
     <sqx-news-dialog [features]="newsFeatures"
-        (closed)="newsDialog.hide()">
+        (close)="newsDialog.hide()">
     </sqx-news-dialog>
 </ng-container>

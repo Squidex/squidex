@@ -46,7 +46,7 @@ namespace Migrate_01.OldTriggers
 
             if (SendRename)
             {
-                conditions.Add($"event.type == '{EnrichedAssetEventType.Renamed}'");
+                conditions.Add($"event.type == '{EnrichedAssetEventType.Annotated}'");
             }
 
             if (SendDelete)

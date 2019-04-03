@@ -24,10 +24,10 @@
         <ng-container *ngIf="!snapshot.isListView; else listTemplate">
             <div class="row no-gutters">
                 <sqx-asset *ngFor="let file of snapshot.assetFiles" [initFile]="file" 
-                    (failed)="removeLoadingAsset(file)" (loaded)="addAsset(file, $event)">
+                    (faile)="removeLoadingAsset(file)" (load)="addAsset(file, $event)">
                 </sqx-asset>
                 <sqx-asset *ngFor="let asset of snapshot.assets; trackBy: trackByAsset" [asset]="asset" [isCompact]="isCompact" removeMode="true"
-                    (updated)="notifyOthers($event)" (removing)="removeLoadedAsset($event)">
+                    (update)="notifyOthers($event)" (remove)="removeLoadedAsset($event)">
                 </sqx-asset>
             </div>
         </ng-container>
@@ -35,17 +35,19 @@
         <ng-template #listTemplate>
             <div class="list-view">
                 <sqx-asset *ngFor="let file of snapshot.assetFiles" [initFile]="file"
-                    [isListView]="true" (failed)="removeLoadingAsset(file)" (loaded)="addAsset(file, $event)">
+                    [isListView]="true" 
+                    (loadError)="removeLoadingAsset(file)"
+                    (load)="addAsset(file, $event)">
                 </sqx-asset>
                 
                 <div
                     [sqxSortModel]="snapshot.assets.mutableValues"
-                    (sqxSorted)="sortAssets($event)">
+                    (sqxSort)="sortAssets($event)">
                     <div *ngFor="let asset of snapshot.assets; trackBy: trackByAsset">
                         <sqx-asset [asset]="asset" removeMode="true" 
                             [isListView]="true"
                             [isCompact]="isCompact"
-                            (updated)="notifyOthers($event)" (removing)="removeLoadedAsset($event)">
+                            (update)="notifyOthers($event)" (remove)="removeLoadedAsset($event)">
                         </sqx-asset>
                     </div>
                 </div>
@@ -56,6 +58,6 @@
 
 <ng-container *sqxModalView="assetsDialog;onRoot:true;closeAuto:false">
     <sqx-assets-selector
-        (selected)="selectAssets($event)">
+        (select)="selectAssets($event)">
     </sqx-assets-selector>
 </ng-container>

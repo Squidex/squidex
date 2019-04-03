@@ -8,15 +8,21 @@
 using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public sealed class UpdateAssetDto
+    public sealed class AnnotateAssetDto
     {
         /// <summary>
         /// The new name of the asset.
         /// </summary>
         public string FileName { get; set; }
+
+        /// <summary>
+        /// The new slug of the asset.
+        /// </summary>
+        public string Slug { get; set; }
 
         /// <summary>
         /// The new asset tags.
@@ -25,14 +31,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
         public AssetCommand ToCommand(Guid id)
         {
-            if (Tags != null)
-            {
-                return new TagAsset { AssetId = id, Tags = Tags };
-            }
-            else
-            {
-                return new RenameAsset { AssetId = id, FileName = FileName };
-            }
+            return SimpleMapper.Map(this, new AnnotateAsset { AssetId = id });
         }
     }
 }

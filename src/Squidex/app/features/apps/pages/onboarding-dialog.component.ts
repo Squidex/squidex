@@ -21,10 +21,10 @@ export class OnboardingDialogComponent {
     public step = 0;
 
     @Output()
-    public closed = new EventEmitter();
+    public close = new EventEmitter();
 
-    public close() {
-        this.closed.emit();
+    public emitClose() {
+        this.close.emit();
     }
 
     public next() {

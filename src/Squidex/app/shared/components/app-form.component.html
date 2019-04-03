@@ -1,5 +1,5 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createApp()">
-    <sqx-modal-dialog (closed)="complete()">
+    <sqx-modal-dialog (close)="emitComplete()">
         <ng-container title>
             <ng-container *ngIf="template; else noTemplate">
                 Create {{template}} Sample
@@ -33,7 +33,7 @@
         </ng-container>
 
         <ng-container footer>
-            <button type="reset" class="float-left btn btn-secondary" (click)="complete()" [disabled]="createForm.submitted | async">Cancel</button>
+            <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()" [disabled]="createForm.submitted | async">Cancel</button>
             <button type="submit" class="float-right btn btn-success">Create</button>
         </ng-container>
     </sqx-modal-dialog>

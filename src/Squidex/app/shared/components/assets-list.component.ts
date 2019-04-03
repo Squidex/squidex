@@ -36,7 +36,7 @@ export class AssetsListComponent {
     public selectedIds: object;
 
     @Output()
-    public selected = new EventEmitter<AssetDto>();
+    public select = new EventEmitter<AssetDto>();
 
     public add(file: File, asset: AssetDto) {
         this.newFiles = this.newFiles.remove(file);
@@ -64,8 +64,8 @@ export class AssetsListComponent {
         this.state.update(asset);
     }
 
-    public select(asset: AssetDto) {
-        this.selected.emit(asset);
+    public emitSelect(asset: AssetDto) {
+        this.select.emit(asset);
     }
 
     public isSelected(asset: AssetDto) {

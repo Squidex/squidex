@@ -5,13 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
+using System.Collections.Generic;
 
-namespace Squidex.Domain.Apps.Events.Assets
+namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    [EventType(nameof(AssetRenamed))]
-    public sealed class AssetRenamed : AssetEvent
+    public sealed class AnnotateAsset : AssetCommand
     {
         public string FileName { get; set; }
+
+        public string Slug { get; set; }
+
+        public HashSet<string> Tags { get; set; }
     }
 }

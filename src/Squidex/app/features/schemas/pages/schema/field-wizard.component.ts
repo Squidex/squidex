@@ -38,7 +38,7 @@ export class FieldWizardComponent implements OnInit {
     public parent: RootFieldDto;
 
     @Output()
-    public completed = new EventEmitter();
+    public complete = new EventEmitter();
 
     public fieldTypes = fieldTypes;
     public field: FieldDto;
@@ -62,8 +62,8 @@ export class FieldWizardComponent implements OnInit {
         }
     }
 
-    public complete() {
-        this.completed.emit();
+    public emitComplete() {
+        this.complete.emit();
     }
 
     public addField(addNew: boolean, edit: boolean) {
@@ -85,7 +85,7 @@ export class FieldWizardComponent implements OnInit {
 
                         this.isEditing = true;
                     } else {
-                        this.complete();
+                        this.emitComplete();
                     }
                 }, error => {
                     this.addFieldForm.submitFailed(error);
@@ -110,7 +110,7 @@ export class FieldWizardComponent implements OnInit {
                     if (addNew) {
                         this.isEditing = false;
                     } else {
-                        this.complete();
+                        this.emitComplete();
                     }
                 }, error => {
                     this.editForm.submitFailed(error);

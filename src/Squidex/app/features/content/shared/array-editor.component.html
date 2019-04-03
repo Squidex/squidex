@@ -1,6 +1,6 @@
 <div class="array-container" *ngIf="arrayControl.controls.length > 0" 
     [sqxSortModel]="arrayControl.controls"
-    (sqxSorted)="sort($event)">
+    (sqxSort)="sort($event)">
     <div class="item" *ngFor="let itemForm of arrayControl.controls; let i = index">
         <sqx-array-item
             [form]="form"
@@ -13,9 +13,9 @@
             [language]="language"
             [languages]="languages"
             (toggle)="hide($event)"
-            (moving)="move(itemForm, $event)"
-            (cloning)="addItem(itemForm)"
-            (removing)="removeItem(i)">
+            (move)="move(itemForm, $event)"
+            (clone)="addItem(itemForm)"
+            (remove)="removeItem(i)">
         </sqx-array-item>
     </div>
 </div>
