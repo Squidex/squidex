@@ -81,13 +81,13 @@ namespace Squidex.Infrastructure
                 return x + x;
             }, true);
 
-            await Assert.ThrowsAsync<TaskCanceledException>(() => sut.RequestAsync<int, int>(1, TimeSpan.FromSeconds(0.5), true));
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sut.RequestAsync<int, int>(1, TimeSpan.FromSeconds(0.5), true));
         }
 
         [Fact]
         public async Task Should_timeout_when_nobody_responds()
         {
-            await Assert.ThrowsAsync<TaskCanceledException>(() => sut.RequestAsync<int, int>(2, TimeSpan.FromSeconds(0.5), true));
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sut.RequestAsync<int, int>(2, TimeSpan.FromSeconds(0.5), true));
         }
     }
 }

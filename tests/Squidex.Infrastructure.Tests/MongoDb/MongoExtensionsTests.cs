@@ -141,7 +141,7 @@ namespace Squidex.Infrastructure.MongoDb
 
             var cursor = new Cursor<int>().Add(0).Add(1).Add(1).Add(2).Add(3).Add(5);
 
-            await Assert.ThrowsAsync<TaskCanceledException>(() =>
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
             {
                 return cursor.ForEachPipelineAsync(x =>
                 {
