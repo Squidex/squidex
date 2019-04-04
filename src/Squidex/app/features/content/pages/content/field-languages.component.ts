@@ -48,5 +48,5 @@ export class FieldLanguagesComponent {
     public languageChange = new EventEmitter<AppLanguageDto>();
 
     @Output()
-    public showAllControlsChange = new EventEmitter<AppLanguageDto>();
+    public showAllControlsChange = new EventEmitter<boolean>();
 }

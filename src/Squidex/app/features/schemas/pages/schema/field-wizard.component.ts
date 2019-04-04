@@ -66,7 +66,7 @@ export class FieldWizardComponent implements OnInit {
         this.complete.emit();
     }
 
-    public addField(addNew: boolean, edit: boolean) {
+    public addField(addNew: boolean, edit = false) {
         const value = this.addFieldForm.submit();
 
         if (value) {
@@ -97,7 +97,7 @@ export class FieldWizardComponent implements OnInit {
         this.selectedTab = tab;
     }
 
-    public save(addNew: boolean) {
+    public save(addNew = false) {
         const value = this.editForm.submit();
 
         if (value) {

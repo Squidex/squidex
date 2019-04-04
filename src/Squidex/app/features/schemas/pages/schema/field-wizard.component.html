@@ -94,8 +94,8 @@
         <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
 
         <div class="float-right" *ngIf="!isEditing">
-            <button type="button" class="btn btn-outline-success mr-1" (click)="addField(false, false)">Create and close</button>
-            <button type="button" class="btn btn-success mr-1" (click)="addField(true, false)">Create and add field</button>
+            <button type="button" class="btn btn-outline-success mr-1" (click)="addField(false)">Create and close</button>
+            <button type="button" class="btn btn-success mr-1" (click)="addField(true)">Create and add field</button>
             <button type="button" class="btn btn-success" (click)="addField(false, true)">Create and edit field</button>
         </div>
 
