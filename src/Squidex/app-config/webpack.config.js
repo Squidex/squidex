@@ -83,7 +83,11 @@ module.exports = {
         }, {
             test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
             use: [{
-                loader: 'file-loader?name=assets/[name].[hash].[ext]'
+                loader: 'file-loader?name=assets/[name].[hash].[ext]',
+                options: {
+                    publicPath: 'assets/',
+                    outputPath: 'assets'
+                }
             }]
         }, {
             test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,

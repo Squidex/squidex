@@ -30,7 +30,7 @@ module.exports = webpackMerge(runConfig, {
          */
         path: helpers.root('wwwroot/build/'),
 
-        publicPath: '/build/',
+        publicPath: './build/',
 
         /**
          * Specifies the name of each output file on disk.

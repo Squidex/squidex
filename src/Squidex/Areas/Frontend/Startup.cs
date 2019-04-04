@@ -23,10 +23,7 @@ namespace Squidex.Areas.Frontend
         {
             var environment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
 
-            if (environment.IsDevelopment())
-            {
-                app.UseMiddleware<WebpackMiddleware>();
-            }
+            app.UseMiddleware<SquidMiddleware>();
 
             app.Use((context, next) =>
             {
@@ -53,7 +50,14 @@ namespace Squidex.Areas.Frontend
                 return next();
             });
 
-            app.UseMiddleware<SquidMiddleware>();
+            if (environment.IsDevelopment())
+            {
+                app.UseMiddleware<WebpackMiddleware>();
+            }
+            else
+            {
+                app.UseMiddleware<IndexMiddleware>();
+            }
 
             app.UseStaticFiles(new StaticFileOptions
             {
