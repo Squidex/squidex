@@ -112,7 +112,7 @@ export class Model {
             if (values.hasOwnProperty(key)) {
                 let value = values[key];
 
-                if (value || validOnly) {
+                if (value || !validOnly) {
                     clone[key] = value;
                 }
             }
