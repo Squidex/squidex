@@ -28,7 +28,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.IsIndex())
+            if (context.IsHtmlPath())
             {
                 var responseBuffer = new MemoryStream();
                 var responseBody = context.Response.Body;
@@ -39,22 +39,25 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                 context.Response.Body = responseBody;
 
-                if (context.Response.StatusCode == 200 && context.IsIndexHtml())
-                {
-                    var response = Encoding.UTF8.GetString(responseBuffer.ToArray());
+                var response = Encoding.UTF8.GetString(responseBuffer.ToArray());
 
+                if (context.IsIndex())
+                {
                     response = InjectStyles(response);
                     response = InjectScripts(response);
-
-                    context.Response.ContentLength = Encoding.UTF8.GetByteCount(response);
-                    context.Response.Body = responseBody;
-
-                    await context.Response.WriteAsync(response);
                 }
-                else if (context.Response.StatusCode != 304)
+
+                var basePath = context.Request.PathBase;
+
+                if (basePath.HasValue)
                 {
-                    await responseBuffer.CopyToAsync(responseBody);
+                    response = AdjustBase(response, basePath.Value);
                 }
+
+                context.Response.ContentLength = Encoding.UTF8.GetByteCount(response);
+                context.Response.Body = responseBody;
+
+                await context.Response.WriteAsync(response);
             }
             else
             {
@@ -98,6 +101,11 @@ namespace Squidex.Areas.Frontend.Middlewares
             response = response.Replace("</body>", $"{sb}</body>");
 
             return response;
+        }
+
+        private static string AdjustBase(string response, string baseUrl)
+        {
+            return response.Replace("<base href=\"/\">", $"<base href=\"{baseUrl}/\">");
         }
     }
 }

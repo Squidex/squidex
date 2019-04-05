@@ -32,7 +32,22 @@ import { SqxShellModule } from './shell';
 import { routing } from './app.routes';
 
 export function configApiUrl() {
-    return new ApiUrlConfig(window.location.protocol + '//' + window.location.host + '/');
+    let bases = document.getElementsByTagName('base');
+    let baseHref = null;
+
+    if (bases.length > 0) {
+        baseHref = bases[0].href;
+    }
+
+    if (!baseHref) {
+        baseHref = '/';
+    }
+
+    if (baseHref.indexOf(window.location.protocol) === 0) {
+        return new ApiUrlConfig(baseHref);
+    } else {
+        return new ApiUrlConfig(window.location.protocol + '//' + window.location.host + baseHref);
+    }
 }
 
 export function configTitles() {

@@ -28,7 +28,7 @@ module.exports = webpackMerge(commonConfig, {
         }),
         
         new plugins.HtmlWebpackPlugin({
-            template: 'wwwroot/theme.html', hash: true, chunksSortMode: 'none', filename: 'theme.html'
+            template: 'wwwroot/_theme.html', hash: true, chunksSortMode: 'none', filename: 'theme.html'
         })
     ]
 });

@@ -1,7 +1,7 @@
 <nav class="navbar fixed-top navbar-dark bg-primary bg-faded">
     <span class="navbar-brand" routerLink="/app">
         <ng-container *ngIf="loadingService.loading | async; else noLoading">
-            <img class="loader" src="/images/loader-white.gif" @fade />
+            <img class="loader" src="./images/loader-white.gif" @fade />
         </ng-container>
 
         <ng-template #noLoading>

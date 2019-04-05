@@ -51,7 +51,9 @@ namespace Squidex.Web
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!context.HttpContext.Request.PathBase.StartsWithSegments("/api"))
+            var request = context.HttpContext.Request;
+
+            if (!request.PathBase.HasValue || !request.PathBase.Value.EndsWith("/api", StringComparison.OrdinalIgnoreCase))
             {
                 context.Result = new RedirectResult("/");
             }

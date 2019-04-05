@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -15,7 +16,9 @@ namespace Squidex.Areas.IdentityServer.Controllers
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!context.HttpContext.Request.PathBase.StartsWithSegments("/identity-server"))
+            var request = context.HttpContext.Request;
+
+            if (!request.PathBase.HasValue || !request.PathBase.Value.EndsWith("/identity-server", StringComparison.OrdinalIgnoreCase))
             {
                 context.Result = new NotFoundResult();
             }

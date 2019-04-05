@@ -31,7 +31,7 @@ p {
     &-content {
         color: $color-dark-foreground;
         background-color: $color-dark-onboarding;
-        background-image: url('/images/onboarding-background.png');
+        background-image: url('./images/onboarding-background.png');
         position: relative;
     }
 

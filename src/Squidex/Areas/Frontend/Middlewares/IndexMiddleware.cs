@@ -25,7 +25,7 @@ namespace Squidex.Areas.Frontend.Middlewares
         {
             var basePath = context.Request.PathBase;
 
-            if (context.IsIndex() && basePath.HasValue)
+            if (context.IsHtmlPath() && basePath.HasValue)
             {
                 var responseBuffer = new MemoryStream();
                 var responseBody = context.Response.Body;
@@ -36,21 +36,14 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                 context.Response.Body = responseBody;
 
-                if (context.Response.StatusCode == 200 && context.IsIndexHtml())
-                {
-                    var response = Encoding.UTF8.GetString(responseBuffer.ToArray());
+                var response = Encoding.UTF8.GetString(responseBuffer.ToArray());
 
-                    response = AdjustBase(response, basePath);
+                response = AdjustBase(response, basePath);
 
-                    context.Response.ContentLength = Encoding.UTF8.GetByteCount(response);
-                    context.Response.Body = responseBody;
+                context.Response.ContentLength = Encoding.UTF8.GetByteCount(response);
+                context.Response.Body = responseBody;
 
-                    await context.Response.WriteAsync(response);
-                }
-                else if (context.Response.StatusCode != 304)
-                {
-                    await responseBuffer.CopyToAsync(responseBody);
-                }
+                await context.Response.WriteAsync(response);
             }
             else
             {

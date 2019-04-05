@@ -12,14 +12,14 @@ namespace Squidex.Areas.Frontend.Middlewares
 {
     public static class IndexExtensions
     {
-        public static bool IsIndexHtml(this HttpContext context)
-        {
-            return context.IsIndex() && context.IsHtml();
-        }
-
         public static bool IsIndex(this HttpContext context)
         {
             return context.Request.Path.Value.EndsWith("/index.html", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool IsHtmlPath(this HttpContext context)
+        {
+            return context.Request.Path.Value.EndsWith(".html", StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool IsHtml(this HttpContext context)

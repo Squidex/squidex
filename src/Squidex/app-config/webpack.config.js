@@ -9,6 +9,8 @@ const plugins = {
     TsconfigPathsPlugin: require('tsconfig-paths-webpack-plugin')
 };
 
+const isDevServer = path.basename(require.main.filename) === 'webpack-dev-server.js';
+
 module.exports = {
     /**
      * Options affecting the resolving of modules.
@@ -83,16 +85,22 @@ module.exports = {
         }, {
             test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
             use: [{
-                loader: 'file-loader?name=assets/[name].[hash].[ext]',
+                loader: 'file-loader?name=[name].[hash].[ext]',
                 options: {
-                    publicPath: 'assets/',
-                    outputPath: 'assets'
+                    outputPath: 'assets', 
+                    /*
+                     * Use custom public path as ./ is not supported by fonts.
+                     */
+                    publicPath: isDevServer ? undefined : 'assets'
                 }
             }]
         }, {
             test: /\.(png|jpe?g|gif|svg|ico)(\?.*$|$)/,
             use: [{
-                loader: 'file-loader?name=assets/[name].[hash].[ext]'
+                loader: 'file-loader?name=[name].[hash].[ext]',
+                options: {
+                    outputPath: 'assets'
+                }
             }]
         }, {
             test: /\.css$/,
