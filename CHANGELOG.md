@@ -1,5 +1,21 @@
 # Changelog
 
+## v2.0.1 - 2019-04-06
+
+### Bugfixes
+
+* **Assets**: Fix the naming of assets that has changed since last version.
+* **Assets**: Fix when overriding assets that do now exists.
+* **Contents**: Fixed a bug that made the text indexer crash when an content was published that had no text.
+
+### Features
+
+* **Assets**: Introduces slugs for assets and the option to query assets by slugs.
+* **Assets**: Dialogs to edit slugs.
+* **UI**: Ability to host Squidex in a virtual directory.
+
+### Features
+
 ## v2.0.0 - 2018-04-01
 
 ### Features
