@@ -23,6 +23,11 @@ namespace Squidex.Config
                     return level >= LogLevel.Error;
                 }
 
+                if (category.StartsWith("Orleans.Runtime.SafeTimer", StringComparison.OrdinalIgnoreCase))
+                {
+                    return level >= LogLevel.Error;
+                }
+
                 if (category.StartsWith("Orleans.Runtime.Scheduler", StringComparison.OrdinalIgnoreCase))
                 {
                     return level >= LogLevel.Error;
