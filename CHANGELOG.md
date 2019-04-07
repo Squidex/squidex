@@ -14,7 +14,7 @@
 * **Assets**: Dialogs to edit slugs.
 * **UI**: Ability to host Squidex in a virtual directory.
 
-### Features
+**BREAKING CHANGE**: This release sets the clustering mode to 'Development' which means it is turned off. This makes operations simpler for most users.
 
 ## v2.0.0 - 2018-04-01
 
