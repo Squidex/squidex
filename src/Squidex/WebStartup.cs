@@ -109,8 +109,8 @@ namespace Squidex
             services.AddOrleans(config, environment);
 
             services.AddHostedService<MigratorHost>();
+            services.AddHostedService<MigrationRebuilderHost>();
             services.AddHostedService<BackgroundHost>();
-            services.AddHostedService<RebuilderHost>();
 
             return services.BuildServiceProvider();
         }

@@ -13,11 +13,11 @@ using Squidex.Infrastructure.Log;
 
 namespace Squidex.Config.Startup
 {
-    public sealed class RebuilderHost : SafeHostedService
+    public sealed class MigrationRebuilderHost : SafeHostedService
     {
         private readonly RebuildRunner rebuildRunner;
 
-        public RebuilderHost(IApplicationLifetime lifetime, ISemanticLog log, RebuildRunner rebuildRunner)
+        public MigrationRebuilderHost(IApplicationLifetime lifetime, ISemanticLog log, RebuildRunner rebuildRunner)
             : base(lifetime, log)
         {
             this.rebuildRunner = rebuildRunner;
