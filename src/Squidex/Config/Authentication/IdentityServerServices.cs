@@ -49,6 +49,7 @@ namespace Squidex.Config.Authentication
                     options.Authority = apiAuthorityUrl;
                     options.ClientId = Constants.InternalClientId;
                     options.ClientSecret = Constants.InternalClientSecret;
+                    options.CallbackPath = "/signin-internal";
                     options.RequireHttpsMetadata = identityOptions.RequiresHttps;
                     options.SaveTokens = true;
                     options.Scope.Add(Constants.PermissionsScope);

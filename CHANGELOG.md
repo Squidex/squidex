@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.2 - 2019-04-XX
+
+### Bugfixes
+
+* **Identity-Server**: Use special callback path for internal odic to not interfere with external oidc and Orleans Dashboard.
+
 ## v2.0.1 - 2019-04-06
 
 ### Bugfixes
@@ -14,7 +20,9 @@
 * **Assets**: Dialogs to edit slugs.
 * **UI**: Ability to host Squidex in a virtual directory.
 
-**BREAKING CHANGE**: This release sets the clustering mode to 'Development' which means it is turned off. This makes operations simpler for most users.
+### Breaking Changes
+
+* This release sets the clustering mode to 'Development' which means it is turned off. This makes operations simpler for most users.
 
 ## v2.0.0 - 2018-04-01
 
