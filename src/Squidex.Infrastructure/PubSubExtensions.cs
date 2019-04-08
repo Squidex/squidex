@@ -37,7 +37,7 @@ namespace Squidex.Infrastructure
             {
                 var response = await callback(x.Body);
 
-                pubsub.Publish(new Response<TResponse> { CorrelationId = x.CorrelationId, Body = response }, true);
+                pubsub.Publish(new Response<TResponse> { CorrelationId = x.CorrelationId, Body = response }, self);
             });
         }
 

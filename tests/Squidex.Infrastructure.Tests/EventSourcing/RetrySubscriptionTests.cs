@@ -25,7 +25,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(eventSubscription);
 
-            sut = new RetrySubscription(eventStore, eventSubscriber, streamFilter, null) { ReconnectWaitMs = 100 };
+            sut = new RetrySubscription(eventStore, eventSubscriber, streamFilter, null) { ReconnectWaitMs = 50 };
 
             sutSubscriber = sut;
         }
