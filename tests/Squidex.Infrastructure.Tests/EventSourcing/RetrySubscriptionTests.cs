@@ -44,7 +44,7 @@ namespace Squidex.Infrastructure.EventSourcing
         {
             await OnErrorAsync(eventSubscription, new InvalidOperationException());
 
-            await Task.Delay(400);
+            await Task.Delay(1000);
 
             await sut.StopAsync();
 

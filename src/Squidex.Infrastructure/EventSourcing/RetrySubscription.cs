@@ -80,16 +80,20 @@ namespace Squidex.Infrastructure.EventSourcing
 
                 if (retryWindow.CanRetryAfterFailure())
                 {
-                    Task.Delay(ReconnectWaitMs, timerCts.Token).ContinueWith(t =>
-                    {
-                        dispatcher.DispatchAsync(Subscribe);
-                    }).Forget();
+                    RetryAsync().Forget();
                 }
                 else
                 {
                     await eventSubscriber.OnErrorAsync(this, exception);
                 }
             }
+        }
+
+        private async Task RetryAsync()
+        {
+            await Task.Delay(ReconnectWaitMs, timerCts.Token);
+
+            await dispatcher.DispatchAsync(Subscribe);
         }
 
         Task IEventSubscriber.OnEventAsync(IEventSubscription subscription, StoredEvent storedEvent)
