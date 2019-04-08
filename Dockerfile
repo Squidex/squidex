@@ -48,7 +48,6 @@ RUN apk update \
 COPY --from=builder /out/alpine .
 
 EXPOSE 80
-EXPOSE 33333
-EXPOSE 40000
+EXPOSE 11111
 
 ENTRYPOINT ["./Squidex"]
