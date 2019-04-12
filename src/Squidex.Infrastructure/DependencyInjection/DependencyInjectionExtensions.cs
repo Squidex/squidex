@@ -14,13 +14,29 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
+        public delegate void Registrator(Type serviceType, Func<IServiceProvider, object> implementationFactory);
+
         public sealed class InterfaceRegistrator<T>
         {
-            private readonly IServiceCollection services;
+            private readonly Registrator register;
+            private readonly Registrator registerOptional;
 
-            public InterfaceRegistrator(IServiceCollection services)
+            public InterfaceRegistrator(Registrator register, Registrator registerOptional)
             {
-                this.services = services;
+                this.register = register;
+                this.registerOptional = registerOptional;
+
+                var interfaces = typeof(T).GetInterfaces();
+
+                if (interfaces.Contains(typeof(IInitializable)))
+                {
+                    register(typeof(IInitializable), c => c.GetRequiredService<T>());
+                }
+
+                if (interfaces.Contains(typeof(IBackgroundProcess)))
+                {
+                    register(typeof(IBackgroundProcess), c => c.GetRequiredService<T>());
+                }
             }
 
             public InterfaceRegistrator<T> AsSelf()
@@ -32,7 +48,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (typeof(TInterface) != typeof(T))
                 {
-                    services.TryAddSingleton(typeof(TInterface), c => c.GetRequiredService<T>());
+                    registerOptional(typeof(TInterface), c => c.GetRequiredService<T>());
                 }
 
                 return this;
@@ -42,7 +58,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (typeof(TInterface) != typeof(T))
                 {
-                    services.AddSingleton(typeof(TInterface), c => c.GetRequiredService<T>());
+                    register(typeof(TInterface), c => c.GetRequiredService<T>());
                 }
 
                 return this;
@@ -53,47 +69,28 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient(typeof(T), factory);
 
-            return new InterfaceRegistrator<T>(services);
+            return new InterfaceRegistrator<T>((t, f) => services.AddTransient(t, f), (t, f) => services.TryAddTransient(t, f));
         }
 
         public static InterfaceRegistrator<T> AddTransientAs<T>(this IServiceCollection services) where T : class
         {
             services.AddTransient<T, T>();
 
-            return new InterfaceRegistrator<T>(services);
+            return new InterfaceRegistrator<T>((t, f) => services.AddTransient(t, f), (t, f) => services.TryAddTransient(t, f));
         }
 
         public static InterfaceRegistrator<T> AddSingletonAs<T>(this IServiceCollection services, Func<IServiceProvider, T> factory) where T : class
         {
             services.AddSingleton(typeof(T), factory);
 
-            RegisterDefaults<T>(services);
-
-            return new InterfaceRegistrator<T>(services);
+            return new InterfaceRegistrator<T>((t, f) => services.AddSingleton(t, f), (t, f) => services.TryAddSingleton(t, f));
         }
 
         public static InterfaceRegistrator<T> AddSingletonAs<T>(this IServiceCollection services) where T : class
         {
             services.AddSingleton<T, T>();
 
-            RegisterDefaults<T>(services);
-
-            return new InterfaceRegistrator<T>(services);
-        }
-
-        private static void RegisterDefaults<T>(IServiceCollection services) where T : class
-        {
-            var interfaces = typeof(T).GetInterfaces();
-
-            if (interfaces.Contains(typeof(IInitializable)))
-            {
-                services.AddSingleton(typeof(IInitializable), c => c.GetRequiredService<T>());
-            }
-
-            if (interfaces.Contains(typeof(IBackgroundProcess)))
-            {
-                services.AddSingleton(typeof(IBackgroundProcess), c => c.GetRequiredService<T>());
-            }
+            return new InterfaceRegistrator<T>((t, f) => services.AddSingleton(t, f), (t, f) => services.TryAddSingleton(t, f));
         }
     }
 }
