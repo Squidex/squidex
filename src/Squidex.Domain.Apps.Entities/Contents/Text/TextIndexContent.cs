@@ -23,14 +23,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const string MetaId = "_id";
         private const string MetaKey = "_key";
         private readonly IndexWriter indexWriter;
-        private readonly IndexSearcher indexSearcher;
         private readonly IndexState indexState;
         private readonly Guid id;
 
-        public TextIndexContent(IndexWriter indexWriter, IndexSearcher indexSearcher, IndexState indexState, Guid id)
+        public TextIndexContent(IndexWriter indexWriter, IndexState indexState, Guid id)
         {
             this.indexWriter = indexWriter;
-            this.indexSearcher = indexSearcher;
             this.indexState = indexState;
 
             this.id = id;
@@ -78,21 +76,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             Upsert(converted, 1, 1, 0);
 
-            var docId = GetPublishedDocument();
+            var isPublishDocumentAdded = IsAdded(0, out var docId);
+            var isPublishForPublished = IsForPublished(0, docId);
 
-            var isPublished = IsForPublished(docId);
-
-            if (!onlyDraft && docId > 0 && isPublished)
+            if (!onlyDraft && isPublishDocumentAdded && isPublishForPublished)
             {
                 Upsert(converted, 0, 0, 1);
             }
-            else if (!onlyDraft || docId == 0)
+            else if (!onlyDraft || !isPublishDocumentAdded)
             {
                 Upsert(converted, 0, 0, 0);
             }
             else
             {
-                Update(0, 0, isPublished ? (byte)1 : (byte)0);
+                UpdateFor(0, 0, isPublishForPublished ? (byte)1 : (byte)0);
             }
         }
 
@@ -100,13 +97,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             if (fromDraft)
             {
-                Update(1, 1, 0);
-                Update(0, 0, 1);
+                UpdateFor(1, 1, 0);
+                UpdateFor(0, 0, 1);
             }
             else
             {
-                Update(1, 0, 0);
-                Update(0, 1, 1);
+                UpdateFor(1, 0, 0);
+                UpdateFor(0, 1, 1);
             }
         }
 
@@ -149,18 +146,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             return document;
         }
 
-        private void Update(byte draft, byte forDraft, byte forPublished)
+        private void UpdateFor(byte draft, byte forDraft, byte forPublished)
         {
             var term = new Term(MetaKey, BuildKey(draft));
 
-            indexState.Index(term, forDraft, forPublished);
-        }
-
-        private int GetPublishedDocument()
-        {
-            var docs = indexSearcher?.Search(new TermQuery(new Term(MetaKey, BuildKey(0))), 1);
-
-            return docs?.ScoreDocs.FirstOrDefault()?.Doc ?? 0;
+            indexState.Index(id, draft, term, forDraft, forPublished);
         }
 
         private void Upsert(Document document, byte draft, byte forDraft, byte forPublished)
@@ -176,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 document.AddStringField(MetaId, contentId, Field.Store.YES);
                 document.AddStringField(MetaKey, contentKey, Field.Store.YES);
 
-                indexState.Index(document, forDraft, forPublished);
+                indexState.Index(id, draft, document, forDraft, forPublished);
 
                 indexWriter.UpdateDocument(new Term(MetaKey, contentKey), document);
             }
@@ -204,9 +194,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private bool IsForPublished(int docId)
+        private bool IsAdded(byte draft, out int docId)
         {
-            return indexState.TryGet(docId, out _, out var p) && p == 1;
+            return indexState.HasBeenAdded(id, draft, new Term(MetaKey, BuildKey(draft)), out docId);
+        }
+
+        private bool IsForPublished(byte draft, int docId)
+        {
+            return indexState.TryGet(id, draft, docId, out _, out var p) && p == 1;
         }
 
         private string BuildKey(byte draft)

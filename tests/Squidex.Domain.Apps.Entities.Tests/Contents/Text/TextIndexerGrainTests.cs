@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             await AddInvariantContent("Hello", "World", false);
 
-            await sut.DeactivateAsync();
+            await sut.DeactivateAsync(true);
 
             var other = new TextIndexerGrain(assetStore);
             try
@@ -137,13 +137,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await TestSearchAsync(null, "Hallo", Scope.Draft);
             await TestSearchAsync(null, "Hallo", Scope.Published);
 
-            await AddInvariantContent("Hallo", "Welt", true);
+            await AddInvariantContent("Guten Morgen", "Welt", true);
 
             await TestSearchAsync(null, "Hello", Scope.Draft);
             await TestSearchAsync(ids1, "Hello", Scope.Published);
 
-            await TestSearchAsync(ids1, "Hallo", Scope.Draft);
-            await TestSearchAsync(null, "Hallo", Scope.Published);
+            await TestSearchAsync(ids1, "Guten Morgen", Scope.Draft);
+            await TestSearchAsync(null, "Guten Morgen", Scope.Published);
         }
 
         [Fact]
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             await TestSearchAsync(ids1, "Hello", Scope.Draft);
             await TestSearchAsync(null, "Hello", Scope.Published);
 
-            await CopyAsync(false);
+            await CopyAsync(true);
 
             await TestSearchAsync(ids1, "Hello", Scope.Draft);
             await TestSearchAsync(ids1, "Hello", Scope.Published);
