@@ -25,11 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private readonly Dictionary<(Guid, byte), BytesRef> changes = new Dictionary<(Guid, byte), BytesRef>();
         private bool isClosed;
 
-        public int Changes
-        {
-            get { return changes.Count; }
-        }
-
         public IndexState(IndexWriter indexWriter, IndexReader indexReader = null, IndexSearcher indexSearcher = null)
         {
             this.indexSearcher = indexSearcher;

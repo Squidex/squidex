@@ -29,6 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private const int MaxResults = 2000;
         private const int MaxUpdates = 400;
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(10);
+        private static readonly MergeScheduler MergeScheduler = new ConcurrentMergeScheduler();
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
         private static readonly string[] Invariant = { InvariantPartitioning.Instance.Master.Key };
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
@@ -41,6 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private IndexState indexState;
         private QueryParser queryParser;
         private HashSet<string> currentLanguages;
+        private int updates;
 
         public TextIndexerGrain(IAssetStore assetStore)
         {
@@ -62,7 +64,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
             var config = new IndexWriterConfig(Version, Analyzer)
             {
-                IndexDeletionPolicy = snapshotter
+                IndexDeletionPolicy = snapshotter,
+                MergePolicy = new TieredMergePolicy(),
+                MergeScheduler = MergeScheduler
             };
 
             indexWriter = new IndexWriter(FSDirectory.Open(directory), config);
@@ -164,7 +168,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         {
             timer?.Dispose();
 
-            if (indexState.Changes >= MaxUpdates)
+            updates++;
+
+            if (updates >= MaxUpdates)
             {
                 await FlushAsync();
             }
@@ -185,7 +191,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public async Task FlushAsync()
         {
-            if (indexState.Changes > 0 && indexWriter != null)
+            if (updates > 0 && indexWriter != null)
             {
                 indexWriter.Commit();
                 indexWriter.Flush(true, true);
@@ -201,6 +207,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 {
                     snapshotter.Release(commit);
                 }
+
+                updates = 0;
             }
         }
 
