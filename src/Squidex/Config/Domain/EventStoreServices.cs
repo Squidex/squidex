@@ -40,7 +40,7 @@ namespace Squidex.Config.Domain
 
                             return new MongoEventStore(mongDatabase, c.GetRequiredService<IEventNotifier>());
                         })
-                        .AsOptional<IEventStore>();
+                        .As<IEventStore>();
                 },
                 ["CosmosDb"] = () =>
                 {
@@ -56,7 +56,7 @@ namespace Squidex.Config.Domain
                             cosmosDbMasterKey,
                             cosmosDbDatabase,
                             c.GetRequiredService<JsonSerializerSettings>()))
-                        .AsOptional<IEventStore>();
+                        .As<IEventStore>();
 
                     services.AddHealthChecks()
                         .AddCheck<CosmosDbHealthCheck>("CosmosDB", tags: new[] { "node" });
@@ -75,7 +75,7 @@ namespace Squidex.Config.Domain
                             c.GetRequiredService<IJsonSerializer>(),
                             eventStorePrefix,
                             eventStoreProjectionHost))
-                        .AsOptional<IEventStore>();
+                        .As<IEventStore>();
 
                     services.AddHealthChecks()
                         .AddCheck<GetEventStoreHealthCheck>("EventStore", tags: new[] { "node" });
