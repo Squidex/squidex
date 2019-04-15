@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
 
@@ -36,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             A.CallTo(() => grainFactory.GetGrain<ITextIndexerGrain>(schemaId, null))
                 .Returns(grain);
 
-            sut = new GrainTextIndexer(grainFactory, A.Fake<ISemanticLog>());
+            sut = new GrainTextIndexer(grainFactory);
         }
 
         [Fact]
