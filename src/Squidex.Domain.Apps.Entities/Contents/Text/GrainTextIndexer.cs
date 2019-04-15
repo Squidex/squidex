@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             if (@event.Payload is ContentEvent contentEvent)
             {
                 var index = grainFactory.GetGrain<ITextIndexerGrain>(contentEvent.SchemaId.Id);
-                
+
                 if (index == null)
                 {
                     throw new InvalidOperationException("Cannot create reference to grain.");
