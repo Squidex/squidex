@@ -23,7 +23,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
     public sealed class GrainTextIndexer : ITextIndexer, IEventConsumer
     {
         private readonly IGrainFactory grainFactory;
-        private readonly ISemanticLog log;
 
         public string Name
         {
@@ -35,14 +34,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             get { return "^content-"; }
         }
 
-        public GrainTextIndexer(IGrainFactory grainFactory, ISemanticLog log)
+        public GrainTextIndexer(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
-            Guard.NotNull(log, nameof(log));
 
             this.grainFactory = grainFactory;
-
-            this.log = log;
         }
 
         public bool Handles(StoredEvent @event)
@@ -71,8 +67,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                     case ContentCreated contentCreated:
                         await index.IndexAsync(id, Data(contentCreated.Data), true);
                         break;
-                    case ContentUpdateProposed contentCreated:
-                        await index.IndexAsync(id, Data(contentCreated.Data), true);
+                    case ContentUpdateProposed contentUpdateProposed:
+                        await index.IndexAsync(id, Data(contentUpdateProposed.Data), true);
                         break;
                     case ContentUpdated contentUpdated:
                         await index.IndexAsync(id, Data(contentUpdated.Data), false);
