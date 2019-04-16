@@ -1,9 +1,11 @@
 # Changelog
 
-## v2.0.2 - 2019-04-XX
+## v2.0.2 - 2019-04-16
 
 ### Bugfixes
 
+* **Fulltext**: Workaround for a clustering bug that prevented the text indexer to run properly in cluster mode.
+* **Fulltext**: Big performance improvement for text indexer.
 * **Identity-Server**: Use special callback path for internal odic to not interfere with external oidc and Orleans Dashboard.
 
 ## v2.0.1 - 2019-04-06
