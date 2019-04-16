@@ -81,29 +81,34 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        public Task DeleteAsync(Guid id)
+        public Task<bool> IndexAsync(J<Update> update)
         {
-            var content = new TextIndexContent(indexWriter, indexState, id);
+            return IndexInternalAsync(update);
+        }
 
-            content.Delete();
+        private Task<bool> IndexInternalAsync(Update update)
+        {
+            var content = new TextIndexContent(indexWriter, indexState, update.Id);
+
+            content.Index(update.Data, update.OnlyDraft);
 
             return TryFlushAsync();
         }
 
-        public Task IndexAsync(Guid id, J<IndexData> data, bool onlyDraft)
-        {
-            var content = new TextIndexContent(indexWriter, indexState, id);
-
-            content.Index(data.Value.Data, onlyDraft);
-
-            return TryFlushAsync();
-        }
-
-        public Task CopyAsync(Guid id, bool fromDraft)
+        public Task<bool> CopyAsync(Guid id, bool fromDraft)
         {
             var content = new TextIndexContent(indexWriter, indexState, id);
 
             content.Copy(fromDraft);
+
+            return TryFlushAsync();
+        }
+
+        public Task<bool> DeleteAsync(Guid id)
+        {
+            var content = new TextIndexContent(indexWriter, indexState, id);
+
+            content.Delete();
 
             return TryFlushAsync();
         }
@@ -164,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private async Task TryFlushAsync()
+        private async Task<bool> TryFlushAsync()
         {
             timer?.Dispose();
 
@@ -173,6 +178,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             if (updates >= MaxUpdates)
             {
                 await FlushAsync();
+
+                return true;
             }
             else
             {
@@ -184,9 +191,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 }
                 catch (InvalidOperationException)
                 {
-                    return;
+                    return false;
                 }
             }
+
+            return false;
         }
 
         public async Task FlushAsync()

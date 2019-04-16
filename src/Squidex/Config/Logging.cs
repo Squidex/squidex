@@ -30,7 +30,7 @@ namespace Squidex.Config
 
                 if (category.StartsWith("Orleans.Runtime.Scheduler", StringComparison.OrdinalIgnoreCase))
                 {
-                    return level >= LogLevel.Error;
+                    return level >= LogLevel.Warning;
                 }
 
                 if (category.StartsWith("Orleans.", StringComparison.OrdinalIgnoreCase))
@@ -45,7 +45,7 @@ namespace Squidex.Config
 
                 if (category.StartsWith("Microsoft.AspNetCore.", StringComparison.OrdinalIgnoreCase))
                 {
-                    return level > LogLevel.Information;
+                    return level >= LogLevel.Warning;
                 }
 #if LOG_ALL_IDENTITY_SERVER
                 if (category.StartsWith("IdentityServer4.", StringComparison.OrdinalIgnoreCase))

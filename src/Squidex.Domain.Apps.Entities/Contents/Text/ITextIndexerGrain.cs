@@ -15,11 +15,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public interface ITextIndexerGrain : IGrainWithGuidKey
     {
-        Task DeleteAsync(Guid id);
+        Task<bool> DeleteAsync(Guid id);
 
-        Task IndexAsync(Guid id, J<IndexData> data, bool onlyDraft);
+        Task<bool> CopyAsync(Guid id, bool fromDraft);
 
-        Task CopyAsync(Guid id, bool fromDraft);
+        Task<bool> IndexAsync(J<Update> update);
 
         Task<List<Guid>> SearchAsync(string queryText, SearchContext context);
     }

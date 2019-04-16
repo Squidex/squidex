@@ -12,30 +12,48 @@ using Newtonsoft.Json;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.MongoDb;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Config.Domain
 {
     public sealed class SerializationInitializer : IInitializable
     {
-        private readonly JsonSerializer jsonSerializer;
+        private readonly JsonSerializer jsonNetSerializer;
+        private readonly IJsonSerializer jsonSerializer;
         private readonly RuleRegistry ruleRegistry;
 
-        public SerializationInitializer(JsonSerializer jsonSerializer, RuleRegistry ruleRegistry)
+        public SerializationInitializer(JsonSerializer jsonNetSerializer, IJsonSerializer jsonSerializer, RuleRegistry ruleRegistry)
         {
+            this.jsonNetSerializer = jsonNetSerializer;
             this.jsonSerializer = jsonSerializer;
-
             this.ruleRegistry = ruleRegistry;
         }
 
         public Task InitializeAsync(CancellationToken ct = default)
         {
-            BsonJsonConvention.Register(jsonSerializer);
-
-            RuleActionConverter.Mapping = ruleRegistry.Actions.ToDictionary(x => x.Key, x => x.Value.Type);
+            SetupBson();
+            SetupOrleans();
+            SetupActions();
 
             return TaskHelper.Done;
+        }
+
+        private void SetupActions()
+        {
+            RuleActionConverter.Mapping = ruleRegistry.Actions.ToDictionary(x => x.Key, x => x.Value.Type);
+        }
+
+        private void SetupBson()
+        {
+            BsonJsonConvention.Register(jsonNetSerializer);
+        }
+
+        private void SetupOrleans()
+        {
+            J.DefaultSerializer = jsonSerializer;
         }
     }
 }

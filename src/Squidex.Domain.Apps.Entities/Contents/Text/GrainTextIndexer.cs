@@ -57,11 +57,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             {
                 var index = grainFactory.GetGrain<ITextIndexerGrain>(contentEvent.SchemaId.Id);
 
-                if (index == null)
-                {
-                    throw new InvalidOperationException("Cannot create reference to grain.");
-                }
-
                 var id = contentEvent.ContentId;
 
                 switch (@event.Payload)
@@ -70,13 +65,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                         await index.DeleteAsync(id);
                         break;
                     case ContentCreated contentCreated:
-                        await index.IndexAsync(id, Data(contentCreated.Data), true);
+                        await index.IndexAsync(Data(id, contentCreated.Data, true));
                         break;
                     case ContentUpdateProposed contentUpdateProposed:
-                        await index.IndexAsync(id, Data(contentUpdateProposed.Data), true);
+                        await index.IndexAsync(Data(id, contentUpdateProposed.Data, true));
                         break;
                     case ContentUpdated contentUpdated:
-                        await index.IndexAsync(id, Data(contentUpdated.Data), false);
+                        await index.IndexAsync(Data(id, contentUpdated.Data, false));
                         break;
                     case ContentChangesDiscarded _:
                         await index.CopyAsync(id, false);
@@ -89,9 +84,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             }
         }
 
-        private static J<IndexData> Data(NamedContentData data)
+        private static J<Update> Data(Guid contentId, NamedContentData data, bool onlySelf)
         {
-            return new IndexData { Data = data };
+            return new Update { Id = contentId, Data = data, OnlyDraft = onlySelf };
         }
 
         public async Task<List<Guid>> SearchAsync(string queryText, IAppEntity app, Guid schemaId, Scope scope = Scope.Published)
