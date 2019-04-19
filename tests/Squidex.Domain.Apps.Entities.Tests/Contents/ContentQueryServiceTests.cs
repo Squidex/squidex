@@ -310,7 +310,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupClaims();
             SetupSchema();
 
-            A.CallTo(() => modelBuilder.BuildEdmModel(schema, app))
+            A.CallTo(() => modelBuilder.BuildEdmModel(app, schema, A<bool>.Ignored))
                 .Throws(new ODataException());
 
             return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context, schemaId.Name, Q.Empty.WithODataQuery("query")));

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.OData.Edm;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateEdmSchema;
 using Squidex.Infrastructure;
@@ -31,7 +32,12 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateEdmSchema
         {
             var languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
 
-            var edmModel = TestUtils.MixedSchema().BuildEdmType(languagesConfig.ToResolver(), x => x);
+            var typeFactory = new EdmTypeFactory(names =>
+            {
+                return (new EdmComplexType("Squidex", string.Join(".", names)), true);
+            });
+
+            var edmModel = TestUtils.MixedSchema().BuildEdmType(true, languagesConfig.ToResolver(), typeFactory);
 
             Assert.NotNull(edmModel);
         }

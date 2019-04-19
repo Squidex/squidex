@@ -60,6 +60,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                         new ReferencesFieldProperties())
                     .AddString(8, "dashed-field", Partitioning.Invariant,
                         new StringFieldProperties())
+                    .AddArray(9, "hobbies", Partitioning.Invariant, a => a
+                        .AddString(91, "name"))
                     .Update(new SchemaProperties());
 
             var schema = A.Dummy<ISchemaEntity>();
@@ -174,6 +176,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         {
             var i = F(FilterBuilder.Eq("data/friends/iv", "guid"));
             var o = C("{ 'do.7.iv' : 'guid' }");
+
+            Assert.Equal(o, i);
+        }
+
+        [Fact]
+        public void Should_make_query_with_array_field()
+        {
+            var i = F(FilterBuilder.Eq("data/hobbies/iv/name", "PC"));
+            var o = C("{ 'do.9.iv.91' : 'PC' }");
 
             Assert.Equal(o, i);
         }

@@ -65,6 +65,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                     }
 
                     result[1] = field.Id.ToString();
+
+                    if (field is IArrayField arrayField && result.Count > 3)
+                    {
+                        var nestedEdmName = result[3].UnescapeEdmField();
+
+                        if (!arrayField.FieldsByName.TryGetValue(nestedEdmName, out var nestedField))
+                        {
+                            throw new NotSupportedException();
+                        }
+
+                        result[3] = nestedField.Id.ToString();
+                    }
                 }
 
                 if (result.Count > 2)

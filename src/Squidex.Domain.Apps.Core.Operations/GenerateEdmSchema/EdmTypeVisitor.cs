@@ -7,25 +7,42 @@
 
 using Microsoft.OData.Edm;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 {
     public sealed class EdmTypeVisitor : IFieldVisitor<IEdmTypeReference>
     {
-        private static readonly EdmTypeVisitor Instance = new EdmTypeVisitor();
+        private readonly EdmTypeFactory typeFactory;
 
-        private EdmTypeVisitor()
+        internal EdmTypeVisitor(EdmTypeFactory typeFactory)
         {
+            this.typeFactory = typeFactory;
         }
 
-        public static IEdmTypeReference CreateEdmType(IField field)
+        public IEdmTypeReference CreateEdmType(IField field)
         {
-            return field.Accept(Instance);
+            return field.Accept(this);
         }
 
         public IEdmTypeReference Visit(IArrayField field)
         {
-            return null;
+            var (fieldEdmType, created) = typeFactory($"Data.{field.Name.ToPascalCase()}.Item");
+
+            if (created)
+            {
+                foreach (var nestedField in field.Fields)
+                {
+                    var nestedEdmType = nestedField.Accept(this);
+
+                    if (nestedEdmType != null)
+                    {
+                        fieldEdmType.AddStructuralProperty(nestedField.Name.EscapeEdmField(), nestedEdmType);
+                    }
+                }
+            }
+
+            return new EdmComplexTypeReference(fieldEdmType, false);
         }
 
         public IEdmTypeReference Visit(IField<AssetsFieldProperties> field)

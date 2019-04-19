@@ -262,7 +262,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 try
                 {
-                    var model = modelBuilder.BuildEdmModel(schema, context.App);
+                    var model = modelBuilder.BuildEdmModel(context.App, schema, context.IsFrontendClient);
 
                     var result = model.ParseQuery(query).ToQuery();
 
