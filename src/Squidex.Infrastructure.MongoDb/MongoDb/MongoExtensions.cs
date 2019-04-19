@@ -133,7 +133,7 @@ namespace Squidex.Infrastructure.MongoDb
             }
         }
 
-        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, long newVersion, T doc) where T : IVersionedEntity<TKey>
+        public static async Task UpsertVersionedAsync<T, TKey>(this IMongoCollection<T> collection, TKey key, long oldVersion, T doc) where T : IVersionedEntity<TKey>
         {
             try
             {

@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Plugins;
 
-namespace Squidex.Extensions.Samples
+namespace Squidex.Extensions.Samples.AssetStore
 {
     public sealed class MemoryAssetStorePlugin : IPlugin
     {
