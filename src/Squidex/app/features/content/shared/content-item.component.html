@@ -82,7 +82,19 @@
     </div>
 </td>
 <td class="cell-actions" *ngIf="isReference" (click)="shouldStop($event)">
-    <button type="button" class="btn btn-text-secondary" (click)="emitDelete()">
-        <i class="icon-close"></i>
-    </button>
+    <div class="reference-edit">
+        <button type="button" class="btn btn-text-secondary">
+            <i class="icon-dots"></i>
+        </button>
+
+        <div class="reference-menu">
+            <a class="btn btn-text-secondary" [routerLink]="['../..', schema.name, content.id]">
+                <i class="icon-pencil"></i>
+            </a>
+
+            <button type="button" class="btn btn-text-secondary" (click)="emitDelete()">
+                <i class="icon-close"></i>
+            </button>
+        </div>
+    </div>
 </td>
