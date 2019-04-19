@@ -51,10 +51,10 @@
             <form [formGroup]="restoreForm.form" (ngSubmit)="restore()">
                 <div class="row no-gutters">
                     <div class="col">
-                        <input class="form-control" name="url" formControlName="url" placeholder="Url to backup" />
+                        <input class="form-control" formControlName="url" placeholder="Url to backup" />
                     </div>
                     <div class="col pl-1">
-                        <input class="form-control" name="name" formControlName="name" placeholder="Optional app name" />
+                        <input class="form-control" formControlName="name" placeholder="Optional app name" />
                     </div>
                     <div class="col-auto pl-1">
                         <button type="submit" class="btn btn-success" [disabled]="restoreForm.hasNoUrl | async">Restore Backup</button>

@@ -16,7 +16,7 @@
             <div class="form-group">
                 <div *ngFor="let script of editForm.form.controls | sqxKeys">
                     <ng-container *ngIf="selectedField === script">
-                        <sqx-code-editor name="script" [formControlName]="script"></sqx-code-editor>
+                        <sqx-code-editor [formControlName]="script"></sqx-code-editor>
                     </ng-container>
                 </div>
             </div>
