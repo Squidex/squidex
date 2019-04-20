@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.0.4 - 2019-04-20
+
+### Features
+
+* **UI**: Link to go from a referenced content to the corresponding edit screen.
+* **Contents**: Also query by items in array fields.
+
+You can use the following syntax for array items:
+
+    $filter=data/iv/hobbies/name eq 'Programming'
+
+## v2.0.3 - 2019-04-19
+
+### Bugfixes
+
+* **UI**: Serveral essential bugfixes for radio buttons in Angular forms.
+
 ## v2.0.2 - 2019-04-16
 
 ### Bugfixes
