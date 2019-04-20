@@ -29,19 +29,27 @@ import { AuthService } from './../services/auth.service';
 import { AppsState } from './apps.state';
 
 interface SnapshotContributor {
+    // The contributor.
     contributor: AppContributorDto;
 
+    // Indicates if the contributor is the ucrrent user.
     isCurrentUser: boolean;
 }
 
 interface Snapshot {
+    // All loaded contributors.
     contributors: ImmutableArray<SnapshotContributor>;
 
+    // Indicates if the maximum number of contributors are reached.
     isMaxReached?: boolean;
+
+    // Indicates if the contributors are loaded.
     isLoaded?: boolean;
 
+    // The maximum allowed users.
     maxContributors: number;
 
+    // The app version.
     version: Version;
 }
 

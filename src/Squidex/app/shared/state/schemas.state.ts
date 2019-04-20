@@ -42,12 +42,16 @@ import { FieldPropertiesDto } from './../services/schemas.types';
 type AnyFieldDto = NestedFieldDto | RootFieldDto;
 
 interface Snapshot {
+    // The schema categories.
     categories: { [name: string]: boolean };
 
+    // The current schemas.
     schemas: ImmutableArray<SchemaDto>;
 
+    // Indicates if the schemas are loaded.
     isLoaded?: boolean;
 
+    // The selected schema.
     selectedSchema?: SchemaDetailsDto | null;
 }
 

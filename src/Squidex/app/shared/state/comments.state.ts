@@ -26,10 +26,13 @@ import {
 import { AppsState } from './apps.state';
 
 interface Snapshot {
+    // The current comments.
     comments: ImmutableArray<CommentDto>;
 
+    // The version of the comments state.
     version: Version;
 
+    // Indicates if the comments are loaded.
     isLoaded?: boolean;
 }
 

@@ -29,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.Languages
         /// Get supported languages.
         /// </summary>
         /// <remarks>
-        /// Provide a list of supported langauges code, following the ISO2Code standard.
+        /// Provide a list of supported language codes, following the ISO2Code standard.
         /// </remarks>
         /// <returns>
         /// 200 => Supported language codes returned.

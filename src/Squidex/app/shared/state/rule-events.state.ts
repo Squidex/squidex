@@ -22,9 +22,13 @@ import { AppsState } from './apps.state';
 import { RuleEventDto, RulesService } from './../services/rules.service';
 
 interface Snapshot {
+    // The current rule events.
     ruleEvents: ImmutableArray<RuleEventDto>;
+
+    // The pagination information.
     ruleEventsPager: Pager;
 
+    // Indicates if the rule events are loaded.
     isLoaded?: boolean;
 }
 

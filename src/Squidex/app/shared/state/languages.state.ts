@@ -22,23 +22,34 @@ import { LanguageDto, LanguagesService } from './../services/languages.service';
 import { AppsState } from './apps.state';
 
 interface SnapshotLanguage {
+    // The language.
     language: AppLanguageDto;
 
+    // All configured fallback languages.
     fallbackLanguages: ImmutableArray<LanguageDto>;
+
+    // The fallback languages that have not been added yet.
     fallbackLanguagesNew: ImmutableArray<LanguageDto>;
 }
 
 interface Snapshot {
+    // the configured languages as plan format.
     plainLanguages: ImmutableArray<AppLanguageDto>;
 
+    // All supported languages.
     allLanguages: ImmutableArray<LanguageDto>;
+
+    // The languages that have not been added yet.
     allLanguagesNew: ImmutableArray<LanguageDto>;
 
+    // The configured languages with extra information.
     languages: ImmutableArray<SnapshotLanguage>;
 
-    isLoaded?: boolean;
-
+    // The app version.
     version: Version;
+
+    // Indicates if the languages are loaded.
+    isLoaded?: boolean;
 }
 
 @Injectable()

@@ -29,8 +29,10 @@ import {
 } from './../services/rules.service';
 
 interface Snapshot {
+    // The current rules.
     rules: ImmutableArray<RuleDto>;
 
+    // Indicates if the rules are loaded.
     isLoaded?: boolean;
 }
 

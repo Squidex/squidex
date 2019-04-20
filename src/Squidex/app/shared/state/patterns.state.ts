@@ -26,11 +26,14 @@ import {
 } from './../services/app-patterns.service';
 
 interface Snapshot {
+    // The current patterns.
     patterns: ImmutableArray<AppPatternDto>;
 
-    isLoaded?: boolean;
-
+    // The app version.
     version: Version;
+
+    // Indicates if the patterns are loaded.
+    isLoaded?: boolean;
 }
 
 @Injectable()

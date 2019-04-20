@@ -27,20 +27,30 @@ import {
 } from './../services/plans.service';
 
 interface PlanInfo {
+    // The plan.
     plan: PlanDto;
 
+    // Indicates if the yearly subscription is selected.
     isYearlySelected?: boolean;
+
+    // Indicates if the monthly subscription is selected.
     isSelected?: boolean;
 }
 
 interface Snapshot {
+    // The current plans.
     plans: ImmutableArray<PlanInfo>;
 
+    // Indicates if the user is the plan owner.
     isOwner?: boolean;
+
+    // Indicates if the plans are loaded.
     isLoaded?: boolean;
 
+    // Indicates if there is a billing portal for the current Squidex instance.
     hasPortal?: boolean;
 
+    // The app version.
     version: Version;
 }
 

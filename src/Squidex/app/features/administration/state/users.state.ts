@@ -86,18 +86,27 @@ export class UserForm extends Form<FormGroup> {
 }
 
 interface SnapshotUser {
+    // The user.
     user: UserDto;
 
+    // Indicates if the user is the current user.
     isCurrentUser: boolean;
 }
 
 interface Snapshot {
+    // The current users.
     users: ImmutableArray<SnapshotUser>;
+
+    // The pagination information.
     usersPager: Pager;
+
+    // The query to filter users.
     usersQuery?: string;
 
+    // Indicates if the users are loaded.
     isLoaded?: boolean;
 
+    // The selected user.
     selectedUser?: SnapshotUser | null;
 }
 

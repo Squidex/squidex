@@ -27,10 +27,13 @@ import {
 } from './../services/app-roles.service';
 
 interface Snapshot {
+    // The current roles.
     roles: ImmutableArray<AppRoleDto>;
 
+    // The app version.
     version: Version;
 
+    // Indicates if the roles are loaded.
     isLoaded?: boolean;
 }
 

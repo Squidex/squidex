@@ -29,13 +29,22 @@ import { SchemasState } from './schemas.state';
 import { ContentDto, ContentsService, ScheduleDto } from './../services/contents.service';
 
 interface Snapshot {
+    // The current comments.
     contents: ImmutableArray<ContentDto>;
+
+    // The pagination information.
     contentsPager: Pager;
+
+    // The query to filter and sort contents.
     contentsQuery?: string;
 
+    // Indicates if the contents are loaded.
     isLoaded?: boolean;
+
+    // Indicates if the archive is shown.
     isArchive?: boolean;
 
+    // The selected content.
     selectedContent?: ContentDto | null;
 }
 

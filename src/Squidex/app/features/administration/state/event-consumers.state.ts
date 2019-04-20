@@ -19,8 +19,10 @@ import {
 import { EventConsumerDto, EventConsumersService } from './../services/event-consumers.service';
 
 interface Snapshot {
+    // The list of event consumers.
     eventConsumers: ImmutableArray<EventConsumerDto>;
 
+    // Indicates if event consumers are loaded.
     isLoaded?: boolean;
 }
 

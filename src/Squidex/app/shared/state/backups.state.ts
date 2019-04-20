@@ -21,8 +21,10 @@ import { AppsState } from './apps.state';
 import { BackupDto, BackupsService } from './../services/backups.service';
 
 interface Snapshot {
+    // The current backups.
     backups: ImmutableArray<BackupDto>;
 
+    // Indicates if the backups are loaded.
     isLoaded?: boolean;
 }
 

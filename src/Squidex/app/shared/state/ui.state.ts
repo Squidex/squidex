@@ -15,8 +15,13 @@ import { AppsState } from './apps.state';
 import { UIService, UISettingsDto } from './../services/ui.service';
 
 interface Snapshot {
+    // All common settings.
     settingsCommon: object & any;
+
+    // All app settings.
     settingsApp: object & any;
+
+    // The merged settings of app and common settings.
     settings: object & any;
 }
 

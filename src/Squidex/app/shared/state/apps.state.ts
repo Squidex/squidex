@@ -23,8 +23,10 @@ import {
 } from './../services/apps.service';
 
 interface Snapshot {
+    // All apps, loaded once.
     apps: ImmutableArray<AppDto>;
 
+    // The selected app.
     selectedApp: AppDto | null;
 }
 

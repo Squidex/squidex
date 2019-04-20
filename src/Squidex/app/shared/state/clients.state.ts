@@ -27,10 +27,13 @@ import {
 } from './../services/app-clients.service';
 
 interface Snapshot {
+    // The current clients.
     clients: ImmutableArray<AppClientDto>;
 
+    // The app version.
     version: Version;
 
+    // Indicates if the clients are loaded.
     isLoaded?: boolean;
 }
 

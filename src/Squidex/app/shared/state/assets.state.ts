@@ -21,13 +21,22 @@ import { AssetDto, AssetsService} from './../services/assets.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot {
+    // All assets tags.
     tags: { [name: string]: number };
+
+    // The selected asset tags.
     tagsSelected: { [name: string]: boolean };
 
+    // The current assets.
     assets: ImmutableArray<AssetDto>;
+
+    // The pagination information.
     assetsPager: Pager;
+
+    // The query to filter assets.
     assetsQuery?: string;
 
+    // Indicates if the assets are loaded.
     isLoaded?: boolean;
 }
 

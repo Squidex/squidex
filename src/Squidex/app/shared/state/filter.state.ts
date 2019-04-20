@@ -19,12 +19,25 @@ import { LanguageDto } from '../services/languages.service';
 import { RootFieldDto } from '../services/schemas.service';
 
 interface Snapshot {
+    // The current language.
     language?: LanguageDto;
+
+    // The order statement.
     order?: string;
+
+    // The order field.
     orderField?: string;
-    orderType?: string;
+
+    // The order direction.
+    orderDirection?: string;
+
+    // The final query.
     query?: string;
+
+    // The odata filter statement.
     filter?: string;
+
+    // The odata full text statement.
     fullText?: string;
 }
 
@@ -100,9 +113,9 @@ function sortMode(snapshot: Snapshot, field: RootFieldDto | string): Sorting {
     let path = getFieldPath(snapshot, field);
 
     if (snapshot.orderField === path) {
-        if (snapshot.orderType === 'asc') {
+        if (snapshot.orderDirection === 'asc') {
             return 'Ascending';
-        } else if (snapshot.orderType === 'desc') {
+        } else if (snapshot.orderDirection === 'desc') {
             return 'Descending';
         }
     }
@@ -196,7 +209,7 @@ function enrichOrderField(snapshot: Snapshot) {
 
         if (orderParts.length === 2) {
             snapshot.orderField = orderParts[0];
-            snapshot.orderType = orderParts[1];
+            snapshot.orderDirection = orderParts[1];
         }
     }
 
