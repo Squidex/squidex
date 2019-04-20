@@ -78,6 +78,7 @@ import {
     SchemasService,
     SchemasState,
     SearchFormComponent,
+    TableHeaderComponent,
     TranslationsService,
     UIService,
     UIState,
@@ -128,7 +129,8 @@ import {
         UserPicturePipe,
         UserPictureRefPipe,
         RichEditorComponent,
-        SearchFormComponent
+        SearchFormComponent,
+        TableHeaderComponent
     ],
     exports: [
         AppFormComponent,
@@ -150,6 +152,7 @@ import {
         LanguageSelectorComponent,
         MarkdownEditorComponent,
         PermissionDirective,
+        RichEditorComponent,
         RouterModule,
         SchemaCategoryComponent,
         SearchFormComponent,
@@ -159,7 +162,7 @@ import {
         UserNameRefPipe,
         UserPicturePipe,
         UserPictureRefPipe,
-        RichEditorComponent
+        TableHeaderComponent
     ],
     providers: [
         AssetsDialogState

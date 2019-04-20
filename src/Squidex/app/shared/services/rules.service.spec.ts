@@ -16,13 +16,13 @@ import {
     DateTime,
     RuleDto,
     RuleElementDto,
+    RuleElementPropertyDto,
     RuleEventDto,
     RuleEventsDto,
     RulesService,
     UpdateRuleDto,
     Version
 } from './../';
-import { RuleElementPropertyDto } from './rules.service';
 
 describe('RulesService', () => {
     const now = DateTime.now();

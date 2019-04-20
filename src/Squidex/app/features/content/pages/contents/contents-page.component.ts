@@ -13,13 +13,16 @@ import {
     AppsState,
     ContentDto,
     ContentsState,
+    FilterState,
     ImmutableArray,
     LanguagesState,
     ModalModel,
     Queries,
     ResourceOwner,
+    RootFieldDto,
     SchemaDetailsDto,
     SchemasState,
+    Sorting,
     UIState
 } from '@app/shared';
 
@@ -45,6 +48,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
 
+    public filter = new FilterState();
+
     public isAllSelected = false;
 
     @ViewChild('dueTimeSelector')
@@ -64,12 +69,21 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
+                    this.filter = new FilterState();
+                    this.filter.setLanguage(this.language);
+
                     this.resetSelection();
 
                     this.schema = schema!;
                     this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
 
                     this.contentsState.init().pipe(onErrorResumeNext()).subscribe();
+                }));
+
+        this.own(
+            this.contentsState.contentsQuery
+                .subscribe(query => {
+                    this.filter.setQuery(query);
                 }));
 
         this.own(
@@ -83,6 +97,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.at(0);
+
+                    this.filter.setLanguage(this.language);
                 }));
     }
 
@@ -160,8 +176,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.goNext().pipe(onErrorResumeNext()).subscribe();
     }
 
-    public search(query: string) {
-        this.contentsState.search(query).pipe(onErrorResumeNext()).subscribe();
+    public search() {
+        this.contentsState.search(this.filter.apiFilter).pipe(onErrorResumeNext()).subscribe();
     }
 
     public selectLanguage(language: AppLanguageDto) {
@@ -198,6 +214,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         }
 
         this.updateSelectionSummary();
+    }
+
+    public sort(field: string | RootFieldDto, sorting: Sorting) {
+        this.filter.setOrderField(field, sorting);
+
+        this.search();
     }
 
     public trackByContent(index: number, content: ContentDto): string {

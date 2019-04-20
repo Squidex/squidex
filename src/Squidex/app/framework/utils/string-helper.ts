@@ -19,4 +19,8 @@ export module StringHelper {
 
         return '';
     }
+
+    export function toCamelCase(value: string) {
+        return value.replace(/[^\s\-_]+/g, (w, i) => (i === 0 ? w[0].toLowerCase() : w[0].toUpperCase()) + w.slice(1)).replace(/[\s\-_]+/g, '').trim();
+    }
 }

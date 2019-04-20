@@ -18,7 +18,7 @@ import {
     PatternsState,
     Version,
     Versioned
-} from '@app/shared';
+} from './../';
 
 describe('PatternsState', () => {
     const app = 'my-app';

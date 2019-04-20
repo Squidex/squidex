@@ -15,12 +15,12 @@ import {
     AppsState,
     AssignContributorDto,
     AuthService,
+    ContributorAssignedDto,
     ContributorsState,
     DialogService,
     Version,
     Versioned
-} from '@app/shared';
-import { ContributorAssignedDto } from '../services/app-contributors.service';
+} from './../';
 
 describe('ContributorsState', () => {
     const app = 'my-app';

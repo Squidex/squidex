@@ -16,7 +16,7 @@ import {
     BackupsState,
     DateTime,
     DialogService
-} from '@app/shared';
+} from './../';
 
 describe('BackupsState', () => {
     const app = 'my-app';

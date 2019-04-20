@@ -12,8 +12,10 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import {
     AppsState,
     AssetsState,
+    FilterState,
     LocalStoreService,
     Queries,
+    ResourceOwner,
     UIState
 } from '@app/shared';
 
@@ -22,10 +24,12 @@ import {
     styleUrls: ['./assets-page.component.scss'],
     templateUrl: './assets-page.component.html'
 })
-export class AssetsPageComponent implements OnInit {
+export class AssetsPageComponent extends ResourceOwner implements OnInit {
     public assetsFilter = new FormControl();
 
     public queries = new Queries(this.uiState, 'assets');
+
+    public filter = new FilterState();
 
     public isListView: boolean;
 
@@ -35,19 +39,27 @@ export class AssetsPageComponent implements OnInit {
         private readonly localStore: LocalStoreService,
         private readonly uiState: UIState
     ) {
+        super();
+
         this.isListView = this.localStore.getBoolean('squidex.assets.list-view');
     }
 
     public ngOnInit() {
         this.assetsState.load().pipe(onErrorResumeNext()).subscribe();
+
+        this.own(
+            this.assetsState.assetsQuery
+                .subscribe(query => {
+                    this.filter.setQuery(query);
+                }));
     }
 
     public reload() {
         this.assetsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public search(query: string) {
-        this.assetsState.search(query).pipe(onErrorResumeNext()).subscribe();
+    public search() {
+        this.assetsState.search(this.filter.apiFilter).pipe(onErrorResumeNext()).subscribe();
     }
 
     public selectTags(tags: string[]) {

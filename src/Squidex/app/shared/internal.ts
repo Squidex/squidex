@@ -59,6 +59,7 @@ export * from './state/contents.forms';
 export * from './state/contents.state';
 export * from './state/contributors.forms';
 export * from './state/contributors.state';
+export * from './state/filter.state';
 export * from './state/languages.forms';
 export * from './state/languages.state';
 export * from './state/patterns.forms';

@@ -10,7 +10,7 @@ import { Injectable} from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
-import { LoadingService, MathHelper } from './../../internal';
+import { LoadingService, MathHelper } from '@app/framework/internal';
 
 @Injectable()
 export class LoadingInterceptor implements HttpInterceptor {

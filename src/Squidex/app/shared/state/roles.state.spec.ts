@@ -13,12 +13,13 @@ import {
     AppRolesDto,
     AppRolesService,
     AppsState,
+    CreateAppRoleDto,
     DialogService,
     RolesState,
+    UpdateAppRoleDto,
     Version,
     Versioned
-} from '@app/shared';
-import { CreateAppRoleDto, UpdateAppRoleDto } from '../services/app-roles.service';
+} from './../';
 
 describe('RolesState', () => {
     const app = 'my-app';

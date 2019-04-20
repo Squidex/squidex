@@ -21,7 +21,7 @@ import {
     UpdateRuleDto,
     Version,
     Versioned
-} from '@app/shared';
+} from './../';
 
 describe('RulesState', () => {
     const app = 'my-app';

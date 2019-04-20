@@ -127,18 +127,18 @@ export class Model {
 }
 
 export class State<T extends {}> {
-    private readonly state: BehaviorSubject<T>;
-    private readonly initialState: T;
+    private readonly state: BehaviorSubject<Readonly<T>>;
+    private readonly initialState: Readonly<T>;
 
-    public get changes(): Observable<T> {
+    public get changes(): Observable<Readonly<T>> {
         return this.state;
     }
 
-    public get snapshot() {
+    public get snapshot(): Readonly<T> {
         return this.state.value;
     }
 
-    constructor(state: T) {
+    constructor(state: Readonly<T>) {
         this.initialState = state;
 
         this.state = new BehaviorSubject(state);
@@ -148,7 +148,7 @@ export class State<T extends {}> {
         this.next(this.initialState);
     }
 
-    public next(update: ((v: T) => T) | object) {
+    public next(update: ((v: T) => Readonly<T>) | object) {
         if (Types.isFunction(update)) {
             this.state.next(update(this.state.value));
         } else {

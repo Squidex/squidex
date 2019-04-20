@@ -12,6 +12,7 @@ import {
     AssetDto,
     AssetsDialogState,
     fadeAnimation,
+    FilterState,
     LocalStoreService,
     StatefulComponent
 } from '@app/shared/internal';
@@ -36,6 +37,8 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     @Output()
     public select = new EventEmitter<AssetDto[]>();
 
+    public filter = new FilterState();
+
     constructor(changeDector: ChangeDetectorRef,
         public readonly assetsState: AssetsDialogState,
         public readonly localStore: LocalStoreService
@@ -55,8 +58,8 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
         this.assetsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public search(query: string) {
-        this.assetsState.search(query).pipe(onErrorResumeNext()).subscribe();
+    public search() {
+        this.assetsState.search(this.filter.apiFilter).pipe(onErrorResumeNext()).subscribe();
     }
 
     public emitComplete() {

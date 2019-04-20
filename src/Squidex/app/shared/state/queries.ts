@@ -60,7 +60,7 @@ export class Queries {
         this.uiState.remove(`${this.prefix}.queries.${key}`);
     }
 
-    public getSaveKey(filter$: Observable<string>): Observable<string | null> {
+    public getSaveKey(filter$: Observable<string | undefined>): Observable<string | undefined> {
         return combineLatest(this.queries, filter$).pipe(
             map(project => {
                 const filter = project[1];
@@ -72,7 +72,7 @@ export class Queries {
                         }
                     }
                 }
-                return null;
+                return undefined;
             }));
     }
 }

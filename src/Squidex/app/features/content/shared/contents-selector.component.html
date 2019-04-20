@@ -11,9 +11,7 @@
                 </button>
             </div>
             <div class="col pl-1">
-                <sqx-search-form formClass="form" placeholder="Search for content" fieldExample="data/[MY_FIELD]/iv"
-                    [query]="contentsState.contentsQuery | async" 
-                    (queryChange)="search($event)"
+                <sqx-search-form formClass="form" placeholder="Search for content" fieldExample="data/[MY_FIELD]/iv" [filter]="filter" (querySubmit)="search()"
                     expandable="true">
                 </sqx-search-form>
             </div>
@@ -33,13 +31,19 @@
                             <input type="checkbox" class="form-check" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
                         </th>
                         <th class="cell-auto" *ngFor="let field of schema.listFields">
-                            <span class="field">{{field.displayName}}</span>
+                            <sqx-table-header [text]="field.displayName" sortable="true"
+                                [sorting]="filter.sortMode(field) | async"
+                                (sortingChange)="sort(field, $event)">
+                            </sqx-table-header>
                         </th>
                         <th class="cell-time">
-                            Updated
+                            <sqx-table-header text="Updated" sortable="true"
+                                [sorting]="filter.sortMode('lastModified') | async"
+                                (sortingChange)="sort('lastModified', $event)">
+                            </sqx-table-header>
                         </th>
                         <th class="cell-user">
-                            By
+                            <sqx-table-header text="By"></sqx-table-header>
                         </th>
                     </tr>
                 </thead>

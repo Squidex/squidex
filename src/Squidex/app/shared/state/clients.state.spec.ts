@@ -19,7 +19,7 @@ import {
     UpdateAppClientDto,
     Version,
     Versioned
- } from '@app/shared';
+} from './../';
 
 describe('ClientsState', () => {
     const app = 'my-app';

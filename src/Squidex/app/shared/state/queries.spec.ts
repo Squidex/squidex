@@ -8,8 +8,11 @@
 import { BehaviorSubject } from 'rxjs';
 import { IMock,  Mock, Times } from 'typemoq';
 
-import { Queries, Query } from './queries';
-import { UIState } from './ui.state';
+import {
+    Queries,
+    Query,
+    UIState
+} from './../';
 
 describe('Queries', () => {
     const prefix = 'schemas.my-schema';

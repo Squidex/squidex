@@ -282,7 +282,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.loadInternal();
     }
 
-    public search(query: string): Observable<any> {
+    public search(query?: string): Observable<any> {
         this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: query }));
 
         return this.loadInternal();

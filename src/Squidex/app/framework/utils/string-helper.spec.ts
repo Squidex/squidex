@@ -38,4 +38,19 @@ describe('StringHelper', () => {
     it('should return empty string if also fallback not found', () => {
         expect(StringHelper.firstNonEmpty(null!, undefined!, '')).toBe('');
     });
+
+    [
+        { src: '', result: '' },
+        { src: 'M', result: 'm' },
+        { src: 'My', result: 'my' },
+        { src: 'M-y', result: 'mY' },
+        { src: 'MyProperty ', result: 'myProperty' },
+        { src: 'My property', result: 'myProperty' },
+        { src: 'My_property', result: 'myProperty' },
+        { src: 'My-property', result: 'myProperty' }
+    ].forEach(test => {
+        it(`should return convert ${test.src} to camel case`, () => {
+            expect(StringHelper.toCamelCase(test.src)).toBe(test.result);
+        });
+    });
 });

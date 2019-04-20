@@ -20,7 +20,7 @@ import {
     PlansState,
     Version,
     Versioned
-} from '@app/shared';
+} from './../';
 
 describe('PlansState', () => {
     const app = 'my-app';

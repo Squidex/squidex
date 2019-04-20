@@ -11,16 +11,12 @@ import { IMock, It, Mock, Times } from 'typemoq';
 import {
     AppsState,
     DateTime,
-    DialogService
-} from '@app/shared';
-
-import { RuleEventsState } from './rule-events.state';
-
-import {
+    DialogService,
     RuleEventDto,
     RuleEventsDto,
+    RuleEventsState,
     RulesService
-} from './../services/rules.service';
+} from './../';
 
 describe('RuleEventsState', () => {
     const app = 'my-app';

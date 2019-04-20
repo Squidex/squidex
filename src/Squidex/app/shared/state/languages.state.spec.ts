@@ -21,7 +21,7 @@ import {
     UpdateAppLanguageDto,
     Version,
     Versioned
-} from '@app/shared';
+} from './../';
 
 describe('LanguagesState', () => {
     const app = 'my-app';

@@ -10,10 +10,12 @@ import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     ContentDto,
+    FilterState,
     LanguageDto,
     ManualContentsState,
-    ModalModel,
-    SchemaDetailsDto
+    RootFieldDto,
+    SchemaDetailsDto,
+    Sorting
 } from '@app/shared';
 
 @Component({
@@ -37,7 +39,7 @@ export class ContentsSelectorComponent implements OnInit {
     @Output()
     public select = new EventEmitter<ContentDto[]>();
 
-    public searchModal = new ModalModel();
+    public filter = new FilterState();
 
     public selectedItems:  { [id: string]: ContentDto; } = {};
     public selectionCount = 0;
@@ -59,8 +61,8 @@ export class ContentsSelectorComponent implements OnInit {
         this.contentsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public search(query: string) {
-        this.contentsState.search(query).pipe(onErrorResumeNext()).subscribe();
+    public search() {
+        this.contentsState.search(this.filter.apiFilter).pipe(onErrorResumeNext()).subscribe();
     }
 
     public goNext() {
@@ -107,6 +109,12 @@ export class ContentsSelectorComponent implements OnInit {
         }
 
         this.updateSelectionSummary();
+    }
+
+    public sort(field: string | RootFieldDto, sorting: Sorting) {
+        this.filter.setOrderField(field, sorting);
+
+        this.search();
     }
 
     private updateSelectionSummary() {

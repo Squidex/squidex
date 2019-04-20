@@ -26,8 +26,8 @@
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="Search by asset name" fieldExample="fileSize"
-                            (queryChange)="search($event)" 
-                            [query]="assetsState.assetsQuery | async"
+                            [filter]="filter"
+                            (querySubmit)="search()"
                             [queries]="queries"
                             enableShortcut="true">
                         </sqx-search-form>

@@ -8,10 +8,11 @@
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import {  AppsState } from '@app/shared';
-
-import { UIService } from './../services/ui.service';
-import { UIState } from './ui.state';
+import {
+    AppsState,
+    UIService,
+    UIState
+} from './../';
 
 describe('UIState', () => {
     const app = 'my-app';

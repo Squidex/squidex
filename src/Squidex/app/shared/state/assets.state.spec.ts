@@ -18,7 +18,7 @@ import {
     DialogService,
     Version,
     Versioned
- } from '@app/shared';
+} from './../';
 
 describe('AssetsState', () => {
     const app = 'my-app';

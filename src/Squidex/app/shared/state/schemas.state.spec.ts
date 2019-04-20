@@ -28,7 +28,7 @@ import {
     UpdateSchemaDto,
     Version,
     Versioned
-} from '@app/shared';
+} from './../';
 
 describe('SchemasState', () => {
     const app = 'my-app';

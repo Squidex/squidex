@@ -94,6 +94,10 @@ a {
         }
     }
 
+    &.pointer {
+        cursor: pointer;
+    }
+
     &.force {
         & {
             color: $color-theme-blue !important;

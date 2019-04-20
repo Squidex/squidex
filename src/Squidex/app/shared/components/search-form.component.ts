@@ -5,17 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 import {
+    DialogModel,
+    FilterState,
     ModalModel,
     Queries,
     SaveQueryForm
 } from '@app/shared/internal';
-
-import { Observable } from 'rxjs';
-import { shareReplay } from 'rxjs/operators';
 
 @Component({
     selector: 'sqx-search-form',
@@ -23,7 +23,7 @@ import { shareReplay } from 'rxjs/operators';
     templateUrl: './search-form.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchFormComponent implements OnChanges, OnInit {
+export class SearchFormComponent implements OnInit {
     @Input()
     public queries: Queries;
 
@@ -37,10 +37,7 @@ export class SearchFormComponent implements OnChanges, OnInit {
     public expandable = false;
 
     @Input()
-    public query = '';
-
-    @Output()
-    public queryChange = new EventEmitter<string>();
+    public filter: FilterState;
 
     @Input()
     public archived = false;
@@ -60,21 +57,14 @@ export class SearchFormComponent implements OnChanges, OnInit {
     @Input()
     public formClass = 'form-inline search-form';
 
-    public contentsFilter = new FormControl();
-    public contentsFilterValue = this.contentsFilter.valueChanges.pipe(shareReplay(1));
+    @Output()
+    public querySubmit = new EventEmitter();
 
-    public saveKey: Observable<string | null>;
+    public saveKey: Observable<string | undefined>;
+    public saveQueryDialog = new DialogModel();
+    public saveQueryForm = new SaveQueryForm(this.formBuilder);
 
     public searchModal = new ModalModel();
-    public searchForm =
-        this.formBuilder.group({
-            odataOrderBy: '',
-            odataFilter: '',
-            odataSearch: ''
-        });
-
-    public saveQueryDialog = new ModalModel();
-    public saveQueryForm = new SaveQueryForm(this.formBuilder);
 
     constructor(
         private readonly formBuilder: FormBuilder
@@ -83,12 +73,8 @@ export class SearchFormComponent implements OnChanges, OnInit {
 
     public ngOnInit() {
         if (this.queries) {
-            this.saveKey = this.queries.getSaveKey(this.contentsFilter.valueChanges);
+            this.saveKey = this.queries.getSaveKey(this.filter.query);
         }
-    }
-
-    public ngOnChanges() {
-        this.invalidate(this.query);
     }
 
     public saveQuery() {
@@ -101,7 +87,7 @@ export class SearchFormComponent implements OnChanges, OnInit {
 
         if (value) {
             if (this.queries) {
-                this.queries.add(value.name, this.contentsFilter.value);
+                this.queries.add(value.name, this.filter.apiFilter!);
             }
 
             this.saveQueryForm.submitCompleted();
@@ -111,84 +97,6 @@ export class SearchFormComponent implements OnChanges, OnInit {
     }
 
     public search() {
-        this.invalidate(this.contentsFilter.value);
-
-        this.queryChange.emit(this.contentsFilter.value);
-    }
-
-    private invalidate(query: string) {
-        if (query === this.contentsFilter.value) {
-            return;
-        }
-
-        let odataOrderBy = '';
-        let odataFilter = '';
-        let odataSearch = '';
-
-        if (this.query) {
-            const parts = this.query.split('&');
-
-            if (parts.length === 1 && parts[0][0] !== '$') {
-                odataSearch = parts[0];
-            } else {
-                for (let part of parts) {
-                    const kvp = part.split('=');
-
-                    if (kvp.length === 2) {
-                        const key = kvp[0].toLowerCase();
-
-                        if (key === '$filter') {
-                            odataFilter = kvp[1];
-                        } else if (key === '$orderby') {
-                            odataOrderBy = kvp[1];
-                        } else if (key === '$search') {
-                            odataSearch = kvp[1];
-                        }
-                    }
-                }
-            }
-        }
-
-        this.searchForm.setValue({
-            odataFilter,
-            odataSearch,
-            odataOrderBy
-        }, { emitEvent: false });
-
-        this.contentsFilter.setValue(this.query);
-    }
-
-    public updateQuery() {
-        const odataOrderBy = this.searchForm.controls['odataOrderBy'].value;
-        const odataFilter = this.searchForm.controls['odataFilter'].value;
-        const odataSearch = this.searchForm.controls['odataSearch'].value;
-
-        let query = '';
-
-        if (odataSearch && !odataOrderBy && !odataFilter) {
-            query = odataSearch;
-        } else {
-            const parts: string[] = [];
-
-            if (odataSearch) {
-                parts.push(`$search=${odataSearch}`);
-            }
-
-            if (odataFilter) {
-                parts.push(`$filter=${odataFilter}`);
-            }
-
-            if (odataOrderBy) {
-                parts.push(`$orderby=${odataOrderBy}`);
-            }
-
-            query = parts.join('&');
-        }
-
-        if (query !== this.query) {
-            this.queryChange.emit(query);
-        }
-
-        this.contentsFilter.setValue(query);
+        this.querySubmit.emit();
     }
 }

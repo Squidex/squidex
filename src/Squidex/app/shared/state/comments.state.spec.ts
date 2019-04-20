@@ -19,7 +19,7 @@ import {
     ImmutableArray,
     UpsertCommentDto,
     Version
- } from '@app/shared';
+} from './../';
 
 describe('CommentsState', () => {
     const app = 'my-app';
