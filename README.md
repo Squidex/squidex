@@ -10,7 +10,7 @@ Squidex is an open source headless CMS and content management hub. In contrast t
 
 Read the docs at [https://docs.squidex.io/](https://docs.squidex.io/) (work in progress) or just check out the code and play around.
 
-## How to make feature requests or report bugs? 
+## How to make feature requests, get help or report bugs? 
 
 Please join our community forum: https://support.squidex.io
 
