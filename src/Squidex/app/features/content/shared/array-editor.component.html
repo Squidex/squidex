@@ -12,10 +12,10 @@
             [itemForm]="itemForm"
             [language]="language"
             [languages]="languages"
-            (toggle)="hide($event)"
-            (move)="move(itemForm, $event)"
             (clone)="addItem(itemForm)"
-            (remove)="removeItem(i)">
+            (move)="move(itemForm, $event)"
+            (remove)="removeItem(i)"
+            (toggle)="hide($event)">
         </sqx-array-item>
     </div>
 </div>
