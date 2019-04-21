@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
             eventConsumer = eventConsumerFactory(key);
 
-            return Task.CompletedTask;
+            return TaskHelper.Done;
         }
 
         public Task<Immutable<EventConsumerInfo>> GetStateAsync()

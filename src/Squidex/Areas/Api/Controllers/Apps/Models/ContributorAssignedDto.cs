@@ -20,11 +20,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Indicates if the user was created.
         /// </summary>
-        public bool WasInvited { get; set; }
+        public bool IsCreated { get; set; }
 
-        public static ContributorAssignedDto FromId(string id, bool wasInvited)
+        public static ContributorAssignedDto FromId(string id, bool isCreated)
         {
-            return new ContributorAssignedDto { ContributorId = id, WasInvited = wasInvited };
+            return new ContributorAssignedDto { ContributorId = id, IsCreated = isCreated };
         }
     }
 }

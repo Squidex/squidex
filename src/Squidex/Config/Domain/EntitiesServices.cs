@@ -22,6 +22,7 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
+using Squidex.Domain.Apps.Entities.Apps.Invitiation;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
@@ -44,6 +45,7 @@ using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Orleans;
@@ -63,7 +65,7 @@ namespace Squidex.Config.Domain
                     c.GetRequiredService<IOptions<UrlsOptions>>(),
                     c.GetRequiredService<IAssetStore>(),
                     exposeSourceUrl))
-                .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>().As<IAssetUrlGenerator>();
+                .As<IGraphQLUrlGenerator>().As<IRuleUrlGenerator>().As<IAssetUrlGenerator>().As<IEmailUrlGenerator>();
 
             services.AddSingletonAs<HistoryService>()
                 .As<IEventConsumer>().As<IHistoryService>();
@@ -147,6 +149,25 @@ namespace Squidex.Config.Domain
 
                 return result;
             });
+
+            var emailOptions = config.GetValue<SmptOptions>("email:smtp");
+
+            if (emailOptions.IsConfigured())
+            {
+                services.AddSingleton(Options.Create(emailOptions));
+
+                services.AddSingletonAs<SmtpEmailSender>()
+                    .As<IEmailSender>();
+
+                services.AddSingletonAs<InvitationEmailEventConsumer>()
+                    .As<IEventConsumer>();
+
+                services.AddSingletonAs<InvitationEmailSender>()
+                    .AsOptional<IInvitationEmailSender>();
+
+                services.Configure<InvitationEmailTextOptions>(
+                    config.GetSection("email:invitations"));
+            }
         }
 
         private static void AddCommandPipeline(this IServiceCollection services)

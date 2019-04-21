@@ -17,6 +17,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
@@ -48,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 
         public Task ClearAsync()
         {
-            return Task.CompletedTask;
+            return TaskHelper.Done;
         }
 
         public async Task On(Envelope<IEvent> @event)

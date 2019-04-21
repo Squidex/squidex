@@ -103,7 +103,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
         public Task OpenAsync(IChangeFeedObserverContext context)
         {
-            return Task.CompletedTask;
+            return TaskHelper.Done;
         }
 
         public async Task ProcessChangesAsync(IChangeFeedObserverContext context, IReadOnlyList<Document> docs, CancellationToken cancellationToken)
