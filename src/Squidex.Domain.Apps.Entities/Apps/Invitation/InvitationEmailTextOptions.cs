@@ -5,15 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Squidex.Shared.Users;
-
-namespace Squidex.Domain.Apps.Entities.Apps.Invitiation
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
-    public interface IInvitationEmailSender
+    public sealed class InvitationEmailTextOptions
     {
-        Task SendNewUserEmailAsync(IUser assigner, IUser assignee, string appName);
+        public string NewUserSubject { get; set; }
 
-        Task SendExistingUserEmailAsync(IUser assigner, IUser assignee, string appName);
+        public string NewUserBody { get; set; }
+
+        public string ExistingUserSubject { get; set; }
+
+        public string ExistingUserBody { get; set; }
     }
 }

@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitiation
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
     public sealed class InvitationEmailSender : IInvitationEmailSender
     {

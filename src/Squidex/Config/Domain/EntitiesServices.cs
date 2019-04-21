@@ -22,7 +22,7 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
-using Squidex.Domain.Apps.Entities.Apps.Invitiation;
+using Squidex.Domain.Apps.Entities.Apps.Invitation;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;

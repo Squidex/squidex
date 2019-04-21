@@ -5,16 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitiation
+using Squidex.Infrastructure.Commands;
+
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
-    public sealed class InvitationEmailTextOptions
+    public sealed class InvitedResult
     {
-        public string NewUserSubject { get; set; }
-
-        public string NewUserBody { get; set; }
-
-        public string ExistingUserSubject { get; set; }
-
-        public string ExistingUserBody { get; set; }
+        public EntityCreatedResult<string> Id { get; set; }
     }
 }
