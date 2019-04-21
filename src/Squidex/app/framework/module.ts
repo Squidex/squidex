@@ -83,8 +83,7 @@ import {
     TitleService,
     ToggleComponent,
     TooltipDirective,
-    TransformInputDirective,
-    UserReportComponent
+    TransformInputDirective
 } from './declarations';
 
 @NgModule({
@@ -153,8 +152,7 @@ import {
         TitleComponent,
         ToggleComponent,
         TooltipDirective,
-        TransformInputDirective,
-        UserReportComponent
+        TransformInputDirective
     ],
     exports: [
         AutocompleteComponent,
@@ -218,8 +216,7 @@ import {
         TitleComponent,
         ToggleComponent,
         TooltipDirective,
-        TransformInputDirective,
-        UserReportComponent
+        TransformInputDirective
     ]
 })
 export class SqxFrameworkModule {

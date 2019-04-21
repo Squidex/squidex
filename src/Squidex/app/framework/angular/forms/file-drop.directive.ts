@@ -50,11 +50,13 @@ export class FileDropDirective {
 
         const result: File[] = [];
 
-        for (let i = 0; i < event.clipboardData.items.length; i++) {
-            const file = event.clipboardData.items[i].getAsFile();
+        if (event.clipboardData) {
+            for (let i = 0; i < event.clipboardData.items.length; i++) {
+                const file = event.clipboardData.items[i].getAsFile();
 
-            if (this.isAllowedFile(file)) {
-                result.push(file!);
+                if (this.isAllowedFile(file)) {
+                    result.push(file!);
+                }
             }
         }
 

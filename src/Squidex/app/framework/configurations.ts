@@ -45,7 +45,3 @@ export class DecimalSeparatorConfig {
 export class ProductionModeConfig {
     constructor(public readonly isProductionMode: boolean) { }
 }
-
-export class UserReportConfig {
-    constructor(public readonly siteId: string) { }
-}
