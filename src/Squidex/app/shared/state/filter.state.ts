@@ -8,11 +8,7 @@
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/internal/operators';
 
-import {
-    State,
-    StringHelper,
-    Types
-} from '@app/framework';
+import { State, Types } from '@app/framework';
 
 import { LanguageDto } from '../services/languages.service';
 
@@ -43,6 +39,8 @@ interface Snapshot {
 
 export type Sorting = 'Ascending' | 'Descending' | 'None';
 
+type Field = string | RootFieldDto;
+
 export class FilterState extends State<Snapshot> {
     private readonly sortModes: { [key: string]: Observable<Sorting> } = {};
 
@@ -70,7 +68,7 @@ export class FilterState extends State<Snapshot> {
         super({});
     }
 
-    public sortMode(field: RootFieldDto | string) {
+    public sortMode(field: Field) {
         const key = Types.isString(field) ? field : field.fieldId.toString();
 
         let result = this.sortModes[key];
@@ -104,12 +102,12 @@ export class FilterState extends State<Snapshot> {
         this.next(s => ({ ...s, language }));
     }
 
-    public setOrderField(field: RootFieldDto | string, sorting: Sorting) {
+    public setOrderField(field: Field, sorting: Sorting) {
         this.setOrder(getFieldSorting(this.snapshot, field, sorting));
     }
 }
 
-function sortMode(snapshot: Snapshot, field: RootFieldDto | string): Sorting {
+function sortMode(snapshot: Snapshot, field: Field): Sorting {
     let path = getFieldPath(snapshot, field);
 
     if (snapshot.orderField === path) {
@@ -123,7 +121,11 @@ function sortMode(snapshot: Snapshot, field: RootFieldDto | string): Sorting {
     return 'None';
 }
 
-function getFieldSorting(snapshot: Snapshot, field: RootFieldDto | string, sorting: Sorting) {
+function escapeField(value: string) {
+    return value.replace('-', '_');
+}
+
+function getFieldSorting(snapshot: Snapshot, field: Field, sorting: Sorting) {
     if (sorting === 'Ascending') {
         return `${getFieldPath(snapshot, field)} asc`;
     } else {
@@ -131,16 +133,16 @@ function getFieldSorting(snapshot: Snapshot, field: RootFieldDto | string, sorti
     }
 }
 
-function getFieldPath(snapshot: Snapshot, field?: RootFieldDto | string) {
+function getFieldPath(snapshot: Snapshot, field?: Field) {
     let path: string | undefined = undefined;
 
     if (field) {
         if (Types.isString(field)) {
             path = field;
         } else if (field.isLocalizable && snapshot.language) {
-            path = `data/${StringHelper.toCamelCase(field.name)}/${snapshot.language.iso2Code}`;
+            path = `data/${escapeField(field.name)}/${snapshot.language.iso2Code}`;
         } else {
-            path = `data/${StringHelper.toCamelCase(field.name)}/iv`;
+            path = `data/${escapeField(field.name)}/iv`;
         }
     }
 

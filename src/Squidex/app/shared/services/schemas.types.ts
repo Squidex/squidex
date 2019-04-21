@@ -130,6 +130,10 @@ export abstract class FieldPropertiesDto {
         return true;
     }
 
+    public get isSortable() {
+        return true;
+    }
+
     public abstract accept<T>(visitor: FieldPropertiesVisitor<T>): T;
 }
 
@@ -165,6 +169,10 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly maxHeight?: number;
     public readonly aspectWidth?: number;
     public readonly aspectHeight?: number;
+
+    public get isSortable() {
+        return false;
+    }
 
     constructor(
         props?: Partial<AssetsFieldPropertiesDto>
@@ -224,6 +232,10 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto {
 export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Geolocation';
 
+    public get isSortable() {
+        return false;
+    }
+
     constructor(
         props?: Partial<GeolocationFieldPropertiesDto>
     ) {
@@ -237,6 +249,10 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto {
 
 export class JsonFieldPropertiesDto extends FieldPropertiesDto {
     public readonly fieldType = 'Json';
+
+    public get isSortable() {
+        return false;
+    }
 
     constructor(
         props?: Partial<JsonFieldPropertiesDto>
@@ -280,6 +296,10 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly minItems?: number;
     public readonly maxItems?: number;
     public readonly schemaId?: string;
+
+    public get isSortable() {
+        return false;
+    }
 
     constructor(
         props?: Partial<ReferencesFieldPropertiesDto>
@@ -327,6 +347,10 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly allowedValues?: string[];
 
     public get isComplexUI() {
+        return false;
+    }
+
+    public get isSortable() {
         return false;
     }
 
