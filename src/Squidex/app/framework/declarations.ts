@@ -64,7 +64,6 @@ export * from './angular/shortcut.component';
 export * from './angular/sorted.directive';
 export * from './angular/template-wrapper.directive';
 export * from './angular/title.component';
-export * from './angular/user-report.component';
 
 export * from './internal';
 
