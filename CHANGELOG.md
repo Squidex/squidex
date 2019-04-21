@@ -1,5 +1,15 @@
 # Changelog
 
+## v2.0.5 - 2019-04-21
+
+## Features
+
+* **UI**: Sort content by clicking on the table header.
+
+## Bugfixes
+
+* **UI**: Fix publish button in content context menu.
+
 ## v2.0.4 - 2019-04-20
 
 ### Features
