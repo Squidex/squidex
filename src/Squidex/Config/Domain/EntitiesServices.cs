@@ -156,18 +156,23 @@ namespace Squidex.Config.Domain
             {
                 services.AddSingleton(Options.Create(emailOptions));
 
+                services.Configure<InvitationEmailTextOptions>(
+                    config.GetSection("email:invitations"));
+
                 services.AddSingletonAs<SmtpEmailSender>()
                     .As<IEmailSender>();
 
-                services.AddSingletonAs<InvitationEmailEventConsumer>()
-                    .As<IEventConsumer>();
-
                 services.AddSingletonAs<InvitationEmailSender>()
                     .AsOptional<IInvitationEmailSender>();
-
-                services.Configure<InvitationEmailTextOptions>(
-                    config.GetSection("email:invitations"));
             }
+            else
+            {
+                services.AddSingletonAs<NoopInvitationEmailSender>()
+                    .AsOptional<IInvitationEmailSender>();
+            }
+
+            services.AddSingletonAs<InvitationEmailEventConsumer>()
+                .As<IEventConsumer>();
         }
 
         private static void AddCommandPipeline(this IServiceCollection services)

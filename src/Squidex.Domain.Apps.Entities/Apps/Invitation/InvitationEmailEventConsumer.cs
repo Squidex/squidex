@@ -55,6 +55,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         public async Task On(Envelope<IEvent> @event)
         {
+            if (!emailSender.IsActive)
+            {
+                return;
+            }
+
             if (@event.Payload is AppContributorAssigned appContributorAssigned && appContributorAssigned.Actor.IsSubject)
             {
                 var assignerId = appContributorAssigned.Actor.Identifier;

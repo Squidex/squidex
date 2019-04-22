@@ -31,6 +31,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         public InvitationEmailEventConsumerTests()
         {
+            A.CallTo(() => emailSender.IsActive)
+                .Returns(true);
+
             sut = new InvitationEmailEventConsumer(emailSender, userResolver, log);
         }
 
@@ -38,6 +41,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         public async Task Should_ignore_contributors_assigned_by_clients()
         {
             var @event = Envelope.Create(CreateEvent(RefTokenType.Client, true));
+
+            await sut.On(@event);
+
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => emailSender.SendNewUserEmailAsync(A<IUser>.Ignored, A<IUser>.Ignored, appName))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_send_email_if_sender_not_active()
+        {
+            var @event = Envelope.Create(CreateEvent(RefTokenType.Subject, true));
+
+            A.CallTo(() => emailSender.IsActive)
+                .Returns(false);
+
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
+                .Returns(Task.FromResult<IUser>(null));
 
             await sut.On(@event);
 

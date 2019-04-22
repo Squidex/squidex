@@ -21,6 +21,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         private readonly ISemanticLog log;
         private readonly InvitationEmailTextOptions texts;
 
+        public bool IsActive
+        {
+            get { return true; }
+        }
+
         public InvitationEmailSender(
             IOptions<InvitationEmailTextOptions> texts,
             IEmailSender emailSender,

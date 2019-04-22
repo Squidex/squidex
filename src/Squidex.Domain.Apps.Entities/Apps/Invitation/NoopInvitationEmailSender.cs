@@ -6,16 +6,26 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
-    public interface IInvitationEmailSender
+    public sealed class NoopInvitationEmailSender : IInvitationEmailSender
     {
-        bool IsActive { get; }
+        public bool IsActive
+        {
+            get { return false; }
+        }
 
-        Task SendNewUserEmailAsync(IUser assigner, IUser assignee, string appName);
+        public Task SendExistingUserEmailAsync(IUser assigner, IUser assignee, string appName)
+        {
+            return TaskHelper.Done;
+        }
 
-        Task SendExistingUserEmailAsync(IUser assigner, IUser assignee, string appName);
+        public Task SendNewUserEmailAsync(IUser assigner, IUser assignee, string appName)
+        {
+            return TaskHelper.Done;
+        }
     }
 }
