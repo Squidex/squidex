@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
     public class InviteUserCommandMiddlewareTests
     {

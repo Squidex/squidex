@@ -40,23 +40,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         public Task SendExistingUserEmailAsync(IUser assigner, IUser assignee, string appName)
         {
-            return SendEmailAsync(texts.NewUserSubject, texts.NewUserBody, assigner, assignee, appName);
+            return SendEmailAsync(texts.ExistingUserSubject, texts.ExistingUserBody, assigner, assignee, appName);
         }
 
         public Task SendNewUserEmailAsync(IUser assigner, IUser assignee, string appName)
         {
-            return SendEmailAsync(texts.ExistingUserBody, texts.ExistingUserSubject, assigner, assignee, appName);
+            return SendEmailAsync(texts.NewUserBody, texts.NewUserSubject, assigner, assignee, appName);
         }
 
-        private async Task SendEmailAsync(string emailBody, string emailSubj, IUser assigner, IUser assignee, string appName)
+        private async Task SendEmailAsync(string emailSubj, string emailBody, IUser assigner, IUser assignee, string appName)
         {
-            if (string.IsNullOrWhiteSpace(texts.NewUserSubject))
+            if (string.IsNullOrWhiteSpace(emailBody))
             {
                 LogWarning("No email subject configured for new users");
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(texts.NewUserBody))
+            if (string.IsNullOrWhiteSpace(emailSubj))
             {
                 LogWarning("No email body configured for new users");
                 return;

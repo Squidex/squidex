@@ -55,13 +55,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         public async Task On(Envelope<IEvent> @event)
         {
-            if (@event.Payload is AppContributorAssigned appContributorAssigned && appContributorAssigned.Actor.IsClient)
+            if (@event.Payload is AppContributorAssigned appContributorAssigned && appContributorAssigned.Actor.IsSubject)
             {
-                var assigner = await userResolver.FindByIdOrEmailAsync(appContributorAssigned.Actor.Identifier);
+                var assignerId = appContributorAssigned.Actor.Identifier;
+                var assigneeId = appContributorAssigned.ContributorId;
+
+                var assigner = await userResolver.FindByIdOrEmailAsync(assignerId);
 
                 if (assigner == null)
                 {
-                    LogWarning($"Assigner {appContributorAssigned.Actor.Identifier} not found");
+                    LogWarning($"Assigner {assignerId} not found");
                     return;
                 }
 
@@ -69,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
                 if (assignee == null)
                 {
-                    LogWarning($"Assignee {appContributorAssigned.ContributorId} not found");
+                    LogWarning($"Assignee {assigneeId} not found");
                     return;
                 }
 
