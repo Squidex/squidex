@@ -30,6 +30,16 @@ namespace Squidex.Infrastructure
 
             Assert.Equal("client", token.Type);
             Assert.Equal("client1", token.Identifier);
+
+            Assert.True(token.IsClient);
+        }
+
+        [Fact]
+        public void Should_instantiate_subject_token()
+        {
+            var token = new RefToken("subject", "client1");
+
+            Assert.True(token.IsSubject);
         }
 
         [Fact]

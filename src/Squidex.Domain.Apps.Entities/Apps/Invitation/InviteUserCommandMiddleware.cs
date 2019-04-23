@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
     public sealed class InviteUserCommandMiddleware : ICommandMiddleware
     {
@@ -31,11 +31,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
             {
                 if (assignContributor.IsInviting && assignContributor.ContributorId.IsEmail())
                 {
-                    var isInvited = await userResolver.CreateUserIfNotExists(assignContributor.ContributorId);
+                    assignContributor.IsCreated = await userResolver.CreateUserIfNotExists(assignContributor.ContributorId, true);
 
                     await next();
 
-                    if (isInvited && context.PlainResult is EntityCreatedResult<string> id)
+                    if (assignContributor.IsCreated && context.PlainResult is EntityCreatedResult<string> id)
                     {
                         context.Complete(new InvitedResult { Id = id });
                     }

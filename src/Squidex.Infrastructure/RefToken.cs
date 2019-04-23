@@ -15,6 +15,16 @@ namespace Squidex.Infrastructure
 
         public string Identifier { get; }
 
+        public bool IsClient
+        {
+            get { return string.Equals(Type, RefTokenType.Client, StringComparison.OrdinalIgnoreCase); }
+        }
+
+        public bool IsSubject
+        {
+            get { return string.Equals(Type, RefTokenType.Subject, StringComparison.OrdinalIgnoreCase); }
+        }
+
         public RefToken(string type, string identifier)
         {
             Guard.NotNullOrEmpty(type, nameof(type));

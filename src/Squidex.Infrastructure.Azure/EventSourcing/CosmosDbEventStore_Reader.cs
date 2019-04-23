@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             ThrowIfDisposed();
 
-            return Task.CompletedTask;
+            return TaskHelper.Done;
         }
 
         public async Task<IReadOnlyList<StoredEvent>> QueryAsync(string streamName, long streamPosition = 0)

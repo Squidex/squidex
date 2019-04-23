@@ -66,7 +66,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                     user = null;
                 }
 
-                if (user == null && actor.Type.Equals(RefTokenType.Client, StringComparison.OrdinalIgnoreCase))
+                if (user == null && actor.IsClient)
                 {
                     user = new ClientUser(actor);
                 }

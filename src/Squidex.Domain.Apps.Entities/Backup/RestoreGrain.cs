@@ -239,7 +239,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             var actor = CurrentJob.Actor;
 
-            if (string.Equals(actor?.Type, RefTokenType.Subject))
+            if (actor?.IsSubject == true)
             {
                 await commandBus.PublishAsync(new AssignContributor
                 {

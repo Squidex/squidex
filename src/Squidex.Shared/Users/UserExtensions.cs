@@ -19,6 +19,11 @@ namespace Squidex.Shared.Users
             return new PermissionSet(user.GetClaimValues(SquidexClaimTypes.Permissions).Select(x => new Permission(x)));
         }
 
+        public static bool IsInvited(this IUser user)
+        {
+            return user.HasClaimValue(SquidexClaimTypes.Invited, "true");
+        }
+
         public static bool IsHidden(this IUser user)
         {
             return user.HasClaimValue(SquidexClaimTypes.Hidden, "true");

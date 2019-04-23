@@ -115,7 +115,7 @@ export class ContributorsState extends State<Snapshot> {
 
                 this.replaceContributors(contributors, dto.version);
 
-                return dto.payload.wasInvited;
+                return dto.payload.isCreated;
             }),
             catchError(error => {
                 if (Types.is(error, ErrorDto) && error.statusCode === 404) {

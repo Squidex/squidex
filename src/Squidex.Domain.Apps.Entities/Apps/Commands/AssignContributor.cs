@@ -18,5 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
         public bool IsRestore { get; set; }
 
         public bool IsInviting { get; set; }
+
+        public bool IsCreated { get; set; }
     }
 }

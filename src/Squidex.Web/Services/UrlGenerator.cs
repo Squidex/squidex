@@ -9,6 +9,7 @@ using System;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -19,7 +20,7 @@ using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Web.Services
 {
-    public sealed class UrlGenerator : IGraphQLUrlGenerator, IRuleUrlGenerator, IAssetUrlGenerator
+    public sealed class UrlGenerator : IGraphQLUrlGenerator, IRuleUrlGenerator, IAssetUrlGenerator, IEmailUrlGenerator
     {
         private readonly IAssetStore assetStore;
         private readonly UrlsOptions urlsOptions;
@@ -62,6 +63,11 @@ namespace Squidex.Web.Services
         public string GenerateContentUIUrl(NamedId<Guid> appId, NamedId<Guid> schemaId, Guid contentId)
         {
             return urlsOptions.BuildUrl($"app/{appId.Name}/content/{schemaId.Name}/{contentId}/history");
+        }
+
+        public string GenerateUIUrl()
+        {
+            return urlsOptions.BuildUrl("app/");
         }
 
         public string GenerateAssetSourceUrl(IAppEntity app, IAssetEntity asset)

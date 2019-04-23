@@ -5,12 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Commands;
+using System.Threading.Tasks;
+using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
-    public sealed class InvitedResult
+    public interface IInvitationEmailSender
     {
-        public EntityCreatedResult<string> Id { get; set; }
+        bool IsActive { get; }
+
+        Task SendNewUserEmailAsync(IUser assigner, IUser assignee, string appName);
+
+        Task SendExistingUserEmailAsync(IUser assigner, IUser assignee, string appName);
     }
 }

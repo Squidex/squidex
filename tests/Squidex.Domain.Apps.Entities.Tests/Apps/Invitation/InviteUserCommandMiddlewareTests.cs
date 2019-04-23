@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
     public class InviteUserCommandMiddlewareTests
     {
@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var command = new AssignContributor { ContributorId = "me@email.com", IsInviting = true };
             var context = new CommandContext(command, commandBus);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com"))
+            A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .Returns(true);
 
             var result = EntityCreatedResult.Create("13", 13L);
@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             Assert.Same(context.Result<InvitedResult>().Id, result);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com"))
+            A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .MustHaveHappened();
         }
 
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var command = new AssignContributor { ContributorId = "me@email.com", IsInviting = true };
             var context = new CommandContext(command, commandBus);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com"))
+            A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .Returns(false);
 
             var result = EntityCreatedResult.Create("13", 13L);
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             Assert.Same(context.Result<EntityCreatedResult<string>>(), result);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com"))
+            A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .MustHaveHappened();
         }
 
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => userResolver.CreateUserIfNotExists(A<string>.Ignored))
+            A.CallTo(() => userResolver.CreateUserIfNotExists(A<string>.Ignored, A<bool>.Ignored))
                 .MustNotHaveHappened();
         }
     }

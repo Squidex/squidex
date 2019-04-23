@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             RegisterOrUpdateReminder("Default", TimeSpan.Zero, TimeSpan.FromMinutes(10));
             RegisterTimer(x => CheckUsagesAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(10));
 
-            return Task.CompletedTask;
+            return TaskHelper.Done;
         }
 
         public Task ActivateAsync()
