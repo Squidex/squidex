@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppContributors
     {
-        public static Task CanAssign(AppContributors contributors, AssignContributor command, IUserResolver users, IAppLimitsPlan plan, Roles roles)
+        public static Task CanAssign(AppContributors contributors, Roles roles, AssignContributor command, IUserResolver users, IAppLimitsPlan plan)
         {
             Guard.NotNull(command, nameof(command));
 

@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
+using NodaTime;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -17,6 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
     public sealed class InvitationEmailEventConsumer : IEventConsumer
     {
+        private static readonly Duration MaxAge = Duration.FromDays(2);
         private readonly IInvitationEmailSender emailSender;
         private readonly IUserResolver userResolver;
         private readonly ISemanticLog log;
@@ -60,8 +63,27 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                 return;
             }
 
-            if (@event.Payload is AppContributorAssigned appContributorAssigned && appContributorAssigned.Actor.IsSubject)
+            if (@event.Headers.EventStreamNumber() <= 1)
             {
+                return;
+            }
+
+            var now = SystemClock.Instance.GetCurrentInstant();
+
+            var timestamp = @event.Headers.Timestamp();
+
+            if (now - timestamp > MaxAge)
+            {
+                return;
+            }
+
+            if (@event.Payload is AppContributorAssigned appContributorAssigned)
+            {
+                if (!appContributorAssigned.Actor.IsSubject || !appContributorAssigned.IsNew)
+                {
+                    return;
+                }
+
                 var assignerId = appContributorAssigned.Actor.Identifier;
                 var assigneeId = appContributorAssigned.ContributorId;
 

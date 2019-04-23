@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AssignContributor();
 
-            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan, roles),
+            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan),
                 new ValidationError("Contributor id is required.", "ContributorId"));
         }
 
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "1", Role = "Invalid" };
 
-            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan, roles),
+            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan),
                 new ValidationError("Role is not a valid value.", "Role"));
         }
 
@@ -75,7 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var contributors_1 = contributors_0.Assign("1", Role.Owner);
 
-            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_1, command, users, appPlan, roles),
+            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_1, roles, command, users, appPlan),
                 new ValidationError("Contributor has already this role.", "Role"));
         }
 
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "notfound", Role = Role.Owner };
 
-            return Assert.ThrowsAsync<DomainObjectNotFoundException>(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan, roles));
+            return Assert.ThrowsAsync<DomainObjectNotFoundException>(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan));
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "3", Role = Role.Editor, Actor = new RefToken("user", "3") };
 
-            return Assert.ThrowsAsync<DomainForbiddenException>(() => GuardAppContributors.CanAssign(contributors_0, command, users, appPlan, roles));
+            return Assert.ThrowsAsync<DomainForbiddenException>(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan));
         }
 
         [Fact]
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var contributors_1 = contributors_0.Assign("1", Role.Owner);
             var contributors_2 = contributors_1.Assign("2", Role.Editor);
 
-            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_2, command, users, appPlan, roles),
+            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_2, roles, command, users, appPlan),
                 new ValidationError("You have reached the maximum number of contributors for your plan."));
         }
 
@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "1@email.com" };
 
-            await GuardAppContributors.CanAssign(contributors_0, command, users, appPlan, roles);
+            await GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan);
 
             Assert.Equal("1", command.ContributorId);
         }
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "1" };
 
-            return GuardAppContributors.CanAssign(contributors_0, command, users, appPlan, roles);
+            return GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan);
         }
 
         [Fact]
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var contributors_1 = contributors_0.Assign("1", Role.Editor);
 
-            return GuardAppContributors.CanAssign(contributors_1, command, users, appPlan, roles);
+            return GuardAppContributors.CanAssign(contributors_1, roles, command, users, appPlan);
         }
 
         [Fact]
@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var contributors_1 = contributors_0.Assign("1", Role.Editor);
             var contributors_2 = contributors_1.Assign("2", Role.Editor);
 
-            return GuardAppContributors.CanAssign(contributors_2, command, users, appPlan, roles);
+            return GuardAppContributors.CanAssign(contributors_2, roles, command, users, appPlan);
         }
 
         [Fact]
