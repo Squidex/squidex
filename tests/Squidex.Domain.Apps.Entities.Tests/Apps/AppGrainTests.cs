@@ -171,7 +171,27 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Role = Role.Editor })
+                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Role = Role.Editor, IsNew = true })
+                );
+        }
+
+        [Fact]
+        public async Task AssignContributor_should_create_update_events_and_update_state()
+        {
+            var command = new AssignContributor { ContributorId = contributorId, Role = Role.Owner };
+
+            await ExecuteCreateAsync();
+            await ExecuteAssignContributorAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(EntityCreatedResult.Create(contributorId, 6));
+
+            Assert.Equal(Role.Owner, sut.Snapshot.Contributors[contributorId]);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Role = Role.Owner })
                 );
         }
 

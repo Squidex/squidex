@@ -17,5 +17,7 @@ namespace Squidex.Domain.Apps.Events.Apps
         public string Role { get; set; }
 
         public bool IsCreated { get; set; }
+
+        public bool IsNew { get; set; }
     }
 }

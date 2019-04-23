@@ -67,12 +67,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         Create(c);
                     });
 
-                case AssignContributor assigneContributor:
-                    return UpdateReturnAsync(assigneContributor, async c =>
+                case AssignContributor assignContributor:
+                    return UpdateReturnAsync(assignContributor, async c =>
                     {
-                        await GuardAppContributors.CanAssign(Snapshot.Contributors, c, userResolver, appPlansProvider.GetPlan(Snapshot.Plan?.PlanId), Snapshot.Roles);
+                        await GuardAppContributors.CanAssign(Snapshot.Contributors, Snapshot.Roles, c, userResolver, GetPlan());
 
-                        AssignContributor(c);
+                        AssignContributor(c, !Snapshot.Contributors.ContainsKey(assignContributor.ContributorId));
 
                         return EntityCreatedResult.Create(c.ContributorId, Version);
                     });
@@ -218,6 +218,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
         }
 
+        private IAppLimitsPlan GetPlan()
+        {
+            return appPlansProvider.GetPlan(Snapshot.Plan?.PlanId);
+        }
+
         public void Create(CreateApp command)
         {
             var appId = NamedId.Of(command.AppId, command.Name);
@@ -261,9 +266,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             RaiseEvent(SimpleMapper.Map(command, new AppLanguageUpdated()));
         }
 
-        public void AssignContributor(AssignContributor command)
+        public void AssignContributor(AssignContributor command, bool isNew)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned()));
+            RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned { IsNew = isNew }));
         }
 
         public void RemoveContributor(RemoveContributor command)

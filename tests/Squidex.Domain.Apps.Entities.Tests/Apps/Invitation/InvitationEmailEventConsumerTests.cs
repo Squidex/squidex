@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
+using NodaTime;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -34,88 +35,104 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             A.CallTo(() => emailSender.IsActive)
                 .Returns(true);
 
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
+                .Returns(assigner);
+
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assigneeId))
+                .Returns(assignee);
+
             sut = new InvitationEmailEventConsumer(emailSender, userResolver, log);
         }
 
         [Fact]
-        public async Task Should_ignore_contributors_assigned_by_clients()
+        public async Task Should_not_send_email_if_contributors_assigned_by_clients()
         {
-            var @event = Envelope.Create(CreateEvent(RefTokenType.Client, true));
+            var @event = CreateEvent(RefTokenType.Client, true);
 
             await sut.On(@event);
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>.Ignored))
-                .MustNotHaveHappened();
+            MustNotResolveUser();
+            MustNotSendEmail();
+        }
 
-            A.CallTo(() => emailSender.SendNewUserEmailAsync(A<IUser>.Ignored, A<IUser>.Ignored, appName))
-                .MustNotHaveHappened();
+        [Fact]
+        public async Task Should_not_send_email_for_initial_owner()
+        {
+            var @event = CreateEvent(RefTokenType.Subject, false, streamNumber: 1);
+
+            await sut.On(@event);
+
+            MustNotSendEmail();
+        }
+
+        [Fact]
+        public async Task Should_not_send_email_for_old_events()
+        {
+            var @event = CreateEvent(RefTokenType.Subject, true, instant: SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(50)));
+
+            await sut.On(@event);
+
+            MustNotResolveUser();
+            MustNotSendEmail();
+        }
+
+        [Fact]
+        public async Task Should_not_send_email_for_old_contributor()
+        {
+            var @event = CreateEvent(RefTokenType.Subject, true, isNewContributor: false);
+
+            await sut.On(@event);
+
+            MustNotResolveUser();
+            MustNotSendEmail();
         }
 
         [Fact]
         public async Task Should_not_send_email_if_sender_not_active()
         {
-            var @event = Envelope.Create(CreateEvent(RefTokenType.Subject, true));
+            var @event = CreateEvent(RefTokenType.Subject, true);
 
             A.CallTo(() => emailSender.IsActive)
                 .Returns(false);
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
-                .Returns(Task.FromResult<IUser>(null));
-
             await sut.On(@event);
 
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>.Ignored))
-                .MustNotHaveHappened();
-
-            A.CallTo(() => emailSender.SendNewUserEmailAsync(A<IUser>.Ignored, A<IUser>.Ignored, appName))
-                .MustNotHaveHappened();
+            MustNotResolveUser();
+            MustNotSendEmail();
         }
 
         [Fact]
         public async Task Should_not_send_email_if_assigner_not_found()
         {
-            var @event = Envelope.Create(CreateEvent(RefTokenType.Subject, true));
+            var @event = CreateEvent(RefTokenType.Subject, true);
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
                 .Returns(Task.FromResult<IUser>(null));
 
             await sut.On(@event);
 
-            A.CallTo(() => emailSender.SendNewUserEmailAsync(A<IUser>.Ignored, A<IUser>.Ignored, appName))
-                .MustNotHaveHappened();
-
+            MustNotSendEmail();
             MustLogWarning();
         }
 
         [Fact]
         public async Task Should_not_send_email_if_assignee_not_found()
         {
-            var @event = Envelope.Create(CreateEvent(RefTokenType.Subject, true));
-
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
-                .Returns(assigner);
+            var @event = CreateEvent(RefTokenType.Subject, true);
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(assigneeId))
                 .Returns(Task.FromResult<IUser>(null));
 
             await sut.On(@event);
 
-            A.CallTo(() => emailSender.SendNewUserEmailAsync(A<IUser>.Ignored, A<IUser>.Ignored, appName))
-                .MustNotHaveHappened();
-
+            MustNotSendEmail();
             MustLogWarning();
         }
 
         [Fact]
         public async Task Should_send_email_for_new_user()
         {
-            var @event = Envelope.Create(CreateEvent(RefTokenType.Subject, true));
-
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
-                .Returns(assigner);
-
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assigneeId))
-                .Returns(assignee);
+            var @event = CreateEvent(RefTokenType.Subject, true);
 
             await sut.On(@event);
 
@@ -126,13 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         [Fact]
         public async Task Should_send_email_for_existing_user()
         {
-            var @event = Envelope.Create(CreateEvent(RefTokenType.Subject, false));
-
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
-                .Returns(assigner);
-
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assigneeId))
-                .Returns(assignee);
+            var @event = CreateEvent(RefTokenType.Subject, false);
 
             await sut.On(@event);
 
@@ -146,15 +157,38 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                 .MustHaveHappened();
         }
 
-        private IEvent CreateEvent(string assignerType, bool isNew)
+        private void MustNotResolveUser()
         {
-            return new AppContributorAssigned
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        private void MustNotSendEmail()
+        {
+            A.CallTo(() => emailSender.SendNewUserEmailAsync(A<IUser>.Ignored, A<IUser>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => emailSender.SendExistingUserEmailAsync(A<IUser>.Ignored, A<IUser>.Ignored, A<string>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        private Envelope<IEvent> CreateEvent(string assignerType, bool isNewUser, bool isNewContributor = true, Instant? instant = null, int streamNumber = 2)
+        {
+            var @event = new AppContributorAssigned
             {
                 Actor = new RefToken(assignerType, assignerId),
                 AppId = new NamedId<Guid>(Guid.NewGuid(), appName),
                 ContributorId = assigneeId,
-                IsCreated = isNew
+                IsCreated = isNewUser,
+                IsNew = isNewContributor,
             };
+
+            var envelope = Envelope.Create(@event);
+
+            envelope.SetTimestamp(instant ?? SystemClock.Instance.GetCurrentInstant());
+            envelope.SetEventStreamNumber(streamNumber);
+
+            return envelope;
         }
     }
 }
