@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                 AppId = new NamedId<Guid>(Guid.NewGuid(), appName),
                 ContributorId = assigneeId,
                 IsCreated = isNewUser,
-                IsNew = isNewContributor,
+                IsAdded = isNewContributor,
             };
 
             var envelope = Envelope.Create(@event);

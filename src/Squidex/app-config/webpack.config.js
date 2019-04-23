@@ -49,8 +49,7 @@ module.exports = {
         rules: [{
             test: /\.mjs$/,
             type: "javascript/auto",
-            include: [/node_modules/],
-            
+            include: [/node_modules/]
           }, {
             test: /[\/\\]@angular[\/\\]core[\/\\].+\.js$/,
             parser: { system: true },

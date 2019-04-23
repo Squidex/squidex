@@ -159,7 +159,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     }
 
     private updateValue() {
-        let result: string | null = null;
+        let result: string | null;
 
         if ((this.dateValue && !this.dateValue.isValid()) || (this.timeValue && !this.timeValue.isValid())) {
             result = null;

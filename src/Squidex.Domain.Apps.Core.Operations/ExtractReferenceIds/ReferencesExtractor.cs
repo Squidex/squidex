@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             if (value is JsonArray array)
             {
-                foreach (JsonObject item in array)
+                foreach (var item in array.OfType<JsonObject>())
                 {
                     foreach (var nestedField in field.Fields)
                     {

@@ -171,7 +171,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Role = Role.Editor, IsNew = true })
+                    CreateEvent(new AppContributorAssigned { ContributorId = contributorId, Role = Role.Editor, IsAdded = true })
                 );
         }
 

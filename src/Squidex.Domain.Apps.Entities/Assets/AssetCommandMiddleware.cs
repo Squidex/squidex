@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         await assetStore.UploadAsync(context.ContextId.ToString(), createAsset.File.OpenRead());
                         try
                         {
-                            var result = await ExecuteCommandAsync(createAsset) as AssetSavedResult;
+                            var result = (AssetSavedResult)await ExecuteCommandAsync(createAsset);
 
                             context.Complete(new AssetCreatedResult(createAsset.AssetId, originalTags, result.Version));
 

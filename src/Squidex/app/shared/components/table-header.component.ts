@@ -39,7 +39,7 @@ export class TableHeaderComponent {
     public sortingChange = new EventEmitter<Sorting>();
 
     public sort() {
-        if (!!this.sortable) {
+        if (this.sortable) {
             if (!this.sorting || this.sorting !== 'Ascending') {
                 this.sorting = 'Ascending';
             } else {

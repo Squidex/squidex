@@ -87,7 +87,7 @@ describe('CommentsService', () => {
         let comment: CommentDto;
 
         commentsService.postComment('my-app', 'my-comments', new UpsertCommentDto('text1')).subscribe(result => {
-            comment = <CommentDto>result;
+            comment = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/comments/my-comments');

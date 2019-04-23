@@ -391,7 +391,7 @@ export class EditContentForm extends Form<FormGroup> {
                 const fieldValue = value ? value[field.name] || {} : {};
 
                 const addControls = (key: string, language: AppLanguageDto | null) => {
-                    const partitionValidators = FieldValidatorsFactory.createValidators(field, language !== null && language.isOptional);
+                    const partitionValidators = FieldValidatorsFactory.createValidators(field, !!language && language.isOptional);
                     const partitionForm = new FormArray([], partitionValidators);
 
                     const partitionValue = fieldValue[key];

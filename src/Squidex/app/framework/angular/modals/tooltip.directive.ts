@@ -52,7 +52,7 @@ export class TooltipDirective {
     private unsetAttribute() {
         try {
             this.renderer.setAttribute(this.element.nativeElement, 'title', '');
-        } catch {
+        } catch (ex) {
             return;
         }
     }

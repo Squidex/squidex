@@ -53,8 +53,6 @@ namespace Squidex.Extensions.Actions.Email
                     message.Subject = job.MessageSubject;
                     message.Body = job.MessageBody;
 
-                    var sendTask = client.SendMailAsync(message);
-
                     using (ct.Register(client.SendAsyncCancel))
                     {
                         await client.SendMailAsync(message);

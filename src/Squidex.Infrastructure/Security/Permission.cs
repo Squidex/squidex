@@ -100,9 +100,9 @@ namespace Squidex.Infrastructure.Security
             return true;
         }
 
-        public bool StartsWith(string id)
+        public bool StartsWith(string test)
         {
-            return id.StartsWith(id, StringComparison.OrdinalIgnoreCase);
+            return id.StartsWith(test, StringComparison.OrdinalIgnoreCase);
         }
 
         public override bool Equals(object obj)

@@ -39,7 +39,7 @@ function SquidexFormField() {
         if (height !== newHeight) {
             height = newHeight;
 
-            window.parent.postMessage({ type: 'resize', height: height }, '*')
+            window.parent.postMessage({ type: 'resize', height: height }, '*');
         }
     }, 500);
 

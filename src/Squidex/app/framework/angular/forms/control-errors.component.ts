@@ -77,7 +77,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             }
         }
 
-        let control: AbstractControl | null = null;
+        let control: AbstractControl | null;
 
         if (Types.isString(this.for)) {
             control = this.formGroupDirective.form.controls[this.for];

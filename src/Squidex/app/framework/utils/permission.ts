@@ -96,14 +96,18 @@ export class Permission {
 
     private static intersects(lhs: { [key: string]: true }, rhs: { [key: string]: true }) {
         for (let key in lhs) {
-            if (rhs[key]) {
-                return true;
+            if (lhs.hasOwnProperty(key)) {
+                if (rhs[key]) {
+                    return true;
+                }
             }
         }
 
         for (let key in rhs) {
-            if (lhs[key]) {
-                return true;
+            if (rhs.hasOwnProperty(key)) {
+                if (lhs[key]) {
+                    return true;
+                }
             }
         }
 

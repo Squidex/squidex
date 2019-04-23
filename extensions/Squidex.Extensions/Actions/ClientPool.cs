@@ -16,7 +16,7 @@ namespace Squidex.Extensions.Actions
 {
     internal sealed class ClientPool<TKey, TClient>
     {
-        private static readonly TimeSpan TTL = TimeSpan.FromMinutes(30);
+        private static readonly TimeSpan TimeToLive = TimeSpan.FromMinutes(30);
         private readonly MemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
         private readonly Func<TKey, Task<TClient>> factory;
 
@@ -41,7 +41,7 @@ namespace Squidex.Extensions.Actions
             {
                 client = await factory(key);
 
-                memoryCache.Set(key, client, TTL);
+                memoryCache.Set(key, client, TimeToLive);
             }
 
             return client;

@@ -18,6 +18,6 @@ namespace Squidex.Domain.Apps.Events.Apps
 
         public bool IsCreated { get; set; }
 
-        public bool IsNew { get; set; }
+        public bool IsAdded { get; set; }
     }
 }

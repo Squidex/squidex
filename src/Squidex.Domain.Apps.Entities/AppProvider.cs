@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {name})", async () =>
             {
-                using (Profiler.TraceMethod<AppProvider>("GetSchemaAsyncByName"))
+                using (Profiler.TraceMethod<AppProvider>())
                 {
                     var schemaId = await GetSchemaIdAsync(appId, name);
 
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities
         {
             return localCache.GetOrCreateAsync($"GetSchemaAsync({appId}, {id}, {allowDeleted})", async () =>
             {
-                using (Profiler.TraceMethod<AppProvider>("GetSchemaAsyncById"))
+                using (Profiler.TraceMethod<AppProvider>())
                 {
                     var schema = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
 

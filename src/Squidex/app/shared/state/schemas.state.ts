@@ -349,8 +349,10 @@ function buildCategories(categories: { [name: string]: boolean }, schemas: Immut
     categories = { ...categories };
 
     for (let category in categories) {
-        if (!categories[category]) {
-            delete categories[category];
+        if (categories.hasOwnProperty(category)) {
+            if (!categories[category]) {
+                delete categories[category];
+            }
         }
     }
     for (let schema of schemas.values) {

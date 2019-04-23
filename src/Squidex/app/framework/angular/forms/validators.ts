@@ -24,7 +24,7 @@ export module ValidatorsEx {
         return (control: AbstractControl) => {
             const error = inner(control);
 
-            if (error !== null && error.pattern && message) {
+            if (!!error && error.pattern && message) {
                 return { patternmessage: { requiredPattern: error.pattern.requiredPattern, actualValue: error.pattern.actualValue, message } };
             }
 

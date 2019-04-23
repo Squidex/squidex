@@ -69,28 +69,28 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient(typeof(T), factory);
 
-            return new InterfaceRegistrator<T>((t, f) => services.AddTransient(t, f), (t, f) => services.TryAddTransient(t, f));
+            return new InterfaceRegistrator<T>((t, f) => services.AddTransient(t, f), services.TryAddTransient);
         }
 
         public static InterfaceRegistrator<T> AddTransientAs<T>(this IServiceCollection services) where T : class
         {
             services.AddTransient<T, T>();
 
-            return new InterfaceRegistrator<T>((t, f) => services.AddTransient(t, f), (t, f) => services.TryAddTransient(t, f));
+            return new InterfaceRegistrator<T>((t, f) => services.AddTransient(t, f), services.TryAddTransient);
         }
 
         public static InterfaceRegistrator<T> AddSingletonAs<T>(this IServiceCollection services, Func<IServiceProvider, T> factory) where T : class
         {
             services.AddSingleton(typeof(T), factory);
 
-            return new InterfaceRegistrator<T>((t, f) => services.AddSingleton(t, f), (t, f) => services.TryAddSingleton(t, f));
+            return new InterfaceRegistrator<T>((t, f) => services.AddSingleton(t, f), services.TryAddSingleton);
         }
 
         public static InterfaceRegistrator<T> AddSingletonAs<T>(this IServiceCollection services) where T : class
         {
             services.AddSingleton<T, T>();
 
-            return new InterfaceRegistrator<T>((t, f) => services.AddSingleton(t, f), (t, f) => services.TryAddSingleton(t, f));
+            return new InterfaceRegistrator<T>((t, f) => services.AddSingleton(t, f), services.TryAddSingleton);
         }
     }
 }

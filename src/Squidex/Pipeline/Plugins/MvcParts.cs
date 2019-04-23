@@ -25,7 +25,7 @@ namespace Squidex.Pipeline.Plugins
 
                 foreach (var reference in RelatedAssemblyAttribute.GetRelatedAssemblies(assembly, false))
                 {
-                    AddParts(parts, assembly);
+                    AddParts(parts, reference);
                 }
             });
         }

@@ -312,6 +312,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
             this.resetAutocompletion();
             return true;
         }
+
+        return false;
     }
 
     private resetAutocompletion() {
