@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         public Task SendExistingUserEmailAsync(IUser assigner, IUser assignee, string appName)
         {
-            return SendEmailAsync(texts.ExistingUserBody, texts.ExistingUserSubject, assigner, assignee, appName);
+            return SendEmailAsync(texts.ExistingUserSubject, texts.ExistingUserBody, assigner, assignee, appName);
         }
 
         public Task SendNewUserEmailAsync(IUser assigner, IUser assignee, string appName)
@@ -87,8 +87,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         {
             text = text.Replace("$APP_NAME", appName);
 
-            text = text.Replace("$UI_URL", uiUrl);
-
             if (assigner != null)
             {
                 text = text.Replace("$ASSIGNER_EMAIL", assigner.Email);
@@ -100,6 +98,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                 text = text.Replace("$ASSIGNEE_EMAIL", assignee.Email);
                 text = text.Replace("$ASSIGNEE_NAME", assignee.DisplayName());
             }
+
+            text = text.Replace("$UI_URL", uiUrl);
 
             return text;
         }

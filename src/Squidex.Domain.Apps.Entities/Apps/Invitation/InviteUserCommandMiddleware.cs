@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             {
                 if (assignContributor.IsInviting && assignContributor.ContributorId.IsEmail())
                 {
-                    assignContributor.IsCreated = await userResolver.CreateUserIfNotExists(assignContributor.ContributorId);
+                    assignContributor.IsCreated = await userResolver.CreateUserIfNotExists(assignContributor.ContributorId, true);
 
                     await next();
 

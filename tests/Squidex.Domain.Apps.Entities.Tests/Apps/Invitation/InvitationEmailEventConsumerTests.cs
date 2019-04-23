@@ -109,23 +109,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         [Fact]
         public async Task Should_send_email_for_new_user()
         {
-            var @event = Envelope.Create(CreateEvent(RefTokenType.Subject, false));
-
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
-                .Returns(assigner);
-
-            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assigneeId))
-                .Returns(assignee);
-
-            await sut.On(@event);
-
-            A.CallTo(() => emailSender.SendNewUserEmailAsync(assigner, assignee, appName))
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_send_email_for_existing_user()
-        {
             var @event = Envelope.Create(CreateEvent(RefTokenType.Subject, true));
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
@@ -136,8 +119,25 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
             await sut.On(@event);
 
+            A.CallTo(() => emailSender.SendNewUserEmailAsync(assigner, assignee, appName))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_send_email_for_existing_user()
+        {
+            var @event = Envelope.Create(CreateEvent(RefTokenType.Subject, false));
+
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assignerId))
+                .Returns(assigner);
+
+            A.CallTo(() => userResolver.FindByIdOrEmailAsync(assigneeId))
+                .Returns(assignee);
+
+            await sut.On(@event);
+
             A.CallTo(() => emailSender.SendExistingUserEmailAsync(assigner, assignee, appName))
-                .MustNotHaveHappened();
+                .MustHaveHappened();
         }
 
         private void MustLogWarning()

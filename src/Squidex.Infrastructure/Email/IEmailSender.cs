@@ -11,6 +11,6 @@ namespace Squidex.Infrastructure.Email
 {
     public interface IEmailSender
     {
-        Task SendAsync(string recipient, string subject, string text);
+        Task SendAsync(string recipient, string subject, string body);
     }
 }

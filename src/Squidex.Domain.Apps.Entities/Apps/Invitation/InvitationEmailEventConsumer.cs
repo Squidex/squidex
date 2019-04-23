@@ -60,9 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
                 return;
             }
 
-            if (@event.Payload is AppContributorAssigned appContributorAssigned &&
-                appContributorAssigned.IsCreated &&
-                appContributorAssigned.Actor.IsSubject)
+            if (@event.Payload is AppContributorAssigned appContributorAssigned && appContributorAssigned.Actor.IsSubject)
             {
                 var assignerId = appContributorAssigned.Actor.Identifier;
                 var assigneeId = appContributorAssigned.ContributorId;
