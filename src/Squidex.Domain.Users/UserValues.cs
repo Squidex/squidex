@@ -22,6 +22,8 @@ namespace Squidex.Domain.Users
 
         public string Email { get; set; }
 
+        public bool? Invited { get; set; }
+
         public bool? Consent { get; set; }
 
         public bool? ConsentForEmails { get; set; }
@@ -45,6 +47,11 @@ namespace Squidex.Domain.Users
             if (Hidden.HasValue)
             {
                 yield return new Claim(SquidexClaimTypes.Hidden, Hidden.ToString());
+            }
+
+            if (Invited.HasValue)
+            {
+                yield return new Claim(SquidexClaimTypes.Invited, Invited.ToString());
             }
 
             if (Consent.HasValue)

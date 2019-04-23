@@ -99,10 +99,10 @@ export class ContributorsPageComponent implements OnInit {
             const requestDto = new AssignContributorDto(user, 'Editor', true);
 
             this.contributorsState.assign(requestDto)
-                .subscribe(wasInvited => {
+                .subscribe(isCreated => {
                     this.assignContributorForm.submitCompleted({});
 
-                    if (wasInvited) {
+                    if (isCreated) {
                         this.dialogs.notifyInfo('A new user with the entered email address has been created and assigned as contributor.');
                     }
                 }, error => {

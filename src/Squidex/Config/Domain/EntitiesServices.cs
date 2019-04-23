@@ -150,7 +150,7 @@ namespace Squidex.Config.Domain
                 return result;
             });
 
-            var emailOptions = config.GetValue<SmptOptions>("email:smtp");
+            var emailOptions = config.GetSection("email:smtp").Get<SmptOptions>();
 
             if (emailOptions.IsConfigured())
             {

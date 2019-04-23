@@ -52,7 +52,7 @@ export class AppContributorDto extends Model {
 export class ContributorAssignedDto {
     constructor(
         public readonly contributorId: string,
-        public readonly wasInvited: boolean
+        public readonly isCreated: boolean
     ) {
     }
 }
@@ -93,7 +93,7 @@ export class AppContributorsService {
                 map(response => {
                     const body: any = response.payload.body;
 
-                    const result = new ContributorAssignedDto(body.contributorId, body.wasInvited);
+                    const result = new ContributorAssignedDto(body.contributorId, body.isCreated);
 
                     return new Versioned(response.version, result);
                 }),

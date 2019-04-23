@@ -94,7 +94,7 @@ describe('AppContributorsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({ contributorId: '123', wasInvited: true });
+        req.flush({ contributorId: '123', isCreated: true });
 
         expect(contributorAssignedDto!.contributorId).toEqual('123');
     }));
