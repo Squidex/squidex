@@ -266,9 +266,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             RaiseEvent(SimpleMapper.Map(command, new AppLanguageUpdated()));
         }
 
-        public void AssignContributor(AssignContributor command, bool isNew)
+        public void AssignContributor(AssignContributor command, bool isAdded)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned { IsAdded = isNew }));
+            RaiseEvent(SimpleMapper.Map(command, new AppContributorAssigned { IsAdded = isAdded }));
         }
 
         public void RemoveContributor(RemoveContributor command)
