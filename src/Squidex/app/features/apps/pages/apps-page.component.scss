@@ -79,4 +79,14 @@
             text-decoration: none;
         }
     }
+
+    &:hover {
+        .deeplinks {
+            display: inline-block;
+        }
+    }
+
+    .deeplinks {
+        display: none;
+    }
 }
