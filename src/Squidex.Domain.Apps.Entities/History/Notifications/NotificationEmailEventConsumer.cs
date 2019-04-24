@@ -14,18 +14,18 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation
+namespace Squidex.Domain.Apps.Entities.History.Notifications
 {
-    public sealed class InvitationEmailEventConsumer : IEventConsumer
+    public sealed class NotificationEmailEventConsumer : IEventConsumer
     {
         private static readonly Duration MaxAge = Duration.FromDays(2);
-        private readonly IInvitationEmailSender emailSender;
+        private readonly INotificationEmailSender emailSender;
         private readonly IUserResolver userResolver;
         private readonly ISemanticLog log;
 
         public string Name
         {
-            get { return "InvitationEmailSender"; }
+            get { return "NotificationEmailSender"; }
         }
 
         public string EventsFilter
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             get { return "^app-";  }
         }
 
-        public InvitationEmailEventConsumer(IInvitationEmailSender emailSender, IUserResolver userResolver, ISemanticLog log)
+        public NotificationEmailEventConsumer(INotificationEmailSender emailSender, IUserResolver userResolver, ISemanticLog log)
         {
             Guard.NotNull(emailSender, nameof(emailSender));
             Guard.NotNull(userResolver, nameof(userResolver));
@@ -104,14 +104,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
                 var appName = appContributorAssigned.AppId.Name;
 
-                if (appContributorAssigned.IsCreated)
-                {
-                    await emailSender.SendNewUserEmailAsync(assigner, assignee, appName);
-                }
-                else
-                {
-                    await emailSender.SendExistingUserEmailAsync(assigner, assignee, appName);
-                }
+                var isCreated = appContributorAssigned.IsCreated;
+
+                await emailSender.SendContributorEmailAsync(assigner, assignee, appName, isCreated);
             }
         }
 

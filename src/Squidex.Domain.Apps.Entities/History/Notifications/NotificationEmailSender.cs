@@ -12,22 +12,22 @@ using Squidex.Infrastructure.Email;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation
+namespace Squidex.Domain.Apps.Entities.History.Notifications
 {
-    public sealed class InvitationEmailSender : IInvitationEmailSender
+    public sealed class NotificationEmailSender : INotificationEmailSender
     {
         private readonly IEmailSender emailSender;
         private readonly IEmailUrlGenerator emailUrlGenerator;
         private readonly ISemanticLog log;
-        private readonly InvitationEmailTextOptions texts;
+        private readonly NotificationEmailTextOptions texts;
 
         public bool IsActive
         {
             get { return true; }
         }
 
-        public InvitationEmailSender(
-            IOptions<InvitationEmailTextOptions> texts,
+        public NotificationEmailSender(
+            IOptions<NotificationEmailTextOptions> texts,
             IEmailSender emailSender,
             IEmailUrlGenerator emailUrlGenerator,
             ISemanticLog log)
@@ -43,14 +43,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             this.log = log;
         }
 
-        public Task SendExistingUserEmailAsync(IUser assigner, IUser assignee, string appName)
+        public Task SendContributorEmailAsync(IUser assigner, IUser assignee, string appName, bool isCreated)
         {
-            return SendEmailAsync(texts.ExistingUserSubject, texts.ExistingUserBody, assigner, assignee, appName);
-        }
+            Guard.NotNull(assigner, nameof(assigner));
+            Guard.NotNull(assignee, nameof(assignee));
+            Guard.NotNull(appName, nameof(appName));
 
-        public Task SendNewUserEmailAsync(IUser assigner, IUser assignee, string appName)
-        {
-            return SendEmailAsync(texts.NewUserSubject, texts.NewUserBody, assigner, assignee, appName);
+            if (assignee.HasConsent())
+            {
+                return SendEmailAsync(texts.ExistingUserSubject, texts.ExistingUserBody, assigner, assignee, appName);
+            }
+            else
+            {
+                return SendEmailAsync(texts.NewUserSubject, texts.NewUserBody, assigner, assignee, appName);
+            }
         }
 
         private async Task SendEmailAsync(string emailSubj, string emailBody, IUser assigner, IUser assignee, string appName)

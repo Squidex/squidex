@@ -35,6 +35,7 @@ using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.History;
+using Squidex.Domain.Apps.Entities.History.Notifications;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
@@ -156,22 +157,22 @@ namespace Squidex.Config.Domain
             {
                 services.AddSingleton(Options.Create(emailOptions));
 
-                services.Configure<InvitationEmailTextOptions>(
-                    config.GetSection("email:invitations"));
+                services.Configure<NotificationEmailTextOptions>(
+                    config.GetSection("email:notifications"));
 
                 services.AddSingletonAs<SmtpEmailSender>()
                     .As<IEmailSender>();
 
-                services.AddSingletonAs<InvitationEmailSender>()
-                    .AsOptional<IInvitationEmailSender>();
+                services.AddSingletonAs<NotificationEmailSender>()
+                    .AsOptional<INotificationEmailSender>();
             }
             else
             {
-                services.AddSingletonAs<NoopInvitationEmailSender>()
-                    .AsOptional<IInvitationEmailSender>();
+                services.AddSingletonAs<NoopNotificationEmailSender>()
+                    .AsOptional<INotificationEmailSender>();
             }
 
-            services.AddSingletonAs<InvitationEmailEventConsumer>()
+            services.AddSingletonAs<NotificationEmailEventConsumer>()
                 .As<IEventConsumer>();
         }
 

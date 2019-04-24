@@ -8,14 +8,12 @@
 using System.Threading.Tasks;
 using Squidex.Shared.Users;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation
+namespace Squidex.Domain.Apps.Entities.History.Notifications
 {
-    public interface IInvitationEmailSender
+    public interface INotificationEmailSender
     {
         bool IsActive { get; }
 
-        Task SendNewUserEmailAsync(IUser assigner, IUser assignee, string appName);
-
-        Task SendExistingUserEmailAsync(IUser assigner, IUser assignee, string appName);
+        Task SendContributorEmailAsync(IUser assigner, IUser assignee, string appName, bool isCreated);
     }
 }

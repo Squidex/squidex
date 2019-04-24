@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation
+namespace Squidex.Domain.Apps.Entities.History.Notifications
 {
-    public sealed class InvitationEmailTextOptions
+    public sealed class NotificationEmailTextOptions
     {
         public string NewUserSubject { get; set; }
 

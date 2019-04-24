@@ -18,36 +18,38 @@ using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation
+namespace Squidex.Domain.Apps.Entities.History.Notifications
 {
-    public class InvitationEmailSenderTests
+    public class NotificationEmailSenderTests
     {
         private readonly IEmailSender emailSender = A.Fake<IEmailSender>();
         private readonly IEmailUrlGenerator emailUrlGenerator = A.Fake<IEmailUrlGenerator>();
         private readonly IUser assigner = A.Fake<IUser>();
         private readonly IUser assignee = A.Fake<IUser>();
         private readonly ISemanticLog log = A.Fake<ISemanticLog>();
+        private readonly List<Claim> assignerClaims = new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Sebastian Stehle") };
+        private readonly List<Claim> assigneeClaims = new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Qaisar Ahmad") };
         private readonly string appName = "my-app";
         private readonly string uiUrl = "my-ui";
-        private readonly InvitationEmailTextOptions texts = new InvitationEmailTextOptions();
-        private readonly InvitationEmailSender sut;
+        private readonly NotificationEmailTextOptions texts = new NotificationEmailTextOptions();
+        private readonly NotificationEmailSender sut;
 
-        public InvitationEmailSenderTests()
+        public NotificationEmailSenderTests()
         {
             A.CallTo(() => assigner.Email)
                 .Returns("sebastian@squidex.io");
             A.CallTo(() => assigner.Claims)
-                .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Sebastian Stehle") });
+                .Returns(assignerClaims);
 
             A.CallTo(() => assignee.Email)
                 .Returns("qaisar@squidex.io");
             A.CallTo(() => assignee.Claims)
-                .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Qaisar Ahmad") });
+                .Returns(assigneeClaims);
 
             A.CallTo(() => emailUrlGenerator.GenerateUIUrl())
                 .Returns(uiUrl);
 
-            sut = new InvitationEmailSender(Options.Create(texts), emailSender, emailUrlGenerator, log);
+            sut = new NotificationEmailSender(Options.Create(texts), emailSender, emailUrlGenerator, log);
         }
 
         [Fact]
@@ -89,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         [Fact]
         public async Task Should_not_send_email_if_texts_for_new_user_are_empty()
         {
-            await sut.SendNewUserEmailAsync(assigner, assignee, appName);
+            await sut.SendContributorEmailAsync(assigner, assignee, appName, true);
 
             A.CallTo(() => emailSender.SendAsync(assignee.Email, A<string>.Ignored, A<string>.Ignored))
                 .MustNotHaveHappened();
@@ -100,7 +102,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         [Fact]
         public async Task Should_not_send_email_if_texts_for_existing_user_are_empty()
         {
-            await sut.SendExistingUserEmailAsync(assigner, assignee, appName);
+            await sut.SendContributorEmailAsync(assigner, assignee, appName, true);
 
             A.CallTo(() => emailSender.SendAsync(assignee.Email, A<string>.Ignored, A<string>.Ignored))
                 .MustNotHaveHappened();
@@ -109,12 +111,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         }
 
         [Fact]
-        public async Task Should_send_email_for_existing_user()
+        public async Task Should_send_email_when_consent_given()
         {
+            assigneeClaims.Add(new Claim(SquidexClaimTypes.Consent, "True"));
+
             texts.ExistingUserSubject = "email-subject";
             texts.ExistingUserBody = "email-body";
 
-            await sut.SendExistingUserEmailAsync(assigner, assignee, appName);
+            await sut.SendContributorEmailAsync(assigner, assignee, appName, true);
 
             A.CallTo(() => emailSender.SendAsync(assignee.Email, "email-subject", "email-body"))
                 .MustHaveHappened();
@@ -125,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             texts.NewUserSubject = pattern;
             texts.NewUserBody = pattern;
 
-            await sut.SendNewUserEmailAsync(assigner, assignee, appName);
+            await sut.SendContributorEmailAsync(assigner, assignee, appName, true);
 
             A.CallTo(() => emailSender.SendAsync(assignee.Email, result, result))
                 .MustHaveHappened();

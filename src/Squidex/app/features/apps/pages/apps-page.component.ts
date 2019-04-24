@@ -73,4 +73,8 @@ export class AppsPageComponent implements OnInit {
         this.addAppTemplate = template;
         this.addAppDialog.show();
     }
+
+    public stop(event: Event) {
+        event.stopPropagation();
+    }
 }

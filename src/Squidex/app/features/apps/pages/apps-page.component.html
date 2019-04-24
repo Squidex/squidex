@@ -19,7 +19,9 @@
                 <h4 class="card-title">{{app.name}}</h4>
 
                 <div class="card-text">
-                    <a [routerLink]="['/app', app.name]">Edit</a>
+                    <a (click)="stop($event)" [routerLink]="['/app', app.name, 'content']">Content</a> |
+                    <a (click)="stop($event)" [routerLink]="['/app', app.name, 'assets']">Assets</a> |
+                    <a (click)="stop($event)" [routerLink]="['/app', app.name, 'settings']">Settings</a>
                 </div>
             </div>
         </div>
