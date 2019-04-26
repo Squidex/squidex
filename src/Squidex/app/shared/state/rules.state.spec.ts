@@ -11,25 +11,27 @@ import { IMock, It, Mock, Times } from 'typemoq';
 import { RulesState } from './rules.state';
 
 import {
-    AppsState,
-    AuthService,
-    DateTime,
     DialogService,
     RuleDto,
     RulesService,
     UpdateRuleDto,
-    Version,
     Versioned
 } from './../';
 
+import { TestValues } from './_test-helpers';
+
 describe('RulesState', () => {
-    const app = 'my-app';
-    const creation = DateTime.today();
-    const creator = 'not-me';
-    const modified = DateTime.now();
-    const modifier = 'me';
-    const version = new Version('1');
-    const newVersion = new Version('2');
+    const {
+        app,
+        appsState,
+        authService,
+        creation,
+        creator,
+        modified,
+        modifier,
+        newVersion,
+        version
+    } = TestValues;
 
     const oldRules = [
         new RuleDto('id1', creator, creator, creation, creation, version, false, {}, 'trigger1', {}, 'action1'),
@@ -37,23 +39,11 @@ describe('RulesState', () => {
     ];
 
     let dialogs: IMock<DialogService>;
-    let appsState: IMock<AppsState>;
-    let authService: IMock<AuthService>;
     let rulesService: IMock<RulesService>;
     let rulesState: RulesState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        authService = Mock.ofType<AuthService>();
-
-        authService.setup(x => x.user)
-            .returns(() => <any>{ id: '1', token: modifier });
-
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
 
         rulesService = Mock.ofType<RulesService>();
 
@@ -95,7 +85,7 @@ describe('RulesState', () => {
     it('should update action and update and user info when updated action', () => {
         const newAction = {};
 
-        rulesService.setup(x => x.putRule(app, oldRules[0].id, It.is<UpdateRuleDto>(i => true), version))
+        rulesService.setup(x => x.putRule(app, oldRules[0].id, It.is<UpdateRuleDto>(() => true), version))
             .returns(() => of(new Versioned<any>(newVersion, {})));
 
         rulesState.updateAction(oldRules[0], newAction, modified).subscribe();
@@ -109,7 +99,7 @@ describe('RulesState', () => {
     it('should update trigger and update and user info when updated trigger', () => {
         const newTrigger = {};
 
-        rulesService.setup(x => x.putRule(app, oldRules[0].id, It.is<UpdateRuleDto>(i => true), version))
+        rulesService.setup(x => x.putRule(app, oldRules[0].id, It.is<UpdateRuleDto>(() => true), version))
             .returns(() => of(new Versioned<any>(newVersion, {})));
 
         rulesState.updateTrigger(oldRules[0], newTrigger, modified).subscribe();

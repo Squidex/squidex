@@ -94,7 +94,12 @@ describe('AppLanguagesService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({ iso2Code: 'de', englishName: 'German' });
+        req.flush({
+            iso2Code: 'de',
+            isMaster: false,
+            isOptional: false,
+            englishName: 'German'
+        });
 
         expect(language!).toEqual(new AppLanguageDto('de', 'German', false, false, []));
     }));

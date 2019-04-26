@@ -9,7 +9,6 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppsState,
     DateTime,
     DialogService,
     RuleEventDto,
@@ -18,26 +17,25 @@ import {
     RulesService
 } from './../';
 
+import { TestValues } from './_test-helpers';
+
 describe('RuleEventsState', () => {
-    const app = 'my-app';
+    const {
+        app,
+        appsState
+    } = TestValues;
 
     const oldRuleEvents = [
         new RuleEventDto('id1', DateTime.now(), null, 'event1', 'description', 'dump1', 'result1', 'result1', 1),
         new RuleEventDto('id2', DateTime.now(), null, 'event2', 'description', 'dump2', 'result2', 'result2', 2)
     ];
 
-    let appsState: IMock<AppsState>;
     let dialogs: IMock<DialogService>;
     let rulesService: IMock<RulesService>;
     let ruleEventsState: RuleEventsState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
 
         rulesService = Mock.ofType<RulesService>();
 

@@ -9,20 +9,23 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppsState,
     DialogService,
     PatternDto,
     PatternsDto,
     PatternsService,
     PatternsState,
-    Version,
     Versioned
 } from './../';
 
+import { TestValues } from './_test-helpers';
+
 describe('PatternsState', () => {
-    const app = 'my-app';
-    const version = new Version('1');
-    const newVersion = new Version('2');
+    const {
+        app,
+        appsState,
+        newVersion,
+        version
+    } = TestValues;
 
     const oldPatterns = [
         new PatternDto('id1', 'name1', 'pattern1', ''),
@@ -30,17 +33,11 @@ describe('PatternsState', () => {
     ];
 
     let dialogs: IMock<DialogService>;
-    let appsState: IMock<AppsState>;
     let patternsService: IMock<PatternsService>;
     let patternsState: PatternsState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
 
         patternsService = Mock.ofType<PatternsService>();
 
@@ -88,7 +85,7 @@ describe('PatternsState', () => {
 
         patternsState.update(oldPatterns[1], request).subscribe();
 
-        const pattern_1 = patternsState.snapshot.patterns.at(0);
+        const pattern_1 = patternsState.snapshot.patterns.at(1);
 
         expect(pattern_1.name).toBe(request.name);
         expect(pattern_1.pattern).toBe(request.pattern);

@@ -82,12 +82,7 @@ export class Form<T extends AbstractControl, V> {
         this.state.next(_ => ({ submitted: false, error: null }));
 
         this.enable();
-
-        if (newValue) {
-            this.setValue(newValue);
-        } else {
-            this.form.markAsPristine();
-        }
+        this.setValue(newValue);
     }
 
     public submitFailed(error?: string | ErrorDto) {

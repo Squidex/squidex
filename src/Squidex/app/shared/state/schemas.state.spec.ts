@@ -12,11 +12,8 @@ import { SchemasState } from './schemas.state';
 
 import {
     AddFieldDto,
-    AppsState,
-    AuthService,
     createProperties,
     CreateSchemaDto,
-    DateTime,
     DialogService,
     NestedFieldDto,
     RootFieldDto,
@@ -24,18 +21,23 @@ import {
     SchemaDto,
     SchemasService,
     UpdateSchemaCategoryDto,
-    Version,
     Versioned
 } from './../';
 
+import { TestValues } from './_test-helpers';
+
 describe('SchemasState', () => {
-    const app = 'my-app';
-    const creation = DateTime.today();
-    const creator = 'not-me';
-    const modified = DateTime.now();
-    const modifier = 'me';
-    const version = new Version('1');
-    const newVersion = new Version('2');
+    const {
+        app,
+        appsState,
+        authService,
+        creation,
+        creator,
+        modified,
+        modifier,
+        newVersion,
+        version
+    } = TestValues;
 
     const oldSchemas = [
         new SchemaDto('id1', 'name1', 'category1', {}, false, false, creation, creator, creation, creator, version),
@@ -56,23 +58,11 @@ describe('SchemasState', () => {
             [field1, field2]);
 
     let dialogs: IMock<DialogService>;
-    let appsState: IMock<AppsState>;
-    let authService: IMock<AuthService>;
     let schemasService: IMock<SchemasService>;
     let schemasState: SchemasState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        authService = Mock.ofType<AuthService>();
-
-        authService.setup(x => x.user)
-            .returns(() => <any>{ id: '1', token: modifier });
-
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
 
         schemasService = Mock.ofType<SchemasService>();
 

@@ -12,20 +12,23 @@ import {
     AppLanguageDto,
     AppLanguagesDto,
     AppLanguagesService,
-    AppsState,
     DialogService,
     ImmutableArray,
     LanguageDto,
     LanguagesService,
     LanguagesState,
-    Version,
     Versioned
 } from './../';
 
+import { TestValues } from './_test-helpers';
+
 describe('LanguagesState', () => {
-    const app = 'my-app';
-    const version = new Version('1');
-    const newVersion = new Version('2');
+    const {
+        app,
+        appsState,
+        newVersion,
+        version
+    } = TestValues;
 
     const languageDE = new LanguageDto('de', 'German');
     const languageEN = new LanguageDto('en', 'English');
@@ -33,23 +36,17 @@ describe('LanguagesState', () => {
     const languageES = new LanguageDto('es', 'Spanish');
 
     const oldLanguages = [
-        new AppLanguageDto(languageEN.iso2Code, languageEN.englishName, true,  false, []),
-        new AppLanguageDto(languageDE.iso2Code, languageDE.englishName, false, true,  [languageEN.iso2Code])
+        AppLanguageDto.fromLanguage(languageEN, true),
+        AppLanguageDto.fromLanguage(languageDE, false, true,  [languageEN.iso2Code])
     ];
 
     let dialogs: IMock<DialogService>;
-    let appsState: IMock<AppsState>;
     let allLanguagesService: IMock<LanguagesService>;
     let languagesService: IMock<AppLanguagesService>;
     let languagesState: LanguagesState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
 
         allLanguagesService = Mock.ofType<LanguagesService>();
 
@@ -120,15 +117,15 @@ describe('LanguagesState', () => {
     });
 
     it('should update language in snapshot when updated', () => {
-        const request = { isMaster: true };
+        const request = { isMaster: true, isOptional: false, fallback: [] };
 
         languagesService.setup(x => x.putLanguage(app, oldLanguages[1].iso2Code, request, version))
             .returns(() => of(new Versioned<any>(newVersion, {})));
 
         languagesState.update(oldLanguages[1], request).subscribe();
 
-        const newLanguage1 = new AppLanguageDto(languageDE.iso2Code, languageDE.englishName, true,  false, []);
-        const newLanguage2 = new AppLanguageDto(languageEN.iso2Code, languageEN.englishName, false, false, []);
+        const newLanguage1 = AppLanguageDto.fromLanguage(languageDE, true);
+        const newLanguage2 = AppLanguageDto.fromLanguage(languageEN);
 
         expect(languagesState.snapshot.languages.values).toEqual([
            {

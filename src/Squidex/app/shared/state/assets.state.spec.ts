@@ -9,25 +9,27 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppsState,
     AssetDto,
     AssetsDto,
     AssetsService,
     AssetsState,
-    DateTime,
     DialogService,
-    Version,
     Versioned
 } from './../';
 
+import { TestValues } from './_test-helpers';
+
 describe('AssetsState', () => {
-    const app = 'my-app';
-    const creation = DateTime.today();
-    const creator = 'not-me';
-    const modified = DateTime.now();
-    const modifier = 'me';
-    const version = new Version('1');
-    const newVersion = new Version('2');
+    const {
+        app,
+        appsState,
+        creation,
+        creator,
+        modified,
+        modifier,
+        newVersion,
+        version
+    } = TestValues;
 
     const oldAssets = [
         new AssetDto('id1', creator, creator, creation, creation, 'name1', 'hash1', 'type1', 1, 1, 'mime1', false, false, null, null, 'slug1', ['tag1', 'shared'], 'url1', version),
@@ -35,17 +37,11 @@ describe('AssetsState', () => {
     ];
 
     let dialogs: IMock<DialogService>;
-    let appsState: IMock<AppsState>;
     let assetsService: IMock<AssetsService>;
     let assetsState: AssetsState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
 
         assetsService = Mock.ofType<AssetsService>();
 

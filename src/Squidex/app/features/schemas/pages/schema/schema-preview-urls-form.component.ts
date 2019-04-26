@@ -46,7 +46,7 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
     }
 
     public cancelAdd() {
-        this.addForm.submitCompleted({ name: '', url: '' });
+        this.addForm.submitCompleted();
     }
 
     public add() {

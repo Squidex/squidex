@@ -12,10 +12,10 @@ import {
 } from './../';
 
 describe('FilterState', () => {
-    let filterState: FilterState;
     let query: string | undefined;
-    let filter: string | undefined;
     let fullText: string | undefined;
+    let filterState: FilterState;
+    let filter: string | undefined;
     let order: string | undefined;
 
     beforeEach(() => {

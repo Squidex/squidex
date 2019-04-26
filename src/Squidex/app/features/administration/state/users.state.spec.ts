@@ -177,7 +177,7 @@ describe('UsersState', () => {
         const user_1 = usersState.snapshot.users.at(0);
 
         expect(user_1.user.email).toEqual(request.email);
-        expect(user_1.user.displayName).toEqual(request.permissions);
+        expect(user_1.user.displayName).toEqual(request.displayName);
         expect(user_1.user.permissions).toEqual(request.permissions);
         expect(user_1).toBe(usersState.snapshot.selectedUser!);
     });

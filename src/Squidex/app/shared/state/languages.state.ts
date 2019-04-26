@@ -132,13 +132,13 @@ export class LanguagesState extends State<Snapshot> {
     public update(language: AppLanguageDto, request: UpdateAppLanguageDto): Observable<any> {
         return this.appLanguagesService.putLanguage(this.appName, language.iso2Code, request, this.version).pipe(
             tap(dto => {
-                const languages = this.snapshot.plainLanguages.map(l => {
-                    if (l.iso2Code === language.iso2Code) {
-                        return update(l, request);
-                    } else if (l.isMaster && request.isMaster) {
-                        return  update(l, { isMaster: false });
+                const languages = this.snapshot.plainLanguages.map(x => {
+                    if (x.iso2Code === language.iso2Code) {
+                        return update(x, request);
+                    } else if (x.isMaster && request.isMaster) {
+                        return update(x, { isMaster: false });
                     } else {
-                        return l;
+                        return x;
                     }
                 });
 

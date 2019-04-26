@@ -20,6 +20,8 @@ import {
     Versioned
 } from '@app/framework';
 
+import { LanguageDto } from './languages.service';
+
 export class AppLanguagesDto extends Model<AppLanguagesDto> {
     constructor(
         public readonly languages: AppLanguageDto[],
@@ -38,6 +40,15 @@ export class AppLanguageDto extends Model<AppLanguageDto> {
         public readonly fallback: string[]
     ) {
         super();
+    }
+
+    public static fromLanguage(language: LanguageDto, isMaster = false, isOptional = false, fallback: string[] = []) {
+        return new AppLanguageDto(
+            language.iso2Code,
+            language.englishName,
+            isMaster,
+            isOptional,
+            fallback);
     }
 }
 

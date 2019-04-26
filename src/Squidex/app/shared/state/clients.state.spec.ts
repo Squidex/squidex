@@ -9,20 +9,23 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppsState,
     ClientDto,
     ClientsDto,
     ClientsService,
     ClientsState,
     DialogService,
-    Version,
     Versioned
 } from './../';
 
+import { TestValues } from './_test-helpers';
+
 describe('ClientsState', () => {
-    const app = 'my-app';
-    const version = new Version('1');
-    const newVersion = new Version('2');
+    const {
+        app,
+        appsState,
+        newVersion,
+        version
+    } = TestValues;
 
     const oldClients = [
         new ClientDto('id1', 'name1', 'secret1'),
@@ -30,17 +33,11 @@ describe('ClientsState', () => {
     ];
 
     let dialogs: IMock<DialogService>;
-    let appsState: IMock<AppsState>;
     let clientsService: IMock<ClientsService>;
     let clientsState: ClientsState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
 
         clientsService = Mock.ofType<ClientsService>();
 

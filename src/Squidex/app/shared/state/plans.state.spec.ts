@@ -10,22 +10,25 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppsState,
-    AuthService,
     DialogService,
     PlanChangedDto,
     PlanDto,
     PlansDto,
     PlansService,
     PlansState,
-    Version,
     Versioned
 } from './../';
 
+import { TestValues } from './_test-helpers';
+
 describe('PlansState', () => {
-    const app = 'my-app';
-    const version = new Version('1');
-    const newVersion = new Version('2');
+    const {
+        app,
+        appsState,
+        authService,
+        newVersion,
+        version
+    } = TestValues;
 
     const oldPlans =
         new PlansDto('id1', 'id2', true, [
@@ -35,23 +38,11 @@ describe('PlansState', () => {
         version);
 
     let dialogs: IMock<DialogService>;
-    let appsState: IMock<AppsState>;
-    let authService: IMock<AuthService>;
     let plansService: IMock<PlansService>;
     let plansState: PlansState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        authService = Mock.ofType<AuthService>();
-
-        authService.setup(x => x.user)
-            .returns(() => <any>{ id: 'id3' });
-
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
 
         plansService = Mock.ofType<PlansService>();
 
@@ -102,8 +93,10 @@ describe('PlansState', () => {
     it('should redirect when returning url', () => {
         plansState.window = <any>{ location: {} };
 
+        const result = { redirectUri: 'http://url' };
+
         plansService.setup(x => x.putPlan(app, It.isAny(), version))
-            .returns(() => of(new Versioned<PlanChangedDto>(newVersion, { redirectUri: 'http://url' })));
+            .returns(() => of(new Versioned<PlanChangedDto>(newVersion, result)));
 
         plansState.load().subscribe();
         plansState.change('free').pipe(onErrorResumeNext()).subscribe();
@@ -112,7 +105,7 @@ describe('PlansState', () => {
             { isSelected: true,  isYearlySelected: false, plan: oldPlans.plans[0] },
             { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[1] }
         ]);
-        expect(plansState.window.location.href).toBe('URI');
+        expect(plansState.window.location.href).toBe(result.redirectUri);
         expect(plansState.snapshot.version).toEqual(version);
     });
 

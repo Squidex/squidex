@@ -110,7 +110,7 @@ describe('PlansService', () => {
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/plan');
 
-        req.flush({ redirectUri: 'my-url' });
+        req.flush({ redirectUri: 'http://url' });
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);

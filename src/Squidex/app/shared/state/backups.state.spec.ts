@@ -10,7 +10,6 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppsState,
     BackupDto,
     BackupsService,
     BackupsState,
@@ -18,8 +17,13 @@ import {
     DialogService
 } from './../';
 
+import { TestValues } from './_test-helpers';
+
 describe('BackupsState', () => {
-    const app = 'my-app';
+    const {
+        app,
+        appsState
+    } = TestValues;
 
     const oldBackups = [
         new BackupDto('id1', DateTime.now(), null, 1, 1, 'Started'),
@@ -27,17 +31,11 @@ describe('BackupsState', () => {
     ];
 
     let dialogs: IMock<DialogService>;
-    let appsState: IMock<AppsState>;
     let backupsService: IMock<BackupsService>;
     let backupsState: BackupsState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
-
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
 
         backupsService = Mock.ofType<BackupsService>();
 
