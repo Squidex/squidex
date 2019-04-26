@@ -20,15 +20,15 @@ import {
 import { AppsState } from './apps.state';
 
 import {
-    AppClientDto,
-    AppClientsService,
-    CreateAppClientDto,
-    UpdateAppClientDto
-} from './../services/app-clients.service';
+    ClientDto,
+    ClientsService,
+    CreateClientDto,
+    UpdateClientDto
+} from './../services/clients.service';
 
 interface Snapshot {
     // The current clients.
-    clients: ImmutableArray<AppClientDto>;
+    clients: ImmutableArray<ClientDto>;
 
     // The app version.
     version: Version;
@@ -48,7 +48,7 @@ export class ClientsState extends State<Snapshot> {
             distinctUntilChanged());
 
     constructor(
-        private readonly appClientsService: AppClientsService,
+        private readonly clientsService: ClientsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
@@ -60,7 +60,7 @@ export class ClientsState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.appClientsService.getClients(this.appName).pipe(
+        return this.clientsService.getClients(this.appName).pipe(
             tap(dtos => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Clients reloaded.');
@@ -75,8 +75,8 @@ export class ClientsState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public attach(request: CreateAppClientDto): Observable<any> {
-        return this.appClientsService.postClient(this.appName, request, this.version).pipe(
+    public attach(request: CreateClientDto): Observable<any> {
+        return this.clientsService.postClient(this.appName, request, this.version).pipe(
             tap(dto => {
                 this.next(s => {
                     const clients = s.clients.push(dto.payload);
@@ -87,8 +87,8 @@ export class ClientsState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public revoke(client: AppClientDto): Observable<any> {
-        return this.appClientsService.deleteClient(this.appName, client.id, this.version).pipe(
+    public revoke(client: ClientDto): Observable<any> {
+        return this.clientsService.deleteClient(this.appName, client.id, this.version).pipe(
             tap(dto => {
                 this.next(s => {
                     const clients = s.clients.filter(c => c.id !== client.id);
@@ -99,8 +99,8 @@ export class ClientsState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public update(client: AppClientDto, request: UpdateAppClientDto): Observable<any> {
-        return this.appClientsService.putClient(this.appName, client.id, request, this.version).pipe(
+    public update(client: ClientDto, request: UpdateClientDto): Observable<any> {
+        return this.clientsService.putClient(this.appName, client.id, request, this.version).pipe(
             tap(dto => {
                 this.next(s => {
                     const clients = s.clients.replaceBy('id', update(client, request));
@@ -120,5 +120,5 @@ export class ClientsState extends State<Snapshot> {
     }
 }
 
-const update = (client: AppClientDto, request: UpdateAppClientDto) =>
+const update = (client: ClientDto, request: UpdateClientDto) =>
     client.with({ name: request.name || client.name, role: request.role || client.role });

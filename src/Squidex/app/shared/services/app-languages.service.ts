@@ -73,8 +73,8 @@ export class AppLanguagesService {
                         return new AppLanguageDto(
                             item.iso2Code,
                             item.englishName,
-                            item.isMaster === true,
-                            item.isOptional === true,
+                            item.isMaster,
+                            item.isOptional,
                             item.fallback || []);
                     });
 
@@ -93,8 +93,8 @@ export class AppLanguagesService {
                     const language = new AppLanguageDto(
                         body.iso2Code,
                         body.englishName,
-                        body.isMaster === true,
-                        body.isOptional === true,
+                        body.isMaster,
+                        body.isOptional,
                         body.fallback || []);
 
                     return new Versioned(response.version, language);

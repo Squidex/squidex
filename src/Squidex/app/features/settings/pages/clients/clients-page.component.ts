@@ -10,11 +10,10 @@ import { FormBuilder } from '@angular/forms';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
-    AppClientDto,
     AppsState,
     AttachClientForm,
+    ClientDto,
     ClientsState,
-    CreateAppClientDto,
     RolesState
 } from '@app/shared';
 
@@ -48,9 +47,7 @@ export class ClientsPageComponent implements OnInit {
         const value = this.addClientForm.submit();
 
         if (value) {
-            const requestDto = new CreateAppClientDto(value.name);
-
-            this.clientsState.attach(requestDto)
+            this.clientsState.attach(value)
                 .subscribe(() => {
                     this.addClientForm.submitCompleted();
                 }, error => {
@@ -63,7 +60,7 @@ export class ClientsPageComponent implements OnInit {
         this.addClientForm.submitCompleted();
     }
 
-    public trackByClient(index: number, item: AppClientDto) {
+    public trackByClient(index: number, item: ClientDto) {
         return item.id;
     }
 }

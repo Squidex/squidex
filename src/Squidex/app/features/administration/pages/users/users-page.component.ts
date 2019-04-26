@@ -9,8 +9,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { onErrorResumeNext } from 'rxjs/operators';
 
-import { UserDto } from './../../services/users.service';
-import { UsersState } from './../../state/users.state';
+import { UserDto, UsersState } from '../../declarations';
 
 @Component({
     selector: 'sqx-users-page',

@@ -9,10 +9,10 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppClientDto,
-    AppClientsDto,
-    AppClientsService,
     AppsState,
+    ClientDto,
+    ClientsDto,
+    ClientsService,
     ClientsState,
     DialogService,
     Version,
@@ -25,13 +25,13 @@ describe('ClientsState', () => {
     const newVersion = new Version('2');
 
     const oldClients = [
-        new AppClientDto('id1', 'name1', 'secret1'),
-        new AppClientDto('id2', 'name2', 'secret2')
+        new ClientDto('id1', 'name1', 'secret1'),
+        new ClientDto('id2', 'name2', 'secret2')
     ];
 
     let dialogs: IMock<DialogService>;
     let appsState: IMock<AppsState>;
-    let clientsService: IMock<AppClientsService>;
+    let clientsService: IMock<ClientsService>;
     let clientsState: ClientsState;
 
     beforeEach(() => {
@@ -42,10 +42,10 @@ describe('ClientsState', () => {
         appsState.setup(x => x.appName)
             .returns(() => app);
 
-        clientsService = Mock.ofType<AppClientsService>();
+        clientsService = Mock.ofType<ClientsService>();
 
         clientsService.setup(x => x.getClients(app))
-            .returns(() => of(new AppClientsDto(oldClients, version)));
+            .returns(() => of(new ClientsDto(oldClients, version)));
 
         clientsState = new ClientsState(clientsService.object, appsState.object, dialogs.object);
         clientsState.load().subscribe();
@@ -68,12 +68,12 @@ describe('ClientsState', () => {
     });
 
     it('should add client to snapshot when created', () => {
-        const newClient = new AppClientDto('id3', 'name3', 'secret3');
+        const newClient = new ClientDto('id3', 'name3', 'secret3');
 
         const request = { id: 'id3' };
 
         clientsService.setup(x => x.postClient(app, request, version))
-            .returns(() => of(new Versioned<AppClientDto>(newVersion, newClient)));
+            .returns(() => of(new Versioned<ClientDto>(newVersion, newClient)));
 
         clientsState.attach(request).subscribe();
 

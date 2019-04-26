@@ -20,7 +20,7 @@ export interface FormState {
     error?: string | null;
 }
 
-export class Form<T extends AbstractControl> {
+export class Form<T extends AbstractControl, V = any> {
     private readonly state = new State<FormState>({ submitted: false });
 
     public submitted =
@@ -42,21 +42,21 @@ export class Form<T extends AbstractControl> {
         this.form.enable();
     }
 
-    protected reset(value: any) {
+    protected reset(value: V | undefined) {
         this.form.reset(value);
     }
 
-    protected setValue(value: any) {
+    protected setValue(value: V | undefined) {
         this.form.reset(value, { emitEvent: true });
     }
 
-    public load(value: any) {
+    public load(value: V | undefined) {
         this.state.next(_ => ({ submitted: false, error: null }));
 
         this.setValue(value);
     }
 
-    public submit(): any | null {
+    public submit(): V | null {
         this.state.next(_ => ({ submitted: true }));
 
         if (this.form.valid) {
@@ -70,7 +70,7 @@ export class Form<T extends AbstractControl> {
         }
     }
 
-    public submitCompleted(newValue?: any) {
+    public submitCompleted(newValue?: V) {
         this.state.next(_ => ({ submitted: false, error: null }));
 
         this.enable();
@@ -106,8 +106,8 @@ export class Model<T> {
         return this.clone(value, validOnly);
     }
 
-    protected clone(update: ((v: any) => T) | Partial<T>, validOnly = false): T {
-        let values: Partial<T>;
+    protected clone<V>(update: ((v: any) => V) | Partial<V>, validOnly = false): V {
+        let values: Partial<V>;
         if (Types.isFunction(update)) {
             values = update(<any>this);
         } else {

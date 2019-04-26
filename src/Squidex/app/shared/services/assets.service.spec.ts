@@ -35,7 +35,7 @@ describe('AssetDto', () => {
         const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'Name.png', 'Hash', 'png', 1, 1, 'image/png', false, false, 1, 1, 'name.png', [], 'url', version);
         const asset_2 = asset_1.annnotate(update, modifier, newVersion, modified);
 
-        expect(asset_2.fileName).toEqual('NewName.png');
+        expect(asset_2.fileName).toEqual(update.fileName);
         expect(asset_2.tags).toEqual([]);
         expect(asset_2.slug).toEqual(asset_1.slug);
         expect(asset_2.lastModified).toEqual(modified);
@@ -44,18 +44,26 @@ describe('AssetDto', () => {
     });
 
     it('should update file properties when uploading', () => {
-        const update = new AssetReplacedDto('Hash New', 2, 2, 'image/jpeg', true, 2, 2);
+        const update = {
+            fileHash: 'Hash New',
+            fileSize: 1024,
+            fileVersion: 12,
+            mimeType: 'image/png',
+            isImage: true,
+            pixelWidth: 1024,
+            pixelHeight: 2048
+        };
 
         const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'Name.png', 'Hash', 'png', 1, 1, 'image/png', false, false, 1, 1, 'name.png', [], 'url', version);
         const asset_2 = asset_1.update(update, modifier, newVersion, modified);
 
-        expect(asset_2.fileHash).toEqual('Hash New');
-        expect(asset_2.fileSize).toEqual(2);
-        expect(asset_2.fileVersion).toEqual(2);
-        expect(asset_2.mimeType).toEqual('image/jpeg');
+        expect(asset_2.fileHash).toEqual(update.fileHash);
+        expect(asset_2.fileSize).toEqual(update.fileSize);
+        expect(asset_2.fileVersion).toEqual(update.fileVersion);
+        expect(asset_2.mimeType).toEqual(update.mimeType);
         expect(asset_2.isImage).toBeTruthy();
-        expect(asset_2.pixelWidth).toEqual(2);
-        expect(asset_2.pixelHeight).toEqual(2);
+        expect(asset_2.pixelWidth).toEqual(update.pixelWidth);
+        expect(asset_2.pixelHeight).toEqual(update.pixelHeight);
         expect(asset_2.lastModified).toEqual(modified);
         expect(asset_2.lastModifiedBy).toEqual(modifier);
         expect(asset_2.version).toEqual(newVersion);
@@ -407,15 +415,15 @@ describe('AssetsService', () => {
             pixelHeight: 2048
         });
 
-        expect(asset!).toEqual(
-            new AssetReplacedDto(
-                'Hash New',
-                1024,
-                12,
-                'image/png',
-                true,
-                1024,
-                2048));
+        expect(asset!).toEqual({
+            fileHash: 'Hash New',
+            fileSize: 1024,
+            fileVersion: 12,
+            mimeType: 'image/png',
+            isImage: true,
+            pixelWidth: 1024,
+            pixelHeight: 2048
+        });
     }));
 
     it('should return proper error when replace failed with 413',

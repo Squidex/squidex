@@ -84,6 +84,10 @@ export class SchemaDetailsDto extends SchemaDto {
             this.listFieldsEditable = fields.filter(x => x.isInlineEditable);
         }
     }
+
+    public with(value: Partial<SchemaDetailsDto>): SchemaDetailsDto {
+        return this.clone(value);
+    }
 }
 
 export class FieldDto extends Model<FieldDto> {
@@ -137,6 +141,10 @@ export class RootFieldDto extends FieldDto {
     ) {
         super(fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
+
+    public with(value: Partial<RootFieldDto>): RootFieldDto {
+        return this.clone(value);
+    }
 }
 
 export class NestedFieldDto extends FieldDto {
@@ -147,6 +155,10 @@ export class NestedFieldDto extends FieldDto {
         isDisabled: boolean = false
     ) {
         super(fieldId, name, properties, isLocked, isHidden, isDisabled);
+    }
+
+    public with(value: Partial<NestedFieldDto>): NestedFieldDto {
+        return this.clone(value);
     }
 }
 

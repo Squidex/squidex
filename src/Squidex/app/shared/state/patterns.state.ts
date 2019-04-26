@@ -20,14 +20,14 @@ import {
 import { AppsState } from './apps.state';
 
 import {
-    AppPatternDto,
-    AppPatternsService,
-    EditAppPatternDto
-} from './../services/app-patterns.service';
+    EditPatternDto,
+    PatternDto,
+    PatternsService
+} from './../services/patterns.service';
 
 interface Snapshot {
     // The current patterns.
-    patterns: ImmutableArray<AppPatternDto>;
+    patterns: ImmutableArray<PatternDto>;
 
     // The app version.
     version: Version;
@@ -47,7 +47,7 @@ export class PatternsState extends State<Snapshot> {
             distinctUntilChanged());
 
     constructor(
-        private readonly appPatternsService: AppPatternsService,
+        private readonly patternsService: PatternsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
@@ -59,7 +59,7 @@ export class PatternsState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.appPatternsService.getPatterns(this.appName).pipe(
+        return this.patternsService.getPatterns(this.appName).pipe(
             tap(dtos => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Patterns reloaded.');
@@ -74,8 +74,8 @@ export class PatternsState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public create(request: EditAppPatternDto): Observable<any> {
-        return this.appPatternsService.postPattern(this.appName, request, this.version).pipe(
+    public create(request: EditPatternDto): Observable<any> {
+        return this.patternsService.postPattern(this.appName, request, this.version).pipe(
             tap(dto => {
                 this.next(s => {
                     const patterns = s.patterns.push(dto.payload).sortByStringAsc(x => x.name);
@@ -86,8 +86,8 @@ export class PatternsState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public update(pattern: AppPatternDto, request: EditAppPatternDto): Observable<any> {
-        return this.appPatternsService.putPattern(this.appName, pattern.id, request, this.version).pipe(
+    public update(pattern: PatternDto, request: EditPatternDto): Observable<any> {
+        return this.patternsService.putPattern(this.appName, pattern.id, request, this.version).pipe(
             tap(dto => {
                 this.next(s => {
                     const patterns = s.patterns.replaceBy('id', update(pattern, request)).sortByStringAsc(x => x.name);
@@ -98,8 +98,8 @@ export class PatternsState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public delete(pattern: AppPatternDto): Observable<any> {
-        return this.appPatternsService.deletePattern(this.appName, pattern.id, this.version).pipe(
+    public delete(pattern: PatternDto): Observable<any> {
+        return this.patternsService.deletePattern(this.appName, pattern.id, this.version).pipe(
             tap(dto => {
                 this.next(s => {
                     const patterns = s.patterns.filter(c => c.id !== pattern.id);
@@ -119,5 +119,5 @@ export class PatternsState extends State<Snapshot> {
     }
 }
 
-const update = (pattern: AppPatternDto, request: EditAppPatternDto) =>
+const update = (pattern: PatternDto, request: EditPatternDto) =>
     pattern.with(request);

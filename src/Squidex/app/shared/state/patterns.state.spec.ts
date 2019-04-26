@@ -9,11 +9,11 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppPatternDto,
-    AppPatternsDto,
-    AppPatternsService,
     AppsState,
     DialogService,
+    PatternDto,
+    PatternsDto,
+    PatternsService,
     PatternsState,
     Version,
     Versioned
@@ -25,13 +25,13 @@ describe('PatternsState', () => {
     const newVersion = new Version('2');
 
     const oldPatterns = [
-        new AppPatternDto('id1', 'name1', 'pattern1', ''),
-        new AppPatternDto('id2', 'name2', 'pattern2', '')
+        new PatternDto('id1', 'name1', 'pattern1', ''),
+        new PatternDto('id2', 'name2', 'pattern2', '')
     ];
 
     let dialogs: IMock<DialogService>;
     let appsState: IMock<AppsState>;
-    let patternsService: IMock<AppPatternsService>;
+    let patternsService: IMock<PatternsService>;
     let patternsState: PatternsState;
 
     beforeEach(() => {
@@ -42,10 +42,10 @@ describe('PatternsState', () => {
         appsState.setup(x => x.appName)
             .returns(() => app);
 
-        patternsService = Mock.ofType<AppPatternsService>();
+        patternsService = Mock.ofType<PatternsService>();
 
         patternsService.setup(x => x.getPatterns(app))
-            .returns(() => of(new AppPatternsDto(oldPatterns, version)));
+            .returns(() => of(new PatternsDto(oldPatterns, version)));
 
         patternsState = new PatternsState(patternsService.object, appsState.object, dialogs.object);
         patternsState.load().subscribe();
@@ -67,12 +67,12 @@ describe('PatternsState', () => {
     });
 
     it('should add pattern to snapshot when created', () => {
-        const newPattern = new AppPatternDto('id3', 'name3', 'pattern3', '');
+        const newPattern = new PatternDto('id3', 'name3', 'pattern3', '');
 
         const request = { ...newPattern };
 
         patternsService.setup(x => x.postPattern(app, request, version))
-            .returns(() => of(new Versioned<AppPatternDto>(newVersion, newPattern)));
+            .returns(() => of(new Versioned<PatternDto>(newVersion, newPattern)));
 
         patternsState.create(request).subscribe();
 

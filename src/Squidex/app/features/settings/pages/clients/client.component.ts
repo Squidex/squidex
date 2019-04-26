@@ -12,15 +12,14 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import {
     AccessTokenDto,
     ApiUrlConfig,
-    AppClientDto,
-    AppClientsService,
-    AppRoleDto,
     AppsState,
+    ClientDto,
+    ClientsService,
     ClientsState,
     DialogModel,
     DialogService,
     RenameClientForm,
-    UpdateAppClientDto
+    RoleDto
 } from '@app/shared';
 
 const ESCAPE_KEY = 27;
@@ -62,10 +61,10 @@ function connectLibrary(apiUrl: ApiUrlConfig, app: string, client: { id: string,
 })
 export class ClientComponent implements OnChanges {
     @Input()
-    public client: AppClientDto;
+    public client: ClientDto;
 
     @Input()
-    public clientRoles: AppRoleDto[];
+    public clientRoles: RoleDto[];
 
     public isRenaming = false;
 
@@ -82,7 +81,7 @@ export class ClientComponent implements OnChanges {
     constructor(
         public readonly appsState: AppsState,
         private readonly apiUrl: ApiUrlConfig,
-        private readonly appClientsService: AppClientsService,
+        private readonly clientsService: ClientsService,
         private readonly clientsState: ClientsState,
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder
@@ -105,7 +104,7 @@ export class ClientComponent implements OnChanges {
     }
 
     public update(role: string) {
-        this.clientsState.update(this.client, new UpdateAppClientDto(undefined, role)).pipe(onErrorResumeNext()).subscribe();
+        this.clientsState.update(this.client, { role }).pipe(onErrorResumeNext()).subscribe();
     }
 
     public toggleRename() {
@@ -122,9 +121,7 @@ export class ClientComponent implements OnChanges {
         const value = this.renameForm.submit();
 
         if (value) {
-            const requestDto = new UpdateAppClientDto(value.name);
-
-            this.clientsState.update(this.client, requestDto)
+            this.clientsState.update(this.client, value)
                 .subscribe(() => {
                     this.renameForm.submitCompleted();
 
@@ -138,7 +135,7 @@ export class ClientComponent implements OnChanges {
     public connect() {
         this.connectDialog.show();
 
-        this.appClientsService.createToken(this.appsState.appName, this.client)
+        this.clientsService.createToken(this.appsState.appName, this.client)
             .subscribe(dto => {
                 this.connectToken = dto;
             }, error => {

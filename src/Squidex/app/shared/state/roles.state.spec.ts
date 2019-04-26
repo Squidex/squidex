@@ -9,11 +9,11 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppRoleDto,
-    AppRolesDto,
-    AppRolesService,
     AppsState,
     DialogService,
+    RoleDto,
+    RolesDto,
+    RolesService,
     RolesState,
     Version,
     Versioned
@@ -25,13 +25,13 @@ describe('RolesState', () => {
     const newVersion = new Version('2');
 
     const oldRoles = [
-        new AppRoleDto('Role1', 3, 5, ['P1']),
-        new AppRoleDto('Role2', 7, 9, ['P2'])
+        new RoleDto('Role1', 3, 5, ['P1']),
+        new RoleDto('Role2', 7, 9, ['P2'])
     ];
 
     let dialogs: IMock<DialogService>;
     let appsState: IMock<AppsState>;
-    let rolesService: IMock<AppRolesService>;
+    let rolesService: IMock<RolesService>;
     let rolesState: RolesState;
 
     beforeEach(() => {
@@ -42,10 +42,10 @@ describe('RolesState', () => {
         appsState.setup(x => x.appName)
             .returns(() => app);
 
-        rolesService = Mock.ofType<AppRolesService>();
+        rolesService = Mock.ofType<RolesService>();
 
         rolesService.setup(x => x.getRoles(app))
-            .returns(() => of(new AppRolesDto(oldRoles, version)));
+            .returns(() => of(new RolesDto(oldRoles, version)));
 
         rolesState = new RolesState(rolesService.object, appsState.object, dialogs.object);
         rolesState.load().subscribe();
@@ -68,12 +68,12 @@ describe('RolesState', () => {
     });
 
     it('should add role to snapshot when added', () => {
-        const newRole = new AppRoleDto('Role3', 0, 0, ['P3']);
+        const newRole = new RoleDto('Role3', 0, 0, ['P3']);
 
         const request = { name: newRole.name };
 
         rolesService.setup(x => x.postRole(app, request, version))
-            .returns(() => of(new Versioned<AppRoleDto>(newVersion, newRole)));
+            .returns(() => of(new Versioned<RoleDto>(newVersion, newRole)));
 
         rolesState.add(request).subscribe();
 

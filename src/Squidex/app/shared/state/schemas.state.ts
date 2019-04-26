@@ -33,7 +33,6 @@ import {
     SchemaPropertiesDto,
     SchemasService,
     UpdateFieldDto,
-    UpdateSchemaCategoryDto,
     UpdateSchemaDto
 } from './../services/schemas.service';
 
@@ -190,7 +189,7 @@ export class SchemasState extends State<Snapshot> {
     }
 
     public changeCategory(schema: SchemaDto, name: string, now?: DateTime): Observable<any> {
-        return this.schemasService.putCategory(this.appName, schema.name, new UpdateSchemaCategoryDto(name), schema.version).pipe(
+        return this.schemasService.putCategory(this.appName, schema.name, { name }, schema.version).pipe(
             tap(dto => {
                 this.replaceSchema(changeCategory(schema, name, this.user, dto.version, now));
             }),
@@ -474,8 +473,8 @@ const setDisabled = <T extends FieldDto>(field: T, isDisabled: boolean) =>
 const update = <T extends FieldDto>(field: T, properties: FieldPropertiesDto) =>
     <T>field.with({ properties });
 
+const pidof = <T extends FieldDto>(field: T) =>
+    Types.is(field, NestedFieldDto) ? field.parentId : undefined;
+
 const pid = (field?: RootFieldDto) =>
     field ? field.fieldId : undefined;
-
-const pidof = (field: FieldDto) =>
-    Types.is(field, NestedFieldDto) ? field.parentId : undefined;

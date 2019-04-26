@@ -14,8 +14,7 @@ import {
     EditLanguageForm,
     fadeAnimation,
     ImmutableArray,
-    LanguagesState,
-    UpdateAppLanguageDto
+    LanguagesState
 } from '@app/shared';
 
 @Component({
@@ -64,7 +63,7 @@ export class LanguageComponent implements OnChanges {
         const value = this.editForm.submit();
 
         if (value) {
-            const request = new UpdateAppLanguageDto(value.isMaster, value.isOptional, this.fallbackLanguages.map(x => x.iso2Code).values);
+            const request = { ...value, fallbackLanguages: this.fallbackLanguages.map(x => x.iso2Code).values };
 
             this.languagesState.update(this.language, request)
                 .subscribe(() => {

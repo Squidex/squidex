@@ -12,13 +12,13 @@ import {
     AccessTokenDto,
     AnalyticsService,
     ApiUrlConfig,
-    AppClientDto,
-    AppClientsDto,
-    AppClientsService,
+    ClientDto,
+    ClientsDto,
+    ClientsService,
     Version
 } from './../';
 
-describe('AppClientsService', () => {
+describe('ClientsService', () => {
     const version = new Version('1');
 
     beforeEach(() => {
@@ -27,7 +27,7 @@ describe('AppClientsService', () => {
                 HttpClientTestingModule
             ],
             providers: [
-                AppClientsService,
+                ClientsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
                 { provide: AnalyticsService, useValue: new AnalyticsService() }
             ]
@@ -39,11 +39,11 @@ describe('AppClientsService', () => {
     }));
 
     it('should make get request to get app clients',
-        inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
+        inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
 
-        let clients: AppClientsDto;
+        let clients: ClientsDto;
 
-        appClientsService.getClients('my-app').subscribe(result => {
+        clientsService.getClients('my-app').subscribe(result => {
             clients = result;
         });
 
@@ -72,20 +72,20 @@ describe('AppClientsService', () => {
         });
 
         expect(clients!).toEqual(
-            new AppClientsDto([
-                new AppClientDto('client1', 'Client 1', 'secret1', 'Editor'),
-                new AppClientDto('client2', 'Client 2', 'secret2', 'Developer')
+            new ClientsDto([
+                new ClientDto('client1', 'Client 1', 'secret1', 'Editor'),
+                new ClientDto('client2', 'Client 2', 'secret2', 'Developer')
             ], new Version('2')));
     }));
 
     it('should make post request to create client',
-        inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
+        inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
 
         const dto = { id: 'client1' };
 
-        let client: AppClientDto;
+        let client: ClientDto;
 
-        appClientsService.postClient('my-app', dto, version).subscribe(result => {
+        clientsService.postClient('my-app', dto, version).subscribe(result => {
             client = result.payload;
         });
 
@@ -96,15 +96,15 @@ describe('AppClientsService', () => {
 
         req.flush({ id: 'client1', name: 'Client 1', secret: 'secret1', role: 'Developer' });
 
-        expect(client!).toEqual(new AppClientDto('client1', 'Client 1', 'secret1', 'Developer'));
+        expect(client!).toEqual(new ClientDto('client1', 'Client 1', 'secret1', 'Developer'));
     }));
 
     it('should make put request to rename client',
-        inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
+        inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
 
         const dto = { name: 'New Name' };
 
-        appClientsService.putClient('my-app', 'client1', dto, version).subscribe();
+        clientsService.putClient('my-app', 'client1', dto, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients/client1');
 
@@ -115,9 +115,9 @@ describe('AppClientsService', () => {
     }));
 
     it('should make delete request to remove client',
-        inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
+        inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
 
-        appClientsService.deleteClient('my-app', 'client1', version).subscribe();
+        clientsService.deleteClient('my-app', 'client1', version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients/client1');
 
@@ -128,11 +128,11 @@ describe('AppClientsService', () => {
     }));
 
     it('should make form request to create token',
-        inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
+        inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
 
         let accessTokenDto: AccessTokenDto;
 
-        appClientsService.createToken('my-app', new AppClientDto('myClientId', 'myClient', 'mySecret', 'Editor')).subscribe(result => {
+        clientsService.createToken('my-app', new ClientDto('myClientId', 'myClient', 'mySecret', 'Editor')).subscribe(result => {
             accessTokenDto = result;
         });
 

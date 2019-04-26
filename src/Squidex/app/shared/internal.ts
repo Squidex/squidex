@@ -19,14 +19,12 @@ export * from './guards/unset-content.guard';
 
 export * from './interceptors/auth.interceptor';
 
-export * from './services/app-contributors.service';
-export * from './services/app-clients.service';
 export * from './services/app-languages.service';
-export * from './services/app-patterns.service';
-export * from './services/app-roles.service';
 export * from './services/apps.service';
 export * from './services/assets.service';
 export * from './services/auth.service';
+export * from './services/clients.service';
+export * from './services/contributors.service';
 export * from './services/backups.service';
 export * from './services/comments.service';
 export * from './services/contents.service';
@@ -35,7 +33,9 @@ export * from './services/help.service';
 export * from './services/history.service';
 export * from './services/languages.service';
 export * from './services/news.service';
+export * from './services/patterns.service';
 export * from './services/plans.service';
+export * from './services/roles.service';
 export * from './services/rules.service';
 export * from './services/schemas.service';
 export * from './services/schemas.types';

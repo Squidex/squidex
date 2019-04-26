@@ -11,11 +11,10 @@ import { Observable } from 'rxjs';
 import { onErrorResumeNext, withLatestFrom } from 'rxjs/operators';
 
 import {
-    AppContributorDto,
     AppsState,
-    AssignContributorDto,
     AssignContributorForm,
     AutocompleteSource,
+    ContributorDto,
     ContributorsState,
     DialogService,
     RolesState,
@@ -78,12 +77,12 @@ export class ContributorsPageComponent implements OnInit {
         this.contributorsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public remove(contributor: AppContributorDto) {
+    public remove(contributor: ContributorDto) {
         this.contributorsState.revoke(contributor).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public changeRole(contributor: AppContributorDto, role: string) {
-        this.contributorsState.assign(new AssignContributorDto(contributor.contributorId, role)).pipe(onErrorResumeNext()).subscribe();
+    public changeRole(contributor: ContributorDto, role: string) {
+        this.contributorsState.assign({ contributorId: contributor.contributorId, role }).pipe(onErrorResumeNext()).subscribe();
     }
 
     public assignContributor() {
@@ -96,7 +95,7 @@ export class ContributorsPageComponent implements OnInit {
                 user = user.id;
             }
 
-            const requestDto = new AssignContributorDto(user, 'Editor', true);
+            const requestDto = { contributorId: user, role: 'Editor', invite: true };
 
             this.contributorsState.assign(requestDto)
                 .subscribe(isCreated => {
@@ -111,7 +110,7 @@ export class ContributorsPageComponent implements OnInit {
         }
     }
 
-    public trackByContributor(index: number, contributorInfo: { contributor: AppContributorDto }) {
+    public trackByContributor(index: number, contributorInfo: { contributor: ContributorDto }) {
         return contributorInfo.contributor.contributorId;
     }
 }

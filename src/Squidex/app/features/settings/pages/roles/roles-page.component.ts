@@ -12,17 +12,17 @@ import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AddRoleForm,
-    AppRoleDto,
-    AppRolesService,
     AppsState,
     AutocompleteSource,
+    RoleDto,
+    RolesService,
     RolesState
 } from '@app/shared';
 
 class PermissionsAutocomplete implements AutocompleteSource {
     private permissions: string[] = [];
 
-    constructor(appsState: AppsState, rolesService: AppRolesService) {
+    constructor(appsState: AppsState, rolesService: RolesService) {
         rolesService.getPermissions(appsState.appName).subscribe(x => this.permissions = x);
     }
 
@@ -43,7 +43,7 @@ export class RolesPageComponent implements OnInit {
 
     constructor(
         public readonly appsState: AppsState,
-        public readonly rolesService: AppRolesService,
+        public readonly rolesService: RolesService,
         public readonly rolesState: RolesState,
         private readonly formBuilder: FormBuilder
     ) {
@@ -74,7 +74,7 @@ export class RolesPageComponent implements OnInit {
         }
     }
 
-    public trackByRole(index: number, role: AppRoleDto) {
+    public trackByRole(index: number, role: RoleDto) {
         return role.name;
     }
 }

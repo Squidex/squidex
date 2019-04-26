@@ -20,16 +20,16 @@ import {
     Versioned
 } from '@app/framework';
 
-export class AppClientsDto extends Model<AppClientsDto> {
+export class ClientsDto extends Model<ClientsDto> {
     constructor(
-        public readonly clients: AppClientDto[],
+        public readonly clients: ClientDto[],
         public readonly version: Version
     ) {
         super();
     }
 }
 
-export class AppClientDto extends Model<AppClientDto> {
+export class ClientDto extends Model<ClientDto> {
     constructor(
         public readonly id: string,
         public readonly name: string,
@@ -48,17 +48,17 @@ export class AccessTokenDto {
     }
 }
 
-export interface CreateAppClientDto {
+export interface CreateClientDto {
     readonly id: string;
 }
 
-export interface UpdateAppClientDto {
+export interface UpdateClientDto {
     readonly name?: string;
     readonly role?: string;
 }
 
 @Injectable()
-export class AppClientsService {
+export class ClientsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
@@ -66,7 +66,7 @@ export class AppClientsService {
     ) {
     }
 
-    public getClients(appName: string): Observable<AppClientsDto> {
+    public getClients(appName: string): Observable<ClientsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
@@ -76,26 +76,26 @@ export class AppClientsService {
                     const items: any[] = body;
 
                     const clients = items.map(item => {
-                        return new AppClientDto(
+                        return new ClientDto(
                             item.id,
                             item.name || body.id,
                             item.secret,
                             item.role);
                     });
 
-                    return new AppClientsDto(clients, response.version);
+                    return new ClientsDto(clients, response.version);
                 }),
                 pretifyError('Failed to load clients. Please reload.'));
     }
 
-    public postClient(appName: string, dto: CreateAppClientDto, version: Version): Observable<Versioned<AppClientDto>> {
+    public postClient(appName: string, dto: CreateClientDto, version: Version): Observable<Versioned<ClientDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
         return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
                 map(response => {
                     const body = response.payload.body;
 
-                    const client = new AppClientDto(
+                    const client = new ClientDto(
                         body.id,
                         body.name || body.id,
                         body.secret,
@@ -109,7 +109,7 @@ export class AppClientsService {
                 pretifyError('Failed to add client. Please reload.'));
     }
 
-    public putClient(appName: string, id: string, dto: UpdateAppClientDto, version: Version): Observable<Versioned<any>> {
+    public putClient(appName: string, id: string, dto: UpdateClientDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(
@@ -129,7 +129,7 @@ export class AppClientsService {
                 pretifyError('Failed to revoke client. Please reload.'));
     }
 
-    public createToken(appName: string, client: AppClientDto): Observable<AccessTokenDto> {
+    public createToken(appName: string, client: ClientDto): Observable<AccessTokenDto> {
         const options = {
             headers: new HttpHeaders({
                 'Content-Type': 'application/x-www-form-urlencoded', 'NoAuth': 'true'

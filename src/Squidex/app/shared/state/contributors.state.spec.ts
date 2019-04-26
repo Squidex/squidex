@@ -9,12 +9,12 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppContributorDto,
-    AppContributorsDto,
-    AppContributorsService,
     AppsState,
     AuthService,
     ContributorAssignedDto,
+    ContributorDto,
+    ContributorsDto,
+    ContributorsService,
     ContributorsState,
     DialogService,
     Version,
@@ -27,14 +27,14 @@ describe('ContributorsState', () => {
     const newVersion = new Version('2');
 
     const oldContributors = [
-        new AppContributorDto('id1', 'Developer'),
-        new AppContributorDto('id2', 'Developer')
+        new ContributorDto('id1', 'Developer'),
+        new ContributorDto('id2', 'Developer')
     ];
 
     let dialogs: IMock<DialogService>;
     let appsState: IMock<AppsState>;
     let authService: IMock<AuthService>;
-    let contributorsService: IMock<AppContributorsService>;
+    let contributorsService: IMock<ContributorsService>;
     let contributorsState: ContributorsState;
 
     beforeEach(() => {
@@ -50,10 +50,10 @@ describe('ContributorsState', () => {
         appsState.setup(x => x.appName)
             .returns(() => app);
 
-        contributorsService = Mock.ofType<AppContributorsService>();
+        contributorsService = Mock.ofType<ContributorsService>();
 
         contributorsService.setup(x => x.getContributors(app))
-            .returns(() => of(new AppContributorsDto(oldContributors, 3, version)));
+            .returns(() => of(new ContributorsDto(oldContributors, 3, version)));
 
         contributorsState = new ContributorsState(contributorsService.object, appsState.object, authService.object, dialogs.object);
         contributorsState.load().subscribe();
@@ -81,12 +81,12 @@ describe('ContributorsState', () => {
     });
 
     it('should add contributor to snapshot when assigned', () => {
-        const newContributor = new AppContributorDto('id3', 'Developer');
+        const newContributor = new ContributorDto('id3', 'Developer');
 
         const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
 
         contributorsService.setup(x => x.postContributor(app, request, version))
-            .returns(() => of(new Versioned<ContributorAssignedDto>(newVersion, new ContributorAssignedDto('id3', true))));
+            .returns(() => of(new Versioned<ContributorAssignedDto>(newVersion, { contributorId: '123', isCreated: true })));
 
         contributorsState.assign(request).subscribe();
 
@@ -101,12 +101,12 @@ describe('ContributorsState', () => {
     });
 
     it('should update contributor in snapshot when assigned and already added', () => {
-        const newContributor = new AppContributorDto('id2', 'Owner');
+        const newContributor = new ContributorDto('id2', 'Owner');
 
-        const request = new AssignContributorDto('mail2stehle@gmail.com', 'Owner');
+        const request = { ...newContributor };
 
         contributorsService.setup(x => x.postContributor(app, request, version))
-            .returns(() => of(new Versioned<ContributorAssignedDto>(newVersion, new ContributorAssignedDto('id2', true))));
+            .returns(() => of(new Versioned<ContributorAssignedDto>(newVersion, { contributorId: '123', isCreated: true })));
 
         contributorsState.assign(request).subscribe();
 

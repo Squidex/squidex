@@ -10,7 +10,6 @@ import { FormBuilder } from '@angular/forms';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
-    AppPatternDto,
     createProperties,
     DialogModel,
     EditFieldForm,
@@ -18,10 +17,10 @@ import {
     ImmutableArray,
     ModalModel,
     NestedFieldDto,
+    PatternDto,
     RootFieldDto,
     SchemaDetailsDto,
-    SchemasState,
-    UpdateFieldDto
+    SchemasState
 } from '@app/shared';
 
 @Component({
@@ -43,7 +42,7 @@ export class FieldComponent implements OnChanges {
     public parent: RootFieldDto;
 
     @Input()
-    public patterns: ImmutableArray<AppPatternDto>;
+    public patterns: ImmutableArray<PatternDto>;
 
     public dropdown = new ModalModel();
 
@@ -120,7 +119,7 @@ export class FieldComponent implements OnChanges {
         if (value) {
             const properties = createProperties(this.field.properties['fieldType'], value);
 
-            this.schemasState.updateField(this.schema, this.field, new UpdateFieldDto(properties))
+            this.schemasState.updateField(this.schema, this.field, { properties })
                 .subscribe(() => {
                     this.editForm.submitCompleted();
                 }, error => {

@@ -11,8 +11,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { ResourceOwner } from '@app/shared';
 
-import { UserDto } from './../../services/users.service';
-import { UserForm, UsersState } from './../../state/users.state';
+import {
+    UserDto,
+    UserForm,
+    UsersState
+} from '../../declarations';
 
 @Component({
     selector: 'sqx-user-page',

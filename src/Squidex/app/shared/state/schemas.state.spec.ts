@@ -23,9 +23,7 @@ import {
     SchemaDetailsDto,
     SchemaDto,
     SchemasService,
-    UpdateFieldDto,
     UpdateSchemaCategoryDto,
-    UpdateSchemaDto,
     Version,
     Versioned
 } from './../';
@@ -248,7 +246,7 @@ describe('SchemasState', () => {
         });
 
         it('should update properties and update user info when updated', () => {
-            const request = new UpdateSchemaDto('name2_label', 'name2_hints');
+            const request = { label: 'name2_label', hints: 'name2_hints' };
 
             schemasService.setup(x => x.putSchema(app, schema.name, It.isAny(), version))
                 .returns(() => of(new Versioned<any>(newVersion, {})));
@@ -257,8 +255,8 @@ describe('SchemasState', () => {
 
             const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
 
-            expect(schema_1.properties.label).toEqual('name2_label');
-            expect(schema_1.properties.hints).toEqual('name2_hints');
+            expect(schema_1.properties.label).toEqual(request.label);
+            expect(schema_1.properties.hints).toEqual(request.hints);
             expectToBeModified(schema_1);
         });
 
@@ -395,7 +393,7 @@ describe('SchemasState', () => {
         });
 
         it('should update field properties and update user info when field updated', () => {
-            const request = new UpdateFieldDto(createProperties('String'));
+            const request = { properties: createProperties('String') };
 
             schemasService.setup(x => x.putField(app, schema.name, field1.fieldId, request, undefined, version))
                 .returns(() => of(new Versioned<any>(newVersion, {})));
@@ -409,7 +407,7 @@ describe('SchemasState', () => {
         });
 
         it('should update field properties and update user info when nested field updated', () => {
-            const request = new UpdateFieldDto(createProperties('String'));
+            const request = { properties: createProperties('String') };
 
             schemasService.setup(x => x.putField(app, schema.name, nested1.fieldId, request, 2, version))
                 .returns(() => of(new Versioned<any>(newVersion, {})));

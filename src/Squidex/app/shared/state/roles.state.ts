@@ -20,15 +20,15 @@ import {
 import { AppsState } from './apps.state';
 
 import {
-    AppRoleDto,
-    AppRolesService,
-    CreateAppRoleDto,
-    UpdateAppRoleDto
-} from './../services/app-roles.service';
+    CreateRoleDto,
+    RoleDto,
+    RolesService,
+    UpdateRoleDto
+} from './../services/roles.service';
 
 interface Snapshot {
     // The current roles.
-    roles: ImmutableArray<AppRoleDto>;
+    roles: ImmutableArray<RoleDto>;
 
     // The app version.
     version: Version;
@@ -48,7 +48,7 @@ export class RolesState extends State<Snapshot> {
             distinctUntilChanged());
 
     constructor(
-        private readonly appRolesService: AppRolesService,
+        private readonly rolesService: RolesService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
@@ -60,7 +60,7 @@ export class RolesState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.appRolesService.getRoles(this.appName).pipe(
+        return this.rolesService.getRoles(this.appName).pipe(
             tap(dtos => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Roles reloaded.');
@@ -75,8 +75,8 @@ export class RolesState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public add(request: CreateAppRoleDto): Observable<any> {
-        return this.appRolesService.postRole(this.appName, request, this.version).pipe(
+    public add(request: CreateRoleDto): Observable<any> {
+        return this.rolesService.postRole(this.appName, request, this.version).pipe(
             tap(dto => {
                 this.next(s => {
                     const roles = s.roles.push(dto.payload).sortByStringAsc(x => x.name);
@@ -87,8 +87,8 @@ export class RolesState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public delete(role: AppRoleDto): Observable<any> {
-        return this.appRolesService.deleteRole(this.appName, role.name, this.version).pipe(
+    public delete(role: RoleDto): Observable<any> {
+        return this.rolesService.deleteRole(this.appName, role.name, this.version).pipe(
             tap(dto => {
                 this.next(s => {
                     const roles = s.roles.filter(c => c.name !== role.name);
@@ -99,8 +99,8 @@ export class RolesState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    public update(role: AppRoleDto, request: UpdateAppRoleDto): Observable<any> {
-        return this.appRolesService.putRole(this.appName, role.name, request, this.version).pipe(
+    public update(role: RoleDto, request: UpdateRoleDto): Observable<any> {
+        return this.rolesService.putRole(this.appName, role.name, request, this.version).pipe(
             tap(dto => {
                 this.next(s => {
                     const roles = s.roles.replaceBy('name', update(role, request));
@@ -120,5 +120,5 @@ export class RolesState extends State<Snapshot> {
     }
 }
 
-const update = (role: AppRoleDto, request: UpdateAppRoleDto) =>
+const update = (role: RoleDto, request: UpdateRoleDto) =>
     role.with({ permissions: request.permissions });

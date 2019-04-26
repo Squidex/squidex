@@ -20,16 +20,16 @@ import {
     Versioned
 } from '@app/framework';
 
-export class AppPatternsDto extends Model<AppPatternsDto> {
+export class PatternsDto extends Model<PatternsDto> {
     constructor(
-        public readonly patterns: AppPatternDto[],
+        public readonly patterns: PatternDto[],
         public readonly version: Version
     ) {
         super();
     }
 }
 
-export class AppPatternDto extends Model<AppPatternDto> {
+export class PatternDto extends Model<PatternDto> {
     constructor(
         public readonly id: string,
         public readonly name: string,
@@ -40,14 +40,14 @@ export class AppPatternDto extends Model<AppPatternDto> {
     }
 }
 
-export interface EditAppPatternDto {
+export interface EditPatternDto {
     readonly name: string;
     readonly pattern: string;
     readonly message?: string;
 }
 
 @Injectable()
-export class AppPatternsService {
+export class PatternsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
@@ -55,7 +55,7 @@ export class AppPatternsService {
     ) {
     }
 
-    public getPatterns(appName: string): Observable<AppPatternsDto> {
+    public getPatterns(appName: string): Observable<PatternsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
@@ -64,9 +64,9 @@ export class AppPatternsService {
 
                 const items: any[] = body;
 
-                return new AppPatternsDto(
+                return new PatternsDto(
                     items.map(item => {
-                        return new AppPatternDto(
+                        return new PatternDto(
                             item.patternId,
                             item.name,
                             item.pattern,
@@ -77,14 +77,14 @@ export class AppPatternsService {
             pretifyError('Failed to add pattern. Please reload.'));
     }
 
-    public postPattern(appName: string, dto: EditAppPatternDto, version: Version): Observable<Versioned<AppPatternDto>> {
+    public postPattern(appName: string, dto: EditPatternDto, version: Version): Observable<Versioned<PatternDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
         return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
             map(response => {
                 const body = response.payload.body;
 
-                const pattern = new AppPatternDto(
+                const pattern = new PatternDto(
                     body.patternId,
                     body.name,
                     body.pattern,
@@ -98,7 +98,7 @@ export class AppPatternsService {
             pretifyError('Failed to add pattern. Please reload.'));
     }
 
-    public putPattern(appName: string, id: string, dto: EditAppPatternDto, version: Version): Observable<Versioned<any>> {
+    public putPattern(appName: string, id: string, dto: EditPatternDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(

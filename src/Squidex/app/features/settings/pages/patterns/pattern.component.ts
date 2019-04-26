@@ -10,8 +10,8 @@ import { FormBuilder } from '@angular/forms';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
-    AppPatternDto,
     EditPatternForm,
+    PatternDto,
     PatternsState
 } from '@app/shared';
 
@@ -22,7 +22,7 @@ import {
 })
 export class PatternComponent implements OnInit {
     @Input()
-    public pattern: AppPatternDto;
+    public pattern: PatternDto;
 
     public editForm = new EditPatternForm(this.formBuilder);
 

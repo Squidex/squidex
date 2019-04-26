@@ -11,13 +11,12 @@ import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AddPermissionForm,
-    AppRoleDto,
     AutocompleteComponent,
     AutocompleteSource,
     EditPermissionsForm,
     fadeAnimation,
-    RolesState,
-    UpdateAppRoleDto
+    RoleDto,
+    RolesState
 } from '@app/shared';
 
 const DEFAULT_ROLES = [
@@ -37,7 +36,7 @@ const DEFAULT_ROLES = [
 })
 export class RoleComponent implements OnChanges {
     @Input()
-    public role: AppRoleDto;
+    public role: RoleDto;
 
     @Input()
     public allPermissions: AutocompleteSource;
@@ -95,7 +94,7 @@ export class RoleComponent implements OnChanges {
         const value = this.editForm.submit();
 
         if (value) {
-            const request = new UpdateAppRoleDto(value);
+            const request = { permissions: value };
 
             this.rolesState.update(this.role, request)
                 .subscribe(() => {

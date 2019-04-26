@@ -9,7 +9,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import {
-    CreateRuleDto,
     Form,
     ImmutableArray,
     RuleDto,
@@ -118,7 +117,7 @@ export class RuleWizardComponent implements OnInit {
     }
 
     private createRule() {
-        const requestDto = new CreateRuleDto(this.trigger, this.action);
+        const requestDto = { trigger: this.trigger, action: this.action };
 
         this.rulesState.create(requestDto)
             .subscribe(() => {

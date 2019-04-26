@@ -48,7 +48,9 @@ describe('SchemasService', () => {
     }));
 
     it('should throw if creating invalid property type', () => {
-        expect(() => createProperties('invalid')).toThrow('Invalid properties type');
+        const type: any = 'invalid';
+
+        expect(() => createProperties(type)).toThrow('Invalid properties type');
     });
 
     it('should make get request to get schemas',
@@ -417,7 +419,7 @@ describe('SchemasService', () => {
 
         const dto = new AddFieldDto('name', 'invariant', createProperties('Number'));
 
-        let field: FieldDto;
+        let field: FieldDto<any>;
 
         schemasService.postField('my-app', 'my-schema', dto, undefined, version).subscribe(result => {
             field = result.payload;
@@ -464,7 +466,7 @@ describe('SchemasService', () => {
 
         const dto = new AddFieldDto('name', 'invariant', createProperties('Number'));
 
-        let field: FieldDto;
+        let field: FieldDto<any>;
 
         schemasService.postField('my-app', 'my-schema', dto, 13, version).subscribe(result => {
             field = result.payload;

@@ -20,9 +20,9 @@ import {
     Versioned
 } from '@app/framework';
 
-export class AppContributorsDto extends Model<AppContributorsDto> {
+export class ContributorsDto extends Model<ContributorsDto> {
     constructor(
-        public readonly contributors: AppContributorDto[],
+        public readonly contributors: ContributorDto[],
         public readonly maxContributors: number,
         public readonly version: Version
     ) {
@@ -30,7 +30,7 @@ export class AppContributorsDto extends Model<AppContributorsDto> {
     }
 }
 
-export class AppContributorDto extends Model<AssignContributorDto> {
+export class ContributorDto extends Model<AssignContributorDto> {
     constructor(
         public readonly contributorId: string,
         public readonly role: string
@@ -51,7 +51,7 @@ export interface AssignContributorDto  {
 }
 
 @Injectable()
-export class AppContributorsService {
+export class ContributorsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
@@ -59,7 +59,7 @@ export class AppContributorsService {
     ) {
     }
 
-    public getContributors(appName: string): Observable<AppContributorsDto> {
+    public getContributors(appName: string): Observable<ContributorsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
@@ -68,9 +68,9 @@ export class AppContributorsService {
 
                     const items: any[] = body.contributors;
 
-                    return new AppContributorsDto(
+                    return new ContributorsDto(
                         items.map(item => {
-                            return new AppContributorDto(
+                            return new ContributorDto(
                                 item.contributorId,
                                 item.role);
                         }),

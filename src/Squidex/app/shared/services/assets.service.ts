@@ -56,7 +56,7 @@ export class AssetDto extends Model<AssetDto> {
     }
 
     public update(update: AssetReplacedDto, user: string, version: Version, now?: DateTime): AssetDto {
-        return this.clone({
+        return this.with({
             ...update,
             lastModified: now || DateTime.now(),
             lastModifiedBy: user,
@@ -65,7 +65,7 @@ export class AssetDto extends Model<AssetDto> {
     }
 
     public annnotate(update: AnnotateAssetDto, user: string, version: Version, now?: DateTime): AssetDto {
-        return this.clone({
+        return this.with({
             ...<any>update,
             lastModified: now || DateTime.now(),
             lastModifiedBy: user,

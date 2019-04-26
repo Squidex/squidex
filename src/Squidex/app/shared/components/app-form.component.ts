@@ -11,7 +11,6 @@ import { FormBuilder } from '@angular/forms';
 import {
     ApiUrlConfig,
     AppsState,
-    CreateAppDto,
     CreateAppForm
 } from '@app/shared/internal';
 
@@ -45,7 +44,7 @@ export class AppFormComponent {
         const value = this.createForm.submit();
 
         if (value) {
-            const request = new CreateAppDto(value.name, this.template);
+            const request = { ...value, template: this.template };
 
             this.appsStore.create(request)
                 .subscribe(() => {

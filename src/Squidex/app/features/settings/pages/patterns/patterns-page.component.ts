@@ -9,8 +9,8 @@ import { Component, OnInit } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
-    AppPatternDto,
     AppsState,
+    PatternDto,
     PatternsState
 } from '@app/shared';
 
@@ -34,7 +34,7 @@ export class PatternsPageComponent implements OnInit {
         this.patternsState.load(true).pipe(onErrorResumeNext()).subscribe();
     }
 
-    public trackByPattern(index: number, pattern: AppPatternDto) {
+    public trackByPattern(index: number, pattern: PatternDto) {
         return pattern.id;
     }
 }

@@ -18,8 +18,7 @@ import {
     RootFieldDto,
     SchemaDetailsDto,
     SchemasState,
-    Types,
-    UpdateFieldDto
+    Types
 } from '@app/shared';
 
 @Component({
@@ -103,7 +102,7 @@ export class FieldWizardComponent implements OnInit {
         if (value) {
             const properties = createProperties(this.field.properties['fieldType'], value);
 
-            this.schemasState.updateField(this.schema, this.field as RootFieldDto, new UpdateFieldDto(properties))
+            this.schemasState.updateField(this.schema, this.field as RootFieldDto, { properties })
                 .subscribe(() => {
                     this.editForm.submitCompleted();
 
