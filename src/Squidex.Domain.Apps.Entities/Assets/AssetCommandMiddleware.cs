@@ -7,9 +7,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
@@ -20,21 +22,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, IAssetGrain>
     {
         private readonly IAssetStore assetStore;
+        private readonly AssetQueryService assetQueryService;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IEnumerable<ITagGenerator<CreateAsset>> tagGenerators;
 
         public AssetCommandMiddleware(
             IGrainFactory grainFactory,
+            AssetQueryService assetQueryService,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
             IEnumerable<ITagGenerator<CreateAsset>> tagGenerators)
             : base(grainFactory)
         {
             Guard.NotNull(assetStore, nameof(assetStore));
+            Guard.NotNull(assetQueryService, nameof(assetQueryService));
             Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
             Guard.NotNull(tagGenerators, nameof(tagGenerators));
 
             this.assetStore = assetStore;
+            this.assetQueryService = assetQueryService;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
 
             this.tagGenerators = tagGenerators;
@@ -53,21 +59,45 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         createAsset.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(createAsset.File.OpenRead());
 
-                        foreach (var tagGenerator in tagGenerators)
-                        {
-                            tagGenerator.GenerateTags(createAsset, createAsset.Tags);
-                        }
+                        createAsset.FileHash = await UploadAsync(context, createAsset.File);
 
-                        var originalTags = new HashSet<string>(createAsset.Tags);
-
-                        await assetStore.UploadAsync(context.ContextId.ToString(), createAsset.File.OpenRead());
                         try
                         {
-                            var result = (AssetSavedResult)await ExecuteCommandAsync(createAsset);
+                            var existing = await assetQueryService.FindAssetByHashAsync(createAsset.AppId.Id, createAsset.FileHash);
 
-                            context.Complete(new AssetCreatedResult(createAsset.AssetId, originalTags, result.Version));
+                            AssetCreatedResult result;
 
-                            await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), result.FileVersion, null);
+                            if (IsDuplicate(createAsset, existing))
+                            {
+                                result = new AssetCreatedResult(
+                                    existing.Id,
+                                    existing.Tags,
+                                    existing.Version,
+                                    existing.FileVersion,
+                                    existing.FileHash,
+                                    true);
+                            }
+                            else
+                            {
+                                foreach (var tagGenerator in tagGenerators)
+                                {
+                                    tagGenerator.GenerateTags(createAsset, createAsset.Tags);
+                                }
+
+                                var commandResult = (AssetSavedResult)await ExecuteCommandAsync(createAsset);
+
+                                result = new AssetCreatedResult(
+                                    createAsset.AssetId,
+                                    createAsset.Tags,
+                                    commandResult.Version,
+                                    commandResult.FileVersion,
+                                    commandResult.FileHash,
+                                    false);
+
+                                await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), result.FileVersion, null);
+                            }
+
+                            context.Complete(result);
                         }
                         finally
                         {
@@ -81,10 +111,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         updateAsset.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(updateAsset.File.OpenRead());
 
-                        await assetStore.UploadAsync(context.ContextId.ToString(), updateAsset.File.OpenRead());
+                        updateAsset.FileHash = await UploadAsync(context, updateAsset.File);
                         try
                         {
-                            var result = await ExecuteCommandAsync(updateAsset) as AssetSavedResult;
+                            var result = (AssetSavedResult)await ExecuteCommandAsync(updateAsset);
 
                             context.Complete(result);
 
@@ -102,6 +132,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     await base.HandleAsync(context, next);
                     break;
             }
+        }
+
+        private static bool IsDuplicate(CreateAsset createAsset, IAssetEntity asset)
+        {
+            return asset != null && asset.FileName == createAsset.File.FileName && asset.FileSize == createAsset.File.FileSize;
+        }
+
+        private async Task<string> UploadAsync(CommandContext context, AssetFile file)
+        {
+            string hash;
+
+            using (var hashStream = new HasherStream(file.OpenRead(), HashAlgorithmName.SHA256))
+            {
+                await assetStore.UploadAsync(context.ContextId.ToString(), hashStream);
+
+                hash = hashStream.GetHashStringAndReset();
+            }
+
+            return hash;
         }
     }
 }

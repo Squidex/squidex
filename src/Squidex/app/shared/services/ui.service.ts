@@ -13,10 +13,10 @@ import { catchError } from 'rxjs/operators';
 import { ApiUrlConfig } from '@app/framework';
 
 export interface UISettingsDto {
-    mapType: string;
-    mapKey?: string;
+    readonly mapType: string;
+    readonly mapKey?: string;
 
-    canCreateApps: boolean;
+    readonly canCreateApps: boolean;
 }
 
 @Injectable()

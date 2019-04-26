@@ -13,10 +13,8 @@ import {
     AppRolesDto,
     AppRolesService,
     AppsState,
-    CreateAppRoleDto,
     DialogService,
     RolesState,
-    UpdateAppRoleDto,
     Version,
     Versioned
 } from './../';
@@ -72,7 +70,7 @@ describe('RolesState', () => {
     it('should add role to snapshot when added', () => {
         const newRole = new AppRoleDto('Role3', 0, 0, ['P3']);
 
-        const request = new CreateAppRoleDto('Role3');
+        const request = { name: newRole.name };
 
         rolesService.setup(x => x.postRole(app, request, version))
             .returns(() => of(new Versioned<AppRoleDto>(newVersion, newRole)));
@@ -84,7 +82,7 @@ describe('RolesState', () => {
     });
 
     it('should update permissions when updated', () => {
-        const request = new UpdateAppRoleDto(['P4', 'P5']);
+        const request = { permissions: ['P4', 'P5'] };
 
         rolesService.setup(x => x.putRole(app, oldRoles[1].name, request, version))
             .returns(() => of(new Versioned<any>(newVersion, {})));

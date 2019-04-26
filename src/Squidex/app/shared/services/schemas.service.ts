@@ -24,7 +24,7 @@ import {
 
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
-export class SchemaDto extends Model {
+export class SchemaDto extends Model<SchemaDto> {
     public get displayName() {
         return StringHelper.firstNonEmpty(this.properties.label, this.name);
     }
@@ -43,10 +43,6 @@ export class SchemaDto extends Model {
         public readonly version: Version
     ) {
         super();
-    }
-
-    public with(value: Partial<SchemaDto>): SchemaDto {
-        return this.clone(value);
     }
 }
 
@@ -88,13 +84,9 @@ export class SchemaDetailsDto extends SchemaDto {
             this.listFieldsEditable = fields.filter(x => x.isInlineEditable);
         }
     }
-
-    public with(value: Partial<SchemaDetailsDto>): SchemaDetailsDto {
-        return this.clone(value);
-    }
 }
 
-export class FieldDto extends Model {
+export class FieldDto extends Model<FieldDto> {
     public get isInlineEditable(): boolean {
         return !this.isDisabled && this.properties['inlineEditable'] === true;
     }
@@ -116,10 +108,6 @@ export class FieldDto extends Model {
         public readonly isDisabled: boolean = false
     ) {
         super();
-    }
-
-    public with(value: Partial<FieldDto>): FieldDto {
-        return this.clone(value);
     }
 }
 
@@ -149,10 +137,6 @@ export class RootFieldDto extends FieldDto {
     ) {
         super(fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
-
-    public with(value: Partial<RootFieldDto>): RootFieldDto {
-        return this.clone(value);
-    }
 }
 
 export class NestedFieldDto extends FieldDto {
@@ -163,10 +147,6 @@ export class NestedFieldDto extends FieldDto {
         isDisabled: boolean = false
     ) {
         super(fieldId, name, properties, isLocked, isHidden, isDisabled);
-    }
-
-    public with(value: Partial<NestedFieldDto>): NestedFieldDto {
-        return this.clone(value);
     }
 }
 
@@ -197,26 +177,17 @@ export class CreateSchemaDto {
     }
 }
 
-export class UpdateSchemaCategoryDto {
-    constructor(
-        public readonly name?: string
-    ) {
-    }
+export interface UpdateSchemaCategoryDto {
+    readonly name?: string;
 }
 
-export class UpdateFieldDto {
-    constructor(
-        public readonly properties: FieldPropertiesDto
-    ) {
-    }
+export interface UpdateFieldDto {
+    readonly properties: FieldPropertiesDto;
 }
 
-export class UpdateSchemaDto {
-    constructor(
-        public readonly label?: string,
-        public readonly hints?: string
-    ) {
-    }
+export interface UpdateSchemaDto {
+    readonly label?: string;
+    readonly hints?: string;
 }
 
 @Injectable()

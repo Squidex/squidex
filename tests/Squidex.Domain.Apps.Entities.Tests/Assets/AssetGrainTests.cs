@@ -27,8 +27,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly ImageInfo image = new ImageInfo(2048, 2048);
-        private readonly Guid assetId = Guid.NewGuid();
         private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
+        private readonly Guid assetId = Guid.NewGuid();
+        private readonly string fileHash = Guid.NewGuid().ToString();
         private readonly AssetGrain sut;
 
         protected override Guid Id
@@ -57,13 +58,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Create_should_create_events()
         {
-            var command = new CreateAsset { File = file, ImageInfo = image };
+            var command = new CreateAsset { File = file, ImageInfo = image, FileHash = fileHash, Tags = new HashSet<string>() };
 
             var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
-            result.ShouldBeEquivalent(new AssetSavedResult(0, 0));
+            result.ShouldBeEquivalent(new AssetSavedResult(0, 0, fileHash));
 
             Assert.Equal(0, sut.Snapshot.FileVersion);
+            Assert.Equal(fileHash, sut.Snapshot.FileHash);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -71,6 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         IsImage = true,
                         FileName = file.FileName,
+                        FileHash = fileHash,
                         FileSize = file.FileSize,
                         FileVersion = 0,
                         MimeType = file.MimeType,
@@ -85,15 +88,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Update_should_create_events()
         {
-            var command = new UpdateAsset { File = file, ImageInfo = image };
+            var command = new UpdateAsset { File = file, ImageInfo = image, FileHash = fileHash };
 
             await ExecuteCreateAsync();
 
             var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
-            result.ShouldBeEquivalent(new AssetSavedResult(1, 1));
+            result.ShouldBeEquivalent(new AssetSavedResult(1, 1, fileHash));
 
             Assert.Equal(1, sut.Snapshot.FileVersion);
+            Assert.Equal(fileHash, sut.Snapshot.FileHash);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -101,6 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         IsImage = true,
                         FileSize = file.FileSize,
+                        FileHash = fileHash,
                         FileVersion = 1,
                         MimeType = file.MimeType,
                         PixelWidth = image.PixelWidth,

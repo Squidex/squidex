@@ -13,7 +13,6 @@ import {
     ApiUrlConfig,
     AppDto,
     AppsService,
-    CreateAppDto,
     DateTime,
     Permission
 } from './../';
@@ -83,7 +82,7 @@ describe('AppsService', () => {
     it('should make post request to create app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
 
-        const dto = new CreateAppDto('new-app');
+        const dto = { name: 'new-app' };
 
         let app: AppDto;
 

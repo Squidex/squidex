@@ -20,7 +20,7 @@ import {
     Versioned
 } from '@app/framework';
 
-export class AppContributorsDto extends Model {
+export class AppContributorsDto extends Model<AppContributorsDto> {
     constructor(
         public readonly contributors: AppContributorDto[],
         public readonly maxContributors: number,
@@ -30,17 +30,7 @@ export class AppContributorsDto extends Model {
     }
 }
 
-export class AssignContributorDto extends Model {
-    constructor(
-        public readonly contributorId: string,
-        public readonly role: string,
-        public readonly invite = false
-    ) {
-        super();
-    }
-}
-
-export class AppContributorDto extends Model {
+export class AppContributorDto extends Model<AssignContributorDto> {
     constructor(
         public readonly contributorId: string,
         public readonly role: string
@@ -49,12 +39,15 @@ export class AppContributorDto extends Model {
     }
 }
 
-export class ContributorAssignedDto {
-    constructor(
-        public readonly contributorId: string,
-        public readonly isCreated: boolean
-    ) {
-    }
+export interface ContributorAssignedDto {
+    readonly contributorId: string;
+    readonly isCreated?: boolean;
+}
+
+export interface AssignContributorDto  {
+    readonly contributorId: string;
+    readonly role: string;
+    readonly invite?: boolean;
 }
 
 @Injectable()
@@ -93,9 +86,7 @@ export class AppContributorsService {
                 map(response => {
                     const body: any = response.payload.body;
 
-                    const result = new ContributorAssignedDto(body.contributorId, body.isCreated);
-
-                    return new Versioned(response.version, result);
+                    return new Versioned(response.version, body);
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Contributor', 'Configured', appName);

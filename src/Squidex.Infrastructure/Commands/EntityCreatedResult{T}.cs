@@ -7,7 +7,7 @@
 
 namespace Squidex.Infrastructure.Commands
 {
-    public sealed class EntityCreatedResult<T> : EntitySavedResult
+    public class EntityCreatedResult<T> : EntitySavedResult
     {
         public T IdOrValue { get; }
 

@@ -37,6 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
 
         public string FileName { get; set; }
 
+        public string FileHash { get; set; }
+
         public string Slug { get; set; }
 
         public long FileSize { get; set; }

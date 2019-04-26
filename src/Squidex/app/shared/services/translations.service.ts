@@ -20,13 +20,10 @@ export class TranslationDto {
     }
 }
 
-export class TranslateDto {
-    constructor(
-        public readonly text: string,
-        public readonly sourceLanguage: string,
-        public readonly targetLanguage: string
-    ) {
-    }
+export interface TranslateDto {
+    readonly text: string;
+    readonly sourceLanguage: string;
+    readonly targetLanguage: string;
 }
 
 @Injectable()

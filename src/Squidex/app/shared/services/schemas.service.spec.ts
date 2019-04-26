@@ -22,9 +22,6 @@ import {
     SchemaDto,
     SchemaPropertiesDto,
     SchemasService,
-    UpdateFieldDto,
-    UpdateSchemaCategoryDto,
-    UpdateSchemaDto,
     Version
 } from './../';
 
@@ -358,7 +355,7 @@ describe('SchemasService', () => {
     it('should make put request to update schema',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateSchemaDto('label', 'hints');
+        const dto = { label: 'label1' };
 
         schemasService.putSchema('my-app', 'my-schema', dto, version).subscribe();
 
@@ -388,7 +385,7 @@ describe('SchemasService', () => {
     it('should make put request to update category',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateSchemaCategoryDto();
+        const dto = {};
 
         schemasService.putCategory('my-app', 'my-schema', dto, version).subscribe();
 
@@ -486,7 +483,7 @@ describe('SchemasService', () => {
     it('should make put request to update field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateFieldDto(createProperties('Number'));
+        const dto = { properties: createProperties('Number') };
 
         schemasService.putField('my-app', 'my-schema', 1, dto, undefined, version).subscribe();
 
@@ -501,7 +498,7 @@ describe('SchemasService', () => {
     it('should make put request to update nested field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateFieldDto(createProperties('Number'));
+        const dto = { properties: createProperties('Number') };
 
         schemasService.putField('my-app', 'my-schema', 1, dto, 13, version).subscribe();
 

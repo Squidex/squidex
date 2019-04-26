@@ -120,4 +120,4 @@ export class PatternsState extends State<Snapshot> {
 }
 
 const update = (pattern: AppPatternDto, request: EditAppPatternDto) =>
-    new AppPatternDto(pattern.id, request.name, request.pattern, request.message);
+    pattern.with(request);

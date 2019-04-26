@@ -20,7 +20,7 @@ import {
     Versioned
 } from '@app/framework';
 
-export class AppPatternsDto extends Model {
+export class AppPatternsDto extends Model<AppPatternsDto> {
     constructor(
         public readonly patterns: AppPatternDto[],
         public readonly version: Version
@@ -29,26 +29,22 @@ export class AppPatternsDto extends Model {
     }
 }
 
-export class AppPatternDto extends Model {
+export class AppPatternDto extends Model<AppPatternDto> {
     constructor(
         public readonly id: string,
         public readonly name: string,
         public readonly pattern: string,
-        public readonly message: string
+        public readonly message?: string
     ) {
         super();
     }
 }
 
-export class EditAppPatternDto {
-    constructor(
-        public readonly name: string,
-        public readonly pattern: string,
-        public readonly message: string
-    ) {
-    }
+export interface EditAppPatternDto {
+    readonly name: string;
+    readonly pattern: string;
+    readonly message?: string;
 }
-
 
 @Injectable()
 export class AppPatternsService {

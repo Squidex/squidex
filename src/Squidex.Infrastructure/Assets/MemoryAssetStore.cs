@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public sealed class MemoryAssetStore : IAssetStore
+    public class MemoryAssetStore : IAssetStore
     {
         private readonly ConcurrentDictionary<string, MemoryStream> streams = new ConcurrentDictionary<string, MemoryStream>();
         private readonly AsyncLock readerLock = new AsyncLock();
@@ -24,7 +24,7 @@ namespace Squidex.Infrastructure.Assets
             return null;
         }
 
-        public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
+        public virtual async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(sourceFileName, nameof(sourceFileName));
             Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
@@ -40,7 +40,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
+        public virtual async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
@@ -62,7 +62,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
+        public virtual async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(fileName, nameof(fileName));
 
@@ -99,7 +99,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        public Task DeleteAsync(string fileName)
+        public virtual Task DeleteAsync(string fileName)
         {
             Guard.NotNullOrEmpty(fileName, nameof(fileName));
 

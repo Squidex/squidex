@@ -19,9 +19,11 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
 
         Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids);
 
-        Task<IAssetEntity> FindAssetAsync(string slug);
+        Task<IAssetEntity> FindAssetAsync(Guid id, bool allowDeleted = false);
 
-        Task<IAssetEntity> FindAssetAsync(Guid id);
+        Task<IAssetEntity> FindAssetBySlugAsync(Guid appId, string slug);
+
+        Task<IAssetEntity> FindAssetByHashAsync(Guid appId, string hash);
 
         Task RemoveAsync(Guid appId);
     }

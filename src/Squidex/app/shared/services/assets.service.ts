@@ -18,21 +18,15 @@ import {
     HTTP,
     Model,
     pretifyError,
+    ResultSet,
     Types,
     Version,
     Versioned
 } from '@app/framework';
 
-export class AssetsDto extends Model {
-    constructor(
-        public readonly total: number,
-        public readonly items: AssetDto[]
-    ) {
-        super();
-    }
-}
+export class AssetsDto extends ResultSet<AssetDto> { }
 
-export class AssetDto extends Model {
+export class AssetDto extends Model<AssetDto> {
     public get canPreview() {
         return this.isImage || (this.mimeType === 'image/svg+xml' && this.fileSize < 100 * 1024);
     }
@@ -44,10 +38,12 @@ export class AssetDto extends Model {
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
         public readonly fileName: string,
+        public readonly fileHash: string,
         public readonly fileType: string,
         public readonly fileSize: number,
         public readonly fileVersion: number,
         public readonly mimeType: string,
+        public readonly isDuplicate: boolean,
         public readonly isImage: boolean,
         public readonly pixelWidth: number | null,
         public readonly pixelHeight: number | null,
@@ -59,12 +55,8 @@ export class AssetDto extends Model {
         super();
     }
 
-    public with(value: Partial<AssetDto>, validOnly = false): AssetDto {
-        return this.clone(value, validOnly);
-    }
-
     public update(update: AssetReplacedDto, user: string, version: Version, now?: DateTime): AssetDto {
-        return this.with({
+        return this.clone({
             ...update,
             lastModified: now || DateTime.now(),
             lastModifiedBy: user,
@@ -73,7 +65,7 @@ export class AssetDto extends Model {
     }
 
     public annnotate(update: AnnotateAssetDto, user: string, version: Version, now?: DateTime): AssetDto {
-        return this.with({
+        return this.clone({
             ...<any>update,
             lastModified: now || DateTime.now(),
             lastModifiedBy: user,
@@ -82,25 +74,20 @@ export class AssetDto extends Model {
     }
 }
 
-export class AnnotateAssetDto {
-    constructor(
-        public readonly fileName: string | null,
-        public readonly slug: string | null,
-        public readonly tags: string[] | null
-    ) {
-    }
+export interface AnnotateAssetDto {
+    readonly fileName?: string;
+    readonly slug?: string;
+    readonly tags?: string[];
 }
 
-export class AssetReplacedDto {
-    constructor(
-        public readonly fileSize: number,
-        public readonly fileVersion: number,
-        public readonly mimeType: string,
-        public readonly isImage: boolean,
-        public readonly pixelWidth: number | null,
-        public readonly pixelHeight: number | null
-    ) {
-    }
+export interface AssetReplacedDto {
+    readonly fileHash: string;
+    readonly fileSize: number;
+    readonly fileVersion: number;
+    readonly mimeType: string;
+    readonly isImage: boolean;
+    readonly pixelWidth?: number | null;
+    readonly pixelHeight?: number | null;
 }
 
 @Injectable()
@@ -169,10 +156,12 @@ export class AssetsService {
                             DateTime.parseISO_UTC(item.created),
                             DateTime.parseISO_UTC(item.lastModified),
                             item.fileName,
+                            item.fileHash,
                             item.fileType,
                             item.fileSize,
                             item.fileVersion,
                             item.mimeType,
+                            false,
                             item.isImage,
                             item.pixelWidth,
                             item.pixelHeight,
@@ -212,10 +201,12 @@ export class AssetsService {
                             now,
                             now,
                             response.fileName,
+                            response.fileHash,
                             response.fileType,
                             response.fileSize,
                             response.fileVersion,
                             response.mimeType,
+                            response.isDuplicate,
                             response.isImage,
                             response.pixelWidth,
                             response.pixelHeight,
@@ -260,10 +251,12 @@ export class AssetsService {
                         DateTime.parseISO_UTC(body.created),
                         DateTime.parseISO_UTC(body.lastModified),
                         body.fileName,
+                        body.fileHash,
                         body.fileType,
                         body.fileSize,
                         body.fileVersion,
                         body.mimeType,
+                        false,
                         body.isImage,
                         body.pixelWidth,
                         body.pixelHeight,
@@ -292,15 +285,7 @@ export class AssetsService {
                     } else if (Types.is(event, HttpResponse)) {
                         const response: any = event.body;
 
-                        const replaced =  new AssetReplacedDto(
-                            response.fileSize,
-                            response.fileVersion,
-                            response.mimeType,
-                            response.isImage,
-                            response.pixelWidth,
-                            response.pixelHeight);
-
-                        return new Versioned(new Version(event.headers.get('etag')!), replaced);
+                        return new Versioned(new Version(event.headers.get('etag')!), response);
                     } else {
                         throw 'Invalid';
                     }

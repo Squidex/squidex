@@ -17,7 +17,6 @@ import {
     DateTime,
     DialogService,
     ImmutableArray,
-    UpsertCommentDto,
     Version
 } from './../';
 
@@ -56,10 +55,10 @@ describe('CommentsState', () => {
 
     it('should load and merge comments', () => {
         const newComments = new CommentsDto([
-            new CommentDto('3', now, 'text3', user)
-        ], [
-            new CommentDto('2', now, 'text2_2', user)
-        ], ['1'], new Version('2'));
+                new CommentDto('3', now, 'text3', user)
+            ], [
+                new CommentDto('2', now, 'text2_2', user)
+            ], ['1'], new Version('2'));
 
         commentsService.setup(x => x.getComments(app, commentsId, new Version('1')))
             .returns(() => of(newComments));
@@ -78,7 +77,9 @@ describe('CommentsState', () => {
     it('should add comment to snapshot when created', () => {
         const newComment = new CommentDto('3', now, 'text3', user);
 
-        commentsService.setup(x => x.postComment(app, commentsId, new UpsertCommentDto('text3')))
+        const request = { text: 'text3' };
+
+        commentsService.setup(x => x.postComment(app, commentsId, request))
             .returns(() => of(newComment));
 
         commentsState.create('text3').subscribe();
@@ -91,7 +92,9 @@ describe('CommentsState', () => {
     });
 
     it('should update properties when updated', () => {
-        commentsService.setup(x => x.putComment(app, commentsId, '2', new UpsertCommentDto('text2_2')))
+        const request = { text: 'text2_2' };
+
+        commentsService.setup(x => x.putComment(app, commentsId, '2', request))
             .returns(() => of({}));
 
         commentsState.update('2', 'text2_2', now).subscribe();
@@ -101,7 +104,7 @@ describe('CommentsState', () => {
             new CommentDto('2', now, 'text2_2', user)
         ]));
 
-        commentsService.verify(x => x.putComment(app, commentsId, '2', new UpsertCommentDto('text2_2')), Times.once());
+        commentsService.verify(x => x.putComment(app, commentsId, '2', request), Times.once());
     });
 
     it('should remove comment from snapshot when deleted', () => {

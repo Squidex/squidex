@@ -77,28 +77,32 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public int? PixelHeight { get; set; }
 
         /// <summary>
+        /// Indicates if the asset has been already uploaded.
+        /// </summary>
+        public bool IsDuplicate { get; set; }
+
+        /// <summary>
         /// The version of the asset.
         /// </summary>
         public long Version { get; set; }
 
         public static AssetCreatedDto FromCommand(CreateAsset command, AssetCreatedResult result)
         {
-            var response = new AssetCreatedDto
+            return new AssetCreatedDto
             {
-                Id = command.AssetId,
+                Id = result.IdOrValue,
                 FileName = command.File.FileName,
                 FileSize = command.File.FileSize,
                 FileType = command.File.FileName.FileType(),
-                FileVersion = result.Version,
+                FileVersion = result.FileVersion,
                 MimeType = command.File.MimeType,
                 IsImage = command.ImageInfo != null,
+                IsDuplicate = result.IsDuplicate,
                 PixelWidth = command.ImageInfo?.PixelWidth,
                 PixelHeight = command.ImageInfo?.PixelHeight,
                 Tags = result.Tags,
                 Version = result.Version
             };
-
-            return response;
         }
     }
 }

@@ -9,13 +9,11 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { inject, TestBed } from '@angular/core/testing';
 
 import {
-    AddAppLanguageDto,
     AnalyticsService,
     ApiUrlConfig,
     AppLanguageDto,
     AppLanguagesDto,
     AppLanguagesService,
-    UpdateAppLanguageDto,
     Version
 } from './../';
 
@@ -83,7 +81,7 @@ describe('AppLanguagesService', () => {
     it('should make post request to add language',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
 
-        const dto = new AddAppLanguageDto('de');
+        const dto = { language: 'de' };
 
         let language: AppLanguageDto;
 
@@ -104,7 +102,7 @@ describe('AppLanguagesService', () => {
     it('should make put request to make master language',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateAppLanguageDto(true, true, []);
+        const dto = { isMaster: true };
 
         appLanguagesService.putLanguage('my-app', 'de', dto, version).subscribe();
 

@@ -11,7 +11,6 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    ChangePlanDto,
     PlanChangedDto,
     PlanDto,
     PlansDto,
@@ -101,7 +100,7 @@ describe('PlansService', () => {
     it('should make put request to change plan',
         inject([PlansService, HttpTestingController], (plansService: PlansService, httpMock: HttpTestingController) => {
 
-        const dto = new ChangePlanDto('enterprise');
+        const dto = { planId: 'enterprise' };
 
         let planChanged: PlanChangedDto;
 
@@ -116,6 +115,6 @@ describe('PlansService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        expect(planChanged!).toEqual(new PlanChangedDto('my-url'));
+        expect(planChanged!).toEqual({ redirectUri: 'http://url' });
     }));
 });

@@ -13,25 +13,19 @@ import { map } from 'rxjs/operators';
 import {
     ApiUrlConfig,
     Model,
-    pretifyError
+    pretifyError,
+    ResultSet
 } from '@app/shared';
 
-export class UsersDto extends Model {
-    constructor(
-        public readonly total: number,
-        public readonly items: UserDto[]
-    ) {
-        super();
-    }
-}
+export class UsersDto extends ResultSet<UserDto> {}
 
-export class UserDto extends Model {
+export class UserDto extends Model<UserDto> {
     constructor(
         public readonly id: string,
         public readonly email: string,
         public readonly displayName: string,
-        public readonly permissions: string[],
-        public readonly isLocked: boolean
+        public readonly permissions: string[] = [],
+        public readonly isLocked?: boolean
     ) {
         super();
     }
@@ -41,24 +35,18 @@ export class UserDto extends Model {
     }
 }
 
-export class CreateUserDto {
-    constructor(
-        public readonly email: string,
-        public readonly displayName: string,
-        public readonly permissions: string[],
-        public readonly password: string
-    ) {
-    }
+export interface CreateUserDto {
+    readonly email: string;
+    readonly displayName: string;
+    readonly permissions: string[];
+    readonly password: string;
 }
 
-export class UpdateUserDto {
-    constructor(
-        public readonly email: string,
-        public readonly displayName: string,
-        public readonly permissions: string[],
-        public readonly password?: string
-    ) {
-    }
+export interface UpdateUserDto {
+    readonly email: string;
+    readonly displayName: string;
+    readonly permissions: string[];
+    readonly password?: string;
 }
 
 @Injectable()

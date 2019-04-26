@@ -13,8 +13,6 @@ import { AuthService, DialogService } from '@app/shared';
 import { UsersState } from './users.state';
 
 import {
-    CreateUserDto,
-    UpdateUserDto,
     UserDto,
     UsersDto,
     UsersService
@@ -168,7 +166,7 @@ describe('UsersState', () => {
     });
 
     it('should update user properties when updated', () => {
-        const request = new UpdateUserDto('new@mail.com', 'New', ['Permission1']);
+        const request = { email: 'new@mail.com', displayName: 'New', permissions: ['Permission1'] };
 
         usersService.setup(x => x.putUser('id1', request))
             .returns(() => of({}));
@@ -178,13 +176,14 @@ describe('UsersState', () => {
 
         const user_1 = usersState.snapshot.users.at(0);
 
-        expect(user_1.user.email).toEqual('new@mail.com');
-        expect(user_1.user.displayName).toEqual('New');
+        expect(user_1.user.email).toEqual(request.email);
+        expect(user_1.user.displayName).toEqual(request.permissions);
+        expect(user_1.user.permissions).toEqual(request.permissions);
         expect(user_1).toBe(usersState.snapshot.selectedUser!);
     });
 
     it('should add user to snapshot when created', () => {
-        const request = new CreateUserDto(newUser.email, newUser.displayName, newUser.permissions, 'password');
+        const request = { ...newUser, password: 'password' };
 
         usersService.setup(x => x.postUser(request))
             .returns(() => of(newUser));

@@ -21,7 +21,7 @@ using Squidex.Infrastructure.Queries.OData;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetQueryService : IAssetQueryService
+    public class AssetQueryService : IAssetQueryService
     {
         private readonly ITagService tagService;
         private readonly IAssetRepository assetRepository;
@@ -38,21 +38,38 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.tagService = tagService;
         }
 
-        public async Task<IAssetEntity> FindAssetAsync(QueryContext context, Guid id)
+        public virtual Task<IAssetEntity> FindAssetAsync(QueryContext context, Guid id)
         {
             Guard.NotNull(context, nameof(context));
 
+            return FindAssetAsync(context.App.Id, id);
+        }
+
+        public virtual async Task<IAssetEntity> FindAssetAsync(Guid appId, Guid id)
+        {
             var asset = await assetRepository.FindAssetAsync(id);
 
             if (asset != null)
             {
-                await DenormalizeTagsAsync(context.App.Id, Enumerable.Repeat(asset, 1));
+                await DenormalizeTagsAsync(appId, Enumerable.Repeat(asset, 1));
             }
 
             return asset;
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(QueryContext context, Q query)
+        public virtual async Task<IAssetEntity> FindAssetByHashAsync(Guid appId, string hash)
+        {
+            var asset = await assetRepository.FindAssetByHashAsync(appId, hash);
+
+            if (asset != null)
+            {
+                await DenormalizeTagsAsync(appId, Enumerable.Repeat(asset, 1));
+            }
+
+            return asset;
+        }
+
+        public virtual async Task<IResultList<IAssetEntity>> QueryAsync(QueryContext context, Q query)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(query, nameof(query));

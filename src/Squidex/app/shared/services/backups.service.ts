@@ -19,7 +19,7 @@ import {
     Types
 } from '@app/framework';
 
-export class BackupDto extends Model {
+export class BackupDto extends Model<BackupDto> {
     constructor(
         public readonly id: string,
         public readonly started: DateTime,
@@ -32,7 +32,7 @@ export class BackupDto extends Model {
     }
 }
 
-export class RestoreDto {
+export class RestoreDto extends Model<BackupDto> {
     constructor(
         public readonly url: string,
         public readonly started: DateTime,
@@ -40,15 +40,13 @@ export class RestoreDto {
         public readonly status: string,
         public readonly log: string[]
     ) {
+        super();
     }
 }
 
-export class StartRestoreDto {
-    constructor(
-        public readonly url: string,
-        public readonly newAppName?: string
-    ) {
-    }
+export interface StartRestoreDto {
+    readonly url: string;
+    readonly newAppName?: string;
 }
 
 @Injectable()

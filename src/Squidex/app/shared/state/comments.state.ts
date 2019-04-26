@@ -17,12 +17,7 @@ import {
     Version
 } from '@app/framework';
 
-import {
-    CommentDto,
-    CommentsService,
-    UpsertCommentDto
-} from './../services/comments.service';
-
+import { CommentDto,  CommentsService } from './../services/comments.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot {
@@ -81,7 +76,7 @@ export class CommentsState extends State<Snapshot> {
     }
 
     public create(text: string): Observable<any> {
-        return this.commentsService.postComment(this.appName, this.commentsId, new UpsertCommentDto(text)).pipe(
+        return this.commentsService.postComment(this.appName, this.commentsId, { text }).pipe(
             tap(dto => {
                 this.next(s => {
                     const comments = s.comments.push(dto);
@@ -93,7 +88,7 @@ export class CommentsState extends State<Snapshot> {
     }
 
     public update(commentId: string, text: string, now?: DateTime): Observable<any> {
-        return this.commentsService.putComment(this.appName, this.commentsId, commentId, new UpsertCommentDto(text)).pipe(
+        return this.commentsService.putComment(this.appName, this.commentsId, commentId, { text }).pipe(
             tap(() => {
                 this.next(s => {
                     const comments = s.comments.map(c => c.id === commentId ? update(c, text, now || DateTime.now()) : c);

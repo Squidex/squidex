@@ -14,7 +14,6 @@ import {
     CommentsDto,
     CommentsService,
     DateTime,
-    UpsertCommentDto,
     Version
 } from './../';
 
@@ -84,9 +83,11 @@ describe('CommentsService', () => {
     it('should make post request to create comment',
         inject([CommentsService, HttpTestingController], (commentsService: CommentsService, httpMock: HttpTestingController) => {
 
+        const dto = { text: 'text1' };
+
         let comment: CommentDto;
 
-        commentsService.postComment('my-app', 'my-comments', new UpsertCommentDto('text1')).subscribe(result => {
+        commentsService.postComment('my-app', 'my-comments', dto).subscribe(result => {
             comment = result;
         });
 
@@ -108,7 +109,9 @@ describe('CommentsService', () => {
     it('should make put request to replace comment content',
         inject([CommentsService, HttpTestingController], (commentsService: CommentsService, httpMock: HttpTestingController) => {
 
-        commentsService.putComment('my-app', 'my-comments', '123', new UpsertCommentDto('text1')).subscribe();
+        const dto = { text: 'text1' };
+
+        commentsService.putComment('my-app', 'my-comments', '123', dto).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/comments/my-comments/123');
 

@@ -17,6 +17,7 @@ import {
     HTTP,
     Model,
     pretifyError,
+    ResultSet,
     Version,
     Versioned
 } from '@app/framework';
@@ -72,7 +73,7 @@ export class RuleElementPropertyDto {
     }
 }
 
-export class RuleDto extends Model {
+export class RuleDto extends Model<RuleDto> {
     constructor(
         public readonly id: string,
         public readonly createdBy: string,
@@ -88,22 +89,11 @@ export class RuleDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<RuleDto>): RuleDto {
-        return this.clone(value);
-    }
 }
 
-export class RuleEventsDto extends Model {
-    constructor(
-        public readonly total: number,
-        public readonly items: RuleEventDto[]
-    ) {
-        super();
-    }
-}
+export class RuleEventsDto extends ResultSet<RuleEventDto> { }
 
-export class RuleEventDto extends Model {
+export class RuleEventDto extends Model<RuleEventDto> {
     constructor(
         public readonly id: string,
         public readonly created: DateTime,
@@ -117,26 +107,16 @@ export class RuleEventDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<RuleEventDto>): RuleEventDto {
-        return this.clone(value);
-    }
 }
 
-export class CreateRuleDto {
-    constructor(
-        public readonly trigger: any,
-        public readonly action: any
-    ) {
-    }
+export interface CreateRuleDto {
+    readonly trigger: any;
+    readonly action: any;
 }
 
-export class UpdateRuleDto {
-    constructor(
-        public readonly trigger: any,
-        public readonly action: any
-    ) {
-    }
+export interface UpdateRuleDto {
+    readonly trigger?: any;
+    readonly action?: any;
 }
 
 @Injectable()

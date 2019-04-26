@@ -18,7 +18,6 @@ import {
     LanguageDto,
     LanguagesService,
     LanguagesState,
-    UpdateAppLanguageDto,
     Version,
     Versioned
 } from './../';
@@ -121,7 +120,7 @@ describe('LanguagesState', () => {
     });
 
     it('should update language in snapshot when updated', () => {
-        const request = new UpdateAppLanguageDto(true, false, []);
+        const request = { isMaster: true };
 
         languagesService.setup(x => x.putLanguage(app, oldLanguages[1].iso2Code, request, version))
             .returns(() => of(new Versioned<any>(newVersion, {})));

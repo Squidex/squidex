@@ -14,9 +14,7 @@ import {
     AppClientsService,
     AppsState,
     ClientsState,
-    CreateAppClientDto,
     DialogService,
-    UpdateAppClientDto,
     Version,
     Versioned
 } from './../';
@@ -27,8 +25,8 @@ describe('ClientsState', () => {
     const newVersion = new Version('2');
 
     const oldClients = [
-        new AppClientDto('id1', 'name1', 'secret1', 'Developer'),
-        new AppClientDto('id2', 'name2', 'secret2', 'Developer')
+        new AppClientDto('id1', 'name1', 'secret1'),
+        new AppClientDto('id2', 'name2', 'secret2')
     ];
 
     let dialogs: IMock<DialogService>;
@@ -70,9 +68,9 @@ describe('ClientsState', () => {
     });
 
     it('should add client to snapshot when created', () => {
-        const newClient = new AppClientDto('id3', 'name3', 'secret3', 'Developer');
+        const newClient = new AppClientDto('id3', 'name3', 'secret3');
 
-        const request = new CreateAppClientDto('id3');
+        const request = { id: 'id3' };
 
         clientsService.setup(x => x.postClient(app, request, version))
             .returns(() => of(new Versioned<AppClientDto>(newVersion, newClient)));
@@ -84,7 +82,7 @@ describe('ClientsState', () => {
     });
 
     it('should update properties when updated', () => {
-        const request = new UpdateAppClientDto('NewName', 'NewRole');
+        const request = { name: 'NewName', role: 'NewRole' };
 
         clientsService.setup(x => x.putClient(app, oldClients[0].id, request, version))
             .returns(() => of(new Versioned<any>(newVersion, {})));

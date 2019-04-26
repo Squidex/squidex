@@ -20,7 +20,7 @@ import {
     Versioned
 } from '@app/framework';
 
-export class PlansDto extends Model {
+export class PlansDto extends Model<PlansDto> {
     constructor(
         public readonly currentPlanId: string,
         public readonly planOwner: string,
@@ -32,7 +32,7 @@ export class PlansDto extends Model {
     }
 }
 
-export class PlanDto extends Model {
+export class PlanDto extends Model<PlanDto> {
     constructor(
         public readonly id: string,
         public readonly name: string,
@@ -47,18 +47,12 @@ export class PlanDto extends Model {
     }
 }
 
-export class PlanChangedDto {
-    constructor(
-        public readonly redirectUri: string
-    ) {
-    }
+export interface PlanChangedDto {
+    readonly redirectUri?: string;
 }
 
-export class ChangePlanDto {
-    constructor(
-        public readonly planId: string
-    ) {
-    }
+export interface ChangePlanDto {
+    readonly planId: string;
 }
 
 @Injectable()
@@ -106,7 +100,7 @@ export class PlansService {
                 map(response => {
                     const body = response.payload.body;
 
-                    return new Versioned(response.version, new PlanChangedDto(body.redirectUri));
+                    return new Versioned(response.version, body);
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Plan', 'Changed', appName);

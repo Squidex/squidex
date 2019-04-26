@@ -20,7 +20,7 @@ import {
     Versioned
 } from '@app/framework';
 
-export class AppRolesDto extends Model {
+export class AppRolesDto extends Model<AppRolesDto> {
     constructor(
         public readonly roles: AppRoleDto[],
         public readonly version: Version
@@ -29,7 +29,7 @@ export class AppRolesDto extends Model {
     }
 }
 
-export class AppRoleDto extends Model {
+export class AppRoleDto extends Model<AppRoleDto> {
     constructor(
         public readonly name: string,
         public readonly numClients: number,
@@ -38,24 +38,14 @@ export class AppRoleDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<AppRoleDto>): AppRoleDto {
-        return this.clone(value);
-    }
 }
 
-export class CreateAppRoleDto {
-    constructor(
-        public readonly name: string
-    ) {
-    }
+export interface CreateAppRoleDto {
+    readonly name: string;
 }
 
-export class UpdateAppRoleDto {
-    constructor(
-        public readonly permissions: string[]
-    ) {
-    }
+export interface UpdateAppRoleDto {
+    readonly permissions: string[];
 }
 
 @Injectable()

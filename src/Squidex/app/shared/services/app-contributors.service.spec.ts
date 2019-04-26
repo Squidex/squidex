@@ -14,7 +14,6 @@ import {
     AppContributorDto,
     AppContributorsDto,
     AppContributorsService,
-    AssignContributorDto,
     ContributorAssignedDto,
     Version
 } from './../';
@@ -81,7 +80,7 @@ describe('AppContributorsService', () => {
     it('should make post request to assign contributor',
         inject([AppContributorsService, HttpTestingController], (appContributorsService: AppContributorsService, httpMock: HttpTestingController) => {
 
-        const dto = new AssignContributorDto('123', 'Owner');
+        const dto = { contributorId: '123', role: 'Owner' };
 
         let contributorAssignedDto: ContributorAssignedDto;
 

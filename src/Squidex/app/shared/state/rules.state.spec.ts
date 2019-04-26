@@ -13,7 +13,6 @@ import { RulesState } from './rules.state';
 import {
     AppsState,
     AuthService,
-    CreateRuleDto,
     DateTime,
     DialogService,
     RuleDto,
@@ -83,7 +82,7 @@ describe('RulesState', () => {
     it('should add rule to snapshot when created', () => {
         const newRule = new RuleDto('id3', creator, creator, creation, creation, version, false, {}, 'trigger3', {}, 'action3');
 
-        const request = new CreateRuleDto({}, {});
+        const request = { action: {}, trigger: {} };
 
         rulesService.setup(x => x.postRule(app, request, modifier, creation))
             .returns(() => of(newRule));

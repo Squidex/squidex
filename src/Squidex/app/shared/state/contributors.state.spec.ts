@@ -13,7 +13,6 @@ import {
     AppContributorsDto,
     AppContributorsService,
     AppsState,
-    AssignContributorDto,
     AuthService,
     ContributorAssignedDto,
     ContributorsState,
@@ -84,7 +83,7 @@ describe('ContributorsState', () => {
     it('should add contributor to snapshot when assigned', () => {
         const newContributor = new AppContributorDto('id3', 'Developer');
 
-        const request = new AssignContributorDto('mail2stehle@gmail.com', 'Developer');
+        const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
 
         contributorsService.setup(x => x.postContributor(app, request, version))
             .returns(() => of(new Versioned<ContributorAssignedDto>(newVersion, new ContributorAssignedDto('id3', true))));

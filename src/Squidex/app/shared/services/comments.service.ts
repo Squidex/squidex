@@ -18,7 +18,7 @@ import {
     Version
 } from '@app/framework';
 
-export class CommentsDto extends Model {
+export class CommentsDto extends Model<CommentsDto> {
     constructor(
         public readonly createdComments: CommentDto[],
         public readonly updatedComments: CommentDto[],
@@ -29,7 +29,7 @@ export class CommentsDto extends Model {
     }
 }
 
-export class CommentDto extends Model {
+export class CommentDto extends Model<CommentDto> {
     constructor(
         public readonly id: string,
         public readonly time: DateTime,
@@ -38,17 +38,10 @@ export class CommentDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<CommentDto>): CommentDto {
-        return this.clone(value);
-    }
 }
 
-export class UpsertCommentDto {
-    constructor(
-        public readonly text: string
-    ) {
-    }
+export interface UpsertCommentDto {
+    readonly text: string;
 }
 
 @Injectable()

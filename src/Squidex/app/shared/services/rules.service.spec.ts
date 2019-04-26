@@ -12,7 +12,6 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    CreateRuleDto,
     DateTime,
     RuleDto,
     RuleElementDto,
@@ -20,7 +19,6 @@ import {
     RuleEventDto,
     RuleEventsDto,
     RulesService,
-    UpdateRuleDto,
     Version
 } from './../';
 
@@ -168,15 +166,18 @@ describe('RulesService', () => {
     it('should make post request to create rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
-        const dto = new CreateRuleDto({
-            param1: 1,
-            param2: 2,
-            triggerType: 'ContentChanged'
-        }, {
-            param3: 3,
-            param4: 4,
-            actionType: 'Webhook'
-        });
+        const dto = {
+            trigger: {
+                param1: 1,
+                param2: 2,
+                triggerType: 'ContentChanged'
+            },
+            action: {
+                param3: 3,
+                param4: 4,
+                actionType: 'Webhook'
+            }
+        };
 
         let rule: RuleDto;
 
@@ -216,7 +217,14 @@ describe('RulesService', () => {
     it('should make put request to update rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateRuleDto({ param1: 1 }, { param2: 2 });
+        const dto = {
+            trigger: {
+                param1: 1
+            },
+            action: {
+                param3: 2
+            }
+        };
 
         rulesService.putRule('my-app', '123', dto, version).subscribe();
 

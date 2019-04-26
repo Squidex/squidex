@@ -17,7 +17,12 @@ import {
     Version
 } from '@app/framework';
 
-import { AddAppLanguageDto, AppLanguageDto, AppLanguagesService, UpdateAppLanguageDto } from './../services/app-languages.service';
+import {
+    AppLanguageDto,
+    AppLanguagesService,
+    UpdateAppLanguageDto
+} from './../services/app-languages.service';
+
 import { LanguageDto, LanguagesService } from './../services/languages.service';
 import { AppsState } from './apps.state';
 
@@ -105,7 +110,7 @@ export class LanguagesState extends State<Snapshot> {
     }
 
     public add(language: LanguageDto): Observable<any> {
-        return this.appLanguagesService.postLanguage(this.appName, new AddAppLanguageDto(language.iso2Code), this.version).pipe(
+        return this.appLanguagesService.postLanguage(this.appName, { language: language.iso2Code }, this.version).pipe(
             tap(dto => {
                 const languages = this.snapshot.plainLanguages.push(dto.payload).sortByStringAsc(x => x.englishName);
 
@@ -129,9 +134,9 @@ export class LanguagesState extends State<Snapshot> {
             tap(dto => {
                 const languages = this.snapshot.plainLanguages.map(l => {
                     if (l.iso2Code === language.iso2Code) {
-                        return update(l, request.isMaster, request.isOptional, request.fallback);
+                        return update(l, request);
                     } else if (l.isMaster && request.isMaster) {
-                        return  update(l, false, l.isOptional, l.fallback);
+                        return  update(l, { isMaster: false });
                     } else {
                         return l;
                     }
@@ -190,10 +195,5 @@ export class LanguagesState extends State<Snapshot> {
     }
 }
 
-const update = (language: AppLanguageDto, isMaster: boolean, isOptional: boolean, fallback: string[]) =>
-    new AppLanguageDto(
-        language.iso2Code,
-        language.englishName,
-        isMaster,
-        isOptional,
-        fallback);
+const update = (language: AppLanguageDto, request: UpdateAppLanguageDto) =>
+    language.with(request);

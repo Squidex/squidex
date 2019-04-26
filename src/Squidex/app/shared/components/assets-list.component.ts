@@ -11,6 +11,7 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import {
     AssetDto,
     AssetsState,
+    DialogService,
     ImmutableArray
 } from '@app/shared/internal';
 
@@ -38,10 +39,19 @@ export class AssetsListComponent {
     @Output()
     public select = new EventEmitter<AssetDto>();
 
+    constructor(
+        private readonly dialogs: DialogService
+    ) {
+    }
+
     public add(file: File, asset: AssetDto) {
         this.newFiles = this.newFiles.remove(file);
 
-        this.state.add(asset);
+        if (asset.isDuplicate) {
+            this.dialogs.notifyError('The same asset has already been uploaded.');
+        } else {
+            this.state.add(asset);
+        }
     }
 
     public search() {

@@ -14,7 +14,6 @@ import {
     AppPatternDto,
     AppPatternsDto,
     AppPatternsService,
-    EditAppPatternDto,
     Version
 } from './../';
 
@@ -80,7 +79,7 @@ describe('AppPatternsService', () => {
     it('should make post request to add pattern',
         inject([AppPatternsService, HttpTestingController], (patternService: AppPatternsService, httpMock: HttpTestingController) => {
 
-        const dto = new EditAppPatternDto('Number', '[0-9]', 'Message1');
+        const dto = { name: 'Number', pattern: '[0-9]' };
 
         let pattern: AppPatternDto;
 
@@ -106,7 +105,7 @@ describe('AppPatternsService', () => {
     it('should make put request to update pattern',
         inject([AppPatternsService, HttpTestingController], (patternService: AppPatternsService, httpMock: HttpTestingController) => {
 
-        const dto = new EditAppPatternDto('Number', '[0-9]', 'Message1');
+        const dto = { name: 'Number', pattern: '[0-9]' };
 
         patternService.putPattern('my-app', '1', dto, version).subscribe();
 

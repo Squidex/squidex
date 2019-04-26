@@ -62,7 +62,38 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("assets/{id}/{*more}")]
         [ProducesResponseType(typeof(FileResult), 200)]
         [ApiCosts(0.5)]
-        public async Task<IActionResult> GetAssetContent(string id, string more,
+        public async Task<IActionResult> GetAssetContent(Guid id, string more,
+            [FromQuery] long version = EtagVersion.Any,
+            [FromQuery] int? width = null,
+            [FromQuery] int? height = null,
+            [FromQuery] int? quality = null,
+            [FromQuery] string mode = null)
+        {
+            var entity = await assetRepository.FindAssetAsync(id);
+
+            return DeliverAsset(entity, version, width, height, quality, mode);
+        }
+
+        /// <summary>
+        /// Get the asset content.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="idOrSlug">The id or slug of the asset.</param>
+        /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
+        /// <param name="version">The optional version of the asset.</param>
+        /// <param name="width">The target width of the asset, if it is an image.</param>
+        /// <param name="height">The target height of the asset, if it is an image.</param>
+        /// <param name="quality">Optional image quality, it is is an jpeg image.</param>
+        /// <param name="mode">The resize mode when the width and height is defined.</param>
+        /// <returns>
+        /// 200 => Asset found and content or (resized) image returned.
+        /// 404 => Asset or app not found.
+        /// </returns>
+        [HttpGet]
+        [Route("assets/{app}/{idOrSlug}/{*more}")]
+        [ProducesResponseType(typeof(FileResult), 200)]
+        [ApiCosts(0.5)]
+        public async Task<IActionResult> GetAssetContent(string app, string idOrSlug, string more,
             [FromQuery] long version = EtagVersion.Any,
             [FromQuery] int? width = null,
             [FromQuery] int? height = null,
@@ -71,15 +102,20 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             IAssetEntity entity;
 
-            if (Guid.TryParse(id, out var guid))
+            if (Guid.TryParse(idOrSlug, out var guid))
             {
                 entity = await assetRepository.FindAssetAsync(guid);
             }
             else
             {
-                entity = await assetRepository.FindAssetAsync(id);
+                entity = await assetRepository.FindAssetByHashAsync(App.Id, idOrSlug);
             }
 
+            return DeliverAsset(entity, version, width, height, quality, mode);
+        }
+
+        private IActionResult DeliverAsset(IAssetEntity entity, long version, int? width, int? height, int? quality, string mode)
+        {
             if (entity == null || entity.FileVersion < version || width == 0 || height == 0 || quality == 0)
             {
                 return NotFound();

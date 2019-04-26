@@ -20,7 +20,7 @@ import {
     Versioned
 } from '@app/framework';
 
-export class AppClientsDto extends Model {
+export class AppClientsDto extends Model<AppClientsDto> {
     constructor(
         public readonly clients: AppClientDto[],
         public readonly version: Version
@@ -29,33 +29,14 @@ export class AppClientsDto extends Model {
     }
 }
 
-export class AppClientDto extends Model {
+export class AppClientDto extends Model<AppClientDto> {
     constructor(
         public readonly id: string,
         public readonly name: string,
         public readonly secret: string,
-        public readonly role: string
+        public readonly role = 'Developer'
     ) {
         super();
-    }
-
-    public with(value: Partial<AppClientDto>): AppClientDto {
-        return this.clone(value);
-    }
-}
-
-export class CreateAppClientDto {
-    constructor(
-        public readonly id: string
-    ) {
-    }
-}
-
-export class UpdateAppClientDto {
-    constructor(
-        public readonly name?: string,
-        public readonly role?: string
-    ) {
     }
 }
 
@@ -65,6 +46,15 @@ export class AccessTokenDto {
         public readonly tokenType: string
     ) {
     }
+}
+
+export interface CreateAppClientDto {
+    readonly id: string;
+}
+
+export interface UpdateAppClientDto {
+    readonly name?: string;
+    readonly role?: string;
 }
 
 @Injectable()

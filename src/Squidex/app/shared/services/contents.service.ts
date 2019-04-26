@@ -17,25 +17,12 @@ import {
     HTTP,
     Model,
     pretifyError,
+    ResultSet,
     Version,
     Versioned
 } from '@app/framework';
 
-export class ContentsDto extends Model {
-    constructor(
-        public readonly total: number,
-        public readonly items: ContentDto[]
-    ) {
-
-        super();
-    }
-
-    public with(value: Partial<ContentsDto>): ContentsDto {
-        return this.clone(value);
-    }}
-
-
-export class ScheduleDto extends Model {
+export class ScheduleDto extends Model<ScheduleDto> {
     constructor(
         public readonly status: string,
         public readonly scheduledBy: string,
@@ -45,7 +32,9 @@ export class ScheduleDto extends Model {
     }
 }
 
-export class ContentDto extends Model {
+export class ContentsDto extends ResultSet<ContentDto> { }
+
+export class ContentDto extends Model<ContentDto> {
     constructor(
         public readonly id: string,
         public readonly status: string,

@@ -20,26 +20,23 @@ import {
     pretifyError
 } from '@app/framework';
 
-export class AppDto extends Model {
+export class AppDto extends Model<AppDto> {
     constructor(
         public readonly id: string,
         public readonly name: string,
         public readonly permissions: Permission[],
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
-        public readonly planName: string,
-        public readonly planUpgrade: string
+        public readonly planName?: string,
+        public readonly planUpgrade?: string
     ) {
         super();
     }
 }
 
-export class CreateAppDto {
-    constructor(
-        public readonly name: string,
-        public readonly template?: string
-    ) {
-    }
+export interface CreateAppDto {
+    readonly name: string;
+    readonly template?: string;
 }
 
 @Injectable()

@@ -14,7 +14,6 @@ import {
     AppPatternsService,
     AppsState,
     DialogService,
-    EditAppPatternDto,
     PatternsState,
     Version,
     Versioned
@@ -70,7 +69,7 @@ describe('PatternsState', () => {
     it('should add pattern to snapshot when created', () => {
         const newPattern = new AppPatternDto('id3', 'name3', 'pattern3', '');
 
-        const request = new EditAppPatternDto('name3', 'pattern3', '');
+        const request = { ...newPattern };
 
         patternsService.setup(x => x.postPattern(app, request, version))
             .returns(() => of(new Versioned<AppPatternDto>(newVersion, newPattern)));
@@ -82,7 +81,7 @@ describe('PatternsState', () => {
     });
 
     it('should update properties when updated', () => {
-        const request = new EditAppPatternDto('a_name2', 'a_pattern2', 'a_message2');
+        const request = { name: 'name2_1', pattern: 'pattern2_1', message: 'message2_1' };
 
         patternsService.setup(x => x.putPattern(app, oldPatterns[1].id, request, version))
             .returns(() => of(new Versioned<any>(newVersion, {})));
@@ -91,9 +90,9 @@ describe('PatternsState', () => {
 
         const pattern_1 = patternsState.snapshot.patterns.at(0);
 
-        expect(pattern_1.name).toBe('a_name2');
-        expect(pattern_1.pattern).toBe('a_pattern2');
-        expect(pattern_1.message).toBe('a_message2');
+        expect(pattern_1.name).toBe(request.name);
+        expect(pattern_1.pattern).toBe(request.pattern);
+        expect(pattern_1.message).toBe(request.message);
         expect(patternsState.snapshot.version).toEqual(newVersion);
     });
 

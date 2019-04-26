@@ -21,7 +21,7 @@ import { EventConsumersState } from './../../state/event-consumers.state';
 })
 export class EventConsumersPageComponent extends ResourceOwner implements OnInit {
     public eventConsumerErrorDialog = new DialogModel();
-    public eventConsumerError = '';
+    public eventConsumerError?: string;
 
     constructor(
         public readonly eventConsumersState: EventConsumersState

@@ -103,7 +103,7 @@ describe('PlansState', () => {
         plansState.window = <any>{ location: {} };
 
         plansService.setup(x => x.putPlan(app, It.isAny(), version))
-            .returns(() => of(new Versioned<PlanChangedDto>(newVersion, new PlanChangedDto('URI'))));
+            .returns(() => of(new Versioned<PlanChangedDto>(newVersion, { redirectUri: 'http://url' })));
 
         plansState.load().subscribe();
         plansState.change('free').pipe(onErrorResumeNext()).subscribe();
@@ -120,7 +120,7 @@ describe('PlansState', () => {
         plansState.window = <any>{ location: {} };
 
         plansService.setup(x => x.putPlan(app, It.isAny(), version))
-            .returns(() => of(new Versioned<PlanChangedDto>(newVersion, new PlanChangedDto(''))));
+            .returns(() => of(new Versioned<PlanChangedDto>(newVersion, { redirectUri: '' })));
 
         plansState.load().subscribe();
         plansState.change('id2_yearly').pipe(onErrorResumeNext()).subscribe();

@@ -14,8 +14,6 @@ import {
     AppRoleDto,
     AppRolesDto,
     AppRolesService,
-    CreateAppRoleDto,
-    UpdateAppRoleDto,
     Version
 } from './../';
 
@@ -101,7 +99,7 @@ describe('AppRolesService', () => {
     it('should make post request to add role',
         inject([AppRolesService, HttpTestingController], (roleService: AppRolesService, httpMock: HttpTestingController) => {
 
-        const dto = new CreateAppRoleDto('Role3');
+        const dto = { name: 'Role3' };
 
         let role: AppRoleDto;
 
@@ -122,7 +120,7 @@ describe('AppRolesService', () => {
     it('should make put request to update role',
         inject([AppRolesService, HttpTestingController], (roleService: AppRolesService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateAppRoleDto(['P4', 'P5']);
+        const dto = { permissions: ['P4', 'P5'] };
 
         roleService.putRole('my-app', 'role1', dto, version).subscribe();
 

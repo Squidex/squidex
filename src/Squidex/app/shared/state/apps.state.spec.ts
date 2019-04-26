@@ -12,7 +12,6 @@ import {
     AppDto,
     AppsService,
     AppsState,
-    CreateAppDto,
     DateTime,
     DialogService,
     Permission
@@ -22,11 +21,11 @@ describe('AppsState', () => {
     const now = DateTime.now();
 
     const oldApps = [
-        new AppDto('id1', 'old-name1', [new Permission('Owner')], now, now, 'Free', 'Plan'),
-        new AppDto('id2', 'old-name2', [new Permission('Owner')], now, now, 'Free', 'Plan')
+        new AppDto('id1', 'old-name1', [new Permission('Owner')], now, now),
+        new AppDto('id2', 'old-name2', [new Permission('Owner')], now, now)
     ];
 
-    const newApp = new AppDto('id3', 'new-name', [new Permission('Owner')], now, now, 'Free', 'Plan');
+    const newApp = new AppDto('id3', 'new-name', [new Permission('Owner')], now, now);
 
     let dialogs: IMock<DialogService>;
     let appsService: IMock<AppsService>;
@@ -83,7 +82,7 @@ describe('AppsState', () => {
     });
 
     it('should add app to snapshot when created', () => {
-        const request = new CreateAppDto(newApp.name);
+        const request = { ...newApp };
 
         appsService.setup(x => x.postApp(request))
             .returns(() => of(newApp));
@@ -94,7 +93,7 @@ describe('AppsState', () => {
     });
 
     it('should remove app from snashot when archived', () => {
-        const request = new CreateAppDto(newApp.name);
+        const request = { ...newApp };
 
         appsService.setup(x => x.postApp(request))
             .returns(() => of(newApp));

@@ -16,8 +16,8 @@ import { EventConsumersState } from './event-consumers.state';
 
 describe('EventConsumersState', () => {
     const oldConsumers = [
-        new EventConsumerDto('name1', false, false, 'error', '1'),
-        new EventConsumerDto('name2', true,  true,  'error', '2')
+        new EventConsumerDto('name1', false),
+        new EventConsumerDto('name2', true)
     ];
 
     let dialogs: IMock<DialogService>;

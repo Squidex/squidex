@@ -18,13 +18,8 @@ import {
 } from '@app/framework';
 
 import { AuthService } from './../services/auth.service';
+import { PlanDto, PlansService } from './../services/plans.service';
 import { AppsState } from './apps.state';
-
-import {
-    ChangePlanDto,
-    PlanDto,
-    PlansService
-} from './../services/plans.service';
 
 interface PlanInfo {
     // The plan.
@@ -116,7 +111,7 @@ export class PlansState extends State<Snapshot> {
     }
 
     public change(planId: string): Observable<any> {
-        return this.plansService.putPlan(this.appName, new ChangePlanDto(planId), this.version).pipe(
+        return this.plansService.putPlan(this.appName, { planId }, this.version).pipe(
             tap(dto => {
                 if (dto.payload.redirectUri && dto.payload.redirectUri.length > 0) {
                     this.window.location.href = dto.payload.redirectUri;

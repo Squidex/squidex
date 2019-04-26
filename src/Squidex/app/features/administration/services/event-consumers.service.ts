@@ -16,19 +16,15 @@ import {
     pretifyError
 } from '@app/shared';
 
-export class EventConsumerDto extends Model {
+export class EventConsumerDto extends Model<EventConsumerDto> {
     constructor(
         public readonly name: string,
-        public readonly isStopped: boolean,
-        public readonly isResetting: boolean,
-        public readonly error: string,
-        public readonly position: string
+        public readonly isStopped?: boolean,
+        public readonly isResetting?: boolean,
+        public readonly error?: string,
+        public readonly position?: string
     ) {
         super();
-    }
-
-    public with(value: Partial<EventConsumerDto>): EventConsumerDto {
-        return this.clone(value);
     }
 }
 

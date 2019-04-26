@@ -24,8 +24,7 @@ import { AppsState } from './apps.state';
 import {
     CreateRuleDto,
     RuleDto,
-    RulesService,
-    UpdateRuleDto
+    RulesService
 } from './../services/rules.service';
 
 interface Snapshot {
@@ -100,7 +99,7 @@ export class RulesState extends State<Snapshot> {
     }
 
     public updateAction(rule: RuleDto, action: any, now?: DateTime): Observable<any> {
-        return this.rulesService.putRule(this.appName, rule.id, new UpdateRuleDto(null, action), rule.version).pipe(
+        return this.rulesService.putRule(this.appName, rule.id, { action }, rule.version).pipe(
             tap(dto => {
                 this.replaceRule(updateAction(rule, action, this.user, dto.version, now));
             }),
@@ -108,7 +107,7 @@ export class RulesState extends State<Snapshot> {
     }
 
     public updateTrigger(rule: RuleDto, trigger: any, now?: DateTime): Observable<any> {
-        return this.rulesService.putRule(this.appName, rule.id, new UpdateRuleDto(trigger, null), rule.version).pipe(
+        return this.rulesService.putRule(this.appName, rule.id, { trigger }, rule.version).pipe(
             tap(dto => {
                 this.replaceRule(updateTrigger(rule, trigger, this.user, dto.version, now));
             }),

@@ -20,7 +20,7 @@ import {
     Versioned
 } from '@app/framework';
 
-export class AppLanguagesDto extends Model {
+export class AppLanguagesDto extends Model<AppLanguagesDto> {
     constructor(
         public readonly languages: AppLanguageDto[],
         public readonly version: Version
@@ -29,7 +29,7 @@ export class AppLanguagesDto extends Model {
     }
 }
 
-export class AppLanguageDto extends Model {
+export class AppLanguageDto extends Model<AppLanguageDto> {
     constructor(
         public readonly iso2Code: string,
         public readonly englishName: string,
@@ -41,20 +41,14 @@ export class AppLanguageDto extends Model {
     }
 }
 
-export class AddAppLanguageDto {
-    constructor(
-        public readonly language: string
-    ) {
-    }
+export interface AddAppLanguageDto {
+    readonly language: string;
 }
 
-export class UpdateAppLanguageDto {
-    constructor(
-        public readonly isMaster: boolean,
-        public readonly isOptional: boolean,
-        public readonly fallback: string[]
-    ) {
-    }
+export interface UpdateAppLanguageDto {
+    readonly isMaster?: boolean;
+    readonly isOptional?: boolean;
+    readonly fallback?: string[];
 }
 
 @Injectable()

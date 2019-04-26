@@ -15,8 +15,6 @@ import {
     AppClientDto,
     AppClientsDto,
     AppClientsService,
-    CreateAppClientDto,
-    UpdateAppClientDto,
     Version
 } from './../';
 
@@ -83,7 +81,7 @@ describe('AppClientsService', () => {
     it('should make post request to create client',
         inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
 
-        const dto = new CreateAppClientDto('client1');
+        const dto = { id: 'client1' };
 
         let client: AppClientDto;
 
@@ -104,7 +102,7 @@ describe('AppClientsService', () => {
     it('should make put request to rename client',
         inject([AppClientsService, HttpTestingController], (appClientsService: AppClientsService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateAppClientDto('Client 1 New');
+        const dto = { name: 'New Name' };
 
         appClientsService.putClient('my-app', 'client1', dto, version).subscribe();
 

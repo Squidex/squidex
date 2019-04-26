@@ -16,6 +16,8 @@ using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
+#pragma warning disable IDE0060 // Remove unused parameter
+
 namespace Squidex.Domain.Apps.Entities.Assets.State
 {
     public class AssetState : DomainObjectState<AssetState>, IAssetEntity
@@ -25,6 +27,9 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
 
         [DataMember]
         public string FileName { get; set; }
+
+        [DataMember]
+        public string FileHash { get; set; }
 
         [DataMember]
         public string MimeType { get; set; }

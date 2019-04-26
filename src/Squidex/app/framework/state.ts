@@ -97,9 +97,17 @@ export class Form<T extends AbstractControl> {
     }
 }
 
-export class Model {
-    protected clone(update: ((v: any) => object) | object, validOnly = false): any {
-        let values: object;
+export function createModel<T>(c: { new(): T; }, values: Partial<T>): T {
+    return Object.assign(new c(), values);
+}
+
+export class Model<T> {
+    public with(value: Partial<T>, validOnly = false): T {
+        return this.clone(value, validOnly);
+    }
+
+    protected clone(update: ((v: any) => T) | Partial<T>, validOnly = false): T {
+        let values: Partial<T>;
         if (Types.isFunction(update)) {
             values = update(<any>this);
         } else {
@@ -123,6 +131,15 @@ export class Model {
         }
 
         return clone;
+    }
+}
+
+export class ResultSet<T> extends Model<ResultSet<T>> {
+    constructor(
+        public readonly total: number,
+        public readonly items: T[]
+    ) {
+        super();
     }
 }
 
