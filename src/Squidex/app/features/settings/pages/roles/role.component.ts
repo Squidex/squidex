@@ -85,7 +85,7 @@ export class RoleComponent implements OnChanges {
         if (value) {
             this.editForm.add(value.permission);
 
-            this.addPermissionForm.submitCompleted({});
+            this.addPermissionForm.submitCompleted({ permission: '' });
             this.addPermissionInput.focus();
         }
     }

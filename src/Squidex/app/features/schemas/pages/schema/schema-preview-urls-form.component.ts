@@ -46,7 +46,7 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
     }
 
     public cancelAdd() {
-        this.addForm.submitCompleted({});
+        this.addForm.submitCompleted({ name: '', url: '' });
     }
 
     public add() {
@@ -55,7 +55,7 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
         if (value) {
             this.editForm.add(value);
 
-            this.addForm.submitCompleted({});
+            this.cancelAdd();
         }
     }
 

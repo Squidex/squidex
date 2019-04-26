@@ -51,7 +51,7 @@ export class RestorePageComponent extends ResourceOwner implements OnInit {
         const value = this.restoreForm.submit();
 
         if (value) {
-            this.restoreForm.submitCompleted({});
+            this.restoreForm.submitCompleted({ url: '' });
 
             this.backupsService.postRestore(value)
                 .subscribe(() => {

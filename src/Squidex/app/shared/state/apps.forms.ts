@@ -16,7 +16,7 @@ import {
 
 const FALLBACK_NAME = 'my-app';
 
-export class CreateAppForm extends Form<FormGroup> {
+export class CreateAppForm extends Form<FormGroup, { name: string }> {
     public appName = value$(this.form.controls['name']).pipe(map(v => v || FALLBACK_NAME));
 
     constructor(formBuilder: FormBuilder) {

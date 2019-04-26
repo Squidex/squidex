@@ -58,7 +58,7 @@ export class PatternComponent implements OnInit {
             } else {
                 this.patternsState.create(value)
                     .subscribe(() => {
-                        this.editForm.submitCompleted({});
+                        this.editForm.submitCompleted({ pattern: '', name: '' });
                     }, error => {
                         this.editForm.submitFailed(error);
                     });

@@ -9,7 +9,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Form } from '@app/framework';
 
-export class EditLanguageForm extends Form<FormGroup> {
+import { LanguageDto } from '../services/languages.service';
+
+export class EditLanguageForm extends Form<FormGroup, { isMaster: boolean, isOptional: boolean }> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             isMaster: false,
@@ -32,7 +34,7 @@ export class EditLanguageForm extends Form<FormGroup> {
     }
 }
 
-export class AddLanguageForm extends Form<FormGroup> {
+export class AddLanguageForm extends Form<FormGroup, { language: LanguageDto }> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             language: [null,

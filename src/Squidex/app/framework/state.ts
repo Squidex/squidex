@@ -20,7 +20,7 @@ export interface FormState {
     error?: string | null;
 }
 
-export class Form<T extends AbstractControl, V = any> {
+export class Form<T extends AbstractControl, V> {
     private readonly state = new State<FormState>({ submitted: false });
 
     public submitted =
@@ -42,12 +42,20 @@ export class Form<T extends AbstractControl, V = any> {
         this.form.enable();
     }
 
-    protected reset(value: V | undefined) {
-        this.form.reset(value);
+    protected setValue(value?: V) {
+        if (value) {
+            this.form.reset(this.transformLoad(value));
+        } else {
+            this.form.reset();
+        }
     }
 
-    protected setValue(value: V | undefined) {
-        this.form.reset(value, { emitEvent: true });
+    protected transformLoad(value: V): any {
+        return value;
+    }
+
+    protected transformSubmit(value: any): V {
+        return value;
     }
 
     public load(value: V | undefined) {
@@ -60,7 +68,7 @@ export class Form<T extends AbstractControl, V = any> {
         this.state.next(_ => ({ submitted: true }));
 
         if (this.form.valid) {
-            const value = fullValue(this.form);
+            const value = this.transformSubmit(fullValue(this.form));
 
             this.disable();
 
@@ -76,7 +84,7 @@ export class Form<T extends AbstractControl, V = any> {
         this.enable();
 
         if (newValue) {
-            this.reset(newValue);
+            this.setValue(newValue);
         } else {
             this.form.markAsPristine();
         }

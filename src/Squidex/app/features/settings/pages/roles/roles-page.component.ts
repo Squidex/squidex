@@ -67,7 +67,7 @@ export class RolesPageComponent implements OnInit {
         if (value) {
             this.rolesState.add(value)
                 .subscribe(() => {
-                    this.addRoleForm.submitCompleted({});
+                    this.addRoleForm.submitCompleted({ name: '' });
                 }, error => {
                     this.addRoleForm.submitFailed(error);
                 });

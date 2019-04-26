@@ -419,7 +419,7 @@ describe('SchemasService', () => {
 
         const dto = new AddFieldDto('name', 'invariant', createProperties('Number'));
 
-        let field: FieldDto<any>;
+        let field: FieldDto;
 
         schemasService.postField('my-app', 'my-schema', dto, undefined, version).subscribe(result => {
             field = result.payload;
@@ -466,7 +466,7 @@ describe('SchemasService', () => {
 
         const dto = new AddFieldDto('name', 'invariant', createProperties('Number'));
 
-        let field: FieldDto<any>;
+        let field: FieldDto;
 
         schemasService.postField('my-app', 'my-schema', dto, 13, version).subscribe(result => {
             field = result.payload;

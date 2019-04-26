@@ -69,7 +69,7 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
         if (value) {
             this.state.create(value.text).pipe(onErrorResumeNext()).subscribe();
 
-            this.commentForm.submitCompleted({});
+            this.commentForm.submitCompleted({ text: '' });
         }
     }
 

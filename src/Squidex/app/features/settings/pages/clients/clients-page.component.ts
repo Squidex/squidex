@@ -47,7 +47,7 @@ export class ClientsPageComponent implements OnInit {
         const value = this.addClientForm.submit();
 
         if (value) {
-            this.clientsState.attach(value)
+            this.clientsState.attach({ id: value.name })
                 .subscribe(() => {
                     this.addClientForm.submitCompleted();
                 }, error => {

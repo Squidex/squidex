@@ -77,7 +77,7 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
             try {
                this.schemasState.addCategory(value.name);
             } finally {
-                this.addCategoryForm.submitCompleted({});
+                this.addCategoryForm.submitCompleted({ name: '' });
             }
         }
     }

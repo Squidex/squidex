@@ -13,7 +13,7 @@ import {
     hasValue$
 } from '@app/framework';
 
-export class EditPermissionsForm extends Form<FormArray> {
+export class EditPermissionsForm extends Form<FormArray, string[]> {
     constructor() {
         super(new FormArray([]));
     }
@@ -39,12 +39,12 @@ export class EditPermissionsForm extends Form<FormArray> {
     }
 }
 
-export class AddPermissionForm extends Form<FormGroup> {
+export class AddPermissionForm extends Form<FormGroup, { permission: string }> {
     public hasPermission = hasValue$(this.form.controls['permission']);
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
-            permission: [null,
+            permission: ['',
                 [
                     Validators.required
                 ]
@@ -53,12 +53,12 @@ export class AddPermissionForm extends Form<FormGroup> {
     }
 }
 
-export class AddRoleForm extends Form<FormGroup> {
+export class AddRoleForm extends Form<FormGroup, { name: string }> {
     public hasNoName = hasNoValue$(this.form.controls['name']);
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
-            name: [null,
+            name: ['',
                 [
                     Validators.required
                 ]
