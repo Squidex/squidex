@@ -36,6 +36,9 @@ export class ProgressBarComponent implements OnChanges, OnInit {
     public showText = true;
 
     @Input()
+    public animated = true;
+
+    @Input()
     public value = 0;
 
     constructor(changeDetector: ChangeDetectorRef,
@@ -74,7 +77,11 @@ export class ProgressBarComponent implements OnChanges, OnInit {
     private updateValue() {
         const value = this.value;
 
-        this.progressBar.animate(value / 100);
+        if (this.animated) {
+            this.progressBar.animate(value / 100);
+        } else {
+            this.progressBar.set(value / 100);
+        }
 
         if (value > 0 && this.showText) {
             this.progressBar.setText(Math.round(value) + '%');

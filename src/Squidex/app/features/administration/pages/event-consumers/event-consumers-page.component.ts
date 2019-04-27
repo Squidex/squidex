@@ -29,25 +29,25 @@ export class EventConsumersPageComponent extends ResourceOwner implements OnInit
     }
 
     public ngOnInit() {
-        this.eventConsumersState.load().pipe(onErrorResumeNext()).subscribe();
+        this.eventConsumersState.load();
 
         this.own(timer(5000, 5000).pipe(switchMap(() => this.eventConsumersState.load(true, true)), onErrorResumeNext()));
     }
 
     public reload() {
-        this.eventConsumersState.load(true, false).pipe(onErrorResumeNext()).subscribe();
+        this.eventConsumersState.load(true, false);
     }
 
-    public start(es: EventConsumerDto) {
-        this.eventConsumersState.start(es).pipe(onErrorResumeNext()).subscribe();
+    public start(eventConsumer: EventConsumerDto) {
+        this.eventConsumersState.start(eventConsumer);
     }
 
-    public stop(es: EventConsumerDto) {
-        this.eventConsumersState.stop(es).pipe(onErrorResumeNext()).subscribe();
+    public stop(eventConsumer: EventConsumerDto) {
+        this.eventConsumersState.stop(eventConsumer);
     }
 
-    public reset(es: EventConsumerDto) {
-        this.eventConsumersState.reset(es).pipe(onErrorResumeNext()).subscribe();
+    public reset(eventConsumer: EventConsumerDto) {
+        this.eventConsumersState.reset(eventConsumer);
     }
 
     public trackByEventConsumer(index: number, es: EventConsumerDto) {

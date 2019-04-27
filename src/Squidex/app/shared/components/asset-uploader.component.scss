@@ -1,0 +1,70 @@
+@import '_vars';
+@import '_mixins';
+
+.nav {
+    & {
+        padding-right: 2rem;
+    }
+    .nav-item {
+        & {
+            line-height: 2rem;
+        }
+
+        .nav-link {
+            color: $color-dark-foreground;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+    }
+}
+
+.icon-upload-3 {
+    vertical-align: middle;
+    font-size: 1.4rem;
+    font-weight: lighter;
+    padding-right: .5rem;
+}
+
+.dropdown-menu {
+    @include absolute(2.6rem, 0, auto, auto);
+    display: block;
+    min-width: 30rem;
+    max-width: 60%;
+    min-height: 4rem;
+    padding: 1rem;
+}
+
+.uploads {
+    & {
+        border: 2px solid transparent;
+    }
+    
+    &-empty {
+        line-height: 2rem;
+    }
+}
+
+.upload {
+    & {
+        line-height: 2rem;
+        min-height: 2rem;
+        max-height: 2rem;
+        margin-bottom: .5rem;
+    }
+
+    &:last-child {
+        margin: 0;
+    }
+
+    &-name {
+        @include truncate;
+        padding-right: .5rem;
+        padding-left: .5rem;
+    }
+}
+
+.drag {
+    & > .uploads {
+        border-color: $color-theme-blue;
+    }
+}

@@ -6,19 +6,48 @@
  */
 
 import { Injectable } from '@angular/core';
-import { combineLatest, Observable } from 'rxjs';
+import { combineLatest, Observable, Subject, Subscription } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
+    DateTime,
     DialogService,
     ImmutableArray,
+    MathHelper,
     notify,
     Pager,
-    State
+    State,
+    Types
 } from '@app/framework';
 
-import { AssetDto, AssetsService} from './../services/assets.service';
+import { AuthService } from '../services/auth.service';
+import { AssetDto, AssetsService } from './../services/assets.service';
 import { AppsState } from './apps.state';
+
+export interface UploadingAsset {
+    // Unique id.
+    id: string;
+
+    // The name of the asset.
+    name: string;
+
+    // The upload subscription.
+    subscription: Subscription;
+
+    // The progress.
+    progress: number;
+
+    // Indicates if the upload has been completed.
+    isCompleted?: boolean;
+}
+
+export interface AssetWithUpload {
+    // The asset.
+    asset: AssetDto;
+
+    // The corresponding upload.
+    upload?: UploadingAsset;
+}
 
 interface Snapshot {
     // All assets tags.
@@ -26,6 +55,12 @@ interface Snapshot {
 
     // The selected asset tags.
     tagsSelected: { [name: string]: boolean };
+
+    // The uploads.
+    uploadsDirect: ImmutableArray<UploadingAsset>;
+
+    // The uploads removed with a delay.
+    uploadsDelayed: ImmutableArray<UploadingAsset>;
 
     // The current assets.
     assets: ImmutableArray<AssetDto>;
@@ -58,12 +93,24 @@ export class AssetsState extends State<Snapshot> {
         this.changes.pipe(map(x => x.assets),
             distinctUntilChanged());
 
+    public assetsWithUploads =
+        this.changes.pipe(map(x => getAssetsWithUploads(x)),
+            distinctUntilChanged());
+
     public assetsQuery =
         this.changes.pipe(map(x => x.assetsQuery),
             distinctUntilChanged());
 
     public assetsPager =
         this.changes.pipe(map(x => x.assetsPager),
+            distinctUntilChanged());
+
+    public uploads =
+        this.changes.pipe(map(x => x.uploadsDirect),
+            distinctUntilChanged());
+
+    public uploadsDelayed =
+        this.changes.pipe(map(x => x.uploadsDelayed),
             distinctUntilChanged());
 
     public isLoaded =
@@ -73,9 +120,17 @@ export class AssetsState extends State<Snapshot> {
     constructor(
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
+        private readonly authService: AuthService,
         private readonly dialogs: DialogService
     ) {
-        super({ assets: ImmutableArray.empty(), assetsPager: new Pager(0, 0, 30), tags: {}, tagsSelected: {} });
+        super({
+            assets: ImmutableArray.empty(),
+            assetsPager: new Pager(0, 0, 30),
+            uploadsDirect: ImmutableArray.empty(),
+            uploadsDelayed: ImmutableArray.empty(),
+            tags: {},
+            tagsSelected: {}
+        });
     }
 
     public load(isReload = false): Observable<any> {
@@ -108,6 +163,100 @@ export class AssetsState extends State<Snapshot> {
                 });
             }),
             notify(this.dialogs));
+    }
+
+    public remove(upload: UploadingAsset, delayed = false) {
+        upload.subscription.unsubscribe();
+
+        this.next(s => {
+            let uploadsDirect = s.uploadsDirect.removeBy('id', upload);
+            let uploadsDelayed = s.uploadsDelayed;
+
+            if (!delayed) {
+                uploadsDelayed = s.uploadsDelayed.removeBy('id', upload);
+            }
+
+            return { ...s, uploadsDirect, uploadsDelayed };
+        });
+
+        if (!delayed) {
+            setTimeout(() => {
+                this.remove(upload, true);
+            }, 10000);
+        }
+    }
+
+    public upload(file: File, now?: DateTime): Observable<number | AssetDto> {
+        const observable = this.assetsService.uploadFile(this.appName, file, this.user, now || DateTime.now());
+
+        let upload: UploadingAsset;
+
+        const subject = new Subject<number | AssetDto>();
+        const subscription = observable.subscribe(event => {
+            if (Types.isNumber(event)) {
+                this.setProgress(upload, event);
+
+                subject.next(event);
+            } else {
+                if (event.isDuplicate) {
+                    this.dialogs.notifyError('The same asset has already been uploaded.');
+                } else {
+                    this.add(event);
+                }
+
+                subject.next(event);
+            }
+
+        }, error => {
+            subject.error(error);
+
+            this.remove(upload, true);
+        }, () => {
+            subject.complete();
+
+            this.remove(upload, true);
+        });
+
+        upload = { id: MathHelper.guid(), name: file.name, progress: 0, subscription };
+
+        this.addUpload(upload);
+
+        return subject;
+    }
+
+    public replaceFile(asset: AssetDto, file: File, now?: DateTime): Observable<number | AssetDto> {
+        const observable = this.assetsService.replaceFile(this.appName, asset.id, file, asset.version);
+
+        let upload: UploadingAsset;
+
+        const subject = new Subject<number | AssetDto>();
+        const subscription = observable.subscribe(event => {
+            if (Types.isNumber(event)) {
+                this.setProgress(upload, event);
+
+                subject.next(event);
+            } else {
+                const newAsset = asset.update(event.payload, this.user, event.version, now || DateTime.now());
+
+                this.update(newAsset);
+
+                subject.next(newAsset);
+            }
+        }, error => {
+            subject.error(error);
+
+            this.remove(upload, true);
+        }, () => {
+            subject.complete();
+
+            this.remove(upload, true);
+        });
+
+        upload = { id: asset.id, name: file.name, progress: 0, subscription };
+
+        this.addUpload(upload);
+
+        return subject;
     }
 
     public add(asset: AssetDto) {
@@ -224,9 +373,41 @@ export class AssetsState extends State<Snapshot> {
         return Object.keys(this.snapshot.tagsSelected).length === 0;
     }
 
+    private setProgress(upload: UploadingAsset, progress: number) {
+        this.next(s => {
+            const newUpload = { ...upload, progress };
+
+            const uploadsDirect = s.uploadsDirect.replaceBy('id', newUpload);
+            const uploadsDelayed = s.uploadsDelayed.replaceBy('id', newUpload);
+
+            return { ...s, uploadsDirect, uploadsDelayed };
+        });
+    }
+
+    private addUpload(upload: UploadingAsset) {
+        this.next(s => {
+            const uploadsDirect = s.uploadsDirect.pushFront(upload);
+            const uploadsDelayed = s.uploadsDelayed.pushFront(upload);
+
+            return { ...s, uploadsDirect, uploadsDelayed };
+        });
+    }
+
     private get appName() {
         return this.appsState.appName;
     }
+
+    private get user() {
+        return this.authService.user!.token;
+    }
+}
+
+function getAssetsWithUploads(state: Snapshot) {
+    return state.assets.map(asset => {
+        const upload = state.uploadsDirect.find(x => x.id === x.id);
+
+        return { upload, asset };
+    });
 }
 
 function addTags(asset: AssetDto, tags: { [x: string]: number; }) {
@@ -263,6 +444,3 @@ function sort(tags: { [name: string]: number }) {
         return { name: key, count: tags[key] };
     });
 }
-
-@Injectable()
-export class AssetsDialogState extends AssetsState { }

@@ -10,7 +10,7 @@ import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AssetDto,
-    AssetsDialogState,
+    AssetsState,
     fadeAnimation,
     FilterState,
     LocalStoreService,
@@ -40,7 +40,7 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     public filter = new FilterState();
 
     constructor(changeDector: ChangeDetectorRef,
-        public readonly assetsState: AssetsDialogState,
+        public readonly assetsState: AssetsState,
         public readonly localStore: LocalStoreService
     ) {
         super(changeDector, {

@@ -10,6 +10,7 @@ export * from './components/asset-dialog.component';
 export * from './components/asset.component';
 export * from './components/assets-list.component';
 export * from './components/assets-selector.component';
+export * from './components/asset-uploader.component';
 export * from './components/comment.component';
 export * from './components/comments.component';
 export * from './components/help-markdown.pipe';

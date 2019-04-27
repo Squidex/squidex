@@ -12,10 +12,14 @@ export interface Openable {
 }
 
 export class DialogModel implements Openable {
-    private readonly isOpen$ = new BehaviorSubject<boolean>(false);
+    private readonly isOpen$: BehaviorSubject<boolean>;
 
     public get isOpen(): Observable<boolean> {
         return this.isOpen$;
+    }
+
+    constructor(isOpen = false) {
+        this.isOpen$ = new BehaviorSubject<boolean>(isOpen);
     }
 
     public show(): DialogModel {
@@ -38,10 +42,14 @@ export class DialogModel implements Openable {
 }
 
 export class ModalModel implements Openable {
-    private readonly isOpen$ = new BehaviorSubject<boolean>(false);
+    private readonly isOpen$: BehaviorSubject<boolean>;
 
     public get isOpen(): Observable<boolean> {
         return this.isOpen$;
+    }
+
+    constructor(isOpen = false) {
+        this.isOpen$ = new BehaviorSubject<boolean>(isOpen);
     }
 
     public show(): ModalModel {

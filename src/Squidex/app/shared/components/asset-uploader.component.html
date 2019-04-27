@@ -1,0 +1,31 @@
+<ul class="nav navbar-nav" *ngIf="assets.uploadsDelayed | async; let uploads" (sqxFileDrop)="addFiles($event)">
+    <li class="nav-item dropdown">
+        <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
+            <i class="icon-upload-3"></i>
+
+            <span>{{uploads.length}}</span>
+        </span>
+
+        <div class="dropdown-menu container" *ngIf="modalMenu.isOpen | async" (sqxFileDrop)="addFiles($event)" @fade>
+            <div class="uploads">
+                <small class="uploads-empty text-muted" *ngIf="uploads.length === 0">
+                    No upload in progress, drop files here.
+                </small>
+    
+                <div class="upload row no-gutters" *ngFor="let upload of uploads">
+                    <div class="col-6">
+                        <div class="upload-name">{{upload.name}}</div>
+                    </div>
+                    <div class="col">
+                        <sqx-progress-bar [value]="upload.progress" [trailWidth]="0.8" [strokeWidth]="0.8" [showText]="false" [animated]="false"></sqx-progress-bar>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-text-secondary" (click)="stopUpload(upload)">
+                            <i class="icon-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </li>
+</ul>

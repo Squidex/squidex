@@ -6,13 +6,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { distinctUntilChanged, map, share } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
-    notify,
     State
 } from '@app/shared';
 
@@ -43,54 +42,67 @@ export class EventConsumersState extends State<Snapshot> {
         super({ eventConsumers: ImmutableArray.empty() });
     }
 
-    public load(isReload = false, silent = false): Observable<any> {
+    public load(isReload = false, silent = false): Observable<EventConsumerDto[]> {
         if (!isReload) {
             this.resetState();
         }
 
-        return this.eventConsumersService.getEventConsumers().pipe(
-            tap(dtos => {
-                if (isReload && !silent) {
-                    this.dialogs.notifyInfo('Event Consumers reloaded.');
-                }
+        const stream = this.eventConsumersService.getEventConsumers().pipe(share());
 
-                this.next(s => {
-                    const eventConsumers = ImmutableArray.of(dtos);
+        stream.subscribe(dtos => {
+            if (isReload && !silent) {
+                this.dialogs.notifyInfo('Event Consumers reloaded.');
+            }
 
-                    return { ...s, eventConsumers, isLoaded: true };
-                });
-            }),
-            catchError(error => {
-                if (!silent) {
-                    this.dialogs.notifyError(error);
-                }
+            this.next(s => {
+                const eventConsumers = ImmutableArray.of(dtos);
 
-                return throwError(error);
-            }));
+                return { ...s, eventConsumers, isLoaded: true };
+            });
+
+        }, error => {
+            if (!silent) {
+                this.dialogs.notifyError(error);
+            }
+        });
+
+        return stream;
     }
 
     public start(eventConsumer: EventConsumerDto): Observable<any> {
-        return this.eventConsumersService.putStart(eventConsumer.name).pipe(
-            tap(() => {
-                this.replaceEventConsumer(setStopped(eventConsumer, false));
-            }),
-            notify(this.dialogs));
+        const stream = this.eventConsumersService.putStart(eventConsumer.name).pipe(share());
+
+        stream.subscribe(() => {
+            this.replaceEventConsumer(setStopped(eventConsumer, false));
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return stream;
     }
 
     public stop(eventConsumer: EventConsumerDto): Observable<any> {
-        return this.eventConsumersService.putStop(eventConsumer.name).pipe(
-            tap(() => {
-                this.replaceEventConsumer(setStopped(eventConsumer, true));
-            }),
-            notify(this.dialogs));
+        const stream = this.eventConsumersService.putStop(eventConsumer.name).pipe(share());
+
+        stream.subscribe(() => {
+            this.replaceEventConsumer(setStopped(eventConsumer, true));
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return stream;
     }
 
     public reset(eventConsumer: EventConsumerDto): Observable<any> {
-        return this.eventConsumersService.putReset(eventConsumer.name).pipe(
-            tap(() => {
-                this.replaceEventConsumer(reset(eventConsumer));
-            }),
-            notify(this.dialogs));
+        const stream = this.eventConsumersService.putReset(eventConsumer.name).pipe(share());
+
+        stream.subscribe(() => {
+            this.replaceEventConsumer(reset(eventConsumer));
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return stream;
     }
 
     private replaceEventConsumer(eventConsumer: EventConsumerDto) {
