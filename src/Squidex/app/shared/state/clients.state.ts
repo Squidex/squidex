@@ -5,14 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable: no-shadowed-variable
+
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, share } from 'rxjs/operators';
 
 import {
+    array,
     DialogService,
     ImmutableArray,
-    notify,
     State,
     Version
 } from '@app/framework';
@@ -28,7 +30,7 @@ import {
 
 interface Snapshot {
     // The current clients.
-    clients: ImmutableArray<ClientDto>;
+    clients: ClientsList;
 
     // The app version.
     version: Version;
@@ -36,6 +38,8 @@ interface Snapshot {
     // Indicates if the clients are loaded.
     isLoaded?: boolean;
 }
+
+type ClientsList = ImmutableArray<ClientDto>;
 
 @Injectable()
 export class ClientsState extends State<Snapshot> {
@@ -60,55 +64,69 @@ export class ClientsState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.clientsService.getClients(this.appName).pipe(
-            tap(dtos => {
-                if (isReload) {
-                    this.dialogs.notifyInfo('Clients reloaded.');
-                }
+        const stream =
+            this.clientsService.getClients(this.appName).pipe(
+                map(({ version, clients }) => ({ version, clients: array(clients) })), share());
 
-                this.next(s => {
-                    const clients = ImmutableArray.of(dtos.clients);
+        stream.subscribe(({ version, clients }) => {
+            if (isReload) {
+                this.dialogs.notifyInfo('Clients reloaded.');
+            }
 
-                    return { ...s, clients, isLoaded: true, version: dtos.version };
-                });
-            }),
-            notify(this.dialogs));
+            this.next(s => {
+                return { ...s, clients, isLoaded: true, version };
+            });
+        });
+
+        return stream;
     }
 
-    public attach(request: CreateClientDto): Observable<any> {
-        return this.clientsService.postClient(this.appName, request, this.version).pipe(
-            tap(dto => {
-                this.next(s => {
-                    const clients = s.clients.push(dto.payload);
+    public attach(request: CreateClientDto): Observable<ClientDto> {
+        const stream =
+            this.clientsService.postClient(this.appName, request, this.version).pipe(
+                share());
 
-                    return { ...s, clients, version: dto.version };
-                });
-            }),
-            notify(this.dialogs));
+        stream.subscribe(dto => {
+            this.next(s => {
+                const clients = s.clients.push(dto.payload);
+
+                return { ...s, clients, version: dto.version };
+            });
+        });
+
+        return stream.pipe(map(x => x.payload));
     }
 
     public revoke(client: ClientDto): Observable<any> {
-        return this.clientsService.deleteClient(this.appName, client.id, this.version).pipe(
-            tap(dto => {
-                this.next(s => {
-                    const clients = s.clients.filter(c => c.id !== client.id);
+        const stream =
+            this.clientsService.deleteClient(this.appName, client.id, this.version).pipe(
+                share());
 
-                    return { ...s, clients, version: dto.version };
-                });
-            }),
-            notify(this.dialogs));
+        stream.subscribe(({ version }) => {
+            this.next(s => {
+                const clients = s.clients.filter(c => c.id !== client.id);
+
+                return { ...s, clients, version };
+            });
+        });
+
+        return stream;
     }
 
-    public update(client: ClientDto, request: UpdateClientDto): Observable<any> {
-        return this.clientsService.putClient(this.appName, client.id, request, this.version).pipe(
-            tap(dto => {
-                this.next(s => {
-                    const clients = s.clients.replaceBy('id', update(client, request));
+    public update(client: ClientDto, request: UpdateClientDto): Observable<ClientDto> {
+        const stream =
+            this.clientsService.putClient(this.appName, client.id, request, this.version).pipe(
+                map(({ version }) => ({ version, client: update(client, request) })), share());
 
-                    return { ...s, clients, version: dto.version };
-                });
-            }),
-            notify(this.dialogs));
+        stream.subscribe(({ version, client }) => {
+            this.next(s => {
+                const clients = s.clients.replaceBy('id', client);
+
+                return { ...s, clients, version };
+            });
+        });
+
+        return stream.pipe(map(x => x.client));
     }
 
     private get appName() {

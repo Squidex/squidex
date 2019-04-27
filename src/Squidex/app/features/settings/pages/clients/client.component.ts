@@ -7,7 +7,6 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AccessTokenDto,
@@ -23,36 +22,6 @@ import {
 } from '@app/shared';
 
 const ESCAPE_KEY = 27;
-
-function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {
-    const url = apiUrl.buildUrl('identity-server/connect/token');
-
-    return `$ curl
-    -X POST '${url}'
-    -H 'Content-Type: application/x-www-form-urlencoded'
-    -d 'grant_type=client_credentials&
-        client_id=${app}:${client.id}&
-        client_secret=${client.secret}&
-        scope=squidex-api`;
-}
-
-function connectCLIWinText(app: string, client: { id: string, secret: string }) {
-    return `.\\sq.exe config add ${app} ${app}:${client.id} ${client.secret};.\\sq.exe config use ${app}`;
-}
-
-function connectCLINixText(app: string, client: { id: string, secret: string }) {
-    return `sq config add ${app} ${app}:${client.id} ${client.secret} && sq config use ${app}`;
-}
-
-function connectLibrary(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {
-    const url = apiUrl.value;
-
-    return `var clientManager = new SquidexClientManager(
-    "${url}",
-    "${app}",
-    "${app}:${client.id}",
-    "${client.secret}")`;
-}
 
 @Component({
     selector: 'sqx-client',
@@ -100,11 +69,11 @@ export class ClientComponent implements OnChanges {
     }
 
     public revoke() {
-        this.clientsState.revoke(this.client).pipe(onErrorResumeNext()).subscribe();
+        this.clientsState.revoke(this.client);
     }
 
     public update(role: string) {
-        this.clientsState.update(this.client, { role }).pipe(onErrorResumeNext()).subscribe();
+        this.clientsState.update(this.client, { role });
     }
 
     public toggleRename() {
@@ -144,3 +113,32 @@ export class ClientComponent implements OnChanges {
     }
 }
 
+function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {
+    const url = apiUrl.buildUrl('identity-server/connect/token');
+
+    return `$ curl
+    -X POST '${url}'
+    -H 'Content-Type: application/x-www-form-urlencoded'
+    -d 'grant_type=client_credentials&
+        client_id=${app}:${client.id}&
+        client_secret=${client.secret}&
+        scope=squidex-api`;
+}
+
+function connectCLIWinText(app: string, client: { id: string, secret: string }) {
+    return `.\\sq.exe config add ${app} ${app}:${client.id} ${client.secret};.\\sq.exe config use ${app}`;
+}
+
+function connectCLINixText(app: string, client: { id: string, secret: string }) {
+    return `sq config add ${app} ${app}:${client.id} ${client.secret} && sq config use ${app}`;
+}
+
+function connectLibrary(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {
+    const url = apiUrl.value;
+
+    return `var clientManager = new SquidexClientManager(
+    "${url}",
+    "${app}",
+    "${app}:${client.id}",
+    "${client.secret}")`;
+}

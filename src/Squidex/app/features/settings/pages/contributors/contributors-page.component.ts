@@ -8,7 +8,7 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { onErrorResumeNext, withLatestFrom } from 'rxjs/operators';
+import { withLatestFrom } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -68,21 +68,21 @@ export class ContributorsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.rolesState.load().pipe(onErrorResumeNext()).subscribe();
+        this.rolesState.load();
 
-        this.contributorsState.load().pipe(onErrorResumeNext()).subscribe();
+        this.contributorsState.load();
     }
 
     public reload() {
-        this.contributorsState.load(true).pipe(onErrorResumeNext()).subscribe();
+        this.contributorsState.load(true);
     }
 
     public remove(contributor: ContributorDto) {
-        this.contributorsState.revoke(contributor).pipe(onErrorResumeNext()).subscribe();
+        this.contributorsState.revoke(contributor);
     }
 
     public changeRole(contributor: ContributorDto, role: string) {
-        this.contributorsState.assign({ contributorId: contributor.contributorId, role }).pipe(onErrorResumeNext()).subscribe();
+        this.contributorsState.assign({ contributorId: contributor.contributorId, role });
     }
 
     public assignContributor() {

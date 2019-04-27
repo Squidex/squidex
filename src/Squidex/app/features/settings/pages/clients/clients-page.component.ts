@@ -7,7 +7,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -34,13 +33,13 @@ export class ClientsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.rolesState.load().pipe(onErrorResumeNext()).subscribe();
+        this.rolesState.load();
 
-        this.clientsState.load().pipe(onErrorResumeNext()).subscribe();
+        this.clientsState.load();
     }
 
     public reload() {
-        this.clientsState.load(true).pipe(onErrorResumeNext()).subscribe();
+        this.clientsState.load(true);
     }
 
     public attachClient() {

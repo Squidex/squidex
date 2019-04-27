@@ -42,10 +42,14 @@ describe('ClientsState', () => {
         clientsService = Mock.ofType<ClientsService>();
 
         clientsService.setup(x => x.getClients(app))
-            .returns(() => of(new ClientsDto(oldClients, version)));
+            .returns(() => of(new ClientsDto(oldClients, version))).verifiable(Times.atLeastOnce());
 
         clientsState = new ClientsState(clientsService.object, appsState.object, dialogs.object);
         clientsState.load().subscribe();
+    });
+
+    afterEach(() => {
+        clientsService.verifyAll();
     });
 
     it('should load clients', () => {
@@ -70,7 +74,7 @@ describe('ClientsState', () => {
         const request = { id: 'id3' };
 
         clientsService.setup(x => x.postClient(app, request, version))
-            .returns(() => of(new Versioned<ClientDto>(newVersion, newClient)));
+            .returns(() => of(new Versioned(newVersion, newClient))).verifiable();
 
         clientsState.attach(request).subscribe();
 
@@ -82,7 +86,7 @@ describe('ClientsState', () => {
         const request = { name: 'NewName', role: 'NewRole' };
 
         clientsService.setup(x => x.putClient(app, oldClients[0].id, request, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {}))).verifiable();
 
         clientsState.update(oldClients[0], request).subscribe();
 
@@ -95,7 +99,7 @@ describe('ClientsState', () => {
 
     it('should remove client from snapshot when revoked', () => {
         clientsService.setup(x => x.deleteClient(app, oldClients[0].id, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {}))).verifiable();
 
         clientsState.revoke(oldClients[0]).subscribe();
 

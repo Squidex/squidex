@@ -69,7 +69,7 @@ describe('PatternsState', () => {
         const request = { ...newPattern };
 
         patternsService.setup(x => x.postPattern(app, request, version))
-            .returns(() => of(new Versioned<PatternDto>(newVersion, newPattern)));
+            .returns(() => of(new Versioned(newVersion, newPattern)));
 
         patternsState.create(request).subscribe();
 
@@ -81,7 +81,7 @@ describe('PatternsState', () => {
         const request = { name: 'name2_1', pattern: 'pattern2_1', message: 'message2_1' };
 
         patternsService.setup(x => x.putPattern(app, oldPatterns[1].id, request, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {})));
 
         patternsState.update(oldPatterns[1], request).subscribe();
 
@@ -95,7 +95,7 @@ describe('PatternsState', () => {
 
     it('should remove pattern from snapshot when deleted', () => {
         patternsService.setup(x => x.deletePattern(app, oldPatterns[0].id, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {})));
 
         patternsState.delete(oldPatterns[0]).subscribe();
 

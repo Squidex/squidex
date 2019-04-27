@@ -6,7 +6,7 @@
  */
 
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, share } from 'rxjs/operators';
 
 import {
     DateTime,
@@ -17,12 +17,12 @@ import {
     Version
 } from '@app/framework';
 
-import { CommentDto,  CommentsService } from './../services/comments.service';
+import { CommentDto,  CommentsDto, CommentsService } from './../services/comments.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot {
     // The current comments.
-    comments: ImmutableArray<CommentDto>;
+    comments: CommentsList;
 
     // The version of the comments state.
     version: Version;
@@ -30,6 +30,8 @@ interface Snapshot {
     // Indicates if the comments are loaded.
     isLoaded?: boolean;
 }
+
+type CommentsList = ImmutableArray<CommentDto>;
 
 export class CommentsState extends State<Snapshot> {
     public comments =
@@ -49,66 +51,90 @@ export class CommentsState extends State<Snapshot> {
         super({ comments: ImmutableArray.empty(), version: new Version('-1') });
     }
 
-    public load(): Observable<any> {
-        return this.commentsService.getComments(this.appName, this.commentsId, this.version).pipe(
-            tap(dtos => {
-                this.next(s => {
-                    let comments = s.comments;
+    public load(): Observable<CommentsDto> {
+        const stream =
+            this.commentsService.getComments(this.appName, this.commentsId, this.version).pipe(
+                share());
 
-                    for (let created of dtos.createdComments) {
-                        if (!comments.find(x => x.id === created.id)) {
-                            comments = comments.push(created);
-                        }
+        stream.subscribe(response => {
+            this.next(s => {
+                let comments = s.comments;
+
+                for (let created of response.createdComments) {
+                    if (!comments.find(x => x.id === created.id)) {
+                        comments = comments.push(created);
                     }
+                }
 
-                    for (let updated of dtos.updatedComments) {
-                        comments = comments.replaceBy('id', updated);
-                    }
+                for (let updated of response.updatedComments) {
+                    comments = comments.replaceBy('id', updated);
+                }
 
-                    for (let deleted of dtos.deletedComments) {
-                        comments = comments.filter(x => x.id !== deleted);
-                    }
+                for (let deleted of response.deletedComments) {
+                    comments = comments.filter(x => x.id !== deleted);
+                }
 
-                    return { ...s, comments, isLoaded: true, version: dtos.version };
-                });
-            }),
-            notify(this.dialogs));
+                return { ...s, comments, isLoaded: true, version: response.version };
+            });
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return stream;
     }
 
-    public create(text: string): Observable<any> {
-        return this.commentsService.postComment(this.appName, this.commentsId, { text }).pipe(
-            tap(dto => {
-                this.next(s => {
-                    const comments = s.comments.push(dto);
+    public create(text: string): Observable<CommentDto> {
+        const stream =
+            this.commentsService.postComment(this.appName, this.commentsId, { text }).pipe(
+                share());
 
-                    return { ...s, comments };
-                });
-            }),
-            notify(this.dialogs));
+        stream.subscribe(comment => {
+            this.next(s => {
+                const comments = s.comments.push(comment);
+
+                return { ...s, comments };
+            });
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return stream;
     }
 
-    public update(commentId: string, text: string, now?: DateTime): Observable<any> {
-        return this.commentsService.putComment(this.appName, this.commentsId, commentId, { text }).pipe(
-            tap(() => {
-                this.next(s => {
-                    const comments = s.comments.map(c => c.id === commentId ? update(c, text, now || DateTime.now()) : c);
+    public update(comment: CommentDto, text: string, now?: DateTime): Observable<CommentDto> {
+        const stream =
+            this.commentsService.putComment(this.appName, this.commentsId, comment.id, { text }).pipe(
+                map(() => update(comment, text, now || DateTime.now())), share());
 
-                    return { ...s, comments };
-                });
-            }),
-            notify(this.dialogs));
+        stream.subscribe(updated => {
+            this.next(s => {
+                const comments = s.comments.replaceBy('id', updated);
+
+                return { ...s, comments };
+            });
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return stream;
     }
 
-    public delete(commentId: string): Observable<any> {
-        return this.commentsService.deleteComment(this.appName, this.commentsId, commentId).pipe(
-            tap(() => {
-                this.next(s => {
-                    const comments = s.comments.filter(c => c.id !== commentId);
+    public delete(comment: CommentDto): Observable<any> {
+        const stream =
+            this.commentsService.deleteComment(this.appName, this.commentsId, comment.id).pipe(
+                share());
 
-                    return { ...s, comments };
-                });
-            }),
-            notify(this.dialogs));
+        stream.subscribe(() => {
+            this.next(s => {
+                const comments = s.comments.removeBy('id', comment);
+
+                return { ...s, comments };
+            });
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return stream;
     }
 
     private get version() {

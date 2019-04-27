@@ -59,13 +59,13 @@ export class Form<T extends AbstractControl, V> {
     }
 
     public load(value: V | undefined) {
-        this.state.next(_ => ({ submitted: false, error: null }));
+        this.state.next(() => ({ submitted: false, error: null }));
 
         this.setValue(value);
     }
 
     public submit(): V | null {
-        this.state.next(_ => ({ submitted: true }));
+        this.state.next(() => ({ submitted: true }));
 
         if (this.form.valid) {
             const value = this.transformSubmit(fullValue(this.form));
@@ -79,14 +79,14 @@ export class Form<T extends AbstractControl, V> {
     }
 
     public submitCompleted(newValue?: V) {
-        this.state.next(_ => ({ submitted: false, error: null }));
+        this.state.next(() => ({ submitted: false, error: null }));
 
         this.enable();
         this.setValue(newValue);
     }
 
     public submitFailed(error?: string | ErrorDto) {
-        this.state.next(_ => ({ submitted: false, error: this.getError(error) }));
+        this.state.next(() => ({ submitted: false, error: this.getError(error) }));
 
         this.enable();
     }

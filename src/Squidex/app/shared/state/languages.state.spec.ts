@@ -93,7 +93,7 @@ describe('LanguagesState', () => {
         const newLanguage = new AppLanguageDto(languageIT.iso2Code, languageIT.englishName, false, false, []);
 
         languagesService.setup(x => x.postLanguage(app, It.isAny(), version))
-            .returns(() => of(new Versioned<AppLanguageDto>(newVersion, newLanguage)));
+            .returns(() => of(new Versioned(newVersion, newLanguage)));
 
         languagesState.add(languageIT).subscribe();
 
@@ -120,7 +120,7 @@ describe('LanguagesState', () => {
         const request = { isMaster: true, isOptional: false, fallback: [] };
 
         languagesService.setup(x => x.putLanguage(app, oldLanguages[1].iso2Code, request, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {})));
 
         languagesState.update(oldLanguages[1], request).subscribe();
 
@@ -144,7 +144,7 @@ describe('LanguagesState', () => {
 
     it('should remove language from snapshot when deleted', () => {
         languagesService.setup(x => x.deleteLanguage(app, oldLanguages[1].iso2Code, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {})));
 
         languagesState.remove(oldLanguages[1]).subscribe();
 

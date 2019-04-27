@@ -70,7 +70,7 @@ describe('RolesState', () => {
         const request = { name: newRole.name };
 
         rolesService.setup(x => x.postRole(app, request, version))
-            .returns(() => of(new Versioned<RoleDto>(newVersion, newRole)));
+            .returns(() => of(new Versioned(newVersion, newRole)));
 
         rolesState.add(request).subscribe();
 
@@ -82,7 +82,7 @@ describe('RolesState', () => {
         const request = { permissions: ['P4', 'P5'] };
 
         rolesService.setup(x => x.putRole(app, oldRoles[1].name, request, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {})));
 
         rolesState.update(oldRoles[1], request).subscribe();
 
@@ -94,7 +94,7 @@ describe('RolesState', () => {
 
     it('should remove role from snapshot when deleted', () => {
         rolesService.setup(x => x.deleteRole(app, oldRoles[0].name, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {})));
 
         rolesState.delete(oldRoles[0]).subscribe();
 

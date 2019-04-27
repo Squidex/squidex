@@ -7,13 +7,13 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map, share } from 'rxjs/operators';
 
 import {
+    array,
     DialogService,
     ErrorDto,
     ImmutableArray,
-    notify,
     State,
     Types,
     Version
@@ -38,7 +38,7 @@ interface SnapshotContributor {
 
 interface Snapshot {
     // All loaded contributors.
-    contributors: ImmutableArray<SnapshotContributor>;
+    contributors: ContributorsList;
 
     // Indicates if the maximum number of contributors are reached.
     isMaxReached?: boolean;
@@ -52,6 +52,8 @@ interface Snapshot {
     // The app version.
     version: Version;
 }
+
+type ContributorsList = ImmutableArray<SnapshotContributor>;
 
 @Injectable()
 export class ContributorsState extends State<Snapshot> {
@@ -85,49 +87,62 @@ export class ContributorsState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.contributorsService.getContributors(this.appName).pipe(
-            tap(dtos => {
-                if (isReload) {
-                    this.dialogs.notifyInfo('Contributors reloaded.');
-                }
+        const stream =
+            this.contributorsService.getContributors(this.appName).pipe(
+                map(({ contributors, ...other }) => ({ ...other, contributors: array(contributors.map(x => this.createContributor(x))) })), share());
 
-                const contributors = ImmutableArray.of(dtos.contributors.map(x => this.createContributor(x)));
+        stream.subscribe(({ version, contributors, maxContributors }) => {
+            if (isReload) {
+                this.dialogs.notifyInfo('Contributors reloaded.');
+            }
 
-                this.replaceContributors(contributors, dtos.version, dtos.maxContributors);
-            }),
-            notify(this.dialogs));
+            this.replaceContributors(contributors, version, maxContributors);
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return stream;
     }
 
     public revoke(contributor: ContributorDto): Observable<any> {
-        return this.contributorsService.deleteContributor(this.appName, contributor.contributorId, this.version).pipe(
-            tap(dto => {
-                const contributors = this.snapshot.contributors.filter(x => x.contributor.contributorId !== contributor.contributorId);
+        const stream =
+            this.contributorsService.deleteContributor(this.appName, contributor.contributorId, this.version).pipe(share());
 
-                this.replaceContributors(contributors, dto.version);
-            }),
-            notify(this.dialogs));
+        stream.subscribe(({ version }) => {
+            const contributors = this.snapshot.contributors.filter(x => x.contributor.contributorId !== contributor.contributorId);
+
+            this.replaceContributors(contributors, version);
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return stream;
     }
 
     public assign(request: AssignContributorDto): Observable<boolean | undefined> {
-        return this.contributorsService.postContributor(this.appName, request, this.version).pipe(
-            map(dto => {
-                const contributors = this.updateContributors(dto.payload.contributorId, request.role, dto.version);
+        const stream =
+            this.contributorsService.postContributor(this.appName, request, this.version).pipe(
+                catchError(error => {
+                    if (Types.is(error, ErrorDto) && error.statusCode === 404) {
+                        return throwError(new ErrorDto(404, 'The user does not exist.'));
+                    } else {
+                        return throwError(error);
+                    }
+                }),
+                share());
 
-                this.replaceContributors(contributors, dto.version);
+        stream.subscribe(({ payload, version }) => {
+            const contributors = this.updateContributors(payload.contributorId, request.role);
 
-                return dto.payload.isCreated;
-            }),
-            catchError(error => {
-                if (Types.is(error, ErrorDto) && error.statusCode === 404) {
-                    return throwError(new ErrorDto(404, 'The user does not exist.'));
-                } else {
-                    return throwError(error);
-                }
-            }),
-            notify(this.dialogs));
+            this.replaceContributors(contributors, version);
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return stream.pipe(map(x => x.payload.isCreated));
     }
 
-    private updateContributors(id: string, role: string, version: Version) {
+    private updateContributors(id: string, role: string) {
         const contributor = new ContributorDto(id, role);
         const contributors = this.snapshot.contributors;
 

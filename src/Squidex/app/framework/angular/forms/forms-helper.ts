@@ -22,7 +22,7 @@ export function formControls(form: AbstractControl): AbstractControl[] {
 }
 
 export function invalid$(form: AbstractControl): Observable<boolean> {
-    return form.statusChanges.pipe(map(_ => form.invalid), startWith(form.invalid));
+    return form.statusChanges.pipe(map(() => form.invalid), startWith(form.invalid));
 }
 
 export function value$<T = any>(form: AbstractControl): Observable<T> {

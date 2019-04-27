@@ -45,10 +45,14 @@ describe('CommentsState', () => {
         commentsService = Mock.ofType<CommentsService>();
 
         commentsService.setup(x => x.getComments(app, commentsId, new Version('-1')))
-            .returns(() => of(oldComments));
+            .returns(() => of(oldComments)).verifiable(Times.atLeastOnce());
 
         commentsState = new CommentsState(appsState.object, commentsId, commentsService.object, dialogs.object);
         commentsState.load().subscribe();
+    });
+
+    beforeEach(() => {
+        commentsService.verifyAll();
     });
 
     it('should load and merge comments', () => {
@@ -59,7 +63,7 @@ describe('CommentsState', () => {
             ], ['1'], new Version('2'));
 
         commentsService.setup(x => x.getComments(app, commentsId, new Version('1')))
-            .returns(() => of(newComments));
+            .returns(() => of(newComments)).verifiable();
 
         commentsState.load().subscribe();
 
@@ -78,7 +82,7 @@ describe('CommentsState', () => {
         const request = { text: 'text3' };
 
         commentsService.setup(x => x.postComment(app, commentsId, request))
-            .returns(() => of(newComment));
+            .returns(() => of(newComment)).verifiable();
 
         commentsState.create('text3').subscribe();
 
@@ -93,28 +97,24 @@ describe('CommentsState', () => {
         const request = { text: 'text2_2' };
 
         commentsService.setup(x => x.putComment(app, commentsId, '2', request))
-            .returns(() => of({}));
+            .returns(() => of({})).verifiable();
 
-        commentsState.update('2', 'text2_2', now).subscribe();
+        commentsState.update(oldComments.createdComments[1], 'text2_2', now).subscribe();
 
         expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
             new CommentDto('1', now, 'text1', creator),
             new CommentDto('2', now, 'text2_2', creator)
         ]));
-
-        commentsService.verify(x => x.putComment(app, commentsId, '2', request), Times.once());
     });
 
     it('should remove comment from snapshot when deleted', () => {
         commentsService.setup(x => x.deleteComment(app, commentsId, '2'))
-            .returns(() => of({}));
+            .returns(() => of({})).verifiable();
 
-        commentsState.delete('2').subscribe();
+        commentsState.delete(oldComments.createdComments[1]).subscribe();
 
         expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
             new CommentDto('1', now, 'text1', creator)
         ]));
-
-        commentsService.verify(x => x.deleteComment(app, commentsId, '2'), Times.once());
     });
 });

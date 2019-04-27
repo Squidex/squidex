@@ -168,7 +168,7 @@ describe('SchemasState', () => {
 
     it('should mark published and update user info when published', () => {
         schemasService.setup(x => x.publishSchema(app, oldSchemas[0].name, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {})));
 
         schemasState.publish(oldSchemas[0], modified).subscribe();
 
@@ -180,7 +180,7 @@ describe('SchemasState', () => {
 
     it('should unmark published and update user info when unpublished', () => {
         schemasService.setup(x => x.unpublishSchema(app, oldSchemas[1].name, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {})));
 
         schemasState.unpublish(oldSchemas[1], modified).subscribe();
 
@@ -194,7 +194,7 @@ describe('SchemasState', () => {
         const category = 'my-new-category';
 
         schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {})));
 
         schemasState.changeCategory(oldSchemas[0], category, modified).subscribe();
 
@@ -211,7 +211,7 @@ describe('SchemasState', () => {
 
         it('should nmark published and update user info when published selected schema', () => {
             schemasService.setup(x => x.publishSchema(app, schema.name, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.publish(schema, modified).subscribe();
 
@@ -225,7 +225,7 @@ describe('SchemasState', () => {
             const category = 'my-new-category';
 
             schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.changeCategory(oldSchemas[0], category, modified).subscribe();
 
@@ -239,7 +239,7 @@ describe('SchemasState', () => {
             const request = { label: 'name2_label', hints: 'name2_hints' };
 
             schemasService.setup(x => x.putSchema(app, schema.name, It.isAny(), version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.update(schema, request, modified).subscribe();
 
@@ -254,7 +254,7 @@ describe('SchemasState', () => {
             const request = { query: '<query-script>' };
 
             schemasService.setup(x => x.putScripts(app, schema.name, It.isAny(), version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.configureScripts(schema, request, modified).subscribe();
 
@@ -268,7 +268,7 @@ describe('SchemasState', () => {
             const request = { web: 'url' };
 
             schemasService.setup(x => x.putPreviewUrls(app, schema.name, It.isAny(), version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.configurePreviewUrls(schema, request, modified).subscribe();
 
@@ -294,7 +294,7 @@ describe('SchemasState', () => {
 
         it('should remove schema from snapshot when deleted', () => {
             schemasService.setup(x => x.deleteSchema(app, schema.name, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.delete(schema).subscribe();
 
@@ -308,7 +308,7 @@ describe('SchemasState', () => {
             const newField = new RootFieldDto(3, '3', createProperties('String'), 'invariant');
 
             schemasService.setup(x => x.postField(app, schema.name, It.isAny(), undefined, version))
-                .returns(() => of(new Versioned<RootFieldDto>(newVersion, newField)));
+                .returns(() => of(new Versioned(newVersion, newField)));
 
             schemasState.addField(schema, request, undefined, modified).subscribe();
 
@@ -324,7 +324,7 @@ describe('SchemasState', () => {
             const newField = new NestedFieldDto(3, '3', createProperties('String'), 2);
 
             schemasService.setup(x => x.postField(app, schema.name, It.isAny(), 2, version))
-                .returns(() => of(new Versioned<NestedFieldDto>(newVersion, newField)));
+                .returns(() => of(new Versioned(newVersion, newField)));
 
             schemasState.addField(schema, request, field2, modified).subscribe();
 
@@ -336,7 +336,7 @@ describe('SchemasState', () => {
 
         it('should remove field and update user info when field removed', () => {
             schemasService.setup(x => x.deleteField(app, schema.name, field1.fieldId, undefined, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.deleteField(schema, field1, modified).subscribe();
 
@@ -348,7 +348,7 @@ describe('SchemasState', () => {
 
         it('should remove field and update user info when nested field removed', () => {
             schemasService.setup(x => x.deleteField(app, schema.name, nested1.fieldId, 2, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.deleteField(schema, nested1, modified).subscribe();
 
@@ -360,7 +360,7 @@ describe('SchemasState', () => {
 
         it('should sort fields and update user info when fields sorted', () => {
             schemasService.setup(x => x.putFieldOrdering(app, schema.name, [field2.fieldId, field1.fieldId], undefined, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.sortFields(schema, [field2, field1], undefined, modified).subscribe();
 
@@ -372,7 +372,7 @@ describe('SchemasState', () => {
 
         it('should sort fields and update user info when nested fields sorted', () => {
             schemasService.setup(x => x.putFieldOrdering(app, schema.name, [nested2.fieldId, nested1.fieldId], 2, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.sortFields(schema, [nested2, nested1], field2, modified).subscribe();
 
@@ -386,7 +386,7 @@ describe('SchemasState', () => {
             const request = { properties: createProperties('String') };
 
             schemasService.setup(x => x.putField(app, schema.name, field1.fieldId, request, undefined, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.updateField(schema, field1, request, modified).subscribe();
 
@@ -400,7 +400,7 @@ describe('SchemasState', () => {
             const request = { properties: createProperties('String') };
 
             schemasService.setup(x => x.putField(app, schema.name, nested1.fieldId, request, 2, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.updateField(schema, nested1, request, modified).subscribe();
 
@@ -412,7 +412,7 @@ describe('SchemasState', () => {
 
         it('should mark field hidden and update user info when field hidden', () => {
             schemasService.setup(x => x.hideField(app, schema.name, field1.fieldId, undefined, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.hideField(schema, field1, modified).subscribe();
 
@@ -424,7 +424,7 @@ describe('SchemasState', () => {
 
         it('should mark field hidden and update user info when nested field hidden', () => {
             schemasService.setup(x => x.hideField(app, schema.name, nested1.fieldId, 2, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.hideField(schema, nested1, modified).subscribe();
 
@@ -436,7 +436,7 @@ describe('SchemasState', () => {
 
         it('should mark field disabled and update user info when field disabled', () => {
             schemasService.setup(x => x.disableField(app, schema.name, field1.fieldId, undefined, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.disableField(schema, field1, modified).subscribe();
 
@@ -448,7 +448,7 @@ describe('SchemasState', () => {
 
         it('should mark field disabled and update user info when nested disabled', () => {
             schemasService.setup(x => x.disableField(app, schema.name, nested1.fieldId, 2, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.disableField(schema, nested1, modified).subscribe();
 
@@ -460,7 +460,7 @@ describe('SchemasState', () => {
 
         it('should mark field locked and update user info when field locked', () => {
             schemasService.setup(x => x.lockField(app, schema.name, field1.fieldId, undefined, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.lockField(schema, field1, modified).subscribe();
 
@@ -472,7 +472,7 @@ describe('SchemasState', () => {
 
         it('should mark field locked and update user info when nested field locked', () => {
             schemasService.setup(x => x.lockField(app, schema.name, nested1.fieldId, 2, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.lockField(schema, nested1, modified).subscribe();
 
@@ -484,7 +484,7 @@ describe('SchemasState', () => {
 
         it('should unmark field hidden and update user info when field shown', () => {
             schemasService.setup(x => x.showField(app, schema.name, field2.fieldId, undefined, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.showField(schema, field2, modified).subscribe();
 
@@ -496,7 +496,7 @@ describe('SchemasState', () => {
 
         it('should unmark field hidden and update user info when nested field shown', () => {
             schemasService.setup(x => x.showField(app, schema.name, nested2.fieldId, 2, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.showField(schema, nested2, modified).subscribe();
 
@@ -508,7 +508,7 @@ describe('SchemasState', () => {
 
         it('should unmark field disabled and update user info when field enabled', () => {
             schemasService.setup(x => x.enableField(app, schema.name, field2.fieldId, undefined, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.enableField(schema, field2, modified).subscribe();
 
@@ -520,7 +520,7 @@ describe('SchemasState', () => {
 
         it('should unmark field disabled and update user info when nested field enabled', () => {
             schemasService.setup(x => x.enableField(app, schema.name, nested2.fieldId, 2, version))
-                .returns(() => of(new Versioned<any>(newVersion, {})));
+                .returns(() => of(new Versioned(newVersion, {})));
 
             schemasState.enableField(schema, nested2, modified).subscribe();
 

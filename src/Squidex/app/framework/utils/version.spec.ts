@@ -24,7 +24,7 @@ describe('Version', () => {
 
 describe('Versioned', () => {
     it('should initialize with version and payload', () => {
-        const versioned = new Versioned<number>(new Version('1.0'), 123);
+        const versioned = new Versioned(new Version('1.0'), 123);
 
         expect(versioned.version.value).toBe('1.0');
         expect(versioned.payload).toBe(123);

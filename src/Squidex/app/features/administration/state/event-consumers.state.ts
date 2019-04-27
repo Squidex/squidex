@@ -45,7 +45,7 @@ export class EventConsumersState extends State<Snapshot> {
         super({ eventConsumers: ImmutableArray.empty() });
     }
 
-    public load(isReload = false, silent = false): Observable<EventConsumersList> {
+    public load(isReload = false, silent = false): Observable<any> {
         if (!isReload) {
             this.resetState();
         }
@@ -75,7 +75,7 @@ export class EventConsumersState extends State<Snapshot> {
     public start(eventConsumer: EventConsumerDto): Observable<any> {
         const stream =
             this.eventConsumersService.putStart(eventConsumer.name).pipe(
-                map(_ => setStopped(eventConsumer, false), share()));
+                map(() => setStopped(eventConsumer, false), share()));
 
         this.updateState(stream);
 
@@ -85,7 +85,7 @@ export class EventConsumersState extends State<Snapshot> {
     public stop(eventConsumer: EventConsumerDto): Observable<EventConsumerDto> {
         const stream =
             this.eventConsumersService.putStop(eventConsumer.name).pipe(
-                map(_ => setStopped(eventConsumer, true), share()));
+                map(() => setStopped(eventConsumer, true), share()));
 
         this.updateState(stream);
 
@@ -95,7 +95,7 @@ export class EventConsumersState extends State<Snapshot> {
     public reset(eventConsumer: EventConsumerDto): Observable<any> {
         const stream =
             this.eventConsumersService.putReset(eventConsumer.name).pipe(
-                map(_ => reset(eventConsumer), share()));
+                map(() => reset(eventConsumer), share()));
 
         this.updateState(stream);
 

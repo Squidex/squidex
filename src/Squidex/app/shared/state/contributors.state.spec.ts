@@ -9,7 +9,6 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    ContributorAssignedDto,
     ContributorDto,
     ContributorsDto,
     ContributorsService,
@@ -43,11 +42,16 @@ describe('ContributorsState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         contributorsService = Mock.ofType<ContributorsService>();
+
         contributorsService.setup(x => x.getContributors(app))
-            .returns(() => of(new ContributorsDto(oldContributors, 3, version)));
+            .returns(() => of(new ContributorsDto(oldContributors, 3, version))).verifiable(Times.atLeastOnce());
 
         contributorsState = new ContributorsState(contributorsService.object, appsState.object, authService.object, dialogs.object);
         contributorsState.load().subscribe();
+    });
+
+    afterEach(() => {
+        contributorsService.verifyAll();
     });
 
     it('should load contributors', () => {
@@ -78,7 +82,7 @@ describe('ContributorsState', () => {
         const response = { contributorId: newContributor.contributorId, isCreated: true };
 
         contributorsService.setup(x => x.postContributor(app, request, version))
-            .returns(() => of(new Versioned<ContributorAssignedDto>(newVersion, response)));
+            .returns(() => of(new Versioned(newVersion, response))).verifiable();
 
         contributorsState.assign(request).subscribe();
 
@@ -99,7 +103,7 @@ describe('ContributorsState', () => {
         const response = { contributorId: newContributor.contributorId, isCreated: true };
 
         contributorsService.setup(x => x.postContributor(app, request, version))
-            .returns(() => of(new Versioned<ContributorAssignedDto>(newVersion, response)));
+            .returns(() => of(new Versioned(newVersion, response))).verifiable();
 
         contributorsState.assign(request).subscribe();
 
@@ -114,7 +118,7 @@ describe('ContributorsState', () => {
 
     it('should remove contributor from snapshot when revoked', () => {
         contributorsService.setup(x => x.deleteContributor(app, oldContributors[0].contributorId, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {}))).verifiable();
 
         contributorsState.revoke(oldContributors[0]).subscribe();
 

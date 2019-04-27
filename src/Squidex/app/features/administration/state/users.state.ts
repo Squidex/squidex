@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, distinctUntilChanged, map, share, switchMap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map, share } from 'rxjs/operators';
 
 import '@app/framework/utils/rxjs-extensions';
 
@@ -113,7 +113,7 @@ export class UsersState extends State<Snapshot> {
         return this.loadInternal(isReload);
     }
 
-    private loadInternal(isReload = false): Observable<UsersResult> {
+    private loadInternal(isReload = false): Observable<any> {
         const stream =
             this.usersService.getUsers(
                 this.snapshot.usersPager.pageSize,
@@ -163,7 +163,7 @@ export class UsersState extends State<Snapshot> {
     public update(user: UserDto, request: UpdateUserDto): Observable<UserDto> {
         const stream =
             this.usersService.putUser(user.id, request).pipe(
-                map(_ => update(user, request)), share());
+                map(() => update(user, request)), share());
 
         this.updateState(stream, false);
 
@@ -173,7 +173,7 @@ export class UsersState extends State<Snapshot> {
     public lock(user: UserDto): Observable<UserDto> {
         const stream =
             this.usersService.lockUser(user.id).pipe(
-                map(_ => setLocked(user, true)), share());
+                map(() => setLocked(user, true)), share());
 
         this.updateState(stream, true);
 
@@ -183,7 +183,7 @@ export class UsersState extends State<Snapshot> {
     public unlock(user: UserDto): Observable<UserDto> {
         const stream =
             this.usersService.unlockUser(user.id).pipe(
-                map(_ => setLocked(user, false)), share());
+                map(() => setLocked(user, false)), share());
 
         this.updateState(stream, true);
 

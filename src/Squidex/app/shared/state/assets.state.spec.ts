@@ -90,7 +90,7 @@ describe('AssetsState', () => {
 
     it('should remove asset from snapshot when deleted', () => {
         assetsService.setup(x => x.deleteAsset(app, oldAssets[0].id, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(new Versioned(newVersion, {})));
 
         assetsState.delete(oldAssets[0]).subscribe();
 

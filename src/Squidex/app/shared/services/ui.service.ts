@@ -31,7 +31,7 @@ export class UIService {
         const url = this.apiUrl.buildUrl(`api/ui/settings`);
 
         return this.http.get<UISettingsDto>(url).pipe(
-            catchError(_ => {
+            catchError(() => {
                 return of({ mapType: 'OSM', mapKey: '', canCreateApps: true });
             }));
     }
@@ -40,7 +40,7 @@ export class UIService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/ui/settings`);
 
         return this.http.get<object>(url).pipe(
-            catchError(_ => {
+            catchError(() => {
                 return of({ });
             }));
     }

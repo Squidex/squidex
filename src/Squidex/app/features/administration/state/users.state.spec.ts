@@ -42,10 +42,14 @@ describe('UsersState', () => {
         usersService = Mock.ofType<UsersService>();
 
         usersService.setup(x => x.getUsers(10, 0, undefined))
-            .returns(() => of(new UsersDto(200, oldUsers)));
+            .returns(() => of(new UsersDto(200, oldUsers))).verifiable(Times.atLeastOnce());
 
         usersState = new UsersState(authService.object, dialogs.object, usersService.object);
-        usersState.load();
+        usersState.load().subscribe();
+    });
+
+    afterEach(() => {
+        usersService.verifyAll();
     });
 
     it('should load users', () => {
@@ -60,7 +64,7 @@ describe('UsersState', () => {
     });
 
     it('should show notification on load when reload is true', () => {
-        usersState.load(true);
+        usersState.load(true).subscribe();
 
         expect().nothing();
 
@@ -68,7 +72,7 @@ describe('UsersState', () => {
     });
 
     it('should replace selected user when reloading', () => {
-        usersState.select('id1');
+        usersState.select('id1').subscribe();
 
         const newUsers = [
             new UserDto('id1', 'mail1@mail.de_new', 'name1_new', ['Permission1_New'], false),
@@ -78,7 +82,7 @@ describe('UsersState', () => {
         usersService.setup(x => x.getUsers(10, 0, undefined))
             .returns(() => of(new UsersDto(200, newUsers)));
 
-        usersState.load();
+        usersState.load().subscribe();
 
         expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUsers[0] });
     });
@@ -92,8 +96,6 @@ describe('UsersState', () => {
 
         expect(selectedUser!.user).toEqual(oldUsers[0]);
         expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: oldUsers[0] });
-
-        usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
     });
 
     it('should return user on select and load when not loaded', () => {
@@ -108,8 +110,6 @@ describe('UsersState', () => {
 
         expect(selectedUser!.user).toEqual(newUser);
         expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUser });
-
-        usersService.verify(x => x.getUser('id3'), Times.once());
     });
 
     it('should return null on select when unselecting user', () => {
@@ -121,19 +121,17 @@ describe('UsersState', () => {
 
         expect(selectedUser!).toBeNull();
         expect(usersState.snapshot.selectedUser).toBeNull();
-
-        usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
     });
 
     it('should return null on select when user is not found', () => {
         usersService.setup(x => x.getUser('unknown'))
-            .returns(() => throwError({}));
+            .returns(() => throwError({})).verifiable();
 
         let selectedUser: SnapshotUser;
 
         usersState.select('unknown').subscribe(x => {
             selectedUser = x!;
-        });
+        }).unsubscribe();
 
         expect(selectedUser!).toBeNull();
         expect(usersState.snapshot.selectedUser).toBeNull();
@@ -141,10 +139,10 @@ describe('UsersState', () => {
 
     it('should mark as locked when locked', () => {
         usersService.setup(x => x.lockUser('id1'))
-            .returns(() => of({}));
+            .returns(() => of({})).verifiable();
 
-        usersState.select('id1');
-        usersState.lock(oldUsers[0]);
+        usersState.select('id1').subscribe();
+        usersState.lock(oldUsers[0]).subscribe();
 
         const user_1 = usersState.snapshot.users.at(0);
 
@@ -154,10 +152,10 @@ describe('UsersState', () => {
 
     it('should unmark as locked when unlocked', () => {
         usersService.setup(x => x.unlockUser('id2'))
-            .returns(() => of({}));
+            .returns(() => of({})).verifiable();
 
-        usersState.select('id2');
-        usersState.unlock(oldUsers[1]);
+        usersState.select('id2').subscribe();
+        usersState.unlock(oldUsers[1]).subscribe();
 
         const user_1 = usersState.snapshot.users.at(1);
 
@@ -169,10 +167,10 @@ describe('UsersState', () => {
         const request = { email: 'new@mail.com', displayName: 'New', permissions: ['Permission1'] };
 
         usersService.setup(x => x.putUser('id1', request))
-            .returns(() => of({}));
+            .returns(() => of({})).verifiable();
 
-        usersState.select('id1');
-        usersState.update(oldUsers[0], request);
+        usersState.select('id1').subscribe();
+        usersState.update(oldUsers[0], request).subscribe();
 
         const user_1 = usersState.snapshot.users.at(0);
 
@@ -186,9 +184,9 @@ describe('UsersState', () => {
         const request = { ...newUser, password: 'password' };
 
         usersService.setup(x => x.postUser(request))
-            .returns(() => of(newUser));
+            .returns(() => of(newUser)).verifiable();
 
-        usersState.create(request);
+        usersState.create(request).subscribe();
 
         expect(usersState.snapshot.users.values).toEqual([
             { isCurrentUser: false, user: newUser },
@@ -200,10 +198,10 @@ describe('UsersState', () => {
 
     it('should load next page and prev page when paging', () => {
         usersService.setup(x => x.getUsers(10, 10, undefined))
-            .returns(() => of(new UsersDto(200, [])));
+            .returns(() => of(new UsersDto(200, []))).verifiable();
 
-        usersState.goNext();
-        usersState.goPrev();
+        usersState.goNext().subscribe();
+        usersState.goPrev().subscribe();
 
         expect().nothing();
 
@@ -213,12 +211,10 @@ describe('UsersState', () => {
 
     it('should load with query when searching', () => {
         usersService.setup(x => x.getUsers(10, 0, 'my-query'))
-            .returns(() => of(new UsersDto(0, [])));
+            .returns(() => of(new UsersDto(0, []))).verifiable();
 
-        usersState.search('my-query');
+        usersState.search('my-query').subscribe();
 
         expect(usersState.snapshot.usersQuery).toEqual('my-query');
-
-        usersService.verify(x => x.getUsers(10, 0, 'my-query'), Times.once());
     });
 });

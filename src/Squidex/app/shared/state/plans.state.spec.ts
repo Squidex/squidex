@@ -11,7 +11,6 @@ import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
     DialogService,
-    PlanChangedDto,
     PlanDto,
     PlansDto,
     PlansService,
@@ -96,7 +95,7 @@ describe('PlansState', () => {
         const result = { redirectUri: 'http://url' };
 
         plansService.setup(x => x.putPlan(app, It.isAny(), version))
-            .returns(() => of(new Versioned<PlanChangedDto>(newVersion, result)));
+            .returns(() => of(new Versioned(newVersion, result)));
 
         plansState.load().subscribe();
         plansState.change('free').pipe(onErrorResumeNext()).subscribe();
@@ -113,7 +112,7 @@ describe('PlansState', () => {
         plansState.window = <any>{ location: {} };
 
         plansService.setup(x => x.putPlan(app, It.isAny(), version))
-            .returns(() => of(new Versioned<PlanChangedDto>(newVersion, { redirectUri: '' })));
+            .returns(() => of(new Versioned(newVersion, { redirectUri: '' })));
 
         plansState.load().subscribe();
         plansState.change('id2_yearly').pipe(onErrorResumeNext()).subscribe();

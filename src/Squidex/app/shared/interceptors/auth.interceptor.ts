@@ -50,7 +50,7 @@ export class AuthInterceptor implements HttpInterceptor {
             catchError((error: HttpErrorResponse) => {
                 if (error.status === 401 && renew) {
                     return this.authService.loginSilent().pipe(
-                        catchError(_ => {
+                        catchError(() => {
                             this.authService.logoutRedirect();
 
                             return empty();
