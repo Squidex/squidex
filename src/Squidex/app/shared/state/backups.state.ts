@@ -6,13 +6,12 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { distinctUntilChanged, map, share } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
-    notify,
     State
 } from '@app/framework';
 
@@ -22,11 +21,13 @@ import { BackupDto, BackupsService } from './../services/backups.service';
 
 interface Snapshot {
     // The current backups.
-    backups: ImmutableArray<BackupDto>;
+    backups: BackupsList;
 
     // Indicates if the backups are loaded.
     isLoaded?: boolean;
 }
+
+type BackupsList = ImmutableArray<BackupDto>;
 
 @Injectable()
 export class BackupsState extends State<Snapshot> {
@@ -55,41 +56,55 @@ export class BackupsState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.backupsService.getBackups(this.appName).pipe(
-            tap(dtos => {
-                if (isReload && !silent) {
-                    this.dialogs.notifyInfo('Backups reloaded.');
-                }
+        const http$ =
+            this.backupsService.getBackups(this.appName).pipe(
+                share());
 
-                this.next(s => {
-                    const backups = ImmutableArray.of(dtos);
+        http$.subscribe(dtos => {
+            if (isReload && !silent) {
+                this.dialogs.notifyInfo('Backups reloaded.');
+            }
 
-                    return { ...s, backups, isLoaded: true };
-                });
-            }),
-            catchError(error => {
-                if (!silent) {
-                    this.dialogs.notifyError(error);
-                }
+            this.next(s => {
+                const backups = ImmutableArray.of(dtos);
 
-                return throwError(error);
-            }));
+                return { ...s, backups, isLoaded: true };
+            });
+        }, error => {
+            if (!silent) {
+                this.dialogs.notifyError(error);
+            }
+        });
+
+        return http$;
     }
 
     public start(): Observable<any> {
-        return this.backupsService.postBackup(this.appsState.appName).pipe(
-            tap(() => {
-                this.dialogs.notifyInfo('Backup started, it can take several minutes to complete.');
-            }),
-            notify(this.dialogs));
+        const http$ =
+            this.backupsService.postBackup(this.appsState.appName).pipe(
+                share());
+
+        http$.subscribe(() => {
+            this.dialogs.notifyInfo('Backup started, it can take several minutes to complete.');
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return http$;
     }
 
     public delete(backup: BackupDto): Observable<any> {
-        return this.backupsService.deleteBackup(this.appsState.appName, backup.id).pipe(
-            tap(() => {
-                this.dialogs.notifyInfo('Backup is about to be deleted.');
-            }),
-            notify(this.dialogs));
+        const http$ =
+            this.backupsService.deleteBackup(this.appsState.appName, backup.id).pipe(
+                share());
+
+        http$.subscribe(() => {
+            this.dialogs.notifyInfo('Backup is about to be deleted.');
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return http$;
     }
 
     private get appName() {

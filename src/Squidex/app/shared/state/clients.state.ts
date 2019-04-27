@@ -12,7 +12,6 @@ import { Observable } from 'rxjs';
 import { distinctUntilChanged, map, share } from 'rxjs/operators';
 
 import {
-    array,
     DialogService,
     ImmutableArray,
     State,
@@ -64,45 +63,47 @@ export class ClientsState extends State<Snapshot> {
             this.resetState();
         }
 
-        const stream =
+        const http$ =
             this.clientsService.getClients(this.appName).pipe(
-                map(({ version, clients }) => ({ version, clients: array(clients) })), share());
+                share());
 
-        stream.subscribe(({ version, clients }) => {
+        http$.subscribe(response => {
             if (isReload) {
                 this.dialogs.notifyInfo('Clients reloaded.');
             }
 
+            const clients = ImmutableArray.of(response.clients);
+
             this.next(s => {
-                return { ...s, clients, isLoaded: true, version };
+                return { ...s, clients, isLoaded: true, version: response.version };
             });
         });
 
-        return stream;
+        return http$;
     }
 
     public attach(request: CreateClientDto): Observable<ClientDto> {
-        const stream =
+        const http$ =
             this.clientsService.postClient(this.appName, request, this.version).pipe(
                 share());
 
-        stream.subscribe(dto => {
+        http$.subscribe(({ version, payload }) => {
             this.next(s => {
-                const clients = s.clients.push(dto.payload);
+                const clients = s.clients.push(payload);
 
-                return { ...s, clients, version: dto.version };
+                return { ...s, clients, version: version };
             });
         });
 
-        return stream.pipe(map(x => x.payload));
+        return http$.pipe(map(x => x.payload));
     }
 
     public revoke(client: ClientDto): Observable<any> {
-        const stream =
+        const http$ =
             this.clientsService.deleteClient(this.appName, client.id, this.version).pipe(
                 share());
 
-        stream.subscribe(({ version }) => {
+        http$.subscribe(({ version }) => {
             this.next(s => {
                 const clients = s.clients.filter(c => c.id !== client.id);
 
@@ -110,15 +111,15 @@ export class ClientsState extends State<Snapshot> {
             });
         });
 
-        return stream;
+        return http$;
     }
 
     public update(client: ClientDto, request: UpdateClientDto): Observable<ClientDto> {
-        const stream =
+        const http$ =
             this.clientsService.putClient(this.appName, client.id, request, this.version).pipe(
                 map(({ version }) => ({ version, client: update(client, request) })), share());
 
-        stream.subscribe(({ version, client }) => {
+        http$.subscribe(({ version, client }) => {
             this.next(s => {
                 const clients = s.clients.replaceBy('id', client);
 
@@ -126,7 +127,7 @@ export class ClientsState extends State<Snapshot> {
             });
         });
 
-        return stream.pipe(map(x => x.client));
+        return http$.pipe(map(x => x.client));
     }
 
     private get appName() {

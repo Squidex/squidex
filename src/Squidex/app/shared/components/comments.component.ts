@@ -56,18 +56,18 @@ export class CommentsComponent extends ResourceOwner implements OnInit {
     }
 
     public delete(comment: CommentDto) {
-        this.state.delete(comment.id).pipe(onErrorResumeNext()).subscribe();
+        this.state.delete(comment);
     }
 
     public update(comment: CommentDto, text: string) {
-        this.state.update(comment.id, text).pipe(onErrorResumeNext()).subscribe();
+        this.state.update(comment, text);
     }
 
     public comment() {
         const value = this.commentForm.submit();
 
         if (value) {
-            this.state.create(value.text).pipe(onErrorResumeNext()).subscribe();
+            this.state.create(value.text);
 
             this.commentForm.submitCompleted();
         }

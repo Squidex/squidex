@@ -28,7 +28,7 @@ import {
 
 interface Snapshot {
     // The current roles.
-    roles: ImmutableArray<RoleDto>;
+    roles: RolesList;
 
     // The app version.
     version: Version;
@@ -36,6 +36,8 @@ interface Snapshot {
     // Indicates if the roles are loaded.
     isLoaded?: boolean;
 }
+
+type RolesList = ImmutableArray<RoleDto>;
 
 @Injectable()
 export class RolesState extends State<Snapshot> {
@@ -91,7 +93,7 @@ export class RolesState extends State<Snapshot> {
         return this.rolesService.deleteRole(this.appName, role.name, this.version).pipe(
             tap(dto => {
                 this.next(s => {
-                    const roles = s.roles.filter(c => c.name !== role.name);
+                    const roles = s.roles.removeBy('name', role);
 
                     return { ...s, roles, version: dto.version };
                 });

@@ -37,11 +37,14 @@ describe('AppsState', () => {
         appsService = Mock.ofType<AppsService>();
 
         appsService.setup(x => x.getApps())
-            .returns(() => of(oldApps))
-            .verifiable(Times.once());
+            .returns(() => of(oldApps)).verifiable();
 
         appsState = new AppsState(appsService.object, dialogs.object);
         appsState.load().subscribe();
+    });
+
+    afterEach(() => {
+        appsService.verifyAll();
     });
 
     it('should load apps', () => {
@@ -53,7 +56,7 @@ describe('AppsState', () => {
 
         appsState.select(oldApps[0].name).subscribe(x => {
             selectedApp = x!;
-        }).unsubscribe();
+        });
 
         expect(selectedApp!).toBe(oldApps[0]);
         expect(appsState.snapshot.selectedApp).toBe(oldApps[0]);
@@ -64,7 +67,7 @@ describe('AppsState', () => {
 
         appsState.select(null).subscribe(x => {
             selectedApp = x!;
-        }).unsubscribe();
+        });
 
         expect(selectedApp!).toBeNull();
         expect(appsState.snapshot.selectedApp).toBeNull();
@@ -75,7 +78,7 @@ describe('AppsState', () => {
 
         appsState.select('unknown').subscribe(x => {
             selectedApp = x!;
-        }).unsubscribe();
+        });
 
         expect(selectedApp!).toBeNull();
         expect(appsState.snapshot.selectedApp).toBeNull();
@@ -85,7 +88,7 @@ describe('AppsState', () => {
         const request = { ...newApp };
 
         appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp));
+            .returns(() => of(newApp)).verifiable();
 
         appsState.create(request).subscribe();
 
@@ -96,10 +99,10 @@ describe('AppsState', () => {
         const request = { ...newApp };
 
         appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp));
+            .returns(() => of(newApp)).verifiable();
 
         appsService.setup(x => x.deleteApp(newApp.name))
-            .returns(() => of({}));
+            .returns(() => of({})).verifiable();
 
         appsState.create(request).subscribe();
 

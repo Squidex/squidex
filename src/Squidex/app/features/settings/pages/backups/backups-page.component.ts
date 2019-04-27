@@ -30,7 +30,7 @@ export class BackupsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.backupsState.load().pipe(onErrorResumeNext()).subscribe();
+        this.backupsState.load();
 
         this.own(
             timer(3000, 3000).pipe(switchMap(() => this.backupsState.load(true, true).pipe(onErrorResumeNext())))
@@ -38,15 +38,15 @@ export class BackupsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public reload() {
-        this.backupsState.load(true, false).pipe(onErrorResumeNext()).subscribe();
+        this.backupsState.load(true, false);
     }
 
     public start() {
-        this.backupsState.start().pipe(onErrorResumeNext()).subscribe();
+        this.backupsState.start();
     }
 
     public delete(backup: BackupDto) {
-        this.backupsState.delete(backup).pipe(onErrorResumeNext()).subscribe();
+        this.backupsState.delete(backup);
     }
 
     public trackByBackup(index: number, item: BackupDto) {

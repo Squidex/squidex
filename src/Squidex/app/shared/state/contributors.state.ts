@@ -10,7 +10,6 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, distinctUntilChanged, map, share } from 'rxjs/operators';
 
 import {
-    array,
     DialogService,
     ErrorDto,
     ImmutableArray,
@@ -87,28 +86,31 @@ export class ContributorsState extends State<Snapshot> {
             this.resetState();
         }
 
-        const stream =
+        const http$ =
             this.contributorsService.getContributors(this.appName).pipe(
-                map(({ contributors, ...other }) => ({ ...other, contributors: array(contributors.map(x => this.createContributor(x))) })), share());
+                share());
 
-        stream.subscribe(({ version, contributors, maxContributors }) => {
+        http$.subscribe(response => {
             if (isReload) {
                 this.dialogs.notifyInfo('Contributors reloaded.');
             }
 
-            this.replaceContributors(contributors, version, maxContributors);
+            const contributors = ImmutableArray.of(response.contributors.map(x => this.createContributor(x)));
+
+            this.replaceContributors(contributors, response.version, response.maxContributors);
         }, error => {
             this.dialogs.notifyError(error);
         });
 
-        return stream;
+        return http$;
     }
 
     public revoke(contributor: ContributorDto): Observable<any> {
-        const stream =
-            this.contributorsService.deleteContributor(this.appName, contributor.contributorId, this.version).pipe(share());
+        const http$ =
+            this.contributorsService.deleteContributor(this.appName, contributor.contributorId, this.version).pipe(
+                share());
 
-        stream.subscribe(({ version }) => {
+        http$.subscribe(({ version }) => {
             const contributors = this.snapshot.contributors.filter(x => x.contributor.contributorId !== contributor.contributorId);
 
             this.replaceContributors(contributors, version);
@@ -116,11 +118,11 @@ export class ContributorsState extends State<Snapshot> {
             this.dialogs.notifyError(error);
         });
 
-        return stream;
+        return http$;
     }
 
     public assign(request: AssignContributorDto): Observable<boolean | undefined> {
-        const stream =
+        const http$ =
             this.contributorsService.postContributor(this.appName, request, this.version).pipe(
                 catchError(error => {
                     if (Types.is(error, ErrorDto) && error.statusCode === 404) {
@@ -131,7 +133,7 @@ export class ContributorsState extends State<Snapshot> {
                 }),
                 share());
 
-        stream.subscribe(({ payload, version }) => {
+        http$.subscribe(({ payload, version }) => {
             const contributors = this.updateContributors(payload.contributorId, request.role);
 
             this.replaceContributors(contributors, version);
@@ -139,7 +141,7 @@ export class ContributorsState extends State<Snapshot> {
             this.dialogs.notifyError(error);
         });
 
-        return stream.pipe(map(x => x.payload.isCreated));
+        return http$.pipe(map(x => x.payload.isCreated));
     }
 
     private updateContributors(id: string, role: string) {

@@ -10,7 +10,6 @@ import { Observable } from 'rxjs';
 import { distinctUntilChanged, map, share } from 'rxjs/operators';
 
 import {
-    array,
     DialogService,
     ImmutableArray,
     State
@@ -50,14 +49,16 @@ export class EventConsumersState extends State<Snapshot> {
             this.resetState();
         }
 
-        const stream =
+        const http$ =
             this.eventConsumersService.getEventConsumers().pipe(
-                map(dtos => array(dtos)), share());
+                share());
 
-        stream.subscribe(eventConsumers => {
+        http$.subscribe(response => {
             if (isReload && !silent) {
                 this.dialogs.notifyInfo('Event Consumers reloaded.');
             }
+
+            const eventConsumers = ImmutableArray.of(response);
 
             this.next(s => {
                 return { ...s, eventConsumers, isLoaded: true };
@@ -69,41 +70,41 @@ export class EventConsumersState extends State<Snapshot> {
             }
         });
 
-        return stream;
+        return http$;
     }
 
     public start(eventConsumer: EventConsumerDto): Observable<any> {
-        const stream =
+        const http$ =
             this.eventConsumersService.putStart(eventConsumer.name).pipe(
                 map(() => setStopped(eventConsumer, false), share()));
 
-        this.updateState(stream);
+        this.updateState(http$);
 
-        return stream;
+        return http$;
     }
 
     public stop(eventConsumer: EventConsumerDto): Observable<EventConsumerDto> {
-        const stream =
+        const http$ =
             this.eventConsumersService.putStop(eventConsumer.name).pipe(
                 map(() => setStopped(eventConsumer, true), share()));
 
-        this.updateState(stream);
+        this.updateState(http$);
 
-        return stream;
+        return http$;
     }
 
     public reset(eventConsumer: EventConsumerDto): Observable<any> {
-        const stream =
+        const http$ =
             this.eventConsumersService.putReset(eventConsumer.name).pipe(
                 map(() => reset(eventConsumer), share()));
 
-        this.updateState(stream);
+        this.updateState(http$);
 
-        return stream;
+        return http$;
     }
 
-    private updateState(stream: Observable<EventConsumerDto>) {
-        stream.subscribe(updated => {
+    private updateState(http$: Observable<EventConsumerDto>) {
+        http$.subscribe(updated => {
             this.replaceEventConsumer(updated);
         }, error => {
             this.dialogs.notifyError(error);

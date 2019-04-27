@@ -40,66 +40,84 @@ describe('PatternsState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         patternsService = Mock.ofType<PatternsService>();
-
-        patternsService.setup(x => x.getPatterns(app))
-            .returns(() => of(new PatternsDto(oldPatterns, version)));
-
         patternsState = new PatternsState(patternsService.object, appsState.object, dialogs.object);
-        patternsState.load().subscribe();
     });
 
-    it('should load patterns', () => {
-        expect(patternsState.snapshot.patterns.values).toEqual(oldPatterns);
-        expect(patternsState.snapshot.version).toEqual(version);
-
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+    afterEach(() => {
+        patternsService.verifyAll();
     });
 
-    it('should show notification on load when reload is true', () => {
-        patternsState.load(true).subscribe();
+    describe('Loading', () => {
+        it('should load patterns', () => {
+            patternsService.setup(x => x.getPatterns(app))
+                .returns(() => of(new PatternsDto(oldPatterns, version))).verifiable();
 
-        expect().nothing();
+            patternsState.load().subscribe();
 
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+            expect(patternsState.snapshot.patterns.values).toEqual(oldPatterns);
+            expect(patternsState.snapshot.version).toEqual(version);
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should show notification on load when reload is true', () => {
+            patternsService.setup(x => x.getPatterns(app))
+                .returns(() => of(new PatternsDto(oldPatterns, version))).verifiable();
+
+            patternsState.load(true).subscribe();
+
+            expect().nothing();
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
     });
 
-    it('should add pattern to snapshot when created', () => {
-        const newPattern = new PatternDto('id3', 'name3', 'pattern3', '');
+    describe('Updates', () => {
+        beforeEach(() => {
+            patternsService.setup(x => x.getPatterns(app))
+                .returns(() => of(new PatternsDto(oldPatterns, version))).verifiable();
 
-        const request = { ...newPattern };
+            patternsState.load().subscribe();
+        });
 
-        patternsService.setup(x => x.postPattern(app, request, version))
-            .returns(() => of(new Versioned(newVersion, newPattern)));
+        it('should add pattern to snapshot when created', () => {
+            const newPattern = new PatternDto('id3', 'name3', 'pattern3', '');
 
-        patternsState.create(request).subscribe();
+            const request = { ...newPattern };
 
-        expect(patternsState.snapshot.patterns.values).toEqual([...oldPatterns, newPattern]);
-        expect(patternsState.snapshot.version).toEqual(newVersion);
-    });
+            patternsService.setup(x => x.postPattern(app, request, version))
+                .returns(() => of(new Versioned(newVersion, newPattern))).verifiable();
 
-    it('should update properties when updated', () => {
-        const request = { name: 'name2_1', pattern: 'pattern2_1', message: 'message2_1' };
+            patternsState.create(request).subscribe();
 
-        patternsService.setup(x => x.putPattern(app, oldPatterns[1].id, request, version))
-            .returns(() => of(new Versioned(newVersion, {})));
+            expect(patternsState.snapshot.patterns.values).toEqual([...oldPatterns, newPattern]);
+            expect(patternsState.snapshot.version).toEqual(newVersion);
+        });
 
-        patternsState.update(oldPatterns[1], request).subscribe();
+        it('should update properties when updated', () => {
+            const request = { name: 'name2_1', pattern: 'pattern2_1', message: 'message2_1' };
 
-        const pattern_1 = patternsState.snapshot.patterns.at(1);
+            patternsService.setup(x => x.putPattern(app, oldPatterns[1].id, request, version))
+                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
 
-        expect(pattern_1.name).toBe(request.name);
-        expect(pattern_1.pattern).toBe(request.pattern);
-        expect(pattern_1.message).toBe(request.message);
-        expect(patternsState.snapshot.version).toEqual(newVersion);
-    });
+            patternsState.update(oldPatterns[1], request).subscribe();
 
-    it('should remove pattern from snapshot when deleted', () => {
-        patternsService.setup(x => x.deletePattern(app, oldPatterns[0].id, version))
-            .returns(() => of(new Versioned(newVersion, {})));
+            const pattern_1 = patternsState.snapshot.patterns.at(1);
 
-        patternsState.delete(oldPatterns[0]).subscribe();
+            expect(pattern_1.name).toBe(request.name);
+            expect(pattern_1.pattern).toBe(request.pattern);
+            expect(pattern_1.message).toBe(request.message);
+            expect(patternsState.snapshot.version).toEqual(newVersion);
+        });
 
-        expect(patternsState.snapshot.patterns.values).toEqual([oldPatterns[1]]);
-        expect(patternsState.snapshot.version).toEqual(newVersion);
+        it('should remove pattern from snapshot when deleted', () => {
+            patternsService.setup(x => x.deletePattern(app, oldPatterns[0].id, version))
+                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+
+            patternsState.delete(oldPatterns[0]).subscribe();
+
+            expect(patternsState.snapshot.patterns.values).toEqual([oldPatterns[1]]);
+            expect(patternsState.snapshot.version).toEqual(newVersion);
+        });
     });
 });

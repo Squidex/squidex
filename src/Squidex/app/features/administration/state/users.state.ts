@@ -12,7 +12,6 @@ import { catchError, distinctUntilChanged, map, share } from 'rxjs/operators';
 import '@app/framework/utils/rxjs-extensions';
 
 import {
-    array,
     AuthService,
     DialogService,
     ImmutableArray,
@@ -82,13 +81,15 @@ export class UsersState extends State<Snapshot> {
     }
 
     public select(id: string | null): Observable<SnapshotUser | null> {
-        const stream = this.loadUser(id).pipe(share());
+        const http$ =
+            this.loadUser(id).pipe(
+                share());
 
-        stream.subscribe(selectedUser => {
+        http$.subscribe(selectedUser => {
             this.next(s => ({ ...s, selectedUser }));
         });
 
-        return stream;
+        return http$;
     }
 
     private loadUser(id: string | null) {
@@ -114,20 +115,21 @@ export class UsersState extends State<Snapshot> {
     }
 
     private loadInternal(isReload = false): Observable<any> {
-        const stream =
+        const http$ =
             this.usersService.getUsers(
                 this.snapshot.usersPager.pageSize,
                 this.snapshot.usersPager.skip,
                 this.snapshot.usersQuery).pipe(
-                map(({ total, items }) => ({ total, users: array(items.map(x => this.createUser(x))) })), share());
+                share());
 
-        stream.subscribe(({ total, users }) => {
+        http$.subscribe(response => {
             if (isReload) {
                 this.dialogs.notifyInfo('Users reloaded.');
             }
 
             this.next(s => {
-                const usersPager = s.usersPager.setCount(total);
+                const usersPager = s.usersPager.setCount(response.total);
+                const users = ImmutableArray.of(response.items.map(x => this.createUser(x)));
 
                 let selectedUser = s.selectedUser;
 
@@ -142,13 +144,15 @@ export class UsersState extends State<Snapshot> {
             this.dialogs.notifyError(error);
         });
 
-        return stream;
+        return http$;
     }
 
     public create(request: CreateUserDto): Observable<UserDto> {
-        const stream = this.usersService.postUser(request).pipe(share());
+        const http$ =
+            this.usersService.postUser(request).pipe(
+                share());
 
-        stream.subscribe(dto => {
+        http$.subscribe(dto => {
             this.next(s => {
                 const users = s.users.pushFront(this.createUser(dto));
                 const usersPager = s.usersPager.incrementCount();
@@ -157,37 +161,37 @@ export class UsersState extends State<Snapshot> {
             });
         });
 
-        return stream;
+        return http$;
     }
 
     public update(user: UserDto, request: UpdateUserDto): Observable<UserDto> {
-        const stream =
+        const http$ =
             this.usersService.putUser(user.id, request).pipe(
                 map(() => update(user, request)), share());
 
-        this.updateState(stream, false);
+        this.updateState(http$, false);
 
-        return stream;
+        return http$;
     }
 
     public lock(user: UserDto): Observable<UserDto> {
-        const stream =
+        const http$ =
             this.usersService.lockUser(user.id).pipe(
                 map(() => setLocked(user, true)), share());
 
-        this.updateState(stream, true);
+        this.updateState(http$, true);
 
-        return stream;
+        return http$;
     }
 
     public unlock(user: UserDto): Observable<UserDto> {
-        const stream =
+        const http$ =
             this.usersService.unlockUser(user.id).pipe(
                 map(() => setLocked(user, false)), share());
 
-        this.updateState(stream, true);
+        this.updateState(http$, true);
 
-        return stream;
+        return http$;
     }
 
     public search(query: string): Observable<UsersResult> {

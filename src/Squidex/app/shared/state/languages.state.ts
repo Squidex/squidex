@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, share, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -31,24 +31,24 @@ interface SnapshotLanguage {
     language: AppLanguageDto;
 
     // All configured fallback languages.
-    fallbackLanguages: ImmutableArray<LanguageDto>;
+    fallbackLanguages: LanguageList;
 
     // The fallback languages that have not been added yet.
-    fallbackLanguagesNew: ImmutableArray<LanguageDto>;
+    fallbackLanguagesNew: LanguageList;
 }
 
 interface Snapshot {
     // the configured languages as plan format.
-    plainLanguages: ImmutableArray<AppLanguageDto>;
+    plainLanguages: AppLanguagesList;
 
     // All supported languages.
-    allLanguages: ImmutableArray<LanguageDto>;
+    allLanguages: LanguageList;
 
     // The languages that have not been added yet.
-    allLanguagesNew: ImmutableArray<LanguageDto>;
+    allLanguagesNew: LanguageList;
 
     // The configured languages with extra information.
-    languages: ImmutableArray<SnapshotLanguage>;
+    languages: LanguageResultList;
 
     // The app version.
     version: Version;
@@ -56,6 +56,10 @@ interface Snapshot {
     // Indicates if the languages are loaded.
     isLoaded?: boolean;
 }
+
+type AppLanguagesList = ImmutableArray<AppLanguageDto>;
+type LanguageList = ImmutableArray<LanguageDto>;
+type LanguageResultList = ImmutableArray<SnapshotLanguage>;
 
 @Injectable()
 export class LanguagesState extends State<Snapshot> {
@@ -91,22 +95,29 @@ export class LanguagesState extends State<Snapshot> {
             this.resetState();
         }
 
-        return forkJoin(
+        const http$ =
+            forkJoin(
                 this.languagesService.getLanguages(),
                 this.appLanguagesService.getLanguages(this.appName)).pipe(
-            map(args => {
-                return { allLanguages: args[0], languages: args[1] };
-            }),
-            tap(dtos => {
-                if (isReload) {
-                    this.dialogs.notifyInfo('Languages reloaded.');
-                }
+                map(args => {
+                    return { allLanguages: args[0], languages: args[1] };
+                }),
+                share());
 
-                const sorted = ImmutableArray.of(dtos.allLanguages).sortByStringAsc(x => x.englishName);
+        http$.subscribe(response => {
+            if (isReload) {
+                this.dialogs.notifyInfo('Languages reloaded.');
+            }
 
-                this.replaceLanguages(ImmutableArray.of(dtos.languages.languages), dtos.languages.version, sorted);
-            }),
-            notify(this.dialogs));
+            const sorted = ImmutableArray.of(response.allLanguages).sortByStringAsc(x => x.englishName);
+
+            this.replaceLanguages(ImmutableArray.of(response.languages.languages), response.languages.version, sorted);
+
+        }, error => {
+            this.dialogs.notifyError(error);
+        });
+
+        return http$;
     }
 
     public add(language: LanguageDto): Observable<any> {
@@ -147,7 +158,7 @@ export class LanguagesState extends State<Snapshot> {
             notify(this.dialogs));
     }
 
-    private replaceLanguages(languages: ImmutableArray<AppLanguageDto>, version: Version, allLanguages?: ImmutableArray<LanguageDto>) {
+    private replaceLanguages(languages: AppLanguagesList, version: Version, allLanguages?: LanguageList) {
         this.next(s => {
             allLanguages = allLanguages || s.allLanguages;
 
@@ -177,7 +188,7 @@ export class LanguagesState extends State<Snapshot> {
         return this.snapshot.version;
     }
 
-    private createLanguage(language: AppLanguageDto, languages: ImmutableArray<AppLanguageDto>): SnapshotLanguage {
+    private createLanguage(language: AppLanguageDto, languages: AppLanguagesList): SnapshotLanguage {
         return {
             language,
             fallbackLanguages:

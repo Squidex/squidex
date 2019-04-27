@@ -12,12 +12,11 @@ import {
     DateTime,
     DialogService,
     ImmutableArray,
-    notify,
     State,
     Version
 } from '@app/framework';
 
-import { CommentDto,  CommentsDto, CommentsService } from './../services/comments.service';
+import { CommentDto, CommentsService } from './../services/comments.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot {
@@ -51,12 +50,12 @@ export class CommentsState extends State<Snapshot> {
         super({ comments: ImmutableArray.empty(), version: new Version('-1') });
     }
 
-    public load(): Observable<CommentsDto> {
-        const stream =
+    public load(): Observable<any> {
+        const http$ =
             this.commentsService.getComments(this.appName, this.commentsId, this.version).pipe(
                 share());
 
-        stream.subscribe(response => {
+        http$.subscribe(response => {
             this.next(s => {
                 let comments = s.comments;
 
@@ -80,15 +79,15 @@ export class CommentsState extends State<Snapshot> {
             this.dialogs.notifyError(error);
         });
 
-        return stream;
+        return http$;
     }
 
     public create(text: string): Observable<CommentDto> {
-        const stream =
+        const http$ =
             this.commentsService.postComment(this.appName, this.commentsId, { text }).pipe(
                 share());
 
-        stream.subscribe(comment => {
+        http$.subscribe(comment => {
             this.next(s => {
                 const comments = s.comments.push(comment);
 
@@ -98,15 +97,15 @@ export class CommentsState extends State<Snapshot> {
             this.dialogs.notifyError(error);
         });
 
-        return stream;
+        return http$;
     }
 
     public update(comment: CommentDto, text: string, now?: DateTime): Observable<CommentDto> {
-        const stream =
+        const http$ =
             this.commentsService.putComment(this.appName, this.commentsId, comment.id, { text }).pipe(
                 map(() => update(comment, text, now || DateTime.now())), share());
 
-        stream.subscribe(updated => {
+        http$.subscribe(updated => {
             this.next(s => {
                 const comments = s.comments.replaceBy('id', updated);
 
@@ -116,15 +115,15 @@ export class CommentsState extends State<Snapshot> {
             this.dialogs.notifyError(error);
         });
 
-        return stream;
+        return http$;
     }
 
     public delete(comment: CommentDto): Observable<any> {
-        const stream =
+        const http$ =
             this.commentsService.deleteComment(this.appName, this.commentsId, comment.id).pipe(
                 share());
 
-        stream.subscribe(() => {
+        http$.subscribe(() => {
             this.next(s => {
                 const comments = s.comments.removeBy('id', comment);
 
@@ -134,7 +133,7 @@ export class CommentsState extends State<Snapshot> {
             this.dialogs.notifyError(error);
         });
 
-        return stream;
+        return http$;
     }
 
     private get version() {

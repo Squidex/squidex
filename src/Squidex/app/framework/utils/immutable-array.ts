@@ -17,11 +17,6 @@ function freeze<T>(items: T[]): T[] {
     return items;
 }
 
-
-export function array<V>(items?: V[]): ImmutableArray<V> {
-    return ImmutableArray.of(items);
-}
-
 export class ImmutableArray<T> implements Iterable<T> {
     private static readonly EMPTY = new ImmutableArray<any>([]);
     private readonly items: T[];
