@@ -10,6 +10,7 @@ import { Observable } from 'rxjs';
 import { distinctUntilChanged, map, share } from 'rxjs/operators';
 
 import {
+    array,
     DialogService,
     ImmutableArray,
     State
@@ -19,11 +20,13 @@ import { EventConsumerDto, EventConsumersService } from './../services/event-con
 
 interface Snapshot {
     // The list of event consumers.
-    eventConsumers: ImmutableArray<EventConsumerDto>;
+    eventConsumers: EventConsumersList;
 
     // Indicates if event consumers are loaded.
     isLoaded?: boolean;
 }
+
+type EventConsumersList = ImmutableArray<EventConsumerDto>;
 
 @Injectable()
 export class EventConsumersState extends State<Snapshot> {
@@ -42,21 +45,21 @@ export class EventConsumersState extends State<Snapshot> {
         super({ eventConsumers: ImmutableArray.empty() });
     }
 
-    public load(isReload = false, silent = false): Observable<EventConsumerDto[]> {
+    public load(isReload = false, silent = false): Observable<EventConsumersList> {
         if (!isReload) {
             this.resetState();
         }
 
-        const stream = this.eventConsumersService.getEventConsumers().pipe(share());
+        const stream =
+            this.eventConsumersService.getEventConsumers().pipe(
+                map(dtos => array(dtos)), share());
 
-        stream.subscribe(dtos => {
+        stream.subscribe(eventConsumers => {
             if (isReload && !silent) {
                 this.dialogs.notifyInfo('Event Consumers reloaded.');
             }
 
             this.next(s => {
-                const eventConsumers = ImmutableArray.of(dtos);
-
                 return { ...s, eventConsumers, isLoaded: true };
             });
 
@@ -70,39 +73,41 @@ export class EventConsumersState extends State<Snapshot> {
     }
 
     public start(eventConsumer: EventConsumerDto): Observable<any> {
-        const stream = this.eventConsumersService.putStart(eventConsumer.name).pipe(share());
+        const stream =
+            this.eventConsumersService.putStart(eventConsumer.name).pipe(
+                map(_ => setStopped(eventConsumer, false), share()));
 
-        stream.subscribe(() => {
-            this.replaceEventConsumer(setStopped(eventConsumer, false));
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
+        this.updateState(stream);
 
         return stream;
     }
 
-    public stop(eventConsumer: EventConsumerDto): Observable<any> {
-        const stream = this.eventConsumersService.putStop(eventConsumer.name).pipe(share());
+    public stop(eventConsumer: EventConsumerDto): Observable<EventConsumerDto> {
+        const stream =
+            this.eventConsumersService.putStop(eventConsumer.name).pipe(
+                map(_ => setStopped(eventConsumer, true), share()));
 
-        stream.subscribe(() => {
-            this.replaceEventConsumer(setStopped(eventConsumer, true));
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
+        this.updateState(stream);
 
         return stream;
     }
 
     public reset(eventConsumer: EventConsumerDto): Observable<any> {
-        const stream = this.eventConsumersService.putReset(eventConsumer.name).pipe(share());
+        const stream =
+            this.eventConsumersService.putReset(eventConsumer.name).pipe(
+                map(_ => reset(eventConsumer), share()));
 
-        stream.subscribe(() => {
-            this.replaceEventConsumer(reset(eventConsumer));
+        this.updateState(stream);
+
+        return stream;
+    }
+
+    private updateState(stream: Observable<EventConsumerDto>) {
+        stream.subscribe(updated => {
+            this.replaceEventConsumer(updated);
         }, error => {
             this.dialogs.notifyError(error);
         });
-
-        return stream;
     }
 
     private replaceEventConsumer(eventConsumer: EventConsumerDto) {

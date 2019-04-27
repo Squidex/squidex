@@ -6,7 +6,6 @@
  */
 
 import { of, throwError } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import { DialogService } from '@app/shared';
@@ -46,7 +45,7 @@ describe('EventConsumersState', () => {
     });
 
     it('should show notification on load when reload is true', () => {
-        eventConsumersState.load(true).subscribe();
+        eventConsumersState.load(true);
 
         expect().nothing();
 
@@ -57,7 +56,7 @@ describe('EventConsumersState', () => {
         eventConsumersService.setup(x => x.getEventConsumers())
             .returns(() => throwError({}));
 
-        eventConsumersState.load(true, false).pipe(onErrorResumeNext()).subscribe();
+        eventConsumersState.load(true, false);
 
         expect().nothing();
 
@@ -68,7 +67,7 @@ describe('EventConsumersState', () => {
         eventConsumersService.setup(x => x.getEventConsumers())
             .returns(() => throwError({}));
 
-        eventConsumersState.load(true, true).pipe(onErrorResumeNext()).subscribe();
+        eventConsumersState.load(true, true);
 
         expect().nothing();
 
@@ -79,7 +78,7 @@ describe('EventConsumersState', () => {
         eventConsumersService.setup(x => x.putStart(oldConsumers[1].name))
             .returns(() => of({}));
 
-        eventConsumersState.start(oldConsumers[1]).subscribe();
+        eventConsumersState.start(oldConsumers[1]);
 
         const es_1 = eventConsumersState.snapshot.eventConsumers.at(1);
 
@@ -90,7 +89,7 @@ describe('EventConsumersState', () => {
         eventConsumersService.setup(x => x.putStop(oldConsumers[0].name))
             .returns(() => of({}));
 
-        eventConsumersState.stop(oldConsumers[0]).subscribe();
+        eventConsumersState.stop(oldConsumers[0]);
 
         const es_1 = eventConsumersState.snapshot.eventConsumers.at(0);
 
@@ -101,7 +100,7 @@ describe('EventConsumersState', () => {
         eventConsumersService.setup(x => x.putReset(oldConsumers[0].name))
             .returns(() => of({}));
 
-        eventConsumersState.reset(oldConsumers[0]).subscribe();
+        eventConsumersState.reset(oldConsumers[0]);
 
         const es_1 = eventConsumersState.snapshot.eventConsumers.at(0);
 
