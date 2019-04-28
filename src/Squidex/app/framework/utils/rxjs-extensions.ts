@@ -7,8 +7,8 @@
 
 // tslint:disable: only-arrow-functions
 
-import { Observable, throwError } from 'rxjs';
-import { catchError, map, onErrorResumeNext, shareReplay, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, onErrorResumeNext, shareReplay, switchMap } from 'rxjs/operators';
 
 import { DialogService } from './../services/dialog.service';
 
@@ -22,16 +22,6 @@ export function mapVersioned<T = any, R = any>(project: (value: T, version: Vers
     return function mapOperation(source: Observable<Versioned<T>>) {
         return source.pipe(map<Versioned<T>, Versioned<R>>(({ version, payload }) => {
             return versioned(version, project(payload, version));
-        }));
-    };
-}
-
-export function notify<T>(dialogs: DialogService) {
-    return function mapOperation(source: Observable<T>) {
-        return source.pipe(catchError(error => {
-            dialogs.notifyError(error);
-
-            return throwError(error);
         }));
     };
 }

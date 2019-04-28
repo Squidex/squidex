@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav" *ngIf="assets.uploadsDelayed | async; let uploads" (sqxFileDrop)="addFiles($event)">
+<ul class="nav navbar-nav" *ngIf="assetUploader.uploads | async; let uploads" (sqxFileDrop)="addFiles($event)">
     <li class="nav-item dropdown">
         <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
             <i class="icon-upload-3"></i>

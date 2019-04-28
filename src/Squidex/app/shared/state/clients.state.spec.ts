@@ -94,8 +94,23 @@ describe('ClientsState', () => {
             expect(clientsState.snapshot.version).toEqual(newVersion);
         });
 
-        it('should update properties when updated', () => {
-            const request = { name: 'NewName', role: 'NewRole' };
+        it('should update properties when role updated', () => {
+            const request = { role: 'Owner' };
+
+            clientsService.setup(x => x.putClient(app, oldClients[0].id, request, version))
+                .returns(() => of(versioned(newVersion))).verifiable();
+
+            clientsState.update(oldClients[0], request).subscribe();
+
+            const client_1 = clientsState.snapshot.clients.at(0);
+
+            expect(client_1.name).toBe('name1');
+            expect(client_1.role).toBe('Owner');
+            expect(clientsState.snapshot.version).toEqual(newVersion);
+        });
+
+        it('should update properties when name updated', () => {
+            const request = { name: 'NewName' };
 
             clientsService.setup(x => x.putClient(app, oldClients[0].id, request, version))
                 .returns(() => of(versioned(newVersion))).verifiable();
@@ -105,7 +120,7 @@ describe('ClientsState', () => {
             const client_1 = clientsState.snapshot.clients.at(0);
 
             expect(client_1.name).toBe('NewName');
-            expect(client_1.role).toBe('NewRole');
+            expect(client_1.role).toBe('Developer');
             expect(clientsState.snapshot.version).toEqual(newVersion);
         });
 

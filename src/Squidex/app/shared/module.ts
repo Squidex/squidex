@@ -21,11 +21,13 @@ import {
     AssetComponent,
     AssetDialogComponent,
     AssetPreviewUrlPipe,
+    AssetsDialogState,
     AssetsListComponent,
     AssetsSelectorComponent,
     AssetsService,
     AssetsState,
     AssetUploaderComponent,
+    AssetUploaderState,
     AssetUrlPipe,
     AuthInterceptor,
     AuthService,
@@ -165,6 +167,9 @@ import {
         UserPicturePipe,
         UserPictureRefPipe,
         TableHeaderComponent
+    ],
+    providers: [
+        AssetsDialogState
     ]
 })
 export class SqxSharedModule {
@@ -182,6 +187,7 @@ export class SqxSharedModule {
                 AppsState,
                 AssetsState,
                 AssetsService,
+                AssetUploaderState,
                 AuthService,
                 BackupsService,
                 BackupsState,

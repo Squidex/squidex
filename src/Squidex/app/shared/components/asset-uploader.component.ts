@@ -9,8 +9,10 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import {
     AssetsState,
+    AssetUploaderState,
     DialogModel,
-    fadeAnimation
+    fadeAnimation,
+    Upload
 } from '@app/shared/internal';
 
 @Component({
@@ -26,11 +28,20 @@ export class AssetUploaderComponent {
     public modalMenu = new DialogModel(true);
 
     constructor(
-        public readonly assets: AssetsState
+        public readonly assetUploader: AssetUploaderState,
+        public readonly assetsState: AssetsState
     ) {
     }
 
-    public addFiles() {
+    public addFiles(files: File[]) {
+        for (let file of files) {
+            this.assetUploader.uploadFile(file, this.assetsState);
+        }
+
         this.modalMenu.show();
+    }
+
+    public stopUpload(upload: Upload) {
+        this.assetUploader.stopUpload(upload);
     }
 }

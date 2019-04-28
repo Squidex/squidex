@@ -11,16 +11,13 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
-    AppsState,
     AssetDto,
-    AssetsService,
-    AuthService,
-    DateTime,
     DialogModel,
     ResourceLoaderService,
     StatefulControlComponent,
     Types
 } from '@app/shared/internal';
+import { AssetUploaderState } from '../state/asset-uploader.state';
 
 declare var tinymce: any;
 
@@ -57,9 +54,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
     public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService,
-        private readonly authState: AuthService,
+        private readonly assetUploader: AssetUploaderState,
         private readonly resourceLoader: ResourceLoaderService
     ) {
         super(changeDetector, {});
@@ -99,7 +94,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
             images_upload_handler: (blob: any, success: (url: string) => void, failed: () => void) => {
                 const file = new File([blob.blob()], blob.filename(), { lastModified: new Date().getTime() });
 
-                this.assetsService.uploadFile(this.appsState.appName, file, this.authState.user!.token, DateTime.now())
+                this.assetUploader.uploadFile(file)
                     .subscribe(asset => {
                         if (Types.is(asset, AssetDto)) {
                             success(asset.url);
@@ -131,11 +126,13 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
                 });
 
                 self.tinyEditor.on('paste', (event: ClipboardEvent) => {
-                    for (let i = 0; i < event.clipboardData.items.length; i++) {
-                        const file = event.clipboardData.items[i].getAsFile();
+                    if (event.clipboardData) {
+                        for (let i = 0; i < event.clipboardData.items.length; i++) {
+                            const file = event.clipboardData.items[i].getAsFile();
 
-                        if (file && ImageTypes.indexOf(file.type) >= 0) {
-                            self.uploadFile(file);
+                            if (file && ImageTypes.indexOf(file.type) >= 0) {
+                                self.uploadFile(file);
+                            }
                         }
                     }
                 });
@@ -213,7 +210,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
             this.tinyEditor.setContent(content);
         };
 
-        this.assetsService.uploadFile(this.appsState.appName, file, this.authState.user!.token, DateTime.now())
+        this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
                     replaceText(`<img src="${asset.url}" alt="${asset.fileName}" />`);

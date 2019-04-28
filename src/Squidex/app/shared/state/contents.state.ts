@@ -14,7 +14,6 @@ import {
     DialogService,
     ErrorDto,
     ImmutableArray,
-    notify,
     Pager,
     shareSubscribed,
     State,
@@ -312,7 +311,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     public loadVersion(content: ContentDto, version: Version): Observable<Versioned<any>> {
         return this.contentsService.getVersionData(this.appName, this.schemaName, content.id, version).pipe(
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     private get appName() {

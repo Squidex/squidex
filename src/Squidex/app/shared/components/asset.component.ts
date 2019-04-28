@@ -8,17 +8,15 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
 
 import {
-    AppsState,
     AssetDto,
-    AssetsService,
     AuthService,
-    DateTime,
     DialogModel,
     DialogService,
     fadeAnimation,
     StatefulComponent,
     Types
 } from '@app/shared/internal';
+import { AssetUploaderState } from '../state/asset-uploader.state';
 
 interface State {
     progress: number;
@@ -82,9 +80,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     public editDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService,
-        private readonly authState: AuthService,
+        private readonly assetUploader: AssetUploaderState,
         private readonly dialogs: DialogService
     ) {
         super(changeDetector, {
@@ -98,7 +94,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
         if (initFile) {
             this.setProgress(1);
 
-            this.assetsService.uploadFile(this.appsState.appName, initFile, this.authState.user!.token, DateTime.now())
+            this.assetUploader.uploadFile(initFile)
                 .subscribe(dto => {
                     if (Types.isNumber(dto)) {
                         this.setProgress(dto);
@@ -117,12 +113,12 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
         if (files.length === 1) {
             this.setProgress(1);
 
-            this.assetsService.replaceFile(this.appsState.appName, this.asset.id, files[0], this.asset.version)
+            this.assetUploader.uploadUpdate(this.asset, files[0])
                 .subscribe(dto => {
                     if (Types.isNumber(dto)) {
                         this.setProgress(dto);
                     } else {
-                        this.updateAsset(this.asset.update(dto.payload, this.authState.user!.token, dto.version), true);
+                        this.updateAsset(dto, true);
                     }
                 }, error => {
                     this.dialogs.notifyError(error);

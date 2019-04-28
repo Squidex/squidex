@@ -132,7 +132,7 @@ export class ContributorsState extends State<Snapshot> {
         const contributors = this.snapshot.contributors;
 
         if (contributors.find(x => x.contributor.contributorId === id)) {
-            return contributors.map(x => x.contributor.contributorId === id ? this.createContributor(contributor, x) : x);
+            return contributors.map(x => x.contributor.contributorId === id ? this.createContributor(contributor) : x);
         } else {
             return contributors.push(this.createContributor(contributor));
         }
@@ -161,13 +161,7 @@ export class ContributorsState extends State<Snapshot> {
         return this.snapshot.version;
     }
 
-    private createContributor(contributor: ContributorDto, current?: SnapshotContributor): SnapshotContributor {
-        if (!contributor) {
-            return null!;
-        } else if (current && current.contributor === contributor) {
-            return current;
-        } else {
-            return { contributor, isCurrentUser: contributor.contributorId === this.userId };
-        }
+    private createContributor(contributor: ContributorDto): SnapshotContributor {
+        return { contributor, isCurrentUser: contributor.contributorId === this.userId };
     }
 }
