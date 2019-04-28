@@ -56,25 +56,27 @@ export class CommentsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}?version=${version.value}`);
 
         return this.http.get<any>(url).pipe(
-                map(response => {
-                    return new CommentsDto(
-                        response.createdComments.map((item: any) => {
+                map(body => {
+                    const comments = new CommentsDto(
+                        body.createdComments.map((item: any) => {
                             return new CommentDto(
                                 item.id,
                                 DateTime.parseISO_UTC(item.time),
                                 item.text,
                                 item.user);
                         }),
-                        response.updatedComments.map((item: any) => {
+                        body.updatedComments.map((item: any) => {
                             return new CommentDto(
                                 item.id,
                                 DateTime.parseISO_UTC(item.time),
                                 item.text,
                                 item.user);
                         }),
-                        response.deletedComments,
-                        new Version(response.version)
+                        body.deletedComments,
+                        new Version(body.version)
                     );
+
+                    return comments;
                 }),
                 pretifyError('Failed to load comments.'));
     }
@@ -82,15 +84,15 @@ export class CommentsService {
     public postComment(appName: string, commentsId: string, dto: UpsertCommentDto): Observable<CommentDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}`);
 
-        return this.http.post(url, dto).pipe(
-                map(response => {
-                    const body: any = response;
-
-                    return new CommentDto(
+        return this.http.post<any>(url, dto).pipe(
+                map(body => {
+                    const comment = new CommentDto(
                         body.id,
                         DateTime.parseISO_UTC(body.time),
                         body.text,
                         body.user);
+
+                    return comment;
                 }),
                 pretifyError('Failed to create comment.'));
     }

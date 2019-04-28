@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     fadeAnimation,
@@ -127,7 +126,7 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
     }
 
     public changeCategory(schema: SchemaDto) {
-        this.schemasState.changeCategory(schema, this.name).pipe(onErrorResumeNext()).subscribe();
+        this.schemasState.changeCategory(schema, this.name);
     }
 
     public emitRemove() {

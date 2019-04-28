@@ -21,8 +21,12 @@
       ]
     }
   },
+  "awesomeTypescriptLoaderOptions": {
+    "useBabel": true,
+    "useCache": true,
+    "emitRequireType": false
+  },
   "angularCompilerOptions": { 
-    "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true
+    "fullTemplateTypeCheck": true
   }
 }

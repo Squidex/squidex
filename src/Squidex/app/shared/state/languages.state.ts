@@ -7,12 +7,13 @@
 
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
-import { distinctUntilChanged, map, share, tap } from 'rxjs/operators';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
-    notify,
+    mapVersioned,
+    shareSubscribed,
     State,
     Version
 } from '@app/framework';
@@ -95,57 +96,51 @@ export class LanguagesState extends State<Snapshot> {
             this.resetState();
         }
 
-        const http$ =
-            forkJoin(
+        return forkJoin(
                 this.languagesService.getLanguages(),
                 this.appLanguagesService.getLanguages(this.appName)).pipe(
-                map(args => {
-                    return { allLanguages: args[0], languages: args[1] };
-                }),
-                share());
+            map(args => {
+                return { allLanguages: args[0], languages: args[1] };
+            }),
+            tap(({ allLanguages, languages }) => {
+                if (isReload) {
+                    this.dialogs.notifyInfo('Languages reloaded.');
+                }
 
-        http$.subscribe(response => {
-            if (isReload) {
-                this.dialogs.notifyInfo('Languages reloaded.');
-            }
+                const sorted = ImmutableArray.of(allLanguages).sortByStringAsc(x => x.englishName);
 
-            const sorted = ImmutableArray.of(response.allLanguages).sortByStringAsc(x => x.englishName);
-
-            this.replaceLanguages(ImmutableArray.of(response.languages.languages), response.languages.version, sorted);
-
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+                this.replaceLanguages(ImmutableArray.of(languages.payload), languages.version, sorted);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
-    public add(language: LanguageDto): Observable<any> {
+    public add(language: LanguageDto): Observable<AppLanguageDto> {
         return this.appLanguagesService.postLanguage(this.appName, { language: language.iso2Code }, this.version).pipe(
-            tap(dto => {
-                const languages = this.snapshot.plainLanguages.push(dto.payload).sortByStringAsc(x => x.englishName);
+            tap(({ version, payload }) => {
+                const languages = this.snapshot.plainLanguages.push(payload).sortByStringAsc(x => x.englishName);
 
-                this.replaceLanguages(languages, dto.version);
+                this.replaceLanguages(languages, version);
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs, { project: x => x.payload }));
     }
 
     public remove(language: AppLanguageDto): Observable<any> {
         return this.appLanguagesService.deleteLanguage(this.appName, language.iso2Code, this.version).pipe(
-            tap(dto => {
+            tap(({ version }) => {
                 const languages = this.snapshot.plainLanguages.filter(x => x.iso2Code !== language.iso2Code);
 
-                this.replaceLanguages(languages, dto.version);
+                this.replaceLanguages(languages, version);
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
-    public update(language: AppLanguageDto, request: UpdateAppLanguageDto): Observable<any> {
+    public update(language: AppLanguageDto, request: UpdateAppLanguageDto): Observable<AppLanguageDto> {
         return this.appLanguagesService.putLanguage(this.appName, language.iso2Code, request, this.version).pipe(
-            tap(dto => {
+            mapVersioned(() => update(language, request)),
+            tap(({ version, payload }) => {
                 const languages = this.snapshot.plainLanguages.map(x => {
                     if (x.iso2Code === language.iso2Code) {
-                        return update(x, request);
+                        return payload;
                     } else if (x.isMaster && request.isMaster) {
                         return update(x, { isMaster: false });
                     } else {
@@ -153,9 +148,9 @@ export class LanguagesState extends State<Snapshot> {
                     }
                 });
 
-                this.replaceLanguages(languages, dto.version);
+                this.replaceLanguages(languages, version);
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     private replaceLanguages(languages: AppLanguagesList, version: Version, allLanguages?: LanguageList) {

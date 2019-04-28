@@ -171,7 +171,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public discardChanges() {
-        this.contentsState.discardChanges(this.content).pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.discardChanges(this.content);
     }
 
     public publish() {

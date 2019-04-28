@@ -70,11 +70,16 @@ describe('ContributorsService', () => {
             }
         });
 
-        expect(contributors!).toEqual(
-            new ContributorsDto([
-                new ContributorDto('123', 'Owner'),
-                new ContributorDto('456', 'Owner')
-            ], 100, new Version('2')));
+        expect(contributors!).toEqual({
+            payload: {
+                contributors: [
+                    new ContributorDto('123', 'Owner'),
+                    new ContributorDto('456', 'Owner')
+                ],
+                maxContributors: 100
+            },
+            version: new Version('2')
+        });
     }));
 
     it('should make post request to assign contributor',

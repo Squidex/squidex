@@ -6,7 +6,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -29,27 +28,27 @@ export class RuleEventsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.ruleEventsState.load().pipe(onErrorResumeNext()).subscribe();
+        this.ruleEventsState.load();
     }
 
     public reload() {
-        this.ruleEventsState.load(true).pipe(onErrorResumeNext()).subscribe();
+        this.ruleEventsState.load(true);
     }
 
     public goNext() {
-        this.ruleEventsState.goNext().pipe(onErrorResumeNext()).subscribe();
+        this.ruleEventsState.goNext();
     }
 
     public goPrev() {
-        this.ruleEventsState.goPrev().pipe(onErrorResumeNext()).subscribe();
+        this.ruleEventsState.goPrev();
     }
 
     public enqueue(event: RuleEventDto) {
-        this.ruleEventsState.enqueue(event).pipe(onErrorResumeNext()).subscribe();
+        this.ruleEventsState.enqueue(event);
     }
 
     public cancel(event: RuleEventDto) {
-        this.ruleEventsState.cancel(event).pipe(onErrorResumeNext()).subscribe();
+        this.ruleEventsState.cancel(event);
     }
 
     public selectEvent(id: string) {

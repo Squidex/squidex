@@ -40,15 +40,16 @@ export class EventConsumersService {
         const url = this.apiUrl.buildUrl('/api/event-consumers');
 
         return this.http.get<any[]>(url).pipe(
-                map(response => {
-                    return response.map(item => {
-                        return new EventConsumerDto(
+                map(body => {
+                    const eventConsumers = body.map(item =>
+                        new EventConsumerDto(
                             item.name,
                             item.isStopped,
                             item.isResetting,
                             item.error,
-                            item.position);
-                    });
+                            item.position));
+
+                    return eventConsumers;
                 }),
                 pretifyError('Failed to load event consumers. Please reload.'));
     }

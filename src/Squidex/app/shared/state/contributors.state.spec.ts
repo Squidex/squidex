@@ -10,11 +10,10 @@ import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
     ContributorDto,
-    ContributorsDto,
     ContributorsService,
     ContributorsState,
     DialogService,
-    Versioned
+    versioned
 } from './../';
 
 import { TestValues } from './_test-helpers';
@@ -52,7 +51,7 @@ describe('ContributorsState', () => {
     describe('Loading', () => {
         it('should load contributors', () => {
             contributorsService.setup(x => x.getContributors(app))
-                .returns(() => of(new ContributorsDto(oldContributors, 3, version))).verifiable();
+                .returns(() => of(versioned(version, { contributors: oldContributors, maxContributors: 3 }))).verifiable();
 
             contributorsState.load().subscribe();
 
@@ -70,7 +69,7 @@ describe('ContributorsState', () => {
 
         it('should show notification on load when reload is true', () => {
             contributorsService.setup(x => x.getContributors(app))
-                .returns(() => of(new ContributorsDto(oldContributors, 3, version))).verifiable();
+                .returns(() => of(versioned(version, { contributors: oldContributors, maxContributors: 3 }))).verifiable();
 
             contributorsState.load(true).subscribe();
 
@@ -83,7 +82,7 @@ describe('ContributorsState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             contributorsService.setup(x => x.getContributors(app))
-                .returns(() => of(new ContributorsDto(oldContributors, 3, version))).verifiable();
+                .returns(() => of(versioned(version, { contributors: oldContributors, maxContributors: 3 }))).verifiable();
 
             contributorsState.load().subscribe();
         });
@@ -95,7 +94,7 @@ describe('ContributorsState', () => {
             const response = { contributorId: newContributor.contributorId, isCreated: true };
 
             contributorsService.setup(x => x.postContributor(app, request, version))
-                .returns(() => of(new Versioned(newVersion, response))).verifiable();
+                .returns(() => of(versioned(newVersion, response))).verifiable();
 
             contributorsState.assign(request).subscribe();
 
@@ -116,7 +115,7 @@ describe('ContributorsState', () => {
             const response = { contributorId: newContributor.contributorId, isCreated: true };
 
             contributorsService.setup(x => x.postContributor(app, request, version))
-                .returns(() => of(new Versioned(newVersion, response))).verifiable();
+                .returns(() => of(versioned(newVersion, response))).verifiable();
 
             contributorsState.assign(request).subscribe();
 
@@ -131,7 +130,7 @@ describe('ContributorsState', () => {
 
         it('should remove contributor from snapshot when revoked', () => {
             contributorsService.setup(x => x.deleteContributor(app, oldContributors[0].contributorId, version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             contributorsState.revoke(oldContributors[0]).subscribe();
 

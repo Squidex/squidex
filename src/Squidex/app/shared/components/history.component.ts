@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { merge, Observable, timer } from 'rxjs';
-import { delay, onErrorResumeNext, switchMap } from 'rxjs/operators';
+import { delay } from 'rxjs/operators';
 
 import {
     allParams,
@@ -16,7 +16,8 @@ import {
     HistoryChannelUpdated,
     HistoryEventDto,
     HistoryService,
-    MessageBus
+    MessageBus,
+    switchSafe
 } from '@app/shared/internal';
 
 @Component({
@@ -33,7 +34,7 @@ export class HistoryComponent {
             timer(0, 10000),
             this.messageBus.of(HistoryChannelUpdated).pipe(delay(1000))
         ).pipe(
-            switchMap(() => this.historyService.getHistory(this.appsState.appName, this.channel).pipe(onErrorResumeNext())));
+            switchSafe(() => this.historyService.getHistory(this.appsState.appName, this.channel)));
 
     constructor(
         private readonly appsState: AppsState,

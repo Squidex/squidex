@@ -10,11 +10,10 @@ import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
     ClientDto,
-    ClientsDto,
     ClientsService,
     ClientsState,
     DialogService,
-    Versioned
+    versioned
 } from './../';
 
 import { TestValues } from './_test-helpers';
@@ -50,7 +49,7 @@ describe('ClientsState', () => {
     describe('Loading', () => {
         it('should load clients', () => {
             clientsService.setup(x => x.getClients(app))
-                .returns(() => of(new ClientsDto(oldClients, version))).verifiable();
+                .returns(() => of(versioned(version, oldClients))).verifiable();
 
             clientsState.load().subscribe();
 
@@ -63,7 +62,7 @@ describe('ClientsState', () => {
 
         it('should show notification on load when reload is true', () => {
             clientsService.setup(x => x.getClients(app))
-                .returns(() => of(new ClientsDto(oldClients, version))).verifiable();
+                .returns(() => of(versioned(version, oldClients))).verifiable();
 
             clientsState.load(true).subscribe();
 
@@ -76,7 +75,7 @@ describe('ClientsState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             clientsService.setup(x => x.getClients(app))
-                .returns(() => of(new ClientsDto(oldClients, version))).verifiable();
+                .returns(() => of(versioned(version, oldClients))).verifiable();
 
             clientsState.load().subscribe();
         });
@@ -87,7 +86,7 @@ describe('ClientsState', () => {
             const request = { id: 'id3' };
 
             clientsService.setup(x => x.postClient(app, request, version))
-                .returns(() => of(new Versioned(newVersion, newClient))).verifiable();
+                .returns(() => of(versioned(newVersion, newClient))).verifiable();
 
             clientsState.attach(request).subscribe();
 
@@ -99,7 +98,7 @@ describe('ClientsState', () => {
             const request = { name: 'NewName', role: 'NewRole' };
 
             clientsService.setup(x => x.putClient(app, oldClients[0].id, request, version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             clientsState.update(oldClients[0], request).subscribe();
 
@@ -112,7 +111,7 @@ describe('ClientsState', () => {
 
         it('should remove client from snapshot when revoked', () => {
             clientsService.setup(x => x.deleteClient(app, oldClients[0].id, version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             clientsState.revoke(oldClients[0]).subscribe();
 

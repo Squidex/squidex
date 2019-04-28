@@ -14,20 +14,14 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
     Version,
     Versioned
 } from '@app/framework';
 
-export class ClientsDto extends Model<ClientsDto> {
-    constructor(
-        public readonly clients: ClientDto[],
-        public readonly version: Version
-    ) {
-        super();
-    }
-}
+export type ClientsDto = Versioned<ClientDto[]>;
 
 export class ClientDto extends Model<ClientDto> {
     constructor(
@@ -70,20 +64,17 @@ export class ClientsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
+                mapVersioned(({ body }) => {
                     const items: any[] = body;
 
-                    const clients = items.map(item => {
-                        return new ClientDto(
+                    const clients = items.map(item =>
+                        new ClientDto(
                             item.id,
-                            item.name || body.id,
+                            item.name || item.id,
                             item.secret,
-                            item.role);
-                    });
+                            item.role));
 
-                    return new ClientsDto(clients, response.version);
+                    return clients;
                 }),
                 pretifyError('Failed to load clients. Please reload.'));
     }
@@ -92,16 +83,14 @@ export class ClientsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
         return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
+                mapVersioned(({ body }) => {
                     const client = new ClientDto(
                         body.id,
                         body.name || body.id,
                         body.secret,
                         body.role);
 
-                    return new Versioned(response.version, client);
+                    return client;
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Client', 'Created', appName);

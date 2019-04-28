@@ -7,12 +7,13 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, distinctUntilChanged, map, share } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ErrorDto,
     ImmutableArray,
+    shareSubscribed,
     State,
     Types,
     Version
@@ -86,62 +87,44 @@ export class ContributorsState extends State<Snapshot> {
             this.resetState();
         }
 
-        const http$ =
-            this.contributorsService.getContributors(this.appName).pipe(
-                share());
+        return this.contributorsService.getContributors(this.appName).pipe(
+            tap(({ version, payload }) => {
+                if (isReload) {
+                    this.dialogs.notifyInfo('Contributors reloaded.');
+                }
 
-        http$.subscribe(response => {
-            if (isReload) {
-                this.dialogs.notifyInfo('Contributors reloaded.');
-            }
+                const contributors = ImmutableArray.of(payload.contributors.map(x => this.createContributor(x)));
 
-            const contributors = ImmutableArray.of(response.contributors.map(x => this.createContributor(x)));
-
-            this.replaceContributors(contributors, response.version, response.maxContributors);
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+                this.replaceContributors(contributors, version, payload.maxContributors);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public revoke(contributor: ContributorDto): Observable<any> {
-        const http$ =
-            this.contributorsService.deleteContributor(this.appName, contributor.contributorId, this.version).pipe(
-                share());
+        return this.contributorsService.deleteContributor(this.appName, contributor.contributorId, this.version).pipe(
+            tap(({ version }) => {
+                const contributors = this.snapshot.contributors.filter(x => x.contributor.contributorId !== contributor.contributorId);
 
-        http$.subscribe(({ version }) => {
-            const contributors = this.snapshot.contributors.filter(x => x.contributor.contributorId !== contributor.contributorId);
-
-            this.replaceContributors(contributors, version);
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+                this.replaceContributors(contributors, version);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public assign(request: AssignContributorDto): Observable<boolean | undefined> {
-        const http$ =
-            this.contributorsService.postContributor(this.appName, request, this.version).pipe(
-                catchError(error => {
-                    if (Types.is(error, ErrorDto) && error.statusCode === 404) {
-                        return throwError(new ErrorDto(404, 'The user does not exist.'));
-                    } else {
-                        return throwError(error);
-                    }
-                }),
-                share());
+        return this.contributorsService.postContributor(this.appName, request, this.version).pipe(
+            catchError(error => {
+                if (Types.is(error, ErrorDto) && error.statusCode === 404) {
+                    return throwError(new ErrorDto(404, 'The user does not exist.'));
+                } else {
+                    return throwError(error);
+                }
+            }),
+            tap(({ version, payload }) => {
+                const contributors = this.updateContributors(payload.contributorId, request.role);
 
-        http$.subscribe(({ payload, version }) => {
-            const contributors = this.updateContributors(payload.contributorId, request.role);
-
-            this.replaceContributors(contributors, version);
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$.pipe(map(x => x.payload.isCreated));
+                this.replaceContributors(contributors, version);
+            }),
+            shareSubscribed(this.dialogs, { project: x => x.payload.isCreated }));
     }
 
     private updateContributors(id: string, role: string) {

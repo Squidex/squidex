@@ -11,7 +11,7 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import {
     AssetDto,
     AssetsState,
-    AssetWithUpload
+    ImmutableArray
 } from '@app/shared/internal';
 
 @Component({
@@ -21,6 +21,8 @@ import {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsListComponent {
+    public newFiles = ImmutableArray.empty<File>();
+
     @Input()
     public state: AssetsState;
 
@@ -35,6 +37,12 @@ export class AssetsListComponent {
 
     @Output()
     public select = new EventEmitter<AssetDto>();
+
+    public add(file: File, asset: AssetDto) {
+        this.newFiles = this.newFiles.remove(file);
+
+        this.state.add(asset);
+    }
 
     public search() {
         this.state.load().pipe(onErrorResumeNext()).subscribe();
@@ -56,10 +64,6 @@ export class AssetsListComponent {
         this.state.update(asset);
     }
 
-    public updateFile(asset: AssetDto, file: File) {
-        this.state.replaceFile(asset, file).pipe(onErrorResumeNext()).subscribe();
-    }
-
     public emitSelect(asset: AssetDto) {
         this.select.emit(asset);
     }
@@ -68,9 +72,13 @@ export class AssetsListComponent {
         return this.selectedIds && this.selectedIds[asset.id];
     }
 
+    public remove(file: File) {
+        this.newFiles = this.newFiles.remove(file);
+    }
+
     public addFiles(files: File[]) {
         for (let file of files) {
-            this.state.upload(file);
+            this.newFiles = this.newFiles.pushFront(file);
         }
 
         return true;
@@ -79,9 +87,4 @@ export class AssetsListComponent {
     public trackByAsset(index: number, asset: AssetDto) {
         return asset.id;
     }
-
-    public trackByUpload(index: number, upload: AssetWithUpload) {
-        return upload.asset.id;
-    }
 }
-

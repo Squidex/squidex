@@ -14,7 +14,6 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
-    HTTP,
     Model,
     Permission,
     pretifyError
@@ -51,13 +50,9 @@ export class AppsService {
     public getApps(): Observable<AppDto[]> {
         const url = this.apiUrl.buildUrl('/api/apps');
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
-                    const items: any[] = body;
-
-                    return items.map(item => {
+        return this.http.get<any[]>(url).pipe(
+                map(body => {
+                    const apps = body.map(item => {
                         const permissions = (<string[]>item.permissions).map(x => new Permission(x));
 
                         return new AppDto(
@@ -69,6 +64,8 @@ export class AppsService {
                             item.planName,
                             item.planUpgrade);
                     });
+
+                    return apps;
                 }),
                 pretifyError('Failed to load apps. Please reload.'));
     }
@@ -76,15 +73,22 @@ export class AppsService {
     public postApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
-        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
+        return this.http.post<any>(url, dto).pipe(
+                map(body => {
                     now = now || DateTime.now();
 
                     const permissions = (<string[]>body.permissions).map(x => new Permission(x));
 
-                    return new AppDto(body.id, dto.name, permissions, now, now, body.planName, body.planUpgrade);
+                    const app = new AppDto(
+                        body.id,
+                        dto.name,
+                        permissions,
+                        now,
+                        now,
+                        body.planName,
+                        body.planUpgrade);
+
+                    return app;
                 }),
                 tap(() => {
                     this.analytics.trackEvent('App', 'Created', dto.name);

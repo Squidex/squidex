@@ -56,7 +56,7 @@ export module HTTP {
         return httpRequest.pipe(map((response: HttpResponse<T>) => {
             const etag = response.headers.get('etag') || '';
 
-            return new Versioned(new Version(etag), response);
+            return { version: new Version(etag), payload: response };
         }));
     }
 }

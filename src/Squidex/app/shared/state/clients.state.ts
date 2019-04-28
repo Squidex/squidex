@@ -9,11 +9,13 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, share } from 'rxjs/operators';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
+    mapVersioned,
+    shareSubscribed,
     State,
     Version
 } from '@app/framework';
@@ -63,71 +65,56 @@ export class ClientsState extends State<Snapshot> {
             this.resetState();
         }
 
-        const http$ =
-            this.clientsService.getClients(this.appName).pipe(
-                share());
+        return this.clientsService.getClients(this.appName).pipe(
+            tap(({ version, payload: newClients }) => {
+                if (isReload) {
+                    this.dialogs.notifyInfo('Clients reloaded.');
+                }
 
-        http$.subscribe(response => {
-            if (isReload) {
-                this.dialogs.notifyInfo('Clients reloaded.');
-            }
+                const clients = ImmutableArray.of(newClients);
 
-            const clients = ImmutableArray.of(response.clients);
-
-            this.next(s => {
-                return { ...s, clients, isLoaded: true, version: response.version };
-            });
-        });
-
-        return http$;
+                this.next(s => {
+                    return { ...s, clients, isLoaded: true, version };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public attach(request: CreateClientDto): Observable<ClientDto> {
-        const http$ =
-            this.clientsService.postClient(this.appName, request, this.version).pipe(
-                share());
+        return this.clientsService.postClient(this.appName, request, this.version).pipe(
+            tap(({ version, payload }) => {
+                this.next(s => {
+                    const clients = s.clients.push(payload);
 
-        http$.subscribe(({ version, payload }) => {
-            this.next(s => {
-                const clients = s.clients.push(payload);
-
-                return { ...s, clients, version: version };
-            });
-        });
-
-        return http$.pipe(map(x => x.payload));
+                    return { ...s, clients, version: version };
+                });
+            }),
+            shareSubscribed(this.dialogs, { project: x => x.payload }));
     }
 
     public revoke(client: ClientDto): Observable<any> {
-        const http$ =
-            this.clientsService.deleteClient(this.appName, client.id, this.version).pipe(
-                share());
+        return this.clientsService.deleteClient(this.appName, client.id, this.version).pipe(
+            tap(({ version }) => {
+                this.next(s => {
+                    const clients = s.clients.filter(c => c.id !== client.id);
 
-        http$.subscribe(({ version }) => {
-            this.next(s => {
-                const clients = s.clients.filter(c => c.id !== client.id);
-
-                return { ...s, clients, version };
-            });
-        });
-
-        return http$;
+                    return { ...s, clients, version };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public update(client: ClientDto, request: UpdateClientDto): Observable<ClientDto> {
-        const http$ =
-            this.clientsService.putClient(this.appName, client.id, request, this.version).pipe(
-                map(({ version }) => ({ version, client: update(client, request) })), share());
+        return this.clientsService.putClient(this.appName, client.id, request, this.version).pipe(
+            mapVersioned(() => update(client, request)),
+            tap(({ version, payload }) => {
+                this.next(s => {
+                    const clients = s.clients.replaceBy('id', payload);
 
-        http$.subscribe(({ version, client }) => {
-            this.next(s => {
-                const clients = s.clients.replaceBy('id', client);
-
-                return { ...s, clients, version };
-            });
-        });
-
-        return http$.pipe(map(x => x.client));
+                    return { ...s, clients, version };
+                });
+            }),
+            shareSubscribed(this.dialogs, { project: x => x.payload }));
     }
 
     private get appName() {

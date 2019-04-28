@@ -61,17 +61,16 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
 
         return this.http.get<{ total: number, items: any[] }>(url).pipe(
-                map(response => {
-                    const users = response.items.map(item => {
-                        return new UserDto(
+                map(body => {
+                    const users = body.items.map(item =>
+                        new UserDto(
                             item.id,
                             item.email,
                             item.displayName,
                             item.permissions,
-                            item.isLocked);
-                    });
+                            item.isLocked));
 
-                    return new UsersDto(response.total, users);
+                    return new UsersDto(body.total, users);
                 }),
                 pretifyError('Failed to load users. Please reload.'));
     }
@@ -80,13 +79,15 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
 
         return this.http.get<any>(url).pipe(
-                map(response => {
-                    return new UserDto(
-                        response.id,
-                        response.email,
-                        response.displayName,
-                        response.permissions,
-                        response.isLocked);
+                map(body => {
+                    const user = new UserDto(
+                        body.id,
+                        body.email,
+                        body.displayName,
+                        body.permissions,
+                        body.isLocked);
+
+                    return user;
                 }),
                 pretifyError('Failed to load user. Please reload.'));
     }
@@ -95,13 +96,15 @@ export class UsersService {
         const url = this.apiUrl.buildUrl('api/user-management');
 
         return this.http.post<any>(url, dto).pipe(
-                map(response => {
-                    return new UserDto(
-                        response.id,
+                map(body => {
+                    const user = new UserDto(
+                        body.id,
                         dto.email,
                         dto.displayName,
                         dto.permissions,
                         false);
+
+                    return user;
                 }),
                 pretifyError('Failed to create user. Please reload.'));
     }

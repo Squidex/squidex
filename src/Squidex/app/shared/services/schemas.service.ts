@@ -15,6 +15,7 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
     StringHelper,
@@ -215,12 +216,12 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-            map(response => {
-                const body = response.payload.body;
+            map(({ payload }) => {
+                const body = payload.body;
 
                 const items: any[] = body;
 
-                return items.map(item => {
+                const schemas = items.map(item => {
                     const properties = new SchemaPropertiesDto(item.properties.label, item.properties.hints);
 
                     return new SchemaDto(
@@ -233,6 +234,8 @@ export class SchemasService {
                         DateTime.parseISO_UTC(item.lastModified), item.lastModifiedBy,
                         new Version(item.version.toString()));
                 });
+
+                return schemas;
             }),
             pretifyError('Failed to load schemas. Please reload.'));
     }
@@ -241,8 +244,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${id}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-            map(response => {
-                const body = response.payload.body;
+            map(({ version, payload }) => {
+                const body = payload.body;
 
                 const fields = body.fields.map((item: any) => {
                     const propertiesDto =
@@ -292,7 +295,7 @@ export class SchemasService {
                     body.isPublished,
                     DateTime.parseISO_UTC(body.created), body.createdBy,
                     DateTime.parseISO_UTC(body.lastModified), body.lastModifiedBy,
-                    response.version,
+                    version,
                     fields,
                     body.scripts || {},
                     body.previewUrls || {});
@@ -304,22 +307,23 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
         return HTTP.postVersioned<any>(this.http, url, dto).pipe(
-            map(response => {
-                const body = response.payload.body;
+            map(({ version, payload }) => {
+                const body = payload.body;
 
                 now = now || DateTime.now();
 
-                return new SchemaDetailsDto(
+                const schema = new SchemaDetailsDto(
                     body.id,
-                    dto.name,
-                    '',
+                    dto.name, '',
                     dto.properties || new SchemaPropertiesDto(),
                     dto.isSingleton === true,
                     false,
                     now, user,
                     now, user,
-                    response.version,
+                    version,
                     dto.fields || []);
+
+                return schema;
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Created', appName);
@@ -401,17 +405,15 @@ export class SchemasService {
         const url = this.buildUrl(appName, schemaName, parentId, '');
 
         return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
-            map(response => {
-                const body = response.payload.body;
-
+            mapVersioned(({ body }) => {
                 if (parentId) {
                     const field = new NestedFieldDto(body.id, dto.name, dto.properties, parentId);
 
-                    return new Versioned(response.version, field);
+                    return field;
                 } else {
                     const field = new RootFieldDto(body.id, dto.name, dto.properties, dto.partitioning);
 
-                    return new Versioned(response.version, field);
+                    return field;
                 }
             }),
             tap(() => {

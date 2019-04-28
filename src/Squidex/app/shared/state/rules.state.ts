@@ -7,12 +7,13 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, share } from 'rxjs/operators';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DateTime,
     DialogService,
     ImmutableArray,
+    shareSubscribed,
     State,
     Version
 } from '@app/framework';
@@ -60,112 +61,86 @@ export class RulesState extends State<Snapshot> {
             this.resetState();
         }
 
-        const http$ =
-            this.rulesService.getRules(this.appName).pipe(
-                share());
+        return this.rulesService.getRules(this.appName).pipe(
+            tap(payload => {
+                if (isReload) {
+                    this.dialogs.notifyInfo('Rules reloaded.');
+                }
 
-        http$.subscribe(response => {
-            if (isReload) {
-                this.dialogs.notifyInfo('Rules reloaded.');
-            }
+                this.next(s => {
+                    const rules = ImmutableArray.of(payload);
 
-            this.next(s => {
-                const rules = ImmutableArray.of(response);
-
-                return { ...s, rules, isLoaded: true };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+                    return { ...s, rules, isLoaded: true };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public create(request: CreateRuleDto, now?: DateTime): Observable<RuleDto> {
-        const http$ =
-            this.rulesService.postRule(this.appName, request, this.user, now || DateTime.now()).pipe(
-                share());
+        return this.rulesService.postRule(this.appName, request, this.user, now || DateTime.now()).pipe(
+            tap(rule => {
+                this.next(s => {
+                    const rules = s.rules.push(rule);
 
-        http$.subscribe(rule => {
-            this.next(s => {
-                const rules = s.rules.push(rule);
-
-                return { ...s, rules };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+                    return { ...s, rules };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public delete(rule: RuleDto): Observable<any> {
-        const http$ =
-            this.rulesService.deleteRule(this.appName, rule.id, rule.version).pipe(
-                share());
+        return this.rulesService.deleteRule(this.appName, rule.id, rule.version).pipe(
+            tap(() => {
+                this.next(s => {
+                    const rules = s.rules.removeAll(x => x.id === rule.id);
 
-        http$.subscribe(() => {
-            this.next(s => {
-                const rules = s.rules.removeAll(x => x.id === rule.id);
-
-                return { ...s, rules };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+                    return { ...s, rules };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public updateAction(rule: RuleDto, action: any, now?: DateTime): Observable<any> {
-        const http$ =
-            this.rulesService.putRule(this.appName, rule.id, { action }, rule.version).pipe(
-                map(({ version }) => updateAction(rule, action, this.user, version, now)), share());
-
-        this.replaceRule(http$);
-
-        return http$;
+        return this.rulesService.putRule(this.appName, rule.id, { action }, rule.version).pipe(
+            map(({ version }) => updateAction(rule, action, this.user, version, now)),
+            tap(updated => {
+                this.replaceRule(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public updateTrigger(rule: RuleDto, trigger: any, now?: DateTime): Observable<any> {
-        const http$ =
-            this.rulesService.putRule(this.appName, rule.id, { trigger }, rule.version).pipe(
-                map(({ version }) => updateTrigger(rule, trigger, this.user, version, now)), share());
-
-        this.replaceRule(http$);
-
-        return http$;
+        return this.rulesService.putRule(this.appName, rule.id, { trigger }, rule.version).pipe(
+            map(({ version }) => updateTrigger(rule, trigger, this.user, version, now)),
+            tap(updated => {
+                this.replaceRule(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public enable(rule: RuleDto, now?: DateTime): Observable<any> {
-        const http$ =
-            this.rulesService.enableRule(this.appName, rule.id, rule.version).pipe(
-                map(({ version }) => setEnabled(rule, true, this.user, version, now)), share());
-
-        this.replaceRule(http$);
-
-        return http$;
+        return this.rulesService.enableRule(this.appName, rule.id, rule.version).pipe(
+            map(({ version }) => setEnabled(rule, true, this.user, version, now)),
+            tap(updated => {
+                this.replaceRule(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public disable(rule: RuleDto, now?: DateTime): Observable<any> {
-        const http$ =
-            this.rulesService.disableRule(this.appName, rule.id, rule.version).pipe(
-                map(({ version }) => setEnabled(rule, false, this.user, version, now)), share());
-
-        this.replaceRule(http$);
-
-        return http$;
+        return this.rulesService.disableRule(this.appName, rule.id, rule.version).pipe(
+            map(({ version }) => setEnabled(rule, false, this.user, version, now)),
+            tap(updated => {
+                this.replaceRule(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
-    private replaceRule(http$: Observable<RuleDto>) {
-        http$.subscribe(rule => {
-            this.next(s => {
-                const rules = s.rules.replaceBy('id', rule);
+    private replaceRule(rule: RuleDto) {
+        this.next(s => {
+            const rules = s.rules.replaceBy('id', rule);
 
-                return { ...s, rules };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
+            return { ...s, rules };
         });
     }
 

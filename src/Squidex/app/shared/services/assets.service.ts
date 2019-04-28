@@ -21,7 +21,8 @@ import {
     ResultSet,
     Types,
     Version,
-    Versioned
+    Versioned,
+    versioned
 } from '@app/framework';
 
 export class AssetsDto extends ResultSet<AssetDto> { }
@@ -102,8 +103,7 @@ export class AssetsService {
     public getTags(appName: string): Observable<{ [name: string]: number }> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/tags`);
 
-        return HTTP.getVersioned(this.http, url).pipe(
-                map(response => <any>response.payload.body));
+        return this.http.get<{ [name: string]: number }>(url);
     }
 
     public getAssets(appName: string, take: number, skip: number, query?: string, tags?: string[], ids?: string[]): Observable<AssetsDto> {
@@ -141,12 +141,12 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
+                map(({ payload  }) => {
+                    const body = payload.body;
 
                     const items: any[] = body.items;
 
-                    return new AssetsDto(body.total, items.map(item => {
+                    const assets = new AssetsDto(body.total, items.map(item => {
                         const assetUrl = this.apiUrl.buildUrl(`api/assets/${item.id}`);
 
                         return new AssetDto(
@@ -170,6 +170,8 @@ export class AssetsService {
                             assetUrl,
                             new Version(item.version.toString()));
                     }));
+
+                    return assets;
                 }),
                 pretifyError('Failed to load assets. Please reload.'));
     }
@@ -239,8 +241,8 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
+                map(({ version, payload }) => {
+                    const body = payload.body;
 
                     const assetUrl = this.apiUrl.buildUrl(`api/assets/${body.id}`);
 
@@ -263,7 +265,7 @@ export class AssetsService {
                         body.slug,
                         body.tags || [],
                         assetUrl,
-                        response.version);
+                        version);
                 }),
                 pretifyError('Failed to load assets. Please reload.'));
     }
@@ -285,7 +287,7 @@ export class AssetsService {
                     } else if (Types.is(event, HttpResponse)) {
                         const response: any = event.body;
 
-                        return new Versioned(new Version(event.headers.get('etag')!), response);
+                        return versioned(new Version(event.headers.get('etag')!), response);
                     } else {
                         throw 'Invalid';
                     }

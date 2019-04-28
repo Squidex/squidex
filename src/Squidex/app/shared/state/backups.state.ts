@@ -7,11 +7,12 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, share } from 'rxjs/operators';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
+    shareSubscribed,
     State
 } from '@app/framework';
 
@@ -56,55 +57,35 @@ export class BackupsState extends State<Snapshot> {
             this.resetState();
         }
 
-        const http$ =
-            this.backupsService.getBackups(this.appName).pipe(
-                share());
+        return this.backupsService.getBackups(this.appName).pipe(
+            tap(payload => {
+                if (isReload && !silent) {
+                    this.dialogs.notifyInfo('Backups reloaded.');
+                }
 
-        http$.subscribe(dtos => {
-            if (isReload && !silent) {
-                this.dialogs.notifyInfo('Backups reloaded.');
-            }
+                this.next(s => {
+                    const backups = ImmutableArray.of(payload);
 
-            this.next(s => {
-                const backups = ImmutableArray.of(dtos);
-
-                return { ...s, backups, isLoaded: true };
-            });
-        }, error => {
-            if (!silent) {
-                this.dialogs.notifyError(error);
-            }
-        });
-
-        return http$;
+                    return { ...s, backups, isLoaded: true };
+                });
+            }),
+            shareSubscribed(this.dialogs, { silent }));
     }
 
     public start(): Observable<any> {
-        const http$ =
-            this.backupsService.postBackup(this.appsState.appName).pipe(
-                share());
-
-        http$.subscribe(() => {
-            this.dialogs.notifyInfo('Backup started, it can take several minutes to complete.');
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+        return this.backupsService.postBackup(this.appsState.appName).pipe(
+            tap(() => {
+                this.dialogs.notifyInfo('Backup started, it can take several minutes to complete.');
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public delete(backup: BackupDto): Observable<any> {
-        const http$ =
-            this.backupsService.deleteBackup(this.appsState.appName, backup.id).pipe(
-                share());
-
-        http$.subscribe(() => {
-            this.dialogs.notifyInfo('Backup is about to be deleted.');
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+        return this.backupsService.deleteBackup(this.appsState.appName, backup.id).pipe(
+            tap(() => {
+                this.dialogs.notifyInfo('Backup is about to be deleted.');
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     private get appName() {

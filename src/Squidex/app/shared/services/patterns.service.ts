@@ -8,26 +8,20 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
     Version,
     Versioned
 } from '@app/framework';
 
-export class PatternsDto extends Model<PatternsDto> {
-    constructor(
-        public readonly patterns: PatternDto[],
-        public readonly version: Version
-    ) {
-        super();
-    }
-}
+export type PatternsDto = Versioned<PatternDto[]>;
 
 export class PatternDto extends Model<PatternDto> {
     constructor(
@@ -59,20 +53,18 @@ export class PatternsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-            map(response => {
-                const body = response.payload.body;
-
+            mapVersioned(({ body }) => {
                 const items: any[] = body;
 
-                return new PatternsDto(
-                    items.map(item => {
-                        return new PatternDto(
+                const patterns =
+                    items.map(item =>
+                        new PatternDto(
                             item.patternId,
                             item.name,
                             item.pattern,
-                            item.message);
-                    }),
-                    response.version);
+                            item.message));
+
+                return patterns;
             }),
             pretifyError('Failed to add pattern. Please reload.'));
     }
@@ -81,16 +73,14 @@ export class PatternsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
         return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
-            map(response => {
-                const body = response.payload.body;
-
+            mapVersioned(({ body }) => {
                 const pattern = new PatternDto(
                     body.patternId,
                     body.name,
                     body.pattern,
                     body.message);
 
-                return new Versioned(response.version, pattern);
+                return pattern;
             }),
             tap(() => {
                 this.analytics.trackEvent('Patterns', 'Created', appName);

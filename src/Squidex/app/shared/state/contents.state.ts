@@ -16,6 +16,7 @@ import {
     ImmutableArray,
     notify,
     Pager,
+    shareSubscribed,
     State,
     Version,
     Versioned
@@ -142,10 +143,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     return { ...s, contents, contentsPager, selectedContent, isLoaded: true };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
-    public create(request: any, publish: boolean) {
+    public create(request: any, publish: boolean): Observable<ContentDto> {
         return this.contentsService.postContent(this.appName, this.schemaName, request, publish).pipe(
             tap(dto => {
                 this.dialogs.notifyInfo('Contents created successfully.');
@@ -157,7 +158,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     return { ...s, contents, contentsPager };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public changeManyStatus(contents: ContentDto[], action: string, dueTime: string | null): Observable<any> {
@@ -205,7 +206,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     this.replaceContent(confirmChanges(content, this.user, dto.version, now));
                 }
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public changeStatus(content: ContentDto, action: string, status: string, dueTime: string | null, now?: DateTime): Observable<any> {
@@ -219,7 +220,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     this.replaceContent(changeStatus(content, status, this.user, dto.version, now));
                 }
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public update(content: ContentDto, request: any, now?: DateTime): Observable<any> {
@@ -231,7 +232,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     this.replaceContent(updateData(content, dto.payload, this.user, dto.version, now));
                 }
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public proposeUpdate(content: ContentDto, request: any, now?: DateTime): Observable<any> {
@@ -243,7 +244,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     this.replaceContent(updateDataDraft(content, dto.payload, this.user, dto.version, now));
                 }
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public discardChanges(content: ContentDto, now?: DateTime): Observable<any> {
@@ -255,7 +256,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     this.replaceContent(discardChanges(content, this.user, dto.version, now));
                 }
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public patch(content: ContentDto, request: any, now?: DateTime): Observable<any> {
@@ -267,7 +268,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     this.replaceContent(updateData(content, dto.payload, this.user, dto.version, now));
                 }
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     private replaceContent(content: ContentDto) {

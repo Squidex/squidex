@@ -7,7 +7,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import { AppsState, SchemasState } from '@app/shared';
 
@@ -26,7 +25,7 @@ export class SchemasPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.schemasState.load().pipe(onErrorResumeNext()).subscribe();
+        this.schemasState.load();
     }
 
     public trackByCategory(index: number, category: string) {

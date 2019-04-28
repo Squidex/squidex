@@ -6,7 +6,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     ContentsState,
@@ -43,7 +42,7 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
     }
 
     public search(query: string) {
-        this.contentsState.search(query).pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.search(query);
     }
 
     public isSelectedQuery(query: string) {

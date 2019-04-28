@@ -8,26 +8,20 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
     Version,
     Versioned
 } from '@app/framework';
 
-export class RolesDto extends Model<RolesDto> {
-    constructor(
-        public readonly roles: RoleDto[],
-        public readonly version: Version
-    ) {
-        super();
-    }
-}
+export type RolesDto = Versioned<RoleDto[]>;
 
 export class RoleDto extends Model<RoleDto> {
     constructor(
@@ -61,20 +55,17 @@ export class RolesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
+                mapVersioned(({ body }) => {
                     const items: any[] = body.roles;
 
-                    const roles = items.map(item => {
-                        return new RoleDto(
+                    const roles = items.map(item =>
+                        new RoleDto(
                             item.name,
                             item.numClients,
                             item.numContributors,
-                            item.permissions);
-                    });
+                            item.permissions));
 
-                    return new RolesDto(roles, response.version);
+                    return roles;
                 }),
                 pretifyError('Failed to load roles. Please reload.'));
     }
@@ -83,10 +74,10 @@ export class RolesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles`);
 
         return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
-                map(response => {
+                mapVersioned(() => {
                     const role = new RoleDto(dto.name, 0, 0, []);
 
-                    return new Versioned(response.version, role);
+                    return role;
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Role', 'Created', appName);

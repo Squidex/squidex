@@ -6,7 +6,7 @@
  */
 
 import { of } from 'rxjs';
-import { IMock, Mock, Times } from 'typemoq';
+import { IMock, Mock } from 'typemoq';
 
 import {
     AppDto,
@@ -95,7 +95,7 @@ describe('AppsState', () => {
         expect(appsState.snapshot.apps.values).toEqual([newApp, ...oldApps]);
     });
 
-    it('should remove app from snashot when archived', () => {
+    it('should remove app from snapshot when archived', () => {
         const request = { ...newApp };
 
         appsService.setup(x => x.postApp(request))
@@ -114,5 +114,21 @@ describe('AppsState', () => {
 
         expect(appsAfterCreate).toEqual([newApp, ...oldApps]);
         expect(appsAfterDelete).toEqual(oldApps);
+    });
+
+    it('should selected app from snapshot when archived', () => {
+        const request = { ...newApp };
+
+        appsService.setup(x => x.postApp(request))
+            .returns(() => of(newApp)).verifiable();
+
+        appsService.setup(x => x.deleteApp(newApp.name))
+            .returns(() => of({})).verifiable();
+
+        appsState.create(request).subscribe();
+        appsState.select(newApp.name).subscribe();
+        appsState.delete(newApp.name).subscribe();
+
+        expect(appsState.snapshot.selectedApp).toBeNull();
     });
 });

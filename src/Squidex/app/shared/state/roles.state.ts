@@ -12,7 +12,8 @@ import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    notify,
+    mapVersioned,
+    shareSubscribed,
     State,
     Version
 } from '@app/framework';
@@ -62,55 +63,56 @@ export class RolesState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.rolesService.getRoles(this.appName).pipe(
-            tap(dtos => {
+       return this.rolesService.getRoles(this.appName).pipe(
+            tap(({ payload, version }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Roles reloaded.');
                 }
 
                 this.next(s => {
-                    const roles = ImmutableArray.of(dtos.roles).sortByStringAsc(x => x.name);
+                    const roles = ImmutableArray.of(payload).sortByStringAsc(x => x.name);
 
-                    return { ...s, roles, isLoaded: true, version: dtos.version };
+                    return { ...s, roles, isLoaded: true, version };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
-    public add(request: CreateRoleDto): Observable<any> {
+    public add(request: CreateRoleDto): Observable<RoleDto> {
         return this.rolesService.postRole(this.appName, request, this.version).pipe(
-            tap(dto => {
+            tap(({ version, payload }) => {
                 this.next(s => {
-                    const roles = s.roles.push(dto.payload).sortByStringAsc(x => x.name);
+                    const roles = s.roles.push(payload).sortByStringAsc(x => x.name);
 
-                    return { ...s, roles, version: dto.version };
+                    return { ...s, roles, version };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs, { project: x => x.payload }));
     }
 
     public delete(role: RoleDto): Observable<any> {
         return this.rolesService.deleteRole(this.appName, role.name, this.version).pipe(
-            tap(dto => {
+            tap(({ version }) => {
                 this.next(s => {
                     const roles = s.roles.removeBy('name', role);
 
-                    return { ...s, roles, version: dto.version };
+                    return { ...s, roles, version };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
-    public update(role: RoleDto, request: UpdateRoleDto): Observable<any> {
+    public update(role: RoleDto, request: UpdateRoleDto): Observable<RoleDto> {
         return this.rolesService.putRole(this.appName, role.name, request, this.version).pipe(
-            tap(dto => {
+            mapVersioned(() => update(role, request)),
+            tap(({ version, payload }) => {
                 this.next(s => {
-                    const roles = s.roles.replaceBy('name', update(role, request));
+                    const roles = s.roles.replaceBy('name', payload);
 
-                    return { ...s, roles, version: dto.version };
+                    return { ...s, roles, version };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs, { project: x => x.payload }));
     }
 
     private get appName() {

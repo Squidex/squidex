@@ -11,10 +11,9 @@ import { IMock, It, Mock, Times } from 'typemoq';
 import {
     DialogService,
     RoleDto,
-    RolesDto,
     RolesService,
     RolesState,
-    Versioned
+    versioned
 } from './../';
 
 import { TestValues } from './_test-helpers';
@@ -46,7 +45,7 @@ describe('RolesState', () => {
     describe('Loading', () => {
         it('should load roles', () => {
             rolesService.setup(x => x.getRoles(app))
-                .returns(() => of(new RolesDto(oldRoles, version))).verifiable();
+                .returns(() => of({ payload: oldRoles, version })).verifiable();
 
             rolesState.load().subscribe();
 
@@ -59,7 +58,7 @@ describe('RolesState', () => {
 
         it('should show notification on load when reload is true', () => {
             rolesService.setup(x => x.getRoles(app))
-                .returns(() => of(new RolesDto(oldRoles, version))).verifiable();
+                .returns(() => of(versioned(version, oldRoles))).verifiable();
 
             rolesState.load(true).subscribe();
 
@@ -72,7 +71,7 @@ describe('RolesState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             rolesService.setup(x => x.getRoles(app))
-                .returns(() => of(new RolesDto(oldRoles, version)));
+                .returns(() => of(versioned(version, oldRoles))).verifiable();
 
             rolesState.load().subscribe();
         });
@@ -83,7 +82,7 @@ describe('RolesState', () => {
             const request = { name: newRole.name };
 
             rolesService.setup(x => x.postRole(app, request, version))
-                .returns(() => of(new Versioned(newVersion, newRole)));
+                .returns(() => of(versioned(newVersion, newRole)));
 
             rolesState.add(request).subscribe();
 
@@ -95,7 +94,7 @@ describe('RolesState', () => {
             const request = { permissions: ['P4', 'P5'] };
 
             rolesService.setup(x => x.putRole(app, oldRoles[1].name, request, version))
-                .returns(() => of(new Versioned(newVersion, {})));
+                .returns(() => of(versioned(newVersion)));
 
             rolesState.update(oldRoles[1], request).subscribe();
 
@@ -107,7 +106,7 @@ describe('RolesState', () => {
 
         it('should remove role from snapshot when deleted', () => {
             rolesService.setup(x => x.deleteRole(app, oldRoles[0].name, version))
-                .returns(() => of(new Versioned(newVersion, {})));
+                .returns(() => of(versioned(newVersion)));
 
             rolesState.delete(oldRoles[0]).subscribe();
 

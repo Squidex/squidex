@@ -132,10 +132,10 @@ export class RulesService {
         const url = this.apiUrl.buildUrl('api/rules/actions');
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-            map(response => {
-                const items: { [name: string]: any } = response.payload.body;
+            map(({ payload }) => {
+                const items: { [name: string]: any } = payload.body;
 
-                const result: { [name: string]: RuleElementDto } = {};
+                const actions: { [name: string]: RuleElementDto } = {};
 
                 for (let key of Object.keys(items).sort()) {
                     const value = items[key];
@@ -150,7 +150,7 @@ export class RulesService {
                             property.isRequired
                         ));
 
-                    result[key] = new RuleElementDto(
+                    actions[key] = new RuleElementDto(
                         value.display,
                         value.description,
                         value.iconColor,
@@ -159,7 +159,7 @@ export class RulesService {
                         properties);
                 }
 
-                return result;
+                return actions;
             }),
             pretifyError('Failed to load Rules. Please reload.'));
     }
@@ -168,11 +168,11 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-            map(response => {
-                const items: any[] = response.payload.body;
+            map(({ payload }) => {
+                const items: any[] = payload.body;
 
-                return items.map(item => {
-                    return new RuleDto(
+                const rules = items.map(item =>
+                    new RuleDto(
                         item.id,
                         item.createdBy,
                         item.lastModifiedBy,
@@ -183,8 +183,9 @@ export class RulesService {
                         item.trigger,
                         item.trigger.triggerType,
                         item.action,
-                        item.action.actionType);
-                });
+                        item.action.actionType));
+
+                return rules;
             }),
             pretifyError('Failed to load Rules. Please reload.'));
     }
@@ -193,8 +194,8 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
         return HTTP.postVersioned<any>(this.http, url, dto).pipe(
-            map(response => {
-                const body = response.payload.body;
+            map(({ version, payload }) => {
+                const body = payload.body;
 
                 return new RuleDto(
                     body.id,
@@ -202,7 +203,7 @@ export class RulesService {
                     user,
                     now,
                     now,
-                    response.version,
+                    version,
                     true,
                     dto.trigger,
                     dto.trigger.triggerType,
@@ -259,13 +260,13 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-            map(response => {
-                const body = response.payload.body;
+            map(({ payload }) => {
+                const body = payload.body;
 
                 const items: any[] = body.items;
 
-                return new RuleEventsDto(body.total, items.map(item => {
-                    return new RuleEventDto(
+                const ruleEvents = new RuleEventsDto(body.total, items.map(item =>
+                    new RuleEventDto(
                         item.id,
                         DateTime.parseISO_UTC(item.created),
                         item.nextAttempt ? DateTime.parseISO_UTC(item.nextAttempt) : null,
@@ -274,8 +275,9 @@ export class RulesService {
                         item.lastDump,
                         item.result,
                         item.jobResult,
-                        item.numCalls);
-                }));
+                        item.numCalls)));
+
+                return ruleEvents;
             }),
             pretifyError('Failed to load events. Please reload.'));
     }

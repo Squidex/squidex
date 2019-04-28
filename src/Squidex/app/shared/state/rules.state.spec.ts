@@ -14,7 +14,7 @@ import {
     DialogService,
     RuleDto,
     RulesService,
-    Versioned
+    versioned
 } from './../';
 
 import { TestValues } from './_test-helpers';
@@ -103,7 +103,7 @@ describe('RulesState', () => {
             const newAction = {};
 
             rulesService.setup(x => x.putRule(app, oldRules[0].id, It.isAny(), version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             rulesState.updateAction(oldRules[0], newAction, modified).subscribe();
 
@@ -117,7 +117,7 @@ describe('RulesState', () => {
             const newTrigger = {};
 
             rulesService.setup(x => x.putRule(app, oldRules[0].id, It.isAny(), version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             rulesState.updateTrigger(oldRules[0], newTrigger, modified).subscribe();
 
@@ -129,7 +129,7 @@ describe('RulesState', () => {
 
         it('should mark as enabled and update and user info when enabled', () => {
             rulesService.setup(x => x.enableRule(app, oldRules[0].id, version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             rulesState.enable(oldRules[0], modified).subscribe();
 
@@ -141,7 +141,7 @@ describe('RulesState', () => {
 
         it('should mark as disabled and update and user info when disabled', () => {
             rulesService.setup(x => x.disableRule(app, oldRules[1].id, version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             rulesState.disable(oldRules[1], modified).subscribe();
 
@@ -153,7 +153,7 @@ describe('RulesState', () => {
 
         it('should remove rule from snapshot when deleted', () => {
             rulesService.setup(x => x.deleteRule(app, oldRules[0].id, version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             rulesState.delete(oldRules[0]).subscribe();
 

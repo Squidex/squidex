@@ -7,7 +7,6 @@
 
 import { Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AddPermissionForm,
@@ -76,7 +75,7 @@ export class RoleComponent implements OnChanges {
     }
 
     public remove() {
-        this.rolesState.delete(this.role).pipe(onErrorResumeNext()).subscribe();
+        this.rolesState.delete(this.role);
     }
 
     public addPermission() {

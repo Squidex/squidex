@@ -69,11 +69,13 @@ describe('PatternsService', () => {
             }
         });
 
-        expect(patterns!).toEqual(
-            new PatternsDto([
+        expect(patterns!).toEqual({
+            payload: [
                 new PatternDto('1', 'Number', '[0-9]', 'Message1'),
                 new PatternDto('2', 'Numbers', '[0-9]*', 'Message2')
-            ], new Version('2')));
+            ],
+            version: new Version('2')
+        });
     }));
 
     it('should make post request to add pattern',
@@ -93,9 +95,9 @@ describe('PatternsService', () => {
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({
+            name: 'Number',
             patternId: '1',
             pattern: '[0-9]',
-            name: 'Number',
             message: 'Message1'
         });
 

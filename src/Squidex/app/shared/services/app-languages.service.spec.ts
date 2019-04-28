@@ -71,11 +71,13 @@ describe('AppLanguagesService', () => {
             }
         });
 
-        expect(languages!).toEqual(
-            new AppLanguagesDto([
+        expect(languages!).toEqual({
+            payload: [
                 new AppLanguageDto('en', 'English', true, true,  ['de', 'en']),
                 new AppLanguageDto('it', 'Italian', false, false, [])
-            ], new Version('2')));
+            ],
+            version: new Version('2')
+        });
     }));
 
     it('should make post request to add language',

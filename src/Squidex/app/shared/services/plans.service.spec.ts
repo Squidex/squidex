@@ -54,7 +54,6 @@ describe('PlansService', () => {
 
         req.flush({
             currentPlanId: '123',
-            hasPortal: true,
             planOwner: '456',
             plans: [
                 {
@@ -77,24 +76,26 @@ describe('PlansService', () => {
                     maxAssetSize: 5500,
                     maxContributors: 6500
                 }
-            ]
+            ],
+            hasPortal: true
         }, {
             headers: {
                 etag: '2'
             }
         });
 
-        expect(plans!).toEqual(
-            new PlansDto(
-                '123',
-                '456',
-                true,
-                [
+        expect(plans!).toEqual({
+            payload: {
+                currentPlanId: '123',
+                planOwner: '456',
+                plans: [
                     new PlanDto('free', 'Free', '14 €', 'free_yearly', '12 €', 1000, 1500, 2500),
                     new PlanDto('prof', 'Prof', '18 €', 'prof_yearly', '16 €', 4000, 5500, 6500)
                 ],
-                new Version('2')
-            ));
+                hasPortal: true
+            },
+            version: new Version('2')
+        });
     }));
 
     it('should make put request to change plan',

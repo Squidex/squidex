@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, distinctUntilChanged, map, share } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import '@app/framework/utils/rxjs-extensions';
 
@@ -16,6 +16,7 @@ import {
     DialogService,
     ImmutableArray,
     Pager,
+    shareSubscribed,
     State
 } from '@app/shared';
 
@@ -81,15 +82,11 @@ export class UsersState extends State<Snapshot> {
     }
 
     public select(id: string | null): Observable<SnapshotUser | null> {
-        const http$ =
-            this.loadUser(id).pipe(
-                share());
-
-        http$.subscribe(selectedUser => {
-            this.next(s => ({ ...s, selectedUser }));
-        });
-
-        return http$;
+        return this.loadUser(id).pipe(
+            tap(selectedUser => {
+                this.next(s => ({ ...s, selectedUser }));
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
     }
 
     private loadUser(id: string | null) {
@@ -115,83 +112,69 @@ export class UsersState extends State<Snapshot> {
     }
 
     private loadInternal(isReload = false): Observable<any> {
-        const http$ =
-            this.usersService.getUsers(
+        return this.usersService.getUsers(
                 this.snapshot.usersPager.pageSize,
                 this.snapshot.usersPager.skip,
                 this.snapshot.usersQuery).pipe(
-                share());
-
-        http$.subscribe(response => {
-            if (isReload) {
-                this.dialogs.notifyInfo('Users reloaded.');
-            }
-
-            this.next(s => {
-                const usersPager = s.usersPager.setCount(response.total);
-                const users = ImmutableArray.of(response.items.map(x => this.createUser(x)));
-
-                let selectedUser = s.selectedUser;
-
-                if (selectedUser) {
-                    selectedUser = users.find(x => x.user.id === selectedUser!.user.id) || selectedUser;
+            tap(({ total, items }) => {
+                if (isReload) {
+                    this.dialogs.notifyInfo('Users reloaded.');
                 }
 
-                return { ...s, users, usersPager, selectedUser, isLoaded: true };
-            });
+                this.next(s => {
+                    const usersPager = s.usersPager.setCount(total);
+                    const users = ImmutableArray.of(items.map(x => this.createUser(x)));
 
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
+                    let selectedUser = s.selectedUser;
 
-        return http$;
+                    if (selectedUser) {
+                        selectedUser = users.find(x => x.user.id === selectedUser!.user.id) || selectedUser;
+                    }
+
+                    return { ...s, users, usersPager, selectedUser, isLoaded: true };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public create(request: CreateUserDto): Observable<UserDto> {
-        const http$ =
-            this.usersService.postUser(request).pipe(
-                share());
+        return this.usersService.postUser(request).pipe(
+            tap(payload => {
+                this.next(s => {
+                    const users = s.users.pushFront(this.createUser(payload));
+                    const usersPager = s.usersPager.incrementCount();
 
-        http$.subscribe(dto => {
-            this.next(s => {
-                const users = s.users.pushFront(this.createUser(dto));
-                const usersPager = s.usersPager.incrementCount();
-
-                return { ...s, users, usersPager };
-            });
-        });
-
-        return http$;
+                    return { ...s, users, usersPager };
+                });
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
     }
 
     public update(user: UserDto, request: UpdateUserDto): Observable<UserDto> {
-        const http$ =
-            this.usersService.putUser(user.id, request).pipe(
-                map(() => update(user, request)), share());
-
-        this.updateState(http$, false);
-
-        return http$;
+        return this.usersService.putUser(user.id, request).pipe(
+            map(() => update(user, request)),
+            tap(updated => {
+                this.replaceUser(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public lock(user: UserDto): Observable<UserDto> {
-        const http$ =
-            this.usersService.lockUser(user.id).pipe(
-                map(() => setLocked(user, true)), share());
-
-        this.updateState(http$, true);
-
-        return http$;
+        return this.usersService.lockUser(user.id).pipe(
+            map(() => setLocked(user, true)),
+            tap(updated => {
+                this.replaceUser(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public unlock(user: UserDto): Observable<UserDto> {
-        const http$ =
-            this.usersService.unlockUser(user.id).pipe(
-                map(() => setLocked(user, false)), share());
-
-        this.updateState(http$, true);
-
-        return http$;
+        return this.usersService.unlockUser(user.id).pipe(
+            map(() => setLocked(user, false)),
+            tap(updated => {
+                this.replaceUser(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public search(query: string): Observable<UsersResult> {
@@ -214,7 +197,7 @@ export class UsersState extends State<Snapshot> {
 
     private replaceUser(user: UserDto) {
         return this.next(s => {
-            const users = s.users.map(u => u.user.id === user.id ? this.createUser(user, u) : u);
+            const users = s.users.map(u => u.user.id === user.id ? this.createUser(user) : u);
 
             const selectedUser =
                 s.selectedUser &&
@@ -230,24 +213,8 @@ export class UsersState extends State<Snapshot> {
         return this.authState.user!.id;
     }
 
-    private updateState(stream: Observable<UserDto>, notify: boolean) {
-        stream.subscribe(dto => {
-            this.replaceUser(dto);
-        }, error => {
-            if (notify) {
-                this.dialogs.notifyError(error);
-            }
-        });
-    }
-
-    private createUser(user: UserDto, current?: SnapshotUser): SnapshotUser {
-        if (!user) {
-            return null!;
-        } else if (current && current.user === user) {
-            return current;
-        } else {
-            return { user, isCurrentUser: user.id === this.userId };
-        }
+    private createUser(user: UserDto): SnapshotUser {
+        return { user, isCurrentUser: user.id === this.userId };
     }
 }
 

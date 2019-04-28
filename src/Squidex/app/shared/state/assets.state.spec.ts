@@ -14,7 +14,7 @@ import {
     AssetsService,
     AssetsState,
     DialogService,
-    Versioned
+    versioned
 } from './../';
 
 import { TestValues } from './_test-helpers';
@@ -98,7 +98,7 @@ describe('AssetsState', () => {
 
     it('should remove asset from snapshot when deleted', () => {
         assetsService.setup(x => x.deleteAsset(app, oldAssets[0].id, version))
-            .returns(() => of(new Versioned<any>(newVersion, {})));
+            .returns(() => of(versioned(newVersion)));
 
         assetsState.delete(oldAssets[0]).subscribe();
 

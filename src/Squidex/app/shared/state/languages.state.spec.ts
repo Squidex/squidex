@@ -10,14 +10,13 @@ import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
     AppLanguageDto,
-    AppLanguagesDto,
     AppLanguagesService,
     DialogService,
     ImmutableArray,
     LanguageDto,
     LanguagesService,
     LanguagesState,
-    Versioned
+    versioned
 } from './../';
 
 import { TestValues } from './_test-helpers';
@@ -56,7 +55,7 @@ describe('LanguagesState', () => {
         languagesService = Mock.ofType<AppLanguagesService>();
 
         languagesService.setup(x => x.getLanguages(app))
-            .returns(() => of(new AppLanguagesDto(oldLanguages, version))).verifiable();
+            .returns(() => of({ payload: oldLanguages, version })).verifiable();
 
         languagesState = new LanguagesState(languagesService.object, appsState.object, dialogs.object, allLanguagesService.object);
     });
@@ -107,7 +106,7 @@ describe('LanguagesState', () => {
             const newLanguage = new AppLanguageDto(languageIT.iso2Code, languageIT.englishName, false, false, []);
 
             languagesService.setup(x => x.postLanguage(app, It.isAny(), version))
-                .returns(() => of(new Versioned(newVersion, newLanguage))).verifiable();
+                .returns(() => of(versioned(newVersion, newLanguage))).verifiable();
 
             languagesState.add(languageIT).subscribe();
 
@@ -134,7 +133,7 @@ describe('LanguagesState', () => {
             const request = { isMaster: true, isOptional: false, fallback: [] };
 
             languagesService.setup(x => x.putLanguage(app, oldLanguages[1].iso2Code, request, version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             languagesState.update(oldLanguages[1], request).subscribe();
 
@@ -158,7 +157,7 @@ describe('LanguagesState', () => {
 
         it('should remove language from snapshot when deleted', () => {
             languagesService.setup(x => x.deleteLanguage(app, oldLanguages[1].iso2Code, version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             languagesState.remove(oldLanguages[1]).subscribe();
 

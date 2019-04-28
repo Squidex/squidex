@@ -8,7 +8,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AddRoleForm,
@@ -50,11 +49,11 @@ export class RolesPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.rolesState.load().pipe(onErrorResumeNext()).subscribe();
+        this.rolesState.load();
     }
 
     public reload() {
-        this.rolesState.load(true).pipe(onErrorResumeNext()).subscribe();
+        this.rolesState.load(true);
     }
 
     public cancelAddRole() {

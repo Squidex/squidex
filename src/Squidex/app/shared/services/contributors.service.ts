@@ -8,27 +8,23 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
     Version,
     Versioned
 } from '@app/framework';
 
-export class ContributorsDto extends Model<ContributorsDto> {
-    constructor(
-        public readonly contributors: ContributorDto[],
-        public readonly maxContributors: number,
-        public readonly version: Version
-    ) {
-        super();
-    }
-}
+export type ContributorsDto = Versioned<{
+    readonly contributors: ContributorDto[],
+    readonly maxContributors: number
+}>;
 
 export class ContributorDto extends Model<AssignContributorDto> {
     constructor(
@@ -63,18 +59,18 @@ export class ContributorsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
+                mapVersioned(payload => {
+                    const body = payload.body;
 
                     const items: any[] = body.contributors;
 
-                    return new ContributorsDto(
-                        items.map(item => {
-                            return new ContributorDto(
+                    const contributors =
+                        items.map(item =>
+                            new ContributorDto(
                                 item.contributorId,
-                                item.role);
-                        }),
-                        body.maxContributors, response.version);
+                                item.role));
+
+                    return { contributors, maxContributors: body.maxContributors };
                 }),
                 pretifyError('Failed to load contributors. Please reload.'));
     }
@@ -83,10 +79,8 @@ export class ContributorsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
-                map(response => {
-                    const body: any = response.payload.body;
-
-                    return new Versioned(response.version, body);
+                mapVersioned(payload => {
+                    return <ContributorAssignedDto>payload.body;
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Contributor', 'Configured', appName);

@@ -88,12 +88,13 @@ describe('RolesService', () => {
             }
         });
 
-        expect(roles!).toEqual(
-            new RolesDto([
+        expect(roles!).toEqual({
+            payload: [
                 new RoleDto('Role1', 3, 5, ['P1']),
                 new RoleDto('Role2', 7, 9, ['P2'])
             ],
-            new Version('2')));
+            version: new Version('2')
+        });
     }));
 
     it('should make post request to add role',

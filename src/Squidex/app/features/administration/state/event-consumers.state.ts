@@ -7,11 +7,12 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, share } from 'rxjs/operators';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
+    shareSubscribed,
     State
 } from '@app/shared';
 
@@ -49,66 +50,46 @@ export class EventConsumersState extends State<Snapshot> {
             this.resetState();
         }
 
-        const http$ =
-            this.eventConsumersService.getEventConsumers().pipe(
-                share());
+        return this.eventConsumersService.getEventConsumers().pipe(
+            tap(payload => {
+                if (isReload && !silent) {
+                    this.dialogs.notifyInfo('Event Consumers reloaded.');
+                }
 
-        http$.subscribe(response => {
-            if (isReload && !silent) {
-                this.dialogs.notifyInfo('Event Consumers reloaded.');
-            }
+                const eventConsumers = ImmutableArray.of(payload);
 
-            const eventConsumers = ImmutableArray.of(response);
-
-            this.next(s => {
-                return { ...s, eventConsumers, isLoaded: true };
-            });
-
-        }, error => {
-            if (!silent) {
-                this.dialogs.notifyError(error);
-            }
-        });
-
-        return http$;
+                this.next(s => {
+                    return { ...s, eventConsumers, isLoaded: true };
+                });
+            }),
+            shareSubscribed(this.dialogs, { silent }));
     }
 
     public start(eventConsumer: EventConsumerDto): Observable<any> {
-        const http$ =
-            this.eventConsumersService.putStart(eventConsumer.name).pipe(
-                map(() => setStopped(eventConsumer, false), share()));
-
-        this.updateState(http$);
-
-        return http$;
+        return this.eventConsumersService.putStart(eventConsumer.name).pipe(
+            map(() => setStopped(eventConsumer, false)),
+            tap(updated => {
+                this.replaceEventConsumer(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public stop(eventConsumer: EventConsumerDto): Observable<EventConsumerDto> {
-        const http$ =
-            this.eventConsumersService.putStop(eventConsumer.name).pipe(
-                map(() => setStopped(eventConsumer, true), share()));
-
-        this.updateState(http$);
-
-        return http$;
+        return this.eventConsumersService.putStop(eventConsumer.name).pipe(
+            map(() => setStopped(eventConsumer, true)),
+            tap(updated => {
+                this.replaceEventConsumer(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
-    public reset(eventConsumer: EventConsumerDto): Observable<any> {
-        const http$ =
-            this.eventConsumersService.putReset(eventConsumer.name).pipe(
-                map(() => reset(eventConsumer), share()));
-
-        this.updateState(http$);
-
-        return http$;
-    }
-
-    private updateState(http$: Observable<EventConsumerDto>) {
-        http$.subscribe(updated => {
-            this.replaceEventConsumer(updated);
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
+    public reset(eventConsumer: EventConsumerDto): Observable<EventConsumerDto> {
+        return this.eventConsumersService.putReset(eventConsumer.name).pipe(
+            map(() => reset(eventConsumer)),
+            tap(updated => {
+                this.replaceEventConsumer(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     private replaceEventConsumer(eventConsumer: EventConsumerDto) {

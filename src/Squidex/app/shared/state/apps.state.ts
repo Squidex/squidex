@@ -7,11 +7,12 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { distinctUntilChanged, map, share } from 'rxjs/operators';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
+    shareSubscribed,
     State
 } from '@app/framework';
 
@@ -23,13 +24,11 @@ import {
 
 interface Snapshot {
     // All apps, loaded once.
-    apps: AppsList;
+    apps: ImmutableArray<AppDto>;
 
     // The selected app.
     selectedApp: AppDto | null;
 }
-
-type AppsList = ImmutableArray<AppDto>;
 
 function sameApp(lhs: AppDto, rhs?: AppDto): boolean {
     return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id);
@@ -57,78 +56,52 @@ export class AppsState extends State<Snapshot> {
     }
 
     public select(name: string | null): Observable<AppDto | null> {
-        const http$ =
-            this.loadApp(name)
-                .pipe(share());
+        const observable =
+            !name ?
+                of(null) :
+                of(this.snapshot.apps.find(x => x.name === name) || null);
 
-        http$.subscribe(selectedApp => {
-            this.next(s => ({ ...s, selectedApp }));
-        });
-
-        return http$;
-    }
-
-    private loadApp(name: string | null) {
-        return of(name ? this.snapshot.apps.find(x => x.name === name) || null : null);
+        return observable.pipe(
+            tap(selectedApp => {
+                this.next(s => ({ ...s, selectedApp }));
+            }));
     }
 
     public load(): Observable<any> {
-        const http$ =
-            this.appsService.getApps().pipe(
-                share());
+        return this.appsService.getApps().pipe(
+            tap((dto: AppDto[]) => {
+                this.next(s => {
+                    const apps = ImmutableArray.of(dto);
 
-        http$.subscribe(response => {
-            this.next(s => {
-                const apps = ImmutableArray.of(response).sortByStringAsc(x => x.name);
-
-                return { ...s, apps };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+                    return { ...s, apps };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public create(request: CreateAppDto): Observable<AppDto> {
-        const http$ =
-            this.appsService.postApp(request).pipe(
-                share());
+        return this.appsService.postApp(request).pipe(
+            tap(dto => {
+                this.next(s => {
+                    const apps = s.apps.push(dto).sortByStringAsc(x => x.name);
 
-        http$.subscribe(app => {
-            this.next(s => {
-                const apps = s.apps.push(app).sortByStringAsc(x => x.name);
-
-                return { ...s, apps };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+                    return { ...s, apps };
+                });
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
     }
 
     public delete(name: string): Observable<any> {
-        const http$ =
-            this.appsService.deleteApp(name).pipe(
-                share());
+        return this.appsService.deleteApp(name).pipe(
+            tap(() => {
+                this.next(s => {
+                    const apps = s.apps.filter(x => x.name !== name);
 
-        http$.subscribe(() => {
-            this.next(s => {
-                const apps = s.apps.filter(x => x.name !== name);
+                    const selectedApp = s.selectedApp && s.selectedApp.name === name ? null : s.selectedApp;
 
-                const selectedApp =
-                    s.selectedApp &&
-                    s.selectedApp.name === name ?
-                    null :
-                    s.selectedApp;
-
-                return { ...s, apps, selectedApp };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+                    return { ...s, apps, selectedApp };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 }

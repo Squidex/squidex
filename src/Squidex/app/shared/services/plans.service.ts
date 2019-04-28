@@ -8,29 +8,25 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
     Version,
     Versioned
 } from '@app/framework';
 
-export class PlansDto extends Model<PlansDto> {
-    constructor(
-        public readonly currentPlanId: string,
-        public readonly planOwner: string,
-        public readonly hasPortal: boolean,
-        public readonly plans: PlanDto[],
-        public readonly version: Version
-    ) {
-        super();
-    }
-}
+export type PlansDto = Versioned<{
+    readonly currentPlanId: string,
+    readonly planOwner: string,
+    readonly hasPortal: boolean,
+    readonly plans: PlanDto[]
+}>;
 
 export class PlanDto extends Model<PlanDto> {
     constructor(
@@ -68,17 +64,16 @@ export class PlansService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plans`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
+                mapVersioned(({ body }) => {
                     const items: any[] = body.plans;
 
-                    return new PlansDto(
-                        body.currentPlanId,
-                        body.planOwner,
-                        body.hasPortal,
-                        items.map(item => {
-                            return new PlanDto(
+                    const { hasPortal, currentPlanId, planOwner } = body;
+
+                    const plans = {
+                        currentPlanId,
+                        planOwner,
+                        plans: items.map(item =>
+                            new PlanDto(
                                 item.id,
                                 item.name,
                                 item.costs,
@@ -86,9 +81,11 @@ export class PlansService {
                                 item.yearlyCosts,
                                 item.maxApiCalls,
                                 item.maxAssetSize,
-                                item.maxContributors);
-                        }),
-                        response.version);
+                                item.maxContributors)),
+                        hasPortal
+                    };
+
+                    return plans;
                 }),
                 pretifyError('Failed to load plans. Please reload.'));
     }
@@ -97,10 +94,8 @@ export class PlansService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plan`);
 
         return HTTP.putVersioned<any>(this.http, url, dto, version).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
-                    return new Versioned(response.version, body);
+                mapVersioned(payload => {
+                    return <PlanChangedDto>payload.body;
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Plan', 'Changed', appName);

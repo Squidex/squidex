@@ -71,11 +71,13 @@ describe('ClientsService', () => {
             }
         });
 
-        expect(clients!).toEqual(
-            new ClientsDto([
+        expect(clients!).toEqual({
+            payload: [
                 new ClientDto('client1', 'Client 1', 'secret1', 'Editor'),
                 new ClientDto('client2', 'Client 2', 'secret2', 'Developer')
-            ], new Version('2')));
+            ],
+            version: new Version('2')
+        });
     }));
 
     it('should make post request to create client',

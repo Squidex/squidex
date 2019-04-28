@@ -5,18 +5,16 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { timer } from 'rxjs';
-import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import {
     AuthService,
     BackupsService,
     DialogService,
-    ResourceOwner,
-    RestoreDto,
-    RestoreForm
+    RestoreForm,
+    switchSafe
 } from '@app/shared';
 
 @Component({
@@ -24,9 +22,11 @@ import {
     styleUrls: ['./restore-page.component.scss'],
     templateUrl: './restore-page.component.html'
 })
-export class RestorePageComponent extends ResourceOwner implements OnInit {
-    public restoreJob: RestoreDto | null;
+export class RestorePageComponent {
     public restoreForm = new RestoreForm(this.formBuilder);
+
+    public restoreJob =
+        timer(0, 2000).pipe(switchSafe(() => this.backupsService.getRestore()));
 
     constructor(
         public readonly authState: AuthService,
@@ -34,17 +34,6 @@ export class RestorePageComponent extends ResourceOwner implements OnInit {
         private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder
     ) {
-        super();
-    }
-
-    public ngOnInit() {
-        this.own(
-            timer(0, 2000).pipe(switchMap(() => this.backupsService.getRestore().pipe(onErrorResumeNext())))
-                .subscribe(job => {
-                    if (job) {
-                        this.restoreJob = job;
-                    }
-                }));
     }
 
     public restore() {

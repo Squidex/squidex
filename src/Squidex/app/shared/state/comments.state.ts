@@ -6,12 +6,13 @@
  */
 
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, share } from 'rxjs/operators';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DateTime,
     DialogService,
     ImmutableArray,
+    shareSubscribed,
     State,
     Version
 } from '@app/framework';
@@ -51,89 +52,66 @@ export class CommentsState extends State<Snapshot> {
     }
 
     public load(): Observable<any> {
-        const http$ =
-            this.commentsService.getComments(this.appName, this.commentsId, this.version).pipe(
-                share());
+        return this.commentsService.getComments(this.appName, this.commentsId, this.version).pipe(
+            tap(payload => {
+                this.next(s => {
+                    let comments = s.comments;
 
-        http$.subscribe(response => {
-            this.next(s => {
-                let comments = s.comments;
-
-                for (let created of response.createdComments) {
-                    if (!comments.find(x => x.id === created.id)) {
-                        comments = comments.push(created);
+                    for (let created of payload.createdComments) {
+                        if (!comments.find(x => x.id === created.id)) {
+                            comments = comments.push(created);
+                        }
                     }
-                }
 
-                for (let updated of response.updatedComments) {
-                    comments = comments.replaceBy('id', updated);
-                }
+                    for (let updated of payload.updatedComments) {
+                        comments = comments.replaceBy('id', updated);
+                    }
 
-                for (let deleted of response.deletedComments) {
-                    comments = comments.filter(x => x.id !== deleted);
-                }
+                    for (let deleted of payload.deletedComments) {
+                        comments = comments.filter(x => x.id !== deleted);
+                    }
 
-                return { ...s, comments, isLoaded: true, version: response.version };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+                    return { ...s, comments, isLoaded: true, version: payload.version };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public create(text: string): Observable<CommentDto> {
-        const http$ =
-            this.commentsService.postComment(this.appName, this.commentsId, { text }).pipe(
-                share());
+        return this.commentsService.postComment(this.appName, this.commentsId, { text }).pipe(
+            tap(comment => {
+                this.next(s => {
+                    const comments = s.comments.push(comment);
 
-        http$.subscribe(comment => {
-            this.next(s => {
-                const comments = s.comments.push(comment);
-
-                return { ...s, comments };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
-    }
-
-    public update(comment: CommentDto, text: string, now?: DateTime): Observable<CommentDto> {
-        const http$ =
-            this.commentsService.putComment(this.appName, this.commentsId, comment.id, { text }).pipe(
-                map(() => update(comment, text, now || DateTime.now())), share());
-
-        http$.subscribe(updated => {
-            this.next(s => {
-                const comments = s.comments.replaceBy('id', updated);
-
-                return { ...s, comments };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return http$;
+                    return { ...s, comments };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     public delete(comment: CommentDto): Observable<any> {
-        const http$ =
-            this.commentsService.deleteComment(this.appName, this.commentsId, comment.id).pipe(
-                share());
+        return this.commentsService.deleteComment(this.appName, this.commentsId, comment.id).pipe(
+            tap(() => {
+                this.next(s => {
+                    const comments = s.comments.removeBy('id', comment);
 
-        http$.subscribe(() => {
-            this.next(s => {
-                const comments = s.comments.removeBy('id', comment);
+                    return { ...s, comments };
+                });
+            }),
+            shareSubscribed(this.dialogs));
+    }
 
-                return { ...s, comments };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
+    public update(comment: CommentDto, text: string, now?: DateTime): Observable<CommentDto> {
+        return this.commentsService.putComment(this.appName, this.commentsId, comment.id, { text }).pipe(
+            map(() => update(comment, text, now || DateTime.now())),
+            tap(updated => {
+                this.next(s => {
+                    const comments = s.comments.replaceBy('id', updated);
 
-        return http$;
+                    return { ...s, comments };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     private get version() {

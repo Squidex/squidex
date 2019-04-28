@@ -10,8 +10,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
     AssetsState,
     DialogModel,
-    fadeAnimation,
-    UploadingAsset
+    fadeAnimation
 } from '@app/shared/internal';
 
 @Component({
@@ -31,19 +30,7 @@ export class AssetUploaderComponent {
     ) {
     }
 
-    public addFiles(files: File[]) {
-        for (let file of files) {
-            this.assets.upload(file).subscribe();
-        }
-
+    public addFiles() {
         this.modalMenu.show();
-    }
-
-    public stopUpload(upload: UploadingAsset) {
-        this.assets.remove(upload);
-    }
-
-    public trackByUpload(index: number, upload: UploadingAsset) {
-        return upload.id;
     }
 }

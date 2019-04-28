@@ -17,8 +17,7 @@ import {
     DialogService,
     fadeAnimation,
     StatefulComponent,
-    Types,
-    Versioned
+    Types
 } from '@app/shared/internal';
 
 interface State {
@@ -101,10 +100,10 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
 
             this.assetsService.uploadFile(this.appsState.appName, initFile, this.authState.user!.token, DateTime.now())
                 .subscribe(dto => {
-                    if (Types.is(dto, AssetDto)) {
-                        this.emitLoad(dto);
-                    } else {
+                    if (Types.isNumber(dto)) {
                         this.setProgress(dto);
+                    } else {
+                        this.emitLoad(dto);
                     }
                 }, error => {
                     this.dialogs.notifyError(error);
@@ -120,10 +119,10 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
 
             this.assetsService.replaceFile(this.appsState.appName, this.asset.id, files[0], this.asset.version)
                 .subscribe(dto => {
-                    if (Types.is(dto, Versioned)) {
-                        this.updateAsset(this.asset.update(dto.payload, this.authState.user!.token, dto.version), true);
-                    } else {
+                    if (Types.isNumber(dto)) {
                         this.setProgress(dto);
+                    } else {
+                        this.updateAsset(this.asset.update(dto.payload, this.authState.user!.token, dto.version), true);
                     }
                 }, error => {
                     this.dialogs.notifyError(error);

@@ -7,7 +7,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -45,7 +44,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.assetsState.load().pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.load();
 
         this.own(
             this.assetsState.assetsQuery
@@ -55,27 +54,27 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public reload() {
-        this.assetsState.load(true).pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.load(true);
     }
 
     public search() {
-        this.assetsState.search(this.filter.apiFilter).pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.search(this.filter.apiFilter);
     }
 
     public selectTags(tags: string[]) {
-        this.assetsState.selectTags(tags).pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.selectTags(tags);
     }
 
     public toggleTag(tag: string) {
-        this.assetsState.toggleTag(tag).pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.toggleTag(tag);
     }
 
     public goNext() {
-        this.assetsState.goNext().pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.goNext();
     }
 
     public goPrev() {
-        this.assetsState.goPrev().pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.goPrev();
     }
 
     public changeView(isListView: boolean) {

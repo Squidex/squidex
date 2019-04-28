@@ -12,8 +12,8 @@ import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    notify,
     Pager,
+    shareSubscribed,
     State
 } from '@app/framework';
 
@@ -78,7 +78,7 @@ export class RuleEventsState extends State<Snapshot> {
                     return { ...s, ruleEvents, ruleEventsPager, isLoaded: true };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public enqueue(event: RuleEventDto): Observable<any> {
@@ -86,7 +86,7 @@ export class RuleEventsState extends State<Snapshot> {
             tap(() => {
                 this.dialogs.notifyInfo('Events enqueued. Will be resend in a few seconds.');
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public cancel(event: RuleEventDto): Observable<any> {
@@ -98,7 +98,7 @@ export class RuleEventsState extends State<Snapshot> {
                     return { ...s, ruleEvents, isLoaded: true };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public goNext(): Observable<any> {

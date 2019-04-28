@@ -7,11 +7,13 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, share } from 'rxjs/operators';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
+    mapVersioned,
+    shareSubscribed,
     State,
     Version
 } from '@app/framework';
@@ -60,79 +62,56 @@ export class PatternsState extends State<Snapshot> {
             this.resetState();
         }
 
-        const update$ =
-            this.patternsService.getPatterns(this.appName).pipe(
-                share());
+        return this.patternsService.getPatterns(this.appName).pipe(
+            tap(({ version, payload }) => {
+                if (isReload) {
+                    this.dialogs.notifyInfo('Patterns reloaded.');
+                }
 
-        update$.subscribe(({ version, patterns: items }) => {
-            if (isReload) {
-                this.dialogs.notifyInfo('Patterns reloaded.');
-            }
+                this.next(s => {
+                    const patterns = ImmutableArray.of(payload).sortByStringAsc(x => x.name);
 
-            this.next(s => {
-                const patterns = ImmutableArray.of(items).sortByStringAsc(x => x.name);
-
-                return { ...s, patterns, isLoaded: true, version: version };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return update$;
+                    return { ...s, patterns, isLoaded: true, version: version };
+                });
+            }),
+            shareSubscribed(this.dialogs, { project: x => x.payload }));
     }
 
     public create(request: EditPatternDto): Observable<PatternDto> {
-        const update$ =
-            this.patternsService.postPattern(this.appName, request, this.version).pipe(
-                share());
+        return this.patternsService.postPattern(this.appName, request, this.version).pipe(
+            tap(({ version, payload }) => {
+                this.next(s => {
+                    const patterns = s.patterns.push(payload).sortByStringAsc(x => x.name);
 
-        update$.subscribe(({ version, payload: pattern }) => {
-            this.next(s => {
-                const patterns = s.patterns.push(pattern).sortByStringAsc(x => x.name);
-
-                return { ...s, patterns, version: version };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return update$.pipe(map(x => x.payload));
+                    return { ...s, patterns, version: version };
+                });
+            }),
+            shareSubscribed(this.dialogs, { project: x => x.payload }));
     }
 
     public update(pattern: PatternDto, request: EditPatternDto): Observable<PatternDto> {
-        const update$ =
-            this.patternsService.putPattern(this.appName, pattern.id, request, this.version).pipe(
-                map(({ version }) => ({ version, payload: update(pattern, request) })), share());
+        return this.patternsService.putPattern(this.appName, pattern.id, request, this.version).pipe(
+            mapVersioned(() => update(pattern, request)),
+            tap(({ version, payload }) => {
+                this.next(s => {
+                    const patterns = s.patterns.replaceBy('id', payload).sortByStringAsc(x => x.name);
 
-        update$.subscribe(({ version, payload }) => {
-            this.next(s => {
-                const patterns = s.patterns.replaceBy('id', payload).sortByStringAsc(x => x.name);
-
-                return { ...s, patterns, version: version };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return update$.pipe(map(x => x.payload));
+                    return { ...s, patterns, version: version };
+                });
+            }),
+            shareSubscribed(this.dialogs, { project: x => x.payload }));
     }
 
     public delete(pattern: PatternDto): Observable<any> {
-        const update$ =
-            this.patternsService.deletePattern(this.appName, pattern.id, this.version).pipe(
-                share());
+        return this.patternsService.deletePattern(this.appName, pattern.id, this.version).pipe(
+            tap(({ version }) => {
+                this.next(s => {
+                    const patterns = s.patterns.filter(c => c.id !== pattern.id);
 
-        update$.subscribe(({ version }) => {
-            this.next(s => {
-                const patterns = s.patterns.filter(c => c.id !== pattern.id);
-
-                return { ...s, patterns, version: version };
-            });
-        }, error => {
-            this.dialogs.notifyError(error);
-        });
-
-        return update$;
+                    return { ...s, patterns, version: version };
+                });
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     private get appName() {

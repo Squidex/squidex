@@ -12,7 +12,7 @@ import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    notify,
+    shareSubscribed,
     State,
     Version
 } from '@app/framework';
@@ -88,26 +88,26 @@ export class PlansState extends State<Snapshot> {
         }
 
         return this.plansService.getPlans(this.appName).pipe(
-            tap(dto => {
+            tap(({ version, payload }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Plans reloaded.');
                 }
 
                 this.next(s => {
-                    const planId = overridePlanId || dto.currentPlanId;
-                    const plans = ImmutableArray.of(dto.plans.map(x => this.createPlan(x, planId)));
+                    const planId = overridePlanId || payload.currentPlanId;
+                    const plans = ImmutableArray.of(payload.plans.map(x => this.createPlan(x, planId)));
 
                     return {
                         ...s,
                         plans: plans,
-                        isOwner: !dto.planOwner || dto.planOwner === this.userId,
+                        isOwner: !payload.planOwner || payload.planOwner === this.userId,
                         isLoaded: true,
-                        version: dto.version,
-                        hasPortal: dto.hasPortal
+                        version,
+                        hasPortal: payload.hasPortal
                     };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public change(planId: string): Observable<any> {
@@ -123,7 +123,7 @@ export class PlansState extends State<Snapshot> {
                     });
                 }
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     private createPlan(plan: PlanDto, id: string) {

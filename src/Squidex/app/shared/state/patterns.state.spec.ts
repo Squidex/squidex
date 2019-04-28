@@ -11,10 +11,9 @@ import { IMock, It, Mock, Times } from 'typemoq';
 import {
     DialogService,
     PatternDto,
-    PatternsDto,
     PatternsService,
     PatternsState,
-    Versioned
+    versioned
 } from './../';
 
 import { TestValues } from './_test-helpers';
@@ -50,7 +49,7 @@ describe('PatternsState', () => {
     describe('Loading', () => {
         it('should load patterns', () => {
             patternsService.setup(x => x.getPatterns(app))
-                .returns(() => of(new PatternsDto(oldPatterns, version))).verifiable();
+                .returns(() => of({ payload: oldPatterns, version })).verifiable();
 
             patternsState.load().subscribe();
 
@@ -62,7 +61,7 @@ describe('PatternsState', () => {
 
         it('should show notification on load when reload is true', () => {
             patternsService.setup(x => x.getPatterns(app))
-                .returns(() => of(new PatternsDto(oldPatterns, version))).verifiable();
+                .returns(() => of({ payload: oldPatterns, version })).verifiable();
 
             patternsState.load(true).subscribe();
 
@@ -75,7 +74,7 @@ describe('PatternsState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             patternsService.setup(x => x.getPatterns(app))
-                .returns(() => of(new PatternsDto(oldPatterns, version))).verifiable();
+                .returns(() => of({ payload: oldPatterns, version })).verifiable();
 
             patternsState.load().subscribe();
         });
@@ -86,7 +85,7 @@ describe('PatternsState', () => {
             const request = { ...newPattern };
 
             patternsService.setup(x => x.postPattern(app, request, version))
-                .returns(() => of(new Versioned(newVersion, newPattern))).verifiable();
+                .returns(() => of(versioned(newVersion, newPattern))).verifiable();
 
             patternsState.create(request).subscribe();
 
@@ -98,7 +97,7 @@ describe('PatternsState', () => {
             const request = { name: 'name2_1', pattern: 'pattern2_1', message: 'message2_1' };
 
             patternsService.setup(x => x.putPattern(app, oldPatterns[1].id, request, version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             patternsState.update(oldPatterns[1], request).subscribe();
 
@@ -112,7 +111,7 @@ describe('PatternsState', () => {
 
         it('should remove pattern from snapshot when deleted', () => {
             patternsService.setup(x => x.deletePattern(app, oldPatterns[0].id, version))
-                .returns(() => of(new Versioned(newVersion, {}))).verifiable();
+                .returns(() => of(versioned(newVersion))).verifiable();
 
             patternsState.delete(oldPatterns[0]).subscribe();
 

@@ -16,7 +16,7 @@ module.exports = webpackMerge(testConfig, {
         rules: [{
             test: /\.ts$/,
             use: [{
-                loader: 'awesome-typescript-loader'
+                loader: 'ts-loader'
             }],
             include: [/\.(e2e|spec)\.ts$/],
             
@@ -25,7 +25,7 @@ module.exports = webpackMerge(testConfig, {
             use: [{
                 loader: 'istanbul-instrumenter-loader'
             }, {
-                loader: 'awesome-typescript-loader'
+                loader: 'ts-loader'
             }, {
                 loader: 'angular-router-loader'
             }, {

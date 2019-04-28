@@ -12,8 +12,8 @@ import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    notify,
     Pager,
+    shareSubscribed,
     State
 } from '@app/framework';
 
@@ -107,7 +107,7 @@ export class AssetsState extends State<Snapshot> {
                     return { ...s, assets, assetsPager, isLoaded: true, tags: dtos[1] };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public add(asset: AssetDto) {
@@ -138,7 +138,7 @@ export class AssetsState extends State<Snapshot> {
                     return { ...s, assets, assetsPager, tags, tagsSelected };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public update(asset: AssetDto) {

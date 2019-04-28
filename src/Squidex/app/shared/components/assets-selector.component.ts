@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AssetDto,
@@ -51,15 +50,15 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     }
 
     public ngOnInit() {
-        this.assetsState.load().pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.load();
     }
 
     public reload() {
-        this.assetsState.load(true).pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.load(true);
     }
 
     public search() {
-        this.assetsState.search(this.filter.apiFilter).pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.search(this.filter.apiFilter);
     }
 
     public emitComplete() {
@@ -71,7 +70,7 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     }
 
     public selectTags(tags: string[]) {
-        this.assetsState.selectTags(tags).pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.selectTags(tags);
     }
 
     public selectAsset(asset: AssetDto) {

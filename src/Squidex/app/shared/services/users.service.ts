@@ -32,12 +32,13 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(`api/users?query=${query || ''}`);
 
         return this.http.get<any[]>(url).pipe(
-                map(response => {
-                    return response.map(item => {
-                        return new UserDto(
+                map(body => {
+                    const users = body.map(item =>
+                        new UserDto(
                             item.id,
-                            item.displayName);
-                    });
+                            item.displayName));
+
+                    return users;
                 }),
                 pretifyError('Failed to load users. Please reload.'));
     }
@@ -46,10 +47,12 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(`api/users/${id}`);
 
         return this.http.get<any>(url).pipe(
-                map(response => {
-                    return new UserDto(
-                        response.id,
-                        response.displayName);
+                map(body => {
+                    const user = new UserDto(
+                        body.id,
+                        body.displayName);
+
+                    return user;
                 }),
                 pretifyError('Failed to load user. Please reload.'));
     }
