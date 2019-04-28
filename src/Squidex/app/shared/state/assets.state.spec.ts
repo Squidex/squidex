@@ -23,7 +23,6 @@ describe('AssetsState', () => {
     const {
         app,
         appsState,
-        authService,
         creation,
         creator,
         modified,
@@ -52,7 +51,7 @@ describe('AssetsState', () => {
         assetsService.setup(x => x.getTags(app))
             .returns(() => of({ tag1: 1, shared: 2, tag2: 1 }));
 
-        assetsState = new AssetsState(appsState.object, assetsService.object, authService.object, dialogs.object);
+        assetsState = new AssetsState(appsState.object, assetsService.object, dialogs.object);
         assetsState.load().subscribe();
     });
 
@@ -77,6 +76,15 @@ describe('AssetsState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
+    it('should add asset to snapshot when created', () => {
+        const newAsset = new AssetDto('id3', creator, creator, creation, creation, 'name3', 'hash3', 'type3', 3, 3, 'mime3', false, true, 0, 0, 'slug2', [], 'url3', version);
+
+        assetsState.add(newAsset);
+
+        expect(assetsState.snapshot.assets.values).toEqual([newAsset, ...oldAssets]);
+        expect(assetsState.snapshot.assetsPager.numberOfItems).toBe(201);
+    });
+
     it('should update properties when updated', () => {
         const newAsset = new AssetDto('id1', modifier, modifier, modified, modified, 'name3', 'hash3', 'type3', 3, 3, 'mime3', false, true, 0, 0, 'slug3', ['new'], 'url3', version);
 
@@ -90,7 +98,7 @@ describe('AssetsState', () => {
 
     it('should remove asset from snapshot when deleted', () => {
         assetsService.setup(x => x.deleteAsset(app, oldAssets[0].id, version))
-            .returns(() => of(new Versioned(newVersion, {})));
+            .returns(() => of(new Versioned<any>(newVersion, {})));
 
         assetsState.delete(oldAssets[0]).subscribe();
 
