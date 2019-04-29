@@ -112,14 +112,14 @@ export class PlansState extends State<Snapshot> {
 
     public change(planId: string): Observable<any> {
         return this.plansService.putPlan(this.appName, { planId }, this.version).pipe(
-            tap(dto => {
-                if (dto.payload.redirectUri && dto.payload.redirectUri.length > 0) {
-                    this.window.location.href = dto.payload.redirectUri;
+            tap(({ payload, version }) => {
+                if (payload.redirectUri && payload.redirectUri.length > 0) {
+                    this.window.location.href = payload.redirectUri;
                 } else {
                     this.next(s => {
                         const plans = s.plans.map(x => this.createPlan(x.plan, planId));
 
-                        return { ...s, plans, isOwner: true, version: dto.version };
+                        return { ...s, plans, isOwner: true, version };
                     });
                 }
             }),

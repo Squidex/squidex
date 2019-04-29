@@ -66,14 +66,14 @@ export class RuleEventsState extends State<Snapshot> {
         return this.rulesService.getEvents(this.appName,
                 this.snapshot.ruleEventsPager.pageSize,
                 this.snapshot.ruleEventsPager.skip).pipe(
-            tap(dtos => {
+            tap(({ total, items }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('RuleEvents reloaded.');
                 }
 
                 return this.next(s => {
-                    const ruleEvents = ImmutableArray.of(dtos.items);
-                    const ruleEventsPager = s.ruleEventsPager.setCount(dtos.total);
+                    const ruleEvents = ImmutableArray.of(items);
+                    const ruleEventsPager = s.ruleEventsPager.setCount(total);
 
                     return { ...s, ruleEvents, ruleEventsPager, isLoaded: true };
                 });

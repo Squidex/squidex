@@ -95,16 +95,16 @@ export class AssetsState extends State<Snapshot> {
                 Object.keys(this.snapshot.tagsSelected)),
             this.assetsService.getTags(this.appName)
         ).pipe(
-            tap(dtos => {
+            tap(([ { items, total }, tags ]) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
 
                 this.next(s => {
-                    const assets = ImmutableArray.of(dtos[0].items);
-                    const assetsPager = s.assetsPager.setCount(dtos[0].total);
+                    const assets = ImmutableArray.of(items);
+                    const assetsPager = s.assetsPager.setCount(total);
 
-                    return { ...s, assets, assetsPager, isLoaded: true, tags: dtos[1] };
+                    return { ...s, assets, assetsPager, isLoaded: true, tags };
                 });
             }),
             shareSubscribed(this.dialogs));

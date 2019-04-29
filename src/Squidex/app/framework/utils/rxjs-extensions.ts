@@ -7,8 +7,8 @@
 
 // tslint:disable: only-arrow-functions
 
-import { Observable } from 'rxjs';
-import { map, onErrorResumeNext, shareReplay, switchMap } from 'rxjs/operators';
+import { empty, Observable } from 'rxjs';
+import { catchError, map, onErrorResumeNext, publishReplay, refCount, switchMap } from 'rxjs/operators';
 
 import { DialogService } from './../services/dialog.service';
 
@@ -30,13 +30,17 @@ type Options<T, R = T> = { silent?: boolean, project?: ((value: T) => R) };
 
 export function shareSubscribed<T, R = T>(dialogs: DialogService, options?: Options<T, R>) {
     return function mapOperation(source: Observable<T>) {
-        const shared = source.pipe(shareReplay());
+        const shared = source.pipe(publishReplay(), refCount());
 
-        shared.subscribe(undefined, error => {
-            if (dialogs && (!options || !options.silent)) {
-                dialogs.notifyError(error);
-            }
-        });
+        shared.pipe(
+            catchError(error => {
+                if (!options || !options.silent) {
+                    dialogs.notifyError(error);
+                }
+
+                return empty();
+            }))
+            .subscribe();
 
         if (options && !!options.project) {
             const project = options.project;

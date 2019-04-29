@@ -12,12 +12,13 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AssetDto,
+    AssetUploaderState,
     DialogModel,
     ResourceLoaderService,
     StatefulControlComponent,
-    Types
+    Types,
+    UploadCanceled
 } from '@app/shared/internal';
-import { AssetUploaderState } from '../state/asset-uploader.state';
 
 declare var tinymce: any;
 
@@ -99,8 +100,10 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
                         if (Types.is(asset, AssetDto)) {
                             success(asset.url);
                         }
-                    }, () => {
-                        failed();
+                    }, error => {
+                        if (!Types.is(error, UploadCanceled)) {
+                            failed();
+                        }
                     });
             },
 
@@ -215,8 +218,10 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
                 if (Types.is(asset, AssetDto)) {
                     replaceText(`<img src="${asset.url}" alt="${asset.fileName}" />`);
                 }
-            }, () => {
-                replaceText('FAILED');
+            }, error => {
+                if (!Types.is(error, UploadCanceled)) {
+                    replaceText('FAILED');
+                }
             });
     }
 }

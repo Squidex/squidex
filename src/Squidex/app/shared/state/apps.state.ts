@@ -69,9 +69,9 @@ export class AppsState extends State<Snapshot> {
 
     public load(): Observable<any> {
         return this.appsService.getApps().pipe(
-            tap((dto: AppDto[]) => {
+            tap(payload => {
                 this.next(s => {
-                    const apps = ImmutableArray.of(dto);
+                    const apps = ImmutableArray.of(payload);
 
                     return { ...s, apps };
                 });
@@ -81,9 +81,9 @@ export class AppsState extends State<Snapshot> {
 
     public create(request: CreateAppDto): Observable<AppDto> {
         return this.appsService.postApp(request).pipe(
-            tap(dto => {
+            tap(payload => {
                 this.next(s => {
-                    const apps = s.apps.push(dto).sortByStringAsc(x => x.name);
+                    const apps = s.apps.push(payload).sortByStringAsc(x => x.name);
 
                     return { ...s, apps };
                 });

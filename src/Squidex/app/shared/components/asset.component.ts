@@ -15,7 +15,7 @@ import {
     StatefulComponent,
     Types
 } from '@app/shared/internal';
-import { AssetUploaderState } from '../state/asset-uploader.state';
+import { AssetUploaderState, UploadCanceled } from '../state/asset-uploader.state';
 
 interface State {
     progress: number;
@@ -101,7 +101,9 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
                         this.emitLoad(dto);
                     }
                 }, error => {
-                    this.dialogs.notifyError(error);
+                    if (!Types.is(error, UploadCanceled)) {
+                        this.dialogs.notifyError(error);
+                    }
 
                     this.emitLoadError(error);
                 });

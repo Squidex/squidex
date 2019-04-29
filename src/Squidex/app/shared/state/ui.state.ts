@@ -55,15 +55,15 @@ export class UIState extends State<Snapshot> {
         this.next(s => updateAppSettings(s, {}));
 
         this.uiService.getSettings(this.appName)
-            .subscribe(dtos => {
-                this.next(s => updateAppSettings(s, dtos));
+            .subscribe(payload => {
+                this.next(s => updateAppSettings(s, payload));
             });
     }
 
     private loadCommon() {
         this.uiService.getCommonSettings()
-            .subscribe(dtos => {
-                this.next(s => updateCommonSettings(s, dtos));
+            .subscribe(payload => {
+                this.next(s => updateCommonSettings(s, payload));
             });
     }
 

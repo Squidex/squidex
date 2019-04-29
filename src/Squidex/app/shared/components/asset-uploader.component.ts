@@ -8,6 +8,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import {
+    AppsState,
     AssetsState,
     AssetUploaderState,
     DialogModel,
@@ -25,9 +26,10 @@ import {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetUploaderComponent {
-    public modalMenu = new DialogModel(true);
+    public modalMenu = new DialogModel();
 
     constructor(
+        public readonly appsState: AppsState,
         public readonly assetUploader: AssetUploaderState,
         public readonly assetsState: AssetsState
     ) {

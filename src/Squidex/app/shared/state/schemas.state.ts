@@ -93,7 +93,7 @@ export class SchemasState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService
     ) {
-        super({ schemas: ImmutableArray.empty(), categories: {} });
+        super({ schemas: ImmutableArray.empty(), categories: buildCategories({}) });
     }
 
     public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
@@ -137,9 +137,9 @@ export class SchemasState extends State<Snapshot> {
 
     public create(request: CreateSchemaDto, now?: DateTime): Observable<SchemaDetailsDto> {
         return this.schemasService.postSchema(this.appName, request, this.user, now || DateTime.now()).pipe(
-            tap(dto => {
+            tap(payload => {
                 this.next(s => {
-                    const schemas = s.schemas.push(dto).sortByStringAsc(x => x.displayName);
+                    const schemas = s.schemas.push(payload).sortByStringAsc(x => x.displayName);
 
                     return { ...s, schemas };
                 });
@@ -375,7 +375,7 @@ export class SchemasState extends State<Snapshot> {
     }
 }
 
-function buildCategories(categories: { [name: string]: boolean }, schemas: SchemasList) {
+function buildCategories(categories: { [name: string]: boolean }, schemas?: SchemasList) {
     categories = { ...categories };
 
     for (let category in categories) {
@@ -385,9 +385,14 @@ function buildCategories(categories: { [name: string]: boolean }, schemas: Schem
             }
         }
     }
-    for (let schema of schemas.values) {
-        categories[schema.category || ''] = false;
+
+    if (schemas) {
+        for (let schema of schemas.values) {
+            categories[schema.category || ''] = false;
+        }
     }
+
+    categories[''] = true;
 
     return categories;
 }

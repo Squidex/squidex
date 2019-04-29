@@ -10,12 +10,13 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
     AssetDto,
+    AssetUploaderState,
     DialogModel,
     ResourceLoaderService,
     StatefulControlComponent,
-    Types
+    Types,
+    UploadCanceled
 } from '@app/shared/internal';
-import { AssetUploaderState } from '../state/asset-uploader.state';
 
 declare var SimpleMDE: any;
 
@@ -245,8 +246,10 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
                 if (Types.is(asset, AssetDto)) {
                     replaceText(`![${asset.fileName}](${asset.url} '${asset.fileName}')`);
                 }
-            }, () => {
-                replaceText('FAILED');
+            }, error => {
+                if (!Types.is(error, UploadCanceled)) {
+                    replaceText('FAILED');
+                }
             });
     }
 }

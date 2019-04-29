@@ -6,8 +6,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject, Subject, Subscription } from 'rxjs';
-import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { distinctUntilChanged, map, publishReplay, refCount, takeUntil } from 'rxjs/operators';
 
 import {
     DateTime,
@@ -31,10 +31,7 @@ export interface Upload {
     name: string;
 
     // The upload subscription.
-    subscription?: Subscription;
-
-    // The subject to notify subscribers.
-    subject: ReplaySubject<UploadResult>;
+    cancel: Subject<any>;
 
     // The progress.
     progress: number;
@@ -47,6 +44,8 @@ interface Snapshot {
     // The uploads.
     uploads: UploadList;
 }
+
+export class UploadCanceled { }
 
 type UploadList = ImmutableArray<Upload>;
 type UploadResult = AssetDto | number;
@@ -67,10 +66,7 @@ export class AssetUploaderState extends State<Snapshot> {
     }
 
     public stopUpload(upload: Upload) {
-        if (upload.subscription) {
-            upload.subscription.unsubscribe();
-            upload.subject.complete();
-        }
+        upload.cancel.error(new UploadCanceled());
 
         this.next(s => {
             const uploads = s.uploads.removeBy('id', upload);
@@ -82,55 +78,49 @@ export class AssetUploaderState extends State<Snapshot> {
     public uploadFile(file: File, target?: AssetsState, now?: DateTime): Observable<UploadResult> {
         const stream = this.assetsService.uploadFile(this.appName, file, this.user, now || DateTime.now());
 
-        return this.upload(stream, MathHelper.guid(), file, (asset, subject) => {
+        return this.upload(stream, MathHelper.guid(), file, asset => {
             if (asset.isDuplicate) {
                 this.dialogs.notifyError('Asset has already been uploaded.');
             } else if (target) {
                 target.add(asset);
             }
 
-            subject.next(asset);
+            return asset;
         });
     }
 
     public uploadAsset(asset: AssetDto, file: File, now?: DateTime): Observable<UploadResult> {
         const stream = this.assetsService.replaceFile(this.appName, asset.id, file, asset.version);
 
-        return this.upload(stream, asset.id, file, ({ version, payload }, subject) => {
-            subject.next(asset.update(payload, this.user, version, now));
-        });
+        return this.upload(stream, asset.id, file, ({ version, payload }) => asset.update(payload, this.user, version, now));
     }
 
-    private upload<T, R>(stream: Observable<number | R>, id: string, file: File, complete: (completion: R, subject: Subject<UploadResult>) => void) {
-        const subject = new ReplaySubject<UploadResult>();
-
-        let upload = { id, name: file.name, progress: 1, status: 'Running', subject };
+    private upload<T>(source: Observable<number | T>, id: string, file: File, complete: ((completion: T) => AssetDto)) {
+        let upload = { id, name: file.name, progress: 1, status: 'Running', cancel: new Subject() };
 
         this.addUpload(upload);
 
-        const subscription = stream.subscribe(event => {
+        const stream = source.pipe(takeUntil(upload.cancel),
+            map(event => {
+                if (Types.isNumber(event)) {
+                    return event;
+                } else {
+                    return complete(event);
+                }
+            }),
+            publishReplay(), refCount());
+
+        stream.subscribe(event => {
             if (Types.isNumber(event)) {
                 upload = this.update(upload, { progress: event });
-
-                subject.next(event);
-            } else {
-                complete(event, subject);
             }
-        }, error => {
-            subject.error(error);
-
+        }, () => {
             upload = this.remove(upload, { status: 'Failed' });
         }, () => {
-            if (!subject.isStopped) {
-                subject.complete();
-            }
-
             upload = this.remove(upload, { status: 'Completed', progress: 100 });
         });
 
-        upload = this.update(upload, { subscription });
-
-        return subject.pipe(shareReplay());
+        return stream;
     }
 
     private remove(upload: Upload, update: Partial<Upload>) {
