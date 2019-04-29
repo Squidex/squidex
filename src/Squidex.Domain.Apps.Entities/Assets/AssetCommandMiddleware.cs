@@ -11,7 +11,6 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
-using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
@@ -22,13 +21,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, IAssetGrain>
     {
         private readonly IAssetStore assetStore;
-        private readonly AssetQueryService assetQueryService;
+        private readonly IAssetQueryService assetQueryService;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IEnumerable<ITagGenerator<CreateAsset>> tagGenerators;
 
         public AssetCommandMiddleware(
             IGrainFactory grainFactory,
-            AssetQueryService assetQueryService,
+            IAssetQueryService assetQueryService,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
             IEnumerable<ITagGenerator<CreateAsset>> tagGenerators)
@@ -63,21 +62,27 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         try
                         {
-                            var existing = await assetQueryService.FindAssetByHashAsync(createAsset.AppId.Id, createAsset.FileHash);
+                            var existings = await assetQueryService.QueryByHashAsync(createAsset.AppId.Id, createAsset.FileHash);
 
-                            AssetCreatedResult result;
+                            AssetCreatedResult result = null;
 
-                            if (IsDuplicate(createAsset, existing))
+                            foreach (var existing in existings)
                             {
-                                result = new AssetCreatedResult(
-                                    existing.Id,
-                                    existing.Tags,
-                                    existing.Version,
-                                    existing.FileVersion,
-                                    existing.FileHash,
-                                    true);
+                                if (IsDuplicate(createAsset, existing))
+                                {
+                                    result = new AssetCreatedResult(
+                                        existing.Id,
+                                        existing.Tags,
+                                        existing.Version,
+                                        existing.FileVersion,
+                                        existing.FileHash,
+                                        true);
+                                }
+
+                                break;
                             }
-                            else
+
+                            if (result == null)
                             {
                                 foreach (var tagGenerator in tagGenerators)
                                 {
@@ -147,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 await assetStore.UploadAsync(context.ContextId.ToString(), hashStream);
 
-                hash = hashStream.GetHashStringAndReset();
+                hash = $"{hashStream.GetHashStringAndReset()}{file.FileName}{file.FileSize}".Sha256Base64();
             }
 
             return hash;

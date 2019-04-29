@@ -9,7 +9,6 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Ho
 
 import {
     AssetDto,
-    AuthService,
     DialogModel,
     DialogService,
     fadeAnimation,
@@ -113,7 +112,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
         if (files.length === 1) {
             this.setProgress(1);
 
-            this.assetUploader.uploadUpdate(this.asset, files[0])
+            this.assetUploader.uploadAsset(this.asset, files[0])
                 .subscribe(dto => {
                     if (Types.isNumber(dto)) {
                         this.setProgress(dto);
@@ -123,6 +122,8 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
                 }, error => {
                     this.dialogs.notifyError(error);
 
+                    this.setProgress(0);
+                }, () => {
                     this.setProgress(0);
                 });
         }

@@ -53,6 +53,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                     new CreateIndexModel<MongoAssetEntity>(
                         Index
                             .Ascending(x => x.AppId)
+                            .Ascending(x => x.IsDeleted)
                             .Ascending(x => x.Slug))
                 },
                 ct);
@@ -114,32 +115,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntity =
-                    await Collection.Find(x => x.IndexedAppId == appId && x.Slug == slug)
+                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.Slug == slug)
                         .FirstOrDefaultAsync();
-
-                if (assetEntity?.IsDeleted == true)
-                {
-                    return null;
-                }
 
                 return assetEntity;
             }
         }
 
-        public async Task<IAssetEntity> FindAssetByHashAsync(Guid appId, string hash)
+        public async Task<IList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
-                var assetEntity =
+                var assetEntities =
                     await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.FileHash == hash)
-                        .FirstOrDefaultAsync();
+                        .ToListAsync();
 
-                if (assetEntity?.IsDeleted == true)
-                {
-                    return null;
-                }
-
-                return assetEntity;
+                return assetEntities.OfType<IAssetEntity>().ToList();
             }
         }
 

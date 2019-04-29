@@ -101,10 +101,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             AddField(new FieldType
             {
-                Name = "slug",
+                Name = "fileHash",
                 ResolvedType = AllTypes.NonNullString,
-                Resolver = Resolve(x => x.Slug),
-                Description = "The file name as slug."
+                Resolver = Resolve(x => x.FileHash),
+                Description = "The hash of the file. Can be null for old files."
             });
 
             AddField(new FieldType
@@ -129,6 +129,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 ResolvedType = AllTypes.NonNullInt,
                 Resolver = Resolve(x => x.FileVersion),
                 Description = "The version of the file."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "slug",
+                ResolvedType = AllTypes.NonNullString,
+                Resolver = Resolve(x => x.Slug),
+                Description = "The file name as slug."
             });
 
             AddField(new FieldType

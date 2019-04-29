@@ -44,4 +44,8 @@ export class AssetUploaderComponent {
     public stopUpload(upload: Upload) {
         this.assetUploader.stopUpload(upload);
     }
+
+    public trackByUpload(index: number, upload: Upload) {
+        return upload.id;
+    }
 }

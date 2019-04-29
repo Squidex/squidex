@@ -172,6 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 FileName = "MyFile.png",
                 Slug = "myfile.png",
                 FileSize = 1024,
+                FileHash = "ABC123",
                 FileVersion = 123,
                 MimeType = "image/png",
                 IsImage = true,

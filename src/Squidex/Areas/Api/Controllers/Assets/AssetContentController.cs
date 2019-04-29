@@ -108,7 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             }
             else
             {
-                entity = await assetRepository.FindAssetByHashAsync(App.Id, idOrSlug);
+                entity = await assetRepository.FindAssetBySlugAsync(App.Id, idOrSlug);
             }
 
             return DeliverAsset(entity, version, width, height, quality, mode);

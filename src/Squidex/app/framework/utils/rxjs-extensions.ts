@@ -53,3 +53,11 @@ export function switchSafe<T, R>(project: (source: T) => Observable<R>) {
         return source.pipe(switchMap(project), onErrorResumeNext<R, R>());
     };
 }
+
+export function ofForever<T>(...values: T[]) {
+    return new Observable<T>(s => {
+        for (let value of values) {
+            s.next(value);
+        }
+    });
+}

@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
 {
     public interface IAssetRepository
     {
+        Task<IList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash);
+
         Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Query query);
 
         Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids);
@@ -22,8 +24,6 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
         Task<IAssetEntity> FindAssetAsync(Guid id, bool allowDeleted = false);
 
         Task<IAssetEntity> FindAssetBySlugAsync(Guid appId, string slug);
-
-        Task<IAssetEntity> FindAssetByHashAsync(Guid appId, string hash);
 
         Task RemoveAsync(Guid appId);
     }

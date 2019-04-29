@@ -6,8 +6,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { Observable, ReplaySubject, Subject, Subscription } from 'rxjs';
+import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
 
 import {
     DateTime,
@@ -31,7 +31,10 @@ export interface Upload {
     name: string;
 
     // The upload subscription.
-    subscription: Subscription;
+    subscription?: Subscription;
+
+    // The subject to notify subscribers.
+    subject: ReplaySubject<UploadResult>;
 
     // The progress.
     progress: number;
@@ -64,7 +67,10 @@ export class AssetUploaderState extends State<Snapshot> {
     }
 
     public stopUpload(upload: Upload) {
-        upload.subscription.unsubscribe();
+        if (upload.subscription) {
+            upload.subscription.unsubscribe();
+            upload.subject.complete();
+        }
 
         this.next(s => {
             const uploads = s.uploads.removeBy('id', upload);
@@ -74,76 +80,61 @@ export class AssetUploaderState extends State<Snapshot> {
     }
 
     public uploadFile(file: File, target?: AssetsState, now?: DateTime): Observable<UploadResult> {
-        const observable = this.assetsService.uploadFile(this.appName, file, this.user, now || DateTime.now());
+        const stream = this.assetsService.uploadFile(this.appName, file, this.user, now || DateTime.now());
 
-        let upload: Upload;
-
-        const subject = new Subject<UploadResult>();
-        const subscription = observable.subscribe(event => {
-            if (Types.isNumber(event)) {
-                this.update(upload, { progress: event });
-            } else {
-                if (event.isDuplicate) {
-                    this.dialogs.notifyError('Asset has already been uploaded.');
-                }
-
-                if (target) {
-                    target.add(event);
-                }
+        return this.upload(stream, MathHelper.guid(), file, (asset, subject) => {
+            if (asset.isDuplicate) {
+                this.dialogs.notifyError('Asset has already been uploaded.');
+            } else if (target) {
+                target.add(asset);
             }
 
-            subject.next(event);
-        }, error => {
-            subject.error(error);
-
-            this.remove(upload, 'failed');
-        }, () => {
-            subject.complete();
-
-            this.remove(upload, 'completed');
+            subject.next(asset);
         });
+    }
 
-        upload = { id: MathHelper.guid(), name: file.name, progress: 1, subscription, status: 'running' };
+    public uploadAsset(asset: AssetDto, file: File, now?: DateTime): Observable<UploadResult> {
+        const stream = this.assetsService.replaceFile(this.appName, asset.id, file, asset.version);
+
+        return this.upload(stream, asset.id, file, ({ version, payload }, subject) => {
+            subject.next(asset.update(payload, this.user, version, now));
+        });
+    }
+
+    private upload<T, R>(stream: Observable<number | R>, id: string, file: File, complete: (completion: R, subject: Subject<UploadResult>) => void) {
+        const subject = new ReplaySubject<UploadResult>();
+
+        let upload = { id, name: file.name, progress: 1, status: 'Running', subject };
 
         this.addUpload(upload);
 
-        return subject;
-    }
-
-    public uploadUpdate(asset: AssetDto, file: File, now?: DateTime): Observable<UploadResult> {
-        const observable = this.assetsService.replaceFile(this.appName, asset.id, file, asset.version);
-
-        let upload: Upload;
-
-        const subject = new Subject<UploadResult>();
-        const subscription = observable.subscribe(event => {
+        const subscription = stream.subscribe(event => {
             if (Types.isNumber(event)) {
-                this.update(upload, { progress: event });
+                upload = this.update(upload, { progress: event });
 
                 subject.next(event);
             } else {
-                subject.next(asset.update(event.payload, this.user, event.version, now));
+                complete(event, subject);
             }
-
         }, error => {
             subject.error(error);
 
-            this.remove(upload, 'failed');
+            upload = this.remove(upload, { status: 'Failed' });
         }, () => {
-            subject.complete();
+            if (!subject.isStopped) {
+                subject.complete();
+            }
 
-            this.remove(upload, 'completed');
+            upload = this.remove(upload, { status: 'Completed', progress: 100 });
         });
 
-        upload = { id: asset.id, name: file.name, progress: 1, subscription, status: 'running' };
+        upload = this.update(upload, { subscription });
 
-        this.addUpload(upload);
-
-        return subject;
+        return subject.pipe(shareReplay());
     }
 
-    private remove(upload: Upload, status: string) {
-        this.update(upload, { status });
+    private remove(upload: Upload, update: Partial<Upload>) {
+        upload = this.update(upload, update);
 
         setTimeout(() => {
             this.next(s => {
@@ -153,14 +144,20 @@ export class AssetUploaderState extends State<Snapshot> {
             });
 
         }, 10000);
+
+        return upload;
     }
 
     private update(upload: Upload, update: Partial<Upload>) {
+        upload = { ...upload, ...update };
+
         this.next(s => {
-            const uploads = s.uploads.replaceBy('id', { ...upload, ...update });
+            const uploads = s.uploads.replaceBy('id', upload);
 
             return { ...s, uploads };
         });
+
+        return upload;
     }
 
     private addUpload(upload: Upload) {

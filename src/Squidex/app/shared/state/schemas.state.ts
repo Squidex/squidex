@@ -271,7 +271,7 @@ export class SchemasState extends State<Snapshot> {
     public lockField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
         return this.schemasService.lockField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
             mapVersioned(() => setLocked(field, true)),
-            tap(({ payload, version }) => {
+            tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
             shareSubscribed(this.dialogs, { project: x => x.payload }));
@@ -280,7 +280,7 @@ export class SchemasState extends State<Snapshot> {
     public enableField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
         return this.schemasService.enableField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
             mapVersioned(() => setDisabled(field, false)),
-            tap(({ payload, version }) => {
+            tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
             shareSubscribed(this.dialogs, { project: x => x.payload }));
@@ -289,7 +289,7 @@ export class SchemasState extends State<Snapshot> {
     public disableField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
         return this.schemasService.disableField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
             mapVersioned(() => setDisabled(field, true)),
-            tap(({ payload, version }) => {
+            tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
             shareSubscribed(this.dialogs, { project: x => x.payload }));
@@ -298,7 +298,7 @@ export class SchemasState extends State<Snapshot> {
     public showField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
         return this.schemasService.showField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
             mapVersioned(() => setHidden(field, false)),
-            tap(({ payload, version }) => {
+            tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
             shareSubscribed(this.dialogs, { project: x => x.payload }));
@@ -307,7 +307,7 @@ export class SchemasState extends State<Snapshot> {
     public hideField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
         return this.schemasService.hideField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
             mapVersioned(() => setHidden(field, true)),
-            tap(({ payload, version }) => {
+            tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
             shareSubscribed(this.dialogs, { project: x => x.payload }));
@@ -316,7 +316,7 @@ export class SchemasState extends State<Snapshot> {
     public updateField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, request: UpdateFieldDto, now?: DateTime): Observable<T> {
         return this.schemasService.putField(this.appName, schema.name, field.fieldId, request, pidof(field), schema.version).pipe(
             mapVersioned(() => update(field, request.properties)),
-            tap(({ payload, version }) => {
+            tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
             shareSubscribed(this.dialogs, { project: x => x.payload }));
@@ -325,7 +325,7 @@ export class SchemasState extends State<Snapshot> {
     public deleteField(schema: SchemaDetailsDto, field: AnyFieldDto, now?: DateTime): Observable<any> {
         return this.schemasService.deleteField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
             mapVersioned(() => field),
-            tap(({ payload, version }) => {
+            tap(({ version, payload }) => {
                 this.removeField(schema, payload, version, now);
             }),
             shareSubscribed(this.dialogs));

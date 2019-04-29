@@ -37,10 +37,12 @@
 .uploads {
     & {
         border: 2px solid transparent;
+        background: none;
+        min-height: 2rem;
     }
     
     &-empty {
-        line-height: 2rem;
+        line-height: 1.8rem;
     }
 }
 
@@ -60,6 +62,34 @@
         @include truncate;
         padding-right: .5rem;
         padding-left: .5rem;
+    }
+}
+
+$circle-size: 1.6rem;
+
+.upload-status {
+    & {
+        @include circle($circle-size);
+        display: inline-block;
+        line-height: $circle-size + .1rem;
+        text-align: center;
+        font-size: .4 * $circle-size;
+        font-weight: normal;
+        background: $color-border;
+        color: $color-dark-foreground;
+        cursor: none;
+    }
+
+    &-running {
+        color: inherit;
+    }
+
+    &-failed {
+        background: $color-theme-error;
+    }
+
+    &-success {
+        background: $color-theme-green;
     }
 }
 

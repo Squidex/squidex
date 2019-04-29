@@ -15,21 +15,20 @@
 </div>
 
 <div class="row assets" [class.unrow]="isListView" *ngIf="state.tagsNames | async; let tags" (paste)="addFiles($event)">
-    <ng-container *ngIf="state.uploads | async; let uploads">
-        <sqx-asset *ngFor="let upload of uploads; trackBy: trackByUpload" [upload]="upload"
-            [isListView]="isListView">
-        </sqx-asset>
-    </ng-container>
+    <sqx-asset *ngFor="let file of newFiles" [initFile]="file"
+        [isListView]="isListView"
+        (loadError)="remove(file)" 
+        (load)="add(file, $event)">
+    </sqx-asset>
 
-    <ng-container *ngIf="state.assetsWithUploads | async; let assets">
-        <sqx-asset *ngFor="let a of assets; trackBy: trackByAsset" [asset]="a.asset" [upload]="a.upload"
+    <ng-container *ngIf="state.assets | async; let assets">
+        <sqx-asset *ngFor="let asset of assets; trackBy: trackByAsset" [asset]="asset"
             [isListView]="isListView"
             [isDisabled]="isDisabled"
             [isSelectable]="selectedIds"
-            [isSelected]="isSelected(a.asset)"
+            [isSelected]="isSelected(asset)"
             [allTags]="tags"
             (update)="update($event)"
-            (uploadFile)="updateFile(a.asset, $event)"
             (select)="emitSelect($event)"
             (delete)="delete($event)">
         </sqx-asset>
