@@ -81,7 +81,7 @@ describe('SchemasState', () => {
 
             expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
-            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false });
+            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, '': true });
 
             schemasService.verifyAll();
         });
@@ -95,7 +95,7 @@ describe('SchemasState', () => {
 
             expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
-            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true });
+            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true, '': true });
 
             schemasService.verifyAll();
         });
@@ -123,13 +123,13 @@ describe('SchemasState', () => {
         it('should add category', () => {
             schemasState.addCategory('category3');
 
-            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true });
+            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true, '': true });
         });
 
         it('should remove category', () => {
             schemasState.removeCategory('category1');
 
-            expect(schemasState.snapshot.categories).toEqual({ 'category2': false });
+            expect(schemasState.snapshot.categories).toEqual({ 'category2': false, '': true });
         });
 
         it('should return schema on select and reload when already loaded', () => {
