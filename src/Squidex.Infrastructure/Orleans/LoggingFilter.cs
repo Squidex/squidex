@@ -29,6 +29,10 @@ namespace Squidex.Infrastructure.Orleans
             {
                 await context.Invoke();
             }
+            catch (DomainException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 log.LogError(ex, w => w
