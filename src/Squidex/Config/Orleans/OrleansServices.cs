@@ -28,6 +28,11 @@ namespace Squidex.Config.Orleans
         {
             services.AddOrleans(config, environment, builder =>
             {
+                builder.ConfigureLogging(logging =>
+                {
+                    logging.AddFilters();
+                });
+
                 builder.ConfigureServices(siloServices =>
                 {
                     siloServices.AddSingleton<IIncomingGrainCallFilter, LocalCacheFilter>();

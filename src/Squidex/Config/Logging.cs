@@ -14,7 +14,7 @@ namespace Squidex.Config
 {
     public static class Logging
     {
-        public static void AddFilter(this ILoggingBuilder builder)
+        public static void AddFilters(this ILoggingBuilder builder)
         {
             builder.AddFilter((category, level) =>
             {

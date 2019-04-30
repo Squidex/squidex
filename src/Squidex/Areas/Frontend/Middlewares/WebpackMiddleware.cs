@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.IO;
-using System.Text;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -15,10 +13,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 {
     public sealed class WebpackMiddleware
     {
-        private const string Host = "localhost";
-        private const string Port = "3000";
-        private static readonly string[] Scripts = { "shims", "app" };
-        private static readonly string[] Styles = Array.Empty<string>();
+        private const string WebpackUrl = "http://localhost:3000/index.html";
         private readonly RequestDelegate next;
 
         public WebpackMiddleware(RequestDelegate next)
@@ -30,77 +25,34 @@ namespace Squidex.Areas.Frontend.Middlewares
         {
             if (context.IsHtmlPath())
             {
-                var responseBuffer = new MemoryStream();
-                var responseBody = context.Response.Body;
-
-                context.Response.Body = responseBuffer;
-
-                await next(context);
-
-                context.Response.Body = responseBody;
-
-                var response = Encoding.UTF8.GetString(responseBuffer.ToArray());
-
-                if (context.IsIndex())
+                if (context.Response.StatusCode != 304)
                 {
-                    response = InjectStyles(response);
-                    response = InjectScripts(response);
+                    using (var client = new HttpClient())
+                    {
+                        var result = await client.GetAsync(WebpackUrl);
+
+                        context.Response.StatusCode = (int)result.StatusCode;
+
+                        if (result.IsSuccessStatusCode)
+                        {
+                            var html = await result.Content.ReadAsStringAsync();
+
+                            var basePath = context.Request.PathBase;
+
+                            if (basePath.HasValue)
+                            {
+                                html = AdjustBase(html, basePath.Value);
+                            }
+
+                            await context.Response.WriteHtmlAsync(html);
+                        }
+                    }
                 }
-
-                var basePath = context.Request.PathBase;
-
-                if (basePath.HasValue)
-                {
-                    response = AdjustBase(response, basePath.Value);
-                }
-
-                context.Response.ContentLength = Encoding.UTF8.GetByteCount(response);
-                context.Response.Body = responseBody;
-
-                await context.Response.WriteAsync(response);
             }
             else
             {
                 await next(context);
             }
-        }
-
-        private static string InjectStyles(string response)
-        {
-            if (!response.Contains("</head>"))
-            {
-                return response;
-            }
-
-            var sb = new StringBuilder();
-
-            foreach (var file in Styles)
-            {
-                sb.AppendLine($"<link href=\"http://{Host}:{Port}/{file}.css\" rel=\"stylesheet\">");
-            }
-
-            response = response.Replace("</head>", $"{sb}</head>");
-
-            return response;
-        }
-
-        private static string InjectScripts(string response)
-        {
-            if (!response.Contains("</body>"))
-            {
-                return response;
-            }
-
-            var sb = new StringBuilder();
-
-            foreach (var file in Scripts)
-            {
-                sb.AppendLine($"<script type=\"text/javascript\" src=\"http://{Host}:{Port}/{file}.js\"></script>");
-            }
-
-            response = response.Replace("</body>", $"{sb}</body>");
-
-            return response;
         }
 
         private static string AdjustBase(string response, string baseUrl)

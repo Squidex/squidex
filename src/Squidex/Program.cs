@@ -31,7 +31,7 @@ namespace Squidex
                 {
                     builder.AddConfiguration(hostingContext.Configuration.GetSection("logging"));
                     builder.AddSemanticLog();
-                    builder.AddFilter();
+                    builder.AddFilters();
                 })
                 .ConfigureAppConfiguration((hostContext, builder) =>
                 {
