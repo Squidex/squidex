@@ -36,6 +36,7 @@ namespace Squidex.Config.Orleans
                 builder.ConfigureServices(siloServices =>
                 {
                     siloServices.AddSingleton<IIncomingGrainCallFilter, LocalCacheFilter>();
+                    siloServices.AddSingleton<IIncomingGrainCallFilter, LoggingFilter>();
                 });
 
                 builder.ConfigureApplicationParts(parts =>

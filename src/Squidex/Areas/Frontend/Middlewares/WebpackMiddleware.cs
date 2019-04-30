@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -23,7 +25,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.IsHtmlPath())
+            if (context.IsIndex())
             {
                 if (context.Response.StatusCode != 304)
                 {
@@ -37,17 +39,32 @@ namespace Squidex.Areas.Frontend.Middlewares
                         {
                             var html = await result.Content.ReadAsStringAsync();
 
-                            var basePath = context.Request.PathBase;
-
-                            if (basePath.HasValue)
-                            {
-                                html = AdjustBase(html, basePath.Value);
-                            }
+                            html = AdjustBase(html, context.Request.PathBase);
 
                             await context.Response.WriteHtmlAsync(html);
                         }
                     }
                 }
+            }
+            else if (context.IsHtmlPath())
+            {
+                var responseBuffer = new MemoryStream();
+                var responseBody = context.Response.Body;
+
+                context.Response.Body = responseBuffer;
+
+                await next(context);
+
+                context.Response.Body = responseBody;
+
+                var html = Encoding.UTF8.GetString(responseBuffer.ToArray());
+
+                html = AdjustBase(html, context.Request.PathBase);
+
+                context.Response.ContentLength = Encoding.UTF8.GetByteCount(html);
+                context.Response.Body = responseBody;
+
+                await context.Response.WriteAsync(html);
             }
             else
             {
@@ -55,9 +72,16 @@ namespace Squidex.Areas.Frontend.Middlewares
             }
         }
 
-        private static string AdjustBase(string response, string baseUrl)
+        private static string AdjustBase(string html, PathString baseUrl)
         {
-            return response.Replace("<base href=\"/\">", $"<base href=\"{baseUrl}/\">");
+            if (baseUrl.HasValue)
+            {
+                return html.Replace("<base href=\"/\">", $"<base href=\"{baseUrl}/\">");
+            }
+            else
+            {
+                return html;
+            }
         }
     }
 }
