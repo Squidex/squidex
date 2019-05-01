@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -15,10 +15,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 {
     public sealed class WebpackMiddleware
     {
-        private const string Host = "localhost";
-        private const string Port = "3000";
-        private static readonly string[] Scripts = { "shims", "app" };
-        private static readonly string[] Styles = Array.Empty<string>();
+        private const string WebpackUrl = "http://localhost:3000/index.html";
         private readonly RequestDelegate next;
 
         public WebpackMiddleware(RequestDelegate next)
@@ -28,7 +25,28 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.IsHtmlPath())
+            if (context.IsIndex())
+            {
+                if (context.Response.StatusCode != 304)
+                {
+                    using (var client = new HttpClient())
+                    {
+                        var result = await client.GetAsync(WebpackUrl);
+
+                        context.Response.StatusCode = (int)result.StatusCode;
+
+                        if (result.IsSuccessStatusCode)
+                        {
+                            var html = await result.Content.ReadAsStringAsync();
+
+                            html = AdjustBase(html, context.Request.PathBase);
+
+                            await context.Response.WriteHtmlAsync(html);
+                        }
+                    }
+                }
+            }
+            else if (context.IsHtmlPath())
             {
                 var responseBuffer = new MemoryStream();
                 var responseBody = context.Response.Body;
@@ -39,25 +57,14 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                 context.Response.Body = responseBody;
 
-                var response = Encoding.UTF8.GetString(responseBuffer.ToArray());
+                var html = Encoding.UTF8.GetString(responseBuffer.ToArray());
 
-                if (context.IsIndex())
-                {
-                    response = InjectStyles(response);
-                    response = InjectScripts(response);
-                }
+                html = AdjustBase(html, context.Request.PathBase);
 
-                var basePath = context.Request.PathBase;
-
-                if (basePath.HasValue)
-                {
-                    response = AdjustBase(response, basePath.Value);
-                }
-
-                context.Response.ContentLength = Encoding.UTF8.GetByteCount(response);
+                context.Response.ContentLength = Encoding.UTF8.GetByteCount(html);
                 context.Response.Body = responseBody;
 
-                await context.Response.WriteAsync(response);
+                await context.Response.WriteAsync(html);
             }
             else
             {
@@ -65,47 +72,16 @@ namespace Squidex.Areas.Frontend.Middlewares
             }
         }
 
-        private static string InjectStyles(string response)
+        private static string AdjustBase(string html, PathString baseUrl)
         {
-            if (!response.Contains("</head>"))
+            if (baseUrl.HasValue)
             {
-                return response;
+                return html.Replace("<base href=\"/\">", $"<base href=\"{baseUrl}/\">");
             }
-
-            var sb = new StringBuilder();
-
-            foreach (var file in Styles)
+            else
             {
-                sb.AppendLine($"<link href=\"http://{Host}:{Port}/{file}.css\" rel=\"stylesheet\">");
+                return html;
             }
-
-            response = response.Replace("</head>", $"{sb}</head>");
-
-            return response;
-        }
-
-        private static string InjectScripts(string response)
-        {
-            if (!response.Contains("</body>"))
-            {
-                return response;
-            }
-
-            var sb = new StringBuilder();
-
-            foreach (var file in Scripts)
-            {
-                sb.AppendLine($"<script type=\"text/javascript\" src=\"http://{Host}:{Port}/{file}.js\"></script>");
-            }
-
-            response = response.Replace("</body>", $"{sb}</body>");
-
-            return response;
-        }
-
-        private static string AdjustBase(string response, string baseUrl)
-        {
-            return response.Replace("<base href=\"/\">", $"<base href=\"{baseUrl}/\">");
         }
     }
 }

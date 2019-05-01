@@ -46,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
         {
             var pathString = path.ToPathString();
 
-            errors.Add(new ValidationError($"{pathString}: {message}", pathString));
+            errors.Add(new ValidationError(message, pathString));
         }
 
         public Task ValidatePartialAsync(NamedContentData data)

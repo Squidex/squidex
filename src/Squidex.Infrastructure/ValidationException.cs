@@ -78,18 +78,21 @@ namespace Squidex.Infrastructure
 
                 for (var i = 0; i < errors.Count; i++)
                 {
-                    var error = errors[i].Message;
+                    var error = errors[i]?.Message;
 
-                    sb.Append(error);
-
-                    if (!error.EndsWith(".", StringComparison.OrdinalIgnoreCase))
+                    if (!string.IsNullOrWhiteSpace(error))
                     {
-                        sb.Append(".");
-                    }
+                        sb.Append(error);
 
-                    if (i < errors.Count - 1)
-                    {
-                        sb.Append(" ");
+                        if (!error.EndsWith(".", StringComparison.OrdinalIgnoreCase))
+                        {
+                            sb.Append(".");
+                        }
+
+                        if (i < errors.Count - 1)
+                        {
+                            sb.Append(" ");
+                        }
                     }
                 }
             }
