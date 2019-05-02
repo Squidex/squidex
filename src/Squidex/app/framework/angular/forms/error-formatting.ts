@@ -26,6 +26,7 @@ const DEFAULT_ERRORS: { [key: string]: string } = {
     patternmessage: '{message}',
     required: '{field} is required.',
     requiredTrue: '{field} is required.',
+    uniquestrings: '{field} must not contain duplicate values.',
     validdatetime: '{field} is not a valid date time.',
     validvalues: '{field} is not a valid value.',
     validarrayvalues: '{field} contains an invalid value: {invalidvalue}.'

@@ -7,7 +7,7 @@
 
 import { AbstractControl, ValidatorFn, Validators } from '@angular/forms';
 
-import { DateTime } from '@app/framework/internal';
+import { DateTime, Types } from '@app/framework/internal';
 
 function isEmptyInputValue(value: any): boolean {
     return value == null || value.length === 0;
@@ -169,6 +169,27 @@ export module ValidatorsEx {
                     if (values.indexOf(n) < 0) {
                         return { validarrayvalues: { invalidvalue: n } };
                     }
+                }
+            }
+
+            return null;
+        };
+    }
+
+    export function uniqueStrings(): ValidatorFn {
+        return (control: AbstractControl) => {
+            if (isEmptyInputValue(control.value) || !Types.isArrayOfString(control.value)) {
+                return null;
+            }
+
+            const a: string[] = control.value;
+            const unique: { [key: string]: boolean } = {};
+
+            for (let value of a) {
+                if (unique[value]) {
+                    return { uniquestrings: false };
+                } else {
+                    unique[value] = true;
                 }
             }
 
