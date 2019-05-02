@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             if (!(isReserved = await appsByNameIndex.ReserveAppAsync(appId, appName)))
             {
-                throw new BackupRestoreException("The app id or name is not available.");
+                throw new BackupRestoreException("vThe app id or name is not available.");
             }
         }
 
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             if (isReserved)
             {
-                await appsByNameIndex.ReserveAppAsync(appId, appName);
+                await appsByNameIndex.RemoveReservationAsync(appId, appName);
             }
         }
 
