@@ -55,6 +55,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
             }
 
+            if (!field.Properties.AllowDuplicates)
+            {
+                yield return new UniqueValuesValidator<Guid>();
+            }
+
             yield return new AssetsValidator(field.Properties);
         }
 
@@ -123,6 +128,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             if (field.Properties.IsRequired || field.Properties.MinItems.HasValue || field.Properties.MaxItems.HasValue)
             {
                 yield return new CollectionValidator(field.Properties.IsRequired, field.Properties.MinItems, field.Properties.MaxItems);
+            }
+
+            if (!field.Properties.AllowDuplicates)
+            {
+                yield return new UniqueValuesValidator<Guid>();
             }
 
             if (field.Properties.SchemaId != Guid.Empty)

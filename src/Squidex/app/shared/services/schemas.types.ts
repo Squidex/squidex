@@ -169,6 +169,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto {
     public readonly maxHeight?: number;
     public readonly aspectWidth?: number;
     public readonly aspectHeight?: number;
+    public readonly allowDuplicates?: boolean;
 
     public get isSortable() {
         return false;
@@ -296,6 +297,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly minItems?: number;
     public readonly maxItems?: number;
     public readonly schemaId?: string;
+    public readonly allowDuplicates?: boolean;
 
     public get isSortable() {
         return false;

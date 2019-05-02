@@ -197,6 +197,10 @@ export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorF
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
         ];
 
+        if (!properties.allowDuplicates) {
+            validators.push(ValidatorsEx.uniqueStrings());
+        }
+
         return validators;
     }
 
@@ -204,6 +208,10 @@ export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorF
         const validators: ValidatorFn[] = [
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems)
         ];
+
+        if (!properties.allowDuplicates) {
+            validators.push(ValidatorsEx.uniqueStrings());
+        }
 
         return validators;
     }

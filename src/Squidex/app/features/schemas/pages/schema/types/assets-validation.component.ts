@@ -61,5 +61,8 @@ export class AssetsValidationComponent implements OnInit {
 
         this.editForm.setControl('aspectHeight',
             new FormControl(this.properties.aspectHeight));
+
+        this.editForm.setControl('allowDuplicates',
+            new FormControl(this.properties.allowDuplicates));
     }
 }

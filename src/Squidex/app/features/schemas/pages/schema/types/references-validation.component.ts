@@ -31,6 +31,9 @@ export class ReferencesValidationComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.editForm.setControl('allowDuplicates',
+            new FormControl(this.properties.allowDuplicates));
+
         this.editForm.setControl('maxItems',
             new FormControl(this.properties.maxItems));
 

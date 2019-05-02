@@ -62,6 +62,16 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
+        public async Task Should_not_add_error_if_duplicate_values_are_allowed()
+        {
+            var sut = Field(new ReferencesFieldProperties { MinItems = 2, MaxItems = 2, AllowDuplicates = true });
+
+            await sut.ValidateAsync(CreateValue(ref1, ref1), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
         public async Task Should_add_error_if_references_are_required_and_null()
         {
             var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId, IsRequired = true });
@@ -125,6 +135,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             errors.Should().BeEquivalentTo(
                 new[] { $"Contains invalid reference '{ref1}'." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_reference_contains_duplicate_values()
+        {
+            var sut = Field(new ReferencesFieldProperties { SchemaId = schemaId });
+
+            await sut.ValidateAsync(CreateValue(ref1, ref1), errors, ValidationTestExtensions.References(ref1));
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must not contain duplicate values." });
         }
 
         private static IJsonValue CreateValue(params Guid[] ids)
