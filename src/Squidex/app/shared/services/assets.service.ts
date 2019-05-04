@@ -46,8 +46,8 @@ export class AssetDto extends Model<AssetDto> {
         public readonly mimeType: string,
         public readonly isDuplicate: boolean,
         public readonly isImage: boolean,
-        public readonly pixelWidth: number | null,
-        public readonly pixelHeight: number | null,
+        public readonly pixelWidth: number | null | undefined,
+        public readonly pixelHeight: number | null | undefined,
         public readonly slug: string,
         public readonly tags: string[],
         public readonly url: string,
@@ -89,6 +89,15 @@ export interface AssetReplacedDto {
     readonly isImage: boolean;
     readonly pixelWidth?: number | null;
     readonly pixelHeight?: number | null;
+}
+
+export interface AssetUploadedDto extends AssetReplacedDto {
+    readonly id: string;
+    readonly fileName: string;
+    readonly fileType: string;
+    readonly slug: string;
+    readonly isDuplicate: boolean;
+    readonly tags?: string[];
 }
 
 @Injectable()
@@ -176,7 +185,7 @@ export class AssetsService {
                 pretifyError('Failed to load assets. Please reload.'));
     }
 
-    public uploadFile(appName: string, file: File, user: string, now: DateTime): Observable<number | AssetDto> {
+    public uploadFile(appName: string, file: File): Observable<number | Versioned<AssetUploadedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
         const req = new HttpRequest('POST', url, getFormData(file), { reportProgress: true });
@@ -192,32 +201,8 @@ export class AssetsService {
                         return percentDone;
                     } else if (Types.is(event, HttpResponse)) {
                         const response: any = event.body;
-                        const assetUrl = this.apiUrl.buildUrl(`api/assets/${response.id}`);
 
-                        now = now || DateTime.now();
-
-                        const dto =  new AssetDto(
-                            response.id,
-                            user,
-                            user,
-                            now,
-                            now,
-                            response.fileName,
-                            response.fileHash,
-                            response.fileType,
-                            response.fileSize,
-                            response.fileVersion,
-                            response.mimeType,
-                            response.isDuplicate,
-                            response.isImage,
-                            response.pixelWidth,
-                            response.pixelHeight,
-                            response.slug,
-                            response.tags || [],
-                            assetUrl,
-                            new Version(event.headers.get('etag')!));
-
-                        return dto;
+                        return versioned(new Version(event.headers.get('etag')!), response);
                     } else {
                         throw 'Invalid';
                     }

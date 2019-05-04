@@ -10,6 +10,7 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, Mock } from 'typemoq';
 
 import {
+    ApiUrlConfig,
     AssetDto,
     AssetReplacedDto,
     AssetsService,
@@ -28,10 +29,9 @@ describe('AssetsState', () => {
         app,
         appsState,
         authService,
-        creator,
-        creation,
         modified,
-        modifier
+        modifier,
+        version
     } = TestValues;
 
     let assetsService: IMock<AssetsService>;
@@ -39,10 +39,10 @@ describe('AssetsState', () => {
     let assetUploader: AssetUploaderState;
 
     const asset = new AssetDto('id1',
-        creator,
-        creator,
-        creation,
-        creation,
+        modifier,
+        modifier,
+        modified,
+        modified,
         'my-asset',
         'my-hash',
         'png',
@@ -55,14 +55,16 @@ describe('AssetsState', () => {
         600,
         'my-slug',
         [],
-        'http://url',
-        new Version('1'));
+        'http://url/api/assets/id1',
+        version);
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 
+        const apiUrl = new ApiUrlConfig('http://url');
+
         assetsService = Mock.ofType<AssetsService>();
-        assetUploader = new AssetUploaderState(appsState.object, assetsService.object, authService.object, dialogs.object);
+        assetUploader = new AssetUploaderState(appsState.object, apiUrl, assetsService.object, authService.object, dialogs.object);
     });
 
     afterEach(() => {
@@ -72,7 +74,7 @@ describe('AssetsState', () => {
     it('should create initial state when uploading file', () => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.uploadFile(app, file, modifier, modified))
+        assetsService.setup(x => x.uploadFile(app, file))
             .returns(() => never()).verifiable();
 
         assetUploader.uploadFile(file, undefined, modified).subscribe();
@@ -86,7 +88,7 @@ describe('AssetsState', () => {
     it('should update progress when uploading file makes progress', () => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.uploadFile(app, file, modifier, modified))
+        assetsService.setup(x => x.uploadFile(app, file))
             .returns(() => ofForever(10, 20)).verifiable();
 
         assetUploader.uploadFile(file, undefined, modified).subscribe();
@@ -100,7 +102,7 @@ describe('AssetsState', () => {
     it('should update status when uploading file failed', () => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.uploadFile(app, file, modifier, modified))
+        assetsService.setup(x => x.uploadFile(app, file))
             .returns(() => throwError('Error')).verifiable();
 
         assetUploader.uploadFile(file, undefined, modified).pipe(onErrorResumeNext()).subscribe();
@@ -114,8 +116,8 @@ describe('AssetsState', () => {
     it('should update status when uploading file completes', (cb) => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.uploadFile(app, file, modifier, modified))
-            .returns(() => of(10, 20, asset)).verifiable();
+        assetsService.setup(x => x.uploadFile(app, file))
+            .returns(() => of(10, 20, versioned(version, { ...asset }))).verifiable();
 
         let uploadedAsset: AssetDto;
 
@@ -131,7 +133,7 @@ describe('AssetsState', () => {
 
         expect(upload.status).toBe('Completed');
         expect(upload.progress).toBe(100);
-        expect(uploadedAsset!).toBe(asset);
+        expect(uploadedAsset!).toEqual(asset);
     });
 
     it('should create initial state when uploading asset', () => {
@@ -189,10 +191,11 @@ describe('AssetsState', () => {
             fileVersion: 2
         };
 
-        const newAsset = asset.update(update, modifier, new Version('2'), modified);
+        const newVersion = new Version('2');
+        const newAsset = asset.update(update, modifier, newVersion, modified);
 
         assetsService.setup(x => x.replaceFile(app, asset.id, file, asset.version))
-            .returns(() => of(10, 20, versioned(new Version('2'), update))).verifiable();
+            .returns(() => of(10, 20, versioned(newVersion, update))).verifiable();
 
         let uploadedAsset: AssetDto;
 

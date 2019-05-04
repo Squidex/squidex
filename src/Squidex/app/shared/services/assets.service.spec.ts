@@ -20,6 +20,7 @@ import {
     Version,
     Versioned
 } from '@app/shared/internal';
+import { AssetUploadedDto } from './assets.service';
 
 describe('AssetDto', () => {
     const creation = DateTime.today();
@@ -71,8 +72,6 @@ describe('AssetDto', () => {
 });
 
 describe('AssetsService', () => {
-    const now = DateTime.now();
-    const user = 'me';
     const version = new Version('1');
 
     beforeEach(() => {
@@ -315,10 +314,10 @@ describe('AssetsService', () => {
     it('should make post request to create asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetDto;
+        let asset: Versioned<AssetUploadedDto>;
 
-        assetsService.uploadFile('my-app', null!, user, now).subscribe(result => {
-            asset = <AssetDto>result;
+        assetsService.uploadFile('my-app', null!).subscribe(result => {
+            asset = <Versioned<AssetUploadedDto>>result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
@@ -342,40 +341,38 @@ describe('AssetsService', () => {
             tags: ['tag1', 'tag2']
         }, {
             headers: {
-                etag: '2'
+                etag: '1'
             }
         });
 
-        expect(asset!).toEqual(
-            new AssetDto(
-                'id1',
-                user,
-                user,
-                now,
-                now,
-                'My Asset1.png',
-                'My Hash1',
-                'png',
-                1024, 2,
-                'image/png',
-                true,
-                true,
-                1024,
-                2048,
-                'my-asset1.png',
-                ['tag1', 'tag2'],
-                'http://service/p/api/assets/id1',
-                new Version('2')));
+        expect(asset!).toEqual({
+            payload: {
+                id: 'id1',
+                fileName: 'My Asset1.png',
+                fileHash: 'My Hash1',
+                fileType: 'png',
+                fileSize: 1024,
+                fileVersion: 2,
+                mimeType: 'image/png',
+                isDuplicate: true,
+                isImage: true,
+                pixelWidth: 1024,
+                pixelHeight: 2048,
+                slug: 'my-asset1.png',
+                tags: ['tag1', 'tag2']
+            },
+            version
+        });
     }));
 
     it('should return proper error when upload failed with 413',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetDto;
+        let asset: Versioned<AssetUploadedDto>;
         let error: ErrorDto;
 
-        assetsService.uploadFile('my-app', null!, user, now).subscribe(result => {
-            asset = <AssetDto>result;
+        assetsService.uploadFile('my-app', null!).subscribe(result => {
+            asset = <Versioned<AssetUploadedDto>>result;
         }, e => {
             error = e;
         });

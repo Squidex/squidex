@@ -111,6 +111,10 @@ export class ClientComponent implements OnChanges {
                 this.dialogs.notifyError(error);
             });
     }
+
+    public trackByRole(index: number, role: RoleDto) {
+        return role.name;
+    }
 }
 
 function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {

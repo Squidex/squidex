@@ -105,7 +105,7 @@
       "always"
     ],
     "template-no-negated-async": true,
-    "template-use-track-by-function": true,
+    "template-use-track-by-function": false,
     "trailing-comma": [
       true,
       {

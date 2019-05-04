@@ -10,15 +10,17 @@ import { Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, map, publishReplay, refCount, takeUntil } from 'rxjs/operators';
 
 import {
+    ApiUrlConfig,
     DateTime,
     DialogService,
     ImmutableArray,
     MathHelper,
     State,
-    Types
+    Types,
+    Versioned
 } from '@app/framework';
 
-import { AssetDto, AssetsService } from './../services/assets.service';
+import { AssetDto, AssetsService, AssetUploadedDto } from './../services/assets.service';
 import { AuthService } from './../services/auth.service';
 import { AppsState } from './apps.state';
 import { AssetsState } from './assets.state';
@@ -58,6 +60,7 @@ export class AssetUploaderState extends State<Snapshot> {
 
     constructor(
         private readonly appsState: AppsState,
+        private readonly apiUrl: ApiUrlConfig,
         private readonly assetsService: AssetsService,
         private readonly authService: AuthService,
         private readonly dialogs: DialogService
@@ -76,9 +79,11 @@ export class AssetUploaderState extends State<Snapshot> {
     }
 
     public uploadFile(file: File, target?: AssetsState, now?: DateTime): Observable<UploadResult> {
-        const stream = this.assetsService.uploadFile(this.appName, file, this.user, now || DateTime.now());
+        const stream = this.assetsService.uploadFile(this.appName, file);
 
-        return this.upload(stream, MathHelper.guid(), file, asset => {
+        return this.upload(stream, MathHelper.guid(), file, response  => {
+            const asset = createAsset(response, this.apiUrl, this.user, now);
+
             if (asset.isDuplicate) {
                 this.dialogs.notifyError('Asset has already been uploaded.');
             } else if (target) {
@@ -92,7 +97,11 @@ export class AssetUploaderState extends State<Snapshot> {
     public uploadAsset(asset: AssetDto, file: File, now?: DateTime): Observable<UploadResult> {
         const stream = this.assetsService.replaceFile(this.appName, asset.id, file, asset.version);
 
-        return this.upload(stream, asset.id, file, ({ version, payload }) => asset.update(payload, this.user, version, now));
+        return this.upload(stream, asset.id, file, ({ version, payload }) => {
+            const newAsset =  asset.update(payload, this.user, version, now);
+
+            return newAsset;
+        });
     }
 
     private upload<T>(source: Observable<number | T>, id: string, file: File, complete: ((completion: T) => AssetDto)) {
@@ -165,4 +174,33 @@ export class AssetUploaderState extends State<Snapshot> {
     private get user() {
         return this.authService.user!.token;
     }
+}
+
+function createAsset({ payload, version }: Versioned<AssetUploadedDto>, apiUrl: ApiUrlConfig, user: string, now?: DateTime) {
+    const assetUrl = apiUrl.buildUrl(`api/assets/${payload.id}`);
+
+    now = now || DateTime.now();
+
+    const asset =  new AssetDto(
+        payload.id,
+        user,
+        user,
+        now,
+        now,
+        payload.fileName,
+        payload.fileHash,
+        payload.fileType,
+        payload.fileSize,
+        payload.fileVersion,
+        payload.mimeType,
+        payload.isDuplicate,
+        payload.isImage,
+        payload.pixelWidth,
+        payload.pixelHeight,
+        payload.slug,
+        payload.tags || [],
+        assetUrl,
+        version);
+
+    return asset;
 }

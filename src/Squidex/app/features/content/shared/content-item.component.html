@@ -10,7 +10,7 @@
     </ng-template>
 </td>
 
-<td class="cell-auto" *ngFor="let field of schema.listFields; let i = index" (click)="shouldStop($event, field)">
+<td class="cell-auto" *ngFor="let field of schema.listFields; let i = index; trackBy: trackByField.bind(this)" (click)="shouldStop($event, field)">
     <ng-container *ngIf="field.isInlineEditable && !isReadOnly; else displayTemplate">
         <sqx-content-item-editor [form]="patchForm.form" [field]="field"></sqx-content-item-editor>
     </ng-container>

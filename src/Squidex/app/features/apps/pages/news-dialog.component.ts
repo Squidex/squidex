@@ -24,4 +24,8 @@ export class NewsDialogComponent {
     public emitClose() {
         this.close.emit();
     }
+
+    public trackByFeature(index: number, feature: FeatureDto) {
+        return feature;
+    }
 }

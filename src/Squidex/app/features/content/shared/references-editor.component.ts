@@ -144,4 +144,8 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
         this.callTouched();
         this.callChange(ids);
     }
+
+    public trackByContent(index: number, content: ContentDto) {
+        return content.id;
+    }
 }

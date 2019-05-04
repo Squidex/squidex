@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+// tslint:disable:template-use-track-by-function
+
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
@@ -362,32 +364,36 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
 
     public onCopy(event: ClipboardEvent) {
         if (!this.hasSelection()) {
-            event.clipboardData.setData('text/plain', this.snapshot.items.filter(x => !!x).join(','));
+            if (event.clipboardData) {
+                event.clipboardData.setData('text/plain', this.snapshot.items.filter(x => !!x).join(','));
+            }
 
             event.preventDefault();
         }
     }
 
     public onPaste(event: ClipboardEvent) {
-        const value = event.clipboardData.getData('text/plain');
+        if (event.clipboardData) {
+            const value = event.clipboardData.getData('text/plain');
 
-        if (value) {
-            this.resetForm();
+            if (value) {
+                this.resetForm();
 
-            const values = [...this.snapshot.items];
+                const values = [...this.snapshot.items];
 
-            for (let part of value.split(',')) {
-                const converted = this.converter.convert(part);
+                for (let part of value.split(',')) {
+                    const converted = this.converter.convert(part);
 
-                if (converted) {
-                    values.push(converted);
+                    if (converted) {
+                        values.push(converted);
+                    }
                 }
+
+                this.updateItems(values);
             }
 
-            this.updateItems(values);
+            event.preventDefault();
         }
-
-        event.preventDefault();
     }
 
     private hasSelection() {
