@@ -60,7 +60,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
                 return NotFound();
             }
 
-            var fileName = $"backup-{app}-{backup.Started:yyyy-MM-dd_HH-mm-ss}";
+            var fileName = $"backup-{app}-{backup.Started:yyyy-MM-dd_HH-mm-ss}.zip";
 
             return new FileCallbackResult("application/zip", fileName, false, bodyStream =>
             {
