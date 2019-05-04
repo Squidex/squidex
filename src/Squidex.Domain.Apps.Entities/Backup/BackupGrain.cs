@@ -164,7 +164,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                             job.HandledAssets = writer.WrittenAttachments;
 
                             lastTimestamp = await WritePeriodically(lastTimestamp);
-                        }, SquidexHeaders.AppId, Key.ToString(), null, currentTask.Token);
+                        }, SquidexHeaders.AppId, Key.ToString(), null, ct);
 
                         foreach (var handler in handlers)
                         {
@@ -181,7 +181,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     ct.ThrowIfCancellationRequested();
 
-                    await assetStore.UploadAsync(jobId, 0, null, stream, false, currentTask.Token);
+                    await assetStore.UploadAsync(jobId, 0, null, stream, false, ct);
                 }
 
                 job.Status = JobStatus.Completed;
