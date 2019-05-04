@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
 {
     public static class Downloader
     {
-        public static async Task DownloadAsync(this IBackupArchiveLocation backupArchiveLocation, Uri url, Guid id)
+        public static async Task DownloadAsync(this IBackupArchiveLocation backupArchiveLocation, Uri url, string id)
         {
             if (string.Equals(url.Scheme, "file"))
             {
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
             }
         }
 
-        public static async Task<BackupReader> OpenArchiveAsync(this IBackupArchiveLocation backupArchiveLocation, Guid id, IJsonSerializer serializer)
+        public static async Task<BackupReader> OpenArchiveAsync(this IBackupArchiveLocation backupArchiveLocation, string id, IJsonSerializer serializer)
         {
             Stream stream = null;
 

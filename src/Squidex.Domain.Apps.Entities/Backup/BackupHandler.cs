@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             return TaskHelper.Done;
         }
 
-        public virtual Task CleanupRestoreAsync(Guid appId)
+        public virtual Task CleanupRestoreErrorAsync(Guid appId)
         {
             return TaskHelper.Done;
         }

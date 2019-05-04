@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Orleans.Concurrency;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
@@ -34,8 +35,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IAssetStore assetStore;
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
-        private readonly IEnumerable<BackupHandler> handlers;
         private readonly IJsonSerializer serializer;
+        private readonly IServiceProvider serviceProvider;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
@@ -48,8 +49,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             IClock clock,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            IEnumerable<BackupHandler> handlers,
             IJsonSerializer serializer,
+            IServiceProvider serviceProvider,
             ISemanticLog log,
             IStore<Guid> store)
             : base(store)
@@ -59,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Guard.NotNull(clock, nameof(clock));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(handlers, nameof(handlers));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
             Guard.NotNull(serializer, nameof(serializer));
             Guard.NotNull(log, nameof(log));
 
@@ -68,8 +69,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.clock = clock;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
-            this.handlers = handlers;
             this.serializer = serializer;
+            this.serviceProvider = serviceProvider;
             this.log = log;
         }
 
@@ -86,10 +87,12 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 if (!job.Stopped.HasValue)
                 {
+                    var jobId = job.Id.ToString();
+
                     job.Stopped = clock.GetCurrentInstant();
 
-                    await Safe.DeleteAsync(backupArchiveLocation, job.Id, log);
-                    await Safe.DeleteAsync(assetStore, job.Id, log);
+                    await Safe.DeleteAsync(backupArchiveLocation, jobId, log);
+                    await Safe.DeleteAsync(assetStore, jobId, log);
 
                     job.Status = JobStatus.Failed;
 
@@ -120,15 +123,29 @@ namespace Squidex.Domain.Apps.Entities.Backup
             currentTask = new CancellationTokenSource();
             currentJob = job;
 
-            var lastTimestamp = job.Started;
-
             State.Jobs.Insert(0, job);
 
             await WriteStateAsync();
 
+            Process(job, currentTask.Token);
+        }
+
+        private void Process(BackupStateJob job, CancellationToken ct)
+        {
+            ProcessAsync(job, ct).Forget();
+        }
+
+        private async Task ProcessAsync(BackupStateJob job, CancellationToken ct)
+        {
+            var jobId = job.Id.ToString();
+
+            var handlers = CreateHandlers();
+
+            var lastTimestamp = job.Started;
+
             try
             {
-                using (var stream = await backupArchiveLocation.OpenStreamAsync(job.Id))
+                using (var stream = await backupArchiveLocation.OpenStreamAsync(jobId))
                 {
                     using (var writer = new BackupWriter(serializer, stream, true))
                     {
@@ -162,16 +179,16 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
                     stream.Position = 0;
 
-                    currentTask.Token.ThrowIfCancellationRequested();
+                    ct.ThrowIfCancellationRequested();
 
-                    await assetStore.UploadAsync(job.Id.ToString(), 0, null, stream, false, currentTask.Token);
+                    await assetStore.UploadAsync(jobId, 0, null, stream, false, currentTask.Token);
                 }
 
                 job.Status = JobStatus.Completed;
             }
             catch (Exception ex)
             {
-                log.LogError(ex, job.Id.ToString(), (ctx, w) => w
+                log.LogError(ex, jobId, (ctx, w) => w
                     .WriteProperty("action", "makeBackup")
                     .WriteProperty("status", "failed")
                     .WriteProperty("backupId", ctx));
@@ -180,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             finally
             {
-                await Safe.DeleteAsync(backupArchiveLocation, job.Id, log);
+                await Safe.DeleteAsync(backupArchiveLocation, jobId, log);
 
                 job.Stopped = clock.GetCurrentInstant();
 
@@ -220,13 +237,20 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
             else
             {
-                await Safe.DeleteAsync(backupArchiveLocation, job.Id, log);
-                await Safe.DeleteAsync(assetStore, job.Id, log);
+                var jobId = job.Id.ToString();
+
+                await Safe.DeleteAsync(backupArchiveLocation, jobId, log);
+                await Safe.DeleteAsync(assetStore, jobId, log);
 
                 State.Jobs.Remove(job);
 
                 await WriteStateAsync();
             }
+        }
+
+        private IEnumerable<BackupHandler> CreateHandlers()
+        {
+            return serviceProvider.GetRequiredService<IEnumerable<BackupHandler>>();
         }
 
         public Task<J<List<IBackupJob>>> GetStateAsync()
