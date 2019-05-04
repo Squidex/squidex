@@ -20,7 +20,6 @@ const creation = DateTime.today().addDays(-2);
 const creator = 'me';
 const modified = DateTime.now().addDays(-1);
 const modifier = 'now-me';
-const now = DateTime.now();
 const version = new Version('1');
 const newVersion = new Version('2');
 
@@ -45,8 +44,6 @@ export const TestValues = {
     creator,
     modified,
     modifier,
-    now,
     newVersion,
-    userId: modifier,
     version
 };

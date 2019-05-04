@@ -10,13 +10,16 @@ import { Observable, of } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
+    DateTime,
     DialogService,
     ImmutableArray,
+    Permission,
     shareSubscribed,
     State
 } from '@app/framework';
 
 import {
+    AppCreatedDto,
     AppDto,
     AppsService,
     CreateAppDto
@@ -79,11 +82,11 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: CreateAppDto): Observable<AppDto> {
+    public create(request: CreateAppDto, now?: DateTime): Observable<AppDto> {
         return this.appsService.postApp(request).pipe(
             tap(payload => {
                 this.next(s => {
-                    const apps = s.apps.push(payload).sortByStringAsc(x => x.name);
+                    const apps = s.apps.push(createApp(request, payload, now)).sortByStringAsc(x => x.name);
 
                     return { ...s, apps };
                 });
@@ -104,4 +107,19 @@ export class AppsState extends State<Snapshot> {
             }),
             shareSubscribed(this.dialogs));
     }
+}
+
+function createApp(request: CreateAppDto, response: AppCreatedDto, now?: DateTime) {
+    now = now || DateTime.now();
+
+    const app = new AppDto(
+        response.id,
+        request.name,
+        response.permissions.map(x => new Permission(x)),
+        now,
+        now,
+        response.planName,
+        response.planUpgrade);
+
+    return app;
 }

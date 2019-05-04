@@ -171,23 +171,21 @@ export class SchemaPropertiesDto {
     }
 }
 
-export class AddFieldDto {
-    constructor(
-        public readonly name: string,
-        public readonly partitioning: string,
-        public readonly properties: FieldPropertiesDto
-    ) {
-    }
+export interface AddFieldDto {
+    readonly name: string;
+    readonly partitioning: string;
+    readonly properties: FieldPropertiesDto;
 }
 
-export class CreateSchemaDto {
-    constructor(
-        public readonly name: string,
-        public readonly fields?: RootFieldDto[],
-        public readonly properties?: SchemaPropertiesDto,
-        public readonly isSingleton?: boolean
-    ) {
-    }
+export interface CreateSchemaDto {
+    readonly name: string;
+    readonly fields?: RootFieldDto[];
+    readonly properties?: SchemaPropertiesDto;
+    readonly isSingleton?: boolean;
+}
+
+export interface SchemaCreatedDto {
+    readonly id: string;
 }
 
 export interface UpdateSchemaCategoryDto {
@@ -303,28 +301,11 @@ export class SchemasService {
             pretifyError('Failed to load schema. Please reload.'));
     }
 
-    public postSchema(appName: string, dto: CreateSchemaDto, user: string, now: DateTime): Observable<SchemaDetailsDto> {
+    public postSchema(appName: string, dto: CreateSchemaDto): Observable<Versioned<SchemaCreatedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
         return HTTP.postVersioned<any>(this.http, url, dto).pipe(
-            map(({ version, payload }) => {
-                const body = payload.body;
-
-                now = now || DateTime.now();
-
-                const schema = new SchemaDetailsDto(
-                    body.id,
-                    dto.name, '',
-                    dto.properties || new SchemaPropertiesDto(),
-                    dto.isSingleton === true,
-                    false,
-                    now, user,
-                    now, user,
-                    version,
-                    dto.fields || []);
-
-                return schema;
-            }),
+            mapVersioned(({ body }) => body!),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Created', appName);
             }),

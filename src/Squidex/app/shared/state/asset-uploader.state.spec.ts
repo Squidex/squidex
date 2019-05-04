@@ -31,9 +31,7 @@ describe('AssetsState', () => {
         creator,
         creation,
         modified,
-        modifier,
-        now,
-        userId
+        modifier
     } = TestValues;
 
     let assetsService: IMock<AssetsService>;
@@ -74,10 +72,10 @@ describe('AssetsState', () => {
     it('should create initial state when uploading file', () => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.uploadFile(app, file, userId, now))
+        assetsService.setup(x => x.uploadFile(app, file, modifier, modified))
             .returns(() => never()).verifiable();
 
-        assetUploader.uploadFile(file, undefined, now).subscribe();
+        assetUploader.uploadFile(file, undefined, modified).subscribe();
 
         const upload = assetUploader.snapshot.uploads.at(0);
 
@@ -88,10 +86,10 @@ describe('AssetsState', () => {
     it('should update progress when uploading file makes progress', () => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.uploadFile(app, file, userId, now))
+        assetsService.setup(x => x.uploadFile(app, file, modifier, modified))
             .returns(() => ofForever(10, 20)).verifiable();
 
-        assetUploader.uploadFile(file, undefined, now).subscribe();
+        assetUploader.uploadFile(file, undefined, modified).subscribe();
 
         const upload = assetUploader.snapshot.uploads.at(0);
 
@@ -102,10 +100,10 @@ describe('AssetsState', () => {
     it('should update status when uploading file failed', () => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.uploadFile(app, file, userId, now))
+        assetsService.setup(x => x.uploadFile(app, file, modifier, modified))
             .returns(() => throwError('Error')).verifiable();
 
-        assetUploader.uploadFile(file, undefined, now).pipe(onErrorResumeNext()).subscribe();
+        assetUploader.uploadFile(file, undefined, modified).pipe(onErrorResumeNext()).subscribe();
 
         const upload = assetUploader.snapshot.uploads.at(0);
 
@@ -116,12 +114,12 @@ describe('AssetsState', () => {
     it('should update status when uploading file completes', (cb) => {
         const file: File = <any>{ name: 'my-file' };
 
-        assetsService.setup(x => x.uploadFile(app, file, userId, now))
+        assetsService.setup(x => x.uploadFile(app, file, modifier, modified))
             .returns(() => of(10, 20, asset)).verifiable();
 
         let uploadedAsset: AssetDto;
 
-        assetUploader.uploadFile(file, undefined, now).subscribe(dto => {
+        assetUploader.uploadFile(file, undefined, modified).subscribe(dto => {
             if (Types.is(dto, AssetDto)) {
                 uploadedAsset = dto;
             }
@@ -142,7 +140,7 @@ describe('AssetsState', () => {
         assetsService.setup(x => x.replaceFile(app, asset.id, file, asset.version))
             .returns(() => never()).verifiable();
 
-        assetUploader.uploadAsset(asset, file, now).subscribe();
+        assetUploader.uploadAsset(asset, file, modified).subscribe();
 
         const upload = assetUploader.snapshot.uploads.at(0);
 
@@ -156,7 +154,7 @@ describe('AssetsState', () => {
         assetsService.setup(x => x.replaceFile(app, asset.id, file, asset.version))
             .returns(() => ofForever(10, 20)).verifiable();
 
-        assetUploader.uploadAsset(asset, file, now).subscribe();
+        assetUploader.uploadAsset(asset, file, modified).subscribe();
 
         const upload = assetUploader.snapshot.uploads.at(0);
 
@@ -170,7 +168,7 @@ describe('AssetsState', () => {
         assetsService.setup(x => x.replaceFile(app, asset.id, file, asset.version))
             .returns(() => throwError('Error')).verifiable();
 
-        assetUploader.uploadAsset(asset, file, now).pipe(onErrorResumeNext()).subscribe();
+        assetUploader.uploadAsset(asset, file, modified).pipe(onErrorResumeNext()).subscribe();
 
         const upload = assetUploader.snapshot.uploads.at(0);
 

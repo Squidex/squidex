@@ -25,14 +25,14 @@ describe('CommentsState', () => {
         app,
         appsState,
         creator,
-        now
+        modified
     } = TestValues;
 
     const commentsId = 'my-comments';
 
     const oldComments = new CommentsDto([
-        new CommentDto('1', now, 'text1', creator),
-        new CommentDto('2', now, 'text2', creator)
+        new CommentDto('1', modified, 'text1', creator),
+        new CommentDto('2', modified, 'text2', creator)
     ], [], [], new Version('1'));
 
     let dialogs: IMock<DialogService>;
@@ -53,9 +53,9 @@ describe('CommentsState', () => {
     describe('Loading', () => {
         it('should load and merge comments', () => {
             const newComments = new CommentsDto([
-                    new CommentDto('3', now, 'text3', creator)
+                    new CommentDto('3', modified, 'text3', creator)
                 ], [
-                    new CommentDto('2', now, 'text2_2', creator)
+                    new CommentDto('2', modified, 'text2_2', creator)
                 ], ['1'], new Version('2'));
 
             commentsService.setup(x => x.getComments(app, commentsId, new Version('-1')))
@@ -69,8 +69,8 @@ describe('CommentsState', () => {
 
             expect(commentsState.snapshot.isLoaded).toBeTruthy();
             expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
-                new CommentDto('2', now, 'text2_2', creator),
-                new CommentDto('3', now, 'text3', creator)
+                new CommentDto('2', modified, 'text2_2', creator),
+                new CommentDto('3', modified, 'text3', creator)
             ]));
         });
     });
@@ -84,7 +84,7 @@ describe('CommentsState', () => {
         });
 
         it('should add comment to snapshot when created', () => {
-            const newComment = new CommentDto('3', now, 'text3', creator);
+            const newComment = new CommentDto('3', modified, 'text3', creator);
 
             const request = { text: 'text3' };
 
@@ -94,9 +94,9 @@ describe('CommentsState', () => {
             commentsState.create('text3').subscribe();
 
             expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
-                new CommentDto('1', now, 'text1', creator),
-                new CommentDto('2', now, 'text2', creator),
-                new CommentDto('3', now, 'text3', creator)
+                new CommentDto('1', modified, 'text1', creator),
+                new CommentDto('2', modified, 'text2', creator),
+                new CommentDto('3', modified, 'text3', creator)
             ]));
         });
 
@@ -106,11 +106,11 @@ describe('CommentsState', () => {
             commentsService.setup(x => x.putComment(app, commentsId, '2', request))
                 .returns(() => of({})).verifiable();
 
-            commentsState.update(oldComments.createdComments[1], 'text2_2', now).subscribe();
+            commentsState.update(oldComments.createdComments[1], 'text2_2', modified).subscribe();
 
             expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
-                new CommentDto('1', now, 'text1', creator),
-                new CommentDto('2', now, 'text2_2', creator)
+                new CommentDto('1', modified, 'text1', creator),
+                new CommentDto('2', modified, 'text2_2', creator)
             ]));
         });
 
@@ -121,7 +121,7 @@ describe('CommentsState', () => {
             commentsState.delete(oldComments.createdComments[1]).subscribe();
 
             expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
-                new CommentDto('1', now, 'text1', creator)
+                new CommentDto('1', modified, 'text1', creator)
             ]));
         });
     });

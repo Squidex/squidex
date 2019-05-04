@@ -23,14 +23,14 @@ describe('ContributorsState', () => {
         app,
         appsState,
         authService,
+        modifier,
         newVersion,
-        userId,
         version
     } = TestValues;
 
     const oldContributors = [
         new ContributorDto('id1', 'Developer'),
-        new ContributorDto(userId, 'Developer')
+        new ContributorDto(modifier, 'Developer')
     ];
 
     let dialogs: IMock<DialogService>;
@@ -109,7 +109,7 @@ describe('ContributorsState', () => {
         });
 
         it('should update contributor in snapshot when assigned and already added', () => {
-            const newContributor = new ContributorDto(userId, 'Owner');
+            const newContributor = new ContributorDto(modifier, 'Owner');
 
             const request = { ...newContributor };
             const response = { contributorId: newContributor.contributorId, isCreated: true };

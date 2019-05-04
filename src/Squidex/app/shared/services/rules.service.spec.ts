@@ -19,12 +19,12 @@ import {
     RuleEventDto,
     RuleEventsDto,
     RulesService,
-    Version
+    Version,
+    Versioned
 } from '@app/shared/internal';
+import { RuleCreatedDto } from './rules.service';
 
 describe('RulesService', () => {
-    const now = DateTime.now();
-    const user = 'me';
     const version = new Version('1');
 
     beforeEach(() => {
@@ -179,9 +179,9 @@ describe('RulesService', () => {
             }
         };
 
-        let rule: RuleDto;
+        let rule: Versioned<RuleCreatedDto>;
 
-        rulesService.postRule('my-app', dto, user, now).subscribe(result => {
+        rulesService.postRule('my-app', dto).subscribe(result => {
             rule = result;
         });
 
@@ -190,28 +190,18 @@ describe('RulesService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({ id: 'id1', sharedSecret: 'token1', schemaId: 'schema1' }, {
+        req.flush({ id: 'id1' }, {
             headers: {
                 etag: '1'
             }
         });
 
-        expect(rule!).toEqual(
-            new RuleDto('id1', user, user, now, now,
-                version,
-                true,
-                {
-                    param1: 1,
-                    param2: 2,
-                    triggerType: 'ContentChanged'
-                },
-                'ContentChanged',
-                {
-                    param3: 3,
-                    param4: 4,
-                    actionType: 'Webhook'
-                },
-                'Webhook'));
+        expect(rule!).toEqual({
+            payload: {
+                id: 'id1'
+            },
+            version
+        });
     }));
 
     it('should make put request to update rule',

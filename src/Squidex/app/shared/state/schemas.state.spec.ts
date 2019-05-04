@@ -11,14 +11,13 @@ import { IMock, It, Mock, Times } from 'typemoq';
 import { SchemasState } from './schemas.state';
 
 import {
-    AddFieldDto,
     createProperties,
-    CreateSchemaDto,
     DialogService,
     NestedFieldDto,
     RootFieldDto,
     SchemaDetailsDto,
     SchemaDto,
+    SchemaPropertiesDto,
     SchemasService,
     UpdateSchemaCategoryDto,
     versioned
@@ -298,17 +297,17 @@ describe('SchemasState', () => {
             });
 
             it('should add schema to snapshot when created', () => {
-                const request = new CreateSchemaDto('newName');
+                const request = { name: 'newName' };
 
-                const result = new SchemaDetailsDto('id4', 'newName', '', {}, false, false, modified, modifier, modified, modifier, version);
+                const result = new SchemaDetailsDto('id4', 'newName', '', new SchemaPropertiesDto(), false, false, modified, modifier, modified, modifier, version);
 
-                schemasService.setup(x => x.postSchema(app, request, modifier, modified))
-                    .returns(() => of(result)).verifiable();
+                schemasService.setup(x => x.postSchema(app, request))
+                    .returns(() => of(versioned(version, { id: 'id4' }))).verifiable();
 
                 schemasState.create(request, modified).subscribe();
 
                 expect(schemasState.snapshot.schemas.values.length).toBe(3);
-                expect(schemasState.snapshot.schemas.at(2)).toBe(result);
+                expect(schemasState.snapshot.schemas.at(2)).toEqual(result);
             });
 
             it('should remove schema from snapshot when deleted', () => {
@@ -322,7 +321,7 @@ describe('SchemasState', () => {
             });
 
             it('should add field and update user info when field added', () => {
-                const request = new AddFieldDto(field1.name, field1.partitioning, field1.properties);
+                const request = { ...field1 };
 
                 const newField = new RootFieldDto(3, '3', createProperties('String'), 'invariant');
 
@@ -338,7 +337,7 @@ describe('SchemasState', () => {
             });
 
             it('should add field and update user info when nested field added', () => {
-                const request = new AddFieldDto(field1.name, field1.partitioning, field1.properties);
+                const request = { ...field1 };
 
                 const newField = new NestedFieldDto(3, '3', createProperties('String'), 2);
 

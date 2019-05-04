@@ -65,6 +65,7 @@
     ],
     "no-input-rename": false,
     "no-output-rename": false,
+    "no-pipe-impure": true,
     "no-shadowed-variable": true,
     "no-string-literal": false,
     "no-switch-case-fall-through": true,
@@ -103,7 +104,8 @@
       true,
       "always"
     ],
-    "templates-no-negated-async": true,
+    "template-no-negated-async": true,
+    "template-use-track-by-function": true,
     "trailing-comma": [
       true,
       {

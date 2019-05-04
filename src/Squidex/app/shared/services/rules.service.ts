@@ -15,6 +15,7 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
     ResultSet,
@@ -109,15 +110,17 @@ export class RuleEventDto extends Model<RuleEventDto> {
     }
 }
 
-export interface CreateRuleDto {
-    readonly trigger: any;
-    readonly action: any;
+export interface UpsertRuleDto {
+    readonly trigger: RuleAction;
+    readonly action: RuleAction;
 }
 
-export interface UpdateRuleDto {
-    readonly trigger?: any;
-    readonly action?: any;
+export interface RuleCreatedDto {
+    readonly id: string;
 }
+
+export type RuleAction = { actionType: string } & any;
+export type RuleTrigger = { triggerType: string } & any;
 
 @Injectable()
 export class RulesService {
@@ -190,33 +193,18 @@ export class RulesService {
             pretifyError('Failed to load Rules. Please reload.'));
     }
 
-    public postRule(appName: string, dto: CreateRuleDto, user: string, now: DateTime): Observable<RuleDto> {
+    public postRule(appName: string, dto: UpsertRuleDto): Observable<Versioned<RuleCreatedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
-            map(({ version, payload }) => {
-                const body = payload.body;
-
-                return new RuleDto(
-                    body.id,
-                    user,
-                    user,
-                    now,
-                    now,
-                    version,
-                    true,
-                    dto.trigger,
-                    dto.trigger.triggerType,
-                    dto.action,
-                    dto.action.actionType);
-            }),
+        return HTTP.postVersioned<RuleCreatedDto>(this.http, url, dto).pipe(
+            mapVersioned(({ body }) => body!),
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Created', appName);
             }),
             pretifyError('Failed to create rule. Please reload.'));
     }
 
-    public putRule(appName: string, id: string, dto: UpdateRuleDto, version: Version): Observable<Versioned<any>> {
+    public putRule(appName: string, id: string, dto: Partial<UpsertRuleDto>, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(

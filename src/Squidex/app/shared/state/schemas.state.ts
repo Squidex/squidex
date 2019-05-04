@@ -17,7 +17,8 @@ import {
     shareSubscribed,
     State,
     Types,
-    Version
+    Version,
+    Versioned
 } from '@app/framework';
 
 import { AuthService } from './../services/auth.service';
@@ -29,6 +30,7 @@ import {
     FieldDto,
     NestedFieldDto,
     RootFieldDto,
+    SchemaCreatedDto,
     SchemaDetailsDto,
     SchemaDto,
     SchemaPropertiesDto,
@@ -136,10 +138,10 @@ export class SchemasState extends State<Snapshot> {
     }
 
     public create(request: CreateSchemaDto, now?: DateTime): Observable<SchemaDetailsDto> {
-        return this.schemasService.postSchema(this.appName, request, this.user, now || DateTime.now()).pipe(
-            tap(payload => {
+        return this.schemasService.postSchema(this.appName, request).pipe(
+            tap(response => {
                 this.next(s => {
-                    const schemas = s.schemas.push(payload).sortByStringAsc(x => x.displayName);
+                    const schemas = s.schemas.push(createSchema(request, response, this.user, now)).sortByStringAsc(x => x.displayName);
 
                     return { ...s, schemas };
                 });
@@ -514,3 +516,20 @@ const pidof = <T extends FieldDto>(field: T) =>
 
 const pid = (field?: RootFieldDto) =>
     field ? field.fieldId : undefined;
+
+function createSchema(request: CreateSchemaDto, { payload, version }: Versioned<SchemaCreatedDto>, user: string, now?: DateTime) {
+    now = now || DateTime.now();
+
+    const schema = new SchemaDetailsDto(
+        payload.id,
+        request.name, '',
+        request.properties || new SchemaPropertiesDto(),
+        request.isSingleton === true,
+        false,
+        now, user,
+        now, user,
+        version,
+        request.fields || []);
+
+    return schema;
+}

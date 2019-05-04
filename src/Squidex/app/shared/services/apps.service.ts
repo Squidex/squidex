@@ -38,6 +38,13 @@ export interface CreateAppDto {
     readonly template?: string;
 }
 
+export interface AppCreatedDto {
+    readonly id: string;
+    readonly permissions: string[];
+    readonly planName?: string;
+    readonly planUpgrade?: string;
+}
+
 @Injectable()
 export class AppsService {
     constructor(
@@ -70,26 +77,10 @@ export class AppsService {
                 pretifyError('Failed to load apps. Please reload.'));
     }
 
-    public postApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
+    public postApp(dto: CreateAppDto): Observable<AppCreatedDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
-        return this.http.post<any>(url, dto).pipe(
-                map(body => {
-                    now = now || DateTime.now();
-
-                    const permissions = (<string[]>body.permissions).map(x => new Permission(x));
-
-                    const app = new AppDto(
-                        body.id,
-                        dto.name,
-                        permissions,
-                        now,
-                        now,
-                        body.planName,
-                        body.planUpgrade);
-
-                    return app;
-                }),
+        return this.http.post<AppCreatedDto>(url, dto).pipe(
                 tap(() => {
                     this.analytics.trackEvent('App', 'Created', dto.name);
                 }),

@@ -87,14 +87,14 @@ describe('RulesState', () => {
         });
 
         it('should add rule to snapshot when created', () => {
-            const newRule = new RuleDto('id3', creator, creator, creation, creation, version, false, {}, 'trigger3', {}, 'action3');
+            const newRule = new RuleDto('id3', modifier, modifier, modified, modified, version, true, { value: 3 }, 'trigger3', { value: 1 }, 'action3');
 
-            const request = { action: {}, trigger: {} };
+            const request = { trigger: { triggerType: 'trigger3', value: 3 }, action: { actionType: 'action3', value: 1 } };
 
-            rulesService.setup(x => x.postRule(app, request, modifier, creation))
-                .returns(() => of(newRule));
+            rulesService.setup(x => x.postRule(app, request))
+                .returns(() => of(versioned(version, { id: 'id3' })));
 
-            rulesState.create(request, creation).subscribe();
+            rulesState.create(request, modified).subscribe();
 
             expect(rulesState.snapshot.rules.values).toEqual([...oldRules, newRule]);
         });

@@ -15,16 +15,18 @@ import {
     ImmutableArray,
     shareSubscribed,
     State,
-    Version
+    Version,
+    Versioned
 } from '@app/framework';
 
 import { AuthService} from './../services/auth.service';
 import { AppsState } from './apps.state';
 
 import {
-    CreateRuleDto,
+    RuleCreatedDto,
     RuleDto,
-    RulesService
+    RulesService,
+    UpsertRuleDto
 } from './../services/rules.service';
 
 interface Snapshot {
@@ -76,11 +78,11 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: CreateRuleDto, now?: DateTime): Observable<RuleDto> {
-        return this.rulesService.postRule(this.appName, request, this.user, now || DateTime.now()).pipe(
-            tap(rule => {
+    public create(request: UpsertRuleDto, now?: DateTime): Observable<RuleDto> {
+        return this.rulesService.postRule(this.appName, request).pipe(
+            tap(response => {
                 this.next(s => {
-                    const rules = s.rules.push(rule);
+                    const rules = s.rules.push(createRule(request, response, this.user, now));
 
                     return { ...s, rules };
                 });
@@ -178,3 +180,26 @@ const setEnabled = (rule: RuleDto, isEnabled: boolean, user: string, version: Ve
         lastModifiedBy: user,
         version
     });
+
+function createRule(request: UpsertRuleDto, { payload, version }: Versioned<RuleCreatedDto>, user: string, now?: DateTime) {
+    now = now || DateTime.now();
+
+    const { triggerType, ...trigger } = request.trigger;
+
+    const { actionType, ...action } = request.action;
+
+    const rule = new RuleDto(
+        payload.id,
+        user,
+        user,
+        now,
+        now,
+        version,
+        true,
+        trigger,
+        triggerType,
+        action,
+        actionType);
+
+    return rule;
+}

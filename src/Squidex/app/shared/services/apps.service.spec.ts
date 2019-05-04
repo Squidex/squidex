@@ -11,6 +11,7 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
+    AppCreatedDto,
     AppDto,
     AppsService,
     DateTime,
@@ -18,8 +19,6 @@ import {
 } from '@app/shared/internal';
 
 describe('AppsService', () => {
-    const now = DateTime.now();
-
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
@@ -84,9 +83,9 @@ describe('AppsService', () => {
 
         const dto = { name: 'new-app' };
 
-        let app: AppDto;
+        let app: AppCreatedDto;
 
-        appsService.postApp(dto, now).subscribe(result => {
+        appsService.postApp(dto).subscribe(result => {
             app = result;
         });
 
@@ -102,7 +101,12 @@ describe('AppsService', () => {
             planUpgrade: 'Enterprise'
         });
 
-        expect(app!).toEqual(new AppDto('123', dto.name, [new Permission('Reader')], now, now, 'Basic', 'Enterprise'));
+        expect(app!).toEqual({
+            id: '123',
+            permissions: ['Reader'],
+            planName: 'Basic',
+            planUpgrade: 'Enterprise'
+        });
     }));
 
     it('should make delete request to archive app',

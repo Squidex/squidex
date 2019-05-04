@@ -88,9 +88,9 @@ describe('AppsState', () => {
         const request = { ...newApp };
 
         appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp)).verifiable();
+            .returns(() => of({ ...newApp, permissions: ['Owner'] })).verifiable();
 
-        appsState.create(request).subscribe();
+        appsState.create(request, now).subscribe();
 
         expect(appsState.snapshot.apps.values).toEqual([newApp, ...oldApps]);
     });
@@ -99,12 +99,12 @@ describe('AppsState', () => {
         const request = { ...newApp };
 
         appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp)).verifiable();
+            .returns(() => of({ ...newApp, permissions: ['Owner'] })).verifiable();
 
         appsService.setup(x => x.deleteApp(newApp.name))
             .returns(() => of({})).verifiable();
 
-        appsState.create(request).subscribe();
+        appsState.create(request, now).subscribe();
 
         const appsAfterCreate = appsState.snapshot.apps.values;
 
@@ -120,12 +120,12 @@ describe('AppsState', () => {
         const request = { ...newApp };
 
         appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp)).verifiable();
+            .returns(() => of({ ...newApp, permissions: ['Owner'] })).verifiable();
 
         appsService.setup(x => x.deleteApp(newApp.name))
             .returns(() => of({})).verifiable();
 
-        appsState.create(request).subscribe();
+        appsState.create(request, now).subscribe();
         appsState.select(newApp.name).subscribe();
         appsState.delete(newApp.name).subscribe();
 
