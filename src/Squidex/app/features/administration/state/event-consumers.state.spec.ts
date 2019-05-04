@@ -9,9 +9,9 @@ import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import { DialogService } from '@app/shared';
+import { DialogService } from '@app/framework';
 
-import { EventConsumerDto, EventConsumersService } from './../services/event-consumers.service';
+import { EventConsumerDto, EventConsumersService } from '@app/features/administration/internal';
 import { EventConsumersState } from './event-consumers.state';
 
 describe('EventConsumersState', () => {

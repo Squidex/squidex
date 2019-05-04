@@ -12,7 +12,7 @@ import { onErrorResumeNext, skip } from 'rxjs/operators';
 
 import { Types } from './../utils/types';
 
-import { State } from '../state';
+import { State } from './../state';
 
 declare type UnsubscribeFunction = () => void;
 

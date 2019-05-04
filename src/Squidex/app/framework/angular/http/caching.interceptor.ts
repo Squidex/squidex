@@ -10,7 +10,7 @@ import { Injectable} from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
-import { Types } from '@app/shared/internal';
+import { Types } from '@app/framework/internal';
 
 @Injectable()
 export class CachingInterceptor implements HttpInterceptor {

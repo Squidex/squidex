@@ -12,7 +12,7 @@ import { map, tap } from 'rxjs/operators';
 
 import { allParams } from '@app/framework';
 
-import { UsersState } from './../state/users.state';
+import { UsersState } from '@app/features/administration/internal';
 
 @Injectable()
 export class UserMustExistGuard implements CanActivate {

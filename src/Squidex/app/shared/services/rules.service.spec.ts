@@ -20,7 +20,7 @@ import {
     RuleEventsDto,
     RulesService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 describe('RulesService', () => {
     const now = DateTime.now();

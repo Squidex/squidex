@@ -8,8 +8,7 @@
 import { AfterViewInit, Directive, ElementRef, Input, OnDestroy, Renderer2 } from '@angular/core';
 import { timer } from 'rxjs';
 
-import { ResourceOwner } from '@app/framework/internal';
-import { positionModal } from '@app/shared';
+import { positionModal, ResourceOwner } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxModalTarget]'

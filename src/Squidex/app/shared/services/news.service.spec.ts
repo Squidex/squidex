@@ -13,7 +13,7 @@ import {
     FeatureDto,
     FeaturesDto,
     NewsService
-} from './../';
+} from '@app/shared/internal';
 
 describe('NewsService', () => {
     beforeEach(() => {

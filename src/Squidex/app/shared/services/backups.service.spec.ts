@@ -15,7 +15,7 @@ import {
     BackupsService,
     DateTime,
     RestoreDto
-} from './../';
+} from '@app/shared/internal';
 
 describe('BackupsService', () => {
     beforeEach(() => {

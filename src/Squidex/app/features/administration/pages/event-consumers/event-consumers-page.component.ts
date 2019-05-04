@@ -11,7 +11,7 @@ import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import { DialogModel, ResourceOwner } from '@app/shared';
 
-import { EventConsumerDto, EventConsumersState } from '../../declarations';
+import { EventConsumerDto, EventConsumersState } from '@app/features/administration/internal';
 
 @Component({
     selector: 'sqx-event-consumers-page',

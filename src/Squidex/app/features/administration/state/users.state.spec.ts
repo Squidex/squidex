@@ -10,13 +10,13 @@ import { IMock, It, Mock, Times } from 'typemoq';
 
 import { AuthService, DialogService } from '@app/shared';
 
-import { SnapshotUser, UsersState } from './users.state';
-
 import {
     UserDto,
     UsersDto,
     UsersService
-} from './../services/users.service';
+} from '@app/features/administration/internal';
+
+import { SnapshotUser, UsersState } from './users.state';
 
 describe('UsersState', () => {
     const oldUsers = [

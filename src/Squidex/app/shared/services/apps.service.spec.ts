@@ -15,7 +15,7 @@ import {
     AppsService,
     DateTime,
     Permission
-} from './../';
+} from '@app/shared/internal';
 
 describe('AppsService', () => {
     const now = DateTime.now();

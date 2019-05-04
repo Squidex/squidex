@@ -15,7 +15,7 @@ import {
     PatternsDto,
     PatternsService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 describe('PatternsService', () => {
     const version = new Version('1');

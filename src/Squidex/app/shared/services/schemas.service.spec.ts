@@ -23,7 +23,7 @@ import {
     SchemaPropertiesDto,
     SchemasService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 describe('SchemasService', () => {
     const now = DateTime.now();

@@ -9,7 +9,7 @@ import {
     FilterState,
     LanguageDto,
     Sorting
-} from './../';
+} from '@app/shared/internal';
 
 describe('FilterState', () => {
     let query: string | undefined;

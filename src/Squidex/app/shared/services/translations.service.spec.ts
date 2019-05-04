@@ -12,7 +12,7 @@ import {
     ApiUrlConfig,
     TranslationDto,
     TranslationsService
-} from './../';
+} from '@app/shared/internal';
 
 describe('TranslationsService', () => {
     beforeEach(() => {

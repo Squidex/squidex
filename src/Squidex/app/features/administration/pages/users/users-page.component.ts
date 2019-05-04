@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { UserDto, UsersState } from '../../declarations';
+import { UserDto, UsersState } from '@app/features/administration/internal';
 
 @Component({
     selector: 'sqx-users-page',

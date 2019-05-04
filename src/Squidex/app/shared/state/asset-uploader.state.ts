@@ -18,8 +18,8 @@ import {
     Types
 } from '@app/framework';
 
-import { AuthService } from '../services/auth.service';
 import { AssetDto, AssetsService } from './../services/assets.service';
+import { AuthService } from './../services/auth.service';
 import { AppsState } from './apps.state';
 import { AssetsState } from './assets.state';
 

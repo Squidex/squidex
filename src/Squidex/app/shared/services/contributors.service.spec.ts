@@ -16,7 +16,7 @@ import {
     ContributorsDto,
     ContributorsService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 describe('ContributorsService', () => {
     const version = new Version('1');

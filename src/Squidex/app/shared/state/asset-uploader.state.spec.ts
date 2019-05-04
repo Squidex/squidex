@@ -10,15 +10,17 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, Mock } from 'typemoq';
 
 import {
+    AssetDto,
+    AssetReplacedDto,
+    AssetsService,
     AssetUploaderState,
     DialogService,
     ofForever,
     Types,
     Version,
     versioned
-} from './../';
+} from '@app/shared/internal';
 
-import { AssetDto, AssetReplacedDto, AssetsService } from '../services/assets.service';
 import { TestValues } from './_test-helpers';
 
 describe('AssetsState', () => {

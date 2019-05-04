@@ -16,7 +16,7 @@ import {
     UserDto,
     UserForm,
     UsersState
-} from '../../declarations';
+} from '@app/features/administration/internal';
 
 @Component({
     selector: 'sqx-user-page',

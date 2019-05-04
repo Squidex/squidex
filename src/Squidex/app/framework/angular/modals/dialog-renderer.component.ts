@@ -14,9 +14,9 @@ import {
     DialogService,
     fadeAnimation,
     Notification,
-    StatefulComponent
+    StatefulComponent,
+    Tooltip
 } from '@app/framework/internal';
-import { Tooltip } from '@app/shared';
 
 interface State {
     dialogRequest?: DialogRequest | null;

@@ -15,7 +15,7 @@ import {
     CommentsService,
     DateTime,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 describe('CommentsService', () => {
     const user = 'me';

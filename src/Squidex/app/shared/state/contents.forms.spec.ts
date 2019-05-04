@@ -5,12 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { DateTime } from '@app/framework';
-
 import {
     ArrayFieldPropertiesDto,
     AssetsFieldPropertiesDto,
     BooleanFieldPropertiesDto,
+    DateTime,
     DateTimeFieldPropertiesDto,
     FieldDefaultValue,
     FieldFormatter,
@@ -25,7 +24,7 @@ import {
     SchemaPropertiesDto,
     StringFieldPropertiesDto,
     TagsFieldPropertiesDto
-} from './../';
+} from '@app/shared/internal';
 
 describe('SchemaDetailsDto', () => {
     it('should return label as display name', () => {

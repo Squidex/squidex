@@ -15,7 +15,7 @@ import {
     RuleEventsDto,
     RuleEventsState,
     RulesService
-} from './../';
+} from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
 

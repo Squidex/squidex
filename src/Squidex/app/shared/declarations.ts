@@ -27,4 +27,16 @@ export * from './components/schema-category.component';
 export * from './components/search-form.component';
 export * from './components/table-header.component';
 
+export * from './guards/app-must-exist.guard';
+export * from './guards/content-must-exist.guard';
+export * from './guards/load-apps.guard';
+export * from './guards/load-languages.guard';
+export * from './guards/must-be-authenticated.guard';
+export * from './guards/must-be-not-authenticated.guard';
+export * from './guards/schema-must-exist-published.guard';
+export * from './guards/schema-must-exist.guard';
+export * from './guards/schema-must-not-be-singleton.guard';
+export * from './guards/unset-app.guard';
+export * from './guards/unset-content.guard';
+
 export * from './internal';

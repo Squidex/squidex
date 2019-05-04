@@ -19,7 +19,7 @@ import {
     ErrorDto,
     Version,
     Versioned
-} from './../';
+} from '@app/shared/internal';
 
 describe('AssetDto', () => {
     const creation = DateTime.today();

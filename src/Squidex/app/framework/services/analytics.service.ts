@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
-import { AnalyticsIdConfig } from '../configurations';
+import { AnalyticsIdConfig } from './../configurations';
 import { Types } from './../utils/types';
 import { ResourceLoaderService } from './resource-loader.service';
 

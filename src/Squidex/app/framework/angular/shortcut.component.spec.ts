@@ -7,7 +7,7 @@
 
 import { NgZone } from '@angular/core';
 
-import { ShortcutService } from './../';
+import { ShortcutService } from '@app/framework/internal';
 import { ShortcutComponent } from './shortcut.component';
 
 describe('ShortcutComponent', () => {

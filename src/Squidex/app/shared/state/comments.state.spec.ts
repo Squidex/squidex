@@ -16,7 +16,7 @@ import {
     DialogService,
     ImmutableArray,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
 

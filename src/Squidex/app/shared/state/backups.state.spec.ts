@@ -15,7 +15,7 @@ import {
     BackupsState,
     DateTime,
     DialogService
-} from './../';
+} from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
 

@@ -16,7 +16,7 @@ import {
     PlansDto,
     PlansService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 describe('PlansService', () => {
     const version = new Version('1');

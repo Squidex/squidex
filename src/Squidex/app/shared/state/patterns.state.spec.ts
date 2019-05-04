@@ -14,7 +14,7 @@ import {
     PatternsService,
     PatternsState,
     versioned
-} from './../';
+} from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
 

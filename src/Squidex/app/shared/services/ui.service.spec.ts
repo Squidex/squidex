@@ -12,7 +12,7 @@ import {
     ApiUrlConfig,
     UIService,
     UISettingsDto
-} from './../';
+} from '@app/shared/internal';
 
 describe('UIService', () => {
     beforeEach(() => {

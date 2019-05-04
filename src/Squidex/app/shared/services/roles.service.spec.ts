@@ -15,7 +15,7 @@ import {
     RolesDto,
     RolesService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 describe('RolesService', () => {
     const version = new Version('1');

@@ -15,7 +15,7 @@ import {
     RuleDto,
     RulesService,
     versioned
-} from './../';
+} from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
 

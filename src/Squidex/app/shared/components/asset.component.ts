@@ -15,7 +15,7 @@ import {
     StatefulComponent,
     Types
 } from '@app/shared/internal';
-import { AssetUploaderState, UploadCanceled } from '../state/asset-uploader.state';
+import { AssetUploaderState, UploadCanceled } from './../state/asset-uploader.state';
 
 interface State {
     progress: number;

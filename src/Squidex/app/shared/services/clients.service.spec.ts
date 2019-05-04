@@ -16,7 +16,7 @@ import {
     ClientsDto,
     ClientsService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 describe('ClientsService', () => {
     const version = new Version('1');

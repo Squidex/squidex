@@ -15,7 +15,7 @@ import {
     AppLanguagesDto,
     AppLanguagesService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 describe('AppLanguagesService', () => {
     const version = new Version('1');

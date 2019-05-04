@@ -15,7 +15,7 @@ import {
     DateTime,
     DialogService,
     Permission
-} from './../';
+} from '@app/shared/internal';
 
 describe('AppsState', () => {
     const now = DateTime.now();

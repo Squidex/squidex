@@ -9,7 +9,8 @@ import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
-import { SnapshotUser, UsersState } from './../state/users.state';
+import { SnapshotUser, UsersState } from '@app/features/administration/internal';
+
 import { UserMustExistGuard } from './user-must-exist.guard';
 
 describe('UserMustExistGuard', () => {

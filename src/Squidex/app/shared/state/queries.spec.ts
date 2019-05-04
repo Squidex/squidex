@@ -12,7 +12,7 @@ import {
     Queries,
     Query,
     UIState
-} from './../';
+} from '@app/shared/internal';
 
 describe('Queries', () => {
     const prefix = 'schemas.my-schema';

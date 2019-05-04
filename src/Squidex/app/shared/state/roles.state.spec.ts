@@ -14,7 +14,7 @@ import {
     RolesService,
     RolesState,
     versioned
-} from './../';
+} from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
 

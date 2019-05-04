@@ -8,7 +8,7 @@
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import { UIService, UIState } from './../';
+import { UIService, UIState } from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
 

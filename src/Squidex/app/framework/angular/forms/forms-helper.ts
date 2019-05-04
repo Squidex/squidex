@@ -9,7 +9,7 @@
  import { Observable } from 'rxjs';
  import { map, startWith } from 'rxjs/operators';
 
-import { Types } from '@app/framework/internal';
+import { Types } from './../../utils/types';
 
 export function formControls(form: AbstractControl): AbstractControl[] {
     if (Types.is(form, FormGroup)) {

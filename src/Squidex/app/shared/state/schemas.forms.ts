@@ -14,7 +14,7 @@ import {
     value$
 } from '@app/framework';
 
-import { AddFieldDto } from '../services/schemas.service';
+import { AddFieldDto } from './../services/schemas.service';
 
 import { createProperties } from './../services/schemas.types';
 

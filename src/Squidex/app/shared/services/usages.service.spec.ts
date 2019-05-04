@@ -16,7 +16,7 @@ import {
     DateTime,
     StorageUsageDto,
     UsagesService
-} from './../';
+} from '@app/shared/internal';
 
 describe('UsagesService', () => {
     beforeEach(() => {
