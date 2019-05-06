@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Infrastructure.TestHelpers;
@@ -76,6 +77,16 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
         public void Should_serialize_and_deserialize_instant()
         {
             var value = Instant.FromUtc(2012, 12, 10, 9, 8, 45);
+
+            var serialized = value.SerializeAndDeserialize();
+
+            Assert.Equal(value, serialized);
+        }
+
+        [Fact]
+        public void Should_serialize_and_deserialize_dictionary()
+        {
+            var value = new Dictionary<string, string> { ["Description"] = "value" };
 
             var serialized = value.SerializeAndDeserialize();
 

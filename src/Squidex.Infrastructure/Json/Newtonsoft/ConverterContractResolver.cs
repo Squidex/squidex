@@ -20,6 +20,8 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         public ConverterContractResolver(params JsonConverter[] converters)
         {
+            NamingStrategy = new CamelCaseNamingStrategy(false, true);
+
             this.converters = converters;
 
             foreach (var converter in converters)
@@ -32,15 +34,6 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
                     }
                 }
             }
-        }
-
-        protected override JsonDictionaryContract CreateDictionaryContract(Type objectType)
-        {
-            var contract = base.CreateDictionaryContract(objectType);
-
-            contract.DictionaryKeyResolver = propertyName => propertyName;
-
-            return contract;
         }
 
         protected override JsonConverter ResolveContractConverter(Type objectType)
