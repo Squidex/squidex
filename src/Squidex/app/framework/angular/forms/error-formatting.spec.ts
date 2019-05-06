@@ -132,6 +132,12 @@ describe('formatErrors', () => {
         expect(error).toEqual('MY_FIELD contains an invalid value: 4.');
     });
 
+    it('should format uniqueStrings', () => {
+        const error = validate(['1', '2', '2', '3'], ValidatorsEx.uniqueStrings());
+
+        expect(error).toEqual('MY_FIELD must not contain duplicate values.');
+    });
+
     it('should format match', () => {
         const formControl1 = new FormControl(1);
         const formControl2 = new FormControl(2);

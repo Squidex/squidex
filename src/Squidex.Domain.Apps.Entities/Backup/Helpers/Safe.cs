@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
 {
     public static class Safe
     {
-        public static async Task DeleteAsync(IBackupArchiveLocation backupArchiveLocation, Guid id, ISemanticLog log)
+        public static async Task DeleteAsync(IBackupArchiveLocation backupArchiveLocation, string id, ISemanticLog log)
         {
             try
             {
@@ -22,33 +22,33 @@ namespace Squidex.Domain.Apps.Entities.Backup.Helpers
             }
             catch (Exception ex)
             {
-                log.LogError(ex, id.ToString(), (logOperationId, w) => w
+                log.LogError(ex, id, (logOperationId, w) => w
                     .WriteProperty("action", "deleteArchive")
                     .WriteProperty("status", "failed")
                     .WriteProperty("operationId", logOperationId));
             }
         }
 
-        public static async Task DeleteAsync(IAssetStore assetStore, Guid id, ISemanticLog log)
+        public static async Task DeleteAsync(IAssetStore assetStore, string id, ISemanticLog log)
         {
             try
             {
-                await assetStore.DeleteAsync(id.ToString(), 0, null);
+                await assetStore.DeleteAsync(id, 0, null);
             }
             catch (Exception ex)
             {
-                log.LogError(ex, id.ToString(), (logOperationId, w) => w
+                log.LogError(ex, id, (logOperationId, w) => w
                     .WriteProperty("action", "deleteBackup")
                     .WriteProperty("status", "failed")
                     .WriteProperty("operationId", logOperationId));
             }
         }
 
-        public static async Task CleanupRestoreAsync(BackupHandler handler, Guid appId, Guid id, ISemanticLog log)
+        public static async Task CleanupRestoreErrorAsync(BackupHandler handler, Guid appId, Guid id, ISemanticLog log)
         {
             try
             {
-                await handler.CleanupRestoreAsync(appId);
+                await handler.CleanupRestoreErrorAsync(appId);
             }
             catch (Exception ex)
             {

@@ -144,7 +144,7 @@ describe('AssetsField', () => {
     const field = createField(new AssetsFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
-        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(2);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);
     });
 
     it('should format to empty string if null', () => {
@@ -327,7 +327,7 @@ describe('ReferencesField', () => {
     const field = createField(new ReferencesFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
-        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(2);
+        expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);
     });
 
     it('should format to empty string if null', () => {

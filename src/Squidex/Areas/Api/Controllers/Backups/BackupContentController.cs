@@ -6,8 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Orleans;
+using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web;
@@ -21,11 +24,13 @@ namespace Squidex.Areas.Api.Controllers.Backups
     public class BackupContentController : ApiController
     {
         private readonly IAssetStore assetStore;
+        private readonly IGrainFactory grainFactory;
 
-        public BackupContentController(ICommandBus commandBus, IAssetStore assetStore)
+        public BackupContentController(ICommandBus commandBus, IAssetStore assetStore, IGrainFactory grainFactory)
             : base(commandBus)
         {
             this.assetStore = assetStore;
+            this.grainFactory = grainFactory;
         }
 
         /// <summary>
@@ -43,9 +48,21 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [ProducesResponseType(typeof(FileResult), 200)]
         [ApiCosts(0)]
         [AllowAnonymous]
-        public IActionResult GetBackupContent(string app, Guid id)
+        public async Task<IActionResult> GetBackupContent(string app, Guid id)
         {
-            return new FileCallbackResult("application/zip", "Backup.zip", false, bodyStream =>
+            var backupGrain = grainFactory.GetGrain<IBackupGrain>(AppId);
+
+            var backups = await backupGrain.GetStateAsync();
+            var backup = backups.Value.Find(x => x.Id == id);
+
+            if (backup == null || backup.Status != JobStatus.Completed)
+            {
+                return NotFound();
+            }
+
+            var fileName = $"backup-{app}-{backup.Started:yyyy-MM-dd_HH-mm-ss}.zip";
+
+            return new FileCallbackResult("application/zip", fileName, false, bodyStream =>
             {
                 return assetStore.DownloadAsync(id.ToString(), 0, null, bodyStream);
             });

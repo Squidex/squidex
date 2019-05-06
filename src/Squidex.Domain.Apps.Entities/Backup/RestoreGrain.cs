@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -31,11 +32,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
         private readonly ICommandBus commandBus;
-        private readonly IEnumerable<BackupHandler> handlers;
         private readonly IJsonSerializer serializer;
         private readonly IEventStore eventStore;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly ISemanticLog log;
+        private readonly IServiceProvider serviceProvider;
         private readonly IStreamNameResolver streamNameResolver;
 
         private RestoreStateJob CurrentJob
@@ -48,9 +49,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
             ICommandBus commandBus,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
-            IEnumerable<BackupHandler> handlers,
             IJsonSerializer serializer,
             ISemanticLog log,
+            IServiceProvider serviceProvider,
             IStreamNameResolver streamNameResolver,
             IStore<string> store)
             : base(store)
@@ -60,8 +61,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Guard.NotNull(commandBus, nameof(commandBus));
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
-            Guard.NotNull(handlers, nameof(handlers));
             Guard.NotNull(serializer, nameof(serializer));
+            Guard.NotNull(serviceProvider, nameof(serviceProvider));
             Guard.NotNull(store, nameof(store));
             Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
             Guard.NotNull(log, nameof(log));
@@ -71,8 +72,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.commandBus = commandBus;
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
-            this.handlers = handlers;
             this.serializer = serializer;
+            this.serviceProvider = serviceProvider;
             this.streamNameResolver = streamNameResolver;
             this.log = log;
         }
@@ -88,16 +89,18 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             if (CurrentJob?.Status == JobStatus.Started)
             {
+                var handlers = CreateHandlers();
+
                 Log("Failed due application restart");
 
                 CurrentJob.Status = JobStatus.Failed;
 
-                await CleanupAsync();
+                await CleanupAsync(handlers);
                 await WriteStateAsync();
             }
         }
 
-        public Task RestoreAsync(Uri url, RefToken actor, string newAppName)
+        public async Task RestoreAsync(Uri url, RefToken actor, string newAppName)
         {
             Guard.NotNull(url, nameof(url));
             Guard.NotNull(actor, nameof(actor));
@@ -122,9 +125,9 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Url = url
             };
 
-            Process();
+            await WriteStateAsync();
 
-            return TaskHelper.Done;
+            Process();
         }
 
         private void Process()
@@ -134,6 +137,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
         private async Task ProcessAsync()
         {
+            var handlers = CreateHandlers();
+
             var logContext = (jobId: CurrentJob.Id.ToString(), jobUrl: CurrentJob.Url.ToString());
 
             using (Profiler.StartSession())
@@ -157,11 +162,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         await DownloadAsync();
                     }
 
-                    using (var reader = await backupArchiveLocation.OpenArchiveAsync(CurrentJob.Id, serializer))
+                    using (var reader = await backupArchiveLocation.OpenArchiveAsync(CurrentJob.Id.ToString(), serializer))
                     {
                         using (Profiler.Trace("ReadEvents"))
                         {
-                            await ReadEventsAsync(reader);
+                            await ReadEventsAsync(reader, handlers);
                         }
 
                         foreach (var handler in handlers)
@@ -212,7 +217,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                         Log("Failed with internal error");
                     }
 
-                    await CleanupAsync();
+                    await CleanupAsync(handlers);
 
                     CurrentJob.Status = JobStatus.Failed;
 
@@ -258,15 +263,15 @@ namespace Squidex.Domain.Apps.Entities.Backup
             }
         }
 
-        private async Task CleanupAsync()
+        private async Task CleanupAsync(IEnumerable<BackupHandler> handlers)
         {
-            await Safe.DeleteAsync(backupArchiveLocation, CurrentJob.Id, log);
+            await Safe.DeleteAsync(backupArchiveLocation, CurrentJob.Id.ToString(), log);
 
             if (CurrentJob.AppId != Guid.Empty)
             {
                 foreach (var handler in handlers)
                 {
-                    await Safe.CleanupRestoreAsync(handler, CurrentJob.AppId, CurrentJob.Id, log);
+                    await Safe.CleanupRestoreErrorAsync(handler, CurrentJob.AppId, CurrentJob.Id, log);
                 }
             }
         }
@@ -275,22 +280,22 @@ namespace Squidex.Domain.Apps.Entities.Backup
         {
             Log("Downloading Backup");
 
-            await backupArchiveLocation.DownloadAsync(CurrentJob.Url, CurrentJob.Id);
+            await backupArchiveLocation.DownloadAsync(CurrentJob.Url, CurrentJob.Id.ToString());
 
             Log("Downloaded Backup");
         }
 
-        private async Task ReadEventsAsync(BackupReader reader)
+        private async Task ReadEventsAsync(BackupReader reader, IEnumerable<BackupHandler> handlers)
         {
             await reader.ReadEventsAsync(streamNameResolver, eventDataFormatter, async storedEvent =>
             {
-                await HandleEventAsync(reader, storedEvent.Stream, storedEvent.Event);
+                await HandleEventAsync(reader, handlers, storedEvent.Stream, storedEvent.Event);
             });
 
             Log($"Reading {reader.ReadEvents} events and {reader.ReadAttachments} attachments completed.", true);
         }
 
-        private async Task HandleEventAsync(BackupReader reader, string stream, Envelope<IEvent> @event)
+        private async Task HandleEventAsync(BackupReader reader, IEnumerable<BackupHandler> handlers, string stream, Envelope<IEvent> @event)
         {
             if (@event.Payload is SquidexEvent squidexEvent)
             {
@@ -338,6 +343,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
             {
                 CurrentJob.Log.Add($"{clock.GetCurrentInstant()}: {message}");
             }
+        }
+
+        private IEnumerable<BackupHandler> CreateHandlers()
+        {
+            return serviceProvider.GetRequiredService<IEnumerable<BackupHandler>>();
         }
 
         public Task<J<IRestoreJob>> GetJobAsync()

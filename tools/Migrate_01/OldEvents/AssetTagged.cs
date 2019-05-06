@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Migrate_01.OldEvents
 {
@@ -21,7 +22,7 @@ namespace Migrate_01.OldEvents
 
         public IEvent Migrate()
         {
-            return new AssetAnnotated { Tags = Tags };
+            return SimpleMapper.Map(this, new AssetAnnotated());
         }
     }
 }

@@ -73,6 +73,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         /// </summary>
         public string[] AllowedExtensions { get; set; }
 
+        /// <summary>
+        /// True, if duplicate values are allowed.
+        /// </summary>
+        public bool AllowDuplicates { get; set; }
+
         public override FieldProperties ToProperties()
         {
             var result = SimpleMapper.Map(this, new AssetsFieldProperties());

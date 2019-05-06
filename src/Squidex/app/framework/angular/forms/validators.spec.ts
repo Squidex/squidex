@@ -372,3 +372,37 @@ describe('ValidatorsEx.pattern', () => {
         expect(error).toEqual(expected);
     });
 });
+
+describe('ValidatorsEx.uniqueStrings', () => {
+    it('should return null when value is null', () => {
+        const input = new FormControl(null);
+
+        const error = ValidatorsEx.uniqueStrings()(input);
+
+        expect(error).toBeNull();
+    });
+
+    it('should return null when value is not a string array', () => {
+        const input = new FormControl([1, 2, 3]);
+
+        const error = ValidatorsEx.uniqueStrings()(input);
+
+        expect(error).toBeNull();
+    });
+
+    it('should return null when values are unique', () => {
+        const input = new FormControl(['1', '2', '3']);
+
+        const error = ValidatorsEx.uniqueStrings()(input);
+
+        expect(error).toBeNull();
+    });
+
+    it('should return error when values are not unique', () => {
+        const input = new FormControl(['1', '2', '2', '3']);
+
+        const error = ValidatorsEx.uniqueStrings()(input);
+
+        expect(error).toEqual({ uniquestrings: false });
+    });
+});

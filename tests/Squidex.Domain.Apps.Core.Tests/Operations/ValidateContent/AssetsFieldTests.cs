@@ -51,7 +51,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             PixelHeight = null
         };
 
-        private readonly AssetInfo image = new AssetInfo
+        private readonly AssetInfo image1 = new AssetInfo
+        {
+            AssetId = Guid.NewGuid(),
+            FileName = "MyImage.png",
+            FileSize = 1024 * 8,
+            IsImage = true,
+            PixelWidth = 800,
+            PixelHeight = 600
+        };
+
+        private readonly AssetInfo image2 = new AssetInfo
         {
             AssetId = Guid.NewGuid(),
             FileName = "MyImage.png",
@@ -65,7 +75,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         public AssetsFieldTests()
         {
-            ctx = ValidationTestExtensions.Assets(image, document);
+            ctx = ValidationTestExtensions.Assets(image1, image2, document);
         }
 
         [Fact]
@@ -101,7 +111,17 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MinItems = 2, MaxItems = 2 });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, document.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(image1.AssetId, image2.AssetId), errors, ctx);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_duplicate_values_are_ignored()
+        {
+            var sut = Field(new AssetsFieldProperties { AllowDuplicates = true });
+
+            await sut.ValidateAsync(CreateValue(image1.AssetId, image1.AssetId), errors, ctx);
 
             Assert.Empty(errors);
         }
@@ -144,7 +164,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MinItems = 3 });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, document.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(image1.AssetId, image2.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must have at least 3 item(s)." });
@@ -155,7 +175,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MaxItems = 1 });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, document.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(image1.AssetId, image2.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
                 new[] { "Must not have more than 1 item(s)." });
@@ -179,7 +199,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MinSize = 5 * 1024 });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
                 new[] { "[1]: \'4 kB\' less than minimum of \'5 kB\'." });
@@ -190,7 +210,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MaxSize = 5 * 1024 });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
                 new[] { "[2]: \'8 kB\' greater than maximum of \'5 kB\'." });
@@ -201,10 +221,21 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MustBeImage = true });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
                 new[] { "[1]: Not an image." });
+        }
+
+        [Fact]
+        public async Task Should_add_error_if_values_contains_duplicate()
+        {
+            var sut = Field(new AssetsFieldProperties { MustBeImage = true });
+
+            await sut.ValidateAsync(CreateValue(image1.AssetId, image1.AssetId), errors, ctx);
+
+            errors.Should().BeEquivalentTo(
+                new[] { "Must not contain duplicate values." });
         }
 
         [Fact]
@@ -212,7 +243,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MinWidth = 1000 });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
                 new[] { "[2]: Width \'800px\' less than minimum of \'1000px\'." });
@@ -223,7 +254,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MaxWidth = 700 });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
                 new[] { "[2]: Width \'800px\' greater than maximum of \'700px\'." });
@@ -234,7 +265,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MinHeight = 800 });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
                 new[] { "[2]: Height \'600px\' less than minimum of \'800px\'." });
@@ -245,7 +276,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { MaxHeight = 500 });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
                 new[] { "[2]: Height \'600px\' greater than maximum of \'500px\'." });
@@ -256,7 +287,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { AspectWidth = 1, AspectHeight = 1 });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
                 new[] { "[2]: Aspect ratio not '1:1'." });
@@ -267,7 +298,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         {
             var sut = Field(new AssetsFieldProperties { AllowedExtensions = ReadOnlyCollection.Create("mp4") });
 
-            await sut.ValidateAsync(CreateValue(document.AssetId, image.AssetId), errors, ctx);
+            await sut.ValidateAsync(CreateValue(document.AssetId, image1.AssetId), errors, ctx);
 
             errors.Should().BeEquivalentTo(
                 new[]

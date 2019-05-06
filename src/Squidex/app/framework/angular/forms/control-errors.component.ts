@@ -61,9 +61,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     public ngOnDestroy() {
         super.ngOnDestroy();
 
-        if (this.control && this.originalMarkAsTouched) {
-            this.control['markAsTouched'] = this.originalMarkAsTouched;
-        }
+        this.unsetCustomMarkAsTouchedFunction();
     }
 
     public ngOnChanges() {
@@ -87,6 +85,7 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
 
         if (this.control !== control) {
             this.unsubscribeAll();
+            this.unsetCustomMarkAsTouchedFunction();
 
             this.control = control;
 
@@ -110,6 +109,12 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
         }
 
         this.createMessages();
+    }
+
+    private unsetCustomMarkAsTouchedFunction() {
+        if (this.control && this.originalMarkAsTouched) {
+            this.control['markAsTouched'] = this.originalMarkAsTouched;
+        }
     }
 
     private createMessages() {

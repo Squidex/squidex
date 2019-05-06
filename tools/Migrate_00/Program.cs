@@ -22,7 +22,7 @@ namespace Migrate_00
 
             var collection = mongoDatabase.GetCollection<BsonDocument>("Events");
 
-            Console.Write("Migrate Indices.....");
+            Console.Write("Migrate indexes.....");
 
             collection.Indexes.DropAll();
 

@@ -24,6 +24,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public int? MaxItems { get; set; }
 
         /// <summary>
+        /// True, if duplicate values are allowed.
+        /// </summary>
+        public bool AllowDuplicates { get; set; }
+
+        /// <summary>
         /// The id of the referenced schema.
         /// </summary>
         public Guid SchemaId { get; set; }
