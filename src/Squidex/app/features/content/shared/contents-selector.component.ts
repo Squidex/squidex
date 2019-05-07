@@ -6,7 +6,6 @@
  */
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     ContentDto,
@@ -54,23 +53,23 @@ export class ContentsSelectorComponent implements OnInit {
     public ngOnInit() {
         this.contentsState.schema = this.schema;
 
-        this.contentsState.load().pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.load();
     }
 
     public reload() {
-        this.contentsState.load(true).pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.load(true);
     }
 
     public search() {
-        this.contentsState.search(this.filter.apiFilter).pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.search(this.filter.apiFilter);
     }
 
     public goNext() {
-        this.contentsState.goNext().pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.goNext();
     }
 
     public goPrev() {
-        this.contentsState.goPrev().pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.goPrev();
     }
 
     public isItemSelected(content: ContentDto) {

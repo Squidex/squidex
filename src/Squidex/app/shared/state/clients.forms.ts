@@ -13,7 +13,7 @@ import {
     ValidatorsEx
 } from '@app/framework';
 
-export class RenameClientForm extends Form<FormGroup> {
+export class RenameClientForm extends Form<FormGroup, { name: string }> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             name: ['',
@@ -25,7 +25,7 @@ export class RenameClientForm extends Form<FormGroup> {
     }
 }
 
-export class AttachClientForm extends Form<FormGroup> {
+export class AttachClientForm extends Form<FormGroup, { name: string}> {
     public hasNoName = hasNoValue$(this.form.controls['name']);
 
     constructor(formBuilder: FormBuilder) {

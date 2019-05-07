@@ -10,16 +10,20 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppsState,
     BackupDto,
     BackupsService,
     BackupsState,
     DateTime,
     DialogService
-} from './../';
+} from '@app/shared/internal';
+
+import { TestValues } from './_test-helpers';
 
 describe('BackupsState', () => {
-    const app = 'my-app';
+    const {
+        app,
+        appsState
+    } = TestValues;
 
     const oldBackups = [
         new BackupDto('id1', DateTime.now(), null, 1, 1, 'Started'),
@@ -27,83 +31,95 @@ describe('BackupsState', () => {
     ];
 
     let dialogs: IMock<DialogService>;
-    let appsState: IMock<AppsState>;
     let backupsService: IMock<BackupsService>;
     let backupsState: BackupsState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
-
         backupsService = Mock.ofType<BackupsService>();
-
-        backupsService.setup(x => x.getBackups(app))
-            .returns(() => of(oldBackups));
-
         backupsState = new BackupsState(appsState.object, backupsService.object, dialogs.object);
-        backupsState.load().subscribe();
     });
 
-    it('should load backups', () => {
-        expect(backupsState.snapshot.backups.values).toEqual(oldBackups);
-        expect(backupsState.snapshot.isLoaded).toBeTruthy();
-
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+    afterEach(() => {
+        backupsService.verifyAll();
     });
 
-    it('should show notification on load when reload is true', () => {
-        backupsState.load(true, false).subscribe();
+    describe('Loading', () => {
+        it('should load backups', () => {
+            backupsService.setup(x => x.getBackups(app))
+                .returns(() => of(oldBackups)).verifiable();
 
-        expect().nothing();
+            backupsState.load().subscribe();
 
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+            expect(backupsState.snapshot.backups.values).toEqual(oldBackups);
+            expect(backupsState.snapshot.isLoaded).toBeTruthy();
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should show notification on load when reload is true', () => {
+            backupsService.setup(x => x.getBackups(app))
+                .returns(() => of(oldBackups)).verifiable();
+
+            backupsState.load(true, false).subscribe();
+
+            expect().nothing();
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
+
+        it('should show notification on load error when silent is false', () => {
+            backupsService.setup(x => x.getBackups(app))
+                .returns(() => throwError({}));
+
+            backupsState.load(true, false).pipe(onErrorResumeNext()).subscribe();
+
+            expect().nothing();
+
+            dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
+        });
+
+        it('should not show notification on load error when silent is true', () => {
+            backupsService.setup(x => x.getBackups(app))
+                .returns(() => throwError({}));
+
+            backupsState.load(true, true).pipe(onErrorResumeNext()).subscribe();
+
+            expect().nothing();
+
+            dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
+        });
     });
 
-    it('should show notification on load error when silent is false', () => {
-        backupsService.setup(x => x.getBackups(app))
-            .returns(() => throwError({}));
+    describe('Updates', () => {
+        beforeEach(() => {
+            backupsService.setup(x => x.getBackups(app))
+                .returns(() => of(oldBackups)).verifiable();
 
-        backupsState.load(true, false).pipe(onErrorResumeNext()).subscribe();
+            backupsState.load().subscribe();
+        });
 
-        expect().nothing();
+        it('should not add backup to snapshot', () => {
+            backupsService.setup(x => x.postBackup(app))
+                .returns(() => of({})).verifiable();
 
-        dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
-    });
+            backupsState.start().subscribe();
 
-    it('should not show notification on load error when silent is true', () => {
-        backupsService.setup(x => x.getBackups(app))
-            .returns(() => throwError({}));
+            expect(backupsState.snapshot.backups.length).toBe(2);
 
-        backupsState.load(true, true).pipe(onErrorResumeNext()).subscribe();
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
 
-        expect().nothing();
+        it('should not remove backup from snapshot', () => {
+            backupsService.setup(x => x.deleteBackup(app, oldBackups[0].id))
+                .returns(() => of({})).verifiable();
 
-        dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
-    });
+            backupsState.delete(oldBackups[0]).subscribe();
 
-    it('should not add backup to snapshot', () => {
-        backupsService.setup(x => x.postBackup(app))
-            .returns(() => of({}));
+            expect(backupsState.snapshot.backups.length).toBe(2);
 
-        backupsState.start().subscribe();
-
-        expect(backupsState.snapshot.backups.length).toBe(2);
-
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
-    });
-
-    it('should not remove backup from snapshot', () => {
-        backupsService.setup(x => x.deleteBackup(app, oldBackups[0].id))
-            .returns(() => of({}));
-
-        backupsState.delete(oldBackups[0]).subscribe();
-
-        expect(backupsState.snapshot.backups.length).toBe(2);
-
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
     });
 });

@@ -9,15 +9,13 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { inject, TestBed } from '@angular/core/testing';
 
 import {
-    AddAppLanguageDto,
     AnalyticsService,
     ApiUrlConfig,
     AppLanguageDto,
     AppLanguagesDto,
     AppLanguagesService,
-    UpdateAppLanguageDto,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 describe('AppLanguagesService', () => {
     const version = new Version('1');
@@ -73,17 +71,19 @@ describe('AppLanguagesService', () => {
             }
         });
 
-        expect(languages!).toEqual(
-            new AppLanguagesDto([
+        expect(languages!).toEqual({
+            payload: [
                 new AppLanguageDto('en', 'English', true, true,  ['de', 'en']),
                 new AppLanguageDto('it', 'Italian', false, false, [])
-            ], new Version('2')));
+            ],
+            version: new Version('2')
+        });
     }));
 
     it('should make post request to add language',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
 
-        const dto = new AddAppLanguageDto('de');
+        const dto = { language: 'de' };
 
         let language: AppLanguageDto;
 
@@ -96,7 +96,12 @@ describe('AppLanguagesService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({ iso2Code: 'de', englishName: 'German' });
+        req.flush({
+            iso2Code: 'de',
+            isMaster: false,
+            isOptional: false,
+            englishName: 'German'
+        });
 
         expect(language!).toEqual(new AppLanguageDto('de', 'German', false, false, []));
     }));
@@ -104,7 +109,7 @@ describe('AppLanguagesService', () => {
     it('should make put request to make master language',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateAppLanguageDto(true, true, []);
+        const dto = { isMaster: true };
 
         appLanguagesService.putLanguage('my-app', 'de', dto, version).subscribe();
 

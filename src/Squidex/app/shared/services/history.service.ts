@@ -82,15 +82,16 @@ export class HistoryService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/history?channel=${channel}`);
 
         return this.http.get<any[]>(url).pipe(
-                map(response => {
-                    return response.map(item => {
-                        return new HistoryEventDto(
+                map(body => {
+                    const history = body.map(item =>
+                        new HistoryEventDto(
                             item.eventId,
                             item.actor,
                             item.message,
                             item.version,
-                            DateTime.parseISO_UTC(item.created));
-                    });
+                            DateTime.parseISO_UTC(item.created)));
+
+                    return history;
                 }),
                 pretifyError('Failed to load history. Please reload.'));
     }

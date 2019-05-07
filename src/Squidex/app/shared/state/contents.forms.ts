@@ -35,7 +35,7 @@ import {
     TagsFieldPropertiesDto
 } from './../services/schemas.types';
 
-export class SaveQueryForm extends Form<FormGroup> {
+export class SaveQueryForm extends Form<FormGroup, any> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             name: ['',
@@ -306,7 +306,7 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     }
 }
 
-export class EditContentForm extends Form<FormGroup> {
+export class EditContentForm extends Form<FormGroup, any> {
     constructor(
         private readonly schema: SchemaDetailsDto,
         private readonly languages: ImmutableArray<AppLanguageDto>
@@ -474,7 +474,7 @@ export class EditContentForm extends Form<FormGroup> {
     }
 }
 
-export class PatchContentForm extends Form<FormGroup> {
+export class PatchContentForm extends Form<FormGroup, any> {
     constructor(
         private readonly schema: SchemaDetailsDto,
         private readonly language: AppLanguageDto

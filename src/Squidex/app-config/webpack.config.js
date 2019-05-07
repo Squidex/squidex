@@ -6,7 +6,9 @@ const plugins = {
     // https://github.com/webpack-contrib/mini-css-extract-plugin
     MiniCssExtractPlugin: require('mini-css-extract-plugin'),
     // https://github.com/dividab/tsconfig-paths-webpack-plugin
-    TsconfigPathsPlugin: require('tsconfig-paths-webpack-plugin')
+    TsconfigPathsPlugin: require('tsconfig-paths-webpack-plugin'),
+    // https://github.com/aackerman/circular-dependency-plugin
+    CircularDependencyPlugin: require('circular-dependency-plugin')
 };
 
 const isDevServer = path.basename(require.main.filename) === 'webpack-dev-server.js';
@@ -57,7 +59,7 @@ module.exports = {
           }, {
             test: /\.ts$/,
             use: [{
-                loader: 'awesome-typescript-loader', options: { useCache: true, useBabel: true }
+                loader: 'awesome-typescript-loader'
             }, {
                 loader: 'angular-router-loader'
             }, {
@@ -139,6 +141,12 @@ module.exports = {
                 },
                 context: '/'
             }
+        }),
+
+        new plugins.CircularDependencyPlugin({
+            exclude: /([\\\/]node_modules[\\\/])|(ngfactory\.js$)/,
+            // Add errors to webpack instead of warnings
+            failOnError: true
         }),
         
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/)

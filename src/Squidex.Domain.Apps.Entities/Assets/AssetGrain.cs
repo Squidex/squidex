@@ -47,11 +47,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         GuardAsset.CanCreate(c);
 
-                        c.Tags = await NormalizeTagsAsync(c.AppId.Id, c.Tags);
+                        var tagIds = await NormalizeTagsAsync(c.AppId.Id, c.Tags);
 
-                        Create(c);
+                        Create(c, tagIds);
 
-                        return new AssetSavedResult(Version, Snapshot.FileVersion);
+                        return new AssetSavedResult(Version, Snapshot.FileVersion, Snapshot.FileHash);
                     });
                 case UpdateAsset updateRule:
                     return UpdateAsync(updateRule, c =>
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         Update(c);
 
-                        return new AssetSavedResult(Version, Snapshot.FileVersion);
+                        return new AssetSavedResult(Version, Snapshot.FileVersion, Snapshot.FileHash);
                     });
                 case DeleteAsset deleteAsset:
                     return UpdateAsync(deleteAsset, async c =>
@@ -76,12 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     {
                         GuardAsset.CanAnnotate(c, Snapshot.FileName, Snapshot.Slug);
 
-                        if (c.Tags != null)
-                        {
-                            c.Tags = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
-                        }
+                        var tagIds = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
 
-                        Annotate(c);
+                        Annotate(c, tagIds);
                     });
                 default:
                     throw new NotSupportedException();
@@ -90,32 +87,37 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private async Task<HashSet<string>> NormalizeTagsAsync(Guid appId, HashSet<string> tags)
         {
+            if (tags == null)
+            {
+                return null;
+            }
+
             var normalized = await tagService.NormalizeTagsAsync(appId, TagGroups.Assets, tags, Snapshot.Tags);
 
             return new HashSet<string>(normalized.Values);
         }
 
-        public void Create(CreateAsset command)
+        public void Create(CreateAsset command, HashSet<string> tagIds)
         {
             var @event = SimpleMapper.Map(command, new AssetCreated
             {
+                IsImage = command.ImageInfo != null,
                 FileName = command.File.FileName,
                 FileSize = command.File.FileSize,
                 FileVersion = 0,
                 MimeType = command.File.MimeType,
                 PixelWidth = command.ImageInfo?.PixelWidth,
                 PixelHeight = command.ImageInfo?.PixelHeight,
-                IsImage = command.ImageInfo != null,
                 Slug = command.File.FileName.ToAssetSlug()
             });
+
+            @event.Tags = tagIds;
 
             RaiseEvent(@event);
         }
 
         public void Update(UpdateAsset command)
         {
-            VerifyNotDeleted();
-
             var @event = SimpleMapper.Map(command, new AssetUpdated
             {
                 FileVersion = Snapshot.FileVersion + 1,
@@ -129,14 +131,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
             RaiseEvent(@event);
         }
 
+        public void Annotate(AnnotateAsset command, HashSet<string> tagIds)
+        {
+            var @event = SimpleMapper.Map(command, new AssetAnnotated());
+
+            @event.Tags = tagIds;
+
+            RaiseEvent(@event);
+        }
+
         public void Delete(DeleteAsset command)
         {
             RaiseEvent(SimpleMapper.Map(command, new AssetDeleted { DeletedSize = Snapshot.TotalSize }));
-        }
-
-        public void Annotate(AnnotateAsset command)
-        {
-            RaiseEvent(SimpleMapper.Map(command, new AssetAnnotated()));
         }
 
         private void RaiseEvent(AppEvent @event)

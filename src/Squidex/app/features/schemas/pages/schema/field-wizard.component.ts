@@ -18,9 +18,10 @@ import {
     RootFieldDto,
     SchemaDetailsDto,
     SchemasState,
-    Types,
-    UpdateFieldDto
+    Types
 } from '@app/shared';
+
+const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createProperties('String') };
 
 @Component({
     selector: 'sqx-field-wizard',
@@ -74,7 +75,7 @@ export class FieldWizardComponent implements OnInit {
                 .subscribe(dto => {
                     this.field = dto;
 
-                    this.addFieldForm.submitCompleted({ type: fieldTypes[0].type });
+                    this.addFieldForm.submitCompleted({ ...DEFAULT_FIELD });
 
                     if (addNew) {
                         if (Types.isFunction(this.nameInput.nativeElement.focus)) {
@@ -103,7 +104,7 @@ export class FieldWizardComponent implements OnInit {
         if (value) {
             const properties = createProperties(this.field.properties['fieldType'], value);
 
-            this.schemasState.updateField(this.schema, this.field as RootFieldDto, new UpdateFieldDto(properties))
+            this.schemasState.updateField(this.schema, this.field as RootFieldDto, { properties })
                 .subscribe(() => {
                     this.editForm.submitCompleted();
 

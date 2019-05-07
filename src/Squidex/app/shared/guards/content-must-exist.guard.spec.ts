@@ -9,8 +9,7 @@ import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import { ContentDto } from './../services/contents.service';
-import { ContentsState } from './../state/contents.state';
+import { ContentDto, ContentsState } from '@app/shared/internal';
 import { ContentMustExistGuard } from './content-must-exist.guard';
 
 describe('ContentMustExistGuard', () => {

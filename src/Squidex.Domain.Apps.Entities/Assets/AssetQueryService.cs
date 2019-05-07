@@ -21,7 +21,7 @@ using Squidex.Infrastructure.Queries.OData;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetQueryService : IAssetQueryService
+    public class AssetQueryService : IAssetQueryService
     {
         private readonly ITagService tagService;
         private readonly IAssetRepository assetRepository;
@@ -38,18 +38,34 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.tagService = tagService;
         }
 
-        public async Task<IAssetEntity> FindAssetAsync(QueryContext context, Guid id)
+        public Task<IAssetEntity> FindAssetAsync(QueryContext context, Guid id)
         {
             Guard.NotNull(context, nameof(context));
 
+            return FindAssetAsync(context.App.Id, id);
+        }
+
+        public async Task<IAssetEntity> FindAssetAsync(Guid appId, Guid id)
+        {
             var asset = await assetRepository.FindAssetAsync(id);
 
             if (asset != null)
             {
-                await DenormalizeTagsAsync(context.App.Id, Enumerable.Repeat(asset, 1));
+                await DenormalizeTagsAsync(appId, Enumerable.Repeat(asset, 1));
             }
 
             return asset;
+        }
+
+        public async Task<IList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash)
+        {
+            Guard.NotNull(hash, nameof(hash));
+
+            var assets = await assetRepository.QueryByHashAsync(appId, hash);
+
+            await DenormalizeTagsAsync(appId, assets);
+
+            return assets;
         }
 
         public async Task<IResultList<IAssetEntity>> QueryAsync(QueryContext context, Q query)

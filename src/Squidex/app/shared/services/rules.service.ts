@@ -15,8 +15,10 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
+    ResultSet,
     Version,
     Versioned
 } from '@app/framework';
@@ -72,7 +74,7 @@ export class RuleElementPropertyDto {
     }
 }
 
-export class RuleDto extends Model {
+export class RuleDto extends Model<RuleDto> {
     constructor(
         public readonly id: string,
         public readonly createdBy: string,
@@ -88,22 +90,11 @@ export class RuleDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<RuleDto>): RuleDto {
-        return this.clone(value);
-    }
 }
 
-export class RuleEventsDto extends Model {
-    constructor(
-        public readonly total: number,
-        public readonly items: RuleEventDto[]
-    ) {
-        super();
-    }
-}
+export class RuleEventsDto extends ResultSet<RuleEventDto> { }
 
-export class RuleEventDto extends Model {
+export class RuleEventDto extends Model<RuleEventDto> {
     constructor(
         public readonly id: string,
         public readonly created: DateTime,
@@ -117,27 +108,19 @@ export class RuleEventDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<RuleEventDto>): RuleEventDto {
-        return this.clone(value);
-    }
 }
 
-export class CreateRuleDto {
-    constructor(
-        public readonly trigger: any,
-        public readonly action: any
-    ) {
-    }
+export interface UpsertRuleDto {
+    readonly trigger: RuleAction;
+    readonly action: RuleAction;
 }
 
-export class UpdateRuleDto {
-    constructor(
-        public readonly trigger: any,
-        public readonly action: any
-    ) {
-    }
+export interface RuleCreatedDto {
+    readonly id: string;
 }
+
+export type RuleAction = { actionType: string } & any;
+export type RuleTrigger = { triggerType: string } & any;
 
 @Injectable()
 export class RulesService {
@@ -152,10 +135,10 @@ export class RulesService {
         const url = this.apiUrl.buildUrl('api/rules/actions');
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-            map(response => {
-                const items: { [name: string]: any } = response.payload.body;
+            map(({ payload }) => {
+                const items: { [name: string]: any } = payload.body;
 
-                const result: { [name: string]: RuleElementDto } = {};
+                const actions: { [name: string]: RuleElementDto } = {};
 
                 for (let key of Object.keys(items).sort()) {
                     const value = items[key];
@@ -170,7 +153,7 @@ export class RulesService {
                             property.isRequired
                         ));
 
-                    result[key] = new RuleElementDto(
+                    actions[key] = new RuleElementDto(
                         value.display,
                         value.description,
                         value.iconColor,
@@ -179,7 +162,7 @@ export class RulesService {
                         properties);
                 }
 
-                return result;
+                return actions;
             }),
             pretifyError('Failed to load Rules. Please reload.'));
     }
@@ -188,11 +171,11 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-            map(response => {
-                const items: any[] = response.payload.body;
+            map(({ payload }) => {
+                const items: any[] = payload.body;
 
-                return items.map(item => {
-                    return new RuleDto(
+                const rules = items.map(item =>
+                    new RuleDto(
                         item.id,
                         item.createdBy,
                         item.lastModifiedBy,
@@ -203,39 +186,25 @@ export class RulesService {
                         item.trigger,
                         item.trigger.triggerType,
                         item.action,
-                        item.action.actionType);
-                });
+                        item.action.actionType));
+
+                return rules;
             }),
             pretifyError('Failed to load Rules. Please reload.'));
     }
 
-    public postRule(appName: string, dto: CreateRuleDto, user: string, now: DateTime): Observable<RuleDto> {
+    public postRule(appName: string, dto: UpsertRuleDto): Observable<Versioned<RuleCreatedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
-            map(response => {
-                const body = response.payload.body;
-
-                return new RuleDto(
-                    body.id,
-                    user,
-                    user,
-                    now,
-                    now,
-                    response.version,
-                    true,
-                    dto.trigger,
-                    dto.trigger.triggerType,
-                    dto.action,
-                    dto.action.actionType);
-            }),
+        return HTTP.postVersioned<RuleCreatedDto>(this.http, url, dto).pipe(
+            mapVersioned(({ body }) => body!),
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Created', appName);
             }),
             pretifyError('Failed to create rule. Please reload.'));
     }
 
-    public putRule(appName: string, id: string, dto: UpdateRuleDto, version: Version): Observable<Versioned<any>> {
+    public putRule(appName: string, id: string, dto: Partial<UpsertRuleDto>, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(
@@ -279,13 +248,13 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-            map(response => {
-                const body = response.payload.body;
+            map(({ payload }) => {
+                const body = payload.body;
 
                 const items: any[] = body.items;
 
-                return new RuleEventsDto(body.total, items.map(item => {
-                    return new RuleEventDto(
+                const ruleEvents = new RuleEventsDto(body.total, items.map(item =>
+                    new RuleEventDto(
                         item.id,
                         DateTime.parseISO_UTC(item.created),
                         item.nextAttempt ? DateTime.parseISO_UTC(item.nextAttempt) : null,
@@ -294,8 +263,9 @@ export class RulesService {
                         item.lastDump,
                         item.result,
                         item.jobResult,
-                        item.numCalls);
-                }));
+                        item.numCalls)));
+
+                return ruleEvents;
             }),
             pretifyError('Failed to load events. Please reload.'));
     }

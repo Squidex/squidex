@@ -8,14 +8,13 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { onErrorResumeNext, withLatestFrom } from 'rxjs/operators';
+import { withLatestFrom } from 'rxjs/operators';
 
 import {
-    AppContributorDto,
     AppsState,
-    AssignContributorDto,
     AssignContributorForm,
     AutocompleteSource,
+    ContributorDto,
     ContributorsState,
     DialogService,
     RolesState,
@@ -69,21 +68,21 @@ export class ContributorsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.rolesState.load().pipe(onErrorResumeNext()).subscribe();
+        this.rolesState.load();
 
-        this.contributorsState.load().pipe(onErrorResumeNext()).subscribe();
+        this.contributorsState.load();
     }
 
     public reload() {
-        this.contributorsState.load(true).pipe(onErrorResumeNext()).subscribe();
+        this.contributorsState.load(true);
     }
 
-    public remove(contributor: AppContributorDto) {
-        this.contributorsState.revoke(contributor).pipe(onErrorResumeNext()).subscribe();
+    public remove(contributor: ContributorDto) {
+        this.contributorsState.revoke(contributor);
     }
 
-    public changeRole(contributor: AppContributorDto, role: string) {
-        this.contributorsState.assign(new AssignContributorDto(contributor.contributorId, role)).pipe(onErrorResumeNext()).subscribe();
+    public changeRole(contributor: ContributorDto, role: string) {
+        this.contributorsState.assign({ contributorId: contributor.contributorId, role });
     }
 
     public assignContributor() {
@@ -96,11 +95,11 @@ export class ContributorsPageComponent implements OnInit {
                 user = user.id;
             }
 
-            const requestDto = new AssignContributorDto(user, 'Editor', true);
+            const requestDto = { contributorId: user, role: 'Editor', invite: true };
 
             this.contributorsState.assign(requestDto)
                 .subscribe(isCreated => {
-                    this.assignContributorForm.submitCompleted({});
+                    this.assignContributorForm.submitCompleted();
 
                     if (isCreated) {
                         this.dialogs.notifyInfo('A new user with the entered email address has been created and assigned as contributor.');
@@ -111,7 +110,7 @@ export class ContributorsPageComponent implements OnInit {
         }
     }
 
-    public trackByContributor(index: number, contributorInfo: { contributor: AppContributorDto }) {
+    public trackByContributor(index: number, contributorInfo: { contributor: ContributorDto }) {
         return contributorInfo.contributor.contributorId;
     }
 }

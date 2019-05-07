@@ -6,27 +6,26 @@
  */
 
 import { of } from 'rxjs';
-import { IMock, Mock, Times } from 'typemoq';
+import { IMock, Mock } from 'typemoq';
 
 import {
     AppDto,
     AppsService,
     AppsState,
-    CreateAppDto,
     DateTime,
     DialogService,
     Permission
-} from './../';
+} from '@app/shared/internal';
 
 describe('AppsState', () => {
     const now = DateTime.now();
 
     const oldApps = [
-        new AppDto('id1', 'old-name1', [new Permission('Owner')], now, now, 'Free', 'Plan'),
-        new AppDto('id2', 'old-name2', [new Permission('Owner')], now, now, 'Free', 'Plan')
+        new AppDto('id1', 'old-name1', [new Permission('Owner')], now, now),
+        new AppDto('id2', 'old-name2', [new Permission('Owner')], now, now)
     ];
 
-    const newApp = new AppDto('id3', 'new-name', [new Permission('Owner')], now, now, 'Free', 'Plan');
+    const newApp = new AppDto('id3', 'new-name', [new Permission('Owner')], now, now);
 
     let dialogs: IMock<DialogService>;
     let appsService: IMock<AppsService>;
@@ -38,11 +37,14 @@ describe('AppsState', () => {
         appsService = Mock.ofType<AppsService>();
 
         appsService.setup(x => x.getApps())
-            .returns(() => of(oldApps))
-            .verifiable(Times.once());
+            .returns(() => of(oldApps)).verifiable();
 
         appsState = new AppsState(appsService.object, dialogs.object);
         appsState.load().subscribe();
+    });
+
+    afterEach(() => {
+        appsService.verifyAll();
     });
 
     it('should load apps', () => {
@@ -54,7 +56,7 @@ describe('AppsState', () => {
 
         appsState.select(oldApps[0].name).subscribe(x => {
             selectedApp = x!;
-        }).unsubscribe();
+        });
 
         expect(selectedApp!).toBe(oldApps[0]);
         expect(appsState.snapshot.selectedApp).toBe(oldApps[0]);
@@ -65,7 +67,7 @@ describe('AppsState', () => {
 
         appsState.select(null).subscribe(x => {
             selectedApp = x!;
-        }).unsubscribe();
+        });
 
         expect(selectedApp!).toBeNull();
         expect(appsState.snapshot.selectedApp).toBeNull();
@@ -76,33 +78,33 @@ describe('AppsState', () => {
 
         appsState.select('unknown').subscribe(x => {
             selectedApp = x!;
-        }).unsubscribe();
+        });
 
         expect(selectedApp!).toBeNull();
         expect(appsState.snapshot.selectedApp).toBeNull();
     });
 
     it('should add app to snapshot when created', () => {
-        const request = new CreateAppDto(newApp.name);
+        const request = { ...newApp };
 
         appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp));
+            .returns(() => of({ ...newApp, permissions: ['Owner'] })).verifiable();
 
-        appsState.create(request).subscribe();
+        appsState.create(request, now).subscribe();
 
         expect(appsState.snapshot.apps.values).toEqual([newApp, ...oldApps]);
     });
 
-    it('should remove app from snashot when archived', () => {
-        const request = new CreateAppDto(newApp.name);
+    it('should remove app from snapshot when archived', () => {
+        const request = { ...newApp };
 
         appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp));
+            .returns(() => of({ ...newApp, permissions: ['Owner'] })).verifiable();
 
         appsService.setup(x => x.deleteApp(newApp.name))
-            .returns(() => of({}));
+            .returns(() => of({})).verifiable();
 
-        appsState.create(request).subscribe();
+        appsState.create(request, now).subscribe();
 
         const appsAfterCreate = appsState.snapshot.apps.values;
 
@@ -112,5 +114,21 @@ describe('AppsState', () => {
 
         expect(appsAfterCreate).toEqual([newApp, ...oldApps]);
         expect(appsAfterDelete).toEqual(oldApps);
+    });
+
+    it('should selected app from snapshot when archived', () => {
+        const request = { ...newApp };
+
+        appsService.setup(x => x.postApp(request))
+            .returns(() => of({ ...newApp, permissions: ['Owner'] })).verifiable();
+
+        appsService.setup(x => x.deleteApp(newApp.name))
+            .returns(() => of({})).verifiable();
+
+        appsState.create(request, now).subscribe();
+        appsState.select(newApp.name).subscribe();
+        appsState.delete(newApp.name).subscribe();
+
+        expect(appsState.snapshot.selectedApp).toBeNull();
     });
 });

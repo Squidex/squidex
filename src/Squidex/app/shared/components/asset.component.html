@@ -1,4 +1,4 @@
- <ng-container *ngIf="!isListView; else listTemplate">
+<ng-container *ngIf="!isListView; else listTemplate">
     <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="emitSelect()" (sqxFileDrop)="updateFile($event)" [noDrop]="true">
         <div class="card-body">
             <div class="file-preview" *ngIf="asset && snapshot.progress === 0" @fade>

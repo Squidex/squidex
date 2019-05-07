@@ -21,6 +21,7 @@ import {
     DialogService,
     EditContentForm,
     fadeAnimation,
+    FieldDto,
     ImmutableArray,
     LanguagesState,
     MessageBus,
@@ -171,7 +172,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public discardChanges() {
-        this.contentsState.discardChanges(this.content).pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.discardChanges(this.content);
     }
 
     public publish() {
@@ -240,5 +241,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     public showLatest() {
         this.loadVersion(null, false);
+    }
+
+    public trackByField(index: number, field: FieldDto) {
+        return field.fieldId + this.schema.id;
     }
 }

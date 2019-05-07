@@ -40,6 +40,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         [BsonIgnoreIfDefault]
         [BsonElement]
+        public string FileHash { get; set; }
+
+        [BsonIgnoreIfDefault]
+        [BsonElement]
         public string Slug { get; set; }
 
         [BsonRequired]

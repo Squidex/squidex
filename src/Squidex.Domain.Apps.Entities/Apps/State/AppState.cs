@@ -14,6 +14,8 @@ using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 
+#pragma warning disable IDE0060 // Remove unused parameter
+
 namespace Squidex.Domain.Apps.Entities.Apps.State
 {
     [CollectionName("Apps")]

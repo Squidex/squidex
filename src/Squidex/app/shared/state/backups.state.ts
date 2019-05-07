@@ -6,13 +6,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
-    notify,
+    shareSubscribed,
     State
 } from '@app/framework';
 
@@ -22,11 +22,13 @@ import { BackupDto, BackupsService } from './../services/backups.service';
 
 interface Snapshot {
     // The current backups.
-    backups: ImmutableArray<BackupDto>;
+    backups: BackupsList;
 
     // Indicates if the backups are loaded.
     isLoaded?: boolean;
 }
+
+type BackupsList = ImmutableArray<BackupDto>;
 
 @Injectable()
 export class BackupsState extends State<Snapshot> {
@@ -56,24 +58,18 @@ export class BackupsState extends State<Snapshot> {
         }
 
         return this.backupsService.getBackups(this.appName).pipe(
-            tap(dtos => {
+            tap(items => {
                 if (isReload && !silent) {
                     this.dialogs.notifyInfo('Backups reloaded.');
                 }
 
                 this.next(s => {
-                    const backups = ImmutableArray.of(dtos);
+                    const backups = ImmutableArray.of(items);
 
                     return { ...s, backups, isLoaded: true };
                 });
             }),
-            catchError(error => {
-                if (!silent) {
-                    this.dialogs.notifyError(error);
-                }
-
-                return throwError(error);
-            }));
+            shareSubscribed(this.dialogs, { silent }));
     }
 
     public start(): Observable<any> {
@@ -81,7 +77,7 @@ export class BackupsState extends State<Snapshot> {
             tap(() => {
                 this.dialogs.notifyInfo('Backup started, it can take several minutes to complete.');
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public delete(backup: BackupDto): Observable<any> {
@@ -89,7 +85,7 @@ export class BackupsState extends State<Snapshot> {
             tap(() => {
                 this.dialogs.notifyInfo('Backup is about to be deleted.');
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     private get appName() {

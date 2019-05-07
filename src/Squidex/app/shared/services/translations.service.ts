@@ -20,13 +20,10 @@ export class TranslationDto {
     }
 }
 
-export class TranslateDto {
-    constructor(
-        public readonly text: string,
-        public readonly sourceLanguage: string,
-        public readonly targetLanguage: string
-    ) {
-    }
+export interface TranslateDto {
+    readonly text: string;
+    readonly sourceLanguage: string;
+    readonly targetLanguage: string;
 }
 
 @Injectable()
@@ -41,8 +38,8 @@ export class TranslationsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/translations`);
 
         return this.http.post<any>(url, request).pipe(
-                map(response => {
-                    return new TranslationDto(response.result, response.text);
+                map(body => {
+                    return new TranslationDto(body.result, body.text);
                 }),
                 pretifyError('Failed to translate text. Please reload.'));
     }

@@ -6,7 +6,7 @@
     </ng-container>
 
     <ng-container content>
-        <div class="card section" *ngIf="restoreJob; let job">
+        <div class="card section" *ngIf="restoreJob | async; let job">
             <div class="card-header">
                 <div class="row no-gutters">
                     <div class="col-auto pr-2">

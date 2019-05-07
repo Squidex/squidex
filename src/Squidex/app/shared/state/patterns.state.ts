@@ -12,7 +12,9 @@ import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    notify,
+    mapVersioned,
+    shareMapSubscribed,
+    shareSubscribed,
     State,
     Version
 } from '@app/framework';
@@ -20,14 +22,14 @@ import {
 import { AppsState } from './apps.state';
 
 import {
-    AppPatternDto,
-    AppPatternsService,
-    EditAppPatternDto
-} from './../services/app-patterns.service';
+    EditPatternDto,
+    PatternDto,
+    PatternsService
+} from './../services/patterns.service';
 
 interface Snapshot {
     // The current patterns.
-    patterns: ImmutableArray<AppPatternDto>;
+    patterns: PatternsList;
 
     // The app version.
     version: Version;
@@ -35,6 +37,8 @@ interface Snapshot {
     // Indicates if the patterns are loaded.
     isLoaded?: boolean;
 }
+
+type PatternsList = ImmutableArray<PatternDto>;
 
 @Injectable()
 export class PatternsState extends State<Snapshot> {
@@ -47,7 +51,7 @@ export class PatternsState extends State<Snapshot> {
             distinctUntilChanged());
 
     constructor(
-        private readonly appPatternsService: AppPatternsService,
+        private readonly patternsService: PatternsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
@@ -59,55 +63,56 @@ export class PatternsState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.appPatternsService.getPatterns(this.appName).pipe(
-            tap(dtos => {
+        return this.patternsService.getPatterns(this.appName).pipe(
+            tap(({ version, payload }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Patterns reloaded.');
                 }
 
                 this.next(s => {
-                    const patterns = ImmutableArray.of(dtos.patterns).sortByStringAsc(x => x.name);
+                    const patterns = ImmutableArray.of(payload).sortByStringAsc(x => x.name);
 
-                    return { ...s, patterns, isLoaded: true, version: dtos.version };
+                    return { ...s, patterns, isLoaded: true, version: version };
                 });
             }),
-            notify(this.dialogs));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
-    public create(request: EditAppPatternDto): Observable<any> {
-        return this.appPatternsService.postPattern(this.appName, request, this.version).pipe(
-            tap(dto => {
+    public create(request: EditPatternDto): Observable<PatternDto> {
+        return this.patternsService.postPattern(this.appName, request, this.version).pipe(
+            tap(({ version, payload }) => {
                 this.next(s => {
-                    const patterns = s.patterns.push(dto.payload).sortByStringAsc(x => x.name);
+                    const patterns = s.patterns.push(payload).sortByStringAsc(x => x.name);
 
-                    return { ...s, patterns, version: dto.version };
+                    return { ...s, patterns, version: version };
                 });
             }),
-            notify(this.dialogs));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
-    public update(pattern: AppPatternDto, request: EditAppPatternDto): Observable<any> {
-        return this.appPatternsService.putPattern(this.appName, pattern.id, request, this.version).pipe(
-            tap(dto => {
+    public update(pattern: PatternDto, request: EditPatternDto): Observable<PatternDto> {
+        return this.patternsService.putPattern(this.appName, pattern.id, request, this.version).pipe(
+            mapVersioned(() => update(pattern, request)),
+            tap(({ version, payload }) => {
                 this.next(s => {
-                    const patterns = s.patterns.replaceBy('id', update(pattern, request)).sortByStringAsc(x => x.name);
+                    const patterns = s.patterns.replaceBy('id', payload).sortByStringAsc(x => x.name);
 
-                    return { ...s, patterns, version: dto.version };
+                    return { ...s, patterns, version: version };
                 });
             }),
-            notify(this.dialogs));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
-    public delete(pattern: AppPatternDto): Observable<any> {
-        return this.appPatternsService.deletePattern(this.appName, pattern.id, this.version).pipe(
-            tap(dto => {
+    public delete(pattern: PatternDto): Observable<any> {
+        return this.patternsService.deletePattern(this.appName, pattern.id, this.version).pipe(
+            tap(({ version }) => {
                 this.next(s => {
                     const patterns = s.patterns.filter(c => c.id !== pattern.id);
 
-                    return { ...s, patterns, version: dto.version };
+                    return { ...s, patterns, version: version };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     private get appName() {
@@ -119,5 +124,5 @@ export class PatternsState extends State<Snapshot> {
     }
 }
 
-const update = (pattern: AppPatternDto, request: EditAppPatternDto) =>
-    new AppPatternDto(pattern.id, request.name, request.pattern, request.message);
+const update = (pattern: PatternDto, request: EditPatternDto) =>
+    pattern.with(request);

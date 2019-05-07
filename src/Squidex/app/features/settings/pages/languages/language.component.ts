@@ -7,15 +7,13 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
     EditLanguageForm,
     fadeAnimation,
     ImmutableArray,
-    LanguagesState,
-    UpdateAppLanguageDto
+    LanguagesState
 } from '@app/shared';
 
 @Component({
@@ -57,14 +55,14 @@ export class LanguageComponent implements OnChanges {
     }
 
     public remove() {
-        this.languagesState.remove(this.language).pipe(onErrorResumeNext()).subscribe();
+        this.languagesState.remove(this.language);
     }
 
     public save() {
         const value = this.editForm.submit();
 
         if (value) {
-            const request = new UpdateAppLanguageDto(value.isMaster, value.isOptional, this.fallbackLanguages.map(x => x.iso2Code).values);
+            const request = { ...value, fallbackLanguages: this.fallbackLanguages.map(x => x.iso2Code).values };
 
             this.languagesState.update(this.language, request)
                 .subscribe(() => {

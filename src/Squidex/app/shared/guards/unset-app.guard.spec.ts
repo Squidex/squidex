@@ -8,7 +8,7 @@
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
-import { AppsState } from '@app/shared';
+import { AppsState } from '@app/shared/internal';
 
 import { UnsetAppGuard } from './unset-app.guard';
 

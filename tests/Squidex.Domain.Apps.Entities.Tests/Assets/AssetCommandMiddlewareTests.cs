@@ -14,6 +14,7 @@ using FakeItEasy;
 using Orleans;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -26,8 +27,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetCommandMiddlewareTests : HandlerTestBase<AssetState>
     {
+        private readonly IAssetQueryService assetQueryService = A.Fake<IAssetQueryService>();
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
-        private readonly IAssetStore assetStore = A.Fake<IAssetStore>();
+        private readonly IAssetStore assetStore = A.Fake<MemoryAssetStore>();
         private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly ITagGenerator<CreateAsset> tagGenerator = A.Fake<ITagGenerator<CreateAsset>>();
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
@@ -50,13 +52,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
             asset = new AssetGrain(Store, tagService, A.Dummy<ISemanticLog>());
             asset.ActivateAsync(Id).Wait();
 
+            A.CallTo(() => assetQueryService.QueryByHashAsync(AppId, A<string>.Ignored))
+                .Returns(new List<IAssetEntity>());
+
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
                 .Returns(new Dictionary<string, string>());
 
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
                 .Returns(asset);
 
-            sut = new AssetCommandMiddleware(grainFactory, assetStore, assetThumbnailGenerator, new[] { tagGenerator });
+            sut = new AssetCommandMiddleware(grainFactory, assetQueryService, assetStore, assetThumbnailGenerator, new[] { tagGenerator });
         }
 
         [Fact]
@@ -65,20 +70,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var command = new CreateAsset { AssetId = assetId, File = file };
             var context = CreateContextForCommand(command);
 
-            A.CallTo(() => tagGenerator.GenerateTags(command, A<HashSet<string>>.Ignored))
-                .Invokes(new Action<CreateAsset, HashSet<string>>((c, tags) =>
-                {
-                    tags.Add("tag1");
-                    tags.Add("tag2");
-                }));
-
+            SetupTags(command);
             SetupImageInfo();
 
             await sut.HandleAsync(context);
 
             var result = context.Result<AssetCreatedResult>();
 
-            Assert.Equal(assetId, result.Id);
+            Assert.Equal(assetId, result.IdOrValue);
             Assert.Contains("tag1", result.Tags);
             Assert.Contains("tag2", result.Tags);
 
@@ -87,9 +86,65 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public async Task Create_should_calculate_hash()
+        {
+            var command = new CreateAsset { AssetId = assetId, File = file };
+            var context = CreateContextForCommand(command);
+
+            SetupImageInfo();
+
+            await sut.HandleAsync(context);
+
+            Assert.True(command.FileHash.Length > 10);
+        }
+
+        [Fact]
+        public async Task Create_should_return_duplicate_result_if_file_with_same_hash_found()
+        {
+            var command = new CreateAsset { AssetId = assetId, File = file };
+            var context = CreateContextForCommand(command);
+
+            SetupSameHashAsset(file.FileName, file.FileSize, out _);
+            SetupImageInfo();
+
+            await sut.HandleAsync(context);
+
+            Assert.True(context.Result<AssetCreatedResult>().IsDuplicate);
+        }
+
+        [Fact]
+        public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_but_other_name_found()
+        {
+            var command = new CreateAsset { AssetId = assetId, File = file };
+            var context = CreateContextForCommand(command);
+
+            SetupSameHashAsset("other-name", file.FileSize, out _);
+            SetupImageInfo();
+
+            await sut.HandleAsync(context);
+
+            Assert.False(context.Result<AssetCreatedResult>().IsDuplicate);
+        }
+
+        [Fact]
+        public async Task Create_should_not_return_duplicate_result_if_file_with_same_hash_but_other_size_found()
+        {
+            var command = new CreateAsset { AssetId = assetId, File = file };
+            var context = CreateContextForCommand(command);
+
+            SetupSameHashAsset(file.FileName, 12345, out _);
+            SetupImageInfo();
+
+            await sut.HandleAsync(context);
+
+            Assert.False(context.Result<AssetCreatedResult>().IsDuplicate);
+        }
+
+        [Fact]
         public async Task Update_should_update_domain_object()
         {
-            var context = CreateContextForCommand(new UpdateAsset { AssetId = assetId, File = file });
+            var command = new UpdateAsset { AssetId = assetId, File = file };
+            var context = CreateContextForCommand(command);
 
             SetupImageInfo();
 
@@ -101,21 +156,57 @@ namespace Squidex.Domain.Apps.Entities.Assets
             AssertAssetImageChecked();
         }
 
+        [Fact]
+        public async Task Update_should_calculate_hash()
+        {
+            var command = new UpdateAsset { AssetId = assetId, File = file };
+            var context = CreateContextForCommand(command);
+
+            SetupImageInfo();
+
+            await ExecuteCreateAsync();
+
+            await sut.HandleAsync(context);
+
+            Assert.True(command.FileHash.Length > 10);
+        }
+
         private Task ExecuteCreateAsync()
         {
             return asset.ExecuteAsync(CreateCommand(new CreateAsset { AssetId = Id, File = file }));
+        }
+
+        private void SetupTags(CreateAsset command)
+        {
+            A.CallTo(() => tagGenerator.GenerateTags(command, A<HashSet<string>>.Ignored))
+                .Invokes(new Action<CreateAsset, HashSet<string>>((c, tags) =>
+                {
+                    tags.Add("tag1");
+                    tags.Add("tag2");
+                }));
         }
 
         private void AssertAssetHasBeenUploaded(long version, Guid commitId)
         {
             var fileName = AssetStoreExtensions.GetFileName(assetId.ToString(), version);
 
-            A.CallTo(() => assetStore.UploadAsync(commitId.ToString(), stream, false, CancellationToken.None))
+            A.CallTo(() => assetStore.UploadAsync(commitId.ToString(), A<HasherStream>.Ignored, false, CancellationToken.None))
                 .MustHaveHappened();
             A.CallTo(() => assetStore.CopyAsync(commitId.ToString(), fileName, CancellationToken.None))
                 .MustHaveHappened();
             A.CallTo(() => assetStore.DeleteAsync(commitId.ToString()))
                 .MustHaveHappened();
+        }
+
+        private void SetupSameHashAsset(string fileName, long fileSize, out IAssetEntity existing)
+        {
+            var temp = existing = A.Fake<IAssetEntity>();
+
+            A.CallTo(() => temp.FileName).Returns(fileName);
+            A.CallTo(() => temp.FileSize).Returns(fileSize);
+
+            A.CallTo(() => assetQueryService.QueryByHashAsync(A<Guid>.Ignored, A<string>.Ignored))
+                .Returns(new List<IAssetEntity> { existing });
         }
 
         private void SetupImageInfo()

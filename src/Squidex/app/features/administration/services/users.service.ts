@@ -13,25 +13,19 @@ import { map } from 'rxjs/operators';
 import {
     ApiUrlConfig,
     Model,
-    pretifyError
+    pretifyError,
+    ResultSet
 } from '@app/shared';
 
-export class UsersDto extends Model {
-    constructor(
-        public readonly total: number,
-        public readonly items: UserDto[]
-    ) {
-        super();
-    }
-}
+export class UsersDto extends ResultSet<UserDto> {}
 
-export class UserDto extends Model {
+export class UserDto extends Model<UserDto> {
     constructor(
         public readonly id: string,
         public readonly email: string,
         public readonly displayName: string,
-        public readonly permissions: string[],
-        public readonly isLocked: boolean
+        public readonly permissions: string[] = [],
+        public readonly isLocked?: boolean
     ) {
         super();
     }
@@ -41,24 +35,18 @@ export class UserDto extends Model {
     }
 }
 
-export class CreateUserDto {
-    constructor(
-        public readonly email: string,
-        public readonly displayName: string,
-        public readonly permissions: string[],
-        public readonly password: string
-    ) {
-    }
+export interface CreateUserDto {
+    readonly email: string;
+    readonly displayName: string;
+    readonly permissions: string[];
+    readonly password: string;
 }
 
-export class UpdateUserDto {
-    constructor(
-        public readonly email: string,
-        public readonly displayName: string,
-        public readonly permissions: string[],
-        public readonly password?: string
-    ) {
-    }
+export interface UpdateUserDto {
+    readonly email: string;
+    readonly displayName: string;
+    readonly permissions: string[];
+    readonly password?: string;
 }
 
 @Injectable()
@@ -73,17 +61,16 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
 
         return this.http.get<{ total: number, items: any[] }>(url).pipe(
-                map(response => {
-                    const users = response.items.map(item => {
-                        return new UserDto(
+                map(body => {
+                    const users = body.items.map(item =>
+                        new UserDto(
                             item.id,
                             item.email,
                             item.displayName,
                             item.permissions,
-                            item.isLocked);
-                    });
+                            item.isLocked));
 
-                    return new UsersDto(response.total, users);
+                    return new UsersDto(body.total, users);
                 }),
                 pretifyError('Failed to load users. Please reload.'));
     }
@@ -92,13 +79,15 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
 
         return this.http.get<any>(url).pipe(
-                map(response => {
-                    return new UserDto(
-                        response.id,
-                        response.email,
-                        response.displayName,
-                        response.permissions,
-                        response.isLocked);
+                map(body => {
+                    const user = new UserDto(
+                        body.id,
+                        body.email,
+                        body.displayName,
+                        body.permissions,
+                        body.isLocked);
+
+                    return user;
                 }),
                 pretifyError('Failed to load user. Please reload.'));
     }
@@ -107,13 +96,15 @@ export class UsersService {
         const url = this.apiUrl.buildUrl('api/user-management');
 
         return this.http.post<any>(url, dto).pipe(
-                map(response => {
-                    return new UserDto(
-                        response.id,
+                map(body => {
+                    const user = new UserDto(
+                        body.id,
                         dto.email,
                         dto.displayName,
                         dto.permissions,
                         false);
+
+                    return user;
                 }),
                 pretifyError('Failed to create user. Please reload.'));
     }

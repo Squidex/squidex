@@ -5,7 +5,7 @@
  * Copyright (c) Sebastian Stehle. All rights r vbeserved
  */
 
-import { Types } from './../../utils/types';
+import { Types } from '@app/framework/internal';
 
 const DEFAULT_ERRORS: { [key: string]: string } = {
     between: '{field} must be between \'{min}\' and \'{max}\'.',

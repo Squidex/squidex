@@ -10,6 +10,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { ErrorDto } from './utils/error';
+
 import { Types } from './utils/types';
 
 import { fullValue} from './angular/forms/forms-helper';
@@ -20,7 +21,7 @@ export interface FormState {
     error?: string | null;
 }
 
-export class Form<T extends AbstractControl> {
+export class Form<T extends AbstractControl, V> {
     private readonly state = new State<FormState>({ submitted: false });
 
     public submitted =
@@ -42,25 +43,33 @@ export class Form<T extends AbstractControl> {
         this.form.enable();
     }
 
-    protected reset(value: any) {
-        this.form.reset(value);
+    protected setValue(value?: V) {
+        if (value) {
+            this.form.reset(this.transformLoad(value));
+        } else {
+            this.form.reset();
+        }
     }
 
-    protected setValue(value: any) {
-        this.form.reset(value, { emitEvent: true });
+    protected transformLoad(value: V): any {
+        return value;
     }
 
-    public load(value: any) {
-        this.state.next(_ => ({ submitted: false, error: null }));
+    protected transformSubmit(value: any): V {
+        return value;
+    }
+
+    public load(value: V | undefined) {
+        this.state.next(() => ({ submitted: false, error: null }));
 
         this.setValue(value);
     }
 
-    public submit(): any | null {
-        this.state.next(_ => ({ submitted: true }));
+    public submit(): V | null {
+        this.state.next(() => ({ submitted: true }));
 
         if (this.form.valid) {
-            const value = fullValue(this.form);
+            const value = this.transformSubmit(fullValue(this.form));
 
             this.disable();
 
@@ -70,20 +79,15 @@ export class Form<T extends AbstractControl> {
         }
     }
 
-    public submitCompleted(newValue?: any) {
-        this.state.next(_ => ({ submitted: false, error: null }));
+    public submitCompleted(newValue?: V) {
+        this.state.next(() => ({ submitted: false, error: null }));
 
         this.enable();
-
-        if (newValue) {
-            this.reset(newValue);
-        } else {
-            this.form.markAsPristine();
-        }
+        this.setValue(newValue);
     }
 
     public submitFailed(error?: string | ErrorDto) {
-        this.state.next(_ => ({ submitted: false, error: this.getError(error) }));
+        this.state.next(() => ({ submitted: false, error: this.getError(error) }));
 
         this.enable();
     }
@@ -97,9 +101,17 @@ export class Form<T extends AbstractControl> {
     }
 }
 
-export class Model {
-    protected clone(update: ((v: any) => object) | object, validOnly = false): any {
-        let values: object;
+export function createModel<T>(c: { new(): T; }, values: Partial<T>): T {
+    return Object.assign(new c(), values);
+}
+
+export class Model<T> {
+    public with(value: Partial<T>, validOnly = false): T {
+        return this.clone(value, validOnly);
+    }
+
+    protected clone<V>(update: ((v: any) => V) | Partial<V>, validOnly = false): V {
+        let values: Partial<V>;
         if (Types.isFunction(update)) {
             values = update(<any>this);
         } else {
@@ -123,6 +135,15 @@ export class Model {
         }
 
         return clone;
+    }
+}
+
+export class ResultSet<T> extends Model<ResultSet<T>> {
+    constructor(
+        public readonly total: number,
+        public readonly items: T[]
+    ) {
+        super();
     }
 }
 

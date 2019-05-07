@@ -5,7 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export const fieldTypes = [
+export type FieldType =
+    'Array' |
+    'Assets' |
+    'Boolean' |
+    'DateTime' |
+    'Json' |
+    'Geolocation' |
+    'Number' |
+    'References' |
+    'String' |
+    'Tags';
+
+export const fieldTypes: { type: FieldType, description: string }[] = [
     {
         type: 'String',
         description: 'Titles, names, paragraphs.'
@@ -41,7 +53,7 @@ export const fieldTypes = [
 
 export const fieldInvariant = 'iv';
 
-export function createProperties(fieldType: string, values: Object | null = null): FieldPropertiesDto {
+export function createProperties(fieldType: FieldType, values: Object | null = null): FieldPropertiesDto {
     let properties: FieldPropertiesDto;
 
     switch (fieldType) {
@@ -109,7 +121,7 @@ export interface FieldPropertiesVisitor<T> {
 }
 
 export abstract class FieldPropertiesDto {
-    public abstract fieldType: string;
+    public abstract fieldType: FieldType;
 
     public readonly editorUrl?: string;
     public readonly label?: string;

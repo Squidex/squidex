@@ -10,10 +10,9 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import {
     ApiUrlConfig,
-    TranslateDto,
     TranslationDto,
     TranslationsService
-} from './../';
+} from '@app/shared/internal';
 
 describe('TranslationsService', () => {
     beforeEach(() => {
@@ -35,11 +34,11 @@ describe('TranslationsService', () => {
     it('should make post request to translate text',
         inject([TranslationsService, HttpTestingController], (translationsService: TranslationsService, httpMock: HttpTestingController) => {
 
+        const dto = { text: 'Hello', sourceLanguage: 'en', targetLanguage: 'de' };
+
         let translation: TranslationDto;
 
-        const request = new TranslateDto('Hello', 'en', 'de');
-
-        translationsService.translate('my-app', request).subscribe(result => {
+        translationsService.translate('my-app', dto).subscribe(result => {
             translation = result;
         });
 

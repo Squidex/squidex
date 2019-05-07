@@ -8,28 +8,22 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
     Version,
     Versioned
 } from '@app/framework';
 
-export class AppRolesDto extends Model {
-    constructor(
-        public readonly roles: AppRoleDto[],
-        public readonly version: Version
-    ) {
-        super();
-    }
-}
+export type RolesDto = Versioned<RoleDto[]>;
 
-export class AppRoleDto extends Model {
+export class RoleDto extends Model<RoleDto> {
     constructor(
         public readonly name: string,
         public readonly numClients: number,
@@ -38,28 +32,18 @@ export class AppRoleDto extends Model {
     ) {
         super();
     }
-
-    public with(value: Partial<AppRoleDto>): AppRoleDto {
-        return this.clone(value);
-    }
 }
 
-export class CreateAppRoleDto {
-    constructor(
-        public readonly name: string
-    ) {
-    }
+export interface CreateRoleDto {
+    readonly name: string;
 }
 
-export class UpdateAppRoleDto {
-    constructor(
-        public readonly permissions: string[]
-    ) {
-    }
+export interface UpdateRoleDto {
+    readonly permissions: string[];
 }
 
 @Injectable()
-export class AppRolesService {
+export class RolesService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
@@ -67,36 +51,33 @@ export class AppRolesService {
     ) {
     }
 
-    public getRoles(appName: string): Observable<AppRolesDto> {
+    public getRoles(appName: string): Observable<RolesDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
+                mapVersioned(({ body }) => {
                     const items: any[] = body.roles;
 
-                    const roles = items.map(item => {
-                        return new AppRoleDto(
+                    const roles = items.map(item =>
+                        new RoleDto(
                             item.name,
                             item.numClients,
                             item.numContributors,
-                            item.permissions);
-                    });
+                            item.permissions));
 
-                    return new AppRolesDto(roles, response.version);
+                    return roles;
                 }),
                 pretifyError('Failed to load roles. Please reload.'));
     }
 
-    public postRole(appName: string, dto: CreateAppRoleDto, version: Version): Observable<Versioned<AppRoleDto>> {
+    public postRole(appName: string, dto: CreateRoleDto, version: Version): Observable<Versioned<RoleDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles`);
 
         return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
-                map(response => {
-                    const role = new AppRoleDto(dto.name, 0, 0, []);
+                mapVersioned(() => {
+                    const role = new RoleDto(dto.name, 0, 0, []);
 
-                    return new Versioned(response.version, role);
+                    return role;
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Role', 'Created', appName);
@@ -104,7 +85,7 @@ export class AppRolesService {
                 pretifyError('Failed to add role. Please reload.'));
     }
 
-    public putRole(appName: string, name: string, dto: UpdateAppRoleDto, version: Version): Observable<Versioned<any>> {
+    public putRole(appName: string, name: string, dto: UpdateRoleDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles/${name}`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(

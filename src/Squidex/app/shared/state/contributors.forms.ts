@@ -9,7 +9,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Form, hasNoValue$ } from '@app/framework';
 
-export class AssignContributorForm extends Form<FormGroup> {
+import { UserDto } from './../services/users.service';
+
+export class AssignContributorForm extends Form<FormGroup, { user: string | UserDto }> {
     public hasNoUser = hasNoValue$(this.form.controls['user']);
 
     constructor(formBuilder: FormBuilder) {

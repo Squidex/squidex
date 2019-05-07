@@ -9,8 +9,7 @@
 
 import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
 
-import { DialogService } from '@app/framework/internal';
-import { Tooltip } from '@app/shared';
+import { DialogService, Tooltip } from '@app/framework/internal';
 
 @Directive({
     selector: '[title]'

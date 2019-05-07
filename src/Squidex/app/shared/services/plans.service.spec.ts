@@ -11,13 +11,12 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    ChangePlanDto,
     PlanChangedDto,
     PlanDto,
     PlansDto,
     PlansService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
 describe('PlansService', () => {
     const version = new Version('1');
@@ -55,7 +54,6 @@ describe('PlansService', () => {
 
         req.flush({
             currentPlanId: '123',
-            hasPortal: true,
             planOwner: '456',
             plans: [
                 {
@@ -78,30 +76,32 @@ describe('PlansService', () => {
                     maxAssetSize: 5500,
                     maxContributors: 6500
                 }
-            ]
+            ],
+            hasPortal: true
         }, {
             headers: {
                 etag: '2'
             }
         });
 
-        expect(plans!).toEqual(
-            new PlansDto(
-                '123',
-                '456',
-                true,
-                [
+        expect(plans!).toEqual({
+            payload: {
+                currentPlanId: '123',
+                planOwner: '456',
+                plans: [
                     new PlanDto('free', 'Free', '14 €', 'free_yearly', '12 €', 1000, 1500, 2500),
                     new PlanDto('prof', 'Prof', '18 €', 'prof_yearly', '16 €', 4000, 5500, 6500)
                 ],
-                new Version('2')
-            ));
+                hasPortal: true
+            },
+            version: new Version('2')
+        });
     }));
 
     it('should make put request to change plan',
         inject([PlansService, HttpTestingController], (plansService: PlansService, httpMock: HttpTestingController) => {
 
-        const dto = new ChangePlanDto('enterprise');
+        const dto = { planId: 'enterprise' };
 
         let planChanged: PlanChangedDto;
 
@@ -111,11 +111,11 @@ describe('PlansService', () => {
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/plan');
 
-        req.flush({ redirectUri: 'my-url' });
+        req.flush({ redirectUri: 'http://url' });
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        expect(planChanged!).toEqual(new PlanChangedDto('my-url'));
+        expect(planChanged!).toEqual({ redirectUri: 'http://url' });
     }));
 });

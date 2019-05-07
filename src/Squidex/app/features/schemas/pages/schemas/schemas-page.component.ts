@@ -8,7 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, onErrorResumeNext } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -63,7 +63,7 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
                     }
                 }));
 
-        this.schemasState.load().pipe(onErrorResumeNext()).subscribe();
+        this.schemasState.load();
     }
 
     public removeCategory(name: string) {
@@ -77,7 +77,7 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
             try {
                this.schemasState.addCategory(value.name);
             } finally {
-                this.addCategoryForm.submitCompleted({});
+                this.addCategoryForm.submitCompleted();
             }
         }
     }

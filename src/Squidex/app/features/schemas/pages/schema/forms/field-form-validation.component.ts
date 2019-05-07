@@ -9,9 +9,9 @@ import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import {
-    AppPatternDto,
     FieldDto,
-    ImmutableArray
+    ImmutableArray,
+    PatternDto
 } from '@app/shared';
 
 @Component({
@@ -27,5 +27,5 @@ export class FieldFormValidationComponent {
     public field: FieldDto;
 
     @Input()
-    public patterns: ImmutableArray<AppPatternDto>;
+    public patterns: ImmutableArray<PatternDto>;
 }

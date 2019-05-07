@@ -14,32 +14,35 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
-    HTTP,
     Model,
     Permission,
     pretifyError
 } from '@app/framework';
 
-export class AppDto extends Model {
+export class AppDto extends Model<AppDto> {
     constructor(
         public readonly id: string,
         public readonly name: string,
         public readonly permissions: Permission[],
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
-        public readonly planName: string,
-        public readonly planUpgrade: string
+        public readonly planName?: string,
+        public readonly planUpgrade?: string
     ) {
         super();
     }
 }
 
-export class CreateAppDto {
-    constructor(
-        public readonly name: string,
-        public readonly template?: string
-    ) {
-    }
+export interface CreateAppDto {
+    readonly name: string;
+    readonly template?: string;
+}
+
+export interface AppCreatedDto {
+    readonly id: string;
+    readonly permissions: string[];
+    readonly planName?: string;
+    readonly planUpgrade?: string;
 }
 
 @Injectable()
@@ -54,13 +57,9 @@ export class AppsService {
     public getApps(): Observable<AppDto[]> {
         const url = this.apiUrl.buildUrl('/api/apps');
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
-                    const items: any[] = body;
-
-                    return items.map(item => {
+        return this.http.get<any[]>(url).pipe(
+                map(body => {
+                    const apps = body.map(item => {
                         const permissions = (<string[]>item.permissions).map(x => new Permission(x));
 
                         return new AppDto(
@@ -72,23 +71,16 @@ export class AppsService {
                             item.planName,
                             item.planUpgrade);
                     });
+
+                    return apps;
                 }),
                 pretifyError('Failed to load apps. Please reload.'));
     }
 
-    public postApp(dto: CreateAppDto, now?: DateTime): Observable<AppDto> {
+    public postApp(dto: CreateAppDto): Observable<AppCreatedDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
-        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
-                    now = now || DateTime.now();
-
-                    const permissions = (<string[]>body.permissions).map(x => new Permission(x));
-
-                    return new AppDto(body.id, dto.name, permissions, now, now, body.planName, body.planUpgrade);
-                }),
+        return this.http.post<AppCreatedDto>(url, dto).pipe(
                 tap(() => {
                     this.analytics.trackEvent('App', 'Created', dto.name);
                 }),

@@ -9,15 +9,13 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
-    AppsState,
     AssetDto,
-    AssetsService,
-    AuthService,
-    DateTime,
+    AssetUploaderState,
     DialogModel,
     ResourceLoaderService,
     StatefulControlComponent,
-    Types
+    Types,
+    UploadCanceled
 } from '@app/shared/internal';
 
 declare var SimpleMDE: any;
@@ -54,9 +52,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
-        private readonly appsState: AppsState,
-        private readonly assetsService: AssetsService,
-        private readonly authState: AuthService,
+        private readonly assetUploader: AssetUploaderState,
         private readonly renderer: Renderer2,
         private readonly resourceLoader: ResourceLoaderService
     ) {
@@ -245,13 +241,15 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
             }
         };
 
-        this.assetsService.uploadFile(this.appsState.appName, file, this.authState.user!.token, DateTime.now())
+        this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
                     replaceText(`![${asset.fileName}](${asset.url} '${asset.fileName}')`);
                 }
-            }, () => {
-                replaceText('FAILED');
+            }, error => {
+                if (!Types.is(error, UploadCanceled)) {
+                    replaceText('FAILED');
+                }
             });
     }
 }

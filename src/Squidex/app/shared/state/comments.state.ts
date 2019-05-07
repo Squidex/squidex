@@ -12,22 +12,17 @@ import {
     DateTime,
     DialogService,
     ImmutableArray,
-    notify,
+    shareSubscribed,
     State,
     Version
 } from '@app/framework';
 
-import {
-    CommentDto,
-    CommentsService,
-    UpsertCommentDto
-} from './../services/comments.service';
-
+import { CommentDto, CommentsService } from './../services/comments.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot {
     // The current comments.
-    comments: ImmutableArray<CommentDto>;
+    comments: CommentsList;
 
     // The version of the comments state.
     version: Version;
@@ -35,6 +30,8 @@ interface Snapshot {
     // Indicates if the comments are loaded.
     isLoaded?: boolean;
 }
+
+type CommentsList = ImmutableArray<CommentDto>;
 
 export class CommentsState extends State<Snapshot> {
     public comments =
@@ -56,64 +53,65 @@ export class CommentsState extends State<Snapshot> {
 
     public load(): Observable<any> {
         return this.commentsService.getComments(this.appName, this.commentsId, this.version).pipe(
-            tap(dtos => {
+            tap(payload => {
                 this.next(s => {
                     let comments = s.comments;
 
-                    for (let created of dtos.createdComments) {
+                    for (let created of payload.createdComments) {
                         if (!comments.find(x => x.id === created.id)) {
                             comments = comments.push(created);
                         }
                     }
 
-                    for (let updated of dtos.updatedComments) {
+                    for (let updated of payload.updatedComments) {
                         comments = comments.replaceBy('id', updated);
                     }
 
-                    for (let deleted of dtos.deletedComments) {
+                    for (let deleted of payload.deletedComments) {
                         comments = comments.filter(x => x.id !== deleted);
                     }
 
-                    return { ...s, comments, isLoaded: true, version: dtos.version };
+                    return { ...s, comments, isLoaded: true, version: payload.version };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
-    public create(text: string): Observable<any> {
-        return this.commentsService.postComment(this.appName, this.commentsId, new UpsertCommentDto(text)).pipe(
-            tap(dto => {
+    public create(text: string): Observable<CommentDto> {
+        return this.commentsService.postComment(this.appName, this.commentsId, { text }).pipe(
+            tap(comment => {
                 this.next(s => {
-                    const comments = s.comments.push(dto);
+                    const comments = s.comments.push(comment);
 
                     return { ...s, comments };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
-    public update(commentId: string, text: string, now?: DateTime): Observable<any> {
-        return this.commentsService.putComment(this.appName, this.commentsId, commentId, new UpsertCommentDto(text)).pipe(
+    public delete(comment: CommentDto): Observable<any> {
+        return this.commentsService.deleteComment(this.appName, this.commentsId, comment.id).pipe(
             tap(() => {
                 this.next(s => {
-                    const comments = s.comments.map(c => c.id === commentId ? update(c, text, now || DateTime.now()) : c);
+                    const comments = s.comments.removeBy('id', comment);
 
                     return { ...s, comments };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
-    public delete(commentId: string): Observable<any> {
-        return this.commentsService.deleteComment(this.appName, this.commentsId, commentId).pipe(
-            tap(() => {
+    public update(comment: CommentDto, text: string, now?: DateTime): Observable<CommentDto> {
+        return this.commentsService.putComment(this.appName, this.commentsId, comment.id, { text }).pipe(
+            map(() => update(comment, text, now || DateTime.now())),
+            tap(updated => {
                 this.next(s => {
-                    const comments = s.comments.filter(c => c.id !== commentId);
+                    const comments = s.comments.replaceBy('id', updated);
 
                     return { ...s, comments };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     private get version() {

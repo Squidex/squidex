@@ -31,9 +31,6 @@ export class ContentStatusComponent {
     @Input()
     public showLabel = false;
 
-    @Input()
-    public alignMiddle = true;
-
     public get tooltipText() {
         if (this.scheduledAt) {
             return `Will be set to '${this.scheduledTo}' at ${this.scheduledAt.toStringFormat('LLLL')}`;

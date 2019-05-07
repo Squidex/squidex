@@ -13,24 +13,25 @@ import {
     DialogService,
     ErrorDto,
     ImmutableArray,
-    notify,
+    shareMapSubscribed,
+    shareSubscribed,
     State,
     Types,
     Version
 } from '@app/framework';
 
 import {
-    AppContributorDto,
-    AppContributorsService,
-    AssignContributorDto
-} from './../services/app-contributors.service';
+    AssignContributorDto,
+    ContributorDto,
+    ContributorsService
+} from './../services/contributors.service';
 
 import { AuthService } from './../services/auth.service';
 import { AppsState } from './apps.state';
 
 interface SnapshotContributor {
     // The contributor.
-    contributor: AppContributorDto;
+    contributor: ContributorDto;
 
     // Indicates if the contributor is the ucrrent user.
     isCurrentUser: boolean;
@@ -38,7 +39,7 @@ interface SnapshotContributor {
 
 interface Snapshot {
     // All loaded contributors.
-    contributors: ImmutableArray<SnapshotContributor>;
+    contributors: ContributorsList;
 
     // Indicates if the maximum number of contributors are reached.
     isMaxReached?: boolean;
@@ -52,6 +53,8 @@ interface Snapshot {
     // The app version.
     version: Version;
 }
+
+type ContributorsList = ImmutableArray<SnapshotContributor>;
 
 @Injectable()
 export class ContributorsState extends State<Snapshot> {
@@ -72,7 +75,7 @@ export class ContributorsState extends State<Snapshot> {
             distinctUntilChanged());
 
     constructor(
-        private readonly appContributorsService: AppContributorsService,
+        private readonly contributorsService: ContributorsService,
         private readonly appsState: AppsState,
         private readonly authState: AuthService,
         private readonly dialogs: DialogService
@@ -85,38 +88,31 @@ export class ContributorsState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.appContributorsService.getContributors(this.appName).pipe(
-            tap(dtos => {
+        return this.contributorsService.getContributors(this.appName).pipe(
+            tap(({ version, payload }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contributors reloaded.');
                 }
 
-                const contributors = ImmutableArray.of(dtos.contributors.map(x => this.createContributor(x)));
+                const contributors = ImmutableArray.of(payload.contributors.map(x => this.createContributor(x)));
 
-                this.replaceContributors(contributors, dtos.version, dtos.maxContributors);
+                this.replaceContributors(contributors, version, payload.maxContributors);
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
-    public revoke(contributor: AppContributorDto): Observable<any> {
-        return this.appContributorsService.deleteContributor(this.appName, contributor.contributorId, this.version).pipe(
-            tap(dto => {
+    public revoke(contributor: ContributorDto): Observable<any> {
+        return this.contributorsService.deleteContributor(this.appName, contributor.contributorId, this.version).pipe(
+            tap(({ version }) => {
                 const contributors = this.snapshot.contributors.filter(x => x.contributor.contributorId !== contributor.contributorId);
 
-                this.replaceContributors(contributors, dto.version);
+                this.replaceContributors(contributors, version);
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
-    public assign(request: AssignContributorDto): Observable<boolean> {
-        return this.appContributorsService.postContributor(this.appName, request, this.version).pipe(
-            map(dto => {
-                const contributors = this.updateContributors(dto.payload.contributorId, request.role, dto.version);
-
-                this.replaceContributors(contributors, dto.version);
-
-                return dto.payload.isCreated;
-            }),
+    public assign(request: AssignContributorDto): Observable<boolean | undefined> {
+        return this.contributorsService.postContributor(this.appName, request, this.version).pipe(
             catchError(error => {
                 if (Types.is(error, ErrorDto) && error.statusCode === 404) {
                     return throwError(new ErrorDto(404, 'The user does not exist.'));
@@ -124,15 +120,20 @@ export class ContributorsState extends State<Snapshot> {
                     return throwError(error);
                 }
             }),
-            notify(this.dialogs));
+            tap(({ version, payload }) => {
+                const contributors = this.updateContributors(payload.contributorId, request.role);
+
+                this.replaceContributors(contributors, version);
+            }),
+            shareMapSubscribed(this.dialogs, x => x.payload.isCreated));
     }
 
-    private updateContributors(id: string, role: string, version: Version) {
-        const contributor = new AppContributorDto(id, role);
+    private updateContributors(id: string, role: string) {
+        const contributor = new ContributorDto(id, role);
         const contributors = this.snapshot.contributors;
 
         if (contributors.find(x => x.contributor.contributorId === id)) {
-            return contributors.map(x => x.contributor.contributorId === id ? this.createContributor(contributor, x) : x);
+            return contributors.map(x => x.contributor.contributorId === id ? this.createContributor(contributor) : x);
         } else {
             return contributors.push(this.createContributor(contributor));
         }
@@ -161,13 +162,7 @@ export class ContributorsState extends State<Snapshot> {
         return this.snapshot.version;
     }
 
-    private createContributor(contributor: AppContributorDto, current?: SnapshotContributor): SnapshotContributor {
-        if (!contributor) {
-            return null!;
-        } else if (current && current.contributor === contributor) {
-            return current;
-        } else {
-            return { contributor, isCurrentUser: contributor.contributorId === this.userId };
-        }
+    private createContributor(contributor: ContributorDto): SnapshotContributor {
+        return { contributor, isCurrentUser: contributor.contributorId === this.userId };
     }
 }

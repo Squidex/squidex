@@ -9,9 +9,12 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angul
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-import { ErrorDto } from './../../utils/error';
-import { Types} from './../../utils/types';
-import { Version, Versioned } from './../../utils/version';
+import {
+    ErrorDto,
+    Types,
+    Version,
+    Versioned
+} from '@app/framework/internal';
 
 export module HTTP {
     export function getVersioned<T>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {
@@ -56,7 +59,7 @@ export module HTTP {
         return httpRequest.pipe(map((response: HttpResponse<T>) => {
             const etag = response.headers.get('etag') || '';
 
-            return new Versioned(new Version(etag), response);
+            return { version: new Version(etag), payload: response };
         }));
     }
 }

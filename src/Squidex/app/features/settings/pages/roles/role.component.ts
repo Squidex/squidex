@@ -7,17 +7,15 @@
 
 import { Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AddPermissionForm,
-    AppRoleDto,
     AutocompleteComponent,
     AutocompleteSource,
     EditPermissionsForm,
     fadeAnimation,
-    RolesState,
-    UpdateAppRoleDto
+    RoleDto,
+    RolesState
 } from '@app/shared';
 
 const DEFAULT_ROLES = [
@@ -37,7 +35,7 @@ const DEFAULT_ROLES = [
 })
 export class RoleComponent implements OnChanges {
     @Input()
-    public role: AppRoleDto;
+    public role: RoleDto;
 
     @Input()
     public allPermissions: AutocompleteSource;
@@ -77,7 +75,7 @@ export class RoleComponent implements OnChanges {
     }
 
     public remove() {
-        this.rolesState.delete(this.role).pipe(onErrorResumeNext()).subscribe();
+        this.rolesState.delete(this.role);
     }
 
     public addPermission() {
@@ -86,7 +84,7 @@ export class RoleComponent implements OnChanges {
         if (value) {
             this.editForm.add(value.permission);
 
-            this.addPermissionForm.submitCompleted({});
+            this.addPermissionForm.submitCompleted();
             this.addPermissionInput.focus();
         }
     }
@@ -95,7 +93,7 @@ export class RoleComponent implements OnChanges {
         const value = this.editForm.submit();
 
         if (value) {
-            const request = new UpdateAppRoleDto(value);
+            const request = { permissions: value };
 
             this.rolesState.update(this.role, request)
                 .subscribe(() => {

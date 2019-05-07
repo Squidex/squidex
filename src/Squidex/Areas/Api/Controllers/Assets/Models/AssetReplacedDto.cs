@@ -20,6 +20,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string MimeType { get; set; }
 
         /// <summary>
+        /// The file hash.
+        /// </summary>
+        [Required]
+        public string FileHash { get; set; }
+
+        /// <summary>
         /// The size of the file in bytes.
         /// </summary>
         public long FileSize { get; set; }

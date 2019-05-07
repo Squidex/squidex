@@ -230,4 +230,8 @@ export class ImmutableArray<T> implements Iterable<T> {
     public replaceBy(field: string, newValue: T, replacer?: (o: T, n: T) => T) {
         return this.replaceAll(x => x[field] === newValue[field], o => replacer ? replacer(o, newValue) : newValue);
     }
+
+    public removeBy(field: string, value: T) {
+        return this.removeAll(x => x[field] === value[field]);
+    }
 }

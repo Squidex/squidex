@@ -9,9 +9,9 @@ import { of, throwError } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import { DialogService } from '@app/shared';
+import { DialogService } from '@app/framework';
 
-import { EventConsumerDto, EventConsumersService } from './../services/event-consumers.service';
+import { EventConsumerDto, EventConsumersService } from '@app/features/administration/internal';
 import { EventConsumersState } from './event-consumers.state';
 
 describe('EventConsumersState', () => {
@@ -28,83 +28,88 @@ describe('EventConsumersState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         eventConsumersService = Mock.ofType<EventConsumersService>();
-
-        eventConsumersService.setup(x => x.getEventConsumers())
-            .returns(() => of(oldConsumers));
-
         eventConsumersState = new EventConsumersState(dialogs.object, eventConsumersService.object);
-        eventConsumersState.load().subscribe();
     });
 
-    it('should load event consumers', () => {
-        expect(eventConsumersState.snapshot.eventConsumers.values).toEqual(oldConsumers);
-        expect(eventConsumersState.snapshot.isLoaded).toBeTruthy();
-
-        expect().nothing();
-
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+    afterEach(() => {
+        eventConsumersService.verifyAll();
     });
 
-    it('should show notification on load when reload is true', () => {
-        eventConsumersState.load(true).subscribe();
+    describe('Loading', () => {
+        it('should load event consumers', () => {
+            eventConsumersService.setup(x => x.getEventConsumers())
+                .returns(() => of(oldConsumers)).verifiable();
 
-        expect().nothing();
+            eventConsumersState.load().subscribe();
 
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+            expect(eventConsumersState.snapshot.eventConsumers.values).toEqual(oldConsumers);
+            expect(eventConsumersState.snapshot.isLoaded).toBeTruthy();
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should show notification on load when reload is true', () => {
+            eventConsumersService.setup(x => x.getEventConsumers())
+                .returns(() => of(oldConsumers)).verifiable();
+
+            eventConsumersState.load(true).subscribe();
+
+            expect().nothing();
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
+
+        it('should show notification on load error when silent is false', () => {
+            eventConsumersService.setup(x => x.getEventConsumers())
+                .returns(() => throwError({})).verifiable();
+
+            eventConsumersState.load(true, false).pipe(onErrorResumeNext()).subscribe();
+
+            expect().nothing();
+
+            dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
+        });
     });
 
-    it('should show notification on load error when silent is false', () => {
-        eventConsumersService.setup(x => x.getEventConsumers())
-            .returns(() => throwError({}));
+    describe('Updates', () => {
+        beforeEach(() => {
+            eventConsumersService.setup(x => x.getEventConsumers())
+                .returns(() => of(oldConsumers)).verifiable();
 
-        eventConsumersState.load(true, false).pipe(onErrorResumeNext()).subscribe();
+            eventConsumersState.load().subscribe();
+        });
 
-        expect().nothing();
+        it('should unmark as stopped when started', () => {
+            eventConsumersService.setup(x => x.putStart(oldConsumers[1].name))
+                .returns(() => of({})).verifiable();
 
-        dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
-    });
+            eventConsumersState.start(oldConsumers[1]).subscribe();
 
-    it('should not show notification on load error when silent is true', () => {
-        eventConsumersService.setup(x => x.getEventConsumers())
-            .returns(() => throwError({}));
+            const es_1 = eventConsumersState.snapshot.eventConsumers.at(1);
 
-        eventConsumersState.load(true, true).pipe(onErrorResumeNext()).subscribe();
+            expect(es_1.isStopped).toBeFalsy();
+        });
 
-        expect().nothing();
+        it('should mark as stopped when stopped', () => {
+            eventConsumersService.setup(x => x.putStop(oldConsumers[0].name))
+                .returns(() => of({})).verifiable();
 
-        dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
-    });
+            eventConsumersState.stop(oldConsumers[0]).subscribe();
 
-    it('should unmark as stopped when started', () => {
-        eventConsumersService.setup(x => x.putStart(oldConsumers[1].name))
-            .returns(() => of({}));
+            const es_1 = eventConsumersState.snapshot.eventConsumers.at(0);
 
-        eventConsumersState.start(oldConsumers[1]).subscribe();
+            expect(es_1.isStopped).toBeTruthy();
+        });
 
-        const es_1 = eventConsumersState.snapshot.eventConsumers.at(1);
+        it('should mark as resetting when reset', () => {
+            eventConsumersService.setup(x => x.putReset(oldConsumers[0].name))
+                .returns(() => of({})).verifiable();
 
-        expect(es_1.isStopped).toBeFalsy();
-    });
+            eventConsumersState.reset(oldConsumers[0]).subscribe();
 
-    it('should mark as stopped when stopped', () => {
-        eventConsumersService.setup(x => x.putStop(oldConsumers[0].name))
-            .returns(() => of({}));
+            const es_1 = eventConsumersState.snapshot.eventConsumers.at(0);
 
-        eventConsumersState.stop(oldConsumers[0]).subscribe();
-
-        const es_1 = eventConsumersState.snapshot.eventConsumers.at(0);
-
-        expect(es_1.isStopped).toBeTruthy();
-    });
-
-    it('should mark as resetting when reset', () => {
-        eventConsumersService.setup(x => x.putReset(oldConsumers[0].name))
-            .returns(() => of({}));
-
-        eventConsumersState.reset(oldConsumers[0]).subscribe();
-
-        const es_1 = eventConsumersState.snapshot.eventConsumers.at(0);
-
-        expect(es_1.isResetting).toBeTruthy();
+            expect(es_1.isResetting).toBeTruthy();
+        });
     });
 });

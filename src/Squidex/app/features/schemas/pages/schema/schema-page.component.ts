@@ -9,7 +9,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AppsState,
@@ -66,7 +65,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.patternsState.load().pipe(onErrorResumeNext()).subscribe();
+        this.patternsState.load();
 
         this.own(
             this.schemasState.selectedSchema

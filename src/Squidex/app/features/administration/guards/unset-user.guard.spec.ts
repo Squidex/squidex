@@ -8,7 +8,8 @@
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
-import { UsersState } from './../state/users.state';
+import { UsersState } from '@app/features/administration/internal';
+
 import { UnsetUserGuard } from './unset-user.guard';
 
 describe('UnsetUserGuard', () => {

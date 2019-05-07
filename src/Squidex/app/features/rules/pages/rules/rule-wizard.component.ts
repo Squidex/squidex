@@ -9,7 +9,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import {
-    CreateRuleDto,
     Form,
     ImmutableArray,
     RuleDto,
@@ -28,11 +27,11 @@ export const MODE_EDIT_ACTION  = 'EditAction';
     templateUrl: './rule-wizard.component.html'
 })
 export class RuleWizardComponent implements OnInit {
-    public actionForm = new Form<FormGroup>(new FormGroup({}));
+    public actionForm = new Form<FormGroup, any>(new FormGroup({}));
     public actionType: string;
     public action: any = {};
 
-    public triggerForm = new Form<FormGroup>(new FormGroup({}));
+    public triggerForm = new Form<FormGroup, any>(new FormGroup({}));
     public triggerType: string;
     public trigger: any = {};
 
@@ -118,7 +117,7 @@ export class RuleWizardComponent implements OnInit {
     }
 
     private createRule() {
-        const requestDto = new CreateRuleDto(this.trigger, this.action);
+        const requestDto = { trigger: this.trigger, action: this.action };
 
         this.rulesState.create(requestDto)
             .subscribe(() => {

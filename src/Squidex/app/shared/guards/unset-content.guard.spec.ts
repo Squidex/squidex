@@ -8,7 +8,7 @@
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
-import { ContentsState } from './../state/contents.state';
+import { ContentsState } from '@app/shared/internal';
 import { UnsetContentGuard } from './unset-content.guard';
 
 describe('UnsetContentGuard', () => {

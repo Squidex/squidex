@@ -11,18 +11,25 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetCreatedResult : EntitySavedResult
+    public sealed class AssetCreatedResult : EntityCreatedResult<Guid>
     {
-        public Guid Id { get; }
-
         public HashSet<string> Tags { get; }
 
-        public AssetCreatedResult(Guid id, HashSet<string> tags, long version)
-            : base(version)
-        {
-            Id = id;
+        public long FileVersion { get; }
 
+        public string FileHash { get; }
+
+        public bool IsDuplicate { get; }
+
+        public AssetCreatedResult(Guid id, HashSet<string> tags, long version, long fileVersion, string fileHash, bool isDuplicate)
+            : base(id, version)
+        {
             Tags = tags;
+
+            FileVersion = fileVersion;
+            FileHash = fileHash;
+
+            IsDuplicate = isDuplicate;
         }
     }
 }

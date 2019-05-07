@@ -15,27 +15,15 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
+    ResultSet,
     Version,
     Versioned
 } from '@app/framework';
 
-export class ContentsDto extends Model {
-    constructor(
-        public readonly total: number,
-        public readonly items: ContentDto[]
-    ) {
-
-        super();
-    }
-
-    public with(value: Partial<ContentsDto>): ContentsDto {
-        return this.clone(value);
-    }}
-
-
-export class ScheduleDto extends Model {
+export class ScheduleDto extends Model<ScheduleDto> {
     constructor(
         public readonly status: string,
         public readonly scheduledBy: string,
@@ -45,7 +33,9 @@ export class ScheduleDto extends Model {
     }
 }
 
-export class ContentDto extends Model {
+export class ContentsDto extends ResultSet<ContentDto> { }
+
+export class ContentDto extends Model<ContentDto> {
     constructor(
         public readonly id: string,
         public readonly status: string,
@@ -110,13 +100,13 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
+                map(({ payload }) => {
+                    const body = payload.body;
 
                     const items: any[] = body.items;
 
-                    return new ContentsDto(body.total, items.map(item => {
-                        return new ContentDto(
+                    const contents = new ContentsDto(body.total, items.map(item =>
+                        new ContentDto(
                             item.id,
                             item.status,
                             DateTime.parseISO_UTC(item.created), item.createdBy,
@@ -130,8 +120,9 @@ export class ContentsService {
                             item.isPending === true,
                             item.data,
                             item.dataDraft,
-                            new Version(item.version.toString()));
-                    }));
+                            new Version(item.version.toString()))));
+
+                    return contents;
                 }),
                 pretifyError('Failed to load contents. Please reload.'));
     }
@@ -140,10 +131,10 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
+                map(({ version, payload }) => {
+                    const body = payload.body;
 
-                    return new ContentDto(
+                    const content = new ContentDto(
                         body.id,
                         body.status,
                         DateTime.parseISO_UTC(body.created), body.createdBy,
@@ -157,7 +148,9 @@ export class ContentsService {
                         body.isPending === true,
                         body.data,
                         body.dataDraft,
-                        response.version);
+                        version);
+
+                    return content;
                 }),
                 pretifyError('Failed to load content. Please reload.'));
     }
@@ -166,8 +159,8 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${version.value}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    return new Versioned(response.version, response.payload.body);
+                mapVersioned(({ body }) => {
+                    return body;
                 }),
                 pretifyError('Failed to load data. Please reload.'));
     }
@@ -176,10 +169,10 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}`);
 
         return HTTP.postVersioned<any>(this.http, url, dto).pipe(
-                map(response => {
-                    const body = response.payload.body;
+                map(({ version, payload }) => {
+                    const body = payload.body;
 
-                    return new ContentDto(
+                    const content = new ContentDto(
                         body.id,
                         body.status,
                         DateTime.parseISO_UTC(body.created), body.createdBy,
@@ -188,7 +181,9 @@ export class ContentsService {
                         body.isPending,
                         null,
                         body.data,
-                        response.version);
+                        version);
+
+                    return content;
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Content', 'Created', appName);
@@ -200,10 +195,8 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}?asDraft=${asDraft}`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
-                    return new Versioned(response.version, body);
+                mapVersioned(payload => {
+                    return payload.body;
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Content', 'Updated', appName);
@@ -215,10 +208,8 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return HTTP.patchVersioned(this.http, url, dto, version).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
-                    return new Versioned(response.version, body);
+                mapVersioned(payload => {
+                    return payload.body;
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Content', 'Updated', appName);

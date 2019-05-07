@@ -28,6 +28,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
             public string FileName { get; set; }
 
+            public string FileHash { get; set; }
+
             public string Slug { get; set; }
 
             public long FileSize { get; set; }

@@ -77,7 +77,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.schema = schema!;
                     this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
 
-                    this.contentsState.init().pipe(onErrorResumeNext()).subscribe();
+                    this.contentsState.init();
                 }));
 
         this.own(
@@ -103,15 +103,15 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public reload() {
-        this.contentsState.load(true).pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.load(true);
     }
 
     public deleteSelected() {
-        this.contentsState.deleteMany(this.selectItems()).pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.deleteMany(this.selectItems());
     }
 
     public delete(content: ContentDto) {
-        this.contentsState.deleteMany([content]).pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.deleteMany([content]);
     }
 
     public publish(content: ContentDto) {
@@ -147,7 +147,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public clone(content: ContentDto) {
-        this.contentsState.create(content.dataDraft, false).pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.create(content.dataDraft, false);
     }
 
     private changeContentItems(contents: ContentDto[], action: string) {
@@ -165,19 +165,19 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public goArchive(isArchive: boolean) {
-        this.contentsState.goArchive(isArchive).pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.goArchive(isArchive);
     }
 
     public goPrev() {
-        this.contentsState.goPrev().pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.goPrev();
     }
 
     public goNext() {
-        this.contentsState.goNext().pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.goNext();
     }
 
     public search() {
-        this.contentsState.search(this.filter.apiFilter).pipe(onErrorResumeNext()).subscribe();
+        this.contentsState.search(this.filter.apiFilter);
     }
 
     public selectLanguage(language: AppLanguageDto) {

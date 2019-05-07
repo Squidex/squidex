@@ -6,114 +6,123 @@
  */
 
 import { of } from 'rxjs';
-import { IMock, It, Mock, Times } from 'typemoq';
+import { IMock, Mock } from 'typemoq';
 
 import {
-    AppsState,
     CommentDto,
     CommentsDto,
     CommentsService,
     CommentsState,
-    DateTime,
     DialogService,
     ImmutableArray,
-    UpsertCommentDto,
     Version
-} from './../';
+} from '@app/shared/internal';
+
+import { TestValues } from './_test-helpers';
 
 describe('CommentsState', () => {
-    const app = 'my-app';
+    const {
+        app,
+        appsState,
+        creator,
+        modified
+    } = TestValues;
+
     const commentsId = 'my-comments';
-    const now = DateTime.today();
-    const user = 'not-me';
 
     const oldComments = new CommentsDto([
-        new CommentDto('1', now, 'text1', user),
-        new CommentDto('2', now, 'text2', user)
+        new CommentDto('1', modified, 'text1', creator),
+        new CommentDto('2', modified, 'text2', creator)
     ], [], [], new Version('1'));
 
     let dialogs: IMock<DialogService>;
-    let appsState: IMock<AppsState>;
     let commentsService: IMock<CommentsService>;
     let commentsState: CommentsState;
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
-
         commentsService = Mock.ofType<CommentsService>();
-
-        commentsService.setup(x => x.getComments(app, commentsId, new Version('-1')))
-            .returns(() => of(oldComments));
-
         commentsState = new CommentsState(appsState.object, commentsId, commentsService.object, dialogs.object);
-        commentsState.load().subscribe();
     });
 
-    it('should load and merge comments', () => {
-        const newComments = new CommentsDto([
-            new CommentDto('3', now, 'text3', user)
-        ], [
-            new CommentDto('2', now, 'text2_2', user)
-        ], ['1'], new Version('2'));
-
-        commentsService.setup(x => x.getComments(app, commentsId, new Version('1')))
-            .returns(() => of(newComments));
-
-        commentsState.load().subscribe();
-
-        expect(commentsState.snapshot.isLoaded).toBeTruthy();
-        expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
-            new CommentDto('2', now, 'text2_2', user),
-            new CommentDto('3', now, 'text3', user)
-        ]));
-
-        commentsService.verify(x => x.getComments(app, commentsId, It.isAny()), Times.exactly(2));
+    beforeEach(() => {
+        commentsService.verifyAll();
     });
 
-    it('should add comment to snapshot when created', () => {
-        const newComment = new CommentDto('3', now, 'text3', user);
+    describe('Loading', () => {
+        it('should load and merge comments', () => {
+            const newComments = new CommentsDto([
+                    new CommentDto('3', modified, 'text3', creator)
+                ], [
+                    new CommentDto('2', modified, 'text2_2', creator)
+                ], ['1'], new Version('2'));
 
-        commentsService.setup(x => x.postComment(app, commentsId, new UpsertCommentDto('text3')))
-            .returns(() => of(newComment));
+            commentsService.setup(x => x.getComments(app, commentsId, new Version('-1')))
+                .returns(() => of(oldComments)).verifiable();
 
-        commentsState.create('text3').subscribe();
+            commentsService.setup(x => x.getComments(app, commentsId, new Version('1')))
+                .returns(() => of(newComments)).verifiable();
 
-        expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
-            new CommentDto('1', now, 'text1', user),
-            new CommentDto('2', now, 'text2', user),
-            new CommentDto('3', now, 'text3', user)
-        ]));
+            commentsState.load().subscribe();
+            commentsState.load().subscribe();
+
+            expect(commentsState.snapshot.isLoaded).toBeTruthy();
+            expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
+                new CommentDto('2', modified, 'text2_2', creator),
+                new CommentDto('3', modified, 'text3', creator)
+            ]));
+        });
     });
 
-    it('should update properties when updated', () => {
-        commentsService.setup(x => x.putComment(app, commentsId, '2', new UpsertCommentDto('text2_2')))
-            .returns(() => of({}));
+    describe('Updates', () => {
+        beforeEach(() => {
+            commentsService.setup(x => x.getComments(app, commentsId, new Version('-1')))
+                .returns(() => of(oldComments)).verifiable();
 
-        commentsState.update('2', 'text2_2', now).subscribe();
+            commentsState.load().subscribe();
+        });
 
-        expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
-            new CommentDto('1', now, 'text1', user),
-            new CommentDto('2', now, 'text2_2', user)
-        ]));
+        it('should add comment to snapshot when created', () => {
+            const newComment = new CommentDto('3', modified, 'text3', creator);
 
-        commentsService.verify(x => x.putComment(app, commentsId, '2', new UpsertCommentDto('text2_2')), Times.once());
-    });
+            const request = { text: 'text3' };
 
-    it('should remove comment from snapshot when deleted', () => {
-        commentsService.setup(x => x.deleteComment(app, commentsId, '2'))
-            .returns(() => of({}));
+            commentsService.setup(x => x.postComment(app, commentsId, request))
+                .returns(() => of(newComment)).verifiable();
 
-        commentsState.delete('2').subscribe();
+            commentsState.create('text3').subscribe();
 
-        expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
-            new CommentDto('1', now, 'text1', user)
-        ]));
+            expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
+                new CommentDto('1', modified, 'text1', creator),
+                new CommentDto('2', modified, 'text2', creator),
+                new CommentDto('3', modified, 'text3', creator)
+            ]));
+        });
 
-        commentsService.verify(x => x.deleteComment(app, commentsId, '2'), Times.once());
+        it('should update properties when updated', () => {
+            const request = { text: 'text2_2' };
+
+            commentsService.setup(x => x.putComment(app, commentsId, '2', request))
+                .returns(() => of({})).verifiable();
+
+            commentsState.update(oldComments.createdComments[1], 'text2_2', modified).subscribe();
+
+            expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
+                new CommentDto('1', modified, 'text1', creator),
+                new CommentDto('2', modified, 'text2_2', creator)
+            ]));
+        });
+
+        it('should remove comment from snapshot when deleted', () => {
+            commentsService.setup(x => x.deleteComment(app, commentsId, '2'))
+                .returns(() => of({})).verifiable();
+
+            commentsState.delete(oldComments.createdComments[1]).subscribe();
+
+            expect(commentsState.snapshot.comments).toEqual(ImmutableArray.of([
+                new CommentDto('1', modified, 'text1', creator)
+            ]));
+        });
     });
 });

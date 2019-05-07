@@ -7,11 +7,10 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
-    AppPatternDto,
     EditPatternForm,
+    PatternDto,
     PatternsState
 } from '@app/shared';
 
@@ -22,7 +21,7 @@ import {
 })
 export class PatternComponent implements OnInit {
     @Input()
-    public pattern: AppPatternDto;
+    public pattern: PatternDto;
 
     public editForm = new EditPatternForm(this.formBuilder);
 
@@ -41,7 +40,7 @@ export class PatternComponent implements OnInit {
     }
 
     public delete() {
-        this.patternsState.delete(this.pattern).pipe(onErrorResumeNext()).subscribe();
+        this.patternsState.delete(this.pattern);
     }
 
     public save() {
@@ -58,7 +57,7 @@ export class PatternComponent implements OnInit {
             } else {
                 this.patternsState.create(value)
                     .subscribe(() => {
-                        this.editForm.submitCompleted({});
+                        this.editForm.submitCompleted();
                     }, error => {
                         this.editForm.submitFailed(error);
                     });

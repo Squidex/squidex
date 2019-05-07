@@ -19,7 +19,7 @@ import {
     Types
 } from '@app/framework';
 
-export class BackupDto extends Model {
+export class BackupDto extends Model<BackupDto> {
     constructor(
         public readonly id: string,
         public readonly started: DateTime,
@@ -32,7 +32,7 @@ export class BackupDto extends Model {
     }
 }
 
-export class RestoreDto {
+export class RestoreDto extends Model<BackupDto> {
     constructor(
         public readonly url: string,
         public readonly started: DateTime,
@@ -40,15 +40,13 @@ export class RestoreDto {
         public readonly status: string,
         public readonly log: string[]
     ) {
+        super();
     }
 }
 
-export class StartRestoreDto {
-    constructor(
-        public readonly url: string,
-        public readonly newAppName?: string
-    ) {
-    }
+export interface StartRestoreDto {
+    readonly url: string;
+    readonly newAppName?: string;
 }
 
 @Injectable()
@@ -64,16 +62,17 @@ export class BackupsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups`);
 
         return this.http.get<any[]>(url).pipe(
-                map(response => {
-                    return response.map(item => {
-                        return new BackupDto(
+                map(body => {
+                    const backups = body.map(item =>
+                        new BackupDto(
                             item.id,
                             DateTime.parseISO_UTC(item.started),
                             item.stopped ? DateTime.parseISO_UTC(item.stopped) : null,
                             item.handledEvents,
                             item.handledAssets,
-                            item.status);
-                    });
+                            item.status));
+
+                    return backups;
                 }),
                 pretifyError('Failed to load backups.'));
     }
@@ -82,13 +81,15 @@ export class BackupsService {
         const url = this.apiUrl.buildUrl(`api/apps/restore`);
 
         return this.http.get<any>(url).pipe(
-                map(response => {
-                    return new RestoreDto(
-                        response.url,
-                        DateTime.parseISO_UTC(response.started),
-                        response.stopped ? DateTime.parseISO_UTC(response.stopped) : null,
-                        response.status,
-                        response.log);
+                map(body => {
+                    const restore = new RestoreDto(
+                        body.url,
+                        DateTime.parseISO_UTC(body.started),
+                        body.stopped ? DateTime.parseISO_UTC(body.stopped) : null,
+                        body.status,
+                        body.log);
+
+                    return restore;
                 }),
                 catchError(error => {
                     if (Types.is(error, HttpErrorResponse) && error.status === 404) {

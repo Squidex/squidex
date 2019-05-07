@@ -5,6 +5,7 @@
  commonConfig = require('./webpack.config.js');
 
 const plugins = {
+    // https://github.com/jantimon/html-webpack-plugin
     HtmlWebpackPlugin: require('html-webpack-plugin')
 };
 

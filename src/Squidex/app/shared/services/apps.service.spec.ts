@@ -11,16 +11,14 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
+    AppCreatedDto,
     AppDto,
     AppsService,
-    CreateAppDto,
     DateTime,
     Permission
-} from './../';
+} from '@app/shared/internal';
 
 describe('AppsService', () => {
-    const now = DateTime.now();
-
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
@@ -83,11 +81,11 @@ describe('AppsService', () => {
     it('should make post request to create app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
 
-        const dto = new CreateAppDto('new-app');
+        const dto = { name: 'new-app' };
 
-        let app: AppDto;
+        let app: AppCreatedDto;
 
-        appsService.postApp(dto, now).subscribe(result => {
+        appsService.postApp(dto).subscribe(result => {
             app = result;
         });
 
@@ -103,7 +101,12 @@ describe('AppsService', () => {
             planUpgrade: 'Enterprise'
         });
 
-        expect(app!).toEqual(new AppDto('123', dto.name, [new Permission('Reader')], now, now, 'Basic', 'Enterprise'));
+        expect(app!).toEqual({
+            id: '123',
+            permissions: ['Reader'],
+            planName: 'Basic',
+            planUpgrade: 'Enterprise'
+        });
     }));
 
     it('should make delete request to archive app',

@@ -11,14 +11,13 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    AppPatternDto,
-    AppPatternsDto,
-    AppPatternsService,
-    EditAppPatternDto,
+    PatternDto,
+    PatternsDto,
+    PatternsService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
-describe('AppPatternsService', () => {
+describe('PatternsService', () => {
     const version = new Version('1');
 
     beforeEach(() => {
@@ -27,7 +26,7 @@ describe('AppPatternsService', () => {
                 HttpClientTestingModule
             ],
             providers: [
-                AppPatternsService,
+                PatternsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
                 { provide: AnalyticsService, useValue: new AnalyticsService() }
             ]
@@ -39,9 +38,9 @@ describe('AppPatternsService', () => {
     }));
 
     it('should make get request to get patterns',
-        inject([AppPatternsService, HttpTestingController], (patternService: AppPatternsService, httpMock: HttpTestingController) => {
+        inject([PatternsService, HttpTestingController], (patternService: PatternsService, httpMock: HttpTestingController) => {
 
-        let patterns: AppPatternsDto;
+        let patterns: PatternsDto;
 
         patternService.getPatterns('my-app').subscribe(result => {
             patterns = result;
@@ -70,19 +69,21 @@ describe('AppPatternsService', () => {
             }
         });
 
-        expect(patterns!).toEqual(
-            new AppPatternsDto([
-                new AppPatternDto('1', 'Number', '[0-9]', 'Message1'),
-                new AppPatternDto('2', 'Numbers', '[0-9]*', 'Message2')
-            ], new Version('2')));
+        expect(patterns!).toEqual({
+            payload: [
+                new PatternDto('1', 'Number', '[0-9]', 'Message1'),
+                new PatternDto('2', 'Numbers', '[0-9]*', 'Message2')
+            ],
+            version: new Version('2')
+        });
     }));
 
     it('should make post request to add pattern',
-        inject([AppPatternsService, HttpTestingController], (patternService: AppPatternsService, httpMock: HttpTestingController) => {
+        inject([PatternsService, HttpTestingController], (patternService: PatternsService, httpMock: HttpTestingController) => {
 
-        const dto = new EditAppPatternDto('Number', '[0-9]', 'Message1');
+        const dto = { name: 'Number', pattern: '[0-9]' };
 
-        let pattern: AppPatternDto;
+        let pattern: PatternDto;
 
         patternService.postPattern('my-app', dto, version).subscribe(result => {
             pattern = result.payload;
@@ -94,19 +95,19 @@ describe('AppPatternsService', () => {
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({
+            name: 'Number',
             patternId: '1',
             pattern: '[0-9]',
-            name: 'Number',
             message: 'Message1'
         });
 
-        expect(pattern!).toEqual(new AppPatternDto('1', 'Number', '[0-9]', 'Message1'));
+        expect(pattern!).toEqual(new PatternDto('1', 'Number', '[0-9]', 'Message1'));
     }));
 
     it('should make put request to update pattern',
-        inject([AppPatternsService, HttpTestingController], (patternService: AppPatternsService, httpMock: HttpTestingController) => {
+        inject([PatternsService, HttpTestingController], (patternService: PatternsService, httpMock: HttpTestingController) => {
 
-        const dto = new EditAppPatternDto('Number', '[0-9]', 'Message1');
+        const dto = { name: 'Number', pattern: '[0-9]' };
 
         patternService.putPattern('my-app', '1', dto, version).subscribe();
 
@@ -119,7 +120,7 @@ describe('AppPatternsService', () => {
     }));
 
     it('should make delete request to remove pattern',
-        inject([AppPatternsService, HttpTestingController], (patternService: AppPatternsService, httpMock: HttpTestingController) => {
+        inject([PatternsService, HttpTestingController], (patternService: PatternsService, httpMock: HttpTestingController) => {
 
         patternService.deletePattern('my-app', '1', version).subscribe();
 

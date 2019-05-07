@@ -46,7 +46,15 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             .Ascending(x => x.Tags)
                             .Descending(x => x.LastModified)),
                     new CreateIndexModel<MongoAssetEntity>(
-                        Index.Ascending(x => x.Slug))
+                        Index
+                            .Ascending(x => x.AppId)
+                            .Ascending(x => x.IsDeleted)
+                            .Ascending(x => x.FileHash)),
+                    new CreateIndexModel<MongoAssetEntity>(
+                        Index
+                            .Ascending(x => x.AppId)
+                            .Ascending(x => x.IsDeleted)
+                            .Ascending(x => x.Slug))
                 },
                 ct);
         }
@@ -102,25 +110,42 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IAssetEntity> FindAssetAsync(string slug)
+        public async Task<IAssetEntity> FindAssetBySlugAsync(Guid appId, string slug)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntity =
-                    await Collection.Find(x => x.Slug == slug)
+                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.Slug == slug)
                         .FirstOrDefaultAsync();
 
                 return assetEntity;
             }
         }
 
-        public async Task<IAssetEntity> FindAssetAsync(Guid id)
+        public async Task<IList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash)
+        {
+            using (Profiler.TraceMethod<MongoAssetRepository>())
+            {
+                var assetEntities =
+                    await Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted && x.FileHash == hash)
+                        .ToListAsync();
+
+                return assetEntities.OfType<IAssetEntity>().ToList();
+            }
+        }
+
+        public async Task<IAssetEntity> FindAssetAsync(Guid id, bool allowDeleted = false)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
                 var assetEntity =
                     await Collection.Find(x => x.Id == id)
                         .FirstOrDefaultAsync();
+
+                if (assetEntity?.IsDeleted == true && !allowDeleted)
+                {
+                    return null;
+                }
 
                 return assetEntity;
             }

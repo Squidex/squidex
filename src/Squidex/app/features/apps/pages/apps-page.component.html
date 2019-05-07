@@ -14,7 +14,7 @@
             <h3 class="empty-headline">You are not collaborating to any app yet</h3>
         </div>
 
-        <div class="card card-href card-app float-left" *ngFor="let app of apps" [routerLink]="['/app', app.name]">
+        <div class="card card-href card-app float-left" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]">
             <div class="card-body">
                 <h4 class="card-title">{{app.name}}</h4>
 

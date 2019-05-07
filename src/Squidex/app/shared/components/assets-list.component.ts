@@ -88,4 +88,3 @@ export class AssetsListComponent {
         return asset.id;
     }
 }
-

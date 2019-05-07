@@ -9,7 +9,7 @@
 
 import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
 
-import { Types } from './../../utils/types';
+import { Types } from '@app/framework/internal';
 
 const ImageTypes = [
     'image/jpeg',

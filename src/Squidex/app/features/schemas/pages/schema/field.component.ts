@@ -7,10 +7,8 @@
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
-    AppPatternDto,
     createProperties,
     DialogModel,
     EditFieldForm,
@@ -18,10 +16,10 @@ import {
     ImmutableArray,
     ModalModel,
     NestedFieldDto,
+    PatternDto,
     RootFieldDto,
     SchemaDetailsDto,
-    SchemasState,
-    UpdateFieldDto
+    SchemasState
 } from '@app/shared';
 
 @Component({
@@ -43,7 +41,7 @@ export class FieldComponent implements OnChanges {
     public parent: RootFieldDto;
 
     @Input()
-    public patterns: ImmutableArray<AppPatternDto>;
+    public patterns: ImmutableArray<PatternDto>;
 
     public dropdown = new ModalModel();
 
@@ -83,23 +81,23 @@ export class FieldComponent implements OnChanges {
     }
 
     public deleteField() {
-        this.schemasState.deleteField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
+        this.schemasState.deleteField(this.schema, this.field);
     }
 
     public enableField() {
-        this.schemasState.enableField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
+        this.schemasState.enableField(this.schema, this.field);
     }
 
     public disableField() {
-        this.schemasState.disableField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
+        this.schemasState.disableField(this.schema, this.field);
     }
 
     public showField() {
-        this.schemasState.showField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
+        this.schemasState.showField(this.schema, this.field);
     }
 
     public hideField() {
-        this.schemasState.hideField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
+        this.schemasState.hideField(this.schema, this.field);
     }
 
     public sortFields(fields: NestedFieldDto[]) {
@@ -107,7 +105,7 @@ export class FieldComponent implements OnChanges {
     }
 
     public lockField() {
-        this.schemasState.lockField(this.schema, this.field).pipe(onErrorResumeNext()).subscribe();
+        this.schemasState.lockField(this.schema, this.field);
     }
 
     public trackByField(index: number, field: NestedFieldDto) {
@@ -120,7 +118,7 @@ export class FieldComponent implements OnChanges {
         if (value) {
             const properties = createProperties(this.field.properties['fieldType'], value);
 
-            this.schemasState.updateField(this.schema, this.field, new UpdateFieldDto(properties))
+            this.schemasState.updateField(this.schema, this.field, { properties })
                 .subscribe(() => {
                     this.editForm.submitCompleted();
                 }, error => {

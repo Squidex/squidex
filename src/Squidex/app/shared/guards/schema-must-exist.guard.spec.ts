@@ -9,8 +9,7 @@ import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
-import { SchemaDetailsDto } from './../services/schemas.service';
-import { SchemasState } from './../state/schemas.state';
+import { SchemaDetailsDto, SchemasState } from '@app/shared/internal';
 import { SchemaMustExistGuard } from './schema-must-exist.guard';
 
 describe('SchemaMustExistGuard', () => {

@@ -57,12 +57,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var id = Guid.NewGuid();
 
-            A.CallTo(() => assetRepository.FindAssetAsync(id))
+            A.CallTo(() => assetRepository.FindAssetAsync(id, false))
                 .Returns(CreateAsset(id, "id1", "id2", "id3"));
 
             var result = await sut.FindAssetAsync(context, id);
 
             Assert.Equal(HashSet.Of("name1", "name2", "name3"), result.Tags);
+        }
+
+        [Fact]
+        public async Task Should_find_asset_by_hash_and_resolve_tags()
+        {
+            var id = Guid.NewGuid();
+
+            A.CallTo(() => assetRepository.QueryByHashAsync(appId.Id, "hash"))
+                .Returns(new List<IAssetEntity> { CreateAsset(id, "id1", "id2", "id3") });
+
+            var result = await sut.QueryByHashAsync(appId.Id, "hash");
+
+            Assert.Equal(HashSet.Of("name1", "name2", "name3"), result[0].Tags);
         }
 
         [Fact]

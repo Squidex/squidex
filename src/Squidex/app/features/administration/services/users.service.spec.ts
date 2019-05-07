@@ -11,8 +11,6 @@ import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig } from '@app/framework';
 
 import {
-    CreateUserDto,
-    UpdateUserDto,
     UserDto,
     UsersDto,
     UsersService
@@ -145,7 +143,7 @@ describe('UsersService', () => {
     it('should make post request to create user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
 
-        const dto = new CreateUserDto('mail@squidex.io', 'Squidex User', ['Permission1'], 'password');
+        const dto = { email: 'mail@squidex.io', displayName: 'Squidex User', permissions: ['Permission1'], password: 'password' };
 
         let user: UserDto;
 
@@ -166,7 +164,7 @@ describe('UsersService', () => {
     it('should make put request to update user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateUserDto('mail@squidex.io', 'Squidex User', ['Permission1'], 'password');
+        const dto = { email: 'mail@squidex.io', displayName: 'Squidex User', permissions: ['Permission1'], password: 'password' };
 
         userManagementService.putUser('123', dto).subscribe();
 

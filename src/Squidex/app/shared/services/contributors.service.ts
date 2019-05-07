@@ -8,39 +8,25 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
     Version,
     Versioned
 } from '@app/framework';
 
-export class AppContributorsDto extends Model {
-    constructor(
-        public readonly contributors: AppContributorDto[],
-        public readonly maxContributors: number,
-        public readonly version: Version
-    ) {
-        super();
-    }
-}
+export type ContributorsDto = Versioned<{
+    readonly contributors: ContributorDto[],
+    readonly maxContributors: number
+}>;
 
-export class AssignContributorDto extends Model {
-    constructor(
-        public readonly contributorId: string,
-        public readonly role: string,
-        public readonly invite = false
-    ) {
-        super();
-    }
-}
-
-export class AppContributorDto extends Model {
+export class ContributorDto extends Model<AssignContributorDto> {
     constructor(
         public readonly contributorId: string,
         public readonly role: string
@@ -49,16 +35,19 @@ export class AppContributorDto extends Model {
     }
 }
 
-export class ContributorAssignedDto {
-    constructor(
-        public readonly contributorId: string,
-        public readonly isCreated: boolean
-    ) {
-    }
+export interface ContributorAssignedDto {
+    readonly contributorId: string;
+    readonly isCreated?: boolean;
+}
+
+export interface AssignContributorDto  {
+    readonly contributorId: string;
+    readonly role: string;
+    readonly invite?: boolean;
 }
 
 @Injectable()
-export class AppContributorsService {
+export class ContributorsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
@@ -66,22 +55,22 @@ export class AppContributorsService {
     ) {
     }
 
-    public getContributors(appName: string): Observable<AppContributorsDto> {
+    public getContributors(appName: string): Observable<ContributorsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
+                mapVersioned(payload => {
+                    const body = payload.body;
 
                     const items: any[] = body.contributors;
 
-                    return new AppContributorsDto(
-                        items.map(item => {
-                            return new AppContributorDto(
+                    const contributors =
+                        items.map(item =>
+                            new ContributorDto(
                                 item.contributorId,
-                                item.role);
-                        }),
-                        body.maxContributors, response.version);
+                                item.role));
+
+                    return { contributors, maxContributors: body.maxContributors };
                 }),
                 pretifyError('Failed to load contributors. Please reload.'));
     }
@@ -90,12 +79,8 @@ export class AppContributorsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
-                map(response => {
-                    const body: any = response.payload.body;
-
-                    const result = new ContributorAssignedDto(body.contributorId, body.isCreated);
-
-                    return new Versioned(response.version, result);
+                mapVersioned(payload => {
+                    return <ContributorAssignedDto>payload.body;
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Contributor', 'Configured', appName);

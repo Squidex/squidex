@@ -11,8 +11,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { ResourceOwner } from '@app/shared';
 
-import { UserDto } from './../../services/users.service';
-import { UserForm, UsersState } from './../../state/users.state';
+import {
+    CreateUserDto,
+    UserDto,
+    UserForm,
+    UsersState
+} from '@app/features/administration/internal';
 
 @Component({
     selector: 'sqx-user-page',
@@ -58,7 +62,7 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
                         this.userForm.submitFailed(error);
                     });
             } else {
-                this.usersState.create(value)
+                this.usersState.create(<CreateUserDto>value)
                     .subscribe(() => {
                         this.back();
                     }, error => {

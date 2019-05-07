@@ -12,11 +12,8 @@ import { of } from 'rxjs';
 import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, Mock, Times } from 'typemoq';
 
-import {
-    ApiUrlConfig,
-    AuthInterceptor,
-    AuthService
-} from './../';
+import { ApiUrlConfig, AuthService } from '@app/shared/internal';
+import { AuthInterceptor } from './auth.interceptor';
 
 describe('AuthInterceptor', () => {
     let authService: IMock<AuthService>;

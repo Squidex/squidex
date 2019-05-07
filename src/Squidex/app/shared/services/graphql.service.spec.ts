@@ -8,7 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 
-import { ApiUrlConfig, GraphQlService } from './../';
+import { ApiUrlConfig, GraphQlService } from '@app/shared/internal';
 
 describe('GraphQlService', () => {
     beforeEach(() => {

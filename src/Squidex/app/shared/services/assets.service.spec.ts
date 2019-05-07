@@ -10,7 +10,6 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import {
     AnalyticsService,
-    AnnotateAssetDto,
     ApiUrlConfig,
     AssetDto,
     AssetReplacedDto,
@@ -20,7 +19,8 @@ import {
     ErrorDto,
     Version,
     Versioned
-} from './../';
+} from '@app/shared/internal';
+import { AssetUploadedDto } from './assets.service';
 
 describe('AssetDto', () => {
     const creation = DateTime.today();
@@ -31,12 +31,12 @@ describe('AssetDto', () => {
     const newVersion = new Version('2');
 
     it('should update tag property and user info when annnoting', () => {
-        const update = new AnnotateAssetDto('NewName.png', null, null);
+        const update = { fileName: 'New-Name.png' };
 
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'Name.png', 'png', 1, 1, 'image/png', false, 1, 1, 'name.png', [], 'url', version);
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'Name.png', 'Hash', 'png', 1, 1, 'image/png', false, false, 1, 1, 'name.png', [], 'url', version);
         const asset_2 = asset_1.annnotate(update, modifier, newVersion, modified);
 
-        expect(asset_2.fileName).toEqual('NewName.png');
+        expect(asset_2.fileName).toEqual(update.fileName);
         expect(asset_2.tags).toEqual([]);
         expect(asset_2.slug).toEqual(asset_1.slug);
         expect(asset_2.lastModified).toEqual(modified);
@@ -45,17 +45,26 @@ describe('AssetDto', () => {
     });
 
     it('should update file properties when uploading', () => {
-        const update = new AssetReplacedDto(2, 2, 'image/jpeg', true, 2, 2);
+        const update = {
+            fileHash: 'Hash New',
+            fileSize: 1024,
+            fileVersion: 12,
+            mimeType: 'image/png',
+            isImage: true,
+            pixelWidth: 1024,
+            pixelHeight: 2048
+        };
 
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'Name.png', 'png', 1, 1, 'image/png', false, 1, 1, 'name.png', [], 'url', version);
+        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'Name.png', 'Hash', 'png', 1, 1, 'image/png', false, false, 1, 1, 'name.png', [], 'url', version);
         const asset_2 = asset_1.update(update, modifier, newVersion, modified);
 
-        expect(asset_2.fileSize).toEqual(2);
-        expect(asset_2.fileVersion).toEqual(2);
-        expect(asset_2.mimeType).toEqual('image/jpeg');
+        expect(asset_2.fileHash).toEqual(update.fileHash);
+        expect(asset_2.fileSize).toEqual(update.fileSize);
+        expect(asset_2.fileVersion).toEqual(update.fileVersion);
+        expect(asset_2.mimeType).toEqual(update.mimeType);
         expect(asset_2.isImage).toBeTruthy();
-        expect(asset_2.pixelWidth).toEqual(2);
-        expect(asset_2.pixelHeight).toEqual(2);
+        expect(asset_2.pixelWidth).toEqual(update.pixelWidth);
+        expect(asset_2.pixelHeight).toEqual(update.pixelHeight);
         expect(asset_2.lastModified).toEqual(modified);
         expect(asset_2.lastModifiedBy).toEqual(modifier);
         expect(asset_2.version).toEqual(newVersion);
@@ -63,8 +72,6 @@ describe('AssetDto', () => {
 });
 
 describe('AssetsService', () => {
-    const now = DateTime.now();
-    const user = 'me';
     const version = new Version('1');
 
     beforeEach(() => {
@@ -133,6 +140,7 @@ describe('AssetsService', () => {
                     lastModified: '2017-12-12T10:10',
                     lastModifiedBy: 'LastModifiedBy1',
                     fileName: 'My Asset1.png',
+                    fileHash: 'My Hash1',
                     fileType: 'png',
                     fileSize: 1024,
                     fileVersion: 2000,
@@ -151,6 +159,7 @@ describe('AssetsService', () => {
                     lastModified: '2017-10-12T10:10',
                     lastModifiedBy: 'LastModifiedBy2',
                     fileName: 'My Asset2.png',
+                    fileHash: 'My Hash1',
                     fileType: 'png',
                     fileSize: 1024,
                     fileVersion: 2000,
@@ -172,10 +181,12 @@ describe('AssetsService', () => {
                     DateTime.parseISO_UTC('2016-12-12T10:10'),
                     DateTime.parseISO_UTC('2017-12-12T10:10'),
                     'My Asset1.png',
+                    'My Hash1',
                     'png',
                     1024,
                     2000,
                     'image/png',
+                    false,
                     true,
                     1024,
                     2048,
@@ -187,10 +198,12 @@ describe('AssetsService', () => {
                     DateTime.parseISO_UTC('2016-10-12T10:10'),
                     DateTime.parseISO_UTC('2017-10-12T10:10'),
                     'My Asset2.png',
+                    'My Hash1',
                     'png',
                     1024,
                     2000,
                     'image/png',
+                    false,
                     true,
                     1024,
                     2048,
@@ -222,6 +235,7 @@ describe('AssetsService', () => {
             lastModified: '2017-12-12T10:10',
             lastModifiedBy: 'LastModifiedBy1',
             fileName: 'My Asset1.png',
+            fileHash: 'My Hash1',
             fileType: 'png',
             fileSize: 1024,
             fileVersion: 2000,
@@ -243,10 +257,12 @@ describe('AssetsService', () => {
                 DateTime.parseISO_UTC('2016-12-12T10:10'),
                 DateTime.parseISO_UTC('2017-12-12T10:10'),
                 'My Asset1.png',
+                'My Hash1',
                 'png',
                 1024,
                 2000,
                 'image/png',
+                false,
                 true,
                 1024,
                 2048,
@@ -298,10 +314,10 @@ describe('AssetsService', () => {
     it('should make post request to create asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetDto;
+        let asset: Versioned<AssetUploadedDto>;
 
-        assetsService.uploadFile('my-app', null!, user, now).subscribe(result => {
-            asset = <AssetDto>result;
+        assetsService.uploadFile('my-app', null!).subscribe(result => {
+            asset = <Versioned<AssetUploadedDto>>result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
@@ -312,10 +328,12 @@ describe('AssetsService', () => {
         req.flush({
             id: 'id1',
             fileName: 'My Asset1.png',
+            fileHash: 'My Hash1',
             fileType: 'png',
             fileSize: 1024,
             fileVersion: 2,
             mimeType: 'image/png',
+            isDuplicate: true,
             isImage: true,
             pixelWidth: 1024,
             pixelHeight: 2048,
@@ -323,38 +341,38 @@ describe('AssetsService', () => {
             tags: ['tag1', 'tag2']
         }, {
             headers: {
-                etag: '2'
+                etag: '1'
             }
         });
 
-        expect(asset!).toEqual(
-            new AssetDto(
-                'id1',
-                user,
-                user,
-                now,
-                now,
-                'My Asset1.png',
-                'png',
-                1024, 2,
-                'image/png',
-                true,
-                1024,
-                2048,
-                'my-asset1.png',
-                ['tag1', 'tag2'],
-                'http://service/p/api/assets/id1',
-                new Version('2')));
+        expect(asset!).toEqual({
+            payload: {
+                id: 'id1',
+                fileName: 'My Asset1.png',
+                fileHash: 'My Hash1',
+                fileType: 'png',
+                fileSize: 1024,
+                fileVersion: 2,
+                mimeType: 'image/png',
+                isDuplicate: true,
+                isImage: true,
+                pixelWidth: 1024,
+                pixelHeight: 2048,
+                slug: 'my-asset1.png',
+                tags: ['tag1', 'tag2']
+            },
+            version
+        });
     }));
 
     it('should return proper error when upload failed with 413',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetDto;
+        let asset: Versioned<AssetUploadedDto>;
         let error: ErrorDto;
 
-        assetsService.uploadFile('my-app', null!, user, now).subscribe(result => {
-            asset = <AssetDto>result;
+        assetsService.uploadFile('my-app', null!).subscribe(result => {
+            asset = <Versioned<AssetUploadedDto>>result;
         }, e => {
             error = e;
         });
@@ -385,21 +403,24 @@ describe('AssetsService', () => {
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush({
+            fileHash: 'Hash New',
             fileSize: 1024,
-            fileVersion: 2,
+            fileVersion: 12,
             mimeType: 'image/png',
             isImage: true,
             pixelWidth: 1024,
             pixelHeight: 2048
         });
 
-        expect(asset!).toEqual(
-            new AssetReplacedDto(
-                1024, 2,
-                'image/png',
-                true,
-                1024,
-                2048));
+        expect(asset!).toEqual({
+            fileHash: 'Hash New',
+            fileSize: 1024,
+            fileVersion: 12,
+            mimeType: 'image/png',
+            isImage: true,
+            pixelWidth: 1024,
+            pixelHeight: 2048
+        });
     }));
 
     it('should return proper error when replace failed with 413',
@@ -428,7 +449,7 @@ describe('AssetsService', () => {
     it('should make put request to annotate asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        const dto = new AnnotateAssetDto('My Asset.pdf', 'my-asset.pdf', ['tag1', 'tag2']);
+        const dto = { fileName: 'New-Name.png' };
 
         assetsService.putAsset('my-app', '123', dto, version).subscribe();
 

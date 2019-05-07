@@ -6,7 +6,6 @@
  */
 
 import { Component } from '@angular/core';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AssetsState,
@@ -29,19 +28,19 @@ export class AssetsFiltersPageComponent {
     }
 
     public search(query: string) {
-        this.assetsState.search(query).pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.search(query);
     }
 
     public selectTags(tags: string[]) {
-        this.assetsState.selectTags(tags).pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.selectTags(tags);
     }
 
     public toggleTag(tag: string) {
-        this.assetsState.toggleTag(tag).pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.toggleTag(tag);
     }
 
     public resetTags() {
-        this.assetsState.resetTags().pipe(onErrorResumeNext()).subscribe();
+        this.assetsState.resetTags();
     }
 
     public isSelectedQuery(query: string) {

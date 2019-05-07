@@ -10,13 +10,16 @@ import { Observable, of } from 'rxjs';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
+    DateTime,
     DialogService,
     ImmutableArray,
-    notify,
+    Permission,
+    shareSubscribed,
     State
 } from '@app/framework';
 
 import {
+    AppCreatedDto,
     AppDto,
     AppsService,
     CreateAppDto
@@ -69,24 +72,27 @@ export class AppsState extends State<Snapshot> {
 
     public load(): Observable<any> {
         return this.appsService.getApps().pipe(
-            tap((dto: AppDto[]) => {
+            tap(payload => {
                 this.next(s => {
-                    const apps = ImmutableArray.of(dto);
+                    const apps = ImmutableArray.of(payload);
 
                     return { ...s, apps };
                 });
-            }));
+            }),
+            shareSubscribed(this.dialogs));
     }
 
-    public create(request: CreateAppDto): Observable<AppDto> {
+    public create(request: CreateAppDto, now?: DateTime): Observable<AppDto> {
         return this.appsService.postApp(request).pipe(
-            tap(dto => {
+            map(payload => createApp(request, payload, now)),
+            tap(created => {
                 this.next(s => {
-                    const apps = s.apps.push(dto).sortByStringAsc(x => x.name);
+                    const apps = s.apps.push(created).sortByStringAsc(x => x.name);
 
                     return { ...s, apps };
                 });
-            }));
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
     }
 
     public delete(name: string): Observable<any> {
@@ -100,6 +106,21 @@ export class AppsState extends State<Snapshot> {
                     return { ...s, apps, selectedApp };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
+}
+
+function createApp(request: CreateAppDto, response: AppCreatedDto, now?: DateTime) {
+    now = now || DateTime.now();
+
+    const app = new AppDto(
+        response.id,
+        request.name,
+        response.permissions.map(x => new Permission(x)),
+        now,
+        now,
+        response.planName,
+        response.planUpgrade);
+
+    return app;
 }

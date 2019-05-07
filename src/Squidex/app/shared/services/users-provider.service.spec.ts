@@ -14,7 +14,7 @@ import {
     UserDto,
     UsersProviderService,
     UsersService
-} from './../';
+} from '@app/shared/internal';
 
 describe('UsersProviderService', () => {
     let authService: IMock<AuthService>;

@@ -12,7 +12,7 @@ import {
     ApiUrlConfig,
     UserDto,
     UsersService
-} from './../';
+} from '@app/shared/internal';
 
 describe('UsersService', () => {
     beforeEach(() => {

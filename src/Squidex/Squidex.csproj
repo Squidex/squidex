@@ -153,6 +153,6 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <NoWarn>$(NoWarn);CS1591;1591;1573;1572;NU1605</NoWarn>
+    <NoWarn>$(NoWarn);CS1591;1591;1573;1572;NU1605;IDE0060</NoWarn>
   </PropertyGroup>
 </Project>

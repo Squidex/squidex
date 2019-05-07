@@ -14,5 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Commands
         public AssetFile File { get; set; }
 
         public ImageInfo ImageInfo { get; set; }
+
+        public string FileHash { get; set; }
     }
 }

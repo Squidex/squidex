@@ -7,14 +7,12 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
-    AppClientDto,
     AppsState,
     AttachClientForm,
+    ClientDto,
     ClientsState,
-    CreateAppClientDto,
     RolesState
 } from '@app/shared';
 
@@ -35,22 +33,20 @@ export class ClientsPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.rolesState.load().pipe(onErrorResumeNext()).subscribe();
+        this.rolesState.load();
 
-        this.clientsState.load().pipe(onErrorResumeNext()).subscribe();
+        this.clientsState.load();
     }
 
     public reload() {
-        this.clientsState.load(true).pipe(onErrorResumeNext()).subscribe();
+        this.clientsState.load(true);
     }
 
     public attachClient() {
         const value = this.addClientForm.submit();
 
         if (value) {
-            const requestDto = new CreateAppClientDto(value.name);
-
-            this.clientsState.attach(requestDto)
+            this.clientsState.attach({ id: value.name })
                 .subscribe(() => {
                     this.addClientForm.submitCompleted();
                 }, error => {
@@ -63,7 +59,7 @@ export class ClientsPageComponent implements OnInit {
         this.addClientForm.submitCompleted();
     }
 
-    public trackByClient(index: number, item: AppClientDto) {
+    public trackByClient(index: number, item: ClientDto) {
         return item.id;
     }
 }

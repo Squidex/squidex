@@ -13,10 +13,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         public long FileVersion { get; }
 
-        public AssetSavedResult(long version, long fileVersion)
+        public string FileHash { get; }
+
+        public AssetSavedResult(long version, long fileVersion, string fileHash)
             : base(version)
         {
             FileVersion = fileVersion;
+            FileHash = fileHash;
         }
     }
 }

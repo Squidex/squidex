@@ -7,7 +7,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
     AddLanguageForm,
@@ -42,11 +41,11 @@ export class LanguagesPageComponent extends ResourceOwner implements OnInit {
                     }
                 }));
 
-        this.languagesState.load().pipe(onErrorResumeNext()).subscribe();
+        this.languagesState.load();
     }
 
     public reload() {
-        this.languagesState.load(true).pipe(onErrorResumeNext()).subscribe();
+        this.languagesState.load(true);
     }
 
     public addLanguage() {

@@ -10,9 +10,9 @@ import { distinctUntilChanged, map } from 'rxjs/internal/operators';
 
 import { State, Types } from '@app/framework';
 
-import { LanguageDto } from '../services/languages.service';
+import { LanguageDto } from './../services/languages.service';
 
-import { RootFieldDto } from '../services/schemas.service';
+import { RootFieldDto } from './../services/schemas.service';
 
 interface Snapshot {
     // The current language.

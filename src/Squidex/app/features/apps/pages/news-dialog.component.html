@@ -7,7 +7,7 @@
         <div class="help">
             <h1>What's new?</h1>
 
-            <div *ngFor="let feature of features">
+            <div *ngFor="let feature of features; trackBy: trackByFeature">
                 <h4>{{feature.name}}</h4>
 
                 <div [innerHTML]="feature.text | sqxHelpMarkdown"></div>

@@ -7,7 +7,6 @@
 
     // Configure glob patterns for excluding files and folders.
     "files.exclude": {
-        "_test-output": true,
         "**/node_modules": true,
         "**/Assets": true,
         "**/artifacts": true,
@@ -23,10 +22,15 @@
         "**/*.user": true,
         "**/*.xproj": true,
         "**/*.gitattributes": true,
-		"appsetttings.Development.json",
-		"appsetttings.Production.json",
+		"appsetttings.Development.json": true,
+		"appsetttings.Production.json": true,
         ".awcache": true,
         ".vs:": true,
         ".vscode:": true
-    }
+    },
+
+    "coverage-gutters.coverageFileNames": [
+        "_test-output/coverage/lcov.info"
+    ],
+    "coverage-gutters.showLineCoverage": true
 }

@@ -10,15 +10,13 @@ import { IMock, It, Mock, Times } from 'typemoq';
 
 import { AuthService, DialogService } from '@app/shared';
 
-import { UsersState } from './users.state';
-
 import {
-    CreateUserDto,
-    UpdateUserDto,
     UserDto,
     UsersDto,
     UsersService
-} from './../services/users.service';
+} from '@app/features/administration/internal';
+
+import { SnapshotUser, UsersState } from './users.state';
 
 describe('UsersState', () => {
     const oldUsers = [
@@ -42,184 +40,199 @@ describe('UsersState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         usersService = Mock.ofType<UsersService>();
-
-        usersService.setup(x => x.getUsers(10, 0, undefined))
-            .returns(() => of(new UsersDto(200, oldUsers)));
-
         usersState = new UsersState(authService.object, dialogs.object, usersService.object);
-        usersState.load().subscribe();
     });
 
-    it('should load users', () => {
-        expect(usersState.snapshot.users.values).toEqual([
-            { isCurrentUser: false, user: oldUsers[0] },
-            { isCurrentUser: true,  user: oldUsers[1] }
-        ]);
-        expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
-        expect(usersState.snapshot.isLoaded).toBeTruthy();
-
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+    afterEach(() => {
+        usersService.verifyAll();
     });
 
-    it('should show notification on load when reload is true', () => {
-        usersState.load(true).subscribe();
+    describe('Loading', () => {
+        it('should load users', () => {
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => of(new UsersDto(200, oldUsers))).verifiable();
 
-        expect().nothing();
+            usersState.load().subscribe();
 
-        dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
-    });
+            expect(usersState.snapshot.users.values).toEqual([
+                { isCurrentUser: false, user: oldUsers[0] },
+                { isCurrentUser: true,  user: oldUsers[1] }
+            ]);
+            expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
+            expect(usersState.snapshot.isLoaded).toBeTruthy();
 
-    it('should replace selected user when reloading', () => {
-        usersState.select('id1').subscribe();
-
-        const newUsers = [
-            new UserDto('id1', 'mail1@mail.de_new', 'name1_new', ['Permission1_New'], false),
-            new UserDto('id2', 'mail2@mail.de_new', 'name2_new', ['Permission2_New'], true)
-        ];
-
-        usersService.setup(x => x.getUsers(10, 0, undefined))
-            .returns(() => of(new UsersDto(200, newUsers)));
-
-        usersState.load().subscribe();
-
-        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUsers[0] });
-    });
-
-    it('should return user on select and not load when already loaded', () => {
-        let selectedUser: UserDto;
-
-        usersState.select('id1').subscribe(x => {
-            selectedUser = x!;
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        expect(selectedUser!).toEqual(oldUsers[0]);
-        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: oldUsers[0] });
+        it('should show notification on load when reload is true', () => {
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => of(new UsersDto(200, oldUsers))).verifiable();
 
-        usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
-    });
+            usersState.load(true).subscribe();
 
-    it('should return user on select and load when not loaded', () => {
-        usersService.setup(x => x.getUser('id3'))
-            .returns(() => of(newUser));
+            expect().nothing();
 
-        let selectedUser: UserDto;
-
-        usersState.select('id3').subscribe(x => {
-            selectedUser = x!;
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
-        expect(selectedUser!).toEqual(newUser);
-        expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUser });
+        it('should replace selected user when reloading', () => {
+            const newUsers = [
+                new UserDto('id1', 'mail1@mail.de_new', 'name1_new', ['Permission1_New'], false),
+                new UserDto('id2', 'mail2@mail.de_new', 'name2_new', ['Permission2_New'], true)
+            ];
 
-        usersService.verify(x => x.getUser('id3'), Times.once());
-    });
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => of(new UsersDto(200, oldUsers))).verifiable(Times.exactly(2));
 
-    it('should return null on select when unselecting user', () => {
-        let selectedUser: UserDto;
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => of(new UsersDto(200, newUsers)));
 
-        usersState.select(null).subscribe(x => {
-            selectedUser = x!;
+            usersState.load().subscribe();
+            usersState.select('id1').subscribe();
+            usersState.load().subscribe();
+
+            expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUsers[0] });
         });
 
-        expect(selectedUser!).toBeNull();
-        expect(usersState.snapshot.selectedUser).toBeNull();
+        it('should load next page and prev page when paging', () => {
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => of(new UsersDto(200, oldUsers))).verifiable(Times.exactly(2));
 
-        usersService.verify(x => x.getUser(It.isAnyString()), Times.never());
+            usersService.setup(x => x.getUsers(10, 10, undefined))
+                .returns(() => of(new UsersDto(200, []))).verifiable();
+
+            usersState.load().subscribe();
+            usersState.goNext().subscribe();
+            usersState.goPrev().subscribe();
+
+            expect().nothing();
+        });
+
+        it('should load with query when searching', () => {
+            usersService.setup(x => x.getUsers(10, 0, 'my-query'))
+                .returns(() => of(new UsersDto(0, []))).verifiable();
+
+            usersState.search('my-query').subscribe();
+
+            expect(usersState.snapshot.usersQuery).toEqual('my-query');
+        });
     });
 
-    it('should return null on select when user is not found', () => {
-        usersService.setup(x => x.getUser('unknown'))
-            .returns(() => throwError({}));
+    describe('Updates', () => {
+        beforeEach(() => {
+            usersService.setup(x => x.getUsers(10, 0, undefined))
+                .returns(() => of(new UsersDto(200, oldUsers))).verifiable();
 
-        let selectedUser: UserDto;
+            usersState.load().subscribe();
+        });
 
-        usersState.select('unknown').subscribe(x => {
-            selectedUser = x!;
-        }).unsubscribe();
+        it('should return user on select and not load when already loaded', () => {
+            let selectedUser: SnapshotUser;
 
-        expect(selectedUser!).toBeNull();
-        expect(usersState.snapshot.selectedUser).toBeNull();
-    });
+            usersState.select('id1').subscribe(x => {
+                selectedUser = x!;
+            });
 
-    it('should mark as locked when locked', () => {
-        usersService.setup(x => x.lockUser('id1'))
-            .returns(() => of({}));
+            expect(selectedUser!.user).toEqual(oldUsers[0]);
+            expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: oldUsers[0] });
+        });
 
-        usersState.select('id1').subscribe();
-        usersState.lock(oldUsers[0]).subscribe();
+        it('should return user on select and load when not loaded', () => {
+            usersService.setup(x => x.getUser('id3'))
+                .returns(() => of(newUser));
 
-        const user_1 = usersState.snapshot.users.at(0);
+            let selectedUser: SnapshotUser;
 
-        expect(user_1.user.isLocked).toBeTruthy();
-        expect(user_1).toBe(usersState.snapshot.selectedUser!);
-    });
+            usersState.select('id3').subscribe(x => {
+                selectedUser = x!;
+            });
 
-    it('should unmark as locked when unlocked', () => {
-        usersService.setup(x => x.unlockUser('id2'))
-            .returns(() => of({}));
+            expect(selectedUser!.user).toEqual(newUser);
+            expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUser });
+        });
 
-        usersState.select('id2').subscribe();
-        usersState.unlock(oldUsers[1]).subscribe();
+        it('should return null on select when unselecting user', () => {
+            let selectedUser: SnapshotUser;
 
-        const user_1 = usersState.snapshot.users.at(1);
+            usersState.select(null).subscribe(x => {
+                selectedUser = x!;
+            });
 
-        expect(user_1.user.isLocked).toBeFalsy();
-        expect(user_1).toBe(usersState.snapshot.selectedUser!);
-    });
+            expect(selectedUser!).toBeNull();
+            expect(usersState.snapshot.selectedUser).toBeNull();
+        });
 
-    it('should update user properties when updated', () => {
-        const request = new UpdateUserDto('new@mail.com', 'New', ['Permission1']);
+        it('should return null on select when user is not found', () => {
+            usersService.setup(x => x.getUser('unknown'))
+                .returns(() => throwError({})).verifiable();
 
-        usersService.setup(x => x.putUser('id1', request))
-            .returns(() => of({}));
+            let selectedUser: SnapshotUser;
 
-        usersState.select('id1').subscribe();
-        usersState.update(oldUsers[0], request).subscribe();
+            usersState.select('unknown').subscribe(x => {
+                selectedUser = x!;
+            }).unsubscribe();
 
-        const user_1 = usersState.snapshot.users.at(0);
+            expect(selectedUser!).toBeNull();
+            expect(usersState.snapshot.selectedUser).toBeNull();
+        });
 
-        expect(user_1.user.email).toEqual('new@mail.com');
-        expect(user_1.user.displayName).toEqual('New');
-        expect(user_1).toBe(usersState.snapshot.selectedUser!);
-    });
+        it('should mark as locked when locked', () => {
+            usersService.setup(x => x.lockUser('id1'))
+                .returns(() => of({})).verifiable();
 
-    it('should add user to snapshot when created', () => {
-        const request = new CreateUserDto(newUser.email, newUser.displayName, newUser.permissions, 'password');
+            usersState.select('id1').subscribe();
+            usersState.lock(oldUsers[0]).subscribe();
 
-        usersService.setup(x => x.postUser(request))
-            .returns(() => of(newUser));
+            const user_1 = usersState.snapshot.users.at(0);
 
-        usersState.create(request).subscribe();
+            expect(user_1.user.isLocked).toBeTruthy();
+            expect(user_1).toBe(usersState.snapshot.selectedUser!);
+        });
 
-        expect(usersState.snapshot.users.values).toEqual([
-            { isCurrentUser: false, user: newUser },
-            { isCurrentUser: false, user: oldUsers[0] },
-            { isCurrentUser: true,  user: oldUsers[1] }
-        ]);
-        expect(usersState.snapshot.usersPager.numberOfItems).toBe(201);
-    });
+        it('should unmark as locked when unlocked', () => {
+            usersService.setup(x => x.unlockUser('id2'))
+                .returns(() => of({})).verifiable();
 
-    it('should load next page and prev page when paging', () => {
-        usersService.setup(x => x.getUsers(10, 10, undefined))
-            .returns(() => of(new UsersDto(200, [])));
+            usersState.select('id2').subscribe();
+            usersState.unlock(oldUsers[1]).subscribe();
 
-        usersState.goNext().subscribe();
-        usersState.goPrev().subscribe();
+            const user_1 = usersState.snapshot.users.at(1);
 
-        expect().nothing();
+            expect(user_1.user.isLocked).toBeFalsy();
+            expect(user_1).toBe(usersState.snapshot.selectedUser!);
+        });
 
-        usersService.verify(x => x.getUsers(10, 10, undefined), Times.once());
-        usersService.verify(x => x.getUsers(10, 0,  undefined), Times.exactly(2));
-    });
+        it('should update user properties when updated', () => {
+            const request = { email: 'new@mail.com', displayName: 'New', permissions: ['Permission1'] };
 
-    it('should load with query when searching', () => {
-        usersService.setup(x => x.getUsers(10, 0, 'my-query'))
-            .returns(() => of(new UsersDto(0, [])));
+            usersService.setup(x => x.putUser('id1', request))
+                .returns(() => of({})).verifiable();
 
-        usersState.search('my-query').subscribe();
+            usersState.select('id1').subscribe();
+            usersState.update(oldUsers[0], request).subscribe();
 
-        expect(usersState.snapshot.usersQuery).toEqual('my-query');
+            const user_1 = usersState.snapshot.users.at(0);
 
-        usersService.verify(x => x.getUsers(10, 0, 'my-query'), Times.once());
+            expect(user_1.user.email).toEqual(request.email);
+            expect(user_1.user.displayName).toEqual(request.displayName);
+            expect(user_1.user.permissions).toEqual(request.permissions);
+            expect(user_1).toBe(usersState.snapshot.selectedUser!);
+        });
+
+        it('should add user to snapshot when created', () => {
+            const request = { ...newUser, password: 'password' };
+
+            usersService.setup(x => x.postUser(request))
+                .returns(() => of(newUser)).verifiable();
+
+            usersState.create(request).subscribe();
+
+            expect(usersState.snapshot.users.values).toEqual([
+                { isCurrentUser: false, user: newUser },
+                { isCurrentUser: false, user: oldUsers[0] },
+                { isCurrentUser: true,  user: oldUsers[1] }
+            ]);
+            expect(usersState.snapshot.usersPager.numberOfItems).toBe(201);
+        });
     });
 });

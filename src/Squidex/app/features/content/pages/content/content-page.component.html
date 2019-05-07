@@ -38,7 +38,6 @@
                     <button type="button" class="btn btn-outline-secondary btn-status" (click)="dropdown.toggle()" [disabled]="schema.isSingleton && !content.isPending" 
                         [class.active]="dropdown.isOpen | async" #optionsButton>
                         <sqx-content-status
-                            [alignMiddle]="false"
                             [status]="content.status"
                             [scheduledTo]="content.scheduleJob?.status"
                             [scheduledAt]="content.scheduleJob?.dueTime"
@@ -112,7 +111,7 @@
                 Viewing <strong>version {{version.value}}</strong>.
             </div>
 
-            <div *ngFor="let field of schema.fields">
+            <div *ngFor="let field of schema.fields; trackBy: trackByField.bind(this)">
                 <sqx-content-field 
                     [form]="contentForm"
                     [field]="field"

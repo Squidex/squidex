@@ -18,21 +18,16 @@ import {
     HTTP,
     Model,
     pretifyError,
+    ResultSet,
     Types,
     Version,
-    Versioned
+    Versioned,
+    versioned
 } from '@app/framework';
 
-export class AssetsDto extends Model {
-    constructor(
-        public readonly total: number,
-        public readonly items: AssetDto[]
-    ) {
-        super();
-    }
-}
+export class AssetsDto extends ResultSet<AssetDto> { }
 
-export class AssetDto extends Model {
+export class AssetDto extends Model<AssetDto> {
     public get canPreview() {
         return this.isImage || (this.mimeType === 'image/svg+xml' && this.fileSize < 100 * 1024);
     }
@@ -44,23 +39,21 @@ export class AssetDto extends Model {
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
         public readonly fileName: string,
+        public readonly fileHash: string,
         public readonly fileType: string,
         public readonly fileSize: number,
         public readonly fileVersion: number,
         public readonly mimeType: string,
+        public readonly isDuplicate: boolean,
         public readonly isImage: boolean,
-        public readonly pixelWidth: number | null,
-        public readonly pixelHeight: number | null,
+        public readonly pixelWidth: number | null | undefined,
+        public readonly pixelHeight: number | null | undefined,
         public readonly slug: string,
         public readonly tags: string[],
         public readonly url: string,
         public readonly version: Version
     ) {
         super();
-    }
-
-    public with(value: Partial<AssetDto>, validOnly = false): AssetDto {
-        return this.clone(value, validOnly);
     }
 
     public update(update: AssetReplacedDto, user: string, version: Version, now?: DateTime): AssetDto {
@@ -82,25 +75,29 @@ export class AssetDto extends Model {
     }
 }
 
-export class AnnotateAssetDto {
-    constructor(
-        public readonly fileName: string | null,
-        public readonly slug: string | null,
-        public readonly tags: string[] | null
-    ) {
-    }
+export interface AnnotateAssetDto {
+    readonly fileName?: string;
+    readonly slug?: string;
+    readonly tags?: string[];
 }
 
-export class AssetReplacedDto {
-    constructor(
-        public readonly fileSize: number,
-        public readonly fileVersion: number,
-        public readonly mimeType: string,
-        public readonly isImage: boolean,
-        public readonly pixelWidth: number | null,
-        public readonly pixelHeight: number | null
-    ) {
-    }
+export interface AssetReplacedDto {
+    readonly fileHash: string;
+    readonly fileSize: number;
+    readonly fileVersion: number;
+    readonly mimeType: string;
+    readonly isImage: boolean;
+    readonly pixelWidth?: number | null;
+    readonly pixelHeight?: number | null;
+}
+
+export interface AssetUploadedDto extends AssetReplacedDto {
+    readonly id: string;
+    readonly fileName: string;
+    readonly fileType: string;
+    readonly slug: string;
+    readonly isDuplicate: boolean;
+    readonly tags?: string[];
 }
 
 @Injectable()
@@ -115,8 +112,7 @@ export class AssetsService {
     public getTags(appName: string): Observable<{ [name: string]: number }> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/tags`);
 
-        return HTTP.getVersioned(this.http, url).pipe(
-                map(response => <any>response.payload.body));
+        return this.http.get<{ [name: string]: number }>(url);
     }
 
     public getAssets(appName: string, take: number, skip: number, query?: string, tags?: string[], ids?: string[]): Observable<AssetsDto> {
@@ -154,12 +150,12 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
+                map(({ payload  }) => {
+                    const body = payload.body;
 
                     const items: any[] = body.items;
 
-                    return new AssetsDto(body.total, items.map(item => {
+                    const assets = new AssetsDto(body.total, items.map(item => {
                         const assetUrl = this.apiUrl.buildUrl(`api/assets/${item.id}`);
 
                         return new AssetDto(
@@ -169,10 +165,12 @@ export class AssetsService {
                             DateTime.parseISO_UTC(item.created),
                             DateTime.parseISO_UTC(item.lastModified),
                             item.fileName,
+                            item.fileHash,
                             item.fileType,
                             item.fileSize,
                             item.fileVersion,
                             item.mimeType,
+                            false,
                             item.isImage,
                             item.pixelWidth,
                             item.pixelHeight,
@@ -181,11 +179,13 @@ export class AssetsService {
                             assetUrl,
                             new Version(item.version.toString()));
                     }));
+
+                    return assets;
                 }),
                 pretifyError('Failed to load assets. Please reload.'));
     }
 
-    public uploadFile(appName: string, file: File, user: string, now: DateTime): Observable<number | AssetDto> {
+    public uploadFile(appName: string, file: File): Observable<number | Versioned<AssetUploadedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
         const req = new HttpRequest('POST', url, getFormData(file), { reportProgress: true });
@@ -201,30 +201,8 @@ export class AssetsService {
                         return percentDone;
                     } else if (Types.is(event, HttpResponse)) {
                         const response: any = event.body;
-                        const assetUrl = this.apiUrl.buildUrl(`api/assets/${response.id}`);
 
-                        now = now || DateTime.now();
-
-                        const dto =  new AssetDto(
-                            response.id,
-                            user,
-                            user,
-                            now,
-                            now,
-                            response.fileName,
-                            response.fileType,
-                            response.fileSize,
-                            response.fileVersion,
-                            response.mimeType,
-                            response.isImage,
-                            response.pixelWidth,
-                            response.pixelHeight,
-                            response.slug,
-                            response.tags || [],
-                            assetUrl,
-                            new Version(event.headers.get('etag')!));
-
-                        return dto;
+                        return versioned(new Version(event.headers.get('etag')!), response);
                     } else {
                         throw 'Invalid';
                     }
@@ -248,8 +226,8 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
+                map(({ version, payload }) => {
+                    const body = payload.body;
 
                     const assetUrl = this.apiUrl.buildUrl(`api/assets/${body.id}`);
 
@@ -260,17 +238,19 @@ export class AssetsService {
                         DateTime.parseISO_UTC(body.created),
                         DateTime.parseISO_UTC(body.lastModified),
                         body.fileName,
+                        body.fileHash,
                         body.fileType,
                         body.fileSize,
                         body.fileVersion,
                         body.mimeType,
+                        false,
                         body.isImage,
                         body.pixelWidth,
                         body.pixelHeight,
                         body.slug,
                         body.tags || [],
                         assetUrl,
-                        response.version);
+                        version);
                 }),
                 pretifyError('Failed to load assets. Please reload.'));
     }
@@ -292,15 +272,7 @@ export class AssetsService {
                     } else if (Types.is(event, HttpResponse)) {
                         const response: any = event.body;
 
-                        const replaced =  new AssetReplacedDto(
-                            response.fileSize,
-                            response.fileVersion,
-                            response.mimeType,
-                            response.isImage,
-                            response.pixelWidth,
-                            response.pixelHeight);
-
-                        return new Versioned(new Version(event.headers.get('etag')!), replaced);
+                        return versioned(new Version(event.headers.get('etag')!), response);
                     } else {
                         throw 'Invalid';
                     }

@@ -10,6 +10,8 @@ using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
+#pragma warning disable IDE0060 // Remove unused parameter
+
 namespace Squidex.Infrastructure
 {
     public class DispatchingTests
@@ -95,13 +97,13 @@ namespace Squidex.Infrastructure
 
             public Task On(MyEventA @event, int context)
             {
-                EventATriggered = EventATriggered + context;
+                EventATriggered += context;
                 return TaskHelper.Done;
             }
 
             public Task On(MyEventB @event, int context)
             {
-                EventBTriggered = EventATriggered + context;
+                EventBTriggered += context;
                 return TaskHelper.Done;
             }
         }
@@ -169,12 +171,12 @@ namespace Squidex.Infrastructure
 
             public void On(MyEventA @event, int context)
             {
-                EventATriggered = EventATriggered + context;
+                EventATriggered += context;
             }
 
             public void On(MyEventB @event, int context)
             {
-                EventBTriggered = EventATriggered + context;
+                EventBTriggered += context;
             }
         }
 

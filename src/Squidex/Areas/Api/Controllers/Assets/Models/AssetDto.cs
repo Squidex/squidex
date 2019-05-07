@@ -30,6 +30,12 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         public string FileName { get; set; }
 
         /// <summary>
+        /// The file hash.
+        /// </summary>
+        [Required]
+        public string FileHash { get; set; }
+
+        /// <summary>
         /// The slug.
         /// </summary>
         [Required]

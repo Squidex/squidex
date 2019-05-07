@@ -9,6 +9,7 @@ import { Component, OnInit } from '@angular/core';
 import { take } from 'rxjs/operators';
 
 import {
+    AppDto,
     AppsState,
     AuthService,
     DialogModel,
@@ -76,5 +77,9 @@ export class AppsPageComponent implements OnInit {
 
     public stop(event: Event) {
         event.stopPropagation();
+    }
+
+    public trackByApp(index: number, app: AppDto) {
+        return app.id;
     }
 }

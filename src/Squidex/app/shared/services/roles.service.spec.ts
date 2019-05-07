@@ -11,15 +11,13 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    AppRoleDto,
-    AppRolesDto,
-    AppRolesService,
-    CreateAppRoleDto,
-    UpdateAppRoleDto,
+    RoleDto,
+    RolesDto,
+    RolesService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
-describe('AppRolesService', () => {
+describe('RolesService', () => {
     const version = new Version('1');
 
     beforeEach(() => {
@@ -28,7 +26,7 @@ describe('AppRolesService', () => {
                 HttpClientTestingModule
             ],
             providers: [
-                AppRolesService,
+                RolesService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
                 { provide: AnalyticsService, useValue: new AnalyticsService() }
             ]
@@ -40,7 +38,7 @@ describe('AppRolesService', () => {
     }));
 
     it('should make get request to get all permissions',
-        inject([AppRolesService, HttpTestingController], (roleService: AppRolesService, httpMock: HttpTestingController) => {
+        inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
 
         let permissions: string[];
 
@@ -59,9 +57,9 @@ describe('AppRolesService', () => {
     }));
 
     it('should make get request to get roles',
-        inject([AppRolesService, HttpTestingController], (roleService: AppRolesService, httpMock: HttpTestingController) => {
+        inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
 
-        let roles: AppRolesDto;
+        let roles: RolesDto;
 
         roleService.getRoles('my-app').subscribe(result => {
             roles = result;
@@ -90,20 +88,21 @@ describe('AppRolesService', () => {
             }
         });
 
-        expect(roles!).toEqual(
-            new AppRolesDto([
-                new AppRoleDto('Role1', 3, 5, ['P1']),
-                new AppRoleDto('Role2', 7, 9, ['P2'])
+        expect(roles!).toEqual({
+            payload: [
+                new RoleDto('Role1', 3, 5, ['P1']),
+                new RoleDto('Role2', 7, 9, ['P2'])
             ],
-            new Version('2')));
+            version: new Version('2')
+        });
     }));
 
     it('should make post request to add role',
-        inject([AppRolesService, HttpTestingController], (roleService: AppRolesService, httpMock: HttpTestingController) => {
+        inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
 
-        const dto = new CreateAppRoleDto('Role3');
+        const dto = { name: 'Role3' };
 
-        let role: AppRoleDto;
+        let role: RoleDto;
 
         roleService.postRole('my-app', dto, version).subscribe(result => {
             role = result.payload;
@@ -116,13 +115,13 @@ describe('AppRolesService', () => {
 
         req.flush({});
 
-        expect(role!).toEqual(new AppRoleDto('Role3', 0, 0, []));
+        expect(role!).toEqual(new RoleDto('Role3', 0, 0, []));
     }));
 
     it('should make put request to update role',
-        inject([AppRolesService, HttpTestingController], (roleService: AppRolesService, httpMock: HttpTestingController) => {
+        inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
 
-        const dto = new UpdateAppRoleDto(['P4', 'P5']);
+        const dto = { permissions: ['P4', 'P5'] };
 
         roleService.putRole('my-app', 'role1', dto, version).subscribe();
 
@@ -135,7 +134,7 @@ describe('AppRolesService', () => {
     }));
 
     it('should make delete request to remove role',
-        inject([AppRolesService, HttpTestingController], (roleService: AppRolesService, httpMock: HttpTestingController) => {
+        inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
 
         roleService.deleteRole('my-app', 'role1', version).subscribe();
 

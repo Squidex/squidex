@@ -18,7 +18,7 @@ import {
     ScheduleDto,
     Version,
     Versioned
-} from './../';
+} from '@app/shared/internal';
 
 describe('ContentsService', () => {
     const version = new Version('1');

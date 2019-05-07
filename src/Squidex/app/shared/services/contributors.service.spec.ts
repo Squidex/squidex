@@ -11,15 +11,14 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    AppContributorDto,
-    AppContributorsDto,
-    AppContributorsService,
-    AssignContributorDto,
     ContributorAssignedDto,
+    ContributorDto,
+    ContributorsDto,
+    ContributorsService,
     Version
-} from './../';
+} from '@app/shared/internal';
 
-describe('AppContributorsService', () => {
+describe('ContributorsService', () => {
     const version = new Version('1');
 
     beforeEach(() => {
@@ -28,7 +27,7 @@ describe('AppContributorsService', () => {
                 HttpClientTestingModule
             ],
             providers: [
-                AppContributorsService,
+                ContributorsService,
                 { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
                 { provide: AnalyticsService, useValue: new AnalyticsService() }
             ]
@@ -40,11 +39,11 @@ describe('AppContributorsService', () => {
     }));
 
     it('should make get request to get app contributors',
-        inject([AppContributorsService, HttpTestingController], (appContributorsService: AppContributorsService, httpMock: HttpTestingController) => {
+        inject([ContributorsService, HttpTestingController], (contributorsService: ContributorsService, httpMock: HttpTestingController) => {
 
-        let contributors: AppContributorsDto;
+        let contributors: ContributorsDto;
 
-        appContributorsService.getContributors('my-app').subscribe(result => {
+        contributorsService.getContributors('my-app').subscribe(result => {
             contributors = result;
         });
 
@@ -71,21 +70,26 @@ describe('AppContributorsService', () => {
             }
         });
 
-        expect(contributors!).toEqual(
-            new AppContributorsDto([
-                new AppContributorDto('123', 'Owner'),
-                new AppContributorDto('456', 'Owner')
-            ], 100, new Version('2')));
+        expect(contributors!).toEqual({
+            payload: {
+                contributors: [
+                    new ContributorDto('123', 'Owner'),
+                    new ContributorDto('456', 'Owner')
+                ],
+                maxContributors: 100
+            },
+            version: new Version('2')
+        });
     }));
 
     it('should make post request to assign contributor',
-        inject([AppContributorsService, HttpTestingController], (appContributorsService: AppContributorsService, httpMock: HttpTestingController) => {
+        inject([ContributorsService, HttpTestingController], (contributorsService: ContributorsService, httpMock: HttpTestingController) => {
 
-        const dto = new AssignContributorDto('123', 'Owner');
+        const dto = { contributorId: '123', role: 'Owner' };
 
         let contributorAssignedDto: ContributorAssignedDto;
 
-        appContributorsService.postContributor('my-app', dto, version).subscribe(result => {
+        contributorsService.postContributor('my-app', dto, version).subscribe(result => {
             contributorAssignedDto = result.payload;
         });
 
@@ -100,9 +104,9 @@ describe('AppContributorsService', () => {
     }));
 
     it('should make delete request to remove contributor',
-        inject([AppContributorsService, HttpTestingController], (appContributorsService: AppContributorsService, httpMock: HttpTestingController) => {
+        inject([ContributorsService, HttpTestingController], (contributorsService: ContributorsService, httpMock: HttpTestingController) => {
 
-        appContributorsService.deleteContributor('my-app', '123', version).subscribe();
+        contributorsService.deleteContributor('my-app', '123', version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors/123');
 

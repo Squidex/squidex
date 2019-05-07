@@ -8,28 +8,24 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
     Version,
     Versioned
 } from '@app/framework';
 
-export class AppLanguagesDto extends Model {
-    constructor(
-        public readonly languages: AppLanguageDto[],
-        public readonly version: Version
-    ) {
-        super();
-    }
-}
+import { LanguageDto } from './languages.service';
 
-export class AppLanguageDto extends Model {
+export type AppLanguagesDto = Versioned<AppLanguageDto[]>;
+
+export class AppLanguageDto extends Model<AppLanguageDto> {
     constructor(
         public readonly iso2Code: string,
         public readonly englishName: string,
@@ -39,22 +35,25 @@ export class AppLanguageDto extends Model {
     ) {
         super();
     }
-}
 
-export class AddAppLanguageDto {
-    constructor(
-        public readonly language: string
-    ) {
+    public static fromLanguage(language: LanguageDto, isMaster = false, isOptional = false, fallback: string[] = []) {
+        return new AppLanguageDto(
+            language.iso2Code,
+            language.englishName,
+            isMaster,
+            isOptional,
+            fallback);
     }
 }
 
-export class UpdateAppLanguageDto {
-    constructor(
-        public readonly isMaster: boolean,
-        public readonly isOptional: boolean,
-        public readonly fallback: string[]
-    ) {
-    }
+export interface AddAppLanguageDto {
+    readonly language: string;
+}
+
+export interface UpdateAppLanguageDto {
+    readonly isMaster?: boolean;
+    readonly isOptional?: boolean;
+    readonly fallback?: string[];
 }
 
 @Injectable()
@@ -70,21 +69,18 @@ export class AppLanguagesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
+                mapVersioned(({ body }) => {
                     const items: any[] = body;
 
-                    const languages = items.map(item => {
-                        return new AppLanguageDto(
+                    const languages = items.map(item =>
+                        new AppLanguageDto(
                             item.iso2Code,
                             item.englishName,
-                            item.isMaster === true,
-                            item.isOptional === true,
-                            item.fallback || []);
-                    });
+                            item.isMaster,
+                            item.isOptional,
+                            item.fallback || []));
 
-                    return new AppLanguagesDto(languages, response.version);
+                    return languages;
                 }),
                 pretifyError('Failed to load languages. Please reload.'));
     }
@@ -93,17 +89,15 @@ export class AppLanguagesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
         return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
-                map(response => {
-                    const body = response.payload.body;
-
+                mapVersioned(({ body }) => {
                     const language = new AppLanguageDto(
                         body.iso2Code,
                         body.englishName,
-                        body.isMaster === true,
-                        body.isOptional === true,
+                        body.isMaster,
+                        body.isOptional,
                         body.fallback || []);
 
-                    return new Versioned(response.version, language);
+                    return language;
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Language', 'Added', appName);

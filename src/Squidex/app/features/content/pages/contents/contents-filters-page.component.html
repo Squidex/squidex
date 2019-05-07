@@ -14,7 +14,7 @@
         <div class="sidebar-section">
             <h3>Saved queries</h3>
 
-            <a class="sidebar-item" *ngFor="let query of schemaQueries.queries | async; trackByQuery" (click)="search(query.filter)"
+            <a class="sidebar-item" *ngFor="let query of schemaQueries.queries | async; trackBy: trackByQuery" (click)="search(query.filter)"
                 [class.active]="isSelectedQuery(query.filter)">
                 
                 {{query.name}}

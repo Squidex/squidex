@@ -8,14 +8,15 @@
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import {
-    AppsState,
-    UIService,
-    UIState
-} from './../';
+import { UIService, UIState } from '@app/shared/internal';
+
+import { TestValues } from './_test-helpers';
 
 describe('UIState', () => {
-    const app = 'my-app';
+    const {
+        app,
+        appsState
+    } = TestValues;
 
     const appSettings = {
         mapType: 'GM',
@@ -29,19 +30,10 @@ describe('UIState', () => {
         canCreateApps: true
     };
 
-    let appsState: IMock<AppsState>;
     let uiService: IMock<UIService>;
     let uiState: UIState;
 
     beforeEach(() => {
-        appsState = Mock.ofType<AppsState>();
-
-        appsState.setup(x => x.appName)
-            .returns(() => app);
-
-        appsState.setup(x => x.selectedApp)
-            .returns(() => of(<any>{ name: app }));
-
         uiService = Mock.ofType<UIService>();
 
         uiService.setup(x => x.getSettings(app))

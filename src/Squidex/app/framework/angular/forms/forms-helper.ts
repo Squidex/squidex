@@ -9,7 +9,7 @@
  import { Observable } from 'rxjs';
  import { map, startWith } from 'rxjs/operators';
 
-import { Types } from '@app/framework/internal';
+import { Types } from './../../utils/types';
 
 export function formControls(form: AbstractControl): AbstractControl[] {
     if (Types.is(form, FormGroup)) {
@@ -22,7 +22,7 @@ export function formControls(form: AbstractControl): AbstractControl[] {
 }
 
 export function invalid$(form: AbstractControl): Observable<boolean> {
-    return form.statusChanges.pipe(map(_ => form.invalid), startWith(form.invalid));
+    return form.statusChanges.pipe(map(() => form.invalid), startWith(form.invalid));
 }
 
 export function value$<T = any>(form: AbstractControl): Observable<T> {

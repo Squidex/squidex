@@ -13,7 +13,7 @@ import { Form, Types } from '@app/framework';
 
 import { AssetDto } from './../services/assets.service';
 
-export class AnnotateAssetForm extends Form<FormGroup> {
+export class AnnotateAssetForm extends Form<FormGroup, { fileName?: string, slug?: string, tags?: string[] }> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             fileName: ['',
@@ -37,7 +37,7 @@ export class AnnotateAssetForm extends Form<FormGroup> {
     public submit(asset?: AssetDto) {
         const result = super.submit();
 
-        if (asset) {
+        if (asset && result) {
             let index = asset.fileName.lastIndexOf('.');
 
             if (index > 0) {

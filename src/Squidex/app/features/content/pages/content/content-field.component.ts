@@ -19,7 +19,6 @@ import {
     LocalStoreService,
     RootFieldDto,
     SchemaDto,
-    TranslateDto,
     TranslationsService,
     Types,
     value$
@@ -158,7 +157,7 @@ export class ContentFieldComponent implements OnChanges {
             const value = control.value;
 
             if (!value) {
-                const request = new TranslateDto(text, sourceLanguage, targetLanguage);
+                const request = { text, sourceLanguage, targetLanguage };
 
                 this.translations.translate(this.appsState.appName, request)
                     .subscribe(result => {

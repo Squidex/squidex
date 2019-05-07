@@ -12,7 +12,7 @@ import {
     ApiUrlConfig,
     LanguageDto,
     LanguagesService
-} from './../';
+} from '@app/shared/internal';
 
 describe('LanguageService', () => {
     beforeEach(() => {

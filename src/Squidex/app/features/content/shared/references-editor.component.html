@@ -9,7 +9,7 @@
         <table class="table table-items table-fixed" [class.disabled]="snapshot.isDisabled" *ngIf="snapshot.schema && snapshot.contentItems && snapshot.contentItems.length > 0"
             [sqxSortModel]="snapshot.contentItems.mutableValues" 
             (sqxSort)="sort($event)">
-            <tbody *ngFor="let content of snapshot.contentItems">
+            <tbody *ngFor="let content of snapshot.contentItems; trackBy: trackByContent">
                 <tr [sqxContent]="content"
                     [language]="language"
                     [isReadOnly]="true"

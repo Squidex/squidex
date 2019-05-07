@@ -103,4 +103,8 @@ export class ContentChangedTriggerComponent implements OnInit {
         this.schemasToAdd = this.schemas.filter(schema => !this.triggerSchemas.find(s => s.schema.id === schema.id)).sortByStringAsc(x => x.name);
         this.schemaToAdd = this.schemasToAdd.at(0);
     }
+
+    public trackBySchema(index: number, schema: SchemaDto) {
+        return schema.id;
+    }
 }

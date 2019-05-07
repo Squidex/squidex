@@ -8,50 +8,40 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     HTTP,
+    mapVersioned,
     Model,
     pretifyError,
     Version,
     Versioned
 } from '@app/framework';
 
-export class AppPatternsDto extends Model {
-    constructor(
-        public readonly patterns: AppPatternDto[],
-        public readonly version: Version
-    ) {
-        super();
-    }
-}
+export type PatternsDto = Versioned<PatternDto[]>;
 
-export class AppPatternDto extends Model {
+export class PatternDto extends Model<PatternDto> {
     constructor(
         public readonly id: string,
         public readonly name: string,
         public readonly pattern: string,
-        public readonly message: string
+        public readonly message?: string
     ) {
         super();
     }
 }
 
-export class EditAppPatternDto {
-    constructor(
-        public readonly name: string,
-        public readonly pattern: string,
-        public readonly message: string
-    ) {
-    }
+export interface EditPatternDto {
+    readonly name: string;
+    readonly pattern: string;
+    readonly message?: string;
 }
 
-
 @Injectable()
-export class AppPatternsService {
+export class PatternsService {
     constructor(
         private readonly http: HttpClient,
         private readonly apiUrl: ApiUrlConfig,
@@ -59,42 +49,38 @@ export class AppPatternsService {
     ) {
     }
 
-    public getPatterns(appName: string): Observable<AppPatternsDto> {
+    public getPatterns(appName: string): Observable<PatternsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-            map(response => {
-                const body = response.payload.body;
-
+            mapVersioned(({ body }) => {
                 const items: any[] = body;
 
-                return new AppPatternsDto(
-                    items.map(item => {
-                        return new AppPatternDto(
+                const patterns =
+                    items.map(item =>
+                        new PatternDto(
                             item.patternId,
                             item.name,
                             item.pattern,
-                            item.message);
-                    }),
-                    response.version);
+                            item.message));
+
+                return patterns;
             }),
             pretifyError('Failed to add pattern. Please reload.'));
     }
 
-    public postPattern(appName: string, dto: EditAppPatternDto, version: Version): Observable<Versioned<AppPatternDto>> {
+    public postPattern(appName: string, dto: EditPatternDto, version: Version): Observable<Versioned<PatternDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
         return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
-            map(response => {
-                const body = response.payload.body;
-
-                const pattern = new AppPatternDto(
+            mapVersioned(({ body }) => {
+                const pattern = new PatternDto(
                     body.patternId,
                     body.name,
                     body.pattern,
                     body.message);
 
-                return new Versioned(response.version, pattern);
+                return pattern;
             }),
             tap(() => {
                 this.analytics.trackEvent('Patterns', 'Created', appName);
@@ -102,7 +88,7 @@ export class AppPatternsService {
             pretifyError('Failed to add pattern. Please reload.'));
     }
 
-    public putPattern(appName: string, id: string, dto: EditAppPatternDto, version: Version): Observable<Versioned<any>> {
+    public putPattern(appName: string, id: string, dto: EditPatternDto, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(

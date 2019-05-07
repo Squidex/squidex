@@ -6,21 +6,18 @@
  */
 
 import { Injectable } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { catchError, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import '@app/framework/utils/rxjs-extensions';
 
 import {
     AuthService,
     DialogService,
-    Form,
     ImmutableArray,
-    notify,
     Pager,
-    State,
-    ValidatorsEx
+    shareSubscribed,
+    State
 } from '@app/shared';
 
 import {
@@ -30,62 +27,7 @@ import {
     UsersService
 } from './../services/users.service';
 
-export class UserForm extends Form<FormGroup> {
-    constructor(
-        formBuilder: FormBuilder
-    ) {
-        super(formBuilder.group({
-            email: ['',
-                [
-                    Validators.email,
-                    Validators.required,
-                    Validators.maxLength(100)
-                ]
-            ],
-            displayName: ['',
-                [
-                    Validators.required,
-                    Validators.maxLength(100)
-                ]
-            ],
-            password: ['',
-                [
-                    Validators.nullValidator
-                ]
-            ],
-            passwordConfirm: ['',
-                [
-                    ValidatorsEx.match('password', 'Passwords must be the same.')
-                ]
-            ],
-            permissions: ['']
-        }));
-    }
-
-    public load(user?: UserDto) {
-        if (user) {
-            this.form.controls['password'].setValidators(null);
-
-            super.load({ ...user, permissions: user.permissions.join('\n') });
-        } else {
-            this.form.controls['password'].setValidators(Validators.required);
-
-            super.load(undefined);
-        }
-    }
-
-    public submit() {
-        const result = super.submit();
-
-        if (result) {
-            result['permissions'] = result['permissions'].split('\n').filter((x: any) => !!x);
-        }
-
-        return result;
-    }
-}
-
-interface SnapshotUser {
+export interface SnapshotUser {
     // The user.
     user: UserDto;
 
@@ -95,7 +37,7 @@ interface SnapshotUser {
 
 interface Snapshot {
     // The current users.
-    users: ImmutableArray<SnapshotUser>;
+    users: UsersList;
 
     // The pagination information.
     usersPager: Pager;
@@ -109,6 +51,9 @@ interface Snapshot {
     // The selected user.
     selectedUser?: SnapshotUser | null;
 }
+
+export type UsersList = ImmutableArray<SnapshotUser>;
+export type UsersResult = { total: number, users: UsersList };
 
 @Injectable()
 export class UsersState extends State<Snapshot> {
@@ -136,25 +81,26 @@ export class UsersState extends State<Snapshot> {
         super({ users: ImmutableArray.empty(), usersPager: new Pager(0) });
     }
 
-    public select(id: string | null): Observable<UserDto | null> {
+    public select(id: string | null): Observable<SnapshotUser | null> {
         return this.loadUser(id).pipe(
             tap(selectedUser => {
                 this.next(s => ({ ...s, selectedUser }));
             }),
-            map(x => x && x.user));
+            shareSubscribed(this.dialogs, { silent: true }));
     }
 
     private loadUser(id: string | null) {
-        return !id ?
-            of(null) :
-            of(this.snapshot.users.find(x => x.user.id === id)).pipe(
-                switchMap(user => {
-                    if (!user) {
-                        return this.usersService.getUser(id).pipe(map(x => this.createUser(x)), catchError(() => of(null)));
-                    } else {
-                        return of(user);
-                    }
-                }));
+        if (!id) {
+            return of(null);
+        }
+
+        const found = this.snapshot.users.find(x => x.user.id === id);
+
+        if (found) {
+            return of(found);
+        }
+
+        return this.usersService.getUser(id).pipe(map(x => this.createUser(x)), catchError(() => of(null)));
     }
 
     public load(isReload = false): Observable<any> {
@@ -170,14 +116,14 @@ export class UsersState extends State<Snapshot> {
                 this.snapshot.usersPager.pageSize,
                 this.snapshot.usersPager.skip,
                 this.snapshot.usersQuery).pipe(
-            tap(dtos => {
+            tap(({ total, items }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Users reloaded.');
                 }
 
                 this.next(s => {
-                    const users = ImmutableArray.of(dtos.items.map(x => this.createUser(x)));
-                    const usersPager = s.usersPager.setCount(dtos.total);
+                    const usersPager = s.usersPager.setCount(total);
+                    const users = ImmutableArray.of(items.map(x => this.createUser(x)));
 
                     let selectedUser = s.selectedUser;
 
@@ -188,57 +134,62 @@ export class UsersState extends State<Snapshot> {
                     return { ...s, users, usersPager, selectedUser, isLoaded: true };
                 });
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
     public create(request: CreateUserDto): Observable<UserDto> {
         return this.usersService.postUser(request).pipe(
-            tap(dto => {
+            tap(created => {
                 this.next(s => {
-                    const users = s.users.pushFront(this.createUser(dto));
+                    const users = s.users.pushFront(this.createUser(created));
                     const usersPager = s.usersPager.incrementCount();
 
                     return { ...s, users, usersPager };
                 });
-            }));
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public update(user: UserDto, request: UpdateUserDto): Observable<any> {
+    public update(user: UserDto, request: UpdateUserDto): Observable<UserDto> {
         return this.usersService.putUser(user.id, request).pipe(
-            tap(() => {
-                this.replaceUser(update(user, request));
-            }));
+            map(() => update(user, request)),
+            tap(updated => {
+                this.replaceUser(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
-    public lock(user: UserDto): Observable<any> {
+    public lock(user: UserDto): Observable<UserDto> {
         return this.usersService.lockUser(user.id).pipe(
-            tap(() => {
-                this.replaceUser(setLocked(user, true));
+            map(() => setLocked(user, true)),
+            tap(updated => {
+                this.replaceUser(updated);
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
-    public unlock(user: UserDto): Observable<any> {
+    public unlock(user: UserDto): Observable<UserDto> {
         return this.usersService.unlockUser(user.id).pipe(
-            tap(() => {
-                this.replaceUser(setLocked(user, false));
+            map(() => setLocked(user, false)),
+            tap(updated => {
+                this.replaceUser(updated);
             }),
-            notify(this.dialogs));
+            shareSubscribed(this.dialogs));
     }
 
-    public search(query: string): Observable<any> {
+    public search(query: string): Observable<UsersResult> {
         this.next(s => ({ ...s, usersPager: new Pager(0), usersQuery: query }));
 
         return this.loadInternal();
     }
 
-    public goNext(): Observable<any> {
+    public goNext(): Observable<UsersResult> {
         this.next(s => ({ ...s, usersPager: s.usersPager.goNext() }));
 
         return this.loadInternal();
     }
 
-    public goPrev(): Observable<any> {
+    public goPrev(): Observable<UsersResult> {
         this.next(s => ({ ...s, usersPager: s.usersPager.goPrev() }));
 
         return this.loadInternal();
@@ -246,9 +197,13 @@ export class UsersState extends State<Snapshot> {
 
     private replaceUser(user: UserDto) {
         return this.next(s => {
-            const users = s.users.map(u => u.user.id === user.id ? this.createUser(user, u) : u);
+            const users = s.users.map(u => u.user.id === user.id ? this.createUser(user) : u);
 
-            const selectedUser = s.selectedUser && s.selectedUser.user.id === user.id ? users.find(x => x.user.id === user.id) : s.selectedUser;
+            const selectedUser =
+                s.selectedUser &&
+                s.selectedUser.user.id !== user.id ?
+                s.selectedUser :
+                users.find(x => x.user.id === user.id);
 
             return { ...s, users, selectedUser };
         });
@@ -258,14 +213,8 @@ export class UsersState extends State<Snapshot> {
         return this.authState.user!.id;
     }
 
-    private createUser(user: UserDto, current?: SnapshotUser): SnapshotUser {
-        if (!user) {
-            return null!;
-        } else if (current && current.user === user) {
-            return current;
-        } else {
-            return { user, isCurrentUser: user.id === this.userId };
-        }
+    private createUser(user: UserDto): SnapshotUser {
+        return { user, isCurrentUser: user.id === this.userId };
     }
 }
 

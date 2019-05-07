@@ -51,6 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     sourceUrl
                     mimeType
                     fileName
+                    fileHash
                     fileSize
                     fileVersion
                     isImage
@@ -86,6 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             sourceUrl = $"assets/source/{asset.Id}",
                             mimeType = "image/png",
                             fileName = "MyFile.png",
+                            fileHash = "ABC123",
                             fileSize = 1024,
                             fileVersion = 123,
                             isImage = true,
@@ -119,6 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       sourceUrl
                       mimeType
                       fileName
+                      fileHash
                       fileSize
                       fileVersion
                       isImage
@@ -158,6 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 sourceUrl = $"assets/source/{asset.Id}",
                                 mimeType = "image/png",
                                 fileName = "MyFile.png",
+                                fileHash = "ABC123",
                                 fileSize = 1024,
                                 fileVersion = 123,
                                 isImage = true,
@@ -193,6 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     sourceUrl
                     mimeType
                     fileName
+                    fileHash
                     fileSize
                     fileVersion
                     isImage
@@ -224,6 +229,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         sourceUrl = $"assets/source/{asset.Id}",
                         mimeType = "image/png",
                         fileName = "MyFile.png",
+                        fileHash = "ABC123",
                         fileSize = 1024,
                         fileVersion = 123,
                         isImage = true,

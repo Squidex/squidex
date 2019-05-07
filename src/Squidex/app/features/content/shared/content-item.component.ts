@@ -187,5 +187,9 @@ export class ContentItemComponent implements OnChanges {
 
         return undefined;
     }
+
+    public trackByField(index: number, field: FieldDto) {
+        return field.fieldId + this.schema.id;
+    }
 }
 
