@@ -14,6 +14,7 @@ import {
     DialogService,
     ImmutableArray,
     mapVersioned,
+    shareMapSubscribed,
     shareSubscribed,
     State,
     Types,
@@ -139,9 +140,10 @@ export class SchemasState extends State<Snapshot> {
 
     public create(request: CreateSchemaDto, now?: DateTime): Observable<SchemaDetailsDto> {
         return this.schemasService.postSchema(this.appName, request).pipe(
-            tap(response => {
+            map(payload => createSchema(request, payload, this.user, now)),
+            tap(created => {
                 this.next(s => {
-                    const schemas = s.schemas.push(createSchema(request, response, this.user, now)).sortByStringAsc(x => x.displayName);
+                    const schemas = s.schemas.push(created).sortByStringAsc(x => x.displayName);
 
                     return { ...s, schemas };
                 });
@@ -181,8 +183,8 @@ export class SchemasState extends State<Snapshot> {
     public publish(schema: SchemaDto, now?: DateTime): Observable<SchemaDto> {
         return this.schemasService.publishSchema(this.appName, schema.name, schema.version).pipe(
             map(({ version }) => setPublished(schema, true, this.user, version, now)),
-            tap(newSchema => {
-                this.replaceSchema(newSchema);
+            tap(updated => {
+                this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -190,8 +192,8 @@ export class SchemasState extends State<Snapshot> {
     public unpublish(schema: SchemaDto, now?: DateTime): Observable<SchemaDto> {
         return this.schemasService.unpublishSchema(this.appName, schema.name, schema.version).pipe(
             map(({ version }) => setPublished(schema, false, this.user, version, now)),
-            tap(newSchema => {
-                this.replaceSchema(newSchema);
+            tap(updated => {
+                this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -199,8 +201,8 @@ export class SchemasState extends State<Snapshot> {
     public changeCategory(schema: SchemaDto, name: string, now?: DateTime): Observable<SchemaDto> {
         return this.schemasService.putCategory(this.appName, schema.name, { name }, schema.version).pipe(
             map(({ version }) => changeCategory(schema, name, this.user, version, now)),
-            tap(newSchema => {
-                this.replaceSchema(newSchema);
+            tap(updated => {
+                this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -208,8 +210,8 @@ export class SchemasState extends State<Snapshot> {
     public configurePreviewUrls(schema: SchemaDetailsDto, request: {}, now?: DateTime): Observable<SchemaDetailsDto> {
         return this.schemasService.putPreviewUrls(this.appName, schema.name, request, schema.version).pipe(
             map(({ version }) => configurePreviewUrls(schema, request, this.user, version, now)),
-            tap(newSchema => {
-                this.replaceSchema(newSchema);
+            tap(updated => {
+                this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -217,8 +219,8 @@ export class SchemasState extends State<Snapshot> {
     public configureScripts(schema: SchemaDetailsDto, request: {}, now?: DateTime): Observable<SchemaDetailsDto> {
         return this.schemasService.putScripts(this.appName, schema.name, request, schema.version).pipe(
             map(({ version }) => configureScripts(schema, request, this.user, version, now)),
-            tap(newSchema => {
-                this.replaceSchema(newSchema);
+            tap(updated => {
+                this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -226,8 +228,8 @@ export class SchemasState extends State<Snapshot> {
     public update(schema: SchemaDetailsDto, request: UpdateSchemaDto, now?: DateTime): Observable<SchemaDetailsDto> {
         return this.schemasService.putSchema(this.appName, schema.name, request, schema.version).pipe(
             map(({ version }) => updateProperties(schema, request, this.user, version, now)),
-            tap(newSchema => {
-                this.replaceSchema(newSchema);
+            tap(updated => {
+                this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -235,37 +237,37 @@ export class SchemasState extends State<Snapshot> {
     public addField(schema: SchemaDetailsDto, request: AddFieldDto, parent?: RootFieldDto, now?: DateTime): Observable<FieldDto> {
         return this.schemasService.postField(this.appName, schema.name, request, pid(parent), schema.version).pipe(
             map(({ version, payload }) => {
-                let newSchema: SchemaDto;
+                let updated: SchemaDto;
 
                 if (Types.is(payload, NestedFieldDto)) {
-                    newSchema = updateField(schema, addNested(parent!, payload), this.user, version, now);
+                    updated = updateField(schema, addNested(parent!, payload), this.user, version, now);
                 } else {
-                    newSchema = addField(schema, payload, this.user, version, now);
+                    updated = addField(schema, payload, this.user, version, now);
                 }
 
-                return {  newSchema, field: payload };
+                return { updated, field: payload };
             }),
-            tap(({ newSchema }) => {
-                this.replaceSchema(newSchema);
+            tap(({ updated }) => {
+                this.replaceSchema(updated);
             }),
-            shareSubscribed(this.dialogs, { silent: true, project: x => x.field }));
+            shareMapSubscribed(this.dialogs, x => x.field, { silent: true }));
     }
 
     public sortFields(schema: SchemaDetailsDto, fields: any[], parent?: RootFieldDto, now?: DateTime): Observable<SchemaDetailsDto> {
         return this.schemasService.putFieldOrdering(this.appName, schema.name, fields.map(t => t.fieldId), pid(parent), schema.version).pipe(
             map(({ version }) => {
-                let newSchema: SchemaDto;
+                let updated: SchemaDetailsDto;
 
                 if (!parent) {
-                    newSchema = replaceFields(schema, fields, this.user, version, now);
+                    updated = replaceFields(schema, fields, this.user, version, now);
                 } else {
-                    newSchema = updateField(schema, replaceNested(parent, fields), this.user, version, now);
+                    updated = updateField(schema, replaceNested(parent, fields), this.user, version, now);
                 }
 
-                return newSchema;
+                return updated;
             }),
-            tap(newSchema => {
-                this.replaceSchema(newSchema);
+            tap(updated => {
+                this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -276,7 +278,7 @@ export class SchemasState extends State<Snapshot> {
             tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public enableField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
@@ -285,7 +287,7 @@ export class SchemasState extends State<Snapshot> {
             tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public disableField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
@@ -294,7 +296,7 @@ export class SchemasState extends State<Snapshot> {
             tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public showField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
@@ -303,7 +305,7 @@ export class SchemasState extends State<Snapshot> {
             tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public hideField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
@@ -312,7 +314,7 @@ export class SchemasState extends State<Snapshot> {
             tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public updateField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, request: UpdateFieldDto, now?: DateTime): Observable<T> {
@@ -321,7 +323,7 @@ export class SchemasState extends State<Snapshot> {
             tap(({ version, payload }) => {
                 this.replaceField(schema, payload, version, now);
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public deleteField(schema: SchemaDetailsDto, field: AnyFieldDto, now?: DateTime): Observable<any> {

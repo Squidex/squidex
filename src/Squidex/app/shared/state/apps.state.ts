@@ -84,9 +84,10 @@ export class AppsState extends State<Snapshot> {
 
     public create(request: CreateAppDto, now?: DateTime): Observable<AppDto> {
         return this.appsService.postApp(request).pipe(
-            tap(payload => {
+            map(payload => createApp(request, payload, now)),
+            tap(created => {
                 this.next(s => {
-                    const apps = s.apps.push(createApp(request, payload, now)).sortByStringAsc(x => x.name);
+                    const apps = s.apps.push(created).sortByStringAsc(x => x.name);
 
                     return { ...s, apps };
                 });

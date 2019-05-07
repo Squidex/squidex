@@ -14,7 +14,6 @@ import {
     DialogService,
     ErrorDto,
     ImmutableArray,
-    mapVersioned,
     Pager,
     shareSubscribed,
     State,
@@ -202,78 +201,78 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     public publishChanges(content: ContentDto, dueTime: string | null, now?: DateTime): Observable<ContentDto> {
         return this.contentsService.changeContentStatus(this.appName, this.schemaName, content.id, 'Publish', dueTime, content.version).pipe(
-            mapVersioned(({ version }) => {
+            map(({ version }) => {
                 if (dueTime) {
                     return changeScheduleStatus(content, 'Published', dueTime, this.user, version, now);
                 } else {
                     return confirmChanges(content, this.user, version, now);
                 }
             }),
-            tap(({ payload }) => {
+            tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(payload);
+                this.replaceContent(updated);
             }),
             shareSubscribed(this.dialogs));
     }
 
     public changeStatus(content: ContentDto, action: string, status: string, dueTime: string | null, now?: DateTime): Observable<ContentDto> {
         return this.contentsService.changeContentStatus(this.appName, this.schemaName, content.id, action, dueTime, content.version).pipe(
-            mapVersioned(({ version }) => {
+            map(({ version }) => {
                 if (dueTime) {
                     return changeScheduleStatus(content, status, dueTime, this.user, version, now);
                 } else {
                     return changeStatus(content, status, this.user, version, now);
                 }
             }),
-            tap(({ payload }) => {
+            tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(payload);
+                this.replaceContent(updated);
             }),
             shareSubscribed(this.dialogs));
     }
 
     public update(content: ContentDto, request: any, now?: DateTime): Observable<ContentDto> {
         return this.contentsService.putContent(this.appName, this.schemaName, content.id, request, false, content.version).pipe(
-            mapVersioned((payload, version) => updateData(content, payload, this.user, version, now)),
-            tap(({ payload }) => {
+            map(({ payload, version }) => updateData(content, payload, this.user, version, now)),
+            tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(payload, content.version);
+                this.replaceContent(updated, content.version);
             }),
             shareSubscribed(this.dialogs));
     }
 
     public proposeUpdate(content: ContentDto, request: any, now?: DateTime): Observable<ContentDto> {
         return this.contentsService.putContent(this.appName, this.schemaName, content.id, request, true, content.version).pipe(
-            mapVersioned((payload, version) => updateDataDraft(content, payload, this.user, version, now)),
-            tap(({ payload }) => {
+            map(({ payload, version }) => updateDataDraft(content, payload, this.user, version, now)),
+            tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(payload, content.version);
+                this.replaceContent(updated, content.version);
             }),
             shareSubscribed(this.dialogs));
     }
 
     public discardChanges(content: ContentDto, now?: DateTime): Observable<ContentDto> {
         return this.contentsService.discardChanges(this.appName, this.schemaName, content.id, content.version).pipe(
-            mapVersioned((_, version) => discardChanges(content, this.user, version, now)),
-            tap(({ payload }) => {
+            map(({ version }) => discardChanges(content, this.user, version, now)),
+            tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(payload, content.version);
+                this.replaceContent(updated, content.version);
             }),
             shareSubscribed(this.dialogs));
     }
 
     public patch(content: ContentDto, request: any, now?: DateTime): Observable<ContentDto> {
         return this.contentsService.patchContent(this.appName, this.schemaName, content.id, request, content.version).pipe(
-            mapVersioned((data, version) => updateData(content, data, this.user, version, now)),
-            tap(({ payload }) => {
+            map(({ payload, version }) => updateData(content, payload, this.user, version, now)),
+            tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
-                this.replaceContent(payload, content.version);
+                this.replaceContent(updated, content.version);
             }),
             shareSubscribed(this.dialogs));
     }

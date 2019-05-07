@@ -80,9 +80,10 @@ export class RulesState extends State<Snapshot> {
 
     public create(request: UpsertRuleDto, now?: DateTime): Observable<RuleDto> {
         return this.rulesService.postRule(this.appName, request).pipe(
-            tap(response => {
+            map(payload => createRule(request, payload, this.user, now)),
+            tap(created => {
                 this.next(s => {
-                    const rules = s.rules.push(createRule(request, response, this.user, now));
+                    const rules = s.rules.push(created);
 
                     return { ...s, rules };
                 });

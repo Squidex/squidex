@@ -13,6 +13,7 @@ import {
     DialogService,
     ImmutableArray,
     mapVersioned,
+    shareMapSubscribed,
     shareSubscribed,
     State,
     Version
@@ -74,7 +75,7 @@ export class PatternsState extends State<Snapshot> {
                     return { ...s, patterns, isLoaded: true, version: version };
                 });
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public create(request: EditPatternDto): Observable<PatternDto> {
@@ -86,7 +87,7 @@ export class PatternsState extends State<Snapshot> {
                     return { ...s, patterns, version: version };
                 });
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public update(pattern: PatternDto, request: EditPatternDto): Observable<PatternDto> {
@@ -99,7 +100,7 @@ export class PatternsState extends State<Snapshot> {
                     return { ...s, patterns, version: version };
                 });
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public delete(pattern: PatternDto): Observable<any> {

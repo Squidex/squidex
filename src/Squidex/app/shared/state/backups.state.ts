@@ -58,13 +58,13 @@ export class BackupsState extends State<Snapshot> {
         }
 
         return this.backupsService.getBackups(this.appName).pipe(
-            tap(payload => {
+            tap(items => {
                 if (isReload && !silent) {
                     this.dialogs.notifyInfo('Backups reloaded.');
                 }
 
                 this.next(s => {
-                    const backups = ImmutableArray.of(payload);
+                    const backups = ImmutableArray.of(items);
 
                     return { ...s, backups, isLoaded: true };
                 });

@@ -15,6 +15,7 @@ import {
     DialogService,
     ImmutableArray,
     mapVersioned,
+    shareMapSubscribed,
     shareSubscribed,
     State,
     Version
@@ -66,12 +67,12 @@ export class ClientsState extends State<Snapshot> {
         }
 
         return this.clientsService.getClients(this.appName).pipe(
-            tap(({ version, payload: newClients }) => {
+            tap(({ version, payload }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Clients reloaded.');
                 }
 
-                const clients = ImmutableArray.of(newClients);
+                const clients = ImmutableArray.of(payload);
 
                 this.next(s => {
                     return { ...s, clients, isLoaded: true, version };
@@ -89,7 +90,7 @@ export class ClientsState extends State<Snapshot> {
                     return { ...s, clients, version: version };
                 });
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public revoke(client: ClientDto): Observable<any> {
@@ -114,7 +115,7 @@ export class ClientsState extends State<Snapshot> {
                     return { ...s, clients, version };
                 });
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     private get appName() {

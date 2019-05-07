@@ -13,6 +13,7 @@ import {
     DialogService,
     ErrorDto,
     ImmutableArray,
+    shareMapSubscribed,
     shareSubscribed,
     State,
     Types,
@@ -124,7 +125,7 @@ export class ContributorsState extends State<Snapshot> {
 
                 this.replaceContributors(contributors, version);
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload.isCreated }));
+            shareMapSubscribed(this.dialogs, x => x.payload.isCreated));
     }
 
     private updateContributors(id: string, role: string) {

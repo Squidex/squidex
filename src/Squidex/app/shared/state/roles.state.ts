@@ -13,6 +13,7 @@ import {
     DialogService,
     ImmutableArray,
     mapVersioned,
+    shareMapSubscribed,
     shareSubscribed,
     State,
     Version
@@ -87,7 +88,7 @@ export class RolesState extends State<Snapshot> {
                     return { ...s, roles, version };
                 });
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public delete(role: RoleDto): Observable<any> {
@@ -112,7 +113,7 @@ export class RolesState extends State<Snapshot> {
                     return { ...s, roles, version };
                 });
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     private get appName() {

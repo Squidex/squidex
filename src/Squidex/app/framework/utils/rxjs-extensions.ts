@@ -26,9 +26,13 @@ export function mapVersioned<T = any, R = any>(project: (value: T, version: Vers
     };
 }
 
-type Options<T, R = T> = { silent?: boolean, project?: ((value: T) => R) };
+type Options = { silent?: boolean };
 
-export function shareSubscribed<T, R = T>(dialogs: DialogService, options?: Options<T, R>) {
+export function shareSubscribed<T>(dialogs: DialogService, options?: Options) {
+    return shareMapSubscribed<T, T>(dialogs, x => x, options);
+}
+
+export function shareMapSubscribed<T, R = T>(dialogs: DialogService, project: (value: T) => R, options?: Options) {
     return function mapOperation(source: Observable<T>) {
         const shared = source.pipe(publishReplay(), refCount());
 
@@ -42,13 +46,7 @@ export function shareSubscribed<T, R = T>(dialogs: DialogService, options?: Opti
             }))
             .subscribe();
 
-        if (options && !!options.project) {
-            const project = options.project;
-
-            return shared.pipe(map(x => project(x)));
-        } else {
-            return <any>shared;
-        }
+        return shared.pipe(map(x => project(x)));
     };
 }
 

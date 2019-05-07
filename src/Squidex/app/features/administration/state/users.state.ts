@@ -139,9 +139,9 @@ export class UsersState extends State<Snapshot> {
 
     public create(request: CreateUserDto): Observable<UserDto> {
         return this.usersService.postUser(request).pipe(
-            tap(payload => {
+            tap(created => {
                 this.next(s => {
-                    const users = s.users.pushFront(this.createUser(payload));
+                    const users = s.users.pushFront(this.createUser(created));
                     const usersPager = s.usersPager.incrementCount();
 
                     return { ...s, users, usersPager };

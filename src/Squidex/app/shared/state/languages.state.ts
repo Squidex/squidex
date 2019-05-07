@@ -13,6 +13,7 @@ import {
     DialogService,
     ImmutableArray,
     mapVersioned,
+    shareMapSubscribed,
     shareSubscribed,
     State,
     Version
@@ -121,7 +122,7 @@ export class LanguagesState extends State<Snapshot> {
 
                 this.replaceLanguages(languages, version);
             }),
-            shareSubscribed(this.dialogs, { project: x => x.payload }));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public remove(language: AppLanguageDto): Observable<any> {
@@ -150,7 +151,7 @@ export class LanguagesState extends State<Snapshot> {
 
                 this.replaceLanguages(languages, version);
             }),
-            shareSubscribed(this.dialogs));
+            shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     private replaceLanguages(languages: AppLanguagesList, version: Version, allLanguages?: LanguageList) {
