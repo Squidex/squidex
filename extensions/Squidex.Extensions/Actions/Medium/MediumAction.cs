@@ -51,7 +51,7 @@ namespace Squidex.Extensions.Actions.Medium
         public string PublicationId { get; set; }
 
         [Display(Name = "Is Html", Description = "Indicates whether the content is markdown or html.")]
-        [DataType(DataType.Custom)]
+        [DataType(DataType.Text)]
         public bool IsHtml { get; set; }
     }
 }

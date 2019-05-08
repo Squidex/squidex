@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                     var type = property.PropertyType;
 
-                    if ((property.GetCustomAttribute<RequiredAttribute>() != null || (type.IsValueType && !IsNullable(type))) && type != typeof(bool) && type != typeof(bool?))
+                    if ((GetDataAttribute<RequiredAttribute>(property) != null || (type.IsValueType && !IsNullable(type))) && type != typeof(bool) && type != typeof(bool?))
                     {
                         actionProperty.IsRequired = true;
                     }
@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
                         actionProperty.IsFormattable = true;
                     }
 
-                    var dataType = property.GetCustomAttribute<DataTypeAttribute>()?.DataType;
+                    var dataType = GetDataAttribute<DataTypeAttribute>(property)?.DataType;
 
                     if (type == typeof(bool) || type == typeof(bool?))
                     {
@@ -133,6 +133,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             }
 
             actionTypes[name] = definition;
+        }
+
+        private static T GetDataAttribute<T>(PropertyInfo property) where T : ValidationAttribute
+        {
+            var result = property.GetCustomAttribute<T>();
+
+            result?.IsValid(null);
+
+            return result;
         }
 
         private static bool IsNullable(Type type)

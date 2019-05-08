@@ -49,11 +49,11 @@ namespace Squidex.Extensions.Actions.Discourse
         public string Title { get; set; }
 
         [Display(Name = "Topic", Description = "The optional topic id.")]
-        [DataType(DataType.Custom)]
+        [DataType(DataType.Text)]
         public int? Topic { get; set; }
 
         [Display(Name = "Category", Description = "The optional category id.")]
-        [DataType(DataType.Custom)]
+        [DataType(DataType.Text)]
         public int? Category { get; set; }
     }
 }
