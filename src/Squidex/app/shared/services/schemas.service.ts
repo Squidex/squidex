@@ -78,7 +78,7 @@ export class SchemaDetailsDto extends SchemaDto {
             }
 
             if (fields.length === 0) {
-                fields = [<any>{ properties: {} }];
+                fields = NONE_FIELDS;
             }
 
             this.listFields = fields;
@@ -147,6 +147,9 @@ export class RootFieldDto extends FieldDto {
         return this.clone(value);
     }
 }
+
+const NONE_FIELD = new RootFieldDto(-1, '', createProperties('String'), 'invariant');
+const NONE_FIELDS = [NONE_FIELD];
 
 export class NestedFieldDto extends FieldDto {
     constructor(fieldId: number, name: string, properties: FieldPropertiesDto,

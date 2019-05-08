@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { filter } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
@@ -19,6 +18,7 @@ import {
 interface State {
     profileDisplayName: string;
     profileId: string;
+    profileEmail: string;
     profileUrl: string;
 }
 
@@ -39,18 +39,22 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     ) {
         super(changeDetector, {
             profileDisplayName: '',
+            profileEmail: '',
             profileId: '',
             profileUrl: apiUrl.buildUrl('/identity-server/account/profile')
         });
     }
     public ngOnInit() {
         this.own(
-            this.authService.userChanges.pipe(filter(user => !!user))
+            this.authService.userChanges
                 .subscribe(user => {
-                    const profileId = user!.id;
-                    const profileDisplayName = user!.displayName;
+                    if (user) {
+                        const profileId = user.id;
+                        const profileEmail = user.email;
+                        const profileDisplayName = user.displayName;
 
-                    this.next(s => ({ ...s, profileId, profileDisplayName }));
+                        this.next(s => ({ ...s, profileId, profileEmail, profileDisplayName }));
+                    }
                 }));
     }
 

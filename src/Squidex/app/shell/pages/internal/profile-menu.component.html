@@ -9,6 +9,14 @@
         </span>
 
         <div class="dropdown-menu" *sqxModalView="modalMenu;closeAlways:true" @fade>
+            <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
+                <div>Signed in with</div>
+        
+                <strong>{{snapshot.profileEmail}}</strong>
+            </a>
+            
+            <div class="dropdown-divider"></div>
+
             <a class="dropdown-item" routerLink="/app/administration" *sqxPermission="'?squidex.admin.events|restore|users.read'">
                 Administration
             </a>
@@ -17,7 +25,9 @@
                 Profile
             </a>
 
-            <a class="dropdown-item" (click)="logout()">
+            <div class="dropdown-divider"></div>
+
+            <a class="dropdown-item" (click)="logout()" sqxExternalLink>
                 Logout
             </a>
         </div>

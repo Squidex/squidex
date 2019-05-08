@@ -29,6 +29,10 @@ export class Profile {
         return this.user.profile['sub'];
     }
 
+    public get email(): string {
+        return this.user.profile['email'];
+    }
+
     public get displayName(): string {
         return this.user.profile['urn:squidex:name'];
     }
