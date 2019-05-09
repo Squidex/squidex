@@ -33,6 +33,12 @@ export class ContentsSelectorComponent implements OnInit {
     public languages: LanguageDto[];
 
     @Input()
+    public allowDuplicates: boolean;
+
+    @Input()
+    public alreadySelected: ContentDto[];
+
+    @Input()
     public schema: SchemaDetailsDto;
 
     @Output()
@@ -74,6 +80,10 @@ export class ContentsSelectorComponent implements OnInit {
 
     public isItemSelected(content: ContentDto) {
         return this.selectedItems[content.id];
+    }
+
+    public isItemAlreadySelected(content: ContentDto) {
+        return !this.allowDuplicates && this.alreadySelected && !!this.alreadySelected.find(x => x.id === content.id);
     }
 
     public emitComplete() {

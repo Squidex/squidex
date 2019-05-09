@@ -1,7 +1,8 @@
 <td class="cell-select" (click)="stop($event)">
     <ng-container *ngIf="!isReference; else referenceTemplate">
         <input type="checkbox" class="form-check"
-            [ngModel]="selected" 
+            [disabled]="!selectable"
+            [ngModel]="selected || !selectable" 
             (ngModelChange)="selectedChange.emit($event)" />
     </ng-container>
     

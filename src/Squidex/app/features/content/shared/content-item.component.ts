@@ -59,6 +59,9 @@ export class ContentItemComponent implements OnChanges {
     public selected = false;
 
     @Input()
+    public selectable = false;
+
+    @Input()
     public language: AppLanguageDto;
 
     @Input()

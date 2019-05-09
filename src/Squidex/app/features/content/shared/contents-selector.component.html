@@ -16,7 +16,7 @@
                 </sqx-search-form>
             </div>
                 
-            <div class="col pl-1" *ngIf="languages.length > 1">
+            <div class="-auto pl-1" *ngIf="languages.length > 1">
                 <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages"></sqx-language-selector>
             </div>
         </div>
@@ -57,6 +57,7 @@
                 <table class="table table-items table-fixed" *ngIf="contentsState.contents | async; let contents">
                     <tbody *ngFor="let content of contents; trackBy: trackByContent">
                         <tr [sqxContent]="content"
+                            [selectable]="!isItemAlreadySelected(content)"
                             [selected]="isItemSelected(content)"
                             (selectedChange)="selectContent(content)"
                             [language]="language"

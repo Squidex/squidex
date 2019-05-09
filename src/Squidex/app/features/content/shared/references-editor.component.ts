@@ -53,6 +53,9 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, s
     @Input()
     public isCompact = false;
 
+    @Input()
+    public allowDuplicates = true;
+
     public selectorDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
