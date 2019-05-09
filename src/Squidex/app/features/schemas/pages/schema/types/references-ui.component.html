@@ -1,3 +1,22 @@
 <div [formGroup]="editForm">
-    <span>Nothing to setup</span>    
+    <div class="form-group row">
+        <label class="col-3 col-form-label">Editor</label>
+
+        <div class="col-9">
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'List'">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Checkbox" />
+
+                <i class="icon-control-Checkboxes"></i>
+
+                <span class="radio-label">List</span>
+            </label>
+            <label class="btn btn-radio" [class.active]="editForm.controls['editor'].value === 'Dropdown'">
+                <input type="radio" class="radio-input" name="editor" formControlName="editor" value="Dropdown" />
+
+                <i class="icon-control-Dropdown"></i>
+
+                <span class="radio-label">Dropdown</span>
+            </label>
+        </div>
+    </div>  
 </div>

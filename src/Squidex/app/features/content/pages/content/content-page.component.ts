@@ -138,14 +138,14 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 if (asProposal) {
                     this.contentsState.proposeUpdate(this.content, value)
                         .subscribe(() => {
-                            this.contentForm.submitCompleted();
+                            this.contentForm.submitCompleted({ noReset: true });
                         }, error => {
                             this.contentForm.submitFailed(error);
                         });
                 } else {
                     this.contentsState.update(this.content, value)
                         .subscribe(() => {
-                            this.contentForm.submitCompleted();
+                            this.contentForm.submitCompleted({ noReset: true });
                         }, error => {
                             this.contentForm.submitFailed(error);
                         });

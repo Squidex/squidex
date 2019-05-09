@@ -324,7 +324,7 @@ describe('NumberField', () => {
 });
 
 describe('ReferencesField', () => {
-    const field = createField(new ReferencesFieldPropertiesDto({ isRequired: true, minItems: 1, maxItems: 5 }));
+    const field = createField(new ReferencesFieldPropertiesDto('List', { isRequired: true, minItems: 1, maxItems: 5 }));
 
     it('should create validators', () => {
         expect(FieldValidatorsFactory.createValidators(field, false).length).toBe(3);

@@ -79,11 +79,16 @@ export class Form<T extends AbstractControl, V> {
         }
     }
 
-    public submitCompleted(newValue?: V) {
+    public submitCompleted(options?: { newValue?: V, noReset?: boolean }) {
         this.state.next(() => ({ submitted: false, error: null }));
 
         this.enable();
-        this.setValue(newValue);
+
+        if (options && options.noReset) {
+            this.form.markAsPristine();
+        } else {
+            this.setValue(options ? options.newValue : undefined);
+        }
     }
 
     public submitFailed(error?: string | ErrorDto) {

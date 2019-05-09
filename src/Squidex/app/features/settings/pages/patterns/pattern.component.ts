@@ -36,7 +36,7 @@ export class PatternComponent implements OnInit {
     }
 
     public cancel() {
-        this.editForm.submitCompleted(this.pattern);
+        this.editForm.submitCompleted({ newValue: this.pattern });
     }
 
     public delete() {
@@ -49,8 +49,8 @@ export class PatternComponent implements OnInit {
         if (value) {
             if (this.pattern) {
                 this.patternsState.update(this.pattern, value)
-                    .subscribe(() => {
-                        this.editForm.submitCompleted();
+                    .subscribe(newPattern => {
+                        this.editForm.submitCompleted({ newValue: newPattern });
                     }, error => {
                         this.editForm.submitFailed(error);
                     });

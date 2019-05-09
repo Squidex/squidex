@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool AllowDuplicates { get; set; }
 
+        public ReferencesFieldEditor Editor { get; set; }
+
         public Guid SchemaId { get; set; }
 
         public override T Accept<T>(IFieldPropertiesVisitor<T> visitor)

@@ -190,6 +190,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public IEnumerable<ValidationError> Visit(ReferencesFieldProperties properties)
         {
+            if (!properties.Editor.IsEnumValue())
+            {
+                yield return new ValidationError(Not.Valid("Editor"),
+                    nameof(properties.Editor));
+            }
+
             if (properties.MaxItems.HasValue && properties.MinItems.HasValue && properties.MinItems.Value > properties.MaxItems.Value)
             {
                 yield return new ValidationError(Not.GreaterEquals("Max items", "min items"),

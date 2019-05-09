@@ -124,13 +124,24 @@
 					</sqx-array-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'References'">
-					<sqx-references-editor
-						[formControl]="control" 
-						[language]="language"
-						[languages]="languages"
-						[schemaId]="field.properties['schemaId']"
-                        [isCompact]="isCompact">
-					</sqx-references-editor>
+                    <ng-container [ngSwitch]="field.properties['editor']">
+                        <ng-container *ngSwitchCase="'List'">
+                            <sqx-references-editor
+                                [formControl]="control" 
+                                [language]="language"
+                                [languages]="languages"
+                                [schemaId]="field.properties['schemaId']"
+                                [isCompact]="isCompact">
+                            </sqx-references-editor>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Dropdown'">
+                            <sqx-references-dropdown
+                                [formControl]="control" 
+                                [language]="language"
+                                [schemaId]="field.properties['schemaId']">
+                            </sqx-references-dropdown>
+                        </ng-container>
+                    </ng-container>
 				</ng-container>
 			</ng-container>
 		</ng-template>

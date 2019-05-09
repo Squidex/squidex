@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
 
@@ -15,7 +15,7 @@ import { FieldDto, ReferencesFieldPropertiesDto } from '@app/shared';
     styleUrls: ['references-ui.component.scss'],
     templateUrl: 'references-ui.component.html'
 })
-export class ReferencesUIComponent {
+export class ReferencesUIComponent implements OnInit {
     @Input()
     public editForm: FormGroup;
 
@@ -24,4 +24,11 @@ export class ReferencesUIComponent {
 
     @Input()
     public properties: ReferencesFieldPropertiesDto;
+
+    public ngOnInit() {
+        this.editForm.setControl('editor',
+            new FormControl(this.properties.editor, [
+                Validators.required
+            ]));
+    }
 }

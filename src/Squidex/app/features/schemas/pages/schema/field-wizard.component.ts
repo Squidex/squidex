@@ -75,7 +75,7 @@ export class FieldWizardComponent implements OnInit {
                 .subscribe(dto => {
                     this.field = dto;
 
-                    this.addFieldForm.submitCompleted({ ...DEFAULT_FIELD });
+                    this.addFieldForm.submitCompleted({ newValue: { ...DEFAULT_FIELD } });
 
                     if (addNew) {
                         if (Types.isFunction(this.nameInput.nativeElement.focus)) {

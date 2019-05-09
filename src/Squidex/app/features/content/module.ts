@@ -38,6 +38,7 @@ import {
     FieldEditorComponent,
     FieldLanguagesComponent,
     PreviewButtonComponent,
+    ReferencesDropdownComponent,
     ReferencesEditorComponent,
     SchemasPageComponent
 } from './declarations';
@@ -122,6 +123,7 @@ const routes: Routes = [
         FieldEditorComponent,
         FieldLanguagesComponent,
         PreviewButtonComponent,
+        ReferencesDropdownComponent,
         ReferencesEditorComponent,
         SchemasPageComponent
     ]

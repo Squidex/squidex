@@ -79,7 +79,7 @@ export function createProperties(fieldType: FieldType, values: Object | null = n
             properties = new NumberFieldPropertiesDto('Input');
             break;
         case 'References':
-            properties = new ReferencesFieldPropertiesDto();
+            properties = new ReferencesFieldPropertiesDto('List');
             break;
         case 'String':
             properties = new StringFieldPropertiesDto('Input');
@@ -308,6 +308,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
 
     public readonly minItems?: number;
     public readonly maxItems?: number;
+    public readonly editor: string;
     public readonly schemaId?: string;
     public readonly allowDuplicates?: boolean;
 
@@ -315,10 +316,10 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
         return false;
     }
 
-    constructor(
+    constructor(editor: string,
         props?: Partial<ReferencesFieldPropertiesDto>
     ) {
-        super('Default', props);
+        super(editor, props);
     }
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
