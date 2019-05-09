@@ -68,7 +68,7 @@ describe('SchemaDetailsDto', () => {
     it('should return empty list fields if fields is empty', () => {
         const schema = createSchema(new SchemaPropertiesDto(), 1, []);
 
-        expect(schema.listFields).toEqual(<any>[{ properties: {} }]);
+        expect(schema.listFields[0].fieldId).toEqual(-1);
     });
 });
 
