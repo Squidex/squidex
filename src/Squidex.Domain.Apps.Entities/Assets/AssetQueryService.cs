@@ -27,9 +27,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetRepository assetRepository;
         private readonly AssetOptions options;
 
-        public int DefaultPageSize
+        public int DefaultPageSizeGraphQl
         {
-            get { return options.DefaultPageSize; }
+            get { return options.DefaultPageSizeGraphQl; }
         }
 
         public AssetQueryService(ITagService tagService, IAssetRepository assetRepository, IOptions<AssetOptions> options)
@@ -120,7 +120,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
                 }
 
-                if (result.Take > options.MaxResults)
+                if (result.Take == long.MaxValue)
+                {
+                    result.Take = options.DefaultPageSize;
+                }
+                else if (result.Take > options.MaxResults)
                 {
                     result.Take = options.MaxResults;
                 }

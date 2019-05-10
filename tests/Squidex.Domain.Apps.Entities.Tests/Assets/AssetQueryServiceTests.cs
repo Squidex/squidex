@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using Xunit;
@@ -49,13 +50,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     ["id3"] = "name3"
                 });
 
-            sut = new AssetQueryService(tagService, assetRepository, Options.Create(new AssetOptions()));
+            var options = Options.Create(new AssetOptions { DefaultPageSize = 30 });
+
+            sut = new AssetQueryService(tagService, assetRepository, options);
         }
 
         [Fact]
         public void Should_provide_default_page_size()
         {
-            var result = sut.DefaultPageSize;
+            var result = sut.DefaultPageSizeGraphQl;
 
             Assert.Equal(20, result);
         }
@@ -128,27 +131,44 @@ namespace Squidex.Domain.Apps.Entities.Assets
         [Fact]
         public async Task Should_transform_odata_query()
         {
-            await sut.QueryAsync(context, Q.Empty.WithODataQuery("$top=100&$orderby=fileName asc&$search=Hello World"));
+            var query = Q.Empty.WithODataQuery("$top=100&$orderby=fileName asc&$search=Hello World");
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Matches(x => x.ToString() == "FullText: 'Hello World'; Take: 100; Sort: fileName Ascending")))
+            await sut.QueryAsync(context, query);
+
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("FullText: 'Hello World'; Take: 100; Sort: fileName Ascending")))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_transform_odata_query_and_enrich_with_defaults()
         {
-            await sut.QueryAsync(context, Q.Empty.WithODataQuery("$filter=fileName eq 'ABC'"));
+            var query = Q.Empty.WithODataQuery("$top=200&$filter=fileName eq 'ABC'");
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Matches(x => x.ToString() == "Filter: fileName == 'ABC'; Take: 200; Sort: lastModified Descending")))
+            await sut.QueryAsync(context, query);
+
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("Filter: fileName == 'ABC'; Take: 200; Sort: lastModified Descending")))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_apply_default_page_size()
+        {
+            var query = Q.Empty;
+
+            await sut.QueryAsync(context, query);
+
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("Take: 30; Sort: lastModified Descending")))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_limit_number_of_assets()
         {
-            await sut.QueryAsync(context, Q.Empty.WithODataQuery("$top=300&$skip=20"));
+            var query = Q.Empty.WithODataQuery("$top=300&$skip=20");
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Matches(x => x.ToString() == "Skip: 20; Take: 200; Sort: lastModified Descending")))
+            await sut.QueryAsync(context, query);
+
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending")))
                 .MustHaveHappened();
         }
 

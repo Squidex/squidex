@@ -99,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
                 var allSchemas = await appProvider.GetSchemasAsync(app.Id);
 
-                return new GraphQLModel(app, allSchemas, contentQuery.DefaultPageSize, assetQuery.DefaultPageSize, urlGenerator);
+                return new GraphQLModel(app, allSchemas, contentQuery.DefaultPageSizeGraphQl, assetQuery.DefaultPageSizeGraphQl, urlGenerator);
             });
         }
 

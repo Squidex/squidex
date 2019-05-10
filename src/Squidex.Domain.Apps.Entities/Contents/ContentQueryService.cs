@@ -45,9 +45,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly ContentOptions options;
         private readonly EdmModelBuilder modelBuilder;
 
-        public int DefaultPageSize
+        public int DefaultPageSizeGraphQl
         {
-            get { return options.DefaultPageSize; }
+            get { return options.DefaultPageSizeGraphQl; }
         }
 
         public ContentQueryService(
@@ -276,7 +276,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
                     }
 
-                    if (result.Take > options.MaxResults)
+                    if (result.Take == long.MaxValue)
+                    {
+                        result.Take = options.DefaultPageSize;
+                    }
+                    else if (result.Take > options.MaxResults)
                     {
                         result.Take = options.MaxResults;
                     }
