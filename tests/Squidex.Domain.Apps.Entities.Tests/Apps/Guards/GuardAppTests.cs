@@ -20,6 +20,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
     {
         private readonly IUserResolver users = A.Fake<IUserResolver>();
         private readonly IAppPlansProvider appPlans = A.Fake<IAppPlansProvider>();
+        private readonly IAppLimitsPlan basicPlan = A.Fake<IAppLimitsPlan>();
+        private readonly IAppLimitsPlan freePlan = A.Fake<IAppLimitsPlan>();
 
         public GuardAppTests()
         {
@@ -29,8 +31,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             A.CallTo(() => appPlans.GetPlan("notfound"))
                 .Returns(null);
 
+            A.CallTo(() => appPlans.GetPlan("basic"))
+                .Returns(basicPlan);
+
             A.CallTo(() => appPlans.GetPlan("free"))
-                .Returns(A.Dummy<IAppLimitsPlan>());
+                .Returns(freePlan);
         }
 
         [Fact]
@@ -75,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanChangePlan_should_throw_exception_if_plan_was_configured_from_another_user()
         {
-            var command = new ChangePlan { PlanId = "free", Actor = new RefToken("user", "me") };
+            var command = new ChangePlan { PlanId = "basic", Actor = new RefToken("user", "me") };
 
             var plan = new AppPlan(new RefToken("user", "other"), "premium");
 
@@ -86,9 +91,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanChangePlan_should_throw_exception_if_plan_is_the_same()
         {
-            var command = new ChangePlan { PlanId = "free", Actor = new RefToken("user", "me") };
+            var command = new ChangePlan { PlanId = "basic", Actor = new RefToken("user", "me") };
 
-            var plan = new AppPlan(new RefToken("user", "me"), "free");
+            var plan = new AppPlan(command.Actor, "basic");
 
             ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, plan, appPlans),
                 new ValidationError("App has already this plan."));
@@ -97,9 +102,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanChangePlan_should_not_throw_exception_if_same_user_but_other_plan()
         {
-            var command = new ChangePlan { PlanId = "free", Actor = new RefToken("user", "me") };
+            var command = new ChangePlan { PlanId = "basic", Actor = new RefToken("user", "me") };
 
-            var plan = new AppPlan(new RefToken("user", "me"), "premium");
+            var plan = new AppPlan(command.Actor, "premium");
 
             GuardApp.CanChangePlan(command, plan, appPlans);
         }

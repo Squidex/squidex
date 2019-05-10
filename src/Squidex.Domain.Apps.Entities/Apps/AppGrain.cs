@@ -198,6 +198,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                             if (result is PlanChangedResult)
                             {
+                                if (result is PlanResetResult)
+                                {
+                                    c.PlanId = null;
+                                }
+
                                 ChangePlan(c);
                             }
 

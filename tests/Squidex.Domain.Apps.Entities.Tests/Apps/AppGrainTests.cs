@@ -98,9 +98,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var command = new ChangePlan { PlanId = planId };
 
-            A.CallTo(() => appPlansProvider.IsConfiguredPlan(planId))
-                .Returns(true);
-
             A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planId))
                 .Returns(new PlanChangedResult());
 
@@ -119,12 +116,31 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task ChangePlan_should_not_make_update_for_redirect_result()
+        public async Task ChangePlan_should_reset_plan_for_reset_plan()
         {
             var command = new ChangePlan { PlanId = planId };
 
-            A.CallTo(() => appPlansProvider.IsConfiguredPlan(planId))
-                .Returns(true);
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planId))
+                .Returns(new PlanResetResult());
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            Assert.True(result.Value is PlanResetResult);
+
+            Assert.Null(sut.Snapshot.Plan);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppPlanChanged { PlanId = null })
+                );
+        }
+
+        [Fact]
+        public async Task ChangePlan_should_not_make_update_for_redirect_result()
+        {
+            var command = new ChangePlan { PlanId = planId };
 
             A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planId))
                 .Returns(new RedirectToCheckoutResult(new Uri("http://squidex.io")));
@@ -142,9 +158,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task ChangePlan_should_not_call_billing_manager_for_callback()
         {
             var command = new ChangePlan { PlanId = planId, FromCallback = true };
-
-            A.CallTo(() => appPlansProvider.IsConfiguredPlan(planId))
-                .Returns(true);
 
             await ExecuteCreateAsync();
 
