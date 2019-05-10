@@ -81,6 +81,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
+        public void Should_provide_default_page_size()
+        {
+            var result = sut.DefaultPageSize;
+
+            Assert.Equal(20, result);
+        }
+
+        [Fact]
         public async Task Should_return_schema_from_id_if_string_is_guid()
         {
             SetupSchema();

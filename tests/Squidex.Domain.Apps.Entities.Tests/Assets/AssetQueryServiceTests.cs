@@ -53,6 +53,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
+        public void Should_provide_default_page_size()
+        {
+            var result = sut.DefaultPageSize;
+
+            Assert.Equal(20, result);
+        }
+
+        [Fact]
         public async Task Should_find_asset_by_id_and_resolve_tags()
         {
             var id = Guid.NewGuid();

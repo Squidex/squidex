@@ -17,12 +17,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class AppQueriesGraphType : ObjectGraphType
     {
-        public AppQueriesGraphType(IGraphModel model, IEnumerable<ISchemaEntity> schemas)
+        public AppQueriesGraphType(IGraphModel model, int pageSizeContents, int pageSizeAssets, IEnumerable<ISchemaEntity> schemas)
         {
             var assetType = model.GetAssetType();
 
             AddAssetFind(assetType);
-            AddAssetsQueries(assetType);
+            AddAssetsQueries(assetType, pageSizeAssets);
 
             foreach (var schema in schemas)
             {
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 var contentType = model.GetContentType(schema.Id);
 
                 AddContentFind(schemaId, schemaType, schemaName, contentType);
-                AddContentQueries(schemaId, schemaType, schemaName, contentType);
+                AddContentQueries(schemaId, schemaType, schemaName, contentType, pageSizeContents);
             }
 
             Description = "The app queries.";
@@ -73,12 +73,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddAssetsQueries(IGraphType assetType)
+        private void AddAssetsQueries(IGraphType assetType, int pageSize)
         {
             AddField(new FieldType
             {
                 Name = "queryAssets",
-                Arguments = CreateAssetQueryArguments(),
+                Arguments = CreateAssetQueryArguments(pageSize),
                 ResolvedType = new ListGraphType(new NonNullGraphType(assetType)),
                 Resolver = ResolveAsync((c, e) =>
                 {
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "queryAssetsWithTotal",
-                Arguments = CreateAssetQueryArguments(),
+                Arguments = CreateAssetQueryArguments(pageSize),
                 ResolvedType = new AssetsResultGraphType(assetType),
                 Resolver = ResolveAsync((c, e) =>
                 {
@@ -104,12 +104,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             });
         }
 
-        private void AddContentQueries(Guid schemaId, string schemaType, string schemaName, IGraphType contentType)
+        private void AddContentQueries(Guid schemaId, string schemaType, string schemaName, IGraphType contentType, int pageSize)
         {
             AddField(new FieldType
             {
                 Name = $"query{schemaType}Contents",
-                Arguments = CreateContentQueryArguments(),
+                Arguments = CreateContentQueryArguments(pageSize),
                 ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
                 Resolver = ResolveAsync((c, e) =>
                 {
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = $"query{schemaType}ContentsWithTotal",
-                Arguments = CreateContentQueryArguments(),
+                Arguments = CreateContentQueryArguments(pageSize),
                 ResolvedType = new ContentsResultGraphType(schemaType, schemaName, contentType),
                 Resolver = ResolveAsync((c, e) =>
                 {
@@ -163,15 +163,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             };
         }
 
-        private static QueryArguments CreateAssetQueryArguments()
+        private static QueryArguments CreateAssetQueryArguments(int pageSize)
         {
             return new QueryArguments
             {
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "take",
-                    Description = "Optional number of assets to take (Default: 20).",
-                    DefaultValue = 20,
+                    Description = $"Optional number of assets to take (Default: {pageSize}).",
+                    DefaultValue = pageSize,
                     ResolvedType = AllTypes.Int
                 },
                 new QueryArgument(AllTypes.None)
@@ -191,15 +191,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             };
         }
 
-        private static QueryArguments CreateContentQueryArguments()
+        private static QueryArguments CreateContentQueryArguments(int pageSize)
         {
             return new QueryArguments
             {
                 new QueryArgument(AllTypes.None)
                 {
                     Name = "top",
-                    Description = "Optional number of contents to take (Default: 20).",
-                    DefaultValue = 20,
+                    Description = $"Optional number of contents to take (Default: {pageSize}).",
+                    DefaultValue = pageSize,
                     ResolvedType = AllTypes.Int
                 },
                 new QueryArgument(AllTypes.None)

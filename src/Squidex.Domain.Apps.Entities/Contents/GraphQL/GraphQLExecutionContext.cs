@@ -18,10 +18,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         public IGraphQLUrlGenerator UrlGenerator { get; }
 
         public GraphQLExecutionContext(QueryContext context,
-            IAssetQueryService assetQueryService,
+            IAssetQueryService assetQuery,
             IContentQueryService contentQuery,
             IGraphQLUrlGenerator urlGenerator)
-            : base(context, assetQueryService, contentQuery)
+            : base(context, assetQuery, contentQuery)
         {
             UrlGenerator = urlGenerator;
         }

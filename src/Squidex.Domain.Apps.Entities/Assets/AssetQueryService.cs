@@ -27,6 +27,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetRepository assetRepository;
         private readonly AssetOptions options;
 
+        public int DefaultPageSize
+        {
+            get { return options.DefaultPageSize; }
+        }
+
         public AssetQueryService(ITagService tagService, IAssetRepository assetRepository, IOptions<AssetOptions> options)
         {
             Guard.NotNull(tagService, nameof(tagService));

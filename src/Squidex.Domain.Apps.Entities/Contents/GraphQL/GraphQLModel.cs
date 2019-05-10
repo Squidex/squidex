@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -39,7 +40,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public bool CanGenerateAssetSourceUrl { get; }
 
-        public GraphQLModel(IAppEntity app, IEnumerable<ISchemaEntity> schemas, IGraphQLUrlGenerator urlGenerator)
+        public GraphQLModel(IAppEntity app,
+            IEnumerable<ISchemaEntity> schemas,
+            int pageSizeContents,
+            int pageSizeAssets,
+            IGraphQLUrlGenerator urlGenerator)
         {
             this.app = app;
 
@@ -52,17 +57,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             schemasById = schemas.Where(x => x.SchemaDef.IsPublished).ToDictionary(x => x.Id);
 
-            graphQLSchema = BuildSchema(this);
+            graphQLSchema = BuildSchema(this, pageSizeContents, pageSizeAssets);
             graphQLSchema.RegisterValueConverter(JsonConverter.Instance);
 
             InitializeContentTypes();
         }
 
-        private static GraphQLSchema BuildSchema(GraphQLModel model)
+        private static GraphQLSchema BuildSchema(GraphQLModel model, int pageSizeContents, int pageSizeAssets)
         {
             var schemas = model.schemasById.Values;
 
-            return new GraphQLSchema { Query = new AppQueriesGraphType(model, schemas) };
+            return new GraphQLSchema { Query = new AppQueriesGraphType(model, pageSizeContents, pageSizeAssets, schemas) };
         }
 
         private void InitializeContentTypes()

@@ -21,25 +21,25 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, IAssetGrain>
     {
         private readonly IAssetStore assetStore;
-        private readonly IAssetQueryService assetQueryService;
+        private readonly IAssetQueryService assetQuery;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IEnumerable<ITagGenerator<CreateAsset>> tagGenerators;
 
         public AssetCommandMiddleware(
             IGrainFactory grainFactory,
-            IAssetQueryService assetQueryService,
+            IAssetQueryService assetQuery,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
             IEnumerable<ITagGenerator<CreateAsset>> tagGenerators)
             : base(grainFactory)
         {
             Guard.NotNull(assetStore, nameof(assetStore));
-            Guard.NotNull(assetQueryService, nameof(assetQueryService));
+            Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
             Guard.NotNull(tagGenerators, nameof(tagGenerators));
 
             this.assetStore = assetStore;
-            this.assetQueryService = assetQueryService;
+            this.assetQuery = assetQuery;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
 
             this.tagGenerators = tagGenerators;
@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         try
                         {
-                            var existings = await assetQueryService.QueryByHashAsync(createAsset.AppId.Id, createAsset.FileHash);
+                            var existings = await assetQuery.QueryByHashAsync(createAsset.AppId.Id, createAsset.FileHash);
 
                             AssetCreatedResult result = null;
 

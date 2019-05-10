@@ -9,6 +9,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentOptions
     {
+        public int DefaultPageSize { get; set; } = 20;
+
         public int MaxResults { get; set; } = 200;
     }
 }

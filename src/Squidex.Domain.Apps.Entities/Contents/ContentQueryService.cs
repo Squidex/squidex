@@ -45,6 +45,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly ContentOptions options;
         private readonly EdmModelBuilder modelBuilder;
 
+        public int DefaultPageSize
+        {
+            get { return options.DefaultPageSize; }
+        }
+
         public ContentQueryService(
             IAppProvider appProvider,
             IAssetUrlGenerator assetUrlGenerator,

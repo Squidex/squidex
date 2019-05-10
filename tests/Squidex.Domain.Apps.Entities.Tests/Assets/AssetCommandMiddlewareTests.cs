@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetCommandMiddlewareTests : HandlerTestBase<AssetState>
     {
-        private readonly IAssetQueryService assetQueryService = A.Fake<IAssetQueryService>();
+        private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly IAssetStore assetStore = A.Fake<MemoryAssetStore>();
         private readonly ITagService tagService = A.Fake<ITagService>();
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             asset = new AssetGrain(Store, tagService, A.Dummy<ISemanticLog>());
             asset.ActivateAsync(Id).Wait();
 
-            A.CallTo(() => assetQueryService.QueryByHashAsync(AppId, A<string>.Ignored))
+            A.CallTo(() => assetQuery.QueryByHashAsync(AppId, A<string>.Ignored))
                 .Returns(new List<IAssetEntity>());
 
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
                 .Returns(asset);
 
-            sut = new AssetCommandMiddleware(grainFactory, assetQueryService, assetStore, assetThumbnailGenerator, new[] { tagGenerator });
+            sut = new AssetCommandMiddleware(grainFactory, assetQuery, assetStore, assetThumbnailGenerator, new[] { tagGenerator });
         }
 
         [Fact]
@@ -205,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => temp.FileName).Returns(fileName);
             A.CallTo(() => temp.FileSize).Returns(fileSize);
 
-            A.CallTo(() => assetQueryService.QueryByHashAsync(A<Guid>.Ignored, A<string>.Ignored))
+            A.CallTo(() => assetQuery.QueryByHashAsync(A<Guid>.Ignored, A<string>.Ignored))
                 .Returns(new List<IAssetEntity> { existing });
         }
 

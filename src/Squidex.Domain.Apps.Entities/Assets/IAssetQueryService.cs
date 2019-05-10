@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public interface IAssetQueryService
     {
+        int DefaultPageSize { get; }
+
         Task<IList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash);
 
         Task<IResultList<IAssetEntity>> QueryAsync(QueryContext contex, Q query);
