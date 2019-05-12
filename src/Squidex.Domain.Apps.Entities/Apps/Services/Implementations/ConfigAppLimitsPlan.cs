@@ -19,8 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
 
         public string YearlyId { get; set; }
 
-        public bool ShouldReset { get; set; }
-
         public long MaxApiCalls { get; set; }
 
         public long MaxAssetSize { get; set; }

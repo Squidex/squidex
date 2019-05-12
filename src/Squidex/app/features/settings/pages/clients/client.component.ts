@@ -45,6 +45,7 @@ export class ClientComponent implements OnChanges {
     public connectHttpText: string;
     public connectCLINixText: string;
     public connectCLIWinText: string;
+    public connectCLINetText: string;
     public connectLibraryText: string;
 
     constructor(
@@ -63,8 +64,9 @@ export class ClientComponent implements OnChanges {
         const app = this.appsState.appName;
 
         this.connectHttpText = connectHttpText(this.apiUrl, app, this.client);
-        this.connectCLINixText = connectCLINixText(app, this.client);
-        this.connectCLIWinText = connectCLIWinText(app, this.client);
+        this.connectCLINetText = connectCLINetText(app, this.client, this.apiUrl);
+        this.connectCLINixText = connectCLINixText(app, this.client, this.apiUrl);
+        this.connectCLIWinText = connectCLIWinText(app, this.client, this.apiUrl);
         this.connectLibraryText = connectLibrary(this.apiUrl, app, this.client);
     }
 
@@ -129,12 +131,16 @@ function connectHttpText(apiUrl: ApiUrlConfig, app: string, client: { id: string
         scope=squidex-api`;
 }
 
-function connectCLIWinText(app: string, client: { id: string, secret: string }) {
-    return `.\\sq.exe config add ${app} ${app}:${client.id} ${client.secret};.\\sq.exe config use ${app}`;
+function connectCLIWinText(app: string, client: { id: string, secret: string }, url: ApiUrlConfig) {
+    return `.\\sq.exe config add ${app} ${app}:${client.id} ${client.secret} -u ${url.value};.\\sq.exe config use ${app}`;
 }
 
-function connectCLINixText(app: string, client: { id: string, secret: string }) {
-    return `sq config add ${app} ${app}:${client.id} ${client.secret} && sq config use ${app}`;
+function connectCLINixText(app: string, client: { id: string, secret: string }, url: ApiUrlConfig) {
+    return `sq config add ${app} ${app}:${client.id} ${client.secret} -u ${url.value} && sq config use ${app}`;
+}
+
+function connectCLINetText(app: string, client: { id: string, secret: string }, url: ApiUrlConfig) {
+    return `dotnet sq.dll config add ${app} ${app}:${client.id} ${client.secret} -u ${url.value}`;
 }
 
 function connectLibrary(apiUrl: ApiUrlConfig, app: string, client: { id: string, secret: string }) {
