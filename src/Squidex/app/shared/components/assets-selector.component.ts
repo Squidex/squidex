@@ -50,6 +50,12 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     }
 
     public ngOnInit() {
+        this.own(
+            this.assetsState.assetsQuery
+                .subscribe(query => {
+                    this.filter.setQuery(query);
+                }));
+
         this.assetsState.load();
     }
 

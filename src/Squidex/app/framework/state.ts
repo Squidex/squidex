@@ -171,7 +171,7 @@ export class State<T extends {}> {
     }
 
     public resetState() {
-        this.next(this.initialState);
+        this.state.next(this.initialState);
     }
 
     public next(update: ((v: T) => Readonly<T>) | object) {

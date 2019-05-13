@@ -44,13 +44,13 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.assetsState.load();
-
         this.own(
             this.assetsState.assetsQuery
                 .subscribe(query => {
                     this.filter.setQuery(query);
                 }));
+
+        this.assetsState.load();
     }
 
     public reload() {
