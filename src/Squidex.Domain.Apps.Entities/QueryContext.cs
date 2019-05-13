@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 
@@ -22,11 +23,11 @@ namespace Squidex.Domain.Apps.Entities
 
         public IAppEntity App { get; private set; }
 
-        public bool Archived { get; private set; }
+        public bool Flatten { get; set; }
 
-        public bool Flatten { get; private set; }
+        public StatusForApi ApiStatus { get; private set; }
 
-        public bool Unpublished { get; set; }
+        public StatusForFrontend FrontendStatus { get; private set; }
 
         public IReadOnlyCollection<string> AssetUrlsToResolve { get; private set; }
 
@@ -41,19 +42,34 @@ namespace Squidex.Domain.Apps.Entities
             return new QueryContext { App = app, User = user };
         }
 
-        public QueryContext WithUnpublished(bool unpublished)
-        {
-            return Clone(c => c.Unpublished = unpublished);
-        }
-
-        public QueryContext WithArchived(bool archived)
-        {
-            return Clone(c => c.Archived = archived);
-        }
-
         public QueryContext WithFlatten(bool flatten)
         {
             return Clone(c => c.Flatten = flatten);
+        }
+
+        public QueryContext WithUnpublished(bool unpublished)
+        {
+            return WithApiStatus(unpublished ? StatusForApi.PublishedDraft : StatusForApi.PublishedOnly);
+        }
+
+        public QueryContext WithApiStatus(StatusForApi status)
+        {
+            return Clone(c => c.ApiStatus = status);
+        }
+
+        public QueryContext WithFrontendStatus(StatusForFrontend status)
+        {
+            return Clone(c => c.FrontendStatus = status);
+        }
+
+        public QueryContext WithFrontendStatus(string status)
+        {
+            if (status != null && Enum.TryParse<StatusForFrontend>(status, out var result))
+            {
+                return WithFrontendStatus(result);
+            }
+
+            return this;
         }
 
         public QueryContext WithAssetUrlsToResolve(IEnumerable<string> fieldNames)

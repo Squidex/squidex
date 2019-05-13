@@ -57,6 +57,8 @@ export class ContentDto extends Model<ContentDto> {
     }
 }
 
+export type ContentQueryStatus = 'Archived' | 'PublishedOnly' | 'PublishedDraft';
+
 @Injectable()
 export class ContentsService {
     constructor(
@@ -66,7 +68,7 @@ export class ContentsService {
     ) {
     }
 
-    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: string, ids?: string[], archived = false): Observable<ContentsDto> {
+    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: string, ids?: string[], status: ContentQueryStatus = 'PublishedDraft'): Observable<ContentsDto> {
         const queryParts: string[] = [];
 
         if (query && query.length > 0) {
@@ -91,8 +93,8 @@ export class ContentsService {
             queryParts.push(`ids=${ids.join(',')}`);
         }
 
-        if (archived) {
-            queryParts.push('archived=true');
+        if (status) {
+            queryParts.push(`status=${status}`);
         }
 
         const fullQuery = queryParts.join('&');

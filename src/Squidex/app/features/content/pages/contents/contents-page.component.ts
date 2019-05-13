@@ -11,7 +11,9 @@ import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 import {
     AppLanguageDto,
     AppsState,
+    CONTENT_STATUSES,
     ContentDto,
+    ContentQueryStatus,
     ContentsState,
     FilterState,
     ImmutableArray,
@@ -45,6 +47,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public canUnpublish = false;
     public canPublish = false;
 
+    public statuses = CONTENT_STATUSES;
+
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
 
@@ -77,7 +81,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.schema = schema!;
                     this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
 
-                    this.contentsState.init();
+                    this.contentsState.load();
                 }));
 
         this.own(
@@ -164,8 +168,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             .subscribe();
     }
 
-    public goArchive(isArchive: boolean) {
-        this.contentsState.goArchive(isArchive);
+    public filterStatus(status: ContentQueryStatus) {
+        this.contentsState.filterStatus(status);
     }
 
     public goPrev() {

@@ -40,16 +40,16 @@ export class SearchFormComponent implements OnInit {
     public filter: FilterState;
 
     @Input()
-    public archived = false;
+    public statuses: { [status: string]: string };
+
+    @Input()
+    public status: string;
 
     @Output()
-    public archivedChange = new EventEmitter<boolean>();
+    public statusChange = new EventEmitter<string>();
 
     @Input()
     public schemaName = '';
-
-    @Input()
-    public enableArchive = false;
 
     @Input()
     public enableShortcut = false;

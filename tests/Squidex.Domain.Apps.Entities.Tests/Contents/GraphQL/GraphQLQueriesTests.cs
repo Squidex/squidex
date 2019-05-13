@@ -930,12 +930,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         private QueryContext MatchsAssetContext()
         {
-            return A<QueryContext>.That.Matches(x => x.App == app && x.User == user && !x.Archived);
+            return A<QueryContext>.That.Matches(x => x.App == app && x.User == user);
         }
 
         private QueryContext MatchsContentContext()
         {
-            return A<QueryContext>.That.Matches(x => x.App == app && x.User == user && !x.Archived);
+            return A<QueryContext>.That.Matches(x => x.App == app && x.User == user);
         }
     }
 }

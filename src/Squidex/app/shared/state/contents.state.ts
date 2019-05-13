@@ -26,7 +26,7 @@ import { SchemaDto } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 import { SchemasState } from './schemas.state';
 
-import { ContentDto, ContentsService, ScheduleDto } from './../services/contents.service';
+import { ContentDto, ContentQueryStatus, ContentsService, ScheduleDto } from './../services/contents.service';
 
 interface Snapshot {
     // The current comments.
@@ -41,12 +41,18 @@ interface Snapshot {
     // Indicates if the contents are loaded.
     isLoaded?: boolean;
 
-    // Indicates if the archive is shown.
-    isArchive?: boolean;
+    // Indicates which status is shown.
+    status: ContentQueryStatus;
 
     // The selected content.
     selectedContent?: ContentDto | null;
 }
+
+export const CONTENT_STATUSES = {
+    'PublishedDraft': 'Published and Drafts (Default)',
+    'PublishedOnly': 'Published only',
+    'Archived': 'Archived'
+};
 
 function sameContent(lhs: ContentDto, rhs?: ContentDto): boolean {
     return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version === rhs.version);
@@ -74,7 +80,11 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             distinctUntilChanged());
 
     public isArchive =
-        this.changes.pipe(map(x => !!x.isArchive),
+        this.changes.pipe(map(x => x.status === 'Archived'),
+            distinctUntilChanged());
+
+    public status =
+        this.changes.pipe(map(x => x.status),
             distinctUntilChanged());
 
     constructor(
@@ -83,7 +93,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService
     ) {
-        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0) });
+        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0), status: 'PublishedDraft' });
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -127,7 +137,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.snapshot.contentsPager.pageSize,
                 this.snapshot.contentsPager.skip,
                 this.snapshot.contentsQuery, undefined,
-                this.snapshot.isArchive).pipe(
+                this.snapshot.status).pipe(
             tap(({ total, items }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contents reloaded.');
@@ -288,14 +298,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         }
     }
 
-    public goArchive(isArchive: boolean): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: undefined, isArchive }));
-
-        return this.loadInternal();
-    }
-
-    public init(): Observable<any> {
-        this.next(s => ({ contents: ImmutableArray.of(), contentsPager: new Pager(0) }));
+    public filterStatus(status: ContentQueryStatus): Observable<any> {
+        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: undefined, status }));
 
         return this.loadInternal();
     }

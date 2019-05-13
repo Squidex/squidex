@@ -19,13 +19,6 @@
     max-width: 25rem;
 }
 
-.form-check {
-    margin-top: 1rem;
-    font-size: 1rem;
-    font-weight: normal;
-    text-align: right;
-}
-
 .save-search {
     @include absolute(8px, 24px, auto, auto);
     color: $color-border-dark !important;

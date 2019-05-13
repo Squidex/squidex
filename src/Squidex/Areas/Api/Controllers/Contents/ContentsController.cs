@@ -111,7 +111,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="ids">The optional ids of the content to fetch.</param>
-        /// <param name="archived">Indicates whether to query content items from the archive.</param>
+        /// <param name="status">The requested status, only for frontend client.</param>
         /// <returns>
         /// 200 => Contents retrieved.
         /// 404 => App not found.
@@ -123,9 +123,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/")]
         [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids, [FromQuery] bool archived = false)
+        public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids, [FromQuery] string status = null)
         {
-            var context = Context().WithArchived(archived);
+            var context = Context().WithFrontendStatus(status);
 
             var result = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).Ids);
 
@@ -151,7 +151,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="ids">The optional ids of the content to fetch.</param>
-        /// <param name="archived">Indicates whether to query content items from the archive.</param>
+        /// <param name="status">The requested status, only for frontend client.</param>
         /// <returns>
         /// 200 => Contents retrieved.
         /// 404 => Schema or app not found.
@@ -163,9 +163,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/{name}/")]
         [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null, [FromQuery] bool archived = false)
+        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null, [FromQuery] string status = null)
         {
-            var context = Context().WithArchived(archived);
+            var context = Context().WithFrontendStatus(status);
 
             var result = await contentQuery.QueryAsync(context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 

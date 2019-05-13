@@ -42,14 +42,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             return query;
         }
 
-        public static FilterNode AdjustToModel(this FilterNode filterNode, Schema schema, bool useDraft)
+        public static FilterNode AdjustToModel(this FilterNode filterNode, Schema schema, bool inDraft)
         {
-            var pathConverter = PathConverter(schema, useDraft);
+            var pathConverter = PathConverter(schema, inDraft);
 
             return filterNode.Accept(new AdaptionVisitor(pathConverter));
         }
 
-        private static Func<IReadOnlyList<string>, IReadOnlyList<string>> PathConverter(Schema schema, bool useDraft)
+        private static Func<IReadOnlyList<string>, IReadOnlyList<string>> PathConverter(Schema schema, bool inDraft)
         {
             return propertyNames =>
             {
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                 {
                     if (result[0].Equals("Data", StringComparison.CurrentCultureIgnoreCase))
                     {
-                        if (useDraft)
+                        if (inDraft)
                         {
                             result[0] = "dd";
                         }
@@ -122,9 +122,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             return cursor.Skip(query);
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> WithoutDraft(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, bool useDraft)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> WithoutDraft(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, bool includeDraft)
         {
-            return !useDraft ? cursor.Not(x => x.DataDraftByIds, x => x.IsDeleted) : cursor;
+            return !includeDraft ? cursor.Not(x => x.DataDraftByIds, x => x.IsDeleted) : cursor;
         }
 
         public static FilterDefinition<MongoContentEntity> Build(Guid schemaId, Guid id, Status[] status)

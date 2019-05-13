@@ -35,8 +35,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private static readonly Status[] StatusAll = { Status.Archived, Status.Draft, Status.Published };
         private static readonly Status[] StatusArchived = { Status.Archived };
-        private static readonly Status[] StatusPublished = { Status.Published };
-        private static readonly Status[] StatusDraftOrPublished = { Status.Draft, Status.Published };
+        private static readonly Status[] StatusPublishedOnly = { Status.Published };
+        private static readonly Status[] StatusPublishedDraft = { Status.Published, Status.Draft };
         private readonly IContentRepository contentRepository;
         private readonly IContentVersionLoader contentVersionLoader;
         private readonly IAppProvider appProvider;
@@ -125,14 +125,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 if (query.Ids?.Count > 0)
                 {
-                    contents = await contentRepository.QueryAsync(context.App, schema, status, new HashSet<Guid>(query.Ids));
+                    contents = await QueryAsync(context, schema, query.Ids.ToHashSet(), status);
                     contents = SortSet(contents, query.Ids);
                 }
                 else
                 {
                     var parsedQuery = ParseQuery(context, query.ODataQuery, schema);
 
-                    contents = await contentRepository.QueryAsync(context.App, schema, status, parsedQuery);
+                    contents = await QueryAsync(context, schema, parsedQuery, status);
                 }
 
                 return Transform(context, schema, contents);
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 if (ids?.Count > 0)
                 {
-                    var contents = await contentRepository.QueryAsync(context.App, status, new HashSet<Guid>(ids));
+                    var contents = await QueryAsync(context, ids, status);
 
                     var permissions = context.User.Permissions();
 
@@ -217,7 +217,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         result.Data = result.Data.ConvertName2Name(schema.SchemaDef, converters);
                     }
 
-                    if (result.DataDraft != null && (context.Unpublished || context.IsFrontendClient))
+                    if (result.DataDraft != null && (context.ApiStatus == StatusForApi.PublishedDraft || context.IsFrontendClient))
                     {
                         result.DataDraft = result.DataDraft.ConvertName2Name(schema.SchemaDef, converters);
                     }
@@ -346,13 +346,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 return StatusAll;
             }
-            else if (context.Unpublished)
+            else if (context.ApiStatus == StatusForApi.PublishedDraft)
             {
-                return StatusDraftOrPublished;
+                return StatusPublishedDraft;
             }
             else
             {
-                return StatusPublished;
+                return StatusPublishedOnly;
             }
         }
 
@@ -360,26 +360,46 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             if (context.IsFrontendClient)
             {
-                if (context.Archived)
+                switch (context.FrontendStatus)
                 {
-                    return StatusArchived;
-                }
-                else
-                {
-                    return StatusDraftOrPublished;
+                    case StatusForFrontend.Archived:
+                        return StatusArchived;
+                    case StatusForFrontend.PublishedOnly:
+                        return StatusPublishedOnly;
+                    default:
+                        return StatusPublishedDraft;
                 }
             }
             else
             {
-                if (context.Unpublished)
+                switch (context.ApiStatus)
                 {
-                    return StatusDraftOrPublished;
-                }
-                else
-                {
-                    return StatusPublished;
+                    case StatusForApi.PublishedDraft:
+                        return StatusPublishedDraft;
+                    default:
+                        return StatusPublishedOnly;
                 }
             }
+        }
+
+        private Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(QueryContext context, IReadOnlyList<Guid> ids, Status[] status)
+        {
+            return contentRepository.QueryAsync(context.App, status, new HashSet<Guid>(ids), ShouldIncludeDraft(context));
+        }
+
+        private Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, ISchemaEntity schema, Query query, Status[] status)
+        {
+            return contentRepository.QueryAsync(context.App, schema, status, context.IsFrontendClient, query, ShouldIncludeDraft(context));
+        }
+
+        private Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, ISchemaEntity schema, HashSet<Guid> ids, Status[] status)
+        {
+            return contentRepository.QueryAsync(context.App, schema, status, ids, ShouldIncludeDraft(context));
+        }
+
+        private Task<IContentEntity> FindContentAsync(QueryContext context, Guid id, Status[] status, ISchemaEntity schema)
+        {
+            return contentRepository.FindContentAsync(context.App, schema, status, id, ShouldIncludeDraft(context));
         }
 
         private Task<IContentEntity> FindContentByVersionAsync(Guid id, long version)
@@ -387,9 +407,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return contentVersionLoader.LoadAsync(id, version);
         }
 
-        private Task<IContentEntity> FindContentAsync(QueryContext context, Guid id, Status[] status, ISchemaEntity schema)
+        private static bool ShouldIncludeDraft(QueryContext context)
         {
-            return contentRepository.FindContentAsync(context.App, schema, status, id);
+            return context.ApiStatus == StatusForApi.PublishedDraft || context.IsFrontendClient;
         }
     }
 }

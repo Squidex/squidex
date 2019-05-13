@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return contents.InitializeAsync(ct);
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, Query query)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, bool inDraft, Query query, bool includeDraft = true)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(schema, nameof(schema));
@@ -69,20 +69,18 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))
             {
-                var useDraft = UseDraft(status);
-
-                var fullTextIds = await indexer.SearchAsync(query.FullText, app, schema.Id, useDraft ? Scope.Draft : Scope.Published);
+                var fullTextIds = await indexer.SearchAsync(query.FullText, app, schema.Id, inDraft ? Scope.Draft : Scope.Published);
 
                 if (fullTextIds?.Count == 0)
                 {
                     return ResultList.Create<IContentEntity>(0);
                 }
 
-                return await contents.QueryAsync(app, schema, query, fullTextIds, status, true);
+                return await contents.QueryAsync(schema, query, fullTextIds, status, inDraft, includeDraft);
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids)
+        public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids, bool includeDraft = true)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(schema, nameof(schema));
@@ -91,13 +89,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIds"))
             {
-                var useDraft = UseDraft(status);
-
-                return await contents.QueryAsync(app, schema, ids, status, useDraft);
+                return await contents.QueryAsync(schema, ids, status, includeDraft);
             }
         }
 
-        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, Status[] status, HashSet<Guid> ids)
+        public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, Status[] status, HashSet<Guid> ids, bool includeDraft = true)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(status, nameof(status));
@@ -105,13 +101,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIdsWithoutSchema"))
             {
-                var useDraft = UseDraft(status);
-
-                return await contents.QueryAsync(app, ids, status, useDraft);
+                return await contents.QueryAsync(app, ids, status, includeDraft);
             }
         }
 
-        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[] status, Guid id)
+        public async Task<IContentEntity> FindContentAsync(IAppEntity app, ISchemaEntity schema, Status[] status, Guid id, bool includeDraft = true)
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(schema, nameof(schema));
@@ -119,9 +113,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                var useDraft = UseDraft(status);
-
-                return await contents.FindContentAsync(app, schema, id, status, useDraft);
+                return await contents.FindContentAsync(schema, id, status, includeDraft);
             }
         }
 
@@ -129,15 +121,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             using (Profiler.TraceMethod<MongoContentRepository>())
             {
-                return await contents.QueryIdsAsync(appId, await appProvider.GetSchemaAsync(appId, schemaId), filterNode);
-            }
-        }
-
-        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(Guid appId)
-        {
-            using (Profiler.TraceMethod<MongoContentRepository>())
-            {
-                return await contents.QueryIdsAsync(appId);
+                return await contents.QueryIdsAsync(await appProvider.GetSchemaAsync(appId, schemaId), filterNode);
             }
         }
 
@@ -157,11 +141,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public Task DeleteArchiveAsync()
         {
             return database.DropCollectionAsync("States_Contents_Archive");
-        }
-
-        private static bool UseDraft(Status[] status)
-        {
-            return status.Length != 1 || status[0] != Status.Published;
         }
     }
 }

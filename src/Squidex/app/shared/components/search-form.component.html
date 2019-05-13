@@ -69,11 +69,15 @@
             </div>
         </div>
         
-        <div class="form-check" *ngIf="enableArchive">
-            <input class="form-check-input" type="checkbox" id="archivedItems" [ngModel]="archived" (ngModelChange)="archivedChange.emit($event)" />
-            <label class="form-check-label" for="archivedItems">
-                Archived items
-            </label>
+        <div class="form-group row" *ngIf="statuses">
+            <div class="col-10 offset-2">
+                <div class="form-check" *ngFor="let key of statuses | sqxKeys">
+                    <input class="form-check-input" type="radio" name="status" id="status_{{key}}" [value]="key" [ngModel]="status" (ngModelChange)="statusChange.emit($event)" />
+                    <label class="form-check-label" for="status_{{key}}">
+                        {{statuses[key]}}
+                    </label>
+                </div>
+            </div>
         </div>
 
         <div class="link">

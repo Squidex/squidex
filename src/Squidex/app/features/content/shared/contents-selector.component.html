@@ -11,7 +11,12 @@
                 </button>
             </div>
             <div class="col pl-1">
-                <sqx-search-form formClass="form" placeholder="Search for content" fieldExample="data/[MY_FIELD]/iv" [filter]="filter" (querySubmit)="search()"
+                <sqx-search-form formClass="form" placeholder="Search for content" fieldExample="data/[MY_FIELD]/iv" 
+                    [filter]="filter"
+                    (statusChange)="filterStatus($event)"
+                    [status]="contentsState.status | async"
+                    [statuses]="statuses"
+                    (querySubmit)="search()"
                     expandable="true">
                 </sqx-search-form>
             </div>
