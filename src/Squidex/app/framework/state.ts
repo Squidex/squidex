@@ -170,8 +170,12 @@ export class State<T extends {}> {
         this.state = new BehaviorSubject(state);
     }
 
-    public resetState() {
+    public resetState(update?: ((v: T) => Readonly<T>) | object) {
         this.state.next(this.initialState);
+
+        if (update) {
+            this.next(update);
+        }
     }
 
     public next(update: ((v: T) => Readonly<T>) | object) {

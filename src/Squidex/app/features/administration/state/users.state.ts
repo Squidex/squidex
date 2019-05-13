@@ -105,7 +105,9 @@ export class UsersState extends State<Snapshot> {
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState();
+            const selectedUser = this.snapshot.selectedUser;
+
+            this.resetState({ selectedUser });
         }
 
         return this.loadInternal(isReload);

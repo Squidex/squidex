@@ -118,7 +118,9 @@ export class SchemasState extends State<Snapshot> {
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            this.resetState();
+            const selectedSchema = this.snapshot.selectedSchema;
+
+            this.resetState({ selectedSchema });
         }
 
         return this.schemasService.getSchemas(this.appName).pipe(
