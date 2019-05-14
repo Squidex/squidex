@@ -209,7 +209,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             return Task.FromResult(
                 ForEvent(@event, channel)
-                    .AddParameter("Plan", @event.PlanId));
+                    .AddParameter("Plan", @event.PlanId ?? "free"));
         }
 
         protected Task<HistoryEvent> On(AppRoleDeleted @event)
