@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -16,9 +17,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class AppHistoryEventsCreator : HistoryEventsCreatorBase
     {
-        public AppHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
+        private readonly IAppPlansProvider appPlansProvider;
+
+        public AppHistoryEventsCreator(TypeNameRegistry typeNameRegistry, IAppPlansProvider appPlansProvider)
             : base(typeNameRegistry)
         {
+            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
+
             AddEventMessage("AppContributorAssignedEvent",
                 "assigned {user:[Contributor]} as {[Role]}");
 
@@ -75,6 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             AddEventMessage<AppRoleUpdated>(
                 "updated role {[Name]}");
+            this.appPlansProvider = appPlansProvider;
         }
 
         protected Task<HistoryEvent> On(AppContributorRemoved @event)
@@ -209,7 +215,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             return Task.FromResult(
                 ForEvent(@event, channel)
-                    .AddParameter("Plan", @event.PlanId ?? "free"));
+                    .AddParameter("Plan", @event.PlanId ?? appPlansProvider.GetFreePlan()?.Id ?? "free"));
         }
 
         protected Task<HistoryEvent> On(AppRoleDeleted @event)
