@@ -11,7 +11,7 @@
     </ng-template>
 </td>
 
-<td class="cell-auto" *ngFor="let field of schema.listFields; let i = index; trackBy: trackByField.bind(this)" [sqxStopClick]="isDirty(field)">
+<td class="cell-auto" *ngFor="let field of schema.listFields; let i = index; trackBy: trackByField.bind(this)" [sqxStopClick]="isDirty || field.isInlineEditable">
     <ng-container *ngIf="field.isInlineEditable && !isReadOnly; else displayTemplate">
         <sqx-content-item-editor [form]="patchForm.form" [field]="field"></sqx-content-item-editor>
     </ng-container>
@@ -21,7 +21,7 @@
     </ng-template>
 </td>
 
-<td class="cell-time" *ngIf="!isCompact" [sqxStopClick]="isDirty()">
+<td class="cell-time" *ngIf="!isCompact" [sqxStopClick]="isDirty">
     <sqx-content-status 
         [status]="content.status"
         [scheduledTo]="content.scheduleJob?.status"
@@ -32,11 +32,11 @@
     <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
 </td>
 
-<td class="cell-user" *ngIf="!isCompact && patchForm.form.pristine" [sqxStopClick]="isDirty()">
+<td class="cell-user" *ngIf="!isCompact && !isDirty" [sqxStopClick]="isDirty">
     <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
 </td>
 
-<ng-container *ngIf="patchForm.form.dirty">
+<ng-container *ngIf="isDirty">
     <td class="cell-user" >
         <button type="button" class="btn btn-success" (click)="save()" sqxStopClick>
             <i class="icon-checkmark"></i>
@@ -49,7 +49,7 @@
     </td>
 </ng-container>
 
-<td class="cell-actions" *ngIf="!isReadOnly && patchForm.form.pristine" sqxStopClick>
+<td class="cell-actions" *ngIf="!isReadOnly && !isDirty" sqxStopClick>
     <div class="dropdown dropdown-options" *ngIf="content">
         <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
             <i class="icon-dots"></i>
@@ -82,7 +82,7 @@
         </div>
     </div>
 </td>
-<td class="cell-actions" *ngIf="isReference" [sqxStopClick]="isDirty()">
+<td class="cell-actions" *ngIf="isReference" [sqxStopClick]="isDirty">
     <div class="reference-edit">
         <button type="button" class="btn btn-text-secondary">
             <i class="icon-dots"></i>

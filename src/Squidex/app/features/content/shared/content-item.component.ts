@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import {
     AppLanguageDto,
@@ -85,7 +85,12 @@ export class ContentItemComponent implements OnChanges {
 
     public values: any[] = [];
 
+    public get isDirty() {
+        return this.patchForm.form.dirty;
+    }
+
     constructor(
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly contentsState: ContentsState
     ) {
     }
@@ -100,10 +105,6 @@ export class ContentItemComponent implements OnChanges {
         }
     }
 
-    public isDirty(field?: FieldDto) {
-        return this.patchForm.form.dirty || (field && field.isInlineEditable);
-    }
-
     public save() {
         const value = this.patchForm.submit();
 
@@ -111,8 +112,12 @@ export class ContentItemComponent implements OnChanges {
             this.contentsState.patch(this.content, value)
                 .subscribe(() => {
                     this.patchForm.submitCompleted({ noReset: true});
+
+                    this.changeDetector.detectChanges();
                 }, error => {
                     this.patchForm.submitFailed(error);
+
+                    this.changeDetector.detectChanges();
                 });
         }
     }

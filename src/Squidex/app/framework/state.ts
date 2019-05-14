@@ -13,7 +13,7 @@ import { ErrorDto } from './utils/error';
 
 import { Types } from './utils/types';
 
-import { fullValue} from './angular/forms/forms-helper';
+import { fullValue } from './angular/forms/forms-helper';
 
 export interface FormState {
     submitted: boolean;

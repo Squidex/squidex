@@ -7,7 +7,7 @@
 
  import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
  import { Observable } from 'rxjs';
- import { map, startWith } from 'rxjs/operators';
+ import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
 
 import { Types } from './../../utils/types';
 
@@ -22,15 +22,7 @@ export function formControls(form: AbstractControl): AbstractControl[] {
 }
 
 export function invalid$(form: AbstractControl): Observable<boolean> {
-    return form.statusChanges.pipe(map(() => form.invalid), startWith(form.invalid));
-}
-
-export function pristine$(form: AbstractControl): Observable<boolean> {
-    return form.statusChanges.pipe(map(() => form.pristine), startWith(form.pristine));
-}
-
-export function dirty$(form: AbstractControl): Observable<boolean> {
-    return form.statusChanges.pipe(map(() => form.dirty), startWith(form.dirty));
+    return form.statusChanges.pipe(map(() => form.invalid), startWith(form.invalid), distinctUntilChanged());
 }
 
 export function value$<T = any>(form: AbstractControl): Observable<T> {
