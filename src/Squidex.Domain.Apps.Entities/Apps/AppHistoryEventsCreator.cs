@@ -17,13 +17,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class AppHistoryEventsCreator : HistoryEventsCreatorBase
     {
-        private readonly IAppPlansProvider appPlansProvider;
-
-        public AppHistoryEventsCreator(TypeNameRegistry typeNameRegistry, IAppPlansProvider appPlansProvider)
+        public AppHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
             : base(typeNameRegistry)
         {
-            Guard.NotNull(appPlansProvider, nameof(appPlansProvider));
-
             AddEventMessage("AppContributorAssignedEvent",
                 "assigned {user:[Contributor]} as {[Role]}");
 
@@ -50,6 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             AddEventMessage<AppPlanChanged>(
                 "changed plan to {[Plan]}");
+
+            AddEventMessage<AppPlanReset>(
+                "resetted plan");
 
             AddEventMessage<AppLanguageAdded>(
                 "added language {[Language]}");
@@ -80,7 +79,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             AddEventMessage<AppRoleUpdated>(
                 "updated role {[Name]}");
-            this.appPlansProvider = appPlansProvider;
         }
 
         protected Task<HistoryEvent> On(AppContributorRemoved @event)
@@ -209,15 +207,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     .AddParameter("Name", @event.Name));
         }
 
-        protected Task<HistoryEvent> On(AppPlanChanged @event)
-        {
-            const string channel = "settings.plan";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Plan", @event.PlanId ?? appPlansProvider.GetFreePlan()?.Id ?? "free"));
-        }
-
         protected Task<HistoryEvent> On(AppRoleDeleted @event)
         {
             const string channel = "settings.roles";
@@ -225,6 +214,23 @@ namespace Squidex.Domain.Apps.Entities.Apps
             return Task.FromResult(
                 ForEvent(@event, channel)
                     .AddParameter("Name", @event.Name));
+        }
+
+        protected Task<HistoryEvent> On(AppPlanChanged @event)
+        {
+            const string channel = "settings.plan";
+
+            return Task.FromResult(
+                ForEvent(@event, channel)
+                    .AddParameter("Plan", @event.PlanId));
+        }
+
+        protected Task<HistoryEvent> On(AppPlanReset @event)
+        {
+            const string channel = "settings.plan";
+
+            return Task.FromResult(
+                ForEvent(@event, channel));
         }
 
         protected override Task<HistoryEvent> CreateEventCoreAsync(Envelope<IEvent> @event)

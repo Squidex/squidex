@@ -57,6 +57,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
             Plan = AppPlan.Build(@event.Actor, @event.PlanId);
         }
 
+        protected void On(AppPlanReset @event)
+        {
+            Plan = null;
+        }
+
         protected void On(AppContributorAssigned @event)
         {
             Contributors = Contributors.Assign(@event.ContributorId, @event.Role);

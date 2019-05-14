@@ -200,10 +200,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
                             {
                                 if (result is PlanResetResult)
                                 {
-                                    c.PlanId = null;
+                                    ResetPlan(c);
                                 }
-
-                                ChangePlan(c);
+                                else
+                                {
+                                    ChangePlan(c);
+                                }
                             }
 
                             return result;
@@ -304,6 +306,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public void ChangePlan(ChangePlan command)
         {
             RaiseEvent(SimpleMapper.Map(command, new AppPlanChanged()));
+        }
+
+        public void ResetPlan(ChangePlan command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppPlanReset()));
         }
 
         public void AddPattern(AddPattern command)

@@ -9,9 +9,8 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [EventType(nameof(AppPlanChanged))]
-    public sealed class AppPlanChanged : AppEvent
+    [EventType(nameof(AppPlanReset))]
+    public sealed class AppPlanReset : AppEvent
     {
-        public string PlanId { get; set; }
     }
 }
