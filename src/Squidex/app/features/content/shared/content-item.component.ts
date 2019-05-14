@@ -100,16 +100,8 @@ export class ContentItemComponent implements OnChanges {
         }
     }
 
-    public shouldStop(event: Event, field?: FieldDto) {
-        if (this.patchForm.form.dirty || (field && field.isInlineEditable)) {
-            event.stopPropagation();
-            event.stopImmediatePropagation();
-        }
-    }
-
-    public stop(event: Event) {
-        event.stopPropagation();
-        event.stopImmediatePropagation();
+    public isDirty(field?: FieldDto) {
+        return this.patchForm.form.dirty || (field && field.isInlineEditable);
     }
 
     public save() {
@@ -118,7 +110,7 @@ export class ContentItemComponent implements OnChanges {
         if (value) {
             this.contentsState.patch(this.content, value)
                 .subscribe(() => {
-                    this.patchForm.submitCompleted();
+                    this.patchForm.submitCompleted({ noReset: true});
                 }, error => {
                     this.patchForm.submitFailed(error);
                 });

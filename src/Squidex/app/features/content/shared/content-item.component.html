@@ -1,4 +1,4 @@
-<td class="cell-select" (click)="stop($event)">
+<td class="cell-select" sqxStopClick>
     <ng-container *ngIf="!isReference; else referenceTemplate">
         <input type="checkbox" class="form-check"
             [disabled]="!selectable"
@@ -11,7 +11,7 @@
     </ng-template>
 </td>
 
-<td class="cell-auto" *ngFor="let field of schema.listFields; let i = index; trackBy: trackByField.bind(this)" (click)="shouldStop($event, field)">
+<td class="cell-auto" *ngFor="let field of schema.listFields; let i = index; trackBy: trackByField.bind(this)" [sqxStopClick]="isDirty(field)">
     <ng-container *ngIf="field.isInlineEditable && !isReadOnly; else displayTemplate">
         <sqx-content-item-editor [form]="patchForm.form" [field]="field"></sqx-content-item-editor>
     </ng-container>
@@ -21,7 +21,7 @@
     </ng-template>
 </td>
 
-<td class="cell-time" *ngIf="!isCompact" (click)="shouldStop($event)">
+<td class="cell-time" *ngIf="!isCompact" [sqxStopClick]="isDirty()">
     <sqx-content-status 
         [status]="content.status"
         [scheduledTo]="content.scheduleJob?.status"
@@ -32,24 +32,24 @@
     <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
 </td>
 
-<td class="cell-user" *ngIf="!isCompact && patchForm.form.pristine" (click)="shouldStop($event)">
+<td class="cell-user" *ngIf="!isCompact && patchForm.form.pristine" [sqxStopClick]="isDirty()">
     <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
 </td>
 
 <ng-container *ngIf="patchForm.form.dirty">
-    <td class="cell-user" (click)="stop($event)">
-        <button type="button" class="btn btn-success" (click)="save()">
+    <td class="cell-user" >
+        <button type="button" class="btn btn-success" (click)="save()" sqxStopClick>
             <i class="icon-checkmark"></i>
         </button>
     </td>
-    <td class="cell-actions" (click)="stop($event)">
-        <button type="button" class="btn btn-text-secondary btn-cancel" (click)="cancel()">
+    <td class="cell-actions" >
+        <button type="button" class="btn btn-text-secondary btn-cancel" (click)="cancel()" sqxStopClick>
             <i class="icon-close"></i>
         </button>
     </td>
 </ng-container>
 
-<td class="cell-actions" *ngIf="!isReadOnly && patchForm.form.pristine" (click)="stop($event)">
+<td class="cell-actions" *ngIf="!isReadOnly && patchForm.form.pristine" sqxStopClick>
     <div class="dropdown dropdown-options" *ngIf="content">
         <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
             <i class="icon-dots"></i>
@@ -82,7 +82,7 @@
         </div>
     </div>
 </td>
-<td class="cell-actions" *ngIf="isReference" (click)="shouldStop($event)">
+<td class="cell-actions" *ngIf="isReference" [sqxStopClick]="isDirty()">
     <div class="reference-edit">
         <button type="button" class="btn btn-text-secondary">
             <i class="icon-dots"></i>

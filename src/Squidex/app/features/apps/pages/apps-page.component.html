@@ -19,13 +19,13 @@
                 <h4 class="card-title">{{app.name}}</h4>
 
                 <div class="card-text">
-                    <a (click)="stop($event)" [routerLink]="['/app', app.name]">Edit</a>
+                    <a [routerLink]="['/app', app.name]" sqxStopClick>Edit</a>
 
                     <span class="deeplinks">
                         &nbsp;|
-                        <a (click)="stop($event)" [routerLink]="['/app', app.name, 'content']">Content</a> &middot;
-                        <a (click)="stop($event)" [routerLink]="['/app', app.name, 'assets']">Assets</a> &middot;
-                        <a (click)="stop($event)" [routerLink]="['/app', app.name, 'settings']">Settings</a>
+                        <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>Content</a> &middot;
+                        <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>Assets</a> &middot;
+                        <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>Settings</a>
                     </span>
                 </div>
             </div>
@@ -59,7 +59,7 @@
             <div class="card-text">
                 <div>Start with our ready to use blog.</div>
                 <div>
-                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Blog" (click)="$event.stopPropagation()" sqxExternalLink>C#</a>
+                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Blog" sqxStopClick sqxExternalLink>C#</a>
                 </div>
             </div>
         </div>
@@ -76,7 +76,7 @@
             <div class="card-text">
                 <div>Create your profile page.</div>
                 <div>
-                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Profile" (click)="$event.stopPropagation()" sqxExternalLink>C#</a>
+                    Sample Code: <a href="https://github.com/Squidex/squidex-samples/tree/master/csharp/Sample.Profile" sqxStopClick sqxExternalLink>C#</a>
                 </div>
             </div>
         </div>
@@ -93,7 +93,7 @@
             <div class="card-text">
                 <div>Create app for Squidex Identity.</div>
                 <div>
-                    <a href="https://github.com/Squidex/squidex-identity" (click)="$event.stopPropagation()" sqxExternalLink>Project</a>
+                    <a href="https://github.com/Squidex/squidex-identity" sqxStopClick sqxExternalLink>Project</a>
                 </div>
             </div>
         </div>

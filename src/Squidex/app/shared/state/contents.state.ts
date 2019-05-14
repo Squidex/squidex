@@ -288,7 +288,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     private replaceContent(content: ContentDto, oldVersion?: Version) {
-        if (!oldVersion || oldVersion.eq(content.version)) {
+        if (!oldVersion || !oldVersion.eq(content.version)) {
             return this.next(s => {
                 const contents = s.contents.replaceBy('id', content);
                 const selectedContent = s.selectedContent && s.selectedContent.id === content.id ? content : s.selectedContent;

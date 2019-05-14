@@ -25,6 +25,14 @@ export function invalid$(form: AbstractControl): Observable<boolean> {
     return form.statusChanges.pipe(map(() => form.invalid), startWith(form.invalid));
 }
 
+export function pristine$(form: AbstractControl): Observable<boolean> {
+    return form.statusChanges.pipe(map(() => form.pristine), startWith(form.pristine));
+}
+
+export function dirty$(form: AbstractControl): Observable<boolean> {
+    return form.statusChanges.pipe(map(() => form.dirty), startWith(form.dirty));
+}
+
 export function value$<T = any>(form: AbstractControl): Observable<T> {
     return form.valueChanges.pipe(startWith(form.value));
 }

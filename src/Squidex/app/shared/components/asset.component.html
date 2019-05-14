@@ -20,7 +20,7 @@
                         <a class="file-edit ml-2" (click)="edit()" *ngIf="!isDisabled">
                             <i class="icon-pencil"></i>
                         </a>
-                        <a class="file-download ml-2" [href]="asset | sqxAssetUrl" sqxExternalLink="noicon" (click)="$event.stopPropagation()">
+                        <a class="file-download ml-2" [href]="asset | sqxAssetUrl" sqxStopClick sqxExternalLink="noicon">
                             <i class="icon-download"></i>
                         </a>
                         <a class="file-delete ml-2" (click)="emitDelete()" *ngIf="!isDisabled && !removeMode">
@@ -98,7 +98,7 @@
                     <img class="user-picture" title="{{asset.lastModifiedBy | sqxUserNameRef}}" [attr.src]="asset.lastModifiedBy | sqxUserPictureRef" />
                 </td>
                 <td class="col-actions text-right" *ngIf="!isCompact">
-                    <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl" sqxExternalLink="noicon" (click)="$event.stopPropagation()">
+                    <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl" sqxStopClick sqxExternalLink="noicon">
                         <i class="icon-download"></i>
                     </a>
                 </td>

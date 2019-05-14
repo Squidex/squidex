@@ -75,10 +75,6 @@ export class AppsPageComponent implements OnInit {
         this.addAppDialog.show();
     }
 
-    public stop(event: Event) {
-        event.stopPropagation();
-    }
-
     public trackByApp(index: number, app: AppDto) {
         return app.id;
     }
