@@ -196,16 +196,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         {
                             var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.Id, Snapshot.Name, c.PlanId);
 
-                            if (result is PlanChangedResult)
+                            switch (result)
                             {
-                                if (result is PlanResetResult)
-                                {
-                                    ResetPlan(c);
-                                }
-                                else
-                                {
+                                case PlanChangedResult _:
                                     ChangePlan(c);
-                                }
+                                    break;
+                                case PlanResetResult _:
+                                    ResetPlan(c);
+                                    break;
                             }
 
                             return result;
