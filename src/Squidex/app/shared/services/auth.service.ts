@@ -94,7 +94,7 @@ export class AuthService {
         Log.logger = console;
 
         this.userManager = new UserManager({
-                       client_id: 'squidex-frontend',
+                           client_id: 'vega.cms',
                            scope: 'squidex-api openid profile email squidex-profile role permissions',
                    response_type: 'id_token token',
                     redirect_uri: apiUrl.buildUrl('login;'),

@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => schema.AppId).Returns(appId);
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
 
-            context = QueryContext.Create(app, user);
+            context = QueryContext.Create(app, user, "vega.cms");
 
             var options = Options.Create(new ContentOptions { DefaultPageSize = 30 });
 
@@ -484,7 +484,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             if (isFrontend)
             {
-                identity.AddClaim(new Claim(OpenIdClaims.ClientId, "squidex-frontend"));
+                identity.AddClaim(new Claim(OpenIdClaims.ClientId, "vega.cms"));
             }
 
             if (allowSchema)
