@@ -41,6 +41,8 @@ namespace Squidex.Config
 
         public string PrivacyUrl { get; set; }
 
+        public string ICISAuthServer { get; set; }
+
         public bool RequiresHttps { get; set; }
 
         public bool AllowPasswordAuth { get; set; }

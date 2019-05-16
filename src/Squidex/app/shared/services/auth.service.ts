@@ -34,7 +34,7 @@ export class Profile {
     }
 
     public get displayName(): string {
-        return this.user.profile['urn:squidex:name'];
+        return this.getUserName();
     }
 
     public get pictureUrl(): string {
@@ -53,10 +53,13 @@ export class Profile {
         return `subject:${this.id}`;
     }
 
+    private decodedToken: any;
+
     constructor(
         public readonly user: User
     ) {
-        const permissions = this.user.profile['urn:squidex:permissions'];
+        this.parseJwt(this.user.access_token);
+        const permissions = this.getPermission();
 
         if (Types.isArrayOfString(permissions)) {
             this.permissions = permissions.map(x => new Permission(x));
@@ -66,9 +69,29 @@ export class Profile {
             this.permissions = [];
         }
 
-        if (this.user.profile['role'] === 'ADMINISTRATOR') {
-            this.permissions.push( new Permission('squidex.admin'));
+    }
+
+    private getPermission(): string[] {
+        const group = this.decodedToken['group'];
+
+        const adminUserGroup = ['ICIS_Darwin', 'ICIS_AppSupport', 'RBI-QHS-SECURITY-ICIS-APPLICATIONS-SUPPORT'];
+        const adminPermissions = ['squidex.*', 'squidex.admin.*', 'squidex.apps.commentary.*'];
+
+        if (Types.isArrayOfString(group) && group.some(item => adminUserGroup.includes(item))) {
+            return adminPermissions;
+        } else {
+            return this.user.profile['urn:squidex:permissions'];
         }
+    }
+
+    private getUserName(): string {
+        return this.decodedToken['given_name'];
+    }
+
+    private parseJwt(token: string): any {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        this.decodedToken = JSON.parse(window.atob(base64));
     }
 }
 
@@ -94,15 +117,15 @@ export class AuthService {
         Log.logger = console;
 
         this.userManager = new UserManager({
-                           client_id: 'vega.cms',
-                           scope: 'squidex-api openid profile email squidex-profile role permissions',
-                   response_type: 'id_token token',
-                    redirect_uri: apiUrl.buildUrl('login;'),
-        post_logout_redirect_uri: apiUrl.buildUrl('logout'),
-             silent_redirect_uri: apiUrl.buildUrl('client-callback-silent'),
-              popup_redirect_uri: apiUrl.buildUrl('client-callback-popup'),
-                       authority: apiUrl.buildUrl('identity-server/'),
-                       userStore: new WebStorageStateStore({ store: window.localStorage || window.sessionStorage }),
+            client_id: 'vega.cms',
+            scope: 'openid all',
+            response_type: 'id_token token',
+            redirect_uri: apiUrl.buildUrl('login'),
+            post_logout_redirect_uri: apiUrl.buildUrl('logout'),
+            silent_redirect_uri: apiUrl.buildUrl('client-callback-silent'),
+            popup_redirect_uri: apiUrl.buildUrl('client-callback-popup'),
+            authority: 'https://identityservice.systest.tesla.cha.rbxd.ds/',
+            userStore: new WebStorageStateStore({ store: window.localStorage || window.sessionStorage }),
             automaticSilentRenew: true
         });
 

@@ -557,7 +557,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
         private QueryContext Context()
         {
-            return QueryContext.Create(App, User)
+            return QueryContext.Create(App, User, "vega.cms")
                 .WithAssetUrlsToResolve(Request.Headers["X-Resolve-Urls"])
                 .WithFlatten(Request.Headers.ContainsKey("X-Flatten"))
                 .WithLanguages(Request.Headers["X-Languages"])

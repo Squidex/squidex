@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Config.Domain;
+using Squidex.ICIS;
 using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
 using Squidex.Web;
@@ -41,7 +42,7 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<RequestLogPerformanceMiddleware>()
                 .AsSelf();
 
-            services.AddSingletonAs<ApiPermissionUnifier>()
+            services.AddSingletonAs<ClaimsTransformer>()
                 .As<IClaimsTransformation>();
 
             services.AddMvc(options =>
