@@ -14,21 +14,25 @@
             <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
         
             <div class="form-group">
-                <label for="appName">Name</label>
+                <label for="appName">Name <small class="hint">(required)</small></label>
                 
                 <sqx-control-errors for="name" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
         
                 <input type="text" class="form-control" id="appName" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit />
                     
-                <small class="form-text text-muted">
-                    You can only use letters, numbers and dashes and not more than 40 characters. The name cannot be changed later.
-                </small>
+                <sqx-form-hint>
+                    You can only use letters, numbers and dashes and not more than 40 characters.
+                </sqx-form-hint>
                 
-                <small class="form-text text-muted">
+                <sqx-form-hint>
                     The app name becomes part of the api url:
-                </small>
+                </sqx-form-hint>
 
                 <sqx-code>{{apiUrl.buildUrl("api/content/")}}{{createForm.appName | async}}</sqx-code>
+
+                <sqx-form-alert class="mt-4">
+                    The app name cannot be changed later.
+                </sqx-form-alert>
             </div>
         </ng-container>
 

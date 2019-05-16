@@ -70,9 +70,11 @@
             <div class="schemas"
                 [sqxSortModel]="schema.fields"
                 (sqxSort)="sortFields($event)">
-                <div *ngFor="let field of schema.fields; trackBy: trackByField.bind(this)">
-                    <sqx-field [field]="field" [schema]="schema" [patterns]="patterns"></sqx-field>
-                </div>
+                <sqx-field *ngFor="let field of schema.fields; trackBy: trackByField.bind(this)"
+                    [field]="field"
+                    [schema]="schema"
+                    [patterns]="patterns">
+                </sqx-field>
             </div>
     
             <button type="button" class="btn btn-success field-button" (click)="addFieldDialog.show()">

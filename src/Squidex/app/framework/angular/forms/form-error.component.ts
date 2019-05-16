@@ -11,8 +11,10 @@ import { fadeAnimation } from './../animations';
 
 @Component({
     selector: 'sqx-form-error',
-    styleUrls: ['./form-error.component.scss'],
-    templateUrl: './form-error.component.html',
+    template: `
+        <ng-container *ngIf="error">
+            <div class="form-alert form-alert-error" [innerHTML]="error" @fade></div>
+        </ng-container>`,
     animations: [
         fadeAnimation
     ],

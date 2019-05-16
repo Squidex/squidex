@@ -111,7 +111,7 @@
                 Viewing <strong>version {{version.value}}</strong>.
             </div>
 
-            <div *ngFor="let field of schema.fields; trackBy: trackByField.bind(this)">
+            <ng-container *ngFor="let field of schema.fields; trackBy: trackByField.bind(this)">
                 <sqx-content-field 
                     [form]="contentForm"
                     [field]="field"
@@ -121,7 +121,7 @@
                     [languages]="languages.mutableValues"
                     [(language)]="language">
                 </sqx-content-field>
-            </div>
+            </ng-container>
         </ng-container>
 
         <ng-container sidebar>

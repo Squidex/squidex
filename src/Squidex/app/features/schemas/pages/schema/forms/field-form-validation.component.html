@@ -1,29 +1,29 @@
-<div [ngSwitch]="field.properties.fieldType">
-    <div *ngSwitchCase="'Number'">
+<ng-container [ngSwitch]="field.properties.fieldType">
+    <ng-container *ngSwitchCase="'Number'">
         <sqx-number-validation [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-number-validation>
-    </div>
-    <div *ngSwitchCase="'String'">
+    </ng-container>
+    <ng-container *ngSwitchCase="'String'">
         <sqx-string-validation [editForm]="editForm" [field]="field" [properties]="field.properties" [patterns]="patterns"></sqx-string-validation>
-    </div>
-    <div *ngSwitchCase="'Boolean'">
+    </ng-container>
+    <ng-container *ngSwitchCase="'Boolean'">
         <sqx-boolean-validation [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-boolean-validation>
-    </div>
-    <div *ngSwitchCase="'DateTime'">
+    </ng-container>
+    <ng-container *ngSwitchCase="'DateTime'">
         <sqx-date-time-validation [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-date-time-validation>
-    </div>
-    <div *ngSwitchCase="'Geolocation'">
+    </ng-container>
+    <ng-container *ngSwitchCase="'Geolocation'">
         <sqx-geolocation-validation [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-geolocation-validation>
-    </div>
-    <div *ngSwitchCase="'Json'">
+    </ng-container>
+    <ng-container *ngSwitchCase="'Json'">
         <sqx-json-validation [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-json-validation>
-    </div>
-    <div *ngSwitchCase="'Assets'">
+    </ng-container>
+    <ng-container *ngSwitchCase="'Assets'">
         <sqx-assets-validation [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-assets-validation>
-    </div>
-    <div *ngSwitchCase="'References'">
+    </ng-container>
+    <ng-container *ngSwitchCase="'References'">
         <sqx-references-validation [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-references-validation>
-    </div>
-    <div *ngSwitchCase="'Tags'">
+    </ng-container>
+    <ng-container *ngSwitchCase="'Tags'">
         <sqx-tags-validation [editForm]="editForm" [field]="field" [properties]="field.properties"></sqx-tags-validation>
-    </div>
-</div>
+    </ng-container>
+</ng-container>

@@ -5,9 +5,9 @@
         <div class="col-6">
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldName" readonly [ngModel]="field.name" [ngModelOptions]="{standalone: true}" />
             
-            <small class="form-text text-muted">
+            <sqx-form-hint>
                 The name of the field in the API response.
-            </small>
+            </sqx-form-hint>
         </div>                        
     </div>
 
@@ -19,9 +19,9 @@
 
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldLabel" maxlength="100" formControlName="label" />
 
-            <small class="form-text text-muted">
+            <sqx-form-hint>
                 Define the display name for the field for documentation and user interfaces.
-            </small>
+            </sqx-form-hint>
         </div>
     </div>
 
@@ -33,9 +33,9 @@
 
             <input type="text" class="form-control" id="{{field.fieldId}}_fieldHints" maxlength="100" formControlName="hints" />
 
-            <small class="form-text text-muted">
+            <sqx-form-hint>
                 Define some hints for the user and editor for the field for documentation and user interfaces.
-            </small>
+            </sqx-form-hint>
         </div>
     </div>
 
@@ -48,9 +48,9 @@
                 </label>
             </div>
 
-            <small class="form-text text-muted">
+            <sqx-form-hint>
                 List fields are shown as a column in the content list.<br />When no list field is defined, the first field is used.
-            </small>
+            </sqx-form-hint>
         </div>
     </div>
 </div>

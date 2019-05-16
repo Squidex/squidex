@@ -3,6 +3,7 @@
 
 .content {
     min-height: 200px;
+    margin-top: 1rem;
 }
 
 .btn-delete {
@@ -16,13 +17,4 @@
 .col-name {
     min-width: 14rem;
     max-width: 14rem;
-}
-
-.title {
-    background: $color-border;
-    margin: -1rem;
-    margin-bottom: 1rem;
-    font-weight: 400;
-    font-size: 1.05rem;
-    padding: 1rem;
 }

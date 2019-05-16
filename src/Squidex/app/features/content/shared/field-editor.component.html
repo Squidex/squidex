@@ -149,8 +149,8 @@
 	</div>
 
 	<ng-container *ngIf="field.properties.hints; let hints">
-		<small class="form-text text-muted" *ngIf="hints.length > 0">
+		<sqx-form-hint *ngIf="hints.length > 0">
 			{{hints}}
-		</small>
+		</sqx-form-hint>
 	</ng-container>
 </ng-container>
