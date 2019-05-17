@@ -214,7 +214,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         if (!this.content || version === null || version.eq(this.content.version)) {
             this.contentFormCompare = null;
             this.contentVersion = null;
-            this.contentForm.load(this.content.dataDraft);
+            this.loadContent(this.content.dataDraft);
         } else {
             this.contentsState.loadVersion(this.content, version)
                 .subscribe(dto => {
@@ -224,14 +224,16 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                             this.contentFormCompare.form.disable();
                         }
 
-                        this.contentFormCompare.load(dto.payload);
-                        this.contentForm.load(this.content.dataDraft);
+                        const isArchive = this.content && this.content.status === 'Archived';
+
+                        this.contentFormCompare.loadContent(dto.payload, true);
+                        this.contentForm.loadContent(this.content.dataDraft, isArchive);
                     } else {
                         if (this.contentFormCompare) {
                             this.contentFormCompare = null;
                         }
 
-                        this.contentForm.load(dto.payload);
+                        this.loadContent(dto.payload);
                     }
 
                     this.contentVersion = version;

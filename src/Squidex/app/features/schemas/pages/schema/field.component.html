@@ -75,10 +75,10 @@
                     <li class="nav-item">
                         <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">Common</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" [class.hidden]="!field.properties.isNormalField">
                         <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">Validation</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item" [class.hidden]="!field.properties.isNormalField || field.properties.fieldType === 'Assets'">
                         <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">Editing</a>
                     </li>
                 </ul>

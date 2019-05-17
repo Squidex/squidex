@@ -71,7 +71,7 @@ export class SchemaDetailsDto extends SchemaDto {
 
     protected onCloned() {
         if (this.fields) {
-            let fields = this.fields.filter(x => x.properties.isListField);
+            let fields = this.fields.filter(x => x.properties.isListField && x.properties.isNormalField);
 
             if (fields.length === 0 && this.fields.length > 0) {
                 fields = [this.fields[0]];

@@ -10,7 +10,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 @Component({
     selector: 'sqx-form-alert',
     template: `
-        <div class="alert alert-info mt-2 {{class}}">
+        <div class="alert alert-hint mt-2 {{class}}">
             <i class="icon-info-outline"></i> <ng-content></ng-content>
         </div>`,
     changeDetection: ChangeDetectionStrategy.OnPush

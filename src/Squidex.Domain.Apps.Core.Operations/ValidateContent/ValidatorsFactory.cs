@@ -183,5 +183,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             yield return new CollectionItemValidator(new RequiredStringValidator(true));
         }
+
+        public IEnumerable<IValidator> Visit(IField<UIFieldProperties> field)
+        {
+            yield return NoValueValidator.Instance;
+        }
     }
 }

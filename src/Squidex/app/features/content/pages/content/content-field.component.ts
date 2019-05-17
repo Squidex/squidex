@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, DoCheck, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { combineLatest } from 'rxjs/operators';
@@ -29,7 +29,7 @@ import {
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html'
 })
-export class ContentFieldComponent implements OnChanges {
+export class ContentFieldComponent implements DoCheck, OnChanges {
     @Input()
     public form: EditContentForm;
 
@@ -75,7 +75,7 @@ export class ContentFieldComponent implements OnChanges {
             this.showAllControls = this.localStore.getBoolean(this.configKey());
         }
 
-        if (changes['fieldForm']) {
+        if (changes['fieldForm'] && this.fieldForm) {
             this.isInvalid = invalid$(this.fieldForm);
         }
 
@@ -89,26 +89,30 @@ export class ContentFieldComponent implements OnChanges {
                     combineLatest(value$(this.fieldFormCompare),
                         (lhs, rhs) => !Types.jsJsonEquals(lhs, rhs)));
         }
+    }
 
-        const control = this.findControl(this.fieldForm);
+    public ngDoCheck() {
+        if (this.fieldForm) {
+            const control = this.findControl(this.fieldForm);
 
-        if (this.selectedFormControl !== control) {
-            if (this.selectedFormControl && Types.isFunction(this.selectedFormControl['_clearChangeFns'])) {
-                this.selectedFormControl['_clearChangeFns']();
-            }
-
-            this.selectedFormControl = control;
-        }
-
-        if (this.fieldFormCompare) {
-            const controlCompare = this.findControl(this.fieldFormCompare);
-
-            if (this.selectedFormControlCompare !== controlCompare) {
-                if (this.selectedFormControlCompare && Types.isFunction(this.selectedFormControlCompare['_clearChangeFns'])) {
-                    this.selectedFormControlCompare['_clearChangeFns']();
+            if (this.selectedFormControl !== control) {
+                if (this.selectedFormControl && Types.isFunction(this.selectedFormControl['_clearChangeFns'])) {
+                    this.selectedFormControl['_clearChangeFns']();
                 }
 
-                this.selectedFormControlCompare = controlCompare;
+                this.selectedFormControl = control;
+            }
+
+            if (this.fieldFormCompare) {
+                const controlCompare = this.findControl(this.fieldFormCompare);
+
+                if (this.selectedFormControlCompare !== controlCompare) {
+                    if (this.selectedFormControlCompare && Types.isFunction(this.selectedFormControlCompare['_clearChangeFns'])) {
+                        this.selectedFormControlCompare['_clearChangeFns']();
+                    }
+
+                    this.selectedFormControlCompare = controlCompare;
+                }
             }
         }
     }

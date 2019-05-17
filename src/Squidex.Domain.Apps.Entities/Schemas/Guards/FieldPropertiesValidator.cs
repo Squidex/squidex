@@ -268,5 +268,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.MaxItems));
             }
         }
+
+        public IEnumerable<ValidationError> Visit(UIFieldProperties properties)
+        {
+            if (!properties.Editor.IsEnumValue())
+            {
+                yield return new ValidationError(Not.Valid("Editor"),
+                    nameof(properties.Editor));
+            }
+        }
     }
 }
