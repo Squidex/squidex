@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (value != null)
             {
-                addError(context.Path, "Field does not accept a value.");
+                addError(context.Path, "Value must not be defined.");
             }
 
             return Task.CompletedTask;

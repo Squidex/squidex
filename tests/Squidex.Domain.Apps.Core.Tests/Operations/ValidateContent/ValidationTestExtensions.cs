@@ -32,23 +32,28 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
 
         public static Task ValidateOptionalAsync(this IValidator validator, object value, IList<string> errors, ValidationContext context = null)
         {
-            return validator.ValidateAsync(value,
+            return validator.ValidateAsync(
+                value,
                 CreateContext(context).Optional(true),
                 CreateFormatter(errors));
         }
 
         public static Task ValidateAsync(this IField field, IJsonValue value, IList<string> errors, ValidationContext context = null)
         {
-            return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field).ValidateAsync(value,
-                CreateContext(context),
-                CreateFormatter(errors));
+            return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field)
+                .ValidateAsync(
+                    value,
+                    CreateContext(context),
+                    CreateFormatter(errors));
         }
 
         public static Task ValidateOptionalAsync(this IField field, IJsonValue value, IList<string> errors, ValidationContext context = null)
         {
-            return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field).ValidateAsync(value,
-                CreateContext(context).Optional(true),
-                CreateFormatter(errors));
+            return new FieldValidator(ValidatorsFactory.CreateValidators(field).ToArray(), field)
+                .ValidateAsync(
+                    value,
+                    CreateContext(context).Optional(true),
+                    CreateFormatter(errors));
         }
 
         private static AddError CreateFormatter(IList<string> errors)

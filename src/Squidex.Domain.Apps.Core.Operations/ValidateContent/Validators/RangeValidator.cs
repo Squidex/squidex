@@ -29,34 +29,30 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (value == null)
+            if (value != null && value is T typedValue)
             {
-                return TaskHelper.Done;
-            }
-
-            var typedValue = (T)value;
-
-            if (min.HasValue && max.HasValue)
-            {
-                if (Equals(min, max) && Equals(min.Value, max.Value))
+                if (min.HasValue && max.HasValue)
                 {
-                    addError(context.Path, $"Must be exactly '{max}'.");
+                    if (Equals(min, max) && Equals(min.Value, max.Value))
+                    {
+                        addError(context.Path, $"Must be exactly '{max}'.");
+                    }
+                    else if (typedValue.CompareTo(min.Value) < 0 || typedValue.CompareTo(max.Value) > 0)
+                    {
+                        addError(context.Path, $"Must be between '{min}' and '{max}'.");
+                    }
                 }
-                else if (typedValue.CompareTo(min.Value) < 0 || typedValue.CompareTo(max.Value) > 0)
+                else
                 {
-                    addError(context.Path, $"Must be between '{min}' and '{max}'.");
-                }
-            }
-            else
-            {
-                if (min.HasValue && typedValue.CompareTo(min.Value) < 0)
-                {
-                    addError(context.Path, $"Must be greater or equal to '{min}'.");
-                }
+                    if (min.HasValue && typedValue.CompareTo(min.Value) < 0)
+                    {
+                        addError(context.Path, $"Must be greater or equal to '{min}'.");
+                    }
 
-                if (max.HasValue && typedValue.CompareTo(max.Value) > 0)
-                {
-                    addError(context.Path, $"Must be less or equal to '{max}'.");
+                    if (max.HasValue && typedValue.CompareTo(max.Value) > 0)
+                    {
+                        addError(context.Path, $"Must be less or equal to '{max}'.");
+                    }
                 }
             }
 
