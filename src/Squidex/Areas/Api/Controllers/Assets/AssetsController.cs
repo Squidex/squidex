@@ -300,7 +300,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
         private QueryContext Context()
         {
-            return QueryContext.Create(App, User);
+            return QueryContext.Create(App, User, "vega.cms");
         }
     }
 }

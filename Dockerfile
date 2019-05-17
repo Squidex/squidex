@@ -15,7 +15,7 @@ COPY . .
 # Build Frontend
 RUN cp -a /tmp/node_modules src/Squidex/ \
  && cd src/Squidex \
- && npm run test:coverage \
+# && npm run test:coverage \
  && npm run build
  
 # Test Backend
@@ -46,8 +46,13 @@ RUN apk update \
 
 # Copy from build stage
 COPY --from=builder /out/alpine .
+COPY src/Squidex/cha-ca.cer /usr/local/share/ca-certificates/cha-ca.cer
+
+RUN update-ca-certificates
 
 EXPOSE 80
-EXPOSE 11111
+EXPOSE 5000
+# EXPOSE 33333
+# EXPOSE 40000
 
 ENTRYPOINT ["./Squidex"]

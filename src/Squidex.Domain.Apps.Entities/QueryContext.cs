@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities
         {
         }
 
-        public static QueryContext Create(IAppEntity app, ClaimsPrincipal user)
+        public static QueryContext Create(IAppEntity app, ClaimsPrincipal user, string clientId)
         {
             return new QueryContext { App = app, User = user };
         }
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public bool IsFrontendClient
         {
-            get { return User.IsInClient("squidex-frontend"); }
+            get { return User.IsInClient("vega.cms"); }
         }
     }
 }

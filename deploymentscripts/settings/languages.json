@@ -1,0 +1,12 @@
+{
+    "languages": [
+        {
+            "language": "zh",
+            "settings": {
+                "isMaster": false,
+                "isOptional": true,
+                "fallback": ["en"]
+            }
+        }
+    ]
+}

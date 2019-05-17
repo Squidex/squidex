@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => app.Name).Returns(appId.Name);
             A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.English);
 
-            context = QueryContext.Create(app, user);
+            context = QueryContext.Create(app, user, "vega.cms");
 
             A.CallTo(() => tagService.DenormalizeTagsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.IsSameSequenceAs("id1", "id2", "id3")))
                 .Returns(new Dictionary<string, string>

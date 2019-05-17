@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => app.Name).Returns(appName);
             A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.Build(Language.DE, Language.GermanGermany));
 
-            context = QueryContext.Create(app, user);
+            context = QueryContext.Create(app, user, "vega.cms");
 
             A.CallTo(() => schema.Id).Returns(schemaId);
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
