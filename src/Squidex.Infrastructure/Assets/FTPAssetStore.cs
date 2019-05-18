@@ -12,49 +12,39 @@ using System.Threading.Tasks;
 using FluentFTP;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.Log;
 
-namespace Squidex.Extensions.Samples.AssetStore
+namespace Squidex.Infrastructure.Assets
 {
     public sealed class FTPAssetStore : IAssetStore, IInitializable
     {
-        private readonly string host;
-        private readonly int port;
-        private readonly string username;
-        private readonly string password;
         private readonly string path;
+        private readonly ISemanticLog log;
+        private readonly string ftpMessage = "The system cannot find the file specified";
 
-        public FTPAssetStore(string host, int port, string username, string password, string path)
+        private readonly Func<IFtpClient> createFtpClient;
+
+        public FTPAssetStore(Func<IFtpClient> createFtpClient, string path, ISemanticLog log)
         {
-            this.host = host;
-            this.port = port;
-            this.username = username;
-            this.password = password;
+            this.createFtpClient = createFtpClient;
             this.path = path;
-        }
-
-        private FtpClient GetFtpClient()
-        {
-            var client = new FtpClient(host, port, username, password);
-            client.Connect();
-            return client;
-        }
-
-        private FtpClient GetFtpClient(string dir)
-        {
-            var client = GetFtpClient();
-            client.SetWorkingDirectory(dir);
-            return client;
+            this.log = log;
         }
 
         public async Task InitializeAsync(CancellationToken ct = default)
         {
-            using (var client = GetFtpClient())
+            using (var client = createFtpClient())
             {
+                await client.ConnectAsync(ct);
                 if (!await client.DirectoryExistsAsync(path, ct))
                 {
                     await client.CreateDirectoryAsync(path, ct);
                 }
             }
+
+            log.LogInformation(w => w
+                  .WriteProperty("action", "FTPAssetStoreConfigured")
+                  .WriteProperty("path", path));
         }
 
         public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
@@ -62,13 +52,20 @@ namespace Squidex.Extensions.Samples.AssetStore
             Guard.NotNullOrEmpty(sourceFileName, nameof(sourceFileName));
             Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
 
-            using (var stream = new MemoryStream())
+            try
             {
                 using (var client = GetFtpClient(path))
                 {
-                    await client.DownloadAsync(stream, sourceFileName, token: ct);
-                    await client.UploadAsync(stream, targetFileName, createRemoteDir: true, token: ct);
+                    using (var stream = new MemoryStream())
+                    {
+                        await client.DownloadAsync(stream, sourceFileName, token: ct);
+                        await client.UploadAsync(stream, targetFileName, existsMode: FtpExists.Skip, createRemoteDir: true, token: ct);
+                    }
                 }
+            }
+            catch (FtpException ex) when (ex.InnerException.Message.Contains(ftpMessage))
+            {
+                throw new AssetNotFoundException(sourceFileName, ex);
             }
         }
 
@@ -89,7 +86,7 @@ namespace Squidex.Extensions.Samples.AssetStore
                     await client.DownloadAsync(stream, fileName, token: ct);
                 }
             }
-            catch (FtpException ex)
+            catch (FtpException ex) when (ex.InnerException.Message.Contains(ftpMessage))
             {
                 throw new AssetNotFoundException(fileName, ex);
             }
@@ -106,6 +103,13 @@ namespace Squidex.Extensions.Samples.AssetStore
             {
                 await client.UploadAsync(stream, fileName, overwrite ? FtpExists.Overwrite : FtpExists.Skip, true, null, ct);
             }
+        }
+
+        private IFtpClient GetFtpClient(string dir)
+        {
+            var client = createFtpClient();
+            client.SetWorkingDirectory(dir);
+            return client;
         }
     }
 }

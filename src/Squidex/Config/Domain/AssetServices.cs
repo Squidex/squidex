@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using FluentFTP;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -32,6 +33,18 @@ namespace Squidex.Config.Domain
                     var path = config.GetRequiredValue("assetStore:folder:path");
 
                     services.AddSingletonAs(c => new FolderAssetStore(path, c.GetRequiredService<ISemanticLog>()))
+                        .As<IAssetStore>();
+                },
+                ["FTP"] = () =>
+                {
+                    var host = config.GetRequiredValue("assetStore:ftp:host");
+                    var port = config.GetOptionalValue<int>("assetStore:ftp:port", 21);
+                    var username = config.GetRequiredValue("assetStore:ftp:username");
+                    var password = config.GetRequiredValue("assetStore:ftp:password");
+                    var path = config.GetOptionalValue("assetStore:ftp:path", "/");
+
+                    services.AddSingletonAs(c => new FTPAssetStore(() =>
+                        new FtpClient(host, port, username, password), path, c.GetRequiredService<ISemanticLog>()))
                         .As<IAssetStore>();
                 },
                 ["GoogleCloud"] = () =>
