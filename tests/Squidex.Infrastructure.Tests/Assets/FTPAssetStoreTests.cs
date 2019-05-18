@@ -15,15 +15,9 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Assets
 {
-    public class FTPAssetStoreTests : IClassFixture<FTPAssetStoreFixture>
+    public class FTPAssetStoreTests : AssetStoreTests<FTPAssetStore>, IClassFixture<FTPAssetStoreFixture>
     {
         private readonly FTPAssetStoreFixture fixture;
-
-        private readonly string ftpMessage = "The system cannot find the file specified";
-
-        private readonly string source = "/file1";
-        private readonly string target = "/file2";
-        private readonly string cannotfindfile = "/cannotfindfile";
 
         public FTPAssetStoreTests(FTPAssetStoreFixture fixture)
         {
@@ -42,21 +36,23 @@ namespace Squidex.Infrastructure.Assets
             A.CallTo(() => fixture.FtpClient.CreateDirectoryAsync("/", token)).MustHaveHappened();
         }
 
+        public override FTPAssetStore CreateStore()
+        {
+            return fixture.AssetStore;
+        }
+
         [Fact]
         public async Task Should_throw_exception_when_copy_files()
         {
             var token = A.Dummy<CancellationToken>();
 
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await fixture.AssetStore.CopyAsync(null, target, token));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await fixture.AssetStore.CopyAsync(null, fixture.Target, token));
 
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await fixture.AssetStore.CopyAsync(source, null, token));
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await fixture.AssetStore.CopyAsync(fixture.Source, null, token));
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await fixture.AssetStore.CopyAsync(null, null, token));
 
-            A.CallTo(() => fixture.FtpClient.UploadAsync(A<Stream>._, cannotfindfile, A<FtpExists>._, A<bool>._, A<IProgress<FtpProgress>>._, token))
-                .ThrowsAsync(new FtpException(ftpMessage, new Exception(ftpMessage)));
-
-            await Assert.ThrowsAsync<AssetNotFoundException>(async () => await fixture.AssetStore.CopyAsync(source, cannotfindfile, token));
+            await Assert.ThrowsAsync<AssetNotFoundException>(async () => await fixture.AssetStore.CopyAsync(fixture.Cannotfindfile, fixture.Target, token));
         }
 
         [Fact]
@@ -64,26 +60,26 @@ namespace Squidex.Infrastructure.Assets
         {
             var token = A.Dummy<CancellationToken>();
 
-            await fixture.AssetStore.CopyAsync(source, target, token);
+            await fixture.AssetStore.CopyAsync(fixture.Source, fixture.Target, token);
 
             A.CallTo(() => fixture.FtpClient.SetWorkingDirectory("/")).MustHaveHappened();
 
-            A.CallTo(() => fixture.FtpClient.DownloadAsync(A<Stream>._, source, A<long>._, A<IProgress<FtpProgress>>._, token)).MustHaveHappened();
+            A.CallTo(() => fixture.FtpClient.DownloadAsync(A<Stream>._, fixture.Source, A<long>._, A<IProgress<FtpProgress>>._, token)).MustHaveHappened();
 
-            A.CallTo(() => fixture.FtpClient.UploadAsync(A<Stream>._, target, A<FtpExists>._, A<bool>._, A<IProgress<FtpProgress>>._, token)).MustHaveHappened();
+            A.CallTo(() => fixture.FtpClient.UploadAsync(A<Stream>._, fixture.Target, A<FtpExists>._, A<bool>._, A<IProgress<FtpProgress>>._, token)).MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_call_delete_async()
         {
-            await fixture.AssetStore.DeleteAsync(source);
-            A.CallTo(() => fixture.FtpClient.DeleteFileAsync(source, A<CancellationToken>.Ignored)).MustHaveHappened();
+            await fixture.AssetStore.DeleteAsync(fixture.Source);
+            A.CallTo(() => fixture.FtpClient.DeleteFileAsync(fixture.Source, A<CancellationToken>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
         public void Should_return_null_value()
         {
-            Assert.Null(fixture.AssetStore.GeneratePublicUrl(source));
+            Assert.Null(fixture.AssetStore.GeneratePublicUrl(fixture.Source));
         }
 
         [Fact]
@@ -91,22 +87,19 @@ namespace Squidex.Infrastructure.Assets
         {
             var token = A.Dummy<CancellationToken>();
 
-            await fixture.AssetStore.DownloadAsync(source, A.Fake<Stream>(), token);
+            await fixture.AssetStore.DownloadAsync(fixture.Source, A.Fake<Stream>(), token);
 
-            A.CallTo(() => fixture.FtpClient.DownloadAsync(A<Stream>._, source, A<long>._, A<IProgress<FtpProgress>>._, token)).MustHaveHappened();
+            A.CallTo(() => fixture.FtpClient.DownloadAsync(A<Stream>._, fixture.Source, A<long>._, A<IProgress<FtpProgress>>._, token)).MustHaveHappened();
 
-            A.CallTo(() => fixture.FtpClient.DownloadAsync(A<Stream>._, cannotfindfile, A<long>._, A<IProgress<FtpProgress>>._, token))
-                .ThrowsAsync(new FtpException(ftpMessage, new Exception(ftpMessage)));
-
-            await Assert.ThrowsAsync<AssetNotFoundException>(async () => await fixture.AssetStore.DownloadAsync(cannotfindfile, A.Fake<Stream>(), token));
+            await Assert.ThrowsAsync<AssetNotFoundException>(async () => await fixture.AssetStore.DownloadAsync(fixture.Cannotfindfile, A.Fake<Stream>(), token));
         }
 
         [Fact]
         public async Task Should_call_upload_async_method()
         {
             var token = A.Dummy<CancellationToken>();
-            await fixture.AssetStore.UploadAsync(source, A.Fake<Stream>(), false, token);
-            A.CallTo(() => fixture.FtpClient.UploadAsync(A<Stream>._, source, A<FtpExists>._, A<bool>._, A<IProgress<FtpProgress>>._, token)).MustHaveHappened();
+            await Assert.ThrowsAsync<AssetAlreadyExistsException>(async () => await fixture.AssetStore.UploadAsync(fixture.Source, A.Fake<Stream>(), false, token));
+            A.CallTo(() => fixture.FtpClient.UploadAsync(A<Stream>._, fixture.Source, A<FtpExists>._, A<bool>._, A<IProgress<FtpProgress>>._, token)).MustHaveHappened();
         }
     }
 }

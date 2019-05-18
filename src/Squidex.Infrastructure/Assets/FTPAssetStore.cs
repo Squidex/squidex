@@ -52,20 +52,13 @@ namespace Squidex.Infrastructure.Assets
             Guard.NotNullOrEmpty(sourceFileName, nameof(sourceFileName));
             Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
 
-            try
+            using (var client = GetFtpClient(path))
             {
-                using (var client = GetFtpClient(path))
+                using (var stream = new MemoryStream())
                 {
-                    using (var stream = new MemoryStream())
-                    {
-                        await client.DownloadAsync(stream, sourceFileName, token: ct);
-                        await client.UploadAsync(stream, targetFileName, existsMode: FtpExists.Skip, createRemoteDir: true, token: ct);
-                    }
+                    await DownloadAsync(sourceFileName, stream, ct);
+                    await UploadAsync(targetFileName, stream, false, ct);
                 }
-            }
-            catch (FtpException ex) when (ex.InnerException.Message.Contains(ftpMessage))
-            {
-                throw new AssetNotFoundException(sourceFileName, ex);
             }
         }
 
@@ -101,6 +94,11 @@ namespace Squidex.Infrastructure.Assets
         {
             using (var client = GetFtpClient(path))
             {
+                if (!overwrite && await client.FileExistsAsync(fileName, ct))
+                {
+                    throw new AssetAlreadyExistsException(fileName);
+                }
+
                 await client.UploadAsync(stream, fileName, overwrite ? FtpExists.Overwrite : FtpExists.Skip, true, null, ct);
             }
         }
