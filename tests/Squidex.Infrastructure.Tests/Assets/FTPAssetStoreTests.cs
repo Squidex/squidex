@@ -23,6 +23,7 @@ namespace Squidex.Infrastructure.Assets
 
         private readonly string source = "/file1";
         private readonly string target = "/file2";
+        private readonly string cannotfindfile = "/cannotfindfile";
 
         public FTPAssetStoreTests(FTPAssetStoreFixture fixture)
         {
@@ -52,10 +53,10 @@ namespace Squidex.Infrastructure.Assets
 
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await fixture.AssetStore.CopyAsync(null, null, token));
 
-            A.CallTo(() => fixture.FtpClient.UploadAsync(A<Stream>._, target, A<FtpExists>._, A<bool>._, A<IProgress<FtpProgress>>._, token))
+            A.CallTo(() => fixture.FtpClient.UploadAsync(A<Stream>._, cannotfindfile, A<FtpExists>._, A<bool>._, A<IProgress<FtpProgress>>._, token))
                 .ThrowsAsync(new FtpException(ftpMessage, new Exception(ftpMessage)));
 
-            await Assert.ThrowsAsync<AssetNotFoundException>(async () => await fixture.AssetStore.CopyAsync(source, target, token));
+            await Assert.ThrowsAsync<AssetNotFoundException>(async () => await fixture.AssetStore.CopyAsync(source, cannotfindfile, token));
         }
 
         [Fact]
@@ -94,10 +95,10 @@ namespace Squidex.Infrastructure.Assets
 
             A.CallTo(() => fixture.FtpClient.DownloadAsync(A<Stream>._, source, A<long>._, A<IProgress<FtpProgress>>._, token)).MustHaveHappened();
 
-            A.CallTo(() => fixture.FtpClient.DownloadAsync(A<Stream>._, source, A<long>._, A<IProgress<FtpProgress>>._, token))
+            A.CallTo(() => fixture.FtpClient.DownloadAsync(A<Stream>._, cannotfindfile, A<long>._, A<IProgress<FtpProgress>>._, token))
                 .ThrowsAsync(new FtpException(ftpMessage, new Exception(ftpMessage)));
 
-            await Assert.ThrowsAsync<AssetNotFoundException>(async () => await fixture.AssetStore.DownloadAsync(source, A.Fake<Stream>(), token));
+            await Assert.ThrowsAsync<AssetNotFoundException>(async () => await fixture.AssetStore.DownloadAsync(cannotfindfile, A.Fake<Stream>(), token));
         }
 
         [Fact]
