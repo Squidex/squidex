@@ -31,7 +31,7 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
-        public async Task InitializeAsyncTest()
+        public async Task Should_call_4_methods()
         {
             var token = A.Dummy<CancellationToken>();
             await fixture.AssetStore.InitializeAsync(token);
@@ -60,7 +60,7 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
-        public async Task CopyAsyncTest()
+        public async Task Should_call_copy_method()
         {
             var token = A.Dummy<CancellationToken>();
 
@@ -74,20 +74,20 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
-        public async Task DeleteAsyncTest()
+        public async Task Should_call_delete_async()
         {
             await fixture.AssetStore.DeleteAsync(source);
             A.CallTo(() => fixture.FtpClient.DeleteFileAsync(source, A<CancellationToken>.Ignored)).MustHaveHappened();
         }
 
         [Fact]
-        public void GeneratePublicUrlTest()
+        public void Should_return_null_value()
         {
             Assert.Null(fixture.AssetStore.GeneratePublicUrl(source));
         }
 
         [Fact]
-        public async Task DownloadAsyncTest()
+        public async Task Should_call_download_async_methods()
         {
             var token = A.Dummy<CancellationToken>();
 
@@ -102,7 +102,7 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
-        public async Task UploadAsyncTest()
+        public async Task Should_call_upload_async_method()
         {
             var token = A.Dummy<CancellationToken>();
             await fixture.AssetStore.UploadAsync(source, A.Fake<Stream>(), false, token);
