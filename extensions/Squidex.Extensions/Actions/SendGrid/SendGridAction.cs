@@ -21,7 +21,7 @@ namespace Squidex.Extensions.Actions.SendGrid
     {
         [Required]
         [Display(Name = "APIKey", Description = "Sendgrid's API Key.")]
-        [DataType(DataType.Text)]
+        [DataType(DataType.Password)]
         public string APIKey { get; set; }
 
         [Required]
