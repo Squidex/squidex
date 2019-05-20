@@ -44,21 +44,24 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
                 command.ContributorId = user.Id;
 
-                if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase) && !command.IsRestore)
+                if (!command.IsRestore)
                 {
-                    throw new DomainForbiddenException("You cannot change your own role.");
-                }
-
-                if (contributors.TryGetValue(command.ContributorId, out var existing))
-                {
-                    if (existing == command.Role)
+                    if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase))
                     {
-                        e(Not.New("Contributor", "role"), nameof(command.Role));
+                        throw new DomainForbiddenException("You cannot change your own role.");
                     }
-                }
-                else if (contributors.Count >= plan.MaxContributors && !command.IsRestore)
-                {
-                    e("You have reached the maximum number of contributors for your plan.");
+
+                    if (contributors.TryGetValue(command.ContributorId, out var existing))
+                    {
+                        if (existing == command.Role)
+                        {
+                            e(Not.New("Contributor", "role"), nameof(command.Role));
+                        }
+                    }
+                    else if (contributors.Count >= plan.MaxContributors)
+                    {
+                        e("You have reached the maximum number of contributors for your plan.");
+                    }
                 }
             });
         }

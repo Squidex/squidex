@@ -107,15 +107,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public Task Should_do_nothing_if_deleting_and_nested_not_found()
+        public async Task Should_do_nothing_if_deleting_and_nested_not_found()
         {
-            return sut.RemoveAsync("root.nested");
+            await sut.RemoveAsync("root.nested");
         }
 
         [Fact]
-        public Task Should_do_nothing_if_deleting_and_key_not_found()
+        public async Task Should_do_nothing_if_deleting_and_key_not_found()
         {
-            return sut.RemoveAsync("root");
+            await sut.RemoveAsync("root");
         }
     }
 }

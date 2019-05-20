@@ -328,14 +328,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public Task Should_throw_if_query_is_invalid()
+        public async Task Should_throw_if_query_is_invalid()
         {
             SetupClaims(isFrontend: false);
             SetupSchemaFound();
 
             var query = Q.Empty.WithODataQuery("$filter=invalid");
 
-            return Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context, schemaId.Name, query));
+            await Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context, schemaId.Name, query));
         }
 
         public static IEnumerable<object[]> ManyDataFrontend = new[]

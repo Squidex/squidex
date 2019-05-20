@@ -37,15 +37,15 @@ namespace Squidex.Infrastructure.Assets
         public abstract T CreateStore();
 
         [Fact]
-        public virtual Task Should_throw_exception_if_asset_to_download_is_not_found()
+        public virtual async Task Should_throw_exception_if_asset_to_download_is_not_found()
         {
-            return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.DownloadAsync(fileName, new MemoryStream()));
+            await Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.DownloadAsync(fileName, new MemoryStream()));
         }
 
         [Fact]
-        public Task Should_throw_exception_if_asset_to_copy_is_not_found()
+        public async Task Should_throw_exception_if_asset_to_copy_is_not_found()
         {
-            return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.CopyAsync(fileName, sourceFile));
+            await Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.CopyAsync(fileName, sourceFile));
         }
 
         [Fact]
