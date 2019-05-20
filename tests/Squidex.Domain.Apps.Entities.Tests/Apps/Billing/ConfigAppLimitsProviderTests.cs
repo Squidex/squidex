@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
             Name = "Infinite",
             MaxApiCalls = -1,
             MaxAssetSize = -1,
-            MaxContributors = -1
+            MaxContributors = int.MaxValue
         };
 
         private static readonly ConfigAppLimitsPlan FreePlan = new ConfigAppLimitsPlan
