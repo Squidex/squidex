@@ -58,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                             e(Not.New("Contributor", "role"), nameof(command.Role));
                         }
                     }
-                    else if (contributors.Count >= plan.MaxContributors)
+                    else if (plan.MaxContributors > 0 && contributors.Count >= plan.MaxContributors)
                     {
                         e("You have reached the maximum number of contributors for your plan.");
                     }

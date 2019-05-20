@@ -26,7 +26,7 @@
         </div>
 
         <div class="panel-main">
-            <div class="panel-content {{contentClass}}" [class.panel-content-scroll]="showScrollbar" [class.panel-content-blank]="isBlank">
+            <div class="panel-content {{contentClass}}" [class.panel-content-scroll-x]="scrollX" [class.panel-content-scroll]="showScrollbar" [class.panel-content-blank]="isBlank">
                 <ng-content select="[content]"></ng-content>
             </div>
 

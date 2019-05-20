@@ -133,6 +133,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public async Task CanAssign_should_not_throw_exception_if_user_found()
         {
+            A.CallTo(() => appPlan.MaxContributors)
+                .Returns(-1);
+
             var command = new AssignContributor { ContributorId = "1" };
 
             await GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan);
