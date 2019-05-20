@@ -25,28 +25,25 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.IsIndex())
+            if (context.IsIndex() && context.Response.StatusCode != 304)
             {
-                if (context.Response.StatusCode != 304)
+                using (var client = new HttpClient())
                 {
-                    using (var client = new HttpClient())
+                    var result = await client.GetAsync(WebpackUrl);
+
+                    context.Response.StatusCode = (int)result.StatusCode;
+
+                    if (result.IsSuccessStatusCode)
                     {
-                        var result = await client.GetAsync(WebpackUrl);
+                        var html = await result.Content.ReadAsStringAsync();
 
-                        context.Response.StatusCode = (int)result.StatusCode;
+                        html = AdjustBase(html, context.Request.PathBase);
 
-                        if (result.IsSuccessStatusCode)
-                        {
-                            var html = await result.Content.ReadAsStringAsync();
-
-                            html = AdjustBase(html, context.Request.PathBase);
-
-                            await context.Response.WriteHtmlAsync(html);
-                        }
+                        await context.Response.WriteHtmlAsync(html);
                     }
                 }
             }
-            else if (context.IsHtmlPath())
+            else if (context.IsHtmlPath() && context.Response.StatusCode != 304)
             {
                 var responseBuffer = new MemoryStream();
                 var responseBody = context.Response.Body;
