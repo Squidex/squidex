@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
@@ -26,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             Name = $"{schemaType}DataDto";
 
-            foreach (var field in schema.SchemaDef.Fields.Where(x => !x.IsHidden))
+            foreach (var field in schema.SchemaDef.Fields.ForApi())
             {
                 var (resolvedType, valueResolver) = model.GetGraphType(schema, field);
 

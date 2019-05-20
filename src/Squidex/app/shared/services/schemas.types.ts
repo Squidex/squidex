@@ -158,7 +158,7 @@ export abstract class FieldPropertiesDto {
         return true;
     }
 
-    public get isNormalField() {
+    public get isContentField() {
         return true;
     }
 
@@ -407,7 +407,7 @@ export class UIFieldPropertiesDto extends FieldPropertiesDto {
         return false;
     }
 
-    public get isNormalField() {
+    public get isContentField() {
         return false;
     }
 

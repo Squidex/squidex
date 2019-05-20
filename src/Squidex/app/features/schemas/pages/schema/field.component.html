@@ -29,21 +29,23 @@
                             <i class="icon-dots"></i>
                         </button>
                         <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
-                            <a class="dropdown-item" (click)="enableField()" *ngIf="field.isDisabled">
-                                Enable in UI
-                            </a>
-                            <a class="dropdown-item" (click)="disableField()" *ngIf="!field.isDisabled">
-                                Disable in UI
-                            </a>
-                            <a class="dropdown-item" (click)="hideField()" *ngIf="!field.isHidden && !field.isLocked">
-                                Hide in API
-                            </a>
-                            <a class="dropdown-item" (click)="showField()" *ngIf="field.isHidden && !field.isLocked">
-                                Show in API
-                            </a>                           
+                            <ng-container *ngIf="field.properties.isContentField">
+                                <a class="dropdown-item" (click)="enableField()" *ngIf="field.isDisabled">
+                                    Enable in UI
+                                </a>
+                                <a class="dropdown-item" (click)="disableField()" *ngIf="!field.isDisabled">
+                                    Disable in UI
+                                </a>
+                                <a class="dropdown-item" (click)="hideField()" *ngIf="!field.isHidden && !field.isLocked">
+                                    Hide in API
+                                </a>
+                                <a class="dropdown-item" (click)="showField()" *ngIf="field.isHidden && !field.isLocked">
+                                    Show in API
+                                </a>
+                            </ng-container>                
                             
                             <ng-container *ngIf="!field.isLocked">
-                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-divider" *ngIf="field.properties.isContentField"></div>
                         
                                 <a class="dropdown-item" 
                                     (sqxConfirmClick)="lockField()"
@@ -75,10 +77,10 @@
                     <li class="nav-item">
                         <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">Common</a>
                     </li>
-                    <li class="nav-item" [class.hidden]="!field.properties.isNormalField">
+                    <li class="nav-item" [class.hidden]="!field.properties.isContentField">
                         <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">Validation</a>
                     </li>
-                    <li class="nav-item" [class.hidden]="!field.properties.isNormalField || field.properties.fieldType === 'Assets'">
+                    <li class="nav-item" [class.hidden]="!field.properties.isContentField || field.properties.fieldType === 'Assets'">
                         <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">Editing</a>
                     </li>
                 </ul>

@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 
@@ -26,7 +25,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
         {
             var item = Builder.Object();
 
-            foreach (var nestedField in field.Fields.Where(x => !x.IsHidden))
+            foreach (var nestedField in field.Fields.ForApi())
             {
                 var childProperty = nestedField.Accept(this);
 

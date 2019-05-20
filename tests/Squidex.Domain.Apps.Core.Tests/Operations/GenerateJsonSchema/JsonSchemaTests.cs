@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
 
             void CheckField(IField field)
             {
-                if (field is IField<UIFieldProperties> || field.IsHidden)
+                if (!field.IsForApi())
                 {
                     Assert.DoesNotContain(field.Name, jsonProperties);
                 }

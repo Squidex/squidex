@@ -1,5 +1,5 @@
-<div [class.ui]="!field.properties.isNormalField" *ngIf="field">
-    <ng-container *ngIf="field.properties.isNormalField">
+<div [class.ui]="!field.properties.isContentField" *ngIf="field">
+    <ng-container *ngIf="field.properties.isContentField">
         <label>
             {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
         </label> 

@@ -12,21 +12,25 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class ObjectValidator<TValue> : IValidator
     {
+        private static readonly IReadOnlyDictionary<string, TValue> DefaultValue = new Dictionary<string, TValue>();
         private readonly IDictionary<string, (bool IsOptional, IValidator Validator)> schema;
         private readonly bool isPartial;
         private readonly string fieldType;
-        private readonly TValue fieldDefault;
 
-        public ObjectValidator(IDictionary<string, (bool IsOptional, IValidator Validator)> schema, bool isPartial, string fieldType, TValue fieldDefault)
+        public ObjectValidator(IDictionary<string, (bool IsOptional, IValidator Validator)> schema, bool isPartial, string fieldType)
         {
             this.schema = schema;
-            this.fieldDefault = fieldDefault;
             this.fieldType = fieldType;
             this.isPartial = isPartial;
         }
 
         public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
+            if (value == null)
+            {
+                value = DefaultValue;
+            }
+
             if (value is IReadOnlyDictionary<string, TValue> values)
             {
                 foreach (var fieldData in values)
@@ -52,7 +56,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                             continue;
                         }
 
-                        fieldValue = fieldDefault;
+                        fieldValue = default;
                     }
 
                     var (isOptional, validator) = field.Value;

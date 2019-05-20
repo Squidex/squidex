@@ -26,12 +26,17 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 return TaskHelper.Done;
             }
 
-            if (value == null || (value is string stringValue && validateEmptyStrings && string.IsNullOrWhiteSpace(stringValue)))
+            if (value.IsNullOrUndefined() || IsEmptyString(value))
             {
                 addError(context.Path, "Field is required.");
             }
 
             return TaskHelper.Done;
+        }
+
+        private bool IsEmptyString(object value)
+        {
+            return value is string typed && validateEmptyStrings && string.IsNullOrWhiteSpace(typed);
         }
     }
 }

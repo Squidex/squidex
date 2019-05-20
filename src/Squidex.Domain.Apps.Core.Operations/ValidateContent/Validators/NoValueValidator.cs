@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (value != null)
+            if (!value.IsUndefined())
             {
                 addError(context.Path, "Value must not be defined.");
             }

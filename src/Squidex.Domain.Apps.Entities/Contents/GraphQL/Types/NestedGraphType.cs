@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             Name = $"{schemaType}{fieldName}ChildDto";
 
-            foreach (var nestedField in field.Fields.Where(x => !x.IsHidden))
+            foreach (var nestedField in field.Fields.ForApi())
             {
                 var fieldInfo = model.GetGraphType(schema, nestedField);
 

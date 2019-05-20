@@ -182,7 +182,7 @@ export class EditSchemaForm extends Form<FormGroup, { label?: string, hints?: st
 }
 
 export class AddFieldForm extends Form<FormGroup, AddFieldDto> {
-    public isNormalField = value$(this.form.get('type')!).pipe(map(x => x !== 'UI'));
+    public isContentField = value$(this.form.get('type')!).pipe(map(x => x !== 'UI'));
 
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({

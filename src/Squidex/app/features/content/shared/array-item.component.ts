@@ -76,7 +76,7 @@ export class ArrayItemComponent implements OnChanges {
         }
 
         if (changes['itemForm'] || changes['field']) {
-            this.fieldControls = this.field.nested.map(field => ({ field, control: this.itemForm.get(field.name)! })).filter(x => !x.field.properties.isNormalField || !!x.control);
+            this.fieldControls = this.field.nested.map(field => ({ field, control: this.itemForm.get(field.name)! })).filter(x => !x.field.properties.isContentField || !!x.control);
         }
     }
 

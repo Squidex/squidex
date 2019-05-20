@@ -123,6 +123,24 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         }
 
         [Fact]
+        public async Task Should_add_error_if_required_data_string_field_is_not_in_bag()
+        {
+            schema = schema.AddString(1, "my-field", Partitioning.Invariant,
+                new StringFieldProperties { IsRequired = true });
+
+            var data =
+                new NamedContentData();
+
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
+
+            errors.Should().BeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Field is required.", "my-field")
+                });
+        }
+
+        [Fact]
         public async Task Should_add_error_if_data_contains_invalid_language()
         {
             schema = schema.AddNumber(1, "my-field", Partitioning.Language);

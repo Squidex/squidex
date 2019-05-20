@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
@@ -19,11 +20,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent.Validators
         private readonly List<string> errors = new List<string>();
 
         [Fact]
-        public async Task Should_not_add_error_if_value_is_null()
+        public async Task Should_not_add_error_if_value_is_undefined()
         {
             var sut = NoValueValidator.Instance;
 
-            await sut.ValidateAsync(null, errors);
+            await sut.ValidateAsync(Undefined.Value, errors);
 
             Assert.Empty(errors);
         }

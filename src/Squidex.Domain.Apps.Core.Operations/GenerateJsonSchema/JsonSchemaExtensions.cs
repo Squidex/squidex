@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -25,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             var jsonTypeVisitor = new JsonTypeVisitor(schemaResolver);
             var jsonSchema = new JsonSchema4 { Type = JsonObjectType.Object };
 
-            foreach (var field in schema.Fields.Where(x => !x.IsHidden))
+            foreach (var field in schema.Fields.ForApi())
             {
                 var partitionObject = Builder.Object();
                 var partition = partitionResolver(field.Partitioning);
