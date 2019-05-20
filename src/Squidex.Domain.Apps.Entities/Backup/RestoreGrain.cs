@@ -246,16 +246,23 @@ namespace Squidex.Domain.Apps.Entities.Backup
 
             if (actor?.IsSubject == true)
             {
-                await commandBus.PublishAsync(new AssignContributor
+                try
                 {
-                    Actor = actor,
-                    AppId = CurrentJob.AppId,
-                    ContributorId = actor.Identifier,
-                    IsRestore = true,
-                    Role = Role.Owner
-                });
+                    await commandBus.PublishAsync(new AssignContributor
+                    {
+                        Actor = actor,
+                        AppId = CurrentJob.AppId,
+                        ContributorId = actor.Identifier,
+                        IsRestore = true,
+                        Role = Role.Owner
+                    });
 
-                Log("Assigned current user.");
+                    Log("Assigned current user.");
+                }
+                catch (DomainException ex)
+                {
+                    Log($"Failed to assign contributor: {ex.Message}");
+                }
             }
             else
             {

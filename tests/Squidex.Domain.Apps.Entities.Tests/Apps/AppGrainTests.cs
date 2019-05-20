@@ -12,6 +12,7 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
 using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
@@ -53,6 +54,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId))
                 .Returns(user);
+
+            A.CallTo(() => appPlansProvider.GetPlan(A<string>.Ignored))
+                .Returns(new ConfigAppLimitsPlan { MaxContributors = 10 });
 
             initialPatterns = new InitialPatterns
             {

@@ -57,6 +57,7 @@ export class AnnotateAssetForm extends Form<FormGroup, { fileName?: string, slug
             }
 
             if (Object.keys(result).length === 0) {
+                this.enable();
                 return null;
             }
         }
