@@ -82,7 +82,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
             await validator.ValidateAsync(data);
 
             validator.Errors.Should().BeEquivalentTo(
-                new[] {
+                new[]
+                {
                     new ValidationError("Value must not be defined.", "my-ui1"),
                     new ValidationError("Value must not be defined.", "my-ui2")
                 });
