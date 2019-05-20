@@ -197,6 +197,20 @@ a {
     }
 }
 
+.dropdown-divider {
+    &:first-child {
+        display: none;
+    }
+
+    &:last-child {
+        display: none;
+    }
+
+    & + .dropdown-divider {
+        display: none;
+    }
+}
+
 //
 // Dark vertical menu for dark panels.
 //

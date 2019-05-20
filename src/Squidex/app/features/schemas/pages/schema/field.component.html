@@ -25,7 +25,7 @@
                     </button>
 
                     <div class="dropdown dropdown-options">
-                        <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
+                        <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" [class.active]="dropdown.isOpen | async" #optionsButton>
                             <i class="icon-dots"></i>
                         </button>
                         <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
@@ -45,7 +45,7 @@
                             </ng-container>                
                             
                             <ng-container *ngIf="!field.isLocked">
-                                <div class="dropdown-divider" *ngIf="field.properties.isContentField"></div>
+                                <div class="dropdown-divider"></div>
                         
                                 <a class="dropdown-item" 
                                     (sqxConfirmClick)="lockField()"

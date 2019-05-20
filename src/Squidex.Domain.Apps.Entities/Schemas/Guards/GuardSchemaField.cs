@@ -101,6 +101,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 throw new DomainException("Schema field is already hidden.");
             }
+
+            if (!field.IsForApi())
+            {
+                throw new DomainException("UI field cannot be hidden.");
+            }
         }
 
         public static void CanDisable(Schema schema, DisableField command)
@@ -112,6 +117,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             if (field.IsDisabled)
             {
                 throw new DomainException("Schema field is already disabled.");
+            }
+
+            if (!field.IsForApi())
+            {
+                throw new DomainException("UI field cannot be disabled.");
             }
         }
 

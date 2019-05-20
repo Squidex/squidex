@@ -21,7 +21,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static IEnumerable<ValidationError> Validate(FieldProperties properties)
         {
-            return properties?.Accept(Instance);
+            if (properties != null)
+            {
+                if (!properties.IsForApi() && properties.IsListField)
+                {
+                    yield return new ValidationError("UI field cannot be a list field.", nameof(properties.IsListField));
+                }
+
+                foreach (var error in properties.Accept(Instance))
+                {
+                    yield return error;
+                }
+            }
         }
 
         public IEnumerable<ValidationError> Visit(ArrayFieldProperties properties)
