@@ -29,7 +29,7 @@ export class HomePage {
   }
 
   userLogout() {
-    const userProfile = element(by.css(".ng-tns-c5-1 ng-tns-c7-3"));
+    const userProfile = element(by.css(".ng-tns-c7-3"));
     const logoutButton = userProfile.element(
       by.cssContainingText(".dropdown-item", "Logout")
     );
