@@ -16,7 +16,7 @@ export class BrowserUtil {
   constructor() {}
 
   //waits for element to be present on the DOM
-  async waitForElementPresent(elementLocator: ElementFinder) {
+  waitForElementPresent(elementLocator: ElementFinder) {
     const until = protractor.ExpectedConditions;
     browser.wait(until.presenceOf(elementLocator), 100000);
   }
@@ -58,13 +58,13 @@ export class BrowserUtil {
   }
 
   //wait for angular enabled
-  // waitForAngularDisabledOnCurrentWindow() {
-  //   browser.waitForAngularEnabled(true).then(async () => {
-  //     browser.waitForAngular();
-  //   });
-  // }
+  waitForAngularEnabledOnCurrentWindow() {
+    return browser.waitForAngularEnabled(true).then(async () => {
+      browser.waitForAngular();
+    });
+  }
 
-  // waitForAngularEnabledOnCurrentWindow(){
-  //   browser.waitForAngularEnabled(true)
-  // }
+  waitForAngularDisabledOnCurrentWindow() {
+    return browser.waitForAngularEnabled(false);
+  }
 }

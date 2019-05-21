@@ -1,37 +1,40 @@
-import { browser, element, by, ExpectedConditions, ElementFinder, $ } from 'protractor';
-import {BasePage} from "./basePage.po";
-import { config } from '../config';
-import { Alert } from 'selenium-webdriver';
+import { BrowserUtil } from "./../utils/browser.util";
+import {
+  browser,
+  element,
+  by,
+  ExpectedConditions,
+  ElementFinder,
+  $
+} from "protractor";
+import { config } from "../config";
+import { Alert } from "selenium-webdriver";
 
-/** 
+/**
  * Class representing login page.
  * Login window which opens after clicking on Login button on Squidex base page
  */
 export class HomePage {
+  //to validate Squidex home page options after login
+  commentaryDisplay(): ElementFinder {
+    return element(by.className("card-title"));
+  }
 
-    constructor() {}
+  userNameDisplay(): ElementFinder {
+    return element(by.className("apps-title"));
+  }
 
-    //to validate Squidex home page options after login for Vega test Editor
-    commentaryDisplay() :ElementFinder{
-        return element(by.className('card-title'));
-    }
+  userProfileIconDisplay(): ElementFinder {
+    return element(by.className("user-picture"));
+  }
 
-    userNameDisplay(): ElementFinder {
-        return element(by.className('apps-title'));
-    }
-
-    userProfileIconDisplay() : ElementFinder{
-        return element(by.className('user-picture'));
-    }
-
-    userLogout(){
-        const userProfile = element(by.css('.ng-tns-c7-3'));
-        const logoutButton = userProfile.element(by.cssContainingText('.dropdown-item', 'Logout'));
-        userProfile.click().then(()=>{
-        logoutButton.click();
-        })
-        
-    }
-
-    
+  userLogout() {
+    const userProfile = element(by.css(".ng-tns-c5-1 ng-tns-c7-3"));
+    const logoutButton = userProfile.element(
+      by.cssContainingText(".dropdown-item", "Logout")
+    );
+    userProfile.click().then(async () => {
+      await logoutButton.click();
+    });
+  }
 }

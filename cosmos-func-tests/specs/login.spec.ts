@@ -1,14 +1,10 @@
-import { ILoginData } from "../data/loginData";
-import * as fs from "fs";
-import { find } from "lodash";
-import { BasePage } from "../pages/basePage.po";
+import { ILoginData } from "../data/iLoginData";
 import { browser, element, ExpectedConditions, by, Browser } from "protractor";
 import { LoginPage } from "../pages/loginPage.po";
 import { BrowserUtil } from "../utils/browser.util";
-import { dataProvider } from "../data/dataProvider";
-import { protractor } from "protractor/built/ptor";
 import { HomePage } from "../pages/homePage.po";
 import { config } from "../config";
+import constants from "../utils/constants";
 
 describe("Login To Squidex", () => {
   let loginData = require("../../data/login.json");
@@ -25,13 +21,12 @@ describe("Login To Squidex", () => {
 
   afterEach(() => {
     homePg.userLogout();
-    browser.sleep(2000);
   });
 
   it("Login with Vega Editor credentials", () => {
     loginPg.navigateTo();
     loginPg.loginButton().then(() => {
-      browser.waitForAngularEnabled(false);
+      browserPg.waitForAngularDisabledOnCurrentWindow();
       browserPg.switchToChildWindow();
       loginPg.login(
         authors.find(function(obj) {
@@ -39,27 +34,23 @@ describe("Login To Squidex", () => {
         })
       );
     });
-    browser.waitForAngularEnabled(true).then(async () => {
-      browser.waitForAngular();
+    browserPg.waitForAngularEnabledOnCurrentWindow().then(async () => {
       browserPg.switchToParentWindow();
-      browser.sleep(5000);
+      browser.sleep(1000);
       await expect(browserPg.getCurrentURL()).toBe(
         config.params.expectedUrlAfterNavigation
       );
       await expect(homePg.userNameDisplay().getText()).toBe(
-        config.params.editorWelcomeMessage
+        constants.editorWelcomeMessage
       );
       await expect(homePg.commentaryDisplay().isDisplayed());
-      await expect(
-        homePg.userProfileIconDisplay().isDisplayed() &&
-          homePg.userProfileIconDisplay().isEnabled()
-      );
     });
   });
+
   it("Login with Vega Reviewer credentials", () => {
     loginPg.navigateTo();
     loginPg.loginButton().then(() => {
-      browser.waitForAngularEnabled(false);
+      browserPg.waitForAngularDisabledOnCurrentWindow();
       browserPg.switchToChildWindow();
       loginPg.login(
         authors.find(function(obj) {
@@ -67,21 +58,16 @@ describe("Login To Squidex", () => {
         })
       );
     });
-    browser.waitForAngularEnabled(true).then(async () => {
-      browser.waitForAngular();
-      browserPg.switchToParentWindow();
-      browser.sleep(5000);
+    browserPg.waitForAngularEnabledOnCurrentWindow().then(async () => {
+      await browserPg.switchToParentWindow();
+      browser.sleep(1000);
       await expect(browserPg.getCurrentURL()).toBe(
         config.params.expectedUrlAfterNavigation
       );
       await expect(homePg.userNameDisplay().getText()).toBe(
-        config.params.reviewerWelcomeMessage
+        constants.reviewerWelcomeMessage
       );
       await expect(homePg.commentaryDisplay().isDisplayed());
-      await expect(
-        homePg.userProfileIconDisplay().isDisplayed() &&
-          homePg.userProfileIconDisplay().isEnabled()
-      );
     });
   });
 });

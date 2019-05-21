@@ -1,14 +1,15 @@
 import { Config, browser } from "protractor";
 import { allure } from "jasmine-allure-reporter";
 
-declare const allure:any;
+declare const allure: any;
 export let config: Config = {
   //to auto start Selenium server every time before test through config, we can use the below command instead of the above one
   directConnect: true,
   framework: "jasmine2", // set to "jasmine" for using Jasmine framework
   capabilities: {
     maxInstances: 1,
-    browserName: "chrome",
+    browserName: "chrome"
+    //for running in headless mode
     // chromeOptions: {
     //   args: ["--headless", "--disable-gpu", "--window-size=800,600"]
     // }
@@ -18,10 +19,10 @@ export let config: Config = {
   jasmineNodeOpts: {
     showColors: true,
     //Jasmine assertions timeout
-    defaultTimeoutInterval: 150000,
+    defaultTimeoutInterval: 150000
   },
 
-  specs: ["../JSFiles/specs/*.spec.js"], 
+  specs: ["../JSFiles/specs/*.spec.js"],
 
   onPrepare: () => {
     // to work with non-angular pages. deprecated
@@ -31,29 +32,31 @@ export let config: Config = {
     jasmine.getEnv().addReporter(
       new AllureReporter({
         allureReport: {
-          resultsDir: "allure-results",
+          resultsDir: "allure-results"
         }
       })
     );
     let addScreenShots = new (function() {
       this.specDone = function(result) {
-        console.log('Pavani')
+        console.log("Pavani");
         if (result.status === "failed") {
-          browser.takeScreenshot().then(function(png) {
-            allure.createAttachment(
-              "Screenshot",
-              function() {
-                return new Buffer(png, "base64");
-              },
-              "image/png"
-            )();
-          }).catch((error: any) => console.log(error));
+          browser
+            .takeScreenshot()
+            .then(function(png) {
+              allure.createAttachment(
+                "Screenshot",
+                function() {
+                  return new Buffer(png, "base64");
+                },
+                "image/png"
+              )();
+            })
+            .catch((error: any) => console.log(error));
         }
       };
     })();
     //generate a screen shot after each failed test
     jasmine.getEnv().addReporter(addScreenShots);
-
 
     browser.driver
       .manage()
@@ -62,9 +65,7 @@ export let config: Config = {
   },
   params: {
     baseUrl: "https://vega.systest.cha.rbxd.ds/",
-    expectedUrlAfterNavigation: "https://vega.systest.cha.rbxd.ds/app",
-    editorWelcomeMessage:"Hi Vega Test. Editor",
-    reviewerWelcomeMessage:"Hi Vega Test. Reviewer",
+    expectedUrlAfterNavigation: "https://vega.systest.cha.rbxd.ds/app"
   },
   //protractor timeouts
   getPageTimeout: 30000,
@@ -73,5 +74,5 @@ export let config: Config = {
 
   onComplete: () => {
     browser.close();
-},
+  }
 };
