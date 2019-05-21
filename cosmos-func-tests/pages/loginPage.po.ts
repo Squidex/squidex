@@ -1,4 +1,4 @@
-import { LoginData } from "./../data/loginData";
+import { LoginData } from "../data/LoginData";
 import {
   browser,
   element,
@@ -7,7 +7,7 @@ import {
   ElementFinder,
   $
 } from "protractor";
-import { BasePage } from "./basePage.po";
+import { BasePage } from "./BasePage.po";
 import { config } from "../config";
 
 /**

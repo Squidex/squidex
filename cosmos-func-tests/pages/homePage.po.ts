@@ -1,4 +1,4 @@
-import { BrowserUtil } from "./../utils/browser.util";
+import { BrowserUtil } from "../utils/Browser.util";
 import {
   browser,
   element,

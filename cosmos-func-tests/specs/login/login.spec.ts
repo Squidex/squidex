@@ -1,10 +1,10 @@
-import { ILoginData } from "../data/iLoginData";
+import { ILoginData } from "../../data/ILoginData";
 import { browser, element, ExpectedConditions, by, Browser } from "protractor";
-import { LoginPage } from "../pages/loginPage.po";
-import { BrowserUtil } from "../utils/browser.util";
-import { HomePage } from "../pages/homePage.po";
-import { config } from "../config";
-import constants from "../utils/constants";
+import { LoginPage } from "../../pages/LoginPage.po";
+import { BrowserUtil } from "../../utils/Browser.util";
+import { HomePage } from "../../pages/HomePage.po";
+import { config } from "../../config";
+import constants from "../../utils/constants";
 
 describe("Login To Squidex", () => {
   let loginData = require("../../data/login.json");
