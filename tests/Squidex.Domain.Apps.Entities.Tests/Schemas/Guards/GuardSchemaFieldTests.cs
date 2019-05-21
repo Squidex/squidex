@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         [MemberData(nameof(FieldCommandData))]
         public void Commands_should_throw_exception_if_field_not_found<T>(Action<Schema, T> action) where T : FieldCommand, new()
         {
-            var command = new T { FieldId = 4 };
+            var command = new T { FieldId = 5 };
 
             Assert.Throws<DomainObjectNotFoundException>(() => action(schema_0, command));
         }
