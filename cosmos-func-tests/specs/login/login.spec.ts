@@ -7,7 +7,7 @@ import { config } from "../../config";
 import constants from "../../utils/constants";
 
 describe("Login To Squidex", () => {
-  let loginData = require("../../data/login.json");
+  let loginData = require("../../../data/login.json");
   var authors: Array<ILoginData> = loginData.authors;
   let loginPg: LoginPage;
   let homePg: HomePage;

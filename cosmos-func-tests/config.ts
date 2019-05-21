@@ -22,7 +22,7 @@ export let config: Config = {
     defaultTimeoutInterval: 150000
   },
 
-  specs: ["../JSFiles/specs/*.spec.js"],
+  specs: ["../JSFiles/specs/login/*.spec.js"],
 
   onPrepare: () => {
     // to work with non-angular pages. deprecated
