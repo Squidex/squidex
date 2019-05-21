@@ -38,7 +38,6 @@ export let config: Config = {
     );
     let addScreenShots = new (function() {
       this.specDone = function(result) {
-        console.log("Pavani");
         if (result.status === "failed") {
           browser
             .takeScreenshot()
