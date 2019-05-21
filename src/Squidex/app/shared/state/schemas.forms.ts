@@ -6,6 +6,7 @@
  */
 
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { map } from 'rxjs/operators';
 
 import {
     Form,
@@ -181,6 +182,8 @@ export class EditSchemaForm extends Form<FormGroup, { label?: string, hints?: st
 }
 
 export class AddFieldForm extends Form<FormGroup, AddFieldDto> {
+    public isContentField = value$(this.form.get('type')!).pipe(map(x => x !== 'UI'));
+
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
             type: ['String',

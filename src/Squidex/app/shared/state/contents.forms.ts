@@ -32,7 +32,8 @@ import {
     NumberFieldPropertiesDto,
     ReferencesFieldPropertiesDto,
     StringFieldPropertiesDto,
-    TagsFieldPropertiesDto
+    TagsFieldPropertiesDto,
+    UIFieldPropertiesDto
 } from './../services/schemas.types';
 
 export class SaveQueryForm extends Form<FormGroup, any> {
@@ -124,6 +125,10 @@ export class FieldFormatter implements FieldPropertiesVisitor<string> {
     }
 
     public visitString(properties: StringFieldPropertiesDto): string {
+        return this.value;
+    }
+
+    public visitUI(properties: UIFieldPropertiesDto): string {
         return this.value;
     }
 }
@@ -245,6 +250,10 @@ export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorF
     public visitJson(properties: JsonFieldPropertiesDto): ValidatorFn[] {
         return [];
     }
+
+    public visitUI(properties: UIFieldPropertiesDto): ValidatorFn[] {
+        return [];
+    }
 }
 
 export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
@@ -304,6 +313,10 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     public visitTags(properties: TagsFieldPropertiesDto): any {
         return null;
     }
+
+    public visitUI(properties: UIFieldPropertiesDto): any {
+        return null;
+    }
 }
 
 export class EditContentForm extends Form<FormGroup, any> {
@@ -314,28 +327,30 @@ export class EditContentForm extends Form<FormGroup, any> {
         super(new FormGroup({}));
 
         for (const field of schema.fields) {
-            const fieldForm = new FormGroup({});
-            const fieldDefault = FieldDefaultValue.get(field);
+            if (field.properties.fieldType !== 'UI') {
+                const fieldForm = new FormGroup({});
+                const fieldDefault = FieldDefaultValue.get(field);
 
-            const createControl = (isOptional: boolean) => {
-                const validators = FieldValidatorsFactory.createValidators(field, isOptional);
+                const createControl = (isOptional: boolean) => {
+                    const validators = FieldValidatorsFactory.createValidators(field, isOptional);
 
-                if (field.isArray) {
-                    return new FormArray([], validators);
+                    if (field.isArray) {
+                        return new FormArray([], validators);
+                    } else {
+                        return new FormControl(fieldDefault, validators);
+                    }
+                };
+
+                if (field.isLocalizable) {
+                    for (let language of this.languages.values) {
+                        fieldForm.setControl(language.iso2Code, createControl(language.isOptional));
+                    }
                 } else {
-                    return new FormControl(fieldDefault, validators);
+                    fieldForm.setControl(fieldInvariant, createControl(false));
                 }
-            };
 
-            if (field.isLocalizable) {
-                for (let language of this.languages.values) {
-                    fieldForm.setControl(language.iso2Code, createControl(language.isOptional));
-                }
-            } else {
-                fieldForm.setControl(fieldInvariant, createControl(false));
+                this.form.setControl(field.name, fieldForm);
             }
-
-            this.form.setControl(field.name, fieldForm);
         }
 
         this.enable();
@@ -359,19 +374,21 @@ export class EditContentForm extends Form<FormGroup, any> {
         let isOptional = field.isLocalizable && !!language && language.isOptional;
 
         for (let nested of field.nested) {
-            const nestedValidators = FieldValidatorsFactory.createValidators(nested, isOptional);
+            if (nested.properties.fieldType !== 'UI') {
+                const nestedValidators = FieldValidatorsFactory.createValidators(nested, isOptional);
 
-            let value = FieldDefaultValue.get(nested);
+                let value = FieldDefaultValue.get(nested);
 
-            if (source) {
-                const sourceField = source.get(nested.name);
+                if (source) {
+                    const sourceField = source.get(nested.name);
 
-                if (sourceField) {
-                    value = sourceField.value;
+                    if (sourceField) {
+                        value = sourceField.value;
+                    }
                 }
-            }
 
-            itemForm.setControl(nested.name, new FormControl(value, nestedValidators));
+                itemForm.setControl(nested.name, new FormControl(value, nestedValidators));
+            }
         }
 
         partitionForm.push(itemForm);
@@ -387,7 +404,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         }
     }
 
-    public loadContent(value: any, isArchive: boolean) {
+    public loadContent(value: any, disable: boolean) {
         for (let field of this.schema.fields) {
             if (field.isArray && field.nested.length > 0) {
                 const fieldForm = <FormGroup>this.form.get(field.name);
@@ -425,7 +442,7 @@ export class EditContentForm extends Form<FormGroup, any> {
 
         super.load(value);
 
-        if (isArchive) {
+        if (disable) {
             this.disable();
         } else {
             this.enable();

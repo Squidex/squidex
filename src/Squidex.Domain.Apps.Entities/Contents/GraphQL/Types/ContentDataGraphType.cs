@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
@@ -26,11 +25,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             Name = $"{schemaType}DataDto";
 
-            foreach (var field in schema.SchemaDef.Fields.Where(x => !x.IsHidden))
+            foreach (var field in schema.SchemaDef.Fields.ForApi())
             {
-                var fieldInfo = model.GetGraphType(schema, field);
+                var (resolvedType, valueResolver) = model.GetGraphType(schema, field);
 
-                if (fieldInfo.ResolveType != null)
+                if (valueResolver != null)
                 {
                     var fieldType = field.TypeName();
                     var fieldName = field.DisplayName();
@@ -46,11 +45,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     {
                         var key = partitionItem.Key;
 
-                        var resolver = new FuncFieldResolver<object>(c =>
+                        var partitionResolver = new FuncFieldResolver<object>(c =>
                         {
                             if (((ContentFieldData)c.Source).TryGetValue(key, out var value))
                             {
-                                return fieldInfo.Resolver(value, c);
+                                return valueResolver(value, c);
                             }
                             else
                             {
@@ -61,8 +60,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         fieldGraphType.AddField(new FieldType
                         {
                             Name = key.EscapePartition(),
-                            Resolver = resolver,
-                            ResolvedType = fieldInfo.ResolveType,
+                            Resolver = partitionResolver,
+                            ResolvedType = resolvedType,
                             Description = field.RawProperties.Hints
                         });
                     }

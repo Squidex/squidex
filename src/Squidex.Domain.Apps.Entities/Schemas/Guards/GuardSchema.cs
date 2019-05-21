@@ -13,6 +13,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 
+#pragma warning disable IDE0060 // Remove unused parameter
+
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 {
     public static class GuardSchema
@@ -199,6 +201,19 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             }
             else
             {
+                if (!field.Properties.IsForApi())
+                {
+                    if (field.IsHidden)
+                    {
+                        e("UI field cannot be hidden.", $"{prefix}.{nameof(field.IsHidden)}");
+                    }
+
+                    if (field.IsDisabled)
+                    {
+                        e("UI field cannot be disabled.", $"{prefix}.{nameof(field.IsDisabled)}");
+                    }
+                }
+
                 var errors = FieldPropertiesValidator.Validate(field.Properties);
 
                 errors.Foreach(x => x.WithPrefix($"{prefix}.{nameof(field.Properties)}").AddTo(e));

@@ -21,7 +21,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
         public static IEnumerable<ValidationError> Validate(FieldProperties properties)
         {
-            return properties?.Accept(Instance);
+            if (properties != null)
+            {
+                if (!properties.IsForApi() && properties.IsListField)
+                {
+                    yield return new ValidationError("UI field cannot be a list field.", nameof(properties.IsListField));
+                }
+
+                foreach (var error in properties.Accept(Instance))
+                {
+                    yield return error;
+                }
+            }
         }
 
         public IEnumerable<ValidationError> Visit(ArrayFieldProperties properties)
@@ -266,6 +277,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 yield return new ValidationError(Not.GreaterEquals("Max items", "min items"),
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
+            }
+        }
+
+        public IEnumerable<ValidationError> Visit(UIFieldProperties properties)
+        {
+            if (!properties.Editor.IsEnumValue())
+            {
+                yield return new ValidationError(Not.Valid("Editor"),
+                    nameof(properties.Editor));
             }
         }
     }

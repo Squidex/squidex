@@ -74,6 +74,11 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
             return JsonValue.Array();
         }
 
+        public IJsonValue Visit(IField<UIFieldProperties> field)
+        {
+            return JsonValue.Null;
+        }
+
         public IJsonValue Visit(IField<DateTimeFieldProperties> field)
         {
             if (field.Properties.CalculatedDefaultValue == DateTimeCalculatedDefaultValue.Now)

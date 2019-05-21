@@ -31,14 +31,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (value == null)
-            {
-                return TaskHelper.Done;
-            }
-
-            var typedValue = (T)value;
-
-            if (!allowedValues.Contains(typedValue))
+            if (value != null && value is T typedValue && !allowedValues.Contains(typedValue))
             {
                 addError(context.Path, "Not an allowed value.");
             }

@@ -44,7 +44,7 @@
                         placeholder="Enter field name" sqxFocusOnInit />
                 </div>
 
-                <div class="form-group" *ngIf="!parent">
+                <div class="form-group" *ngIf="!parent && (addFieldForm.isContentField | async)">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="isLocalizable" formControlName="isLocalizable" />
                         <label class="form-check-label" for="isLocalizable">

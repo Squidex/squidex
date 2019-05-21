@@ -78,7 +78,8 @@ namespace Squidex.Domain.Apps.Core
                     .AddNumber(206, "nested-number")
                     .AddReferences(207, "nested-references")
                     .AddString(208, "nested-string")
-                    .AddTags(209, "nested-tags"))
+                    .AddTags(209, "nested-tags")
+                    .AddUI(210, "nested-ui"))
                 .AddAssets(102, "root-assets", Partitioning.Invariant,
                     new AssetsFieldProperties())
                 .AddBoolean(103, "root-boolean", Partitioning.Invariant,
@@ -101,6 +102,8 @@ namespace Squidex.Domain.Apps.Core
                     new StringFieldProperties { Hints = "My String1" })
                 .AddTags(112, "root-tags", Partitioning.Language,
                     new TagsFieldProperties())
+                .AddUI(113, "root-ui", Partitioning.Language,
+                    new UIFieldProperties())
                 .Update(new SchemaProperties { Hints = "The User" })
                 .HideField(104)
                 .HideField(211, 101)
@@ -116,10 +119,8 @@ namespace Squidex.Domain.Apps.Core
             return DefaultSerializer.Deserialize<T>(DefaultSerializer.Serialize(value));
         }
 
-        public static void TestFreeze(IFreezable freezable)
+        public static void TestFreeze(IFreezable sut)
         {
-            var sut = new AssetsFieldProperties();
-
             foreach (var property in sut.GetType().GetRuntimeProperties().Where(x => x.Name != "IsFrozen"))
             {
                 var value =

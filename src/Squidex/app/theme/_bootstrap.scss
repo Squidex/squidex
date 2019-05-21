@@ -77,10 +77,16 @@
 }
 
 .alert-info {
+    background: $color-theme-blue;
+    border: 0;
+}
+
+.alert-hint {
     @include border-radius(0);
     background: lighten($color-theme-blue, 35%);
     border: 1px solid $color-border;
     font-size: 90%;
+    font-weight: normal;
     color: $color-text;
 
     .alert-link {
@@ -188,6 +194,20 @@ a {
                 color: $color-dark-foreground;
             }
         }
+    }
+}
+
+.dropdown-divider {
+    &:first-child {
+        display: none;
+    }
+
+    &:last-child {
+        display: none;
+    }
+
+    & + .dropdown-divider {
+        display: none;
     }
 }
 

@@ -21,8 +21,7 @@ import { Sorting } from '@app/shared/internal';
 
         <ng-template #notSortable>
             {{text}}
-        </ng-template>
-    `,
+        </ng-template>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TableHeaderComponent {

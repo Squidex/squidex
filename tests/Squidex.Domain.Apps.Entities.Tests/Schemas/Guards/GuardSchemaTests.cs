@@ -342,6 +342,38 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public async Task CanCreate_should_throw_exception_if_ui_field_is_invalid()
+        {
+            var command = new CreateSchema
+            {
+                AppId = appId,
+                Fields = new List<UpsertSchemaField>
+                {
+                    new UpsertSchemaField
+                    {
+                        Name = "field1",
+                        Properties = new UIFieldProperties
+                        {
+                            IsListField = true
+                        },
+                        IsHidden = true,
+                        IsDisabled = true,
+                        Partitioning = Partitioning.Invariant.Key
+                    }
+                },
+                Name = "new-schema"
+            };
+
+            await ValidationAssert.ThrowsAsync(() => GuardSchema.CanCreate(command, appProvider),
+                new ValidationError("UI field cannot be a list field.",
+                    "Fields[1].Properties.IsListField"),
+                new ValidationError("UI field cannot be hidden.",
+                    "Fields[1].IsHidden"),
+                new ValidationError("UI field cannot be disabled.",
+                    "Fields[1].IsDisabled"));
+        }
+
+        [Fact]
         public async Task CanCreate_should_not_throw_exception_if_command_is_valid()
         {
             var command = new CreateSchema
@@ -352,7 +384,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     new UpsertSchemaField
                     {
                         Name = "field1",
-                        Properties = ValidProperties(),
+                        Properties = new StringFieldProperties
+                        {
+                            IsListField = true
+                        },
+                        IsHidden = true,
+                        IsDisabled = true,
                         Partitioning = Partitioning.Invariant.Key
                     },
                     new UpsertSchemaField

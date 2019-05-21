@@ -1,25 +1,30 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
-    public class RequiredValidator : IValidator
+    public sealed class NoValueValidator : IValidator
     {
+        public static readonly NoValueValidator Instance = new NoValueValidator();
+
+        private NoValueValidator()
+        {
+        }
+
         public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (value.IsNullOrUndefined() && !context.IsOptional)
+            if (!value.IsUndefined())
             {
-                addError(context.Path, "Field is required.");
+                addError(context.Path, "Value must not be defined.");
             }
 
-            return TaskHelper.Done;
+            return Task.CompletedTask;
         }
     }
 }

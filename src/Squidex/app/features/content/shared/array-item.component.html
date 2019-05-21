@@ -5,16 +5,16 @@
     
             <span class="header-text text-decent">Item #{{index + 1}}</span>
 
-            <button type="button" class="btn btn-text-secondary" [disabled]="isFirst" (click)="emitMoveTop()">
+            <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="emitMoveTop()">
                 <i class="icon-caret-top"></i>
             </button>
-            <button type="button" class="btn btn-text-secondary" [disabled]="isFirst" (click)="emitMoveUp()">
+            <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isFirst" (click)="emitMoveUp()">
                 <i class="icon-caret-up"></i>
             </button>
-            <button type="button" class="btn btn-text-secondary" [disabled]="isLast" (click)="emitMoveDown()">
+            <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="emitMoveDown()">
                 <i class="icon-caret-down"></i>
             </button>
-            <button type="button" class="btn btn-text-secondary" [disabled]="isLast" (click)="emitMoveBottom()">
+            <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled || isLast" (click)="emitMoveBottom()">
                 <i class="icon-caret-bottom"></i>
             </button>
             <button type="button" class="btn btn-text-secondary" [class.hidden]="!isHidden" (click)="emitToggle(false)" title="Open all items">
@@ -26,14 +26,13 @@
         </span>
 
         <span class="float-right">
-            <button type="button" class="btn btn-text-secondary" (click)="emitClone()">
+            <button type="button" class="btn btn-text-secondary" [disabled]="isDisabled" (click)="emitClone()">
                 <i class="icon-clone"></i>
             </button>
     
-            <button type="button" class="btn btn-text-danger" (click)="emitRemove()">
+            <button type="button" class="btn btn-text-danger" [disabled]="isDisabled" (click)="emitRemove()">
                 <i class="icon-bin2"></i>
             </button>
-
         </span>
     </div>
     
