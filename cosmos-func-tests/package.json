@@ -1,0 +1,33 @@
+{
+  "name": "vega-func-tests",
+  "version": "1.0.0",
+  "description": "Automation framework for VEGA",
+  "main": "index.js",
+  "scripts": {
+    "test": "protractor JSFiles/config.js",
+    "pretest": "tsc",
+    "protractor": "./node_modules/protractor/built/cli.js",
+    "webdriver-update": "./node_modules/.bin/webdriver-manager update"
+  },
+  "author": "Pavani",
+  "license": "ISC",
+  "dependencies": {
+    "@types/jasmine": "^3.3.5",
+    "@types/jasminewd2": "^2.0.6",
+    "@types/node": "^12.0.0",
+    "jasmine": "^3.4.0",
+    "jasmine-allure-reporter": "^1.0.2",
+    "lodash": "^4.17.11",
+    "protractor": "^5.4.2",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.4.5",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "fs": "0.0.1-security",
+    "log4js": "^2.5.3",
+    "log4js-protractor-appender": "^1.1.2",
+    "nconf": "^0.10.0",
+    "ts-node": "^3.0.2"
+  }
+}
