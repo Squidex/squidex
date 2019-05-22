@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -25,6 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             AddEventMessage("AppClientUpdatedEvent",
                 "updated client {[Id]}");
+
+            AddEventMessage("AppPlanChanged",
+                "changed plan to {[Plan]}");
 
             AddEventMessage<AppContributorAssigned>(
                 "assigned {user:[Contributor]} as {[Role]}");

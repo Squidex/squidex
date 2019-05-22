@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields

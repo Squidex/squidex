@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
