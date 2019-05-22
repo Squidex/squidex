@@ -76,7 +76,6 @@ namespace Squidex.Infrastructure.UsageTracking
             var id = $"{usageUpdate.Key}_{usageUpdate.Date:yyyy-MM-dd}_{usageUpdate.Category}";
 
             var update = Update
-                .SetOnInsert(x => x.Id, id)
                 .SetOnInsert(x => x.Key, usageUpdate.Key)
                 .SetOnInsert(x => x.Date, usageUpdate.Date)
                 .SetOnInsert(x => x.Category, usageUpdate.Category);
