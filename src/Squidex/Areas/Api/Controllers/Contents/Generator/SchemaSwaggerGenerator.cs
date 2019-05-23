@@ -40,7 +40,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             SchemaQueryDescription = NSwagHelper.LoadDocs("schemaquery");
         }
 
-        public SchemaSwaggerGenerator(SwaggerDocument document, string appName, string appPath, Schema schema, Func<string, JsonSchema4, JsonSchema4> schemaResolver, PartitionResolver partitionResolver)
+        public SchemaSwaggerGenerator(
+            SwaggerDocument document,
+            string appName,
+            string appPath,
+            Schema schema,
+            SchemaResolver schemaResolver,
+            PartitionResolver partitionResolver)
         {
             this.document = document;
 

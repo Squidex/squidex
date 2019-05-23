@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
@@ -14,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public static class JsonSchemaExtensions
     {
-        public static JsonSchema4 BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver, Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public static JsonSchema4 BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver, SchemaResolver schemaResolver)
         {
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
@@ -27,9 +26,9 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             foreach (var field in schema.Fields.ForApi())
             {
                 var partitionObject = Builder.Object();
-                var partition = partitionResolver(field.Partitioning);
+                var partitionSet = partitionResolver(field.Partitioning);
 
-                foreach (var partitionItem in partition)
+                foreach (var partitionItem in partitionSet)
                 {
                     var partitionItemProperty = field.Accept(jsonTypeVisitor);
 

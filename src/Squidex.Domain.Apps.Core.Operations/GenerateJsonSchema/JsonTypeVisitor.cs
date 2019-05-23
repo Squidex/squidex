@@ -5,18 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.ObjectModel;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
+    public delegate JsonSchema4 SchemaResolver(string name, JsonSchema4 schema);
+
     public sealed class JsonTypeVisitor : IFieldVisitor<JsonProperty>
     {
-        private readonly Func<string, JsonSchema4, JsonSchema4> schemaResolver;
+        private readonly SchemaResolver schemaResolver;
 
-        public JsonTypeVisitor(Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+        public JsonTypeVisitor(SchemaResolver schemaResolver)
         {
             this.schemaResolver = schemaResolver;
         }
