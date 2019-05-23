@@ -31,7 +31,7 @@ namespace Squidex.Areas.Api.Controllers.History
         }
 
         /// <summary>
-        /// Get the events from the history
+        /// Get the events from the history.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="channel">The name of the channel.</param>

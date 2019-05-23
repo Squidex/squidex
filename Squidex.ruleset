@@ -62,6 +62,7 @@
     <Rule Id="SA1404" Action="None" />
     <Rule Id="SA1601" Action="None" />
     <Rule Id="SA1413" Action="None" />
+    <Rule Id="SA0001" Action="None" />
   </Rules>
   <Rules AnalyzerId="RefactoringEssentials" RuleNamespace="RefactoringEssentials">
     <Rule Id="RECS0061" Action="Error" />
