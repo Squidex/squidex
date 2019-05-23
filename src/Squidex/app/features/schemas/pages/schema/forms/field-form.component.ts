@@ -8,7 +8,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { FieldDto, ImmutableArray, PatternDto } from '@app/shared';
+import {
+    FieldDto,
+    ImmutableArray,
+    PatternDto
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-field-form',
