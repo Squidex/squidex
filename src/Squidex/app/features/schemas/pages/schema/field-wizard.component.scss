@@ -3,25 +3,12 @@
 
 $icon-size: 4.5rem;
 
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.nav-link {
-    cursor: default;
-}
-
-.nav-tabs {
-    margin-bottom: 1rem;
-}
-
-.table-items-row-details-tab {
+:host /deep/ .table-items-row-details-tab {
     padding: 1.5rem 1.75rem;
 }
 
-.edit-form {
-    margin: -1.5rem -1.75rem;
-    margin-bottom: 0;
+.form-group {
+    margin-bottom: 1.5rem;
 }
 
 .type {
@@ -78,4 +65,9 @@ $icon-size: 4.5rem;
     .radio-input {
         display: none;
     }
+}
+
+.edit-form {
+    margin: -1.5rem -1.75rem;
+    margin-bottom: 0;
 }

@@ -20,7 +20,7 @@
             </div>
             <div class="col col-options">
                 <div class="float-right">
-                    <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
+                    <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="editing" (click)="toggleEditing()">
                         <i class="icon-settings"></i>
                     </button>
 
@@ -70,38 +70,16 @@
         </div>
     </div>
 
-    <div class="table-items-row-details" *ngIf="isEditing">
+    <div class="table-items-row-details" *ngIf="editing">
         <form [formGroup]="editForm.form" (ngSubmit)="save()">
-            <div class="table-items-row-details-tabs clearfix">
-                <ul class="nav nav-tabs2">
-                    <li class="nav-item">
-                        <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">Common</a>
-                    </li>
-                    <li class="nav-item" [class.hidden]="!field.properties.isContentField">
-                        <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">Validation</a>
-                    </li>
-                    <li class="nav-item" [class.hidden]="!field.properties.isContentField || field.properties.fieldType === 'Assets'">
-                        <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">Editing</a>
-                    </li>
-                </ul>
-
-                <div class="float-right">
-                    <button [disabled]="field.isLocked" type="reset" class="btn btn-secondary" (click)="toggleEditing()">Cancel</button>
-                    <button [disabled]="field.isLocked" type="submit" class="btn btn-primary ml-1">Save</button>
-                </div>
-            </div>
-
-            <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
-                <sqx-field-form-common [editForm]="editForm.form" [editFormSubmitted]="editForm.submitted | async" [field]="field"></sqx-field-form-common>
-            </div>
-
-            <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
-                <sqx-field-form-validation [patterns]="patterns" [editForm]="editForm.form" [field]="field"></sqx-field-form-validation>
-            </div>
-
-            <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
-                <sqx-field-form-ui [editForm]="editForm.form" [field]="field"></sqx-field-form-ui>
-            </div>
+            <sqx-field-form
+                (cancel)="toggleEditing()"
+                [showButtons]="true"
+                [patterns]="patterns"
+                [editForm]="editForm.form"
+                [editFormSubmitted]="editForm.submitted | async"
+                [field]="field">
+            </sqx-field-form>
         </form> 
     </div>
 
