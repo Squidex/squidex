@@ -271,6 +271,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private void AddSecurity(SwaggerOperation operation, string permission)
         {
+            if (operation.Security == null)
+            {
+                operation.Security = new List<SwaggerSecurityRequirement>();
+            }
+
             operation.Security.Add(new SwaggerSecurityRequirement
             {
                 [Constants.SecurityDefinition] = new[] { Permissions.ForApp(permission, appName, schemaPath).Id }
