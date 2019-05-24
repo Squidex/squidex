@@ -62,8 +62,8 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
 
     public showAllControls = false;
 
-    public isInvalid: Observable<boolean>;
     public isDifferent: Observable<boolean>;
+    public isInvalid: Observable<boolean>;
     public isTranslatable: boolean;
 
     constructor(
