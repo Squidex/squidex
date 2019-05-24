@@ -40,6 +40,9 @@ export class ArrayItemComponent implements OnChanges {
     public form: EditContentForm;
 
     @Input()
+    public formContext: any;
+
+    @Input()
     public field: RootFieldDto;
 
     @Input()

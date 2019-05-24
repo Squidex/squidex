@@ -4,6 +4,7 @@
     <div class="item" *ngFor="let itemForm of arrayControl.controls; let i = index">
         <sqx-array-item
             [form]="form"
+            [formContext]="formContext"
             [field]="field"
             [isHidden]="snapshot.isHidden"
             [isDisabled]="arrayControl.disabled"

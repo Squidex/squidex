@@ -13,8 +13,10 @@ import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 import { ContentVersionSelected } from './../messages';
 
 import {
+    ApiUrlConfig,
     AppLanguageDto,
     AppsState,
+    AuthService,
     CanComponentDeactivate,
     ContentDto,
     ContentsState,
@@ -45,6 +47,8 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
 export class ContentPageComponent extends ResourceOwner implements CanComponentDeactivate, OnInit {
     public schema: SchemaDetailsDto;
 
+    public formContext: any;
+
     public content: ContentDto;
     public contentVersion: Version | null;
     public contentForm: EditContentForm;
@@ -58,7 +62,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     @ViewChild('dueTimeSelector')
     public dueTimeSelector: DueTimeSelectorComponent;
 
-    constructor(
+    constructor(apiUrl: ApiUrlConfig, authService: AuthService,
         public readonly appsState: AppsState,
         private readonly contentsState: ContentsState,
         private readonly dialogs: DialogService,
@@ -69,6 +73,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         private readonly schemasState: SchemasState
     ) {
         super();
+
+        this.formContext = { user: authService.user, apiUrl: apiUrl.buildUrl('api') };
     }
 
     public ngOnInit() {

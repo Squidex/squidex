@@ -11,7 +11,11 @@
 
 	<div>
 		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
-			<sqx-iframe-editor [url]="field.properties.editorUrl" [formControl]="control"></sqx-iframe-editor>
+            <sqx-iframe-editor [url]="field.properties.editorUrl"
+                [context]="formContext"
+                [formControl]="control"
+                [formValue]="form?.value | async">
+            </sqx-iframe-editor>
 		</ng-container>
 
 		<ng-template #noEditor>
@@ -20,6 +24,7 @@
                     <sqx-array-editor 
                         [arrayControl]="control"
                         [form]="form"
+                        [formContext]="formContext"
                         [field]="field"
                         [language]="language"
                         [languages]="languages">

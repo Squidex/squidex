@@ -15,7 +15,8 @@ import {
     formControls,
     ImmutableArray,
     Types,
-    ValidatorsEx
+    ValidatorsEx,
+    value$
 } from '@app/framework';
 
 import { AppLanguageDto } from './../services/app-languages.service';
@@ -320,6 +321,9 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
 }
 
 export class EditContentForm extends Form<FormGroup, any> {
+    public value =
+        value$(this.form);
+
     constructor(
         private readonly schema: SchemaDetailsDto,
         private readonly languages: ImmutableArray<AppLanguageDto>

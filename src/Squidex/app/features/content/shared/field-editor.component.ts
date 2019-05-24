@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import {
@@ -20,9 +20,12 @@ import {
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html'
 })
-export class FieldEditorComponent implements OnChanges {
+export class FieldEditorComponent {
     @Input()
     public form: EditContentForm;
+
+    @Input()
+    public formContext: any;
 
     @Input()
     public field: FieldDto;
@@ -43,10 +46,4 @@ export class FieldEditorComponent implements OnChanges {
     public displaySuffix: string;
 
     public uniqueId = MathHelper.guid();
-
-    public ngOnChanges() {
-        let a = 0;
-        a++;
-        console.log(a);
-    }
 }

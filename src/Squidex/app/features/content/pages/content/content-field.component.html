@@ -21,6 +21,7 @@
                     <sqx-field-editor
                         [displaySuffix]="prefix(language)"
                         [form]="form"
+                        [formContext]="formContext"
                         [field]="field"
                         [language]="language"
                         [languages]="languages"
@@ -33,6 +34,7 @@
             <ng-template #singleControl>
                 <sqx-field-editor
                     [form]="form"
+                    [formContext]="formContext"
                     [field]="field"
                     [language]="language"
                     [languages]="languages"
@@ -45,6 +47,7 @@
         <ng-template #uiField>
             <sqx-field-editor
                 [form]="form"
+                [formContext]="formContext"
                 [field]="field"
                 [language]="language"
                 [languages]="languages"
@@ -98,6 +101,7 @@
         <ng-template #uiField>
             <sqx-field-editor
                 [form]="form"
+                [formContext]="formContext"
                 [field]="field"
                 [language]="language"
                 [languages]="languages"

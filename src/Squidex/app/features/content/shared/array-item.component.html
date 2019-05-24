@@ -40,6 +40,7 @@
         <div class="form-group" *ngFor="let fieldControl of fieldControls">
             <sqx-field-editor
                 [form]="form"
+                [formContext]="formContext"
                 [field]="fieldControl.field"
                 [language]="language"
                 [languages]="languages"
