@@ -1,22 +1,21 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Services
+namespace Squidex.Domain.Apps.Entities
 {
-    public interface IAppPlanBillingManager
+    public static class EntityExtensions
     {
-        bool HasPortal { get; }
-
-        Task<IChangePlanResult> ChangePlanAsync(string userId, NamedId<Guid> appId, string planId);
-
-        Task<string> GetPortalLinkAsync(string userId);
+        public static NamedId<Guid> NamedId(this IAppEntity entity)
+        {
+            return new NamedId<Guid>(entity.Id, entity.Name);
+        }
     }
 }

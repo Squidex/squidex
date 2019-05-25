@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Apps;
 using Xunit;
@@ -23,6 +24,31 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         public AppPatternsTests()
         {
             patterns_0 = AppPatterns.Empty.Add(firstId, "Default", "Default Pattern", "Message");
+        }
+
+        [Fact]
+        public void Should_create_patterns()
+        {
+            var pattern = new AppPattern("NewPattern", "New Pattern", "Message");
+            var patterns = AppPatterns.Create(Enumerable.Repeat(pattern, 1));
+
+            Assert.Same(pattern, patterns.Values.First());
+        }
+
+        [Fact]
+        public void Should_create_empty_from_null_enumerable()
+        {
+            var patterns = AppPatterns.Create(null);
+
+            Assert.Same(AppPatterns.Empty, patterns);
+        }
+
+        [Fact]
+        public void Should_create_empty_from_empty_enumerable()
+        {
+            var patterns = AppPatterns.Create(Enumerable.Empty<AppPattern>());
+
+            Assert.Same(AppPatterns.Empty, patterns);
         }
 
         [Fact]

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Orleans;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Reflection;
 
 namespace Migrate_01.Migrations
 {
@@ -32,6 +33,11 @@ namespace Migrate_01.Migrations
         {
             var ids = await grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id).GetAppIdsAsync();
 
+            var command = new ConfigurePatterns
+            {
+                Patterns = initialPatterns.Select(p => SimpleMapper.Map(p, new UpsertAppPattern())).ToArray()
+            };
+
             foreach (var id in ids)
             {
                 var app = grainFactory.GetGrain<IAppGrain>(id);
@@ -40,21 +46,10 @@ namespace Migrate_01.Migrations
 
                 if (state.Value.Patterns.Count == 0)
                 {
-                    foreach (var pattern in initialPatterns.Values)
-                    {
-                        var command =
-                            new AddPattern
-                            {
-                                Actor = state.Value.CreatedBy,
-                                AppId = state.Value.Id,
-                                Name = pattern.Name,
-                                PatternId = Guid.NewGuid(),
-                                Pattern = pattern.Pattern,
-                                Message = pattern.Message
-                            };
+                    command.AppId = state.Value.Id;
+                    command.Actor = state.Value.CreatedBy;
 
-                        await app.ExecuteAsync(command);
-                    }
+                    await app.ExecuteAsync(command);
                 }
             }
         }

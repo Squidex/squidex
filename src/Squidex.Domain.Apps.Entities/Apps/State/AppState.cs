@@ -92,6 +92,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
             Clients = Clients.Revoke(@event.Id);
         }
 
+        protected void On(AppPatternsConfigured @event)
+        {
+            Patterns = AppPatterns.Create(@event.Patterns);
+        }
+
         protected void On(AppPatternAdded @event)
         {
             Patterns = Patterns.Add(@event.PatternId, @event.Name, @event.Pattern, @event.Message);

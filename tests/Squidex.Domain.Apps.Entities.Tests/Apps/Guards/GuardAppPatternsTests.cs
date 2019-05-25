@@ -5,176 +5,135 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
-#pragma warning disable SA1310 // Field names must not contain underscore
-
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public class GuardAppPatternsTests
     {
-        private readonly Guid patternId = Guid.NewGuid();
-        private readonly AppPatterns patterns_0 = AppPatterns.Empty;
-
         [Fact]
-        public void CanAdd_should_throw_exception_if_name_empty()
+        public void CanConfigure_should_throw_exception_if_two_patterns_with_same_pattern_exist()
         {
-            var command = new AddPattern { PatternId = patternId, Name = string.Empty, Pattern = ".*" };
+            var command = new ConfigurePatterns
+            {
+                Patterns = new[]
+                {
+                    new UpsertAppPattern { Name = "name1", Pattern = "[a-z]" },
+                    new UpsertAppPattern { Name = "name2", Pattern = "[a-z]" }
+                }
+            };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_0, command),
-                new ValidationError("Name is required.", "Name"));
+            ValidationAssert.Throws(() => GuardAppPatterns.CanConfigure(command),
+                new ValidationError("Two patterns with the same expression exist.", "Patterns"));
         }
 
         [Fact]
-        public void CanAdd_should_throw_exception_if_pattern_empty()
+        public void CanConfigure_should_throw_exception_if_two_patterns_with_same_name_exist()
         {
-            var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = string.Empty };
+            var command = new ConfigurePatterns
+            {
+                Patterns = new[]
+                {
+                    new UpsertAppPattern { Name = "name", Pattern = "[a-z]" },
+                    new UpsertAppPattern { Name = "name", Pattern = "[0-9]" }
+                }
+            };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_0, command),
-                new ValidationError("Pattern is required.", "Pattern"));
+            ValidationAssert.Throws(() => GuardAppPatterns.CanConfigure(command),
+                new ValidationError("Two patterns with the same name exist.", "Patterns"));
         }
 
         [Fact]
-        public void CanAdd_should_throw_exception_if_pattern_not_valid()
+        public void CanConfigure_should_throw_exception_if_expression_not_valid()
         {
-            var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
+            var command = new ConfigurePatterns
+            {
+                Patterns = new[]
+                {
+                    new UpsertAppPattern { Name = "name", Pattern = "((" }
+                }
+            };
 
-            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_0, command),
-                new ValidationError("Pattern is not a valid value.", "Pattern"));
+            ValidationAssert.Throws(() => GuardAppPatterns.CanConfigure(command),
+                new ValidationError("Expression is not a valid value.", "Patterns[1].Pattern"));
         }
 
         [Fact]
-        public void CanAdd_should_throw_exception_if_name_exists()
+        public void CanConfigure_should_throw_exception_if_expression_is_empty()
         {
-            var patterns_1 = patterns_0.Add(Guid.NewGuid(), "any", "[a-z]", "Message");
+            var command = new ConfigurePatterns
+            {
+                Patterns = new[]
+                {
+                    new UpsertAppPattern { Name = "name" }
+                }
+            };
 
-            var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
-
-            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_1, command),
-                new ValidationError("A pattern with the same name already exists."));
+            ValidationAssert.Throws(() => GuardAppPatterns.CanConfigure(command),
+                new ValidationError("Expression is required.", "Patterns[1].Pattern"));
         }
 
         [Fact]
-        public void CanAdd_should_throw_exception_if_pattern_exists()
+        public void CanConfigure_should_throw_exception_if_name_is_empty()
         {
-            var patterns_1 = patterns_0.Add(Guid.NewGuid(), "any", "[a-z]", "Message");
+            var command = new ConfigurePatterns
+            {
+                Patterns = new[]
+                {
+                    new UpsertAppPattern { Pattern = "[0-9]" }
+                }
+            };
 
-            var command = new AddPattern { PatternId = patternId, Name = "other", Pattern = "[a-z]" };
-
-            ValidationAssert.Throws(() => GuardAppPatterns.CanAdd(patterns_1, command),
-                new ValidationError("This pattern already exists but with another name."));
+            ValidationAssert.Throws(() => GuardAppPatterns.CanConfigure(command),
+                new ValidationError("Name is required.", "Patterns[1].Name"));
         }
 
         [Fact]
-        public void CanAdd_should_not_throw_exception_if_success()
+        public void CanConfigure_should_throw_exception_if_pattern_is_null()
         {
-            var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
+            var command = new ConfigurePatterns
+            {
+                Patterns = new UpsertAppPattern[]
+                {
+                    null
+                }
+            };
 
-            GuardAppPatterns.CanAdd(patterns_0, command);
+            ValidationAssert.Throws(() => GuardAppPatterns.CanConfigure(command),
+                new ValidationError("Pattern is required.", "Patterns[1]"));
         }
 
         [Fact]
-        public void CanDelete_should_throw_exception_if_pattern_not_found()
+        public void CanConfigure_should_not_throw_exception_if_patterns_is_valid()
         {
-            var command = new DeletePattern { PatternId = patternId };
+            var command = new ConfigurePatterns
+            {
+                Patterns = new[]
+                {
+                    new UpsertAppPattern { Name = "number", Pattern = "[0-9]" }
+                }
+            };
 
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPatterns.CanDelete(patterns_0, command));
+            GuardAppPatterns.CanConfigure(command);
         }
 
         [Fact]
-        public void CanDelete_should_not_throw_exception_if_success()
+        public void CanConfigure_should_not_throw_exception_if_patterns_is_null()
         {
-            var patterns_1 = patterns_0.Add(patternId, "any", ".*", "Message");
+            var command = new ConfigurePatterns();
 
-            var command = new DeletePattern { PatternId = patternId };
-
-            GuardAppPatterns.CanDelete(patterns_1, command);
+            GuardAppPatterns.CanConfigure(command);
         }
 
         [Fact]
-        public void CanUpdate_should_throw_exception_if_name_empty()
+        public void CanConfigure_should_not_throw_exception_if_patterns_is_empty()
         {
-            var patterns_1 = patterns_0.Add(patternId, "any", ".*", "Message");
+            var command = new ConfigurePatterns { Patterns = new UpsertAppPattern[0] };
 
-            var command = new UpdatePattern { PatternId = patternId, Name = string.Empty, Pattern = ".*" };
-
-            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_1, command),
-                new ValidationError("Name is required.", "Name"));
-        }
-
-        [Fact]
-        public void CanUpdate_should_throw_exception_if_pattern_empty()
-        {
-            var patterns_1 = patterns_0.Add(patternId, "any", ".*", "Message");
-
-            var command = new UpdatePattern { PatternId = patternId, Name = "any", Pattern = string.Empty };
-
-            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_1, command),
-                new ValidationError("Pattern is required.", "Pattern"));
-        }
-
-        [Fact]
-        public void CanUpdate_should_throw_exception_if_pattern_not_valid()
-        {
-            var patterns_1 = patterns_0.Add(patternId, "any", ".*", "Message");
-
-            var command = new UpdatePattern { PatternId = patternId, Name = "any", Pattern = "[0-9{1}" };
-
-            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_1, command),
-                new ValidationError("Pattern is not a valid value.", "Pattern"));
-        }
-
-        [Fact]
-        public void CanUpdate_should_throw_exception_if_name_exists()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var patterns_1 = patterns_0.Add(id1, "Pattern1", "[0-5]", "Message");
-            var patterns_2 = patterns_1.Add(id2, "Pattern2", "[0-4]", "Message");
-
-            var command = new UpdatePattern { PatternId = id2, Name = "Pattern1", Pattern = "[0-4]" };
-
-            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_2, command),
-                new ValidationError("A pattern with the same name already exists."));
-        }
-
-        [Fact]
-        public void CanUpdate_should_throw_exception_if_pattern_exists()
-        {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
-
-            var patterns_1 = patterns_0.Add(id1, "Pattern1", "[0-5]", "Message");
-            var patterns_2 = patterns_1.Add(id2, "Pattern2", "[0-4]", "Message");
-
-            var command = new UpdatePattern { PatternId = id2, Name = "Pattern2", Pattern = "[0-5]" };
-
-            ValidationAssert.Throws(() => GuardAppPatterns.CanUpdate(patterns_2, command),
-                new ValidationError("This pattern already exists but with another name."));
-        }
-
-        [Fact]
-        public void CanUpdate_should_throw_exception_if_pattern_does_not_exists()
-        {
-            var command = new UpdatePattern { PatternId = patternId, Name = "Pattern1", Pattern = ".*" };
-
-            Assert.Throws<DomainObjectNotFoundException>(() => GuardAppPatterns.CanUpdate(patterns_0, command));
-        }
-
-        [Fact]
-        public void CanUpdate_should_not_throw_exception_if_pattern_exist_with_valid_command()
-        {
-            var patterns_1 = patterns_0.Add(patternId, "any", ".*", "Message");
-
-            var command = new UpdatePattern { PatternId = patternId, Name = "Pattern1", Pattern = ".*" };
-
-            GuardAppPatterns.CanUpdate(patterns_1, command);
+            GuardAppPatterns.CanConfigure(command);
         }
     }
 }

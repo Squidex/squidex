@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
@@ -157,28 +158,12 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         UpdateRole(c);
                     });
 
-                case AddPattern addPattern:
-                    return UpdateAsync(addPattern, c =>
+                case ConfigurePatterns configurePatterns:
+                    return UpdateAsync(configurePatterns, c =>
                     {
-                        GuardAppPatterns.CanAdd(Snapshot.Patterns, c);
+                        GuardAppPatterns.CanConfigure(c);
 
-                        AddPattern(c);
-                    });
-
-                case DeletePattern deletePattern:
-                    return UpdateAsync(deletePattern, c =>
-                    {
-                        GuardAppPatterns.CanDelete(Snapshot.Patterns, c);
-
-                        DeletePattern(c);
-                    });
-
-                case UpdatePattern updatePattern:
-                    return UpdateAsync(updatePattern, c =>
-                    {
-                        GuardAppPatterns.CanUpdate(Snapshot.Patterns, c);
-
-                        UpdatePattern(c);
+                        ConfigurePatterns(c);
                     });
 
                 case ChangePlan changePlan:
@@ -194,7 +179,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
                         else
                         {
-                            var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.Id, Snapshot.Name, c.PlanId);
+                            var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId);
 
                             switch (result)
                             {
@@ -213,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case ArchiveApp archiveApp:
                     return UpdateAsync(archiveApp, async c =>
                     {
-                        await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.Id, Snapshot.Name, null);
+                        await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null);
 
                         ArchiveApp(c);
                     });
@@ -234,15 +219,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var events = new List<AppEvent>
             {
-                CreateInitalEvent(command.Name),
+                CreateInitialEvent(command.Name),
+                CreateInitialLanguage(),
                 CreateInitialOwner(command.Actor),
-                CreateInitialLanguage()
+                CreateInitialPatterns(initialPatterns)
             };
-
-            foreach (var pattern in initialPatterns)
-            {
-                events.Add(CreateInitialPattern(pattern.Key, pattern.Value));
-            }
 
             foreach (var @event in events)
             {
@@ -311,19 +292,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             RaiseEvent(SimpleMapper.Map(command, new AppPlanReset()));
         }
 
-        public void AddPattern(AddPattern command)
+        public void ConfigurePatterns(ConfigurePatterns command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppPatternAdded()));
-        }
-
-        public void DeletePattern(DeletePattern command)
-        {
-            RaiseEvent(SimpleMapper.Map(command, new AppPatternDeleted()));
-        }
-
-        public void UpdatePattern(UpdatePattern command)
-        {
-            RaiseEvent(SimpleMapper.Map(command, new AppPatternUpdated()));
+            RaiseEvent(SimpleMapper.Map(command, CreatePatterns(command)));
         }
 
         public void AddRole(AddRole command)
@@ -358,20 +329,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             if (@event.AppId == null)
             {
-                @event.AppId = NamedId.Of(Snapshot.Id, Snapshot.Name);
+                @event.AppId = Snapshot.NamedId();
             }
 
             RaiseEvent(Envelope.Create(@event));
         }
 
-        private static AppCreated CreateInitalEvent(string name)
+        private static AppCreated CreateInitialEvent(string name)
         {
             return new AppCreated { Name = name };
-        }
-
-        private static AppPatternAdded CreateInitialPattern(Guid id, AppPattern pattern)
-        {
-            return new AppPatternAdded { PatternId = id, Name = pattern.Name, Pattern = pattern.Pattern, Message = pattern.Message };
         }
 
         private static AppLanguageAdded CreateInitialLanguage()
@@ -382,6 +348,21 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private static AppContributorAssigned CreateInitialOwner(RefToken actor)
         {
             return new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner };
+        }
+
+        private static AppPatternsConfigured CreateInitialPatterns(InitialPatterns patterns)
+        {
+            return new AppPatternsConfigured { Patterns = patterns.ToArray() };
+        }
+
+        private static AppPatternsConfigured CreatePatterns(ConfigurePatterns command)
+        {
+            return new AppPatternsConfigured { Patterns = command.Patterns?.Select(Convert).ToArray() };
+        }
+
+        private static AppPattern Convert(UpsertAppPattern source)
+        {
+            return new AppPattern(source.Name, source.Pattern, source.Message);
         }
 
         public Task<J<IAppEntity>> GetStateAsync()

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
@@ -24,6 +25,16 @@ namespace Squidex.Domain.Apps.Core.Apps
         public AppPatterns(KeyValuePair<Guid, AppPattern>[] items)
             : base(items)
         {
+        }
+
+        public static AppPatterns Create(IEnumerable<AppPattern> patterns)
+        {
+            if (patterns == null || !patterns.Any())
+            {
+                return Empty;
+            }
+
+            return new AppPatterns(patterns.Select(x => new KeyValuePair<Guid, AppPattern>(Guid.NewGuid(), x)).ToArray());
         }
 
         [Pure]

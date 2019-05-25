@@ -81,7 +81,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_assign_app_id_to_app_self_command()
         {
-            var command = new AddPattern();
+            var command = new ConfigurePatterns();
             var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);
@@ -92,7 +92,7 @@ namespace Squidex.Web.CommandMiddlewares
         [Fact]
         public async Task Should_not_override_app_id()
         {
-            var command = new AddPattern { AppId = Guid.NewGuid() };
+            var command = new ConfigurePatterns { AppId = Guid.NewGuid() };
             var context = new CommandContext(command, commandBus);
 
             await sut.HandleAsync(context);

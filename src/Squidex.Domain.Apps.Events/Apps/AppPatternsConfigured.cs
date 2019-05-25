@@ -1,16 +1,18 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Squidex.Domain.Apps.Events.Apps
 {
-    public sealed class DeletePattern : AppCommand
+    [EventType(nameof(AppPatternsConfigured))]
+    public sealed class AppPatternsConfigured : AppEvent
     {
-        public Guid PatternId { get; set; }
+        public AppPattern[] Patterns { get; set; }
     }
 }

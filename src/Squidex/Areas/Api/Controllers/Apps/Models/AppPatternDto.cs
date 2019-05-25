@@ -9,18 +9,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
     public sealed class AppPatternDto
     {
-        /// <summary>
-        /// Unique id of the pattern.
-        /// </summary>
-        public Guid PatternId { get; set; }
-
         /// <summary>
         /// The name of the suggestion.
         /// </summary>
@@ -40,12 +34,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static AppPatternDto FromKvp(KeyValuePair<Guid, AppPattern> kvp)
         {
-            return SimpleMapper.Map(kvp.Value, new AppPatternDto { PatternId = kvp.Key });
-        }
-
-        public static AppPatternDto FromCommand(AddPattern command)
-        {
-            return SimpleMapper.Map(command, new AppPatternDto());
+            return SimpleMapper.Map(kvp.Value, new AppPatternDto());
         }
     }
 }

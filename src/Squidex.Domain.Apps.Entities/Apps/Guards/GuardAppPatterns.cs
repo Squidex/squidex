@@ -4,9 +4,9 @@
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
+
 using System;
 using System.Linq;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 
@@ -14,88 +14,64 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppPatterns
     {
-        public static void CanAdd(AppPatterns patterns, AddPattern command)
+        public static void CanConfigure(ConfigurePatterns command)
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot add pattern.", e =>
+            Validate.It(() => "Cannot configure patterns.", e =>
             {
-                if (command.PatternId == Guid.Empty)
+                if (command.Patterns?.Length > 0)
                 {
-                   e(Not.Defined("Id"), nameof(command.PatternId));
-                }
+                    var patternIndex = 0;
+                    var patternPrefix = string.Empty;
 
-                if (string.IsNullOrWhiteSpace(command.Name))
-                {
-                   e(Not.Defined("Name"), nameof(command.Name));
-                }
+                    foreach (var pattern in command.Patterns)
+                    {
+                        patternIndex++;
+                        patternPrefix = $"{nameof(command.Patterns)}[{patternIndex}]";
 
-                if (patterns.Values.Any(x => x.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
-                {
-                    e("A pattern with the same name already exists.");
-                }
+                        ValidatePattern(pattern, patternPrefix, e);
+                    }
 
-                if (string.IsNullOrWhiteSpace(command.Pattern))
-                {
-                   e(Not.Defined("Pattern"), nameof(command.Pattern));
-                }
-                else if (!command.Pattern.IsValidRegex())
-                {
-                    e(Not.Valid("Pattern"), nameof(command.Pattern));
-                }
+                    var validNames = command.Patterns.Select(p => p?.Name).Where(p => !string.IsNullOrWhiteSpace(p));
 
-                if (patterns.Values.Any(x => x.Pattern == command.Pattern))
-                {
-                    e("This pattern already exists but with another name.");
+                    if (validNames.Count() != validNames.Distinct(StringComparer.OrdinalIgnoreCase).Count())
+                    {
+                        e("Two patterns with the same name exist.", nameof(command.Patterns));
+                    }
+
+                    var validPatterns = command.Patterns.Select(p => p?.Pattern).Where(p => !string.IsNullOrWhiteSpace(p));
+
+                    if (validPatterns.Count() != validPatterns.Distinct().Count())
+                    {
+                        e("Two patterns with the same expression exist.", nameof(command.Patterns));
+                    }
                 }
             });
         }
 
-        public static void CanDelete(AppPatterns patterns, DeletePattern command)
+        private static void ValidatePattern(UpsertAppPattern pattern, string prefix, AddValidation e)
         {
-            Guard.NotNull(command, nameof(command));
-
-            if (!patterns.ContainsKey(command.PatternId))
+            if (pattern == null)
             {
-                throw new DomainObjectNotFoundException(command.PatternId.ToString(), typeof(AppPattern));
+                e(Not.Defined("Pattern"), prefix);
             }
-        }
-
-        public static void CanUpdate(AppPatterns patterns, UpdatePattern command)
-        {
-            Guard.NotNull(command, nameof(command));
-
-            if (!patterns.ContainsKey(command.PatternId))
+            else
             {
-                throw new DomainObjectNotFoundException(command.PatternId.ToString(), typeof(AppPattern));
+                if (string.IsNullOrWhiteSpace(pattern.Name))
+                {
+                    e(Not.Defined("Name"), $"{prefix}.{nameof(pattern.Name)}");
+                }
+
+                if (string.IsNullOrWhiteSpace(pattern.Pattern))
+                {
+                    e(Not.Defined("Expression"), $"{prefix}.{nameof(pattern.Pattern)}");
+                }
+                else if (!pattern.Pattern.IsValidRegex())
+                {
+                    e(Not.Valid("Expression"), $"{prefix}.{nameof(pattern.Pattern)}");
+                }
             }
-
-            Validate.It(() => "Cannot update pattern.", e =>
-            {
-                if (string.IsNullOrWhiteSpace(command.Name))
-                {
-                   e(Not.Defined("Name"), nameof(command.Name));
-                }
-
-                if (patterns.Any(x => x.Key != command.PatternId && x.Value.Name.Equals(command.Name, StringComparison.OrdinalIgnoreCase)))
-                {
-                    e("A pattern with the same name already exists.");
-                }
-
-                if (string.IsNullOrWhiteSpace(command.Pattern))
-                {
-                   e(Not.Defined("Pattern"), nameof(command.Pattern));
-                }
-                else if (!command.Pattern.IsValidRegex())
-                {
-                    e(Not.Valid("Pattern"), nameof(command.Pattern));
-                }
-
-                if (patterns.Any(x => x.Key != command.PatternId && x.Value.Pattern == command.Pattern))
-                {
-                    e("This pattern already exists but with another name.");
-                }
-            });
         }
     }
 }

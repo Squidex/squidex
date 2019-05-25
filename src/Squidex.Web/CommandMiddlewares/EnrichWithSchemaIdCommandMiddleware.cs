@@ -69,7 +69,7 @@ namespace Squidex.Web.CommandMiddlewares
 
                 if (appFeature?.App != null)
                 {
-                    appId = NamedId.Of(appFeature.App.Id, appFeature.App.Name);
+                    appId = appFeature.App.NamedId();
                 }
             }
 

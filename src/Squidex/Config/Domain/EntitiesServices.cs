@@ -144,7 +144,7 @@ namespace Squidex.Config.Domain
                     if (!string.IsNullOrWhiteSpace(pattern.Key) &&
                         !string.IsNullOrWhiteSpace(pattern.Value))
                     {
-                        result[Guid.NewGuid()] = new AppPattern(pattern.Key, pattern.Value);
+                        result.Add(new AppPattern(pattern.Key, pattern.Value));
                     }
                 }
 

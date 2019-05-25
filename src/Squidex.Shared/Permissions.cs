@@ -80,9 +80,7 @@ namespace Squidex.Shared
 
         public const string AppPatterns = "squidex.apps.{app}.patterns";
         public const string AppPatternsRead = "squidex.apps.{app}.patterns.read";
-        public const string AppPatternsCreate = "squidex.apps.{app}.patterns.create";
         public const string AppPatternsUpdate = "squidex.apps.{app}.patterns.update";
-        public const string AppPatternsDelete = "squidex.apps.{app}.patterns.delete";
 
         public const string AppBackups = "squidex.apps.{app}.backups";
         public const string AppBackupsRead = "squidex.apps.{app}.backups.read";

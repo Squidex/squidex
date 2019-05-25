@@ -1,22 +1,20 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class UpdatePattern : AppCommand
+    public static class AppExtensions
     {
-        public Guid PatternId { get; set; }
-
-        public string Name { get; set; }
-
-        public string Pattern { get; set; }
-
-        public string Message { get; set; }
+        public static NamedId<Guid> NamedId(this IAppEntity app)
+        {
+            return new NamedId<Guid>(app.Id, app.Name);
+        }
     }
 }

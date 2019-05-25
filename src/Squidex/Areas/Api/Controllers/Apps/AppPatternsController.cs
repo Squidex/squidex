@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -55,73 +54,24 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Create a new app pattern.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="request">Pattern to be added to the app.</param>
-        /// <returns>
-        /// 201 => Pattern generated.
-        /// 400 => Pattern request not valid.
-        /// 404 => App not found.
-        /// </returns>
-        [HttpPost]
-        [Route("apps/{app}/patterns/")]
-        [ProducesResponseType(typeof(AppPatternDto), 201)]
-        [ApiPermission(Permissions.AppPatternsCreate)]
-        [ApiCosts(1)]
-        public async Task<IActionResult> PostPattern(string app, [FromBody] UpdatePatternDto request)
-        {
-            var command = request.ToAddCommand();
-
-            await CommandBus.PublishAsync(command);
-
-            var response = AppPatternDto.FromCommand(command);
-
-            return CreatedAtAction(nameof(GetPatterns), new { app }, response);
-        }
-
-        /// <summary>
-        /// Update an existing app pattern.
+        /// Updates all app pattern.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the pattern to be updated.</param>
-        /// <param name="request">Pattern to be updated for the app.</param>
+        /// <param name="request">Patterns to be updated for the app.</param>
         /// <returns>
-        /// 204 => Pattern updated.
-        /// 400 => Pattern request not valid.
-        /// 404 => Pattern or app not found.
+        /// 204 => Patterns updated.
+        /// 400 => Patterns request not valid.
+        /// 404 => App not found.
         /// </returns>
         [HttpPut]
-        [Route("apps/{app}/patterns/{id}/")]
+        [Route("apps/{app}/patterns/")]
         [ProducesResponseType(typeof(AppPatternDto), 201)]
         [ApiPermission(Permissions.AppPatternsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> UpdatePattern(string app, Guid id, [FromBody] UpdatePatternDto request)
+        public async Task<IActionResult> UpdatePatterns(string app, Guid id, [FromBody] ConfigurePatternsDto request)
         {
-            await CommandBus.PublishAsync(request.ToUpdateCommand(id));
-
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Delete an existing app pattern.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="id">The id of the pattern to be deleted.</param>
-        /// <returns>
-        /// 204 => Pattern removed.
-        /// 404 => Pattern or app not found.
-        /// </returns>
-        /// <remarks>
-        /// Schemas using this pattern will still function using the same Regular Expression.
-        /// </remarks>
-        [HttpDelete]
-        [Route("apps/{app}/patterns/{id}/")]
-        [ApiPermission(Permissions.AppPatternsDelete)]
-        [ApiCosts(1)]
-        public async Task<IActionResult> DeletePattern(string app, Guid id)
-        {
-            await CommandBus.PublishAsync(new DeletePattern { PatternId = id });
+            await CommandBus.PublishAsync(request.ToConfigureCommand());
 
             return NoContent();
         }
