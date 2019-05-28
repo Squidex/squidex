@@ -5,18 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Avro.Specific;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Extensions.Actions.Kafka.Entities;
 
 namespace Squidex.Extensions.Actions.Kafka
 {
-    public class CommentaryTypeMapper : IKafkaMessageMapper
+    public class CommodityMapper : IKafkaMessageMapper
     {
         public ISpecificRecord ToAvro(NamedContentData namedContentData)
         {
-            var commentaryType = new CommentaryType();
+            var commentaryType = new Commodity();
             ContentFieldData idData = null;
 
             if (!namedContentData.TryGetValue("Id", out idData))

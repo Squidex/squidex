@@ -10,18 +10,26 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avro;
 using Avro.Specific;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Extensions.Actions.Kafka.Entities;
 
 namespace Squidex.Extensions.Actions.Kafka
 {
     public sealed class KafkaActionHandler : RuleActionHandler<KafkaAction, KafkaJob>
     {
         private const string DescriptionIgnore = "Ignore";
+        private IContentRepository contentRepository;
+        private IAppProvider appProvider;
 
-        public KafkaActionHandler(RuleEventFormatter formatter)
+        public KafkaActionHandler(RuleEventFormatter formatter, IAppProvider appProvider, IContentRepository contentRepository)
             : base(formatter)
         {
+            this.appProvider = appProvider;
+            this.contentRepository = contentRepository;
         }
 
         protected override (string Description, KafkaJob Data) CreateJob(EnrichedEvent @event, KafkaAction action)
@@ -34,7 +42,7 @@ namespace Squidex.Extensions.Actions.Kafka
                     SchemaRegistry = action.SchemaRegistry,
                     TopicName = action.TopicName,
                     Key = contentEvent.Id.ToString(),
-                    Message = KafkaMessageFactory.GetKafkaMessage(action.TopicName, contentEvent.Data)
+                    Message = contentEvent.Data
                 };
                 return ("Push to Kafka", ruleJob);
             }
@@ -46,9 +54,27 @@ namespace Squidex.Extensions.Actions.Kafka
         {
             try
             {
-                using (var kafkaProducer = KafkaProducerFactory.GetKafkaProducer(job.TopicName, job.Broker.AbsoluteUri, job.SchemaRegistry.AbsoluteUri))
+                switch (job.TopicName)
                 {
-                    await kafkaProducer.Send(job.Key, job.Message);
+                    case "Commentary":
+                        using (var commentaryProducer = new KafkaProducer<Commentary>(job.TopicName, job.Broker.AbsoluteUri, job.SchemaRegistry.AbsoluteUri))
+                        {
+                            var commentaryData = (Commentary)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message, this.appProvider, this.contentRepository);
+                            commentaryData.Id = job.Key;
+                            await commentaryProducer.Send(commentaryData.Id, commentaryData);
+                        }
+
+                        break;
+                    case "CommentaryType":
+                        using (var commentaryTypeProducer = new KafkaProducer<CommentaryType>(job.TopicName, job.Broker.AbsoluteUri, job.SchemaRegistry.AbsoluteUri))
+                        {
+                            var commentaryTypeData = (CommentaryType)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message, this.appProvider, this.contentRepository);
+                            await commentaryTypeProducer.Send(commentaryTypeData.Id, commentaryTypeData);
+                        }
+
+                        break;
+                    default:
+                        throw new Exception("kafka Topic not configured.");
                 }
 
                 return Result.Success("Event pushed to Kafka");
@@ -70,6 +96,6 @@ namespace Squidex.Extensions.Actions.Kafka
 
         public string Key { get; set; }
 
-        public ISpecificRecord Message { get; set; }
+        public NamedContentData Message { get; set; }
     }
 }

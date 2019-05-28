@@ -1,0 +1,14 @@
+{
+    "trigger":{
+       "schemas":[
+            {
+                "condition":"event.type == 'Published'"
+            }
+        ],
+       "handleAll":false,
+       "triggerType":"ContentChanged"
+    },
+    "action":{
+       "actionType":"Kafka"
+    }
+ }

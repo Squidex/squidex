@@ -5,27 +5,29 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Avro.Specific;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Extensions.Actions.Kafka.Entities;
+using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 
 namespace Squidex.Extensions.Actions.Kafka
 {
     public static class KafkaMessageFactory
     {
-        public static ISpecificRecord GetKafkaMessage(string topicName, NamedContentData namedContentData)
+        public static ISpecificRecord GetKafkaMessage(string topicName, NamedContentData namedContentData, IAppProvider appProvider, IContentRepository contentRepository)
         {
             ISpecificRecord entity = null;
             switch (topicName)
             {
                 case "Commentary":
-                    entity = new CommentaryMapper().ToAvro(namedContentData);
+                    entity = new CommentaryMapper(appProvider, contentRepository).ToAvro(namedContentData);
                     break;
                 case "CommentaryType":
                     entity = new CommentaryTypeMapper().ToAvro(namedContentData);
                     break;
                 default:
-                    break;
+                    throw new Exception("kafka Topic not configured.");
             }
 
             return entity;

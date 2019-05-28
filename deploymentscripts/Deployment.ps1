@@ -18,8 +18,15 @@ param(
 
     [Parameter(Mandatory=$true)]
     [string]
-    $appName
+    $appName,
 
+    [Parameter(Mandatory=$false)]
+    [string]
+    $broker,
+
+    [Parameter(Mandatory=$false)]
+    [string]
+    $schemaRegistry
 )
 
 add-type @"
@@ -36,8 +43,16 @@ add-type @"
 [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 
  $token = .\Authentication.ps1 -identityServiceBaseUrl $identityServiceBaseUrl -tokenUser $tokenUser -tokenPassword $tokenPassword
- .\1_CreateApp.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
- .\2_CreateSchemas.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
- .\3_CreateRoles.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
- .\4_CreateLanguages.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName 
- .\5_CreateRefDataContent.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
+ Write-Host $token
+.\1_CreateApp.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
+
+$schemaResponse = .\2_CreateSchemas.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
+Write-Host $schemaResponse
+.\3_CreateRoles.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
+.\4_CreateLanguages.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName 
+
+if ($broker -and $schemaRegistry) {
+    .\5_CreateRules.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName -broker $broker -schemaRegistry $schemaRegistry -schemaIds $schemaResponse
+}
+
+.\6_CreateRefDataContent.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
