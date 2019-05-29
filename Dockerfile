@@ -3,8 +3,8 @@
 #
 FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder
 
-#RUN npm config set https-proxy http://outboundproxycha.cha.rbxd.ds:3128/
-#RUN npm config set http-proxy http://outboundproxycha.cha.rbxd.ds:3128/
+RUN npm config set https-proxy http://outboundproxycha.cha.rbxd.ds:3128/
+RUN npm config set http-proxy http://outboundproxycha.cha.rbxd.ds:3128/
 
 WORKDIR /src
 
