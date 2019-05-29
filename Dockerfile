@@ -22,7 +22,7 @@ RUN cp -a /tmp/node_modules src/Squidex/ \
  && npm run build
  
 # Test Backend
-RUN dotnet restore \
+RUN dotnet restore
 #  && dotnet test --filter Category!=Dependencies tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj \ 
 #  && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj \ 
 #  && dotnet test tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj \
