@@ -1,7 +1,10 @@
 #
 # Stage 1, Prebuild
 #
-FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as builder
+FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder
+
+ENV https_proxy http://outboundproxycha.cha.rbxd.ds:3128/
+ENV http_proxy http://outboundproxycha.cha.rbxd.ds:3128/
 
 WORKDIR /src
 
@@ -32,7 +35,10 @@ RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configurati
 #
 # Stage 2, Build runtime
 #
-FROM microsoft/dotnet:2.2-runtime-deps-alpine
+FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-runtime-deps-alpine
+
+ENV https_proxy https://outboundproxycha.cha.rbxd.ds:3128/
+ENV http_proxy http://outboundproxycha.cha.rbxd.ds:3128/
 
 # Default AspNetCore directory
 WORKDIR /app
