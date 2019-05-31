@@ -36,7 +36,7 @@ else
 }
 
 Write-Host "Artifact Version: '$semVer'"
-return $semVer
+$semVer
 
 
 
