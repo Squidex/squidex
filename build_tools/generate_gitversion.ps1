@@ -8,7 +8,7 @@ param(
 $mono = if( Get-Command mono) { $(Get-Command mono).Path } else {"" }
 
 $nugetExe = "& $mono $PSScriptRoot/.nuget/nuget.exe"
-$nugetGitversionInstallArgs = 'Install', 'GitVersion.CommandLine', '-version', '4.0.0', '-OutputDirectory', "$PSScriptRoot/packages"
+$nugetGitversionInstallArgs = 'Install', 'GitVersion.CommandLine', '-version', '4.0.0', '-OutputDirectory', "$PSScriptRoot/build_tools/packages"
 
 Invoke-Expression "$nugetExe $nugetGitversionInstallArgs"
 
@@ -21,7 +21,7 @@ echo @'
 '@ > $PSScriptRoot/packages/GitVersion.CommandLine.4.0.0/tools/LibGit2Sharp.dll.config
 
 
-$gitVersionExe = "& $mono $PSScriptRoot/packages/GitVersion.CommandLine.4.0.0/tools/GitVersion.exe -nofetch"
+$gitVersionExe = "& $mono $PSScriptRoot/build_tools/packages/GitVersion.CommandLine.4.0.0/tools/GitVersion.exe -nofetch"
 $json = Invoke-Expression $gitVersionExe
 
 $version = $json | out-string | ConvertFrom-Json
