@@ -15,13 +15,13 @@ namespace Squidex.Extensions.Actions.Kafka
 {
     public static class KafkaMessageFactory
     {
-        public static ISpecificRecord GetKafkaMessage(string topicName, NamedContentData namedContentData, IAppProvider appProvider, IContentRepository contentRepository)
+        public static ISpecificRecord GetKafkaMessage(string topicName, NamedContentData namedContentData)
         {
             ISpecificRecord entity = null;
             switch (topicName)
             {
                 case "Commentary":
-                    entity = new CommentaryMapper(appProvider, contentRepository).ToAvro(namedContentData);
+                    entity = new CommentaryMapper().ToAvro(namedContentData);
                     break;
                 case "CommentaryType":
                     entity = new CommentaryTypeMapper().ToAvro(namedContentData);

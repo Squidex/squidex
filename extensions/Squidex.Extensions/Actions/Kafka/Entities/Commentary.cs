@@ -17,29 +17,11 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
             {
                 ""type"": ""record"",
                 ""name"": ""Commentary"",
-                ""namespace"": ""Cosmos.Kafka.Entities"",
+                ""namespace"": ""Squidex.Extensions.Actions.Kafka.Entities"",
                 ""fields"": [
                     {""name"": ""id"", ""type"": ""string""},
-                    {""name"": ""commentaryType"", ""type"": 
-                        {
-                            ""type"": ""record"", 
-                            ""name"": ""CommentaryType"",
-                            ""fields"": [
-                                {""name"": ""id"", ""type"": ""string""},
-                                {""name"": ""name"", ""type"": ""string""}
-                            ]
-                        }
-                    },
-                    {""name"": ""commodity"", ""type"": 
-                        {
-                            ""type"": ""record"", 
-                            ""name"": ""Commodity"",
-                            ""fields"": [
-                                {""name"": ""id"", ""type"": ""string""},
-                                {""name"": ""name"", ""type"": ""string""}
-                            ]
-                        }
-                    },
+                    {""name"": ""commmentaryTypeId"", ""type"": ""string""},
+                    {""name"": ""commodityId"", ""type"": ""string""},
                     {""name"": ""body"", ""type"": [""string"", ""null""]}
                 ]
             }");
@@ -48,8 +30,8 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
 
         public string Id { get; set; }
         public string Body { get; set; }
-        public CommentaryType CommentaryType { get; set; }
-        public Commodity Commodity { get; set; }
+        public string CommentaryTypeId { get; set; }
+        public string CommodityId { get; set; }
 
         public virtual object Get(int fieldPos)
         {
@@ -58,9 +40,9 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
                 case 0:
                     return Id;
                 case 1:
-                    return CommentaryType;
+                    return CommentaryTypeId;
                 case 2:
-                    return Commodity;
+                    return CommodityId;
                 case 3:
                     return Body;
                 default:
@@ -76,10 +58,10 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
                     Id = (string)fieldValue;
                     break;
                 case 1:
-                    CommentaryType = (CommentaryType)fieldValue;
+                    CommentaryTypeId = (string)fieldValue;
                     break;
                 case 2:
-                    Commodity = (Commodity)fieldValue;
+                    CommodityId = (string)fieldValue;
                     break;
                 case 3:
                     Body = (string)fieldValue;

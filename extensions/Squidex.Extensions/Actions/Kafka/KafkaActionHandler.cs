@@ -22,14 +22,9 @@ namespace Squidex.Extensions.Actions.Kafka
     public sealed class KafkaActionHandler : RuleActionHandler<KafkaAction, KafkaJob>
     {
         private const string DescriptionIgnore = "Ignore";
-        private IContentRepository contentRepository;
-        private IAppProvider appProvider;
-
-        public KafkaActionHandler(RuleEventFormatter formatter, IAppProvider appProvider, IContentRepository contentRepository)
+        public KafkaActionHandler(RuleEventFormatter formatter)
             : base(formatter)
         {
-            this.appProvider = appProvider;
-            this.contentRepository = contentRepository;
         }
 
         protected override (string Description, KafkaJob Data) CreateJob(EnrichedEvent @event, KafkaAction action)
@@ -59,7 +54,7 @@ namespace Squidex.Extensions.Actions.Kafka
                     case "Commentary":
                         using (var commentaryProducer = new KafkaProducer<Commentary>(job.TopicName, job.Broker.AbsoluteUri, job.SchemaRegistry.AbsoluteUri))
                         {
-                            var commentaryData = (Commentary)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message, this.appProvider, this.contentRepository);
+                            var commentaryData = (Commentary)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message);
                             commentaryData.Id = job.Key;
                             await commentaryProducer.Send(commentaryData.Id, commentaryData);
                         }
@@ -68,7 +63,7 @@ namespace Squidex.Extensions.Actions.Kafka
                     case "CommentaryType":
                         using (var commentaryTypeProducer = new KafkaProducer<CommentaryType>(job.TopicName, job.Broker.AbsoluteUri, job.SchemaRegistry.AbsoluteUri))
                         {
-                            var commentaryTypeData = (CommentaryType)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message, this.appProvider, this.contentRepository);
+                            var commentaryTypeData = (CommentaryType)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message);
                             await commentaryTypeProducer.Send(commentaryTypeData.Id, commentaryTypeData);
                         }
 
