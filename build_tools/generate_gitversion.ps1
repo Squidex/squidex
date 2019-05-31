@@ -1,7 +1,7 @@
 param(
 
     [Parameter(Mandatory=$false)]
-    [string]
+    [Int]
     $BuildCounter
 )
 
