@@ -22,7 +22,7 @@ echo @'
 
 
 #test commit
-$gitVersionExe = "& $mono $PSScriptRoot/packages/GitVersion.CommandLine.4.0.0/tools/GitVersion.exe"
+$gitVersionExe = "& $mono $PSScriptRoot/packages/GitVersion.CommandLine.4.0.0/tools/GitVersion.exe -nofetch"
 $json = Invoke-Expression $gitVersionExe
 
 $version = $json | out-string | ConvertFrom-Json
