@@ -12,7 +12,7 @@ $TAG_NAME = $env:Version
 
 Write-Host $TAG_NAME
 
-$DOCKER_TAG =  $TAG_NAME.toLower() -replace "[^a-z0-9_\-]",'.'
+$DOCKER_TAG =  "nexus.cha.rbxd.ds:8000/cosmos:" + $TAG_NAME.toLower() -replace "[^a-z0-9_\-]",'.'
 
 Write-Host $DOCKER_TAG
 
