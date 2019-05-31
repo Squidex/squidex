@@ -6,7 +6,7 @@ param(
 )
 
 $TAG_NAME= .\build_tools\generate_gitversion.ps1 -BuildCounter $BuildCounter
-docker build . -t $TAG_NAME --pull `
+docker build . -t $TAG_NAME.ToLower() --pull `
     --build-arg http_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
     --build-arg https_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
     -f Dockerfile
