@@ -6,7 +6,9 @@ param(
 )
 
 $GIT_VERSION_PS = "build_tools/generate_gitversion.ps1 -BuildCounter $BuildCounter"
-$TAG_NAME = Invoke-Expression $GIT_VERSION_PS
+Invoke-Expression $GIT_VERSION_PS
+$TAG_NAME = $env:Version
+
 
 Write-Host $TAG_NAME
 

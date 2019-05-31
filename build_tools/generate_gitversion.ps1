@@ -5,7 +5,7 @@ param(
     $BuildCounter
 )
 
-$mono = if( Get-Command mono) { $(Get-Command mono).Path } else {"" }
+$mono = if( Get-Command mono) { $(Get-Command mono).Path } else {"" } 
 
 $nugetExe = "& $mono $PSScriptRoot/.nuget/nuget.exe"
 $nugetGitversionInstallArgs = 'Install', 'GitVersion.CommandLine', '-version', '4.0.0', '-OutputDirectory', "$PSScriptRoot/packages"
@@ -13,7 +13,7 @@ $nugetGitversionInstallArgs = 'Install', 'GitVersion.CommandLine', '-version', '
 Invoke-Expression "$nugetExe $nugetGitversionInstallArgs"
 
 #set up libgit to work correcly with centos
-Write-Host @'
+echo @'
 <configuration>
     <dllmap os="linux" cpu="x86-64" wordsize="64" dll="git2-15e1193" target="/usr/lib64/libgit2.so.24" />
     <dllmap os="osx" cpu="x86,x86-64" dll="git2-15e1193" target="lib/osx/libgit2-15e1193.dylib" />
@@ -36,7 +36,8 @@ else
 }
 
 Write-Host "Artifact Version: '$semVer'"
-Write-Output $semVer
+$env:Version = $semVer
+
 
 
 
