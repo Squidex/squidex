@@ -5,7 +5,8 @@ param(
     $BuildCounter
 )
 
-$TAG_NAME = .\build_tools\generate_gitversion.ps1 -BuildCounter $BuildCounter
+$GIT_VERSION_PS = "build_tools/generate_gitversion.ps1 -BuildCounter $BuildCounter"
+$TAG_NAME = Invoke-Expression $GIT_VERSION_PS
 
 Write-Host $TAG_NAME
 
