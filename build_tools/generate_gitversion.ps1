@@ -21,6 +21,7 @@ $mono = if( Get-Command mono) { $(Get-Command mono).Path } else {"" }
 # '@ > $PSScriptRoot/packages/GitVersion.CommandLine.4.0.0/tools/LibGit2Sharp.dll.config
 
 
+#test commit
 $gitVersionExe = "& $mono $PSScriptRoot/packages/GitVersion.CommandLine.4.0.0/tools/GitVersion.exe -nofetch"
 $json = Invoke-Expression $gitVersionExe
 
