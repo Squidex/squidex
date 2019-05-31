@@ -17,7 +17,7 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
             {
                 ""type"": ""record"",
                 ""name"": ""Commentary"",
-                ""namespace"": ""Squidex.Extensions.Actions.Kafka.Entities"",
+                ""namespace"": ""Cosmos.Kafka.Entities"",
                 ""fields"": [
                     {""name"": ""id"", ""type"": ""string""},
                     {""name"": ""commmentaryTypeId"", ""type"": ""string""},
