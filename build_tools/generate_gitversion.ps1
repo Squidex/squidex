@@ -8,7 +8,7 @@ param(
 $mono = if( Get-Command mono) { $(Get-Command mono).Path } else {"" }
 
 $nugetExe = "& $mono $PSScriptRoot/.nuget/nuget.exe"
-$nugetGitversionInstallArgs = 'Install', 'GitVersion.CommandLine', '-version', '4.0.0', '-OutputDirectory', "$PSScriptRoot/src"
+$nugetGitversionInstallArgs = 'Install', 'GitVersion.CommandLine', '-version', '4.0.0', '-OutputDirectory', "$PSScriptRoot/packages"
 
 Invoke-Expression "$nugetExe $nugetGitversionInstallArgs"
 
