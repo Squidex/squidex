@@ -34,8 +34,10 @@ else
   $semVer = $version.FullSemVer
 }
 
+# Set environment variables with the semantic version tag
 $env:Version = $semVer
-Write-Host "Semantic Version: '$semVer'"
+
+# Modify the teamcity 'buildNumber' with the semantic version tag
 Write-Host "##teamcity[buildNumber '$semVer']"
 
 
