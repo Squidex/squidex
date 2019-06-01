@@ -21,7 +21,6 @@ echo @'
 '@ > $PSScriptRoot/packages/GitVersion.CommandLine.4.0.0/tools/LibGit2Sharp.dll.config
 
 
-#test commit
 $gitVersionExe = "& $mono $PSScriptRoot/packages/GitVersion.CommandLine.4.0.0/tools/GitVersion.exe -nofetch"
 $json = Invoke-Expression $gitVersionExe
 
@@ -35,9 +34,8 @@ else
   $semVer = $version.FullSemVer
 }
 
-Write-Host "Artifact Version: '$semVer'"
 $env:Version = $semVer
-
-
+Write-Host "Semantic Version: '$semVer'"
+Write-Host "##teamcity[buildNumber '$semVer']"
 
 
