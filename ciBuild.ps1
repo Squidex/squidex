@@ -21,4 +21,4 @@ docker build . -t $DOCKER_TAG --pull `
     --build-arg https_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
     -f Dockerfile
 
-docker push $DOCKER_TAG
+# docker push $DOCKER_TAG
