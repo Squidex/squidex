@@ -19,7 +19,7 @@
     }
 }
 
-:host /deep/ canvas {
+::ng-deep canvas {
     height: 12rem !important;
     margin-top: -1rem;
     margin-bottom: 0;
@@ -72,7 +72,7 @@
         }
 
         &:hover {
-            @include box-shadow(0, 3px, 16px, .2px);
+            @include box-shadow(0, 3px, 16px, .2);
         }
 
         &:focus {

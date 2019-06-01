@@ -32,7 +32,7 @@ export class JsonEditorComponent extends ExternalControlComponent<string> implem
     private valueString: string;
     private isDisabled = false;
 
-    @ViewChild('editor')
+    @ViewChild('editor', { static: false })
     public editor: ElementRef<HTMLDivElement>;
 
     constructor(changeDetector: ChangeDetectorRef,

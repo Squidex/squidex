@@ -40,13 +40,13 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     private value: string;
     private isDisabled = false;
 
-    @ViewChild('editor')
+    @ViewChild('editor', { static: false })
     public editor: ElementRef;
 
-    @ViewChild('container')
+    @ViewChild('container', { static: false })
     public container: ElementRef;
 
-    @ViewChild('inner')
+    @ViewChild('inner', { static: false })
     public inner: ElementRef;
 
     public assetsDialog = new DialogModel();
