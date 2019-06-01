@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             const string query = @"
                 query {
-                  queryAssets(search: ""my-query"", take: 30, skip: 5) {
+                  queryAssets(filter: ""my-query"", top: 30, skip: 5) {
                     id
                     version
                     created
@@ -57,13 +57,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     isImage
                     pixelWidth
                     pixelHeight
+                    tags
                     slug
                   }
                 }";
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$take=30&$skip=5&$search=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.Create(0, asset));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
@@ -93,6 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             isImage = true,
                             pixelWidth = 800,
                             pixelHeight = 600,
+                            tags = new string[] { "tag1", "tag2" },
                             slug = "myfile.png"
                         }
                     }
@@ -107,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             const string query = @"
                 query {
-                  queryAssetsWithTotal(search: ""my-query"", take: 30, skip: 5) {
+                  queryAssetsWithTotal(filter: ""my-query"", top: 30, skip: 5) {
                     total
                     items {
                       id
@@ -127,6 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       isImage
                       pixelWidth
                       pixelHeight
+                      tags
                       slug
                     }   
                   }
@@ -134,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$take=30&$skip=5&$search=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.Create(10, asset));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
@@ -167,6 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 isImage = true,
                                 pixelWidth = 800,
                                 pixelHeight = 600,
+                                tags = new string[] { "tag1", "tag2" },
                                 slug = "myfile.png"
                             }
                         }
@@ -203,6 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     isImage
                     pixelWidth
                     pixelHeight
+                    tags
                     slug
                   }}
                 }}";
@@ -235,6 +240,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         isImage = true,
                         pixelWidth = 800,
                         pixelHeight = 600,
+                        tags = new string[] { "tag1", "tag2" },
                         slug = "myfile.png"
                     }
                 }

@@ -177,7 +177,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 MimeType = "image/png",
                 IsImage = true,
                 PixelWidth = 800,
-                PixelHeight = 600
+                PixelHeight = 600,
+                Tags = new[] { "tag1", "tag2" }.ToHashSet()
             };
 
             return asset;
