@@ -6,12 +6,12 @@
   "repository": "https://github.com/SebastianStehle/Squidex",
   "scripts": {
     "copy": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/",
-    "start": "npm run copy && webpack-dev-server --config app-config/webpack.run.dev.js --inline --port 3000 --hot",
+    "start": "npm run copy && webpack-dev-server --config app-config/webpack.config.js --inline --port 3000 --hot",
     "test": "karma start",
     "test:coverage": "karma start karma.coverage.conf.js",
     "test:clean": "rimraf _test-output",
     "tslint": "tslint -c tslint.json -p tsconfig.json app/**/*.ts",
-    "build": "npm run copy && webpack --config app-config/webpack.run.prod.js",
+    "build": "npm run copy && webpack --config app-config/webpack.config.js --env.production",
     "build:clean": "rimraf wwwroot/build"
   },
   "dependencies": {
@@ -20,13 +20,15 @@
     "@angular/core": "8.0.0",
     "@angular/forms": "8.0.0",
     "@angular/http": "7.2.15",
-    "@angular/platform-browser-dynamic": "8.0.0",
     "@angular/platform-browser": "8.0.0",
+    "@angular/platform-browser-dynamic": "8.0.0",
     "@angular/platform-server": "8.0.0",
     "@angular/router": "8.0.0",
     "angular2-chartjs": "0.5.1",
     "babel-polyfill": "6.26.0",
     "bootstrap": "4.3.1",
+    "browserslist": "^4.6.1",
+    "caniuse-lite": "^1.0.30000971",
     "core-js": "3.1.3",
     "graphiql": "0.13.0",
     "graphql": "14.3.1",
@@ -38,8 +40,8 @@
     "oidc-client": "1.7.1",
     "pikaday": "1.8.0",
     "progressbar.js": "1.0.1",
-    "react-dom": "16.8.6",
     "react": "16.8.6",
+    "react-dom": "16.8.6",
     "rxjs": "6.5.2",
     "slugify": "1.3.4",
     "sortablejs": "1.9.0",
@@ -58,8 +60,6 @@
     "@types/react-dom": "16.8.4",
     "@types/react": "16.8.19",
     "@types/sortablejs": "1.7.2",
-    "angular-router-loader": "0.8.5",
-    "angular2-template-loader": "0.6.2",
     "awesome-typescript-loader": "5.2.1",
     "babel-core": "6.26.3",
     "circular-dependency-plugin": "5.0.2",
@@ -101,7 +101,6 @@
     "underscore": "1.9.1",
     "webpack-cli": "3.3.2",
     "webpack-dev-server": "3.5.1",
-    "webpack-merge": "4.2.1",
     "webpack": "4.32.2"
   }
 }
