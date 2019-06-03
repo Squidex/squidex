@@ -34,10 +34,11 @@ else
   $semVer = $version.FullSemVer
 }
 
+# Convert the semantic version to lowercase and remove all docker-build breaking characters
+$semVer.toLower() -replace "[^a-z0-9_\-]",'.'
+
 # Set environment variables with the semantic version tag
 $env:Version = $semVer
 
 # Modify the teamcity 'buildNumber' with the semantic version tag
 Write-Host "##teamcity[buildNumber '$semVer']"
-
-

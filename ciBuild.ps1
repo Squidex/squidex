@@ -11,16 +11,12 @@ Invoke-Expression $GIT_VERSION_PS
 
 $REPO_PATH = "nexus.cha.rbxd.ds:8000/cosmos"
 
-# Convert the semantic version to lowercase and remove all breaking characters
-$TAG_NAME = $env:Version.toLower() -replace "[^a-z0-9_\-]",'.'
-
-# Build the docker tags
 $SEMANTIC_DOCKER_TAG = $REPO_PATH + ":" + $TAG_NAME
-$LATEST_DOCKER_TAG = $REPO_PATH + ":" + "latest"
 
-docker build . -t $LATEST_DOCKER_TAG -t $SEMANTIC_DOCKER_TAG --pull `
+Write-Host "Building docker image $SEMANTIC_DOCKER_TAG"
+docker build . -t $SEMANTIC_DOCKER_TAG --pull `
     --build-arg http_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
     --build-arg https_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
 
-docker push $LATEST_DOCKER_TAG
+Write-Host "Pushing docker image $SEMANTIC_DOCKER_TAG to repository $REPO_PATH"
 docker push $SEMANTIC_DOCKER_TAG
