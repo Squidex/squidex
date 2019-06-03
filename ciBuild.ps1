@@ -19,5 +19,5 @@ docker build . -t $SEMANTIC_DOCKER_TAG --pull `
     --build-arg http_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
     --build-arg https_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
 
-Write-Host "Pushing docker image $SEMANTIC_DOCKER_TAG to repository $REPO_PATH"
+Write-Host "Pushing docker image $SEMANTIC_DOCKER_TAG"
 docker push $SEMANTIC_DOCKER_TAG
