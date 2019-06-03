@@ -10,6 +10,7 @@ $GIT_VERSION_PS = "build_tools/generate_gitversion.ps1 -BuildCounter $BuildCount
 Invoke-Expression $GIT_VERSION_PS
 
 $REPO_PATH = "nexus.cha.rbxd.ds:8000/cosmos"
+$TAG_NAME = $env:Version
 
 $SEMANTIC_DOCKER_TAG = $REPO_PATH + ":" + $TAG_NAME
 
