@@ -8,11 +8,12 @@
 using System.Threading.Tasks;
 using Avro.Specific;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 
 namespace Squidex.Extensions.Actions.Kafka
 {
     public interface IKafkaMessageMapper
     {
-        ISpecificRecord ToAvro(NamedContentData namedContentData);
+        ISpecificRecord ToAvro(EnrichedContentEvent namedContentData);
     }
 }

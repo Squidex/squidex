@@ -20,7 +20,8 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
                 ""namespace"": ""Cosmos.Kafka.Entities"",
                 ""fields"": [
                     {""name"": ""id"", ""type"": ""string""},
-                    {""name"": ""name"", ""type"": ""string""}
+                    {""name"": ""name"", ""type"": ""string""},
+                    {""name"": ""lastModified"", ""type"": ""long""}
                 ]
             }");
 
@@ -28,6 +29,7 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
 
         public string Id { get; set; }
         public string Name { get; set; }
+        public long LastModified { get; set; }
 
         public virtual object Get(int fieldPos)
         {
@@ -37,6 +39,8 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
                     return Id;
                 case 1:
                     return Name;
+                case 2:
+                    return LastModified;
                 default:
                     throw new AvroRuntimeException("Bad index " + fieldPos + " in Get()");
             }
@@ -51,6 +55,9 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
                     break;
                 case 1:
                     Name = (string)fieldValue;
+                    break;
+                case 2:
+                    LastModified = (long)fieldValue;
                     break;
                 default: throw new AvroRuntimeException("Bad index " + fieldPos + " in Put()");
             }

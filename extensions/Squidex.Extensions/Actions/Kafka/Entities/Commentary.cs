@@ -22,7 +22,8 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
                     {""name"": ""id"", ""type"": ""string""},
                     {""name"": ""commmentaryTypeId"", ""type"": ""string""},
                     {""name"": ""commodityId"", ""type"": ""string""},
-                    {""name"": ""body"", ""type"": [""string"", ""null""]}
+                    {""name"": ""body"", ""type"": [""string"", ""null""]},
+                    {""name"": ""lastModified"", ""type"": ""long""}
                 ]
             }");
 
@@ -32,6 +33,7 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
         public string Body { get; set; }
         public string CommentaryTypeId { get; set; }
         public string CommodityId { get; set; }
+        public long LastModified { get; set; }
 
         public virtual object Get(int fieldPos)
         {
@@ -45,6 +47,8 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
                     return CommodityId;
                 case 3:
                     return Body;
+                case 4:
+                    return LastModified;
                 default:
                     throw new AvroRuntimeException("Bad index " + fieldPos + " in Get()");
             }
@@ -65,6 +69,9 @@ namespace Squidex.Extensions.Actions.Kafka.Entities
                     break;
                 case 3:
                     Body = (string)fieldValue;
+                    break;
+                case 4:
+                    LastModified = (long)fieldValue;
                     break;
                 default: throw new AvroRuntimeException("Bad index " + fieldPos + " in Put()");
             }

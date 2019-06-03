@@ -31,15 +31,17 @@ namespace Squidex.Extensions.Actions.Kafka
         {
             if (@event is EnrichedContentEvent contentEvent)
             {
-                var ruleJob = new KafkaJob
+                if (contentEvent.Type == EnrichedContentEventType.Published || (contentEvent.Type == EnrichedContentEventType.Updated && contentEvent.Status == Status.Published))
                 {
-                    Broker = action.Broker,
-                    SchemaRegistry = action.SchemaRegistry,
-                    TopicName = action.TopicName,
-                    Key = contentEvent.Id.ToString(),
-                    Message = contentEvent.Data
-                };
-                return ("Push to Kafka", ruleJob);
+                    var ruleJob = new KafkaJob
+                    {
+                        Broker = action.Broker,
+                        SchemaRegistry = action.SchemaRegistry,
+                        TopicName = action.TopicName,
+                        Message = contentEvent
+                    };
+                    return ("Push to Kafka", ruleJob);
+                }
             }
 
             return (DescriptionIgnore, new KafkaJob());
@@ -47,6 +49,11 @@ namespace Squidex.Extensions.Actions.Kafka
 
         protected override async Task<Result> ExecuteJobAsync(KafkaJob job, CancellationToken ct)
         {
+            if (string.IsNullOrEmpty(job.TopicName))
+            {
+                return Result.Ignored();
+            }
+
             try
             {
                 switch (job.TopicName)
@@ -55,7 +62,6 @@ namespace Squidex.Extensions.Actions.Kafka
                         using (var commentaryProducer = new KafkaProducer<Commentary>(job.TopicName, job.Broker.AbsoluteUri, job.SchemaRegistry.AbsoluteUri))
                         {
                             var commentaryData = (Commentary)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message);
-                            commentaryData.Id = job.Key;
                             await commentaryProducer.Send(commentaryData.Id, commentaryData);
                         }
 
@@ -89,8 +95,6 @@ namespace Squidex.Extensions.Actions.Kafka
 
         public string TopicName { get; set; }
 
-        public string Key { get; set; }
-
-        public NamedContentData Message { get; set; }
+        public EnrichedContentEvent Message { get; set; }
     }
 }
