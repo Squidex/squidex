@@ -10,7 +10,7 @@ COPY src/Squidex/package*.json /tmp/
 # Install Node packages 
 RUN cd /tmp && npm install --loglevel=error
 
-COPY . .
+COPY src/Squidex src/Squidex
 
 # Build Frontend
 RUN cp -a /tmp/node_modules src/Squidex/ \
@@ -19,12 +19,24 @@ RUN cp -a /tmp/node_modules src/Squidex/ \
  && npm run build
  
 # Test Backend
+FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder_backend
+
+WORKDIR /src
+
+COPY src/**/*.csproj /tmp/
+COPY tests/**/*.csproj /tmp/
+RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p; true; done; popd'
+
+COPY . .
+
 RUN dotnet restore \
  && dotnet test --filter Category!=Dependencies tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj \ 
  && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj \ 
  && dotnet test tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj \
  && dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj \
  && dotnet test tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj
+
+COPY --from=builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
 
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64
@@ -45,7 +57,7 @@ RUN apk update \
  && ln -s /usr/lib/libuv.so.1 /usr/lib/libuv.so
 
 # Copy from build stage
-COPY --from=builder /out/alpine .
+COPY --from=builder_backend /out/alpine .
 COPY src/Squidex/cha-ca.cer /usr/local/share/ca-certificates/cha-ca.cer
 
 RUN update-ca-certificates
