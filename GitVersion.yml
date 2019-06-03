@@ -1,9 +1,7 @@
 mode: Mainline
 branches:
-  # we do not actually deploy from master. master is only kept for archives
   master:
     tag: ''
-  # but we do deploy from release and hotfix
   release:
     tag: ''
   hotfix:
