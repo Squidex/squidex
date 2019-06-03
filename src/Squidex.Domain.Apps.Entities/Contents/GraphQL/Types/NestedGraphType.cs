@@ -25,27 +25,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             Name = $"{schemaType}{fieldName}ChildDto";
 
-            foreach (var nestedField in field.Fields.ForApi())
+            foreach (var (nestedField, nestedName, _) in field.Fields.SafeFields())
             {
                 var fieldInfo = model.GetGraphType(schema, nestedField);
 
                 if (fieldInfo.ResolveType != null)
                 {
-                    var resolver = new FuncFieldResolver<object>(c =>
-                    {
-                        if (((JsonObject)c.Source).TryGetValue(nestedField.Name, out var value))
-                        {
-                            return fieldInfo.Resolver(value, c);
-                        }
-                        else
-                        {
-                            return fieldInfo;
-                        }
-                    });
+                    var resolver = ValueResolver(nestedField, fieldInfo);
 
                     AddField(new FieldType
                     {
-                        Name = nestedField.Name.ToCamelCase(),
+                        Name = nestedName,
                         Resolver = resolver,
                         ResolvedType = fieldInfo.ResolveType,
                         Description = $"The {fieldName}/{nestedField.DisplayName()} nested field."
@@ -54,6 +44,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             Description = $"The structure of the {schemaName}.{fieldName} nested schema.";
+        }
+
+        private static FuncFieldResolver<object> ValueResolver(NestedField nestedField, (IGraphType ResolveType, ValueResolver Resolver) fieldInfo)
+        {
+            return new FuncFieldResolver<object>(c =>
+            {
+                if (((JsonObject)c.Source).TryGetValue(nestedField.Name, out var value))
+                {
+                    return fieldInfo.Resolver(value, c);
+                }
+                else
+                {
+                    return fieldInfo;
+                }
+            });
         }
     }
 }
