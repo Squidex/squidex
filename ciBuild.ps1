@@ -21,5 +21,4 @@ docker build . -t $semanticDockerTag --pull `
 
 Write-Host "Pushing docker image $semanticDockerTag"
 docker push $semanticDockerTag
-
-docker rmi $semanticDockerTag
+docker rmi  $semanticDockerTag
