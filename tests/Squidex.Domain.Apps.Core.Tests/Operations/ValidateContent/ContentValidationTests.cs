@@ -339,9 +339,8 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
         [Fact]
         public async Task Should_add_error_if_array_field_has_required_nested_field()
         {
-            schema =
-                schema.AddArray(1, "my-field", Partitioning.Invariant, f => f.
-                    AddNumber(1, "my-nested", new NumberFieldProperties { IsRequired = true }));
+            schema = schema.AddArray(1, "my-field", Partitioning.Invariant, f => f.
+                AddNumber(2, "my-nested", new NumberFieldProperties { IsRequired = true }));
 
             var data =
                 new NamedContentData()
@@ -361,6 +360,38 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     new ValidationError("Field is required.", "my-field[1].my-nested"),
                     new ValidationError("Field is required.", "my-field[3].my-nested")
                 });
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_separator_not_defined()
+        {
+            schema = schema.AddUI(2, "ui", Partitioning.Invariant);
+
+            var data =
+                new NamedContentData();
+
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
+
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public async Task Should_not_add_error_if_nested_separator_not_defined()
+        {
+            schema = schema.AddArray(1, "my-field", Partitioning.Invariant, f => f.
+                AddUI(2, "my-nested"));
+
+            var data =
+                new NamedContentData()
+                    .AddField("my-field",
+                        new ContentFieldData()
+                            .AddValue("iv",
+                                JsonValue.Array(
+                                    JsonValue.Object())));
+
+            await data.ValidateAsync(context, schema, languagesConfig.ToResolver(), errors);
+
+            Assert.Empty(errors);
         }
     }
 }

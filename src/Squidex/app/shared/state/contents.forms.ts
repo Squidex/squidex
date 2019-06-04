@@ -331,7 +331,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         super(new FormGroup({}));
 
         for (const field of schema.fields) {
-            if (field.properties.fieldType !== 'UI') {
+            if (field.properties.isContentField) {
                 const fieldForm = new FormGroup({});
                 const fieldDefault = FieldDefaultValue.get(field);
 
@@ -378,7 +378,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         let isOptional = field.isLocalizable && !!language && language.isOptional;
 
         for (let nested of field.nested) {
-            if (nested.properties.fieldType !== 'UI') {
+            if (nested.properties.isContentField) {
                 const nestedValidators = FieldValidatorsFactory.createValidators(nested, isOptional);
 
                 let value = FieldDefaultValue.get(nested);

@@ -194,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
                         else
                         {
-                            var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.Id, Snapshot.Name, c.PlanId);
+                            var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId);
 
                             switch (result)
                             {
@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case ArchiveApp archiveApp:
                     return UpdateAsync(archiveApp, async c =>
                     {
-                        await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.Id, Snapshot.Name, null);
+                        await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null);
 
                         ArchiveApp(c);
                     });

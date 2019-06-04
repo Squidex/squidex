@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppNamedId, planIdPaid))
                 .Returns(new PlanChangedResult());
 
             await ExecuteCreateAsync();
@@ -125,10 +125,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var command = new ChangePlan { PlanId = planIdFree };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppNamedId, planIdPaid))
                 .Returns(new PlanChangedResult());
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planIdFree))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppNamedId, planIdFree))
                 .Returns(new PlanResetResult());
 
             await ExecuteCreateAsync();
@@ -151,7 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppNamedId, planIdPaid))
                 .Returns(new RedirectToCheckoutResult(new Uri("http://squidex.io")));
 
             await ExecuteCreateAsync();
@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(new EntitySavedResult(5));
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppNamedId, planIdPaid))
                 .MustNotHaveHappened();
         }
 
@@ -486,7 +486,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     CreateEvent(new AppArchived())
                 );
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppId, AppName, null))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppNamedId, null))
                 .MustHaveHappened();
         }
 

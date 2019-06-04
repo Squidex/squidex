@@ -34,11 +34,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
             {
                 var typedValue = value;
 
-                if (value == null)
-                {
-                    typedValue = Undefined.Value;
-                }
-                else if (value is IJsonValue jsonValue)
+                if (value is IJsonValue jsonValue)
                 {
                     if (jsonValue.Type == JsonValueType.Null)
                     {

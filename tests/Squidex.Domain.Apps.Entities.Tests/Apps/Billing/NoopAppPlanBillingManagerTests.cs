@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
 using Xunit;
@@ -25,7 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
         [Fact]
         public async Task Should_do_nothing_when_changing_plan()
         {
-            await sut.ChangePlanAsync(null, Guid.Empty, null, null);
+            await sut.ChangePlanAsync(null, null, null);
         }
 
         [Fact]
