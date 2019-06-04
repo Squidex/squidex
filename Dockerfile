@@ -29,7 +29,7 @@ RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p; true; done; po
 
 COPY . .
 
-RUN dotnet restore && dotnet test -s ../../.runsettings --filter Category!=Dependencies
+RUN dotnet test -s ../../.runsettings --filter Category!=Dependencies
 
 COPY --from=builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
 
