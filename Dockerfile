@@ -23,13 +23,11 @@ FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder_ba
 
 WORKDIR /src
 
-COPY src/**/*.csproj /tmp/
-COPY tests/**/*.csproj /tmp/
-RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p; true; done; popd'
-
 COPY . .
 
-RUN dotnet restore && dotnet test -s ../../.runsettings --filter Category!=Dependencies
+RUN dotnet restore 
+
+RUN dotnet test -s ../../.runsettings --filter Category!=Dependencies
 
 COPY --from=builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
 
