@@ -46,9 +46,9 @@ WORKDIR /app
 
 # add libuv & curl
 RUN apk update \
- && apk add libc6-compat \
- && apk add libuv \
- && apk add curl \
+ && apk add --no-cache libc6-compat \
+ && apk add --no-cache libuv \
+ && apk add --no-cache curl \
  && ln -s /usr/lib/libuv.so.1 /usr/lib/libuv.so
 
 # Copy from build stage
