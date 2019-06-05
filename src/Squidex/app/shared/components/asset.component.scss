@@ -44,7 +44,7 @@ $list-height: 2.375rem;
     padding: 0;
 }
 
-:host /deep/ {
+::ng-deep {
     .form-control {
         &.disabled,
         &:disabled {

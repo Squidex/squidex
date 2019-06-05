@@ -3,7 +3,7 @@
 
 $icon-size: 4.5rem;
 
-:host /deep/ .table-items-row-details-tab {
+::ng-deep .table-items-row-details-tab {
     padding: 1.5rem 1.75rem;
 }
 
