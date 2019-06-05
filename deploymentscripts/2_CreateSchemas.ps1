@@ -49,7 +49,15 @@ function CreateSchemas {
     $commentaryObj.fields[1].properties | Add-Member -Name "schemaId" -value $commentaryTypeResponse.id -MemberType NoteProperty
     
     $commentary = $commentaryObj | ConvertTo-Json -Depth 32
-    CreateSchema 'commentary'  $commentary
+    $commentarySchemaResponse = CreateSchema 'commentary'  $commentary
+
+    $response = @{
+        CommoditySchemaId = $commoditySchemaResponse.id
+        CommentaryTypeSchemaId = $commentaryTypeResponse.id
+        CommentarySchemaId = $commentarySchemaResponse.id
+    }
+
+    return New-Object psobject -Property $response
 }
 
 CreateSchemas
