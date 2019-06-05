@@ -139,8 +139,8 @@ namespace Squidex.Infrastructure.Assets
         {
             var client = factory();
 
-            client.SetWorkingDirectory(path);
             client.Connect();
+            client.SetWorkingDirectory(path);
 
             return client;
         }
@@ -152,7 +152,7 @@ namespace Squidex.Infrastructure.Assets
                 return command.CompletionCode == "550";
             }
 
-            return exception.InnerException != null ? IsNotFound(exception.InnerException) : false;
+            return exception.InnerException != null && IsNotFound(exception.InnerException);
         }
     }
 }
