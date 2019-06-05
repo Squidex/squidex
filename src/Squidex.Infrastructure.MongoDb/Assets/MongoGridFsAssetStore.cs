@@ -46,6 +46,8 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task CopyAsync(string sourceFileName, string targetFileName, CancellationToken ct = default)
         {
+            Guard.NotNullOrEmpty(targetFileName, nameof(targetFileName));
+
             try
             {
                 var sourceName = GetFileName(sourceFileName, nameof(sourceFileName));
@@ -63,6 +65,8 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
+            Guard.NotNull(stream, nameof(stream));
+
             try
             {
                 var name = GetFileName(fileName, nameof(fileName));
@@ -80,6 +84,8 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
+            Guard.NotNull(stream, nameof(stream));
+
             try
             {
                 var name = GetFileName(fileName, nameof(fileName));
