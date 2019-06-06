@@ -22,5 +22,5 @@ docker build . -t $semanticDockerTag --pull `
 Write-Host "Pushing docker image $semanticDockerTag"
 docker push $semanticDockerTag
 
-Write-Host "Removing Docker Images and Dangling Tags (Older than 1 hour)"
-docker image prune -a --filter "until=1h" -f
+Write-Host "Removing Docker Image on Build Agent"
+docker rmi $semanticDockerTag
