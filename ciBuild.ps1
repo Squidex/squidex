@@ -23,4 +23,4 @@ Write-Host "Pushing docker image $semanticDockerTag"
 docker push $semanticDockerTag
 
 Write-Host "Removing Docker Image on Build Agent"
-docker rmi $semanticDockerTag 
+docker rmi $semanticDockerTag
