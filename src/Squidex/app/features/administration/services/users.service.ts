@@ -14,12 +14,19 @@ import {
     ApiUrlConfig,
     Model,
     pretifyError,
-    ResultSet
+    Resource,
+    ResourceLinks,
+    ResultSet,
+    withLinks
 } from '@app/shared';
 
-export class UsersDto extends ResultSet<UserDto> {}
+export class UsersDto  extends ResultSet<UserDto> {
+    public _links: ResourceLinks;
+}
 
 export class UserDto extends Model<UserDto> {
+    public _links: ResourceLinks;
+
     constructor(
         public readonly id: string,
         public readonly email: string,
@@ -60,17 +67,19 @@ export class UsersService {
     public getUsers(take: number, skip: number, query?: string): Observable<UsersDto> {
         const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
 
-        return this.http.get<{ total: number, items: any[] }>(url).pipe(
+        return this.http.get<{ total: number, items: any[] } & Resource>(url).pipe(
                 map(body => {
                     const users = body.items.map(item =>
-                        new UserDto(
-                            item.id,
-                            item.email,
-                            item.displayName,
-                            item.permissions,
-                            item.isLocked));
+                        withLinks(
+                            new UserDto(
+                                item.id,
+                                item.email,
+                                item.displayName,
+                                item.permissions,
+                                item.isLocked),
+                            item));
 
-                    return new UsersDto(body.total, users);
+                    return withLinks(new UsersDto(body.total, users), body);
                 }),
                 pretifyError('Failed to load users. Please reload.'));
     }

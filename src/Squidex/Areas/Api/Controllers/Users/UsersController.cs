@@ -76,7 +76,7 @@ namespace Squidex.Areas.Api.Controllers.Users
             {
                 var entities = await userResolver.QueryByEmailAsync(query);
 
-                var models = entities.Where(x => !x.IsHidden()).Select(UserDto.FromUser).ToArray();
+                var models = entities.Where(x => !x.IsHidden()).Select(x => UserDto.FromUser(x, this)).ToArray();
 
                 return Ok(models);
             }
@@ -110,7 +110,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
                 if (entity != null)
                 {
-                    var response = UserDto.FromUser(entity);
+                    var response = UserDto.FromUser(entity, this);
 
                     return Ok(response);
                 }

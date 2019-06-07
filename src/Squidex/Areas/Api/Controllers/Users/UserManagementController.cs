@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +12,6 @@ using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -43,11 +40,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
             await Task.WhenAll(taskForItems, taskForCount);
 
-            var response = new UsersDto
-            {
-                Total = taskForCount.Result,
-                Items = taskForItems.Result.Select(UserDto.FromUser).ToArray()
-            };
+            var response = UsersDto.FromResults(taskForItems.Result, taskForCount.Result, this);
 
             return Ok(response);
         }
@@ -64,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Users
                 return NotFound();
             }
 
-            var response = UserDto.FromUser(entity);
+            var response = UserDto.FromUser(entity, this);
 
             return Ok(response);
         }
@@ -96,7 +89,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersLock)]
         public async Task<IActionResult> LockUser(string id)
         {
-            if (IsSelf(id))
+            if (this.IsUser(id))
             {
                 throw new ValidationException("Locking user failed.", new ValidationError("You cannot lock yourself."));
             }
@@ -111,7 +104,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersUnlock)]
         public async Task<IActionResult> UnlockUser(string id)
         {
-            if (IsSelf(id))
+            if (this.IsUser(id))
             {
                 throw new ValidationException("Unlocking user failed.", new ValidationError("You cannot unlock yourself."));
             }
@@ -119,13 +112,6 @@ namespace Squidex.Areas.Api.Controllers.Users
             await userManager.UnlockAsync(id);
 
             return NoContent();
-        }
-
-        private bool IsSelf(string id)
-        {
-            var subject = User.OpenIdSubject();
-
-            return string.Equals(subject, id, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

@@ -16,7 +16,7 @@ import {
     UsersService
 } from '@app/features/administration/internal';
 
-import { SnapshotUser, UsersState } from './users.state';
+import { UsersState } from './users.state';
 
 describe('UsersState', () => {
     const oldUsers = [
@@ -26,21 +26,15 @@ describe('UsersState', () => {
 
     const newUser = new UserDto('id3', 'mail3@mail.de', 'name3', ['Permission3'], false);
 
-    let authService: IMock<AuthService>;
     let dialogs: IMock<DialogService>;
     let usersService: IMock<UsersService>;
     let usersState: UsersState;
 
     beforeEach(() => {
-        authService = Mock.ofType<AuthService>();
-
-        authService.setup(x => x.user)
-            .returns(() => <any>{ id: 'id2' });
-
         dialogs = Mock.ofType<DialogService>();
 
         usersService = Mock.ofType<UsersService>();
-        usersState = new UsersState(authService.object, dialogs.object, usersService.object);
+        usersState = new UsersState(dialogs.object, usersService.object);
     });
 
     afterEach(() => {
@@ -54,10 +48,7 @@ describe('UsersState', () => {
 
             usersState.load().subscribe();
 
-            expect(usersState.snapshot.users.values).toEqual([
-                { isCurrentUser: false, user: oldUsers[0] },
-                { isCurrentUser: true,  user: oldUsers[1] }
-            ]);
+            expect(usersState.snapshot.users.values).toEqual(oldUsers);
             expect(usersState.snapshot.usersPager.numberOfItems).toEqual(200);
             expect(usersState.snapshot.isLoaded).toBeTruthy();
 
@@ -91,7 +82,7 @@ describe('UsersState', () => {
             usersState.select('id1').subscribe();
             usersState.load().subscribe();
 
-            expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUsers[0] });
+            expect(usersState.snapshot.selectedUser).toEqual(newUsers[0]);
         });
 
         it('should load next page and prev page when paging', () => {
@@ -127,32 +118,32 @@ describe('UsersState', () => {
         });
 
         it('should return user on select and not load when already loaded', () => {
-            let selectedUser: SnapshotUser;
+            let selectedUser: UserDto;
 
             usersState.select('id1').subscribe(x => {
                 selectedUser = x!;
             });
 
-            expect(selectedUser!.user).toEqual(oldUsers[0]);
-            expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: oldUsers[0] });
+            expect(selectedUser!).toEqual(oldUsers[0]);
+            expect(usersState.snapshot.selectedUser).toEqual(oldUsers[0]);
         });
 
         it('should return user on select and load when not loaded', () => {
             usersService.setup(x => x.getUser('id3'))
                 .returns(() => of(newUser));
 
-            let selectedUser: SnapshotUser;
+            let selectedUser: UserDto;
 
             usersState.select('id3').subscribe(x => {
                 selectedUser = x!;
             });
 
-            expect(selectedUser!.user).toEqual(newUser);
-            expect(usersState.snapshot.selectedUser).toEqual({ isCurrentUser: false, user: newUser });
+            expect(selectedUser!).toEqual(newUser);
+            expect(usersState.snapshot.selectedUser).toEqual(newUser);
         });
 
         it('should return null on select when unselecting user', () => {
-            let selectedUser: SnapshotUser;
+            let selectedUser: UserDto;
 
             usersState.select(null).subscribe(x => {
                 selectedUser = x!;
@@ -166,7 +157,7 @@ describe('UsersState', () => {
             usersService.setup(x => x.getUser('unknown'))
                 .returns(() => throwError({})).verifiable();
 
-            let selectedUser: SnapshotUser;
+            let selectedUser: UserDto;
 
             usersState.select('unknown').subscribe(x => {
                 selectedUser = x!;
@@ -185,7 +176,7 @@ describe('UsersState', () => {
 
             const user_1 = usersState.snapshot.users.at(0);
 
-            expect(user_1.user.isLocked).toBeTruthy();
+            expect(user_1.isLocked).toBeTruthy();
             expect(user_1).toBe(usersState.snapshot.selectedUser!);
         });
 
@@ -198,7 +189,7 @@ describe('UsersState', () => {
 
             const user_1 = usersState.snapshot.users.at(1);
 
-            expect(user_1.user.isLocked).toBeFalsy();
+            expect(user_1.isLocked).toBeFalsy();
             expect(user_1).toBe(usersState.snapshot.selectedUser!);
         });
 
@@ -213,9 +204,9 @@ describe('UsersState', () => {
 
             const user_1 = usersState.snapshot.users.at(0);
 
-            expect(user_1.user.email).toEqual(request.email);
-            expect(user_1.user.displayName).toEqual(request.displayName);
-            expect(user_1.user.permissions).toEqual(request.permissions);
+            expect(user_1.email).toEqual(request.email);
+            expect(user_1.displayName).toEqual(request.displayName);
+            expect(user_1.permissions).toEqual(request.permissions);
             expect(user_1).toBe(usersState.snapshot.selectedUser!);
         });
 
@@ -227,11 +218,7 @@ describe('UsersState', () => {
 
             usersState.create(request).subscribe();
 
-            expect(usersState.snapshot.users.values).toEqual([
-                { isCurrentUser: false, user: newUser },
-                { isCurrentUser: false, user: oldUsers[0] },
-                { isCurrentUser: true,  user: oldUsers[1] }
-            ]);
+            expect(usersState.snapshot.users.values).toEqual([newUser, ...oldUsers]);
             expect(usersState.snapshot.usersPager.numberOfItems).toBe(201);
         });
     });

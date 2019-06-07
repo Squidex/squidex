@@ -26,7 +26,7 @@ import {
 export class UserPageComponent extends ResourceOwner implements OnInit {
     public canUpdate = false;
 
-    public user?: { user: UserDto, isCurrentUser: boolean };
+    public user?: UserDto;
     public userForm = new UserForm(this.formBuilder);
 
     constructor(
@@ -45,7 +45,7 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
                     this.user = selectedUser!;
 
                     if (selectedUser) {
-                        this.userForm.load(selectedUser.user);
+                        this.userForm.load(selectedUser);
                     }
                 }));
     }
@@ -55,7 +55,7 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
 
         if (value) {
             if (this.user) {
-                this.usersState.update(this.user.user, value)
+                this.usersState.update(this.user, value)
                     .subscribe(() => {
                         this.userForm.submitCompleted();
                     }, error => {
