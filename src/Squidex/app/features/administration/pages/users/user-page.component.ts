@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { ResourceOwner } from '@app/shared';
+import { hasLink, ResourceOwner } from '@app/shared';
 
 import {
     CreateUserDto,
@@ -46,11 +46,19 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
 
                     if (selectedUser) {
                         this.userForm.load(selectedUser);
+
+                        if (!hasLink(selectedUser, 'update')) {
+                            this.userForm.form.disable();
+                        }
                     }
                 }));
     }
 
     public save() {
+        if (this.userForm.form.disabled) {
+            return;
+        }
+
         const value = this.userForm.submit();
 
         if (value) {

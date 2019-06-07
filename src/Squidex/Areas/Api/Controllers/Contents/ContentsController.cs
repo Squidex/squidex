@@ -278,9 +278,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
 
-            var publishPermission = Permissions.ForApp(Permissions.AppContentsPublish, app, name);
-
-            if (publish && !User.Permissions().Includes(publishPermission))
+            if (publish && !this.HasPermission(Permissions.AppContentsPublish, app, name))
             {
                 return new StatusCodeResult(123);
             }

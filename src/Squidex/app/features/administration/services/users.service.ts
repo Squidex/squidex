@@ -12,7 +12,6 @@ import { map } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
-    Model,
     pretifyError,
     Resource,
     ResourceLinks,
@@ -21,11 +20,11 @@ import {
 } from '@app/shared';
 
 export class UsersDto  extends ResultSet<UserDto> {
-    public _links: ResourceLinks;
+    public readonly _links: ResourceLinks = {};
 }
 
-export class UserDto extends Model<UserDto> {
-    public _links: ResourceLinks;
+export class UserDto {
+    public readonly _links: ResourceLinks = {};
 
     constructor(
         public readonly id: string,
@@ -34,11 +33,6 @@ export class UserDto extends Model<UserDto> {
         public readonly permissions: string[] = [],
         public readonly isLocked?: boolean
     ) {
-        super();
-    }
-
-    public with(value: Partial<UserDto>): UserDto {
-        return this.clone(value);
     }
 }
 
@@ -69,15 +63,7 @@ export class UsersService {
 
         return this.http.get<{ total: number, items: any[] } & Resource>(url).pipe(
                 map(body => {
-                    const users = body.items.map(item =>
-                        withLinks(
-                            new UserDto(
-                                item.id,
-                                item.email,
-                                item.displayName,
-                                item.permissions,
-                                item.isLocked),
-                            item));
+                    const users = body.items.map(item => parseUser(item));
 
                     return withLinks(new UsersDto(body.total, users), body);
                 }),
@@ -89,14 +75,7 @@ export class UsersService {
 
         return this.http.get<any>(url).pipe(
                 map(body => {
-                    const user = new UserDto(
-                        body.id,
-                        body.email,
-                        body.displayName,
-                        body.permissions,
-                        body.isLocked);
-
-                    return user;
+                    return parseUser(body);
                 }),
                 pretifyError('Failed to load user. Please reload.'));
     }
@@ -106,36 +85,55 @@ export class UsersService {
 
         return this.http.post<any>(url, dto).pipe(
                 map(body => {
-                    const user = new UserDto(
-                        body.id,
-                        dto.email,
-                        dto.displayName,
-                        dto.permissions,
-                        false);
-
-                    return user;
+                    return parseUser(body);
                 }),
                 pretifyError('Failed to create user. Please reload.'));
     }
 
-    public putUser(id: string, dto: UpdateUserDto): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
+    public putUser(user: Resource, dto: UpdateUserDto): Observable<UserDto> {
+        const link = user._links['update'];
 
-        return this.http.put(url, dto).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url, { body: dto }).pipe(
+                map(body => {
+                    return parseUser(body);
+                }),
                 pretifyError('Failed to update user. Please reload.'));
     }
 
-    public lockUser(id: string): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/user-management/${id}/lock`);
+    public lockUser(user: Resource): Observable<UserDto> {
+        const link = user._links['lock'];
 
-        return this.http.put(url, {}).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url).pipe(
+                map(body => {
+                    return parseUser(body);
+                }),
                 pretifyError('Failed to load users. Please retry.'));
     }
 
-    public unlockUser(id: string): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/user-management/${id}/unlock`);
+    public unlockUser(user: Resource): Observable<UserDto> {
+        const link = user._links['unlock'];
 
-        return this.http.put(url, {}).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url).pipe(
+                map(body => {
+                    return parseUser(body);
+                }),
                 pretifyError('Failed to load users. Please retry.'));
     }
+}
+
+function parseUser(response: any) {
+    return withLinks(
+        new UserDto(
+            response.id,
+            response.email,
+            response.displayName,
+            response.permissions,
+            response.isLocked),
+        response);
 }

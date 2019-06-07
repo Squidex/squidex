@@ -40,7 +40,13 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
 
         public UserValues ToValues()
         {
-            return new UserValues { Email = Email, DisplayName = DisplayName, Password = Password, Permissions = new PermissionSet(Permissions) };
+            return new UserValues
+            {
+                Email = Email,
+                DisplayName = DisplayName,
+                Password = Password,
+                Permissions = new PermissionSet(Permissions)
+            };
         }
     }
 }

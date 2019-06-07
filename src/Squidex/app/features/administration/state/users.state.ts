@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import '@app/framework/utils/rxjs-extensions';
 
@@ -15,6 +15,7 @@ import {
     DialogService,
     ImmutableArray,
     Pager,
+    ResourceLinks,
     shareSubscribed,
     State
 } from '@app/shared';
@@ -36,6 +37,9 @@ interface Snapshot {
     // The query to filter users.
     usersQuery?: string;
 
+    // The resource links.
+    links: ResourceLinks;
+
     // Indicates if the users are loaded.
     isLoaded?: boolean;
 
@@ -56,6 +60,10 @@ export class UsersState extends State<Snapshot> {
         this.changes.pipe(map(x => x.usersPager),
             distinctUntilChanged());
 
+    public links =
+        this.changes.pipe(map(x => x.links),
+            distinctUntilChanged());
+
     public selectedUser =
         this.changes.pipe(map(x => x.selectedUser),
             distinctUntilChanged());
@@ -68,7 +76,7 @@ export class UsersState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly usersService: UsersService
     ) {
-        super({ users: ImmutableArray.empty(), usersPager: new Pager(0) });
+        super({ users: ImmutableArray.empty(), usersPager: new Pager(0), links: {} });
     }
 
     public select(id: string | null): Observable<UserDto | null> {
@@ -108,7 +116,7 @@ export class UsersState extends State<Snapshot> {
                 this.snapshot.usersPager.pageSize,
                 this.snapshot.usersPager.skip,
                 this.snapshot.usersQuery).pipe(
-            tap(({ total, items }) => {
+            tap(({ total, items, _links: links }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Users reloaded.');
                 }
@@ -123,7 +131,7 @@ export class UsersState extends State<Snapshot> {
                         selectedUser = users.find(x => x.id === selectedUser!.id) || selectedUser;
                     }
 
-                    return { ...s, users, usersPager, selectedUser, isLoaded: true };
+                    return { ...s, users, usersPager, links, selectedUser, isLoaded: true };
                 });
             }),
             shareSubscribed(this.dialogs));
@@ -143,8 +151,7 @@ export class UsersState extends State<Snapshot> {
     }
 
     public update(user: UserDto, request: UpdateUserDto): Observable<UserDto> {
-        return this.usersService.putUser(user.id, request).pipe(
-            switchMap(() => this.usersService.getUser(user.id)),
+        return this.usersService.putUser(user, request).pipe(
             tap(updated => {
                 this.replaceUser(updated);
             }),
@@ -152,8 +159,7 @@ export class UsersState extends State<Snapshot> {
     }
 
     public lock(user: UserDto): Observable<UserDto> {
-        return this.usersService.lockUser(user.id).pipe(
-            switchMap(() => this.usersService.getUser(user.id)),
+        return this.usersService.lockUser(user).pipe(
             tap(updated => {
                 this.replaceUser(updated);
             }),
@@ -161,8 +167,7 @@ export class UsersState extends State<Snapshot> {
     }
 
     public unlock(user: UserDto): Observable<UserDto> {
-        return this.usersService.unlockUser(user.id).pipe(
-            switchMap(() => this.usersService.getUser(user.id)),
+        return this.usersService.unlockUser(user).pipe(
             tap(updated => {
                 this.replaceUser(updated);
             }),

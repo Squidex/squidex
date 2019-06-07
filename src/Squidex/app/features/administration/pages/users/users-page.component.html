@@ -12,15 +12,18 @@
 
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
         <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
-        <sqx-shortcut keys="ctrl+shift+n" (trigger)="buttonNew.click()"></sqx-shortcut>
 
         <form class="form-inline mr-1" (ngSubmit)="search()">
             <input class="form-control" #inputFind [formControl]="usersFilter" placeholder="Search for user" />
         </form>
 
-        <button type="button" class="btn btn-success" #buttonNew routerLink="new" title="New User (CTRL + N)">
-            <i class="icon-plus"></i> New
-        </button>
+        <ng-container *ngIf="usersState.links | async | sqxHasLink: 'create'">
+            <sqx-shortcut keys="ctrl+shift+n" (trigger)="buttonNew.click()"></sqx-shortcut>
+
+            <button type="button" class="btn btn-success" #buttonNew routerLink="new" title="New User (CTRL + N)">
+                <i class="icon-plus"></i> New
+            </button>
+        </ng-container>
     </ng-container>
 
     <ng-container content>

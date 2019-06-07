@@ -15,12 +15,14 @@
         </ng-container>
 
         <ng-container menu>
-            <ng-container *ngIf="usersState.selectedUser | async; else noUserMenu">
-                <button type="submit" class="btn btn-primary" title="CTRL + S">
-                    Save
-                </button>
-                
-                <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
+            <ng-container *ngIf="usersState.selectedUser | async; let user; else noUserMenu">
+                <ng-container *ngIf="user | sqxHasLink: 'update'">
+                    <button type="submit" class="btn btn-primary" title="CTRL + S">
+                        Save
+                    </button>
+                    
+                    <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
+                </ng-container>
             </ng-container>
 
             <ng-template #noUserMenu>

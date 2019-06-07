@@ -26,25 +26,30 @@ namespace Squidex.Web
 
         public void AddGetLink(string rel, string href)
         {
-            AddLink(rel, HttpMethod.Get, href);
+            AddLink(rel, "GET", href);
+        }
+
+        public void AddPatchLink(string rel, string href)
+        {
+            AddLink(rel, "PATCH", href);
         }
 
         public void AddPostLink(string rel, string href)
         {
-            AddLink(rel, HttpMethod.Post, href);
+            AddLink(rel, "POST", href);
         }
 
         public void AddPutLink(string rel, string href)
         {
-            AddLink(rel, HttpMethod.Put, href);
+            AddLink(rel, "PUT", href);
         }
 
         public void AddDeleteLink(string rel, string href)
         {
-            AddLink(rel, HttpMethod.Delete, href);
+            AddLink(rel, "DELETE", href);
         }
 
-        public void AddLink(string rel, HttpMethod method, string href)
+        public void AddLink(string rel, string method, string href)
         {
             Links[rel] = new ResourceLink { Href = href, Method = method };
         }

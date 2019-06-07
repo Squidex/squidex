@@ -32,6 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
         [HttpGet]
         [Route("user-management/")]
+        [ProducesResponseType(typeof(UsersDto), 200)]
         [ApiPermission(Permissions.AdminUsersRead)]
         public async Task<IActionResult> GetUsers([FromQuery] string query = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
@@ -47,6 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
         [HttpGet]
         [Route("user-management/{id}/")]
+        [ProducesResponseType(typeof(UserDto), 201)]
         [ApiPermission(Permissions.AdminUsersRead)]
         public async Task<IActionResult> GetUser(string id)
         {
@@ -64,28 +66,33 @@ namespace Squidex.Areas.Api.Controllers.Users
 
         [HttpPost]
         [Route("user-management/")]
+        [ProducesResponseType(typeof(UserDto), 201)]
         [ApiPermission(Permissions.AdminUsersCreate)]
         public async Task<IActionResult> PostUser([FromBody] CreateUserDto request)
         {
-            var user = await userManager.CreateAsync(userFactory, request.ToValues());
+            var entity = await userManager.CreateAsync(userFactory, request.ToValues());
 
-            var response = new UserCreatedDto { Id = user.Id };
+            var response = UserDto.FromUser(entity, this);
 
             return Ok(response);
         }
 
         [HttpPut]
         [Route("user-management/{id}/")]
+        [ProducesResponseType(typeof(UserDto), 201)]
         [ApiPermission(Permissions.AdminUsersUpdate)]
         public async Task<IActionResult> PutUser(string id, [FromBody] UpdateUserDto request)
         {
-            await userManager.UpdateAsync(id, request.ToValues());
+            var entity = await userManager.UpdateAsync(id, request.ToValues());
 
-            return NoContent();
+            var response = UserDto.FromUser(entity, this);
+
+            return Ok(response);
         }
 
         [HttpPut]
         [Route("user-management/{id}/lock/")]
+        [ProducesResponseType(typeof(UserDto), 201)]
         [ApiPermission(Permissions.AdminUsersLock)]
         public async Task<IActionResult> LockUser(string id)
         {
@@ -94,13 +101,16 @@ namespace Squidex.Areas.Api.Controllers.Users
                 throw new ValidationException("Locking user failed.", new ValidationError("You cannot lock yourself."));
             }
 
-            await userManager.LockAsync(id);
+            var entity = await userManager.LockAsync(id);
 
-            return NoContent();
+            var response = UserDto.FromUser(entity, this);
+
+            return Ok(response);
         }
 
         [HttpPut]
         [Route("user-management/{id}/unlock/")]
+        [ProducesResponseType(typeof(UserDto), 201)]
         [ApiPermission(Permissions.AdminUsersUnlock)]
         public async Task<IActionResult> UnlockUser(string id)
         {
@@ -109,9 +119,11 @@ namespace Squidex.Areas.Api.Controllers.Users
                 throw new ValidationException("Unlocking user failed.", new ValidationError("You cannot unlock yourself."));
             }
 
-            await userManager.UnlockAsync(id);
+            var entity = await userManager.UnlockAsync(id);
 
-            return NoContent();
+            var response = UserDto.FromUser(entity, this);
+
+            return Ok(response);
         }
     }
 }

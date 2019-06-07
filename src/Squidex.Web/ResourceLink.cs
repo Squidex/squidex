@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using System.Net.Http;
 
 namespace Squidex.Web
 {
@@ -18,6 +17,6 @@ namespace Squidex.Web
 
         [Required]
         [Display(Description = "The link method.")]
-        public HttpMethod Method { get; set; } 
+        public string Method { get; set; } 
     }
 }

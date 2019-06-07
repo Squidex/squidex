@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         /// </returns>
         [HttpGet]
         [Route("users/")]
-        [ProducesResponseType(typeof(PublicUserDto[]), 200)]
+        [ProducesResponseType(typeof(UserDto[]), 200)]
         [ApiPermission]
         public async Task<IActionResult> GetUsers(string query)
         {
@@ -76,9 +76,9 @@ namespace Squidex.Areas.Api.Controllers.Users
             {
                 var entities = await userResolver.QueryByEmailAsync(query);
 
-                var models = entities.Where(x => !x.IsHidden()).Select(x => UserDto.FromUser(x, this)).ToArray();
+                var response = entities.Where(x => !x.IsHidden()).Select(x => UserDto.FromUser(x, this)).ToArray();
 
-                return Ok(models);
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -100,7 +100,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         /// </returns>
         [HttpGet]
         [Route("users/{id}/")]
-        [ProducesResponseType(typeof(PublicUserDto), 200)]
+        [ProducesResponseType(typeof(UserDto), 200)]
         [ApiPermission]
         public async Task<IActionResult> GetUser(string id)
         {
