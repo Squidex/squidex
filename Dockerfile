@@ -62,4 +62,4 @@ EXPOSE 5000
 # EXPOSE 33333
 # EXPOSE 40000
 
-ENTRYPOINT ["./Squidex"]    
+ENTRYPOINT ["./Squidex"]
