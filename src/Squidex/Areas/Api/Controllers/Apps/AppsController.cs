@@ -58,11 +58,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
         public async Task<IActionResult> GetApps()
         {
             var userOrClientId = HttpContext.User.UserOrClientId();
-            var userPermissions = HttpContext.User.Permissions();
+            var userPermissions = HttpContext.Permissions();
 
             var entities = await appProvider.GetUserApps(userOrClientId, userPermissions);
 
-            var response = entities.ToArray(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider));
+            var response = entities.ToArray(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this));
 
             Response.Headers[HeaderNames.ETag] = response.ToManyEtag();
 

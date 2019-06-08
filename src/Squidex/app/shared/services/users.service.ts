@@ -10,7 +10,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { ApiUrlConfig, pretifyError } from '@app/framework';
+import {
+    ApiUrlConfig,
+    pretifyError,
+    ResourceLinks,
+    withLinks
+} from '@app/framework';
 
 export class UserDto {
     constructor(
@@ -18,6 +23,10 @@ export class UserDto {
         public readonly displayName: string
     ) {
     }
+}
+
+export class ResourcesDto {
+    public readonly _links: ResourceLinks = {};
 }
 
 @Injectable()
@@ -53,6 +62,16 @@ export class UsersService {
                         body.displayName);
 
                     return user;
+                }),
+                pretifyError('Failed to load user. Please reload.'));
+    }
+
+    public getResources(): Observable<ResourcesDto> {
+        const url = this.apiUrl.buildUrl(`api/user/resources`);
+
+        return this.http.get<any>(url).pipe(
+                map(body => {
+                    return withLinks(new ResourcesDto(), body);
                 }),
                 pretifyError('Failed to load user. Please reload.'));
     }

@@ -18,17 +18,13 @@ import {
     pure: true
 })
 export class HasLinkPipe implements PipeTransform {
-    public transform(value: Resource | ResourceLinks, rel: string) {
-        return hasLink(value, rel);
-    }
-}
+    public transform(value: Resource | ResourceLinks,  ...rels: string[]) {
+        for (let rel of rels) {
+            if (hasLink(value, rel)) {
+                return true;
+            }
+        }
 
-@Pipe({
-    name: 'sqxHasNoLink',
-    pure: true
-})
-export class HasNoLinkPipe implements PipeTransform {
-    public transform(value: Resource | ResourceLinks, rel: string) {
-        return !hasLink(value, rel);
+        return false;
     }
 }

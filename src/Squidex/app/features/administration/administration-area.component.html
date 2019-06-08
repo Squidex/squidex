@@ -1,18 +1,18 @@
 <sqx-title message="Administration"></sqx-title>
 
-<div class="sidebar">
+<div class="sidebar" *ngIf="uiState.resources | async; let resources">
     <ul class="nav nav-panel flex-column">
-        <li class="nav-item" *sqxPermission="'squidex.admin.events.read'">
+        <li class="nav-item" *ngIf="resources | sqxHasLink:'admin/events'">
             <a class="nav-link" routerLink="event-consumers" routerLinkActive="active">
                 <i class="nav-icon icon-time"></i> <div class="nav-text">Consumers</div>
             </a>
         </li>
-        <li class="nav-item" *sqxPermission="'squidex.admin.users.read'">
+        <li class="nav-item" *ngIf="resources | sqxHasLink:'admin/users'">
             <a class="nav-link" routerLink="users" routerLinkActive="active">
                 <i class="nav-icon icon-user-o"></i> <div class="nav-text">Users</div>
             </a>
         </li>
-        <li class="nav-item" *sqxPermission="'squidex.admin.restore.read'">
+        <li class="nav-item" *ngIf="resources | sqxHasLink:'admin/restore'">
             <a class="nav-link" routerLink="restore" routerLinkActive="active">
                 <i class="nav-icon icon-backup"></i> <div class="nav-text">Restore</div>
             </a>

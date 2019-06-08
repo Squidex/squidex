@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var schemas = await appProvider.GetSchemasAsync(AppId);
 
-            var response = schemas.ToArray(SchemaDto.FromSchema);
+            var response = schemas.ToArray(x => SchemaDto.FromSchema(x, this, app));
 
             Response.Headers[HeaderNames.ETag] = response.ToManyEtag();
 
@@ -90,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
                 return NotFound();
             }
 
-            var response = SchemaDetailsDto.FromSchema(entity);
+            var response = SchemaDetailsDto.FromSchemaWithDetails(entity, this, app);
 
             Response.Headers[HeaderNames.ETag] = entity.Version.ToString();
 

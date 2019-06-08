@@ -13,19 +13,18 @@ import {
     AppsService,
     AppsState,
     DateTime,
-    DialogService,
-    Permission
+    DialogService
 } from '@app/shared/internal';
 
 describe('AppsState', () => {
     const now = DateTime.now();
 
     const oldApps = [
-        new AppDto('id1', 'old-name1', [new Permission('Owner')], now, now),
-        new AppDto('id2', 'old-name2', [new Permission('Owner')], now, now)
+        new AppDto('id1', 'old-name1', ['Owner'], now, now),
+        new AppDto('id2', 'old-name2', ['Owner'], now, now)
     ];
 
-    const newApp = new AppDto('id3', 'new-name', [new Permission('Owner')], now, now);
+    const newApp = new AppDto('id3', 'new-name', ['Owner'], now, now);
 
     let dialogs: IMock<DialogService>;
     let appsService: IMock<AppsService>;

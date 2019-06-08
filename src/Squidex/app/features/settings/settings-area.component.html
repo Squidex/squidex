@@ -6,50 +6,50 @@
     </ng-container>
     
     <ng-container content>
-        <ul class="nav nav-panel nav-dark flex-column">
-            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.backups.read'">
+        <ul class="nav nav-panel nav-dark flex-column" *ngIf="appsState.selectedValidApp | async; let selectedApp">
+            <li class="nav-item" *ngIf="selectedApp | sqxHasLink:'backups'">
                 <a class="nav-link" routerLink="backups" routerLinkActive="active">
                     Backups
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.clients.read'">
+            <li class="nav-item" *ngIf="selectedApp | sqxHasLink:'clients'">
                 <a class="nav-link" routerLink="clients" routerLinkActive="active">
                     Clients
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.contributors.read'">
+            <li class="nav-item" *ngIf="selectedApp | sqxHasLink:'contributors'">
                 <a class="nav-link" routerLink="contributors" routerLinkActive="active">
                     Contributors
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.roles.read'">
+            <li class="nav-item" *ngIf="selectedApp | sqxHasLink:'roles'">
                 <a class="nav-link" routerLink="roles" routerLinkActive="active">
                     Roles
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.languages.read'">
+            <li class="nav-item" *ngIf="selectedApp | sqxHasLink:'languages'">
                 <a class="nav-link" routerLink="languages" routerLinkActive="active">
                     Languages
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.patterns.read'">
+            <li class="nav-item" *ngIf="selectedApp | sqxHasLink:'patterns'">
                 <a class="nav-link" routerLink="patterns" routerLinkActive="active">
                     Patterns
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.plans.read'">
+            <li class="nav-item" *ngIf="selectedApp | sqxHasLink:'plans'">
                 <a class="nav-link" routerLink="plans" routerLinkActive="active">
                     Subscription
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.delete'">
+            <li class="nav-item" *ngIf="selectedApp | sqxHasLink:'delete'">
                 <a class="nav-link" routerLink="more" routerLinkActive="active">
                     More
                     <i class="icon-angle-right"></i>

@@ -14,8 +14,7 @@ import {
     AppCreatedDto,
     AppDto,
     AppsService,
-    DateTime,
-    Permission
+    DateTime
 } from '@app/shared/internal';
 
 describe('AppsService', () => {
@@ -73,8 +72,8 @@ describe('AppsService', () => {
 
         expect(apps!).toEqual(
             [
-                new AppDto('123', 'name1', [new Permission('Owner')], DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Free', 'Basic'),
-                new AppDto('456', 'name2', [new Permission('Owner')], DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Basic', 'Enterprise')
+                new AppDto('123', 'name1', ['Owner'], DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Free', 'Basic'),
+                new AppDto('456', 'name2', ['Owner'], DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Basic', 'Enterprise')
             ]);
     }));
 

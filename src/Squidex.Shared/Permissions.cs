@@ -79,7 +79,6 @@ namespace Squidex.Shared
         public const string AppRolesDelete = "squidex.apps.{app}.roles.delete";
 
         public const string AppPatterns = "squidex.apps.{app}.patterns";
-        public const string AppPatternsRead = "squidex.apps.{app}.patterns.read";
         public const string AppPatternsCreate = "squidex.apps.{app}.patterns.create";
         public const string AppPatternsUpdate = "squidex.apps.{app}.patterns.update";
         public const string AppPatternsDelete = "squidex.apps.{app}.patterns.delete";
@@ -117,7 +116,6 @@ namespace Squidex.Shared
 
         public const string AppContents = "squidex.apps.{app}.contents.{name}";
         public const string AppContentsRead = "squidex.apps.{app}.contents.{name}.read";
-        public const string AppContentsGraphQL = "squidex.apps.{app}.contents.{name}.graphql";
         public const string AppContentsCreate = "squidex.apps.{app}.contents.{name}.create";
         public const string AppContentsUpdate = "squidex.apps.{app}.contents.{name}.update";
         public const string AppContentsDiscard = "squidex.apps.{app}.contents.{name}.discard";

@@ -57,6 +57,23 @@ namespace Squidex.Areas.Api.Controllers.Users
         }
 
         /// <summary>
+        /// Get the user resources.
+        /// </summary>
+        /// <returns>
+        /// 200 => User resources returned.
+        /// </returns>
+        [HttpGet]
+        [Route("user/resources/")]
+        [ProducesResponseType(typeof(ResourcesDto), 200)]
+        [ApiPermission]
+        public IActionResult GetUserResources()
+        {
+            var response = ResourcesDto.FromController(this);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Get users by query.
         /// </summary>
         /// <param name="query">The query to search the user by email address. Case invariant.</param>

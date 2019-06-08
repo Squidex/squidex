@@ -16,7 +16,8 @@ import { AppsState } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LeftMenuComponent {
-    constructor(public readonly appsState: AppsState
+    constructor(
+        public readonly appsState: AppsState
     ) {
     }
 }

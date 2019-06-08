@@ -74,7 +74,7 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppPlansChange)]
         [ApiCosts(0)]
-        public async Task<IActionResult> ChangePlanAsync(string app, [FromBody] ChangePlanDto request)
+        public async Task<IActionResult> PutPlan(string app, [FromBody] ChangePlanDto request)
         {
             var context = await CommandBus.PublishAsync(request.ToCommand());
 

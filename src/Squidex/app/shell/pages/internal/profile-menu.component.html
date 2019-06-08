@@ -17,9 +17,11 @@
             
             <div class="dropdown-divider"></div>
 
-            <a class="dropdown-item" routerLink="/app/administration" *sqxPermission="'?squidex.admin.events|restore|users.read'">
-                Administration
-            </a>
+            <ng-container *ngIf="uiState.resources | async; let resources">
+                <a class="dropdown-item" routerLink="/app/administration" *ngIf="resources | sqxHasLink:'admin/events':'admin/restore':'admin/users'">
+                    Administration
+                </a>
+            </ng-container>
 
             <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl">
                 Profile

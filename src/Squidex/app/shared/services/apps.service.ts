@@ -15,15 +15,18 @@ import {
     ApiUrlConfig,
     DateTime,
     Model,
-    Permission,
-    pretifyError
+    pretifyError,
+    ResourceLinks,
+    withLinks
 } from '@app/framework';
 
 export class AppDto extends Model<AppDto> {
+    public readonly _links: ResourceLinks = {};
+
     constructor(
         public readonly id: string,
         public readonly name: string,
-        public readonly permissions: Permission[],
+        public readonly permissions: string[],
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
         public readonly planName?: string,
@@ -59,18 +62,7 @@ export class AppsService {
 
         return this.http.get<any[]>(url).pipe(
                 map(body => {
-                    const apps = body.map(item => {
-                        const permissions = (<string[]>item.permissions).map(x => new Permission(x));
-
-                        return new AppDto(
-                            item.id,
-                            item.name,
-                            permissions,
-                            DateTime.parseISO(item.created),
-                            DateTime.parseISO(item.lastModified),
-                            item.planName,
-                            item.planUpgrade);
-                    });
+                    const apps = body.map(item => parseApp(item));
 
                     return apps;
                 }),
@@ -96,4 +88,17 @@ export class AppsService {
                 }),
                 pretifyError('Failed to archive app. Please reload.'));
     }
+}
+
+function parseApp(response: any) {
+    return withLinks(
+        new AppDto(
+            response.id,
+            response.name,
+            response.permissions,
+            DateTime.parseISO(response.created),
+            DateTime.parseISO(response.lastModified),
+            response.planName,
+            response.planUpgrade),
+        response);
 }

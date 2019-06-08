@@ -8,11 +8,17 @@
 import { Injectable } from '@angular/core';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-import { State, Types } from '@app/framework';
+import {
+    ResourceLinks,
+    State,
+    Types
+} from '@app/framework';
 
 import { AppsState } from './apps.state';
 
 import { UIService, UISettingsDto } from './../services/ui.service';
+
+import { UsersService } from './../services/users.service';
 
 interface Snapshot {
     // All common settings.
@@ -23,12 +29,18 @@ interface Snapshot {
 
     // The merged settings of app and common settings.
     settings: object & any;
+
+    resources: ResourceLinks;
 }
 
 @Injectable()
 export class UIState extends State<Snapshot> {
     public settings =
         this.changes.pipe(map(x => x.settings),
+            distinctUntilChanged());
+
+    public resources =
+        this.changes.pipe(map(x => x.resources),
             distinctUntilChanged());
 
     public get<T>(path: string, defaultValue: T) {
@@ -38,16 +50,16 @@ export class UIState extends State<Snapshot> {
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly uiService: UIService
+        private readonly uiService: UIService,
+        private readonly usersService: UsersService
     ) {
-        super({ settings: { }, settingsCommon: { }, settingsApp: { } });
+        super({ settings: {}, settingsCommon: {}, settingsApp: {}, resources: {} });
 
+        this.loadResources();
         this.loadCommon();
 
-        appsState.selectedApp.subscribe(app => {
-            if (app) {
-                this.load();
-            }
+        appsState.selectedValidApp.subscribe(app => {
+            this.load();
         });
     }
 
@@ -64,6 +76,13 @@ export class UIState extends State<Snapshot> {
         this.uiService.getCommonSettings()
             .subscribe(payload => {
                 this.next(s => updateCommonSettings(s, payload));
+            });
+    }
+
+    private loadResources() {
+        this.usersService.getResources()
+            .subscribe(payload => {
+                this.next(s => ({ ...s, resources: payload._links }));
             });
     }
 
@@ -151,11 +170,11 @@ export class UIState extends State<Snapshot> {
 function updateAppSettings(state: Snapshot, settingsApp: object & any) {
     const { settingsCommon } = state;
 
-    return { settings: { ...settingsCommon, ...settingsApp }, settingsApp, settingsCommon };
+    return { ...state, settings: { ...settingsCommon, ...settingsApp }, settingsApp, settingsCommon };
 }
 
 function updateCommonSettings(state: Snapshot, settingsCommon: object & any) {
     const { settingsApp } = state;
 
-    return { settings: { ...settingsCommon, ...settingsApp }, settingsApp, settingsCommon };
+    return { ...state, settings: { ...settingsCommon, ...settingsApp }, settingsApp, settingsCommon };
 }

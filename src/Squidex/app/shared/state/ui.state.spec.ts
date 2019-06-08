@@ -8,7 +8,14 @@
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import { UIService, UIState } from '@app/shared/internal';
+import {
+    ResourceLinks,
+    ResourcesDto,
+    UIService,
+    UIState,
+    UsersService,
+    withLinks
+} from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
 
@@ -30,6 +37,11 @@ describe('UIState', () => {
         canCreateApps: true
     };
 
+    const resources: ResourceLinks = {
+        schemas: { method: 'GET', href: '/api/schemas' }
+    };
+
+    let usersService: IMock<UsersService>;
     let uiService: IMock<UIService>;
     let uiState: UIState;
 
@@ -48,7 +60,12 @@ describe('UIState', () => {
         uiService.setup(x => x.deleteSetting(app, It.isAnyString()))
             .returns(() => of({}));
 
-        uiState = new UIState(appsState.object, uiService.object);
+        usersService = Mock.ofType<UsersService>();
+
+        usersService.setup(x => x.getResources())
+            .returns(() => of(withLinks(new ResourcesDto(), { _links: resources })));
+
+        uiState = new UIState(appsState.object, uiService.object, usersService.object);
     });
 
     it('should load settings', () => {
@@ -58,6 +75,8 @@ describe('UIState', () => {
             mapSize: 1024,
             canCreateApps: true
         });
+
+        expect(uiState.snapshot.resources).toEqual(resources);
     });
 
     it('should add value to snapshot when set', () => {

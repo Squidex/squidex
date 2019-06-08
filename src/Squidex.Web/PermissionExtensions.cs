@@ -24,7 +24,7 @@ namespace Squidex.Web
             }
         }
 
-        public static PermissionSet GetPermissions(this HttpContext httpContext)
+        public static PermissionSet Permissions(this HttpContext httpContext)
         {
             var feature = httpContext.Features.Get<PermissionFeature>();
 
@@ -38,22 +38,22 @@ namespace Squidex.Web
             return feature.Permissions;
         }
 
-        public static bool HasPermission(this HttpContext httpContext, Permission permission)
+        public static bool HasPermission(this HttpContext httpContext, Permission permission, PermissionSet permissions = null)
         {
-            return httpContext.GetPermissions().Includes(permission);
+            return httpContext.Permissions().Includes(permission) || permission?.Includes(permission) == true;
         }
 
-        public static bool HasPermission(this HttpContext httpContext, string id, string app = "*", string schema = "*")
+        public static bool HasPermission(this HttpContext httpContext, string id, string app = "*", string schema = "*", PermissionSet permissions = null)
         {
-            return httpContext.GetPermissions().Includes(Permissions.ForApp(id, app, schema));
+            return httpContext.HasPermission(Shared.Permissions.ForApp(id, app, schema), permissions);
         }
 
-        public static bool HasPermission(this ApiController controller, Permission permission)
+        public static bool HasPermission(this ApiController controller, Permission permission, PermissionSet permissions = null)
         {
-            return controller.HttpContext.GetPermissions().Includes(permission);
+            return controller.HttpContext.HasPermission(permission, permissions);
         }
 
-        public static bool HasPermission(this ApiController controller, string id, string app = "*", string schema = "*")
+        public static bool HasPermission(this ApiController controller, string id, string app = "*", string schema = "*", PermissionSet permissions = null)
         {
             if (app == "*")
             {
@@ -71,7 +71,7 @@ namespace Squidex.Web
                 }
             }
 
-            return controller.HttpContext.GetPermissions().Includes(Permissions.ForApp(id, app, schema));
+            return controller.HasPermission(Shared.Permissions.ForApp(id, app, schema), permissions);
         }
     }
 }

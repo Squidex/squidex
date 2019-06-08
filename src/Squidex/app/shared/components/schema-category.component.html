@@ -15,7 +15,7 @@
 
     <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="snapshot.isOpen" @fade>
         <ng-container *ngFor="let schema of snapshot.schemasFiltered; trackBy: trackBySchema">
-            <ng-container *sqxPermission="schemaPermission(schema)">
+            <ng-container *ngIf="schemaPermission(schema)">
                 <li class="nav-item" dnd-draggable [dragEnabled]="!isReadonly" [dragData]="schema">
                     <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active">
                         <div class="row" *ngIf="!isReadonly">

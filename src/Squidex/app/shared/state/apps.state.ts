@@ -7,13 +7,12 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
 
 import {
     DateTime,
     DialogService,
     ImmutableArray,
-    Permission,
     shareSubscribed,
     State
 } from '@app/framework';
@@ -46,6 +45,10 @@ export class AppsState extends State<Snapshot> {
     public selectedApp =
         this.changes.pipe(map(s => s.selectedApp),
             distinctUntilChanged(sameApp));
+
+    public selectedValidApp =
+        this.selectedApp.pipe(filter(x => !!x), map(x => <AppDto>x),
+            distinctUntilChanged());
 
     public apps =
         this.changes.pipe(map(s => s.apps),
@@ -116,7 +119,7 @@ function createApp(request: CreateAppDto, response: AppCreatedDto, now?: DateTim
     const app = new AppDto(
         response.id,
         request.name,
-        response.permissions.map(x => new Permission(x)),
+        response.permissions,
         now,
         now,
         response.planName,
