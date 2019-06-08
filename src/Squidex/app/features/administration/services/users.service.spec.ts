@@ -227,7 +227,8 @@ describe('UsersService', () => {
 });
 
 export function createUser(id: number, suffix = '') {
-    const result = new UserDto(`${id}`,
+    const result = new UserDto(
+        `${id}`,
         `user${id}${suffix}@domain.com`,
         `user${id}${suffix}`,
         [

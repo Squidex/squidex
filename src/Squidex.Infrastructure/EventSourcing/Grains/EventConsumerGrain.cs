@@ -58,7 +58,12 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public Task<Immutable<EventConsumerInfo>> GetStateAsync()
         {
-            return Task.FromResult(State.ToInfo(eventConsumer.Name).AsImmutable());
+            return Task.FromResult(CreateInfo());
+        }
+
+        private Immutable<EventConsumerInfo> CreateInfo()
+        {
+            return State.ToInfo(eventConsumer.Name).AsImmutable();
         }
 
         public Task OnEventAsync(Immutable<IEventSubscription> subscription, Immutable<StoredEvent> storedEvent)
@@ -109,39 +114,43 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             return TaskHelper.Done;
         }
 
-        public Task StartAsync()
+        public async Task<Immutable<EventConsumerInfo>> StartAsync()
         {
             if (!State.IsStopped)
             {
-                return TaskHelper.Done;
+                return CreateInfo();
             }
 
-            return DoAndUpdateStateAsync(() =>
+            await DoAndUpdateStateAsync(() =>
             {
                 Subscribe(State.Position);
 
                 State = State.Started();
             });
+
+            return CreateInfo();
         }
 
-        public Task StopAsync()
+        public async Task<Immutable<EventConsumerInfo>> StopAsync()
         {
             if (State.IsStopped)
             {
-                return TaskHelper.Done;
+                return CreateInfo();
             }
 
-            return DoAndUpdateStateAsync(() =>
+            await DoAndUpdateStateAsync(() =>
             {
                 Unsubscribe();
 
                 State = State.Stopped();
             });
+
+            return CreateInfo();
         }
 
-        public Task ResetAsync()
+        public async Task<Immutable<EventConsumerInfo>> ResetAsync()
         {
-            return DoAndUpdateStateAsync(async () =>
+            await DoAndUpdateStateAsync(async () =>
             {
                 Unsubscribe();
 
@@ -151,6 +160,8 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 State = State.Reset();
             });
+
+            return CreateInfo();
         }
 
         private Task DoAndUpdateStateAsync(Action action, [CallerMemberName] string caller = null)

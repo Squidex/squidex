@@ -7,8 +7,6 @@
 
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Squidex.Web
 {

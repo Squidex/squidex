@@ -168,7 +168,7 @@ describe('UsersState', () => {
             expect(usersState.snapshot.selectedUser).toBeNull();
         });
 
-        it('should mark as locked when locked', () => {
+        it('should update user selected user when locked', () => {
             const updated = createUser(2, '_new');
 
             usersService.setup(x => x.lockUser(user2))
@@ -177,12 +177,12 @@ describe('UsersState', () => {
             usersState.select(user2.id).subscribe();
             usersState.lock(user2).subscribe();
 
-            const userUser2 = usersState.snapshot.users.at(1);
+            const newUser2 = usersState.snapshot.users.at(1);
 
-            expect(userUser2).toBe(usersState.snapshot.selectedUser!);
+            expect(newUser2).toBe(usersState.snapshot.selectedUser!);
         });
 
-        it('should unmark as locked when unlocked', () => {
+        it('should update user and selected user when unlocked', () => {
             const updated = createUser(2, '_new');
 
             usersService.setup(x => x.unlockUser(user2))
@@ -197,7 +197,7 @@ describe('UsersState', () => {
             expect(newUser2).toBe(usersState.snapshot.selectedUser!);
         });
 
-        it('should update user properties when updated', () => {
+        it('should update user and selected user when updated', () => {
             const request = { email: 'new@mail.com', displayName: 'New', permissions: ['Permission1'] };
 
             const updated = createUser(2, '_new');
