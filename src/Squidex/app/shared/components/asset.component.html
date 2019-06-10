@@ -23,7 +23,7 @@
                         <a class="file-download ml-2" [href]="asset | sqxAssetUrl" sqxStopClick sqxExternalLink="noicon">
                             <i class="icon-download"></i>
                         </a>
-                        <a class="file-delete ml-2" (click)="emitDelete()" *ngIf="!isDisabled && !removeMode">
+                        <a class="file-delete ml-2" (click)="emitDelete()" *ngIf="!isDisabled && !removeMode && asset | sqxHasLink:'delete'">
                             <i class="icon-delete"></i>
                         </a>
                         <a class="file-delete ml-2" (click)="emitRemove()" *ngIf="removeMode">
@@ -103,7 +103,7 @@
                     </a>
                 </td>
                 <td class="col-actions text-right" *ngIf="!isDisabled || removeMode">
-                    <button type="button" class="btn btn-text-danger" (click)="emitDelete()" *ngIf="!isDisabled && !removeMode">
+                    <button type="button" class="btn btn-text-danger" (click)="emitDelete()" *ngIf="!isDisabled && !removeMode && asset | sqxHasLink:'delete'">
                         <i class="icon-bin2"></i>
                     </button>
                     <button type="button" class="btn btn-text-secondary" (click)="emitRemove()" *ngIf="removeMode">

@@ -124,7 +124,7 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public delete(asset: AssetDto): Observable<any> {
-        return this.assetsService.deleteAsset(this.appName, asset.id, asset.version).pipe(
+        return this.assetsService.deleteAsset(this.appName, asset, asset.version).pipe(
             tap(() => {
                 return this.next(s => {
                     const assets = s.assets.filter(x => x.id !== asset.id);

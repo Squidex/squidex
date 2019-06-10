@@ -5,19 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public sealed class AssetCreatedResult
+    public sealed class AssetMetadata
     {
-        public IAssetEntity Asset { get; }
-
-        public bool IsDuplicate { get; }
-
-        public AssetCreatedResult(IAssetEntity asset, bool isDuplicate)
-        {
-            Asset = asset;
-
-            IsDuplicate = isDuplicate;
-        }
+        /// <summary>
+        /// Indicates whether the asset is a duplicate.
+        /// </summary>
+        public string IsDuplicate { get; set; }
     }
 }

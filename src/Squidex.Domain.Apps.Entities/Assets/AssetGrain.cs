@@ -51,16 +51,27 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         Create(c, tagIds);
 
-                        return new AssetSavedResult(Version, Snapshot.FileVersion, Snapshot.FileHash);
+                        return await GetRawStateAsync();
                     });
                 case UpdateAsset updateRule:
-                    return UpdateAsync(updateRule, c =>
+                    return UpdateReturnAsync(updateRule, async c =>
                     {
                         GuardAsset.CanUpdate(c);
 
                         Update(c);
 
-                        return new AssetSavedResult(Version, Snapshot.FileVersion, Snapshot.FileHash);
+                        return await GetRawStateAsync();
+                    });
+                case AnnotateAsset annotateAsset:
+                    return UpdateReturnAsync(annotateAsset, async c =>
+                    {
+                        GuardAsset.CanAnnotate(c, Snapshot.FileName, Snapshot.Slug);
+
+                        var tagIds = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
+
+                        Annotate(c, tagIds);
+
+                        return await GetRawStateAsync();
                     });
                 case DeleteAsset deleteAsset:
                     return UpdateAsync(deleteAsset, async c =>
@@ -70,15 +81,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         await tagService.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, null, Snapshot.Tags);
 
                         Delete(c);
-                    });
-                case AnnotateAsset annotateAsset:
-                    return UpdateAsync(annotateAsset, async c =>
-                    {
-                        GuardAsset.CanAnnotate(c, Snapshot.FileName, Snapshot.Slug);
-
-                        var tagIds = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
-
-                        Annotate(c, tagIds);
                     });
                 default:
                     throw new NotSupportedException();
@@ -161,6 +163,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 throw new DomainException("Asset has already been deleted");
             }
+        }
+
+        public Task<IAssetEntity> GetRawStateAsync()
+        {
+            return Task.FromResult<IAssetEntity>(Snapshot);
         }
 
         public Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any)

@@ -9,13 +9,15 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Ho
 
 import {
     AssetDto,
+    AssetUploaderState,
     DialogModel,
     DialogService,
     fadeAnimation,
+    hasLink,
     StatefulComponent,
-    Types
+    Types,
+    UploadCanceled
 } from '@app/shared/internal';
-import { AssetUploaderState, UploadCanceled } from './../state/asset-uploader.state';
 
 interface State {
     progress: number;
@@ -111,7 +113,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     }
 
     public updateFile(files: FileList) {
-        if (files.length === 1) {
+        if (files.length === 1 && hasLink(this.asset, 'upload')) {
             this.setProgress(1);
 
             this.assetUploader.uploadAsset(this.asset, files[0])

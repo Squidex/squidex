@@ -70,13 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                             {
                                 if (IsDuplicate(createAsset, existing))
                                 {
-                                    result = new AssetCreatedResult(
-                                        existing.Id,
-                                        existing.Tags,
-                                        existing.Version,
-                                        existing.FileVersion,
-                                        existing.FileHash,
-                                        true);
+                                    result = new AssetCreatedResult(existing, true);
                                 }
 
                                 break;
@@ -89,17 +83,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
                                     tagGenerator.GenerateTags(createAsset, createAsset.Tags);
                                 }
 
-                                var commandResult = (AssetSavedResult)await ExecuteCommandAsync(createAsset);
+                                var asset = (IAssetEntity)await ExecuteCommandAsync(createAsset);
 
-                                result = new AssetCreatedResult(
-                                    createAsset.AssetId,
-                                    createAsset.Tags,
-                                    commandResult.Version,
-                                    commandResult.FileVersion,
-                                    commandResult.FileHash,
-                                    false);
+                                result = new AssetCreatedResult(asset, false);
 
-                                await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), result.FileVersion, null);
+                                await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), asset.FileVersion, null);
                             }
 
                             context.Complete(result);
@@ -119,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         updateAsset.FileHash = await UploadAsync(context, updateAsset.File);
                         try
                         {
-                            var result = (AssetSavedResult)await ExecuteCommandAsync(updateAsset);
+                            var result = (IAssetEntity)await ExecuteCommandAsync(updateAsset);
 
                             context.Complete(result);
 

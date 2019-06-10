@@ -16,6 +16,7 @@ import {
     formatHistoryMessage,
     HistoryEventDto,
     MathHelper,
+    Resource,
     UserDto,
     UsersProviderService
 } from '@app/shared/internal';
@@ -215,8 +216,8 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
     pure: true
 })
 export class AssetUrlPipe implements PipeTransform {
-    public transform(asset: { url: any }): string {
-        return `${asset.url}?q=${MathHelper.guid()}`;
+    public transform(asset: Resource): string {
+        return `${asset._links['content'].href}&sq=${MathHelper.guid()}`;
     }
 }
 
@@ -225,13 +226,8 @@ export class AssetUrlPipe implements PipeTransform {
     pure: true
 })
 export class AssetPreviewUrlPipe implements PipeTransform {
-    constructor(
-        private readonly apiUrl: ApiUrlConfig
-    ) {
-    }
-
-    public transform(asset: { id: any, fileVersion: number }): string {
-        return this.apiUrl.buildUrl(`api/assets/${asset.id}?version=${asset.fileVersion}`);
+    public transform(asset: Resource): string {
+        return asset._links['content'].href;
     }
 }
 

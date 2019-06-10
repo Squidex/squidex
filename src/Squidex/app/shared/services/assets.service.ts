@@ -16,21 +16,30 @@ import {
     DateTime,
     ErrorDto,
     HTTP,
+    Metadata,
     Model,
     pretifyError,
+    Resource,
+    ResourceLinks,
     ResultSet,
     Types,
     Version,
     Versioned,
-    versioned
+    withLinks
 } from '@app/framework';
 
-export class AssetsDto extends ResultSet<AssetDto> { }
+export class AssetsDto extends ResultSet<AssetDto> {
+    public readonly _links: ResourceLinks = {};
+}
 
 export class AssetDto extends Model<AssetDto> {
     public get canPreview() {
         return this.isImage || (this.mimeType === 'image/svg+xml' && this.fileSize < 100 * 1024);
     }
+
+    public readonly _meta: Metadata = {};
+
+    public readonly _links: ResourceLinks = {};
 
     constructor(
         public readonly id: string,
@@ -44,59 +53,20 @@ export class AssetDto extends Model<AssetDto> {
         public readonly fileSize: number,
         public readonly fileVersion: number,
         public readonly mimeType: string,
-        public readonly isDuplicate: boolean,
         public readonly isImage: boolean,
         public readonly pixelWidth: number | null | undefined,
         public readonly pixelHeight: number | null | undefined,
         public readonly slug: string,
         public readonly tags: string[],
-        public readonly url: string,
         public readonly version: Version
     ) {
         super();
-    }
-
-    public update(update: AssetReplacedDto, user: string, version: Version, now?: DateTime): AssetDto {
-        return this.with({
-            ...update,
-            lastModified: now || DateTime.now(),
-            lastModifiedBy: user,
-            version
-        });
-    }
-
-    public annnotate(update: AnnotateAssetDto, user: string, version: Version, now?: DateTime): AssetDto {
-        return this.with({
-            ...<any>update,
-            lastModified: now || DateTime.now(),
-            lastModifiedBy: user,
-            version
-        }, true);
     }
 }
 
 export interface AnnotateAssetDto {
     readonly fileName?: string;
     readonly slug?: string;
-    readonly tags?: string[];
-}
-
-export interface AssetReplacedDto {
-    readonly fileHash: string;
-    readonly fileSize: number;
-    readonly fileVersion: number;
-    readonly mimeType: string;
-    readonly isImage: boolean;
-    readonly pixelWidth?: number | null;
-    readonly pixelHeight?: number | null;
-}
-
-export interface AssetUploadedDto extends AssetReplacedDto {
-    readonly id: string;
-    readonly fileName: string;
-    readonly fileType: string;
-    readonly slug: string;
-    readonly isDuplicate: boolean;
     readonly tags?: string[];
 }
 
@@ -150,42 +120,17 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(({ payload  }) => {
-                    const body = payload.body;
+                map(({ payload }) => {
+                    const { total, items } = <{ total: number, items: any[] }>payload.body;
 
-                    const items: any[] = body.items;
+                    const assets = new AssetsDto(total, items.map(item => parseAsset(item)));
 
-                    const assets = new AssetsDto(body.total, items.map(item => {
-                        const assetUrl = this.apiUrl.buildUrl(`api/assets/${item.id}`);
-
-                        return new AssetDto(
-                            item.id,
-                            item.createdBy,
-                            item.lastModifiedBy,
-                            DateTime.parseISO_UTC(item.created),
-                            DateTime.parseISO_UTC(item.lastModified),
-                            item.fileName,
-                            item.fileHash,
-                            item.fileType,
-                            item.fileSize,
-                            item.fileVersion,
-                            item.mimeType,
-                            false,
-                            item.isImage,
-                            item.pixelWidth,
-                            item.pixelHeight,
-                            item.slug,
-                            item.tags || [],
-                            assetUrl,
-                            new Version(item.version.toString()));
-                    }));
-
-                    return assets;
+                    return withLinks(assets, payload.body);
                 }),
                 pretifyError('Failed to load assets. Please reload.'));
     }
 
-    public uploadFile(appName: string, file: File): Observable<number | Versioned<AssetUploadedDto>> {
+    public uploadFile(appName: string, file: File): Observable<number | AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
         const req = new HttpRequest('POST', url, getFormData(file), { reportProgress: true });
@@ -200,9 +145,7 @@ export class AssetsService {
 
                         return percentDone;
                     } else if (Types.is(event, HttpResponse)) {
-                        const response: any = event.body;
-
-                        return versioned(new Version(event.headers.get('etag')!), response);
+                        return parseAsset(event.body);
                     } else {
                         throw 'Invalid';
                     }
@@ -226,39 +169,20 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                map(({ version, payload }) => {
+                map(({ payload }) => {
                     const body = payload.body;
 
-                    const assetUrl = this.apiUrl.buildUrl(`api/assets/${body.id}`);
-
-                    return new AssetDto(
-                        body.id,
-                        body.createdBy,
-                        body.lastModifiedBy,
-                        DateTime.parseISO_UTC(body.created),
-                        DateTime.parseISO_UTC(body.lastModified),
-                        body.fileName,
-                        body.fileHash,
-                        body.fileType,
-                        body.fileSize,
-                        body.fileVersion,
-                        body.mimeType,
-                        false,
-                        body.isImage,
-                        body.pixelWidth,
-                        body.pixelHeight,
-                        body.slug,
-                        body.tags || [],
-                        assetUrl,
-                        version);
+                    return parseAsset(body);
                 }),
                 pretifyError('Failed to load assets. Please reload.'));
     }
 
-    public replaceFile(appName: string, id: string, file: File, version: Version): Observable<number | Versioned<AssetReplacedDto>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}/content`);
+    public replaceFile(appName: string, asset: Resource, file: File, version: Version): Observable<number | AssetDto> {
+        const link = asset._links['upload'];
 
-        const req = new HttpRequest('PUT', url, getFormData(file), { headers: new HttpHeaders().set('If-Match', version.value), reportProgress: true });
+        const url = this.apiUrl.buildUrl(link.href);
+
+        const req = new HttpRequest(link.method, url, getFormData(file), { headers: new HttpHeaders().set('If-Match', version.value), reportProgress: true });
 
         return this.http.request(req).pipe(
                 filter(event =>
@@ -270,9 +194,7 @@ export class AssetsService {
 
                         return percentDone;
                     } else if (Types.is(event, HttpResponse)) {
-                        const response: any = event.body;
-
-                        return versioned(new Version(event.headers.get('etag')!), response);
+                        return parseAsset(event.body);
                     } else {
                         throw 'Invalid';
                     }
@@ -292,22 +214,29 @@ export class AssetsService {
                 pretifyError('Failed to replace asset. Please reload.'));
     }
 
-    public deleteAsset(appName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
+    public putAsset(appName: string, asset: Resource, dto: AnnotateAssetDto, version: Version): Observable<AssetDto> {
+        const link = asset._links['update'];
 
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+                map(({ payload }) => {
+                    return parseAsset(payload.body);
+                }),
                 tap(() => {
-                    this.analytics.trackEvent('Analytics', 'Deleted', appName);
+                    this.analytics.trackEvent('Analytics', 'Updated', appName);
                 }),
                 pretifyError('Failed to delete asset. Please reload.'));
     }
 
-    public putAsset(appName: string, id: string, dto: AnnotateAssetDto, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
+    public deleteAsset(appName: string, asset: Resource, version: Version): Observable<Versioned<any>> {
+        const link = asset._links['delete'];
 
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
                 tap(() => {
-                    this.analytics.trackEvent('Analytics', 'Updated', appName);
+                    this.analytics.trackEvent('Analytics', 'Deleted', appName);
                 }),
                 pretifyError('Failed to delete asset. Please reload.'));
     }
@@ -319,4 +248,27 @@ function getFormData(file: File) {
     formData.append('file', file);
 
     return formData;
+}
+
+function parseAsset(response: any) {
+    return withLinks(
+        new AssetDto(
+            response.id,
+            response.createdBy,
+            response.lastModifiedBy,
+            DateTime.parseISO_UTC(response.created),
+            DateTime.parseISO_UTC(response.lastModified),
+            response.fileName,
+            response.fileHash,
+            response.fileType,
+            response.fileSize,
+            response.fileVersion,
+            response.mimeType,
+            response.isImage,
+            response.pixelWidth,
+            response.pixelHeight,
+            response.slug,
+            response.tags || [],
+            new Version(response.version.toString())),
+        response);
 }

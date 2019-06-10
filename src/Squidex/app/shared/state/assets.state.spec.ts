@@ -9,7 +9,6 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AssetDto,
     AssetsDto,
     AssetsService,
     AssetsState,
@@ -17,26 +16,22 @@ import {
     versioned
 } from '@app/shared/internal';
 
+import { createAsset } from './../services/assets.service.spec';
+
 import { TestValues } from './_test-helpers';
 
 describe('AssetsState', () => {
     const {
         app,
         appsState,
-        creation,
-        creator,
-        modified,
-        modifier,
         newVersion,
         version
     } = TestValues;
 
-    const oldAssets = [
-        new AssetDto('id1', creator, creator, creation, creation, 'name1', 'hash1', 'type1', 1, 1, 'mime1', false, false, null, null, 'slug1', ['tag1', 'shared'], 'url1', version),
-        new AssetDto('id2', creator, creator, creation, creation, 'name2', 'hash2', 'type2', 2, 2, 'mime2', false, false, null, null, 'slug2', ['tag2', 'shared'], 'url2', version)
-    ];
+    const asset1 = createAsset(1, ['tag1', 'shared']);
+    const asset2 = createAsset(2, ['tag2', 'shared']);
 
-    const newAsset = new AssetDto('id1', modifier, modifier, modified, modified, 'name3', 'hash3', 'type3', 3, 3, 'mime3', false, true, 0, 0, 'slug3', ['new'], 'url3', version);
+    const newAsset = createAsset(3, ['new']);
 
     let dialogs: IMock<DialogService>;
     let assetsService: IMock<AssetsService>;
@@ -56,14 +51,14 @@ describe('AssetsState', () => {
     describe('Loading', () => {
         it('should load assets', () => {
             assetsService.setup(x => x.getAssets(app, 30, 0, undefined, []))
-                .returns(() => of(new AssetsDto(200, oldAssets))).verifiable();
+                .returns(() => of(new AssetsDto(200, [asset1, asset2]))).verifiable();
 
             assetsService.setup(x => x.getTags(app))
                 .returns(() => of({ tag1: 1, shared: 2, tag2: 1 })).verifiable();
 
             assetsState.load().subscribe();
 
-            expect(assetsState.snapshot.assets.values).toEqual(oldAssets);
+            expect(assetsState.snapshot.assets.values).toEqual([asset1, asset2]);
             expect(assetsState.snapshot.assetsPager.numberOfItems).toEqual(200);
             expect(assetsState.snapshot.isLoaded).toBeTruthy();
 
@@ -72,7 +67,7 @@ describe('AssetsState', () => {
 
         it('should show notification on load when reload is true', () => {
             assetsService.setup(x => x.getAssets(app, 30, 0, undefined, []))
-                .returns(() => of(new AssetsDto(200, oldAssets)));
+                .returns(() => of(new AssetsDto(200, [asset1, asset2])));
 
             assetsService.setup(x => x.getTags(app))
                 .returns(() => of({ tag1: 1, shared: 2, tag2: 1 })).verifiable();
@@ -147,7 +142,7 @@ describe('AssetsState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             assetsService.setup(x => x.getAssets(app, 30, 0, undefined, []))
-                .returns(() => of(new AssetsDto(200, oldAssets))).verifiable();
+                .returns(() => of(new AssetsDto(200, [asset1, asset2]))).verifiable();
 
             assetsService.setup(x => x.getTags(app))
                 .returns(() => of({ tag1: 1, shared: 2, tag2: 1 })).verifiable();
@@ -158,7 +153,7 @@ describe('AssetsState', () => {
         it('should add asset to snapshot when created', () => {
             assetsState.add(newAsset);
 
-            expect(assetsState.snapshot.assets.values).toEqual([newAsset, ...oldAssets]);
+            expect(assetsState.snapshot.assets.values).toEqual([newAsset, asset1, asset2]);
             expect(assetsState.snapshot.assetsPager.numberOfItems).toBe(201);
         });
 
@@ -169,20 +164,22 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.tags).toEqual({ tag1: 1, tag2: 1, shared: 2, new: 2 });
         });
 
-        it('should update properties when updated', () => {
-            assetsState.update(newAsset);
+        it('should update asset when updated', () => {
+            const update = createAsset(1, ['new'], '-new');
 
-            const asset_1 = assetsState.snapshot.assets.at(0);
+            assetsState.update(update);
 
-            expect(asset_1).toBe(newAsset);
+            const newAsset1 = assetsState.snapshot.assets.at(0);
+
+            expect(newAsset1).toEqual(update);
             expect(assetsState.snapshot.tags).toEqual({ tag2: 1, shared: 1, new: 1 });
         });
 
         it('should remove asset from snapshot when deleted', () => {
-            assetsService.setup(x => x.deleteAsset(app, oldAssets[0].id, version))
+            assetsService.setup(x => x.deleteAsset(app, asset1, version))
                 .returns(() => of(versioned(newVersion)));
 
-            assetsState.delete(oldAssets[0]).subscribe();
+            assetsState.delete(asset1).subscribe();
 
             expect(assetsState.snapshot.assets.values.length).toBe(1);
             expect(assetsState.snapshot.assetsPager.numberOfItems).toBe(199);

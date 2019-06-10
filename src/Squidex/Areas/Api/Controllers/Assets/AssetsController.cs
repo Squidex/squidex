@@ -105,7 +105,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var assets = await assetQuery.QueryAsync(context, Q.Empty.WithODataQuery(Request.QueryString.ToString()).WithIds(ids));
 
-            var response = AssetsDto.FromAssets(assets);
+            var response = AssetsDto.FromAssets(assets, this, app);
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
@@ -142,7 +142,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return NotFound();
             }
 
-            var response = AssetDto.FromAsset(entity);
+            var response = AssetDto.FromAsset(entity, this, app);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
@@ -169,8 +169,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/assets/")]
-        [ProducesResponseType(typeof(AssetCreatedDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(AssetDto), 200)]
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
@@ -182,7 +181,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<AssetCreatedResult>();
-            var response = AssetCreatedDto.FromCommand(command, result);
+            var response = AssetDto.FromAsset(result.Asset, this, app, result.IsDuplicate);
 
             return StatusCode(201, response);
         }
@@ -194,7 +193,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="id">The id of the asset.</param>
         /// <param name="file">The file to upload.</param>
         /// <returns>
-        /// 201 => Asset updated.
+        /// 200 => Asset updated.
         /// 404 => Asset or app not found.
         /// 400 => Asset exceeds the maximum size.
         /// </returns>
@@ -203,8 +202,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/assets/{id}/content/")]
-        [ProducesResponseType(typeof(AssetReplacedDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(AssetDto), 200)]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAssetContent(string app, Guid id, [SwaggerIgnore] List<IFormFile> file)
@@ -214,10 +212,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var command = new UpdateAsset { File = assetFile, AssetId = id };
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<AssetSavedResult>();
-            var response = AssetReplacedDto.FromCommand(command, result);
+            var result = context.Result<IAssetEntity>();
+            var response = AssetDto.FromAsset(result, this, app);
 
-            return StatusCode(201, response);
+            return Ok(response);
         }
 
         /// <summary>
@@ -233,15 +231,19 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/assets/{id}/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(AssetDto), 200)]
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AnnotateAssetDto request)
         {
-            await CommandBus.PublishAsync(request.ToCommand(id));
+            var command = request.ToCommand(id);
+            var context = await CommandBus.PublishAsync(command);
 
-            return NoContent();
+            var result = context.Result<IAssetEntity>();
+            var response = AssetDto.FromAsset(result, this, app);
+
+            return Ok(response);
         }
 
         /// <summary>

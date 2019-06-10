@@ -29,6 +29,8 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
     public user?: UserDto;
     public userForm = new UserForm(this.formBuilder);
 
+    public isReadOnly = false;
+
     constructor(
         public readonly usersState: UsersState,
         private readonly formBuilder: FormBuilder,
@@ -47,7 +49,9 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
                     if (selectedUser) {
                         this.userForm.load(selectedUser);
 
-                        if (!hasLink(selectedUser, 'update')) {
+                        this.isReadOnly = !hasLink(this.user, 'update');
+
+                        if (this.isReadOnly) {
                             this.userForm.form.disable();
                         }
                     }
@@ -55,7 +59,7 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
     }
 
     public save() {
-        if (this.userForm.form.disabled) {
+        if (this.isReadOnly) {
             return;
         }
 

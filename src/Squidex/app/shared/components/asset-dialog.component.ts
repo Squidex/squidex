@@ -13,7 +13,7 @@ import {
     AppsState,
     AssetDto,
     AssetsService,
-    AuthService,
+    hasLink,
     StatefulComponent
 } from '@app/shared/internal';
 
@@ -36,12 +36,13 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
     @Output()
     public complete = new EventEmitter<AssetDto>();
 
+    public isReadOnly = false;
+
     public annotateForm = new AnnotateAssetForm(this.formBuilder);
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
         private readonly assetsService: AssetsService,
-        private readonly authState: AuthService,
         private readonly formBuilder: FormBuilder
     ) {
         super(changeDetector, {
@@ -53,6 +54,12 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
 
     public ngOnInit() {
         this.annotateForm.load(this.asset);
+
+        this.isReadOnly = !hasLink(this.asset, 'update');
+
+        if (this.isReadOnly) {
+            this.annotateForm.form.disable();
+        }
     }
 
     public generateSlug() {
@@ -68,12 +75,16 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
     }
 
     public annotateAsset() {
+        if (this.isReadOnly) {
+            return;
+        }
+
         const value = this.annotateForm.submit(this.asset);
 
         if (value) {
-            this.assetsService.putAsset(this.appsState.appName, this.asset.id, value, this.asset.version)
+            this.assetsService.putAsset(this.appsState.appName, this.asset, value, this.asset.version)
                 .subscribe(dto => {
-                    this.emitComplete(this.asset.annnotate(value, this.authState.user!.token, dto.version));
+                    this.emitComplete(dto);
                 }, error => {
                     this.annotateForm.submitFailed(error);
                 });
