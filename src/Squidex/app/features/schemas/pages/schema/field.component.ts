@@ -45,9 +45,7 @@ export class FieldComponent implements OnChanges {
 
     public dropdown = new ModalModel();
 
-    public isEditing = false;
-    public selectedTab = 0;
-
+    public editing = false;
     public editForm = new EditFieldForm(this.formBuilder);
 
     public addFieldDialog = new DialogModel();
@@ -69,15 +67,11 @@ export class FieldComponent implements OnChanges {
     }
 
     public toggleEditing() {
-        this.isEditing = !this.isEditing;
+        this.editing = !this.editing;
 
-        if (this.isEditing) {
+        if (this.editing) {
             this.editForm.load(this.field.properties);
         }
-    }
-
-    public selectTab(tab: number) {
-        this.selectedTab = tab;
     }
 
     public deleteField() {

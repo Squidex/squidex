@@ -12,10 +12,12 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Tasks;
 
@@ -41,6 +43,7 @@ namespace Squidex.Domain.Users.MongoDb
         private const string InternalLoginProvider = "[AspNetUserStore]";
         private const string AuthenticatorKeyTokenName = "AuthenticatorKey";
         private const string RecoveryCodeTokenName = "RecoveryCodes";
+        private readonly MongoDbOptions options;
 
         static MongoUserStore()
         {
@@ -104,9 +107,12 @@ namespace Squidex.Domain.Users.MongoDb
             });
         }
 
-        public MongoUserStore(IMongoDatabase database)
+        public MongoUserStore(IMongoDatabase database, IOptions<MongoDbOptions> options)
             : base(database)
         {
+            Guard.NotNull(options, nameof(options));
+
+            this.options = options.Value;
         }
 
         protected override string CollectionName()
@@ -119,7 +125,9 @@ namespace Squidex.Domain.Users.MongoDb
             return collection.Indexes.CreateManyAsync(
                 new[]
                 {
-                    new CreateIndexModel<MongoUser>(Index.Ascending("Logins.LoginProvider").Ascending("Logins.ProviderKey")),
+                    options.IsDocumentDb ?
+                        new CreateIndexModel<MongoUser>(Index.Ascending("Logins.LoginProvider")) :
+                        new CreateIndexModel<MongoUser>(Index.Ascending("Logins.LoginProvider").Ascending("Logins.ProviderKey")),
                     new CreateIndexModel<MongoUser>(Index.Ascending(x => x.NormalizedUserName), new CreateIndexOptions { Unique = true }),
                     new CreateIndexModel<MongoUser>(Index.Ascending(x => x.NormalizedEmail), new CreateIndexOptions { Unique = true })
                 }, ct);

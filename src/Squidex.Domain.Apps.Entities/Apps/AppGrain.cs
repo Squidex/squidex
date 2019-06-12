@@ -194,16 +194,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         }
                         else
                         {
-                            var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.Id, Snapshot.Name, c.PlanId);
+                            var result = await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), c.PlanId);
 
-                            if (result is PlanChangedResult)
+                            switch (result)
                             {
-                                if (result is PlanResetResult)
-                                {
-                                    c.PlanId = null;
-                                }
-
-                                ChangePlan(c);
+                                case PlanChangedResult _:
+                                    ChangePlan(c);
+                                    break;
+                                case PlanResetResult _:
+                                    ResetPlan(c);
+                                    break;
                             }
 
                             return result;
@@ -213,7 +213,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 case ArchiveApp archiveApp:
                     return UpdateAsync(archiveApp, async c =>
                     {
-                        await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.Id, Snapshot.Name, null);
+                        await appPlansBillingManager.ChangePlanAsync(c.Actor.Identifier, Snapshot.NamedId(), null);
 
                         ArchiveApp(c);
                     });
@@ -304,6 +304,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public void ChangePlan(ChangePlan command)
         {
             RaiseEvent(SimpleMapper.Map(command, new AppPlanChanged()));
+        }
+
+        public void ResetPlan(ChangePlan command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppPlanReset()));
         }
 
         public void AddPattern(AddPattern command)

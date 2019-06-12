@@ -163,6 +163,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Description = "The height of the image in pixels if the asset is an image."
             });
 
+            AddField(new FieldType
+            {
+                Name = "tags",
+                ResolvedType = null,
+                Resolver = Resolve(x => x.Tags),
+                Description = "The height of the image in pixels if the asset is an image.",
+                Type = AllTypes.NonNullTagsType
+            });
+
             if (model.CanGenerateAssetSourceUrl)
             {
                 AddField(new FieldType

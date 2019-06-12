@@ -27,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         public Instant Created { get; set; }
 
         /// <summary>
-        /// The description
+        /// The description.
         /// </summary>
         [Required]
         public string Description { get; set; }

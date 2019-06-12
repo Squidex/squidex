@@ -5,7 +5,13 @@
         </ng-container>
 
         <ng-container content>
-            <h3 class="title">Preview Urls define where the content is used</h3>
+            <sqx-form-hint>
+                Adding a preview url generates a link in the content editor, referring to your custom preview environment where the content item is used.
+            </sqx-form-hint>
+
+            <sqx-form-hint>
+                Read the <a href="https://https://docs.squidex.io/guides/09-preview" sqxExternalLink>documentation</a> before setting up a custom content preview urls.
+            </sqx-form-hint>
 
             <div class="content">
                 <div class="form-group row no-gutters" *ngFor="let form of editForm.form.controls; let i = index">

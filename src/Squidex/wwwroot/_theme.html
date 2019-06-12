@@ -512,7 +512,7 @@
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Email address</label>
                                     <input type="email" class="form-control" aria-describedby="emailHelp" placeholder="Enter email">
-                                    <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+                                    <sqx-form-hint>We'll never share your email with anyone else.</small>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputPassword1">Password</label>
@@ -545,7 +545,7 @@
                                 <div class="form-group">
                                     <label for="exampleInputFile">File input</label>
                                     <input type="file" class="form-control-file" aria-describedby="fileHelp">
-                                    <small class="form-text text-muted">This is some placeholder block-level help text for the above input. It's a bit lighter and easily wraps to a new line.</small>
+                                    <sqx-form-hint>This is some placeholder block-level help text for the above input. It's a bit lighter and easily wraps to a new line.</small>
                                 </div>
                                 <fieldset class="form-group">
                                     <legend>Radio buttons</legend>
@@ -848,7 +848,7 @@
                 <div class="col-lg-12">
                     <h2>Alerts</h2>
                     <div class="bs-component">
-                        <div class="alert alert-dismissible alert-warning">
+                        <div class="alert alert-dismissible alert-warning mt-2">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
                             <h4>Warning!</h4>
                             <p>Best check yo self, you're not looking too good. Nulla vitae elit libero, a pharetra augue. Praesent commodo cursus magna, <a href="#" class="alert-link">vel scelerisque nisl consectetur et</a>.</p>
@@ -859,7 +859,7 @@
             <div class="row">
                 <div class="col-lg-4">
                     <div class="bs-component">
-                        <div class="alert alert-dismissible alert-danger">
+                        <div class="alert alert-dismissible alert-danger mt-2">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
                             <strong>Oh snap!</strong> <a href="#" class="alert-link">Change a few things up</a> and try submitting again.
                         </div>
@@ -867,7 +867,7 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="bs-component">
-                        <div class="alert alert-dismissible alert-success">
+                        <div class="alert alert-dismissible alert-success mt-2">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
                             <strong>Well done!</strong> You successfully read <a href="#" class="alert-link">this important alert message</a>.
                         </div>
@@ -875,9 +875,9 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="bs-component">
-                        <div class="alert alert-dismissible alert-info">
+                        <div class="alert alert-dismissible alert-info mt-2">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            <strong>Heads up!</strong> This <a href="#" class="alert-link">alert needs your attention</a>, but it's not super important.
+                            <i class="icon-info-outline"></i> <strong>Heads up!</strong> This <a href="#" class="alert-link">alert needs your attention</a>, but it's not super important.
                         </div>
                     </div>
                 </div>
@@ -1192,7 +1192,7 @@
                     <h2>Modals</h2>
                     <div class="bs-component">
                         <div class="modal" style="position: relative; width: 100%; height: 500px">
-                            <div class="modal-backdrop" style="position: absolute"></div> 
+                            <div class="modal-backdrop show" style="position: absolute"></div> 
                         
                             <div class="modal-dialog modal-lg" style="position: absolute; top: 50px; left: 50px; right: 50px; bottom: 50px">
                                 <div class="modal-content">

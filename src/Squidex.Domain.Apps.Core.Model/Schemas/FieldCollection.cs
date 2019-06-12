@@ -122,9 +122,14 @@ namespace Squidex.Domain.Apps.Core.Schemas
         {
             Guard.NotNull(field, nameof(field));
 
-            if (ByName.ContainsKey(field.Name) || ById.ContainsKey(field.Id))
+            if (ByName.ContainsKey(field.Name))
             {
-                throw new ArgumentException($"A field with name '{field.Name}' and id {field.Id} already exists.", nameof(field));
+                throw new ArgumentException($"A field with name '{field.Name}' already exists.", nameof(field));
+            }
+
+            if (ById.ContainsKey(field.Id))
+            {
+                throw new ArgumentException($"A field with id {field.Id} already exists.", nameof(field));
             }
 
             return Clone(clone =>

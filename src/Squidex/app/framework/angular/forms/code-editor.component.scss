@@ -3,7 +3,7 @@
 
 // sass-lint:disable class-name-format
 
-:host /deep/ {
+::ng-deep {
     .ace_editor {
         background: $color-dark-foreground;
         border: 1px solid $color-input;

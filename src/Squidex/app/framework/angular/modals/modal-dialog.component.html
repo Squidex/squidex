@@ -1,5 +1,5 @@
 <div class="modal" @fade>
-    <div class="modal-backdrop"></div>
+    <div class="modal-backdrop show"></div>
 
     <div class="modal-dialog" [class.modal-lg]="large" [class.modal-fh]="fullHeight">
         <div class="modal-content">
@@ -9,7 +9,7 @@
                 </h4>
 
                 <button type="button" class="close" (click)="emitClose()">
-                    <span aria-hidden="true">&times;</span>
+                    <i class="icon-close"></i>
                 </button>
             </div>
 

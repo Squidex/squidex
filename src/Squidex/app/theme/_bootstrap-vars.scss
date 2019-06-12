@@ -10,7 +10,11 @@ $h4-font-size:              $font-size-base * 1.1;
 $h5-font-size:              $font-size-base;
 $h6-font-size:              $font-size-base;
 
+$small-font-size:           90%;
+
 $body-bg:                   $color-background;
+
+$border-color:              $color-border;
 
 $danger:                    $color-theme-error;
 $primary:                   $color-theme-blue;
@@ -33,3 +37,15 @@ $card-border-color:         $color-border;
 $card-cap-bg:               $panel-light-background;
 
 $paragraph-margin-bottom:   .5rem;
+
+$modal-backdrop-opacity:    .35;
+$modal-footer-border-width: 1px;
+$modal-header-border-width: 0;
+$modal-header-padding:      1.25rem 1.75rem;
+$modal-inner-padding:       1.5rem 1.75rem;
+$modal-md:                  560px;
+$modal-title-line-height:   1.8rem;
+
+$close-font-weight:         normal;
+$close-font-size:           1rem;
+$close-text-shadow:         none;

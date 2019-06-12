@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {
-    [TypeName("AppPlanChanged")]
+    [EventType(nameof(AppPlanChanged))]
     public sealed class AppPlanChanged : AppEvent
     {
         public string PlanId { get; set; }

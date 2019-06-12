@@ -14,49 +14,49 @@ import { FieldDto } from '@app/shared';
     selector: 'sqx-content-item-editor',
     template: `
         <div [formGroup]="form">
-            <div [ngSwitch]="field.properties.fieldType">
-                <div *ngSwitchCase="'Number'">
-                    <div [ngSwitch]="field.properties['editor']">
-                        <div *ngSwitchCase="'Input'">
+            <ng-container [ngSwitch]="field.properties.fieldType">
+                <ng-container *ngSwitchCase="'Number'">
+                    <ng-container [ngSwitch]="field.properties['editor']">
+                        <ng-container *ngSwitchCase="'Input'">
                             <input class="form-control" type="number" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
-                        </div>
-                        <div *ngSwitchCase="'Dropdown'">
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Dropdown'">
                             <select class="form-control" [formControlName]="field.name">
                                 <option [ngValue]="null"></option>
                                 <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
                             </select>
-                        </div>
-                    </div>
-                </div>
-                <div *ngSwitchCase="'String'">
-                    <div [ngSwitch]="field.properties['editor']">
-                        <div *ngSwitchCase="'Input'">
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'String'">
+                    <ng-container [ngSwitch]="field.properties['editor']">
+                        <ng-container *ngSwitchCase="'Input'">
                             <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" />
-                        </div>
-                        <div *ngSwitchCase="'Slug'">
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Slug'">
                             <input class="form-control" type="text" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" sqxTransformInput="Slugify" />
-                        </div>
-                        <div *ngSwitchCase="'Dropdown'">
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Dropdown'">
                             <select class="form-control" [formControlName]="field.name">
                                 <option [ngValue]="null"></option>
                                 <option *ngFor="let value of field.properties['allowedValues']" [ngValue]="value">{{value}}</option>
                             </select>
-                        </div>
-                    </div>
-                </div>
-                <div *ngSwitchCase="'Boolean'">
-                    <div [ngSwitch]="field.properties['editor']">
-                        <div *ngSwitchCase="'Toggle'">
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'Boolean'">
+                    <ng-container [ngSwitch]="field.properties['editor']">
+                        <ng-container *ngSwitchCase="'Toggle'">
                             <sqx-toggle [formControlName]="field.name" [threeStates]="!field.properties.isRequired"></sqx-toggle>
-                        </div>
-                        <div *ngSwitchCase="'Checkbox'">
-                            <div class="form-check form-check-inline">
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Checkbox'">
+                            <ng-container class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" [formControlName]="field.name" sqxIndeterminateValue />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
         </div>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -13,8 +13,10 @@ import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 import { ContentVersionSelected } from './../messages';
 
 import {
+    ApiUrlConfig,
     AppLanguageDto,
     AppsState,
+    AuthService,
     CanComponentDeactivate,
     ContentDto,
     ContentsState,
@@ -45,6 +47,8 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
 export class ContentPageComponent extends ResourceOwner implements CanComponentDeactivate, OnInit {
     public schema: SchemaDetailsDto;
 
+    public formContext: any;
+
     public content: ContentDto;
     public contentVersion: Version | null;
     public contentForm: EditContentForm;
@@ -58,7 +62,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     @ViewChild('dueTimeSelector')
     public dueTimeSelector: DueTimeSelectorComponent;
 
-    constructor(
+    constructor(apiUrl: ApiUrlConfig, authService: AuthService,
         public readonly appsState: AppsState,
         private readonly contentsState: ContentsState,
         private readonly dialogs: DialogService,
@@ -69,6 +73,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         private readonly schemasState: SchemasState
     ) {
         super();
+
+        this.formContext = { user: authService.user, apiUrl: apiUrl.buildUrl('api') };
     }
 
     public ngOnInit() {
@@ -214,7 +220,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         if (!this.content || version === null || version.eq(this.content.version)) {
             this.contentFormCompare = null;
             this.contentVersion = null;
-            this.contentForm.load(this.content.dataDraft);
+            this.loadContent(this.content.dataDraft);
         } else {
             this.contentsState.loadVersion(this.content, version)
                 .subscribe(dto => {
@@ -224,14 +230,16 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                             this.contentFormCompare.form.disable();
                         }
 
-                        this.contentFormCompare.load(dto.payload);
-                        this.contentForm.load(this.content.dataDraft);
+                        const isArchive = this.content && this.content.status === 'Archived';
+
+                        this.contentFormCompare.loadContent(dto.payload, true);
+                        this.contentForm.loadContent(this.content.dataDraft, isArchive);
                     } else {
                         if (this.contentFormCompare) {
                             this.contentFormCompare = null;
                         }
 
-                        this.contentForm.load(dto.payload);
+                        this.loadContent(dto.payload);
                     }
 
                     this.contentVersion = version;

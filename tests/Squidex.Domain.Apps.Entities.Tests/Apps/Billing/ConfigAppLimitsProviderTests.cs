@@ -69,6 +69,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.Billing
         }
 
         [Fact]
+        public void Should_return_free_plan()
+        {
+            var sut = new ConfigAppPlansProvider(Plans);
+
+            var plan = sut.GetFreePlan();
+
+            plan.Should().BeEquivalentTo(FreePlan);
+        }
+
+        [Fact]
+        public void Should_return_infinite_plan_for_free_plan_if_not_found()
+        {
+            var sut = new ConfigAppPlansProvider(Enumerable.Empty<ConfigAppLimitsPlan>());
+
+            var plan = sut.GetFreePlan();
+
+            plan.Should().NotBeNull();
+        }
+
+        [Fact]
         public void Should_return_fitting_app_plan()
         {
             var sut = new ConfigAppPlansProvider(Plans);

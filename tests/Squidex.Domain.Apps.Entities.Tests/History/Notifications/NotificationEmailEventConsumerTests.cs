@@ -174,7 +174,7 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
             var @event = new AppContributorAssigned
             {
                 Actor = new RefToken(assignerType, assignerId),
-                AppId = new NamedId<Guid>(Guid.NewGuid(), appName),
+                AppId = NamedId.Of(Guid.NewGuid(), appName),
                 ContributorId = assigneeId,
                 IsCreated = isNewUser,
                 IsAdded = isNewContributor,

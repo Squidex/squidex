@@ -90,6 +90,11 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
             return CreatePrimitive(EdmPrimitiveTypeKind.String, field);
         }
 
+        public IEdmTypeReference Visit(IField<UIFieldProperties> field)
+        {
+            return null;
+        }
+
         private static IEdmTypeReference CreatePrimitive(EdmPrimitiveTypeKind kind, IField field)
         {
             return EdmCoreModel.Instance.GetPrimitive(kind, !field.RawProperties.IsRequired);

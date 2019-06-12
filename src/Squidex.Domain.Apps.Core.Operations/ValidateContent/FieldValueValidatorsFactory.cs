@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
@@ -16,11 +15,11 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public sealed class ValidatorsFactory : IFieldVisitor<IEnumerable<IValidator>>
+    public sealed class FieldValueValidatorsFactory : IFieldVisitor<IEnumerable<IValidator>>
     {
-        private static readonly ValidatorsFactory Instance = new ValidatorsFactory();
+        private static readonly FieldValueValidatorsFactory Instance = new FieldValueValidatorsFactory();
 
-        private ValidatorsFactory()
+        private FieldValueValidatorsFactory()
         {
         }
 
@@ -42,10 +41,10 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
 
             foreach (var nestedField in field.Fields)
             {
-                nestedSchema[nestedField.Name] = (false, new FieldValidator(nestedField.Accept(this).ToArray(), nestedField));
+                nestedSchema[nestedField.Name] = (false, nestedField.CreateValidator());
             }
 
-            yield return new CollectionItemValidator(new ObjectValidator<IJsonValue>(nestedSchema, false, "field", JsonValue.Null));
+            yield return new CollectionItemValidator(new ObjectValidator<IJsonValue>(nestedSchema, false, "field"));
         }
 
         public IEnumerable<IValidator> Visit(IField<AssetsFieldProperties> field)
@@ -182,6 +181,14 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             }
 
             yield return new CollectionItemValidator(new RequiredStringValidator(true));
+        }
+
+        public IEnumerable<IValidator> Visit(IField<UIFieldProperties> field)
+        {
+            if (field is INestedField)
+            {
+                yield return NoValueValidator.Instance;
+            }
         }
     }
 }

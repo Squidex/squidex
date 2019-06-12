@@ -28,27 +28,27 @@ namespace Squidex.Infrastructure.UsageTracking
         }
 
         [Fact]
-        public Task Should_throw_exception_if_tracking_on_disposed_object()
+        public async Task Should_throw_exception_if_tracking_on_disposed_object()
         {
             sut.Dispose();
 
-            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync(key, "category1", 1, 1000));
+            await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.TrackAsync(key, "category1", 1, 1000));
         }
 
         [Fact]
-        public Task Should_throw_exception_if_querying_on_disposed_object()
+        public async Task Should_throw_exception_if_querying_on_disposed_object()
         {
             sut.Dispose();
 
-            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.QueryAsync(key, DateTime.Today, DateTime.Today.AddDays(1)));
+            await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.QueryAsync(key, DateTime.Today, DateTime.Today.AddDays(1)));
         }
 
         [Fact]
-        public Task Should_throw_exception_if_querying_montly_usage_on_disposed_object()
+        public async Task Should_throw_exception_if_querying_montly_usage_on_disposed_object()
         {
             sut.Dispose();
 
-            return Assert.ThrowsAsync<ObjectDisposedException>(() => sut.GetMonthlyCallsAsync(key, DateTime.Today));
+            await Assert.ThrowsAsync<ObjectDisposedException>(() => sut.GetMonthlyCallsAsync(key, DateTime.Today));
         }
 
         [Fact]

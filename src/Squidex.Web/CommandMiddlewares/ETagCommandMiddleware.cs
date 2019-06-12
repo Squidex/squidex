@@ -26,7 +26,9 @@ namespace Squidex.Web.CommandMiddlewares
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (httpContextAccessor.HttpContext == null)
+            var httpContext = httpContextAccessor.HttpContext;
+
+            if (httpContext == null)
             {
                 await next();
 
@@ -35,7 +37,7 @@ namespace Squidex.Web.CommandMiddlewares
 
             context.Command.ExpectedVersion = EtagVersion.Any;
 
-            var headers = httpContextAccessor.HttpContext.Request.Headers;
+            var headers = httpContext.Request.Headers;
 
             if (headers.TryGetValue(HeaderNames.IfMatch, out var etag) && !string.IsNullOrWhiteSpace(etag))
             {
@@ -56,7 +58,7 @@ namespace Squidex.Web.CommandMiddlewares
 
             if (context.PlainResult is EntitySavedResult result)
             {
-                httpContextAccessor.HttpContext.Response.Headers[HeaderNames.ETag] = result.Version.ToString();
+                httpContext.Response.Headers[HeaderNames.ETag] = result.Version.ToString();
             }
         }
     }

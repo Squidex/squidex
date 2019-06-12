@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         }
 
         [Fact]
-         public async Task Should_simulate_content_reversion()
+        public async Task Should_simulate_content_reversion()
         {
             await AddInvariantContent("Hello", "World", false);
 

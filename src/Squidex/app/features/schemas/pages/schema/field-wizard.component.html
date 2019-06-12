@@ -5,12 +5,12 @@
         </ng-container>
 
         <ng-template #noParent>
-            {{isEditing ? 'Edit' : 'Add'}} Field
+            {{editing ? 'Edit' : 'Add'}} Field
         </ng-template>
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="!isEditing; else notEditing">
+        <ng-container *ngIf="!editing; else notEditing">
             <form [formGroup]="addFieldForm.form" (ngSubmit)="addField(false)">
                 <sqx-form-error [error]="addFieldForm.error | async"></sqx-form-error>
 
@@ -31,7 +31,6 @@
                                         <div class="type-text text-muted">{{fieldType.description}}</div>
                                     </div>
                                 </div>
-
                             </label>
                         </div>
                     </div>
@@ -44,7 +43,7 @@
                         placeholder="Enter field name" sqxFocusOnInit />
                 </div>
 
-                <div class="form-group" *ngIf="!parent">
+                <div class="form-group" *ngIf="!parent && (addFieldForm.isContentField | async)">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="isLocalizable" formControlName="isLocalizable" />
                         <label class="form-check-label" for="isLocalizable">
@@ -52,40 +51,25 @@
                         </label>
                     </div>
 
-                    <small class="form-text text-muted">
+                    <sqx-form-hint>
                         You can the field as localizable. It means that is dependent on the language, for example a city name.
-                    </small>
+                    </sqx-form-hint>
                 </div>
+
+                <sqx-form-alert class="mt-4">
+                    These values cannot be changed later.
+                </sqx-form-alert>
             </form>
         </ng-container>
 
         <ng-template #notEditing>
             <form [formGroup]="editForm.form" class="edit-form" (ngSubmit)="save()">
-                <div class="table-items-row-details-tabs clearfix">
-                    <ul class="nav nav-tabs2">
-                        <li class="nav-item">
-                            <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">Common</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">Validation</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">Editing</a>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
-                    <sqx-field-form-common [editForm]="editForm.form" [editFormSubmitted]="editForm.submitted | async" [field]="field"></sqx-field-form-common>
-                </div>
-
-                <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
-                    <sqx-field-form-validation [patterns]="patternsState.patterns | async" [editForm]="editForm.form" [field]="field"></sqx-field-form-validation>
-                </div>
-
-                <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
-                    <sqx-field-form-ui [editForm]="editForm.form" [field]="field"></sqx-field-form-ui>
-                </div>
+                <sqx-field-form
+                    [patterns]="patternsState.patterns | async"
+                    [editForm]="editForm.form"
+                    [editFormSubmitted]="editForm.submitted | async"
+                    [field]="field">
+                </sqx-field-form>
             </form>
         </ng-template>
     </ng-container>
@@ -93,13 +77,13 @@
     <ng-container footer>
         <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
 
-        <div class="float-right" *ngIf="!isEditing">
+        <div class="float-right" *ngIf="!editing">
             <button type="button" class="btn btn-outline-success mr-1" (click)="addField(false)">Create and close</button>
             <button type="button" class="btn btn-success mr-1" (click)="addField(true)">Create and add field</button>
             <button type="button" class="btn btn-success" (click)="addField(false, true)">Create and edit field</button>
         </div>
 
-        <div class="float-right" *ngIf="isEditing">
+        <div class="float-right" *ngIf="editing">
             <button type="button" class="btn btn-success mr-1" (click)="save(true)">Save and add field</button>
             <button type="button" class="btn btn-primary" (click)="save()">Save and close</button>
         </div>

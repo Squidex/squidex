@@ -19,7 +19,7 @@ p {
     max-width: 489px;
 }
 
-:host /deep/ .modal {
+::ng-deep .modal {
     &-content,
     &-dialog {
         min-height: $size-height;

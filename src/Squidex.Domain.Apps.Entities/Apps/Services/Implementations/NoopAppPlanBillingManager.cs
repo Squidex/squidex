@@ -7,6 +7,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
 {
@@ -17,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
             get { return false; }
         }
 
-        public Task<IChangePlanResult> ChangePlanAsync(string userId, Guid appId, string appName, string planId)
+        public Task<IChangePlanResult> ChangePlanAsync(string userId, NamedId<Guid> appId, string planId)
         {
             return Task.FromResult<IChangePlanResult>(new PlanResetResult());
         }

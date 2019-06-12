@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.GenerateEdmSchema
 
             foreach (var field in schema.FieldsByName.Values)
             {
-                if (!withHidden && field.IsHidden)
+                if (!field.IsForApi(withHidden))
                 {
                     continue;
                 }
