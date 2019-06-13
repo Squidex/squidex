@@ -1,6 +1,6 @@
 <div class="row no-gutters" [class.compare]="fieldFormCompare">
     <div [class.col-12]="!fieldFormCompare" [class.col-6]="fieldFormCompare">
-        <div class="table-items-row" [class.field-invalid]="isInvalid | async">
+        <div class="table-items-row" [class.field-invalid]="isInvalid | async" *ngIf="field.properties.isContentField; else uiField">
             <div class="languages-buttons">
                 <button *ngIf="isTranslatable" type="button" class="btn btn-text-secondary btn-sm mr-1" (click)="translate()" title="Autotranslate from master language">
                     <i class="icon-translate"></i>
@@ -21,6 +21,7 @@
                     <sqx-field-editor
                         [displaySuffix]="prefix(language)"
                         [form]="form"
+                        [formContext]="formContext"
                         [field]="field"
                         [language]="language"
                         [languages]="languages"
@@ -33,6 +34,7 @@
             <ng-template #singleControl>
                 <sqx-field-editor
                     [form]="form"
+                    [formContext]="formContext"
                     [field]="field"
                     [language]="language"
                     [languages]="languages"
@@ -41,14 +43,26 @@
                 </sqx-field-editor>
             </ng-template>
         </div>
+
+        <ng-template #uiField>
+            <sqx-field-editor
+                [form]="form"
+                [formContext]="formContext"
+                [field]="field"
+                [language]="language"
+                [languages]="languages"
+                [isCompact]="!!fieldFormCompare"
+                [control]="selectedFormControl">
+            </sqx-field-editor>
+        </ng-template>
     </div>
 
     <div class="col-6 col-right" *ngIf="fieldFormCompare">
-        <button type="button" class="btn btn-primary btn-sm field-copy" (click)="copy()" *ngIf="isDifferent | async">
+        <button type="button" class="btn btn-primary btn-sm field-copy" (click)="copy()" *ngIf="field.properties.isContentField && (isDifferent | async)">
             <i class="icon-arrow_back"></i>
         </button>
 
-        <div class="table-items-row">
+        <div class="table-items-row" *ngIf="field.properties.isContentField; else uiField">
             <div class="languages-buttons">
                 <sqx-field-languages 
                     [field]="field"
@@ -83,5 +97,15 @@
                 </sqx-field-editor>
             </ng-template>
         </div>
+
+        <ng-template #uiField>
+            <sqx-field-editor
+                [field]="field"
+                [language]="language"
+                [languages]="languages"
+                [isCompact]="!!fieldFormCompare"
+                [control]="selectedFormControl">
+            </sqx-field-editor>
+        </ng-template>
     </div>
 </div>

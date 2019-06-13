@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 new QueryArgument(AllTypes.None)
                 {
-                    Name = "take",
+                    Name = "top",
                     Description = $"Optional number of assets to take (Default: {pageSize}).",
                     DefaultValue = pageSize,
                     ResolvedType = AllTypes.Int
@@ -183,8 +183,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 },
                 new QueryArgument(AllTypes.None)
                 {
-                    Name = "search",
-                    Description = "Optional query to limit the files by name.",
+                    Name = "filter",
+                    Description = "Optional OData filter.",
+                    DefaultValue = string.Empty,
+                    ResolvedType = AllTypes.String
+                },
+                new QueryArgument(AllTypes.None)
+                {
+                    Name = "orderby",
+                    Description = "Optional OData order definition.",
                     DefaultValue = string.Empty,
                     ResolvedType = AllTypes.String
                 }

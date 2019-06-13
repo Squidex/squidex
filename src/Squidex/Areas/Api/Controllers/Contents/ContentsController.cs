@@ -54,7 +54,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 404 => Schema or app not found.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
         [HttpPost]
@@ -85,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 404 => Schema or app not found.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
         [HttpPost]
@@ -117,7 +117,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 404 => App not found.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/")]
@@ -157,7 +157,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 404 => Schema or app not found.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/")]
@@ -196,7 +196,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 404 => Content, schema or app not found.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/")]
@@ -232,7 +232,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 400 => Content data is not valid.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/{version}/")]
@@ -268,7 +268,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 400 => Content data is not valid.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/")]
@@ -309,7 +309,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 400 => Content data is not valid.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/")]
@@ -342,7 +342,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 400 => Content patch is not valid.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPatch]
         [Route("content/{app}/{name}/{id}/")]
@@ -374,7 +374,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 400 => Content was already published.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/publish/")]
@@ -404,7 +404,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 400 => Content was not published.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/unpublish/")]
@@ -434,7 +434,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 400 => Content was already archived.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/archive/")]
@@ -464,7 +464,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 400 => Content was not archived.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/restore/")]
@@ -493,7 +493,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 400 => Content was not archived.
         /// </returns>
         /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs
+        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/discard/")]
@@ -521,7 +521,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// 404 => Content, schema or app not found.
         /// </returns>
         /// <remarks>
-        /// You can create an generated documentation for your app at /api/content/{appName}/docs
+        /// You can create an generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpDelete]
         [Route("content/{app}/{name}/{id}/")]

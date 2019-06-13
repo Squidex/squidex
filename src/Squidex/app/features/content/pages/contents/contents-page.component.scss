@@ -1,7 +1,7 @@
 @import '_vars';
 @import '_mixins';
 
-:host /deep/ .search-form {
+::ng-deep .search-form {
     display: block;
 }
 

@@ -14,25 +14,25 @@
             <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
         
             <div class="form-group name-group">
-                <label for="schemaName">Name</label>
+                <label for="schemaName">Name <small class="hint">(required)</small></label>
                 
                 <sqx-control-errors for="name" submitOnly="true" [submitted]="createForm.submitted | async"></sqx-control-errors>
         
                 <input type="text" class="form-control" id="schemaName" formControlName="name" autocomplete="off" sqxTransformInput="LowerCase" sqxFocusOnInit />
 
-                <small class="form-text text-muted">
-                    You can only use letters, numbers and dashes and not more than 40 characters. The name cannot be changed later.
-                </small>
+                <sqx-form-hint>
+                    You can only use letters, numbers and dashes and not more than 40 characters.
+                </sqx-form-hint>
                 
-                <small class="form-text text-muted">
+                <sqx-form-hint>
                     The schema name becomes part of the api url:
-                </small>
+                </sqx-form-hint>
 
                 <sqx-code>{{apiUrl.buildUrl("api/content/")}}{{appsState.appName}}/{{createForm.schemaName | async}}</sqx-code>
             </div>
 
             <div class="form-group">
-                <div class="row no-gutters">
+                <div class="row">
                     <div class="col-6 type">
                         <label>
                             <input type="radio" class="radio-input" name="isSingleton" formControlName="isSingleton" [value]="false" />
@@ -81,6 +81,10 @@
         
                 <sqx-json-editor *ngIf="showImport" formControlName="import"></sqx-json-editor>
             </div>
+
+            <sqx-form-alert>
+                These values cannot be changed later.
+            </sqx-form-alert>
         </ng-container>
 
         <ng-container footer>

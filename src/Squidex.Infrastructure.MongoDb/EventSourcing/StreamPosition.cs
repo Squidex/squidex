@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.EventSourcing
 {
     internal sealed class StreamPosition
     {
-        private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(0);
+        private static readonly BsonTimestamp EmptyTimestamp = new BsonTimestamp(946681200, 0);
 
         public BsonTimestamp Timestamp { get; }
 

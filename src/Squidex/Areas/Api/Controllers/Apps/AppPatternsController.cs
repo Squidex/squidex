@@ -113,7 +113,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// 404 => Pattern or app not found.
         /// </returns>
         /// <remarks>
-        /// Schemas using this pattern will still function using the same Regular Expression
+        /// Schemas using this pattern will still function using the same Regular Expression.
         /// </remarks>
         [HttpDelete]
         [Route("apps/{app}/patterns/{id}/")]

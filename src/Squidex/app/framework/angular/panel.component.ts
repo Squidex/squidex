@@ -44,6 +44,9 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     public isLazyLoaded = true;
 
     @Input()
+    public scrollX = false;
+
+    @Input()
     public showScrollbar = false;
 
     @Input()

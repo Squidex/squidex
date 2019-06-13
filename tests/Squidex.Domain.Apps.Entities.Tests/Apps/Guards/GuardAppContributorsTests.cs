@@ -51,52 +51,62 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public Task CanAssign_should_throw_exception_if_contributor_id_is_null()
+        public async Task CanAssign_should_throw_exception_if_contributor_id_is_null()
         {
             var command = new AssignContributor();
 
-            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan),
+            await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan),
                 new ValidationError("Contributor id is required.", "ContributorId"));
         }
 
         [Fact]
-        public Task CanAssign_should_throw_exception_if_role_not_valid()
+        public async Task CanAssign_should_throw_exception_if_role_not_valid()
         {
             var command = new AssignContributor { ContributorId = "1", Role = "Invalid" };
 
-            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan),
+            await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan),
                 new ValidationError("Role is not a valid value.", "Role"));
         }
 
         [Fact]
-        public Task CanAssign_should_throw_exception_if_user_already_exists_with_same_role()
+        public async Task CanAssign_should_throw_exception_if_user_already_exists_with_same_role()
         {
             var command = new AssignContributor { ContributorId = "1", Role = Role.Owner };
 
             var contributors_1 = contributors_0.Assign("1", Role.Owner);
 
-            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_1, roles, command, users, appPlan),
+            await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_1, roles, command, users, appPlan),
                 new ValidationError("Contributor has already this role.", "Role"));
         }
 
         [Fact]
-        public Task CanAssign_should_throw_exception_if_user_not_found()
+        public async Task CanAssign_should_not_throw_exception_if_user_already_exists_with_some_role_but_is_from_restore()
+        {
+            var command = new AssignContributor { ContributorId = "1", Role = Role.Owner, IsRestore = true };
+
+            var contributors_1 = contributors_0.Assign("1", Role.Owner);
+
+            await GuardAppContributors.CanAssign(contributors_1, roles, command, users, appPlan);
+        }
+
+        [Fact]
+        public async Task CanAssign_should_throw_exception_if_user_not_found()
         {
             var command = new AssignContributor { ContributorId = "notfound", Role = Role.Owner };
 
-            return Assert.ThrowsAsync<DomainObjectNotFoundException>(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan));
         }
 
         [Fact]
-        public Task CanAssign_should_throw_exception_if_user_is_actor()
+        public async Task CanAssign_should_throw_exception_if_user_is_actor()
         {
             var command = new AssignContributor { ContributorId = "3", Role = Role.Editor, Actor = new RefToken("user", "3") };
 
-            return Assert.ThrowsAsync<DomainForbiddenException>(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan));
+            await Assert.ThrowsAsync<DomainForbiddenException>(() => GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan));
         }
 
         [Fact]
-        public Task CanAssign_should_throw_exception_if_contributor_max_reached()
+        public async Task CanAssign_should_throw_exception_if_contributor_max_reached()
         {
             A.CallTo(() => appPlan.MaxContributors)
                 .Returns(2);
@@ -106,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var contributors_1 = contributors_0.Assign("1", Role.Owner);
             var contributors_2 = contributors_1.Assign("2", Role.Editor);
 
-            return ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_2, roles, command, users, appPlan),
+            await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(contributors_2, roles, command, users, appPlan),
                 new ValidationError("You have reached the maximum number of contributors for your plan."));
         }
 
@@ -121,35 +131,52 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public Task CanAssign_should_not_throw_exception_if_user_found()
+        public async Task CanAssign_should_not_throw_exception_if_user_found()
+        {
+            A.CallTo(() => appPlan.MaxContributors)
+                .Returns(-1);
+
+            var command = new AssignContributor { ContributorId = "1" };
+
+            await GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan);
+        }
+
+        [Fact]
+        public async Task CanAssign_should_not_throw_exception_if_contributor_has_another_role()
         {
             var command = new AssignContributor { ContributorId = "1" };
 
-            return GuardAppContributors.CanAssign(contributors_0, roles, command, users, appPlan);
-        }
-
-        [Fact]
-        public Task CanAssign_should_not_throw_exception_if_contributor_has_another_role()
-        {
-            var command = new AssignContributor { ContributorId = "1", Role = Role.Developer };
-
             var contributors_1 = contributors_0.Assign("1", Role.Editor);
 
-            return GuardAppContributors.CanAssign(contributors_1, roles, command, users, appPlan);
+            await GuardAppContributors.CanAssign(contributors_1, roles, command, users, appPlan);
         }
 
         [Fact]
-        public Task CanAssign_should_not_throw_exception_if_contributor_max_reached_but_role_changed()
+        public async Task CanAssign_should_not_throw_exception_if_contributor_max_reached_but_role_changed()
         {
             A.CallTo(() => appPlan.MaxContributors)
                 .Returns(2);
 
-            var command = new AssignContributor { ContributorId = "1", Role = Role.Developer };
+            var command = new AssignContributor { ContributorId = "1" };
 
             var contributors_1 = contributors_0.Assign("1", Role.Editor);
             var contributors_2 = contributors_1.Assign("2", Role.Editor);
 
-            return GuardAppContributors.CanAssign(contributors_2, roles, command, users, appPlan);
+            await GuardAppContributors.CanAssign(contributors_2, roles, command, users, appPlan);
+        }
+
+        [Fact]
+        public async Task CanAssign_should_not_throw_exception_if_contributor_max_reached_but_from_restore()
+        {
+            A.CallTo(() => appPlan.MaxContributors)
+                .Returns(2);
+
+            var command = new AssignContributor { ContributorId = "3", IsRestore = true };
+
+            var contributors_1 = contributors_0.Assign("1", Role.Editor);
+            var contributors_2 = contributors_1.Assign("2", Role.Editor);
+
+            await GuardAppContributors.CanAssign(contributors_2, roles, command, users, appPlan);
         }
 
         [Fact]

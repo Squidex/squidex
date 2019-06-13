@@ -27,8 +27,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
             {
                 var classMap = BsonClassMap.RegisterClassMap<HistoryEvent>();
 
-                classMap.MapProperty(x => x.Created)
-                    .SetElementName("_ts");
+                classMap.MapProperty(x => x.Created).SetElementName("_ts");
                 classMap.AutoMap();
             }
         }

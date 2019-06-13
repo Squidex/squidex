@@ -19,7 +19,7 @@
     }
 }
 
-:host /deep/ canvas {
+::ng-deep canvas {
     height: 12rem !important;
     margin-top: -1rem;
     margin-bottom: 0;

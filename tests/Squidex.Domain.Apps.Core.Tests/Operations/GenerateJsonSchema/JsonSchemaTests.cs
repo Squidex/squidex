@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
@@ -24,8 +25,32 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
             var languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
 
             var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema4 { Reference = s });
+            var jsonProperties = AllPropertyNames(jsonSchema);
 
-            Assert.NotNull(jsonSchema);
+            void CheckField(IField field)
+            {
+                if (!field.IsForApi())
+                {
+                    Assert.DoesNotContain(field.Name, jsonProperties);
+                }
+                else
+                {
+                    Assert.Contains(field.Name, jsonProperties);
+                }
+
+                if (field is IArrayField array)
+                {
+                    foreach (var nested in array.Fields)
+                    {
+                        CheckField(nested);
+                    }
+                }
+            }
+
+            foreach (var field in schema.Fields)
+            {
+                CheckField(field);
+            }
         }
 
         [Fact]
@@ -36,6 +61,34 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
             var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema4 { Reference = s });
 
             Assert.NotNull(new ContentSchemaBuilder().CreateContentSchema(schema, jsonSchema));
+        }
+
+        private static HashSet<string> AllPropertyNames(JsonSchema4 schema)
+        {
+            var result = new HashSet<string>();
+
+            void AddProperties(JsonSchema4 current)
+            {
+                if (current != null)
+                {
+                    if (current.Properties != null)
+                    {
+                        foreach (var property in current.Properties)
+                        {
+                            result.Add(property.Key);
+
+                            AddProperties(property.Value);
+                        }
+                    }
+
+                    AddProperties(current.Item);
+                    AddProperties(current.Reference);
+                }
+            }
+
+            AddProperties(schema);
+
+            return result;
         }
     }
 }

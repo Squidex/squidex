@@ -2,15 +2,15 @@
 @import '_mixins';
 
 .rule-element {
-    margin: .25rem;
+    padding-right: .25rem;
 }
 
 .wizard-title {
     background: $color-border;
-    margin: -1rem;
+    margin: -1.5rem -1.75rem;
     margin-bottom: 1rem;
     font-weight: 400;
     font-size: 1.05rem;
-    padding: 1rem;
+    padding: 1rem 1.75rem;
 }
 

@@ -45,8 +45,7 @@ type ContentName = { name: string, id: string };
         <select class="form-control" [formControl]="selectedId">
             <option [ngValue]="null"></option>
             <option *ngFor="let content of snapshot.contentNames" [ngValue]="content.id">{{content.name}}</option>
-        </select>
-    `,
+        </select>`,
     providers: [SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })

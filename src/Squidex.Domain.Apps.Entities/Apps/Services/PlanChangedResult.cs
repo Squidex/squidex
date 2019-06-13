@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Apps.Services
 {
-    public class PlanChangedResult : IChangePlanResult
+    public sealed class PlanChangedResult : IChangePlanResult
     {
     }
 }
