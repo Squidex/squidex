@@ -5,11 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import {
     Form,
+    hasLink,
     ImmutableArray,
     RuleDto,
     RuleElementDto,
@@ -26,7 +27,7 @@ export const MODE_EDIT_ACTION  = 'EditAction';
     styleUrls: ['./rule-wizard.component.scss'],
     templateUrl: './rule-wizard.component.html'
 })
-export class RuleWizardComponent implements OnInit {
+export class RuleWizardComponent implements AfterViewInit, OnInit {
     public actionForm = new Form<FormGroup, any>(new FormGroup({}));
     public actionType: string;
     public action: any = {};
@@ -34,6 +35,8 @@ export class RuleWizardComponent implements OnInit {
     public triggerForm = new Form<FormGroup, any>(new FormGroup({}));
     public triggerType: string;
     public trigger: any = {};
+
+    public canUpdate: boolean;
 
     public step = 1;
 
@@ -61,6 +64,8 @@ export class RuleWizardComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.canUpdate = !this.rule || hasLink(this.rule, 'update');
+
         if (this.mode === MODE_EDIT_ACTION) {
             this.step = 4;
 
@@ -71,6 +76,14 @@ export class RuleWizardComponent implements OnInit {
 
             this.trigger = this.rule.trigger;
             this.triggerType = this.rule.triggerType;
+        }
+    }
+
+    public ngAfterViewInit() {
+        if (!this.canUpdate) {
+            this.actionForm.form.disable();
+
+            this.triggerForm.form.disable();
         }
     }
 
@@ -132,6 +145,10 @@ export class RuleWizardComponent implements OnInit {
     }
 
     private updateTrigger() {
+        if (!this.canUpdate) {
+            return;
+        }
+
         this.rulesState.updateTrigger(this.rule, this.trigger)
             .subscribe(() => {
                 this.emitComplete();
@@ -143,6 +160,10 @@ export class RuleWizardComponent implements OnInit {
     }
 
     private updateAction() {
+        if (!this.canUpdate) {
+            return;
+        }
+
         this.rulesState.updateAction(this.rule, this.action)
             .subscribe(() => {
                 this.emitComplete();

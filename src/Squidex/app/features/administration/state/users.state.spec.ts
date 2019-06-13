@@ -168,7 +168,7 @@ describe('UsersState', () => {
             expect(usersState.snapshot.selectedUser).toBeNull();
         });
 
-        it('should update user selected user when locked', () => {
+        it('should update user and selected user when locked', () => {
             const updated = createUser(2, '_new');
 
             usersService.setup(x => x.lockUser(user2))
@@ -177,9 +177,9 @@ describe('UsersState', () => {
             usersState.select(user2.id).subscribe();
             usersState.lock(user2).subscribe();
 
-            const newUser2 = usersState.snapshot.users.at(1);
+            const user2New = usersState.snapshot.users.at(1);
 
-            expect(newUser2).toBe(usersState.snapshot.selectedUser!);
+            expect(user2New).toBe(usersState.snapshot.selectedUser!);
         });
 
         it('should update user and selected user when unlocked', () => {
@@ -191,10 +191,10 @@ describe('UsersState', () => {
             usersState.select(user2.id).subscribe();
             usersState.unlock(user2).subscribe();
 
-            const newUser2 = usersState.snapshot.users.at(1);
+            const user2New = usersState.snapshot.users.at(1);
 
-            expect(newUser2).toEqual(updated);
-            expect(newUser2).toBe(usersState.snapshot.selectedUser!);
+            expect(user2New).toEqual(updated);
+            expect(user2New).toBe(usersState.snapshot.selectedUser!);
         });
 
         it('should update user and selected user when updated', () => {
@@ -208,10 +208,10 @@ describe('UsersState', () => {
             usersState.select(user2.id).subscribe();
             usersState.update(user2, request).subscribe();
 
-            const newUser2 = usersState.snapshot.users.at(1);
+            const user2New = usersState.snapshot.users.at(1);
 
-            expect(newUser2).toEqual(updated);
-            expect(newUser2).toBe(usersState.snapshot.selectedUser!);
+            expect(user2New).toEqual(updated);
+            expect(user2New).toBe(usersState.snapshot.selectedUser!);
         });
 
         it('should add user to snapshot when created', () => {

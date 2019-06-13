@@ -178,12 +178,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var assetFile = await CheckAssetFileAsync(file);
 
             var command = new CreateAsset { File = assetFile };
-            var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<AssetCreatedResult>();
-            var response = AssetDto.FromAsset(result.Asset, this, app, result.IsDuplicate);
+            var response = await InvokeCommand(app, command);
 
-            return StatusCode(201, response);
+            return CreatedAtAction(nameof(GetAsset), new { app, id = response.Id }, response);
         }
 
         /// <summary>
@@ -202,6 +200,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/assets/{id}/content/")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(AssetDto), 200)]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
@@ -210,10 +209,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var assetFile = await CheckAssetFileAsync(file);
 
             var command = new UpdateAsset { File = assetFile, AssetId = id };
-            var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<IAssetEntity>();
-            var response = AssetDto.FromAsset(result, this, app);
+            var response = await InvokeCommand(app, command);
 
             return Ok(response);
         }
@@ -225,12 +222,13 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="id">The id of the asset.</param>
         /// <param name="request">The asset object that needs to updated.</param>
         /// <returns>
-        /// 204 => Asset updated.
+        /// 200 => Asset updated.
         /// 400 => Asset name not valid.
         /// 404 => Asset or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/assets/{id}/")]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(AssetDto), 200)]
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsUpdate)]
@@ -238,10 +236,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
         public async Task<IActionResult> PutAsset(string app, Guid id, [FromBody] AnnotateAssetDto request)
         {
             var command = request.ToCommand(id);
-            var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<IAssetEntity>();
-            var response = AssetDto.FromAsset(result, this, app);
+            var response = await InvokeCommand(app, command);
 
             return Ok(response);
         }
@@ -264,6 +260,16 @@ namespace Squidex.Areas.Api.Controllers.Assets
             await CommandBus.PublishAsync(new DeleteAsset { AssetId = id });
 
             return NoContent();
+        }
+
+        private async Task<AssetDto> InvokeCommand(string app, AssetCommand command)
+        {
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<IAssetEntity>();
+            var response = AssetDto.FromAsset(result, this, app);
+
+            return response;
         }
 
         private async Task<AssetFile> CheckAssetFileAsync(IReadOnlyList<IFormFile> file)

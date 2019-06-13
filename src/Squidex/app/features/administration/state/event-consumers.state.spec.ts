@@ -79,7 +79,7 @@ describe('EventConsumersState', () => {
             eventConsumersState.load().subscribe();
         });
 
-        it('should update evnet consumer when started', () => {
+        it('should update event consumer when started', () => {
             const updated = createEventConsumer(2, '_new');
 
             eventConsumersService.setup(x => x.putStart(eventConsumer2))

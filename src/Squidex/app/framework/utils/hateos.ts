@@ -54,6 +54,16 @@ export function hasLink(value: Resource | ResourceLinks, rel: string): boolean {
     return !!(link && link.method && link.href);
 }
 
+export function hasAnyLink(value: Resource | ResourceLinks,  ...rels: string[]) {
+    for (let rel of rels) {
+        if (hasLink(value, rel)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 export function getLink(value: Resource | ResourceLinks, rel: string): ResourceLink {
     return value ? (value._links ? value._links[rel] : value[rel]) : undefined;
 }

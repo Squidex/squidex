@@ -76,9 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = context.Result<AssetCreatedResult>();
 
-            Assert.Equal(assetId, result.IdOrValue);
-            Assert.Contains("tag1", result.Tags);
-            Assert.Contains("tag2", result.Tags);
+            Assert.Equal(assetId, result.Asset.Id);
+            Assert.Contains("tag1", result.Asset.Tags);
+            Assert.Contains("tag2", result.Asset.Tags);
 
             AssertAssetHasBeenUploaded(0, context.ContextId);
             AssertAssetImageChecked();

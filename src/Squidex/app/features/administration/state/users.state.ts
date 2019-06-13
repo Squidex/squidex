@@ -60,16 +60,16 @@ export class UsersState extends State<Snapshot> {
         this.changes.pipe(map(x => x.usersPager),
             distinctUntilChanged());
 
-    public links =
-        this.changes.pipe(map(x => x.links),
-            distinctUntilChanged());
-
     public selectedUser =
         this.changes.pipe(map(x => x.selectedUser),
             distinctUntilChanged());
 
     public isLoaded =
         this.changes.pipe(map(x => !!x.isLoaded),
+            distinctUntilChanged());
+
+    public links =
+        this.changes.pipe(map(x => x.links),
             distinctUntilChanged());
 
     constructor(
@@ -131,7 +131,7 @@ export class UsersState extends State<Snapshot> {
                         selectedUser = users.find(x => x.id === selectedUser!.id) || selectedUser;
                     }
 
-                    return { ...s, users, usersPager, links, selectedUser, isLoaded: true };
+                    return { ...s, users, usersPager, selectedUser, isLoaded: true, links };
                 });
             }),
             shareSubscribed(this.dialogs));

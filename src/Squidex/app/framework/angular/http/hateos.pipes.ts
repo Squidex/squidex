@@ -8,7 +8,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 import {
-    hasLink,
+    hasAnyLink,
     Resource,
     ResourceLinks
 } from '@app/framework/internal';
@@ -19,12 +19,16 @@ import {
 })
 export class HasLinkPipe implements PipeTransform {
     public transform(value: Resource | ResourceLinks,  ...rels: string[]) {
-        for (let rel of rels) {
-            if (hasLink(value, rel)) {
-                return true;
-            }
-        }
+        return hasAnyLink(value, ...rels);
+    }
+}
 
-        return false;
+@Pipe({
+    name: 'sqxHasNoLink',
+    pure: true
+})
+export class HasNoLinkPipe implements PipeTransform {
+    public transform(value: Resource | ResourceLinks,  ...rels: string[]) {
+        return !hasAnyLink(value, ...rels);
     }
 }

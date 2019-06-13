@@ -41,32 +41,40 @@ namespace Squidex.Domain.Apps.Entities.Rules
             switch (command)
             {
                 case CreateRule createRule:
-                    return CreateAsync(createRule, async c =>
+                    return CreateReturnAsync(createRule, async c =>
                     {
                         await GuardRule.CanCreate(c, appProvider);
 
                         Create(c);
+
+                        return await GetRawStateAsync();
                     });
                 case UpdateRule updateRule:
-                    return UpdateAsync(updateRule, async c =>
+                    return UpdateReturnAsync(updateRule, async c =>
                     {
                         await GuardRule.CanUpdate(c, Snapshot.AppId.Id, appProvider);
 
                         Update(c);
+
+                        return await GetRawStateAsync();
                     });
                 case EnableRule enableRule:
-                    return UpdateAsync(enableRule, c =>
+                    return UpdateReturnAsync(enableRule, async c =>
                     {
                         GuardRule.CanEnable(c, Snapshot.RuleDef);
 
                         Enable(c);
+
+                        return await GetRawStateAsync();
                     });
                 case DisableRule disableRule:
-                    return UpdateAsync(disableRule, c =>
+                    return UpdateReturnAsync(disableRule, async c =>
                     {
                         GuardRule.CanDisable(c, Snapshot.RuleDef);
 
                         Disable(c);
+
+                        return await GetRawStateAsync();
                     });
                 case DeleteRule deleteRule:
                     return UpdateAsync(deleteRule, c =>
@@ -121,6 +129,11 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 throw new DomainException("Rule has already been deleted.");
             }
+        }
+
+        public Task<IRuleEntity> GetRawStateAsync()
+        {
+            return Task.FromResult<IRuleEntity>(Snapshot);
         }
 
         public Task<J<IRuleEntity>> GetStateAsync()

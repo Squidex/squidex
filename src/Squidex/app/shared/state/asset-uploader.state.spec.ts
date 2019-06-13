@@ -22,7 +22,7 @@ import { createAsset } from './../services/assets.service.spec';
 
 import { TestValues } from './_test-helpers';
 
-describe('AssetsState', () => {
+describe('AssetUploaderState', () => {
     const {
         app,
         appsState
@@ -155,7 +155,7 @@ describe('AssetsState', () => {
     it('should update status when uploading asset completes', () => {
         const file: File = <any>{ name: 'my-file' };
 
-        let updated = createAsset(1, undefined, '-new');
+        let updated = createAsset(1, undefined, '_new');
 
         assetsService.setup(x => x.replaceFile(app, asset, file, asset.version))
             .returns(() => of(10, 20, updated)).verifiable();

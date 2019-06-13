@@ -15,12 +15,13 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
-    mapVersioned,
     Model,
     pretifyError,
+    Resource,
+    ResourceLinks,
     ResultSet,
     Version,
-    Versioned
+    withLinks
 } from '@app/framework';
 
 export const ALL_TRIGGERS = {
@@ -74,7 +75,13 @@ export class RuleElementPropertyDto {
     }
 }
 
+export class RulesDto extends ResultSet<RuleDto> {
+    public readonly _links: ResourceLinks = {};
+}
+
 export class RuleDto extends Model<RuleDto> {
+    public readonly _links: ResourceLinks = {};
+
     constructor(
         public readonly id: string,
         public readonly createdBy: string,
@@ -92,9 +99,13 @@ export class RuleDto extends Model<RuleDto> {
     }
 }
 
-export class RuleEventsDto extends ResultSet<RuleEventDto> { }
+export class RuleEventsDto extends ResultSet<RuleEventDto> {
+    public readonly _links: ResourceLinks = {};
+}
 
 export class RuleEventDto extends Model<RuleEventDto> {
+    public readonly _links: ResourceLinks = {};
+
     constructor(
         public readonly id: string,
         public readonly created: DateTime,
@@ -113,10 +124,6 @@ export class RuleEventDto extends Model<RuleEventDto> {
 export interface UpsertRuleDto {
     readonly trigger: RuleAction;
     readonly action: RuleAction;
-}
-
-export interface RuleCreatedDto {
-    readonly id: string;
 }
 
 export type RuleAction = { actionType: string } & any;
@@ -167,77 +174,87 @@ export class RulesService {
             pretifyError('Failed to load Rules. Please reload.'));
     }
 
-    public getRules(appName: string): Observable<RuleDto[]> {
+    public getRules(appName: string): Observable<RulesDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
             map(({ payload }) => {
-                const items: any[] = payload.body;
+                const items: any[] = payload.body.items;
 
-                const rules = items.map(item =>
-                    new RuleDto(
-                        item.id,
-                        item.createdBy,
-                        item.lastModifiedBy,
-                        DateTime.parseISO_UTC(item.created),
-                        DateTime.parseISO_UTC(item.lastModified),
-                        new Version(item.version.toString()),
-                        item.isEnabled,
-                        item.trigger,
-                        item.trigger.triggerType,
-                        item.action,
-                        item.action.actionType));
+                const rules = items.map(item => parseRule(item));
 
-                return rules;
+                return withLinks(new RulesDto(rules.length, rules), payload.body);
             }),
             pretifyError('Failed to load Rules. Please reload.'));
     }
 
-    public postRule(appName: string, dto: UpsertRuleDto): Observable<Versioned<RuleCreatedDto>> {
+    public postRule(appName: string, dto: UpsertRuleDto): Observable<RuleDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return HTTP.postVersioned<RuleCreatedDto>(this.http, url, dto).pipe(
-            mapVersioned(({ body }) => body!),
+        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
+            map(({ payload }) => {
+                return parseRule(payload.body);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Created', appName);
             }),
             pretifyError('Failed to create rule. Please reload.'));
     }
 
-    public putRule(appName: string, id: string, dto: Partial<UpsertRuleDto>, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}`);
+    public putRule(appName: string, resource: Resource, dto: Partial<UpsertRuleDto>, version: Version): Observable<RuleDto> {
+        const link = resource._links['update'];
 
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ payload }) => {
+                return parseRule(payload.body);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Updated', appName);
             }),
             pretifyError('Failed to update rule. Please reload.'));
     }
 
-    public enableRule(appName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}/enable`);
+    public enableRule(appName: string, resource: Resource, version: Version): Observable<RuleDto> {
+        const link = resource._links['enable'];
 
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+            map(({ payload }) => {
+                return parseRule(payload.body);
+            }),
             tap(() => {
-                this.analytics.trackEvent('Rule', 'Updated', appName);
+                this.analytics.trackEvent('Rule', 'Enabled', appName);
             }),
             pretifyError('Failed to enable rule. Please reload.'));
     }
 
-    public disableRule(appName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}/disable`);
+    public disableRule(appName: string, resource: Resource, version: Version): Observable<RuleDto> {
+        const link = resource._links['disable'];
 
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+            map(({ payload }) => {
+                return parseRule(payload.body);
+            }),
             tap(() => {
-                this.analytics.trackEvent('Rule', 'Updated', appName);
+                this.analytics.trackEvent('Rule', 'Disabled', appName);
             }),
             pretifyError('Failed to disable rule. Please reload.'));
     }
 
-    public deleteRule(appName: string, id: string, version: Version): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/${id}`);
+    public deleteRule(appName: string, resource: Resource, version: Version): Observable<any> {
+        const link = resource._links['delete'];
 
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            map(({ payload }) => {
+                return parseRule(payload.body);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Deleted', appName);
             }),
@@ -270,23 +287,44 @@ export class RulesService {
             pretifyError('Failed to load events. Please reload.'));
     }
 
-    public enqueueEvent(appName: string, id: string): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events/${id}`);
+    public enqueueEvent(appName: string, resource: Resource): Observable<any> {
+        const link = resource._links['update'];
 
-        return HTTP.putVersioned(this.http, url, {}).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url).pipe(
             tap(() => {
                 this.analytics.trackEvent('Rule', 'EventEnqueued', appName);
             }),
             pretifyError('Failed to enqueue rule event. Please reload.'));
     }
 
-    public cancelEvent(appName: string, id: string): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events/${id}`);
+    public cancelEvent(appName: string, resource: Resource): Observable<any> {
+        const link = resource._links['delete'];
 
-        return HTTP.deleteVersioned(this.http, url).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url).pipe(
             tap(() => {
                 this.analytics.trackEvent('Rule', 'EventDequeued', appName);
             }),
             pretifyError('Failed to cancel rule event. Please reload.'));
     }
+}
+
+function parseRule(resource: any) {
+    return withLinks(
+        new RuleDto(
+            resource.id,
+            resource.createdBy,
+            resource.lastModifiedBy,
+            DateTime.parseISO_UTC(resource.created),
+            DateTime.parseISO_UTC(resource.lastModified),
+            new Version(resource.version.toString()),
+            resource.isEnabled,
+            resource.trigger,
+            resource.trigger.triggerType,
+            resource.action,
+            resource.action.actionType),
+        resource);
 }

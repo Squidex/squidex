@@ -11,10 +11,11 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
-    public sealed class RuleEventDto
+    public sealed class RuleEventDto : Resource
     {
         /// <summary>
         /// The id of the event.
@@ -63,14 +64,25 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public RuleJobResult JobResult { get; set; }
 
-        public static RuleEventDto FromRuleEvent(IRuleEventEntity ruleEvent)
+        public static RuleEventDto FromRuleEvent(IRuleEventEntity ruleEvent, ApiController controller, string app)
         {
-            var response = new RuleEventDto();
+            var result = new RuleEventDto();
 
-            SimpleMapper.Map(ruleEvent, response);
-            SimpleMapper.Map(ruleEvent.Job, response);
+            SimpleMapper.Map(ruleEvent, result);
+            SimpleMapper.Map(ruleEvent.Job, result);
 
-            return response;
+            return CreateLinks(result, controller, app);
+        }
+
+        private static RuleEventDto CreateLinks(RuleEventDto result, ApiController controller, string app)
+        {
+            var values = new { app, id = result.Id };
+
+            result.AddPutLink("update", controller.Url<RulesController>(x => nameof(x.PutEvent), values));
+
+            result.AddDeleteLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteEvent), values));
+
+            return result;
         }
     }
 }

@@ -30,6 +30,9 @@ export class ContentChangedTriggerComponent implements OnInit {
     public schemas: ImmutableArray<SchemaDto>;
 
     @Input()
+    public canUpdate: boolean;
+
+    @Input()
     public trigger: any;
 
     @Input()

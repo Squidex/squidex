@@ -16,7 +16,7 @@
 
         <ng-container menu>
             <ng-container *ngIf="usersState.selectedUser | async; let user; else noUserMenu">
-                <ng-container *ngIf="!isReadOnly">
+                <ng-container *ngIf="canUpdate">
                     <button type="submit" class="btn btn-primary" title="CTRL + S">
                         Save
                     </button>
