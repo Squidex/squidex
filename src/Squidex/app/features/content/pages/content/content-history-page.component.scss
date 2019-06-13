@@ -1,7 +1,7 @@
 @import '_vars';
 @import '_mixins';
 
-::ng-deep {
+:host ::ng-deep {
     .user-ref {
         color: $color-title;
     }
