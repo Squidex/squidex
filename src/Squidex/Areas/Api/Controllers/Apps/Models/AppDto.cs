@@ -112,7 +112,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (controller.HasPermission(AllPermissions.AppBackupsRead, result.Name, permissions: permissions))
             {
-                result.AddGetLink("backups", controller.Url<BackupsController>(x => nameof(x.GetJobs), values));
+                result.AddGetLink("backups", controller.Url<BackupsController>(x => nameof(x.GetBackups), values));
             }
 
             if (controller.HasPermission(AllPermissions.AppClientsRead, result.Name, permissions: permissions))

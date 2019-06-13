@@ -12,7 +12,7 @@
 
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
-        <button type="button" class="btn btn-success" [disabled]="backupsState.maxBackupsReached | async" (click)="start()">
+        <button type="button" class="btn btn-success" [disabled]="backupsState.maxBackupsReached | async" *ngIf="backupsState.links | async | sqxHasLink:'create'" (click)="start()">
             Start Backup
         </button>
     </ng-container>
@@ -78,7 +78,8 @@
                         </div>
                     </div>
                     <div class="col-auto">
-                        <button type="button" class="btn btn-text-danger" 
+                        <button type="button" class="btn btn-text-danger mt-1"
+                            [disabled]="backup | sqxHasNoLink:'delete'"
                             (sqxConfirmClick)="delete(backup)" 
                             confirmTitle="Delete backup"
                             confirmText="Do you really want to delete the backup?">

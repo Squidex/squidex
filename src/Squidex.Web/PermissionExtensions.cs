@@ -7,7 +7,6 @@
 
 using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure.Security;
-using Squidex.Shared;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Web

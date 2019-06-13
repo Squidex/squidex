@@ -16,10 +16,20 @@ import {
     DateTime,
     Model,
     pretifyError,
-    Types
+    Resource,
+    ResourceLinks,
+    ResultSet,
+    Types,
+    withLinks
 } from '@app/framework';
 
+export class BackupsDto extends ResultSet<BackupDto> {
+    public readonly _links: ResourceLinks = {};
+}
+
 export class BackupDto extends Model<BackupDto> {
+    public readonly _links: ResourceLinks = {};
+
     constructor(
         public readonly id: string,
         public readonly started: DateTime,
@@ -58,21 +68,14 @@ export class BackupsService {
     ) {
     }
 
-    public getBackups(appName: string): Observable<BackupDto[]> {
+    public getBackups(appName: string): Observable<BackupsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups`);
 
-        return this.http.get<any[]>(url).pipe(
+        return this.http.get<{ items: any[] } & Resource>(url).pipe(
                 map(body => {
-                    const backups = body.map(item =>
-                        new BackupDto(
-                            item.id,
-                            DateTime.parseISO_UTC(item.started),
-                            item.stopped ? DateTime.parseISO_UTC(item.stopped) : null,
-                            item.handledEvents,
-                            item.handledAssets,
-                            item.status));
+                    const backups = body.items.map(item => parseBackup(item));
 
-                    return backups;
+                    return withLinks(new BackupsDto(backups.length, backups), body);
                 }),
                 pretifyError('Failed to load backups.'));
     }
@@ -82,12 +85,7 @@ export class BackupsService {
 
         return this.http.get<any>(url).pipe(
                 map(body => {
-                    const restore = new RestoreDto(
-                        body.url,
-                        DateTime.parseISO_UTC(body.started),
-                        body.stopped ? DateTime.parseISO_UTC(body.stopped) : null,
-                        body.status,
-                        body.log);
+                    const restore = parseRestore(body);
 
                     return restore;
                 }),
@@ -121,13 +119,36 @@ export class BackupsService {
                 pretifyError('Failed to start restore.'));
     }
 
-    public deleteBackup(appName: string, id: string): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups/${id}`);
+    public deleteBackup(appName: string, resource: Resource): Observable<any> {
+        const link = resource._links['delete'];
 
-        return this.http.delete(url).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url).pipe(
                 tap(() => {
                     this.analytics.trackEvent('Backup', 'Deleted', appName);
                 }),
                 pretifyError('Failed to delete backup.'));
     }
+}
+
+function parseRestore(response: any) {
+    return new RestoreDto(
+        response.url,
+        DateTime.parseISO_UTC(response.started),
+        response.stopped ? DateTime.parseISO_UTC(response.stopped) : null,
+        response.status,
+        response.log);
+}
+
+function parseBackup(response: any) {
+    return withLinks(
+        new BackupDto(
+            response.id,
+            DateTime.parseISO_UTC(response.started),
+            response.stopped ? DateTime.parseISO_UTC(response.stopped) : null,
+            response.handledEvents,
+            response.handledAssets,
+            response.status),
+        response);
 }

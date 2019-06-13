@@ -12,6 +12,7 @@ import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
+    ResourceLinks,
     shareSubscribed,
     State
 } from '@app/framework';
@@ -26,6 +27,9 @@ interface Snapshot {
 
     // Indicates if the backups are loaded.
     isLoaded?: boolean;
+
+    // The links.
+    links: ResourceLinks;
 }
 
 type BackupsList = ImmutableArray<BackupDto>;
@@ -44,12 +48,16 @@ export class BackupsState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
+    public links =
+        this.changes.pipe(map(x => x.links),
+            distinctUntilChanged());
+
     constructor(
         private readonly appsState: AppsState,
         private readonly backupsService: BackupsService,
         private readonly dialogs: DialogService
     ) {
-        super({ backups: ImmutableArray.empty() });
+        super({ backups: ImmutableArray.empty(), links: {} });
     }
 
     public load(isReload = false, silent = false): Observable<any> {
@@ -58,7 +66,7 @@ export class BackupsState extends State<Snapshot> {
         }
 
         return this.backupsService.getBackups(this.appName).pipe(
-            tap(items => {
+            tap(({ items, _links: links }) => {
                 if (isReload && !silent) {
                     this.dialogs.notifyInfo('Backups reloaded.');
                 }
@@ -66,7 +74,7 @@ export class BackupsState extends State<Snapshot> {
                 this.next(s => {
                     const backups = ImmutableArray.of(items);
 
-                    return { ...s, backups, isLoaded: true };
+                    return { ...s, backups, isLoaded: true, links };
                 });
             }),
             shareSubscribed(this.dialogs, { silent }));
@@ -81,7 +89,7 @@ export class BackupsState extends State<Snapshot> {
     }
 
     public delete(backup: BackupDto): Observable<any> {
-        return this.backupsService.deleteBackup(this.appsState.appName, backup.id).pipe(
+        return this.backupsService.deleteBackup(this.appsState.appName, backup).pipe(
             tap(() => {
                 this.dialogs.notifyInfo('Backup is about to be deleted.');
             }),
