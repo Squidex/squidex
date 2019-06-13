@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -39,12 +40,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/languages/")]
-        [ProducesResponseType(typeof(AppLanguageDto[]), 200)]
+        [ProducesResponseType(typeof(AppLanguagesDto), 200)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public IActionResult GetLanguages(string app)
         {
-            var response = AppLanguageDto.FromApp(App);
+            var response = AppLanguagesDto.FromApp(App, this);
 
             Response.Headers[HeaderNames.ETag] = App.Version.ToString();
 
@@ -63,7 +64,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/languages/")]
-        [ProducesResponseType(typeof(AppLanguageDto), 201)]
+        [ProducesResponseType(typeof(AppLanguagesDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppLanguagesCreate)]
         [ApiCosts(1)]
@@ -71,9 +72,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var command = request.ToCommand();
 
-            await CommandBus.PublishAsync(command);
-
-            var response = AppLanguageDto.FromCommand(command);
+            var response = await InvokeCommandAsync(app, command);
 
             return CreatedAtAction(nameof(GetLanguages), new { app }, response);
         }
@@ -85,19 +84,23 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="language">The language to update.</param>
         /// <param name="request">The language object.</param>
         /// <returns>
-        /// 204 => Language updated.
+        /// 200 => Language updated.
         /// 400 => Language request not valid.
         /// 404 => Language or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/languages/{language}/")]
+        [ProducesResponseType(typeof(AppLanguagesDto), 200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppLanguagesUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> Update(string app, string language, [FromBody] UpdateLanguageDto request)
+        public async Task<IActionResult> PutLanguage(string app, string language, [FromBody] UpdateLanguageDto request)
         {
-            await CommandBus.PublishAsync(request.ToCommand(ParseLanguage(language)));
+            var command = request.ToCommand(ParseLanguage(language));
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -106,18 +109,31 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="language">The language to delete from the app.</param>
         /// <returns>
-        /// 204 => Language deleted.
+        /// 200 => Language deleted.
         /// 404 => Language or app not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/languages/{language}/")]
+        [ProducesResponseType(typeof(AppLanguagesDto), 200)]
         [ApiPermission(Permissions.AppLanguagesDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteLanguage(string app, string language)
         {
-            await CommandBus.PublishAsync(new RemoveLanguage { Language = ParseLanguage(language) });
+            var command = new RemoveLanguage { Language = ParseLanguage(language) };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
+        }
+
+        private async Task<AppLanguagesDto> InvokeCommandAsync(string app, ICommand command)
+        {
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<IAppEntity>();
+            var response = AppLanguagesDto.FromApp(result, this);
+
+            return response;
         }
 
         private static Language ParseLanguage(string language)

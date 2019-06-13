@@ -61,8 +61,8 @@ export class LanguagesPageComponent extends ResourceOwner implements OnInit {
         }
     }
 
-    public trackByLanguage(language: { language: AppLanguageDto }) {
-        return language.language;
+    public trackByLanguage(index: number, language: { language: AppLanguageDto }) {
+        return language.language.iso2Code;
     }
 }
 

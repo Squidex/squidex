@@ -14,6 +14,7 @@ import * as Sortable from 'sortablejs';
 })
 export class SortedDirective implements OnDestroy, OnInit {
     private sortable: Sortable.Ref;
+    private isDisabled: boolean;
 
     @Input()
     public dragHandle = '.drag-handle';
@@ -23,6 +24,15 @@ export class SortedDirective implements OnDestroy, OnInit {
 
     @Output('sqxSort')
     public sort = new EventEmitter<any[]>();
+
+    @Input('disabled')
+    public setDisabled(value: boolean) {
+        this.isDisabled = value;
+
+        if (this.sortable) {
+            this.sortable.option('disabled', value);
+        }
+    }
 
     constructor(
         private readonly elementRef: ElementRef
@@ -52,6 +62,8 @@ export class SortedDirective implements OnDestroy, OnInit {
                     this.sort.emit(newModel);
                 }
             },
+
+            isDisabled: this.isDisabled,
 
             handle: this.dragHandle
         });

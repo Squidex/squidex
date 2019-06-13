@@ -139,11 +139,14 @@ describe('ContributorsService', () => {
 export function createContributors(...ids: number[]): ContributorsPayload {
     return {
         contributors: ids.map(id =>
-            withLinks(new ContributorDto(`id${id}`, id % 2 === 0 ? 'Owner' : 'Developer'), {
-                _links: {
-                    update: { method: 'PUT', href: `/contributors/id${id}` }
+            withLinks(
+                new ContributorDto(`id${id}`, id % 2 === 0 ? 'Owner' : 'Developer'),
+                {
+                    _links: {
+                        update: { method: 'PUT', href: `/contributors/id${id}` }
+                    }
                 }
-            })),
+            )),
         maxContributors: ids.length * 13,
         _links: {
             create: { method: 'POST', href: '/contributors' }

@@ -24,7 +24,7 @@ import {
     templateUrl: './user-page.component.html'
 })
 export class UserPageComponent extends ResourceOwner implements OnInit {
-    public canUpdate = false;
+    public isEditable = false;
 
     public user?: UserDto;
     public userForm = new UserForm(this.formBuilder);
@@ -47,9 +47,9 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
                     if (selectedUser) {
                         this.userForm.load(selectedUser);
 
-                        this.canUpdate = hasLink(this.user, 'update');
+                        this.isEditable = hasLink(this.user, 'update');
 
-                        if (!this.canUpdate) {
+                        if (!this.isEditable) {
                             this.userForm.form.disable();
                         }
                     }
@@ -57,7 +57,7 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
     }
 
     public save() {
-        if (!this.canUpdate) {
+        if (!this.isEditable) {
             return;
         }
 

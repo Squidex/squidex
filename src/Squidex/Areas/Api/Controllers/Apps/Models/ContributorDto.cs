@@ -7,6 +7,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -33,6 +34,19 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         private static ContributorDto CreateLinks(ContributorDto result, ApiController controller, string app)
         {
+            if (!controller.IsUser(result.ContributorId))
+            {
+                if (controller.HasPermission(Permissions.AppContributorsAssign, app))
+                {
+                    result.AddPostLink("update", controller.Url<AppContributorsController>(x => nameof(x.PostContributor), new { app }));
+                }
+
+                if (controller.HasPermission(Permissions.AppContributorsRevoke, app))
+                {
+                    result.AddDeleteLink("delete", controller.Url<AppContributorsController>(x => nameof(x.DeleteContributor), new { app, id = result.ContributorId }));
+                }
+            }
+
             return result;
         }
     }

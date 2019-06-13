@@ -15,8 +15,6 @@ import {
     ApiUrlConfig,
     HTTP,
     mapVersioned,
-    Metadata,
-    Model,
     pretifyError,
     Resource,
     ResourceLinks,
@@ -27,20 +25,17 @@ import {
 
 export type ContributorsDto = Versioned<ContributorsPayload>;
 export type ContributorsPayload = {
-    readonly _links?: ResourceLinks,
-    readonly _meta?: Metadata
     readonly contributors: ContributorDto[],
     readonly maxContributors: number
-};
+} & Resource;
 
-export class ContributorDto extends Model<AssignContributorDto> {
+export class ContributorDto {
     public readonly _links: ResourceLinks = {};
 
     constructor(
         public readonly contributorId: string,
         public readonly role: string
     ) {
-        super();
     }
 }
 
@@ -63,9 +58,7 @@ export class ContributorsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.getVersioned<any>(this.http, url).pipe(
-                mapVersioned(payload => {
-                    const body = payload.body;
-
+                mapVersioned(({ body }) => {
                     return parseContributors(body);
                 }),
                 pretifyError('Failed to load contributors. Please reload.'));
@@ -75,9 +68,7 @@ export class ContributorsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
-                mapVersioned(payload => {
-                    const body = payload.body;
-
+            mapVersioned(({ body }) => {
                     return parseContributors(body);
                 }),
                 tap(() => {
@@ -107,13 +98,12 @@ export class ContributorsService {
 function parseContributors(body: any) {
     const items: any[] = body.contributors;
 
-    const contributors =
-        items.map(item =>
-            withLinks(
-                new ContributorDto(
-                    item.contributorId,
-                    item.role),
-                item));
+    const contributors = items.map(item =>
+        withLinks(
+            new ContributorDto(
+                item.contributorId,
+                item.role),
+            item));
 
     return withLinks({ contributors, maxContributors: body.maxContributors, _links: {} }, body);
 }

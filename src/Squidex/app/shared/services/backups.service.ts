@@ -27,7 +27,7 @@ export class BackupsDto extends ResultSet<BackupDto> {
     public readonly _links: ResourceLinks = {};
 }
 
-export class BackupDto extends Model<BackupDto> {
+export class BackupDto {
     public readonly _links: ResourceLinks = {};
 
     constructor(
@@ -38,7 +38,6 @@ export class BackupDto extends Model<BackupDto> {
         public readonly handledAssets: number,
         public readonly status: string
     ) {
-        super();
     }
 }
 

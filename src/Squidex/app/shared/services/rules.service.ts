@@ -79,7 +79,7 @@ export class RulesDto extends ResultSet<RuleDto> {
     public readonly _links: ResourceLinks = {};
 }
 
-export class RuleDto extends Model<RuleDto> {
+export class RuleDto {
     public readonly _links: ResourceLinks = {};
 
     constructor(
@@ -95,7 +95,6 @@ export class RuleDto extends Model<RuleDto> {
         public readonly action: any,
         public readonly actionType: string
     ) {
-        super();
     }
 }
 

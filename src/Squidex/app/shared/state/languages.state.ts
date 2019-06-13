@@ -12,7 +12,7 @@ import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    mapVersioned,
+    ResourceLinks,
     shareMapSubscribed,
     shareSubscribed,
     State,
@@ -21,6 +21,7 @@ import {
 
 import {
     AppLanguageDto,
+    AppLanguagesPayload,
     AppLanguagesService,
     UpdateAppLanguageDto
 } from './../services/app-languages.service';
@@ -57,6 +58,9 @@ interface Snapshot {
 
     // Indicates if the languages are loaded.
     isLoaded?: boolean;
+
+    // The links.
+    links: ResourceLinks;
 }
 
 type AppLanguagesList = ImmutableArray<AppLanguageDto>;
@@ -77,6 +81,10 @@ export class LanguagesState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
+    public links =
+        this.changes.pipe(map(x => x.links),
+            distinctUntilChanged());
+
     constructor(
         private readonly appLanguagesService: AppLanguagesService,
         private readonly appsState: AppsState,
@@ -88,7 +96,8 @@ export class LanguagesState extends State<Snapshot> {
             allLanguages: ImmutableArray.empty(),
             allLanguagesNew: ImmutableArray.empty(),
             languages: ImmutableArray.empty(),
-            version: new Version('')
+            version: new Version(''),
+            links: {}
         });
     }
 
@@ -110,67 +119,49 @@ export class LanguagesState extends State<Snapshot> {
 
                 const sorted = ImmutableArray.of(allLanguages).sortByStringAsc(x => x.englishName);
 
-                this.replaceLanguages(ImmutableArray.of(languages.payload), languages.version, sorted);
+                this.replaceLanguages(languages.payload, languages.version, sorted);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public add(language: LanguageDto): Observable<AppLanguageDto> {
+    public add(language: LanguageDto): Observable<any> {
         return this.appLanguagesService.postLanguage(this.appName, { language: language.iso2Code }, this.version).pipe(
             tap(({ version, payload }) => {
-                const languages = this.snapshot.plainLanguages.push(payload).sortByStringAsc(x => x.englishName);
-
-                this.replaceLanguages(languages, version);
+                this.replaceLanguages(payload, version);
             }),
             shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public remove(language: AppLanguageDto): Observable<any> {
-        return this.appLanguagesService.deleteLanguage(this.appName, language.iso2Code, this.version).pipe(
-            tap(({ version }) => {
-                const languages = this.snapshot.plainLanguages.filter(x => x.iso2Code !== language.iso2Code);
-
-                this.replaceLanguages(languages, version);
+        return this.appLanguagesService.deleteLanguage(this.appName, language, this.version).pipe(
+            tap(({ version, payload }) => {
+                this.replaceLanguages(payload, version);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public update(language: AppLanguageDto, request: UpdateAppLanguageDto): Observable<AppLanguageDto> {
-        return this.appLanguagesService.putLanguage(this.appName, language.iso2Code, request, this.version).pipe(
-            mapVersioned(() => update(language, request)),
+    public update(language: AppLanguageDto, request: UpdateAppLanguageDto): Observable<any> {
+        return this.appLanguagesService.putLanguage(this.appName, language, request, this.version).pipe(
             tap(({ version, payload }) => {
-                const languages = this.snapshot.plainLanguages.map(x => {
-                    if (x.iso2Code === language.iso2Code) {
-                        return payload;
-                    } else if (x.isMaster && request.isMaster) {
-                        return update(x, { isMaster: false });
-                    } else {
-                        return x;
-                    }
-                });
-
-                this.replaceLanguages(languages, version);
+                this.replaceLanguages(payload, version);
             }),
             shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
-    private replaceLanguages(languages: AppLanguagesList, version: Version, allLanguages?: LanguageList) {
+    private replaceLanguages(payload: AppLanguagesPayload, version: Version, allLanguages?: LanguageList) {
         this.next(s => {
             allLanguages = allLanguages || s.allLanguages;
 
+            const languages = ImmutableArray.of(payload.items);
+
             return {
                 ...s,
-                languages: languages.sort((a, b) => {
-                    if (a.isMaster === b.isMaster) {
-                        return a.englishName.localeCompare(b.englishName);
-                    } else {
-                        return (a.isMaster ? 0 : 1) - (b.isMaster ? 0 : 1);
-                    }
-                }).map(x => this.createLanguage(x, languages)),
-                plainLanguages: languages,
+                languages: languages.map(x => this.createLanguage(x, languages)),
+                plainLanguages: payload,
                 allLanguages: allLanguages,
                 allLanguagesNew: allLanguages.filter(x => !languages.find(l => l.iso2Code === x.iso2Code)),
                 isLoaded: true,
+                links: payload._links,
                 version: version
             };
         });
@@ -201,6 +192,3 @@ export class LanguagesState extends State<Snapshot> {
         };
     }
 }
-
-const update = (language: AppLanguageDto, request: UpdateAppLanguageDto) =>
-    language.with(request);

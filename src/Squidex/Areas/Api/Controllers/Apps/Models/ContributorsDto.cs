@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure;
+using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -57,6 +58,15 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         private static ContributorsDto CreateLinks(ContributorsDto result, ApiController controller, string app)
         {
+            var values = new { app };
+
+            result.AddSelfLink(controller.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
+
+            if (controller.HasPermission(Permissions.AppContributorsAssign, app))
+            {
+                result.AddPostLink("create", controller.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
+            }
+
             return result;
         }
     }

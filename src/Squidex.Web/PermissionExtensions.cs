@@ -39,7 +39,7 @@ namespace Squidex.Web
 
         public static bool HasPermission(this HttpContext httpContext, Permission permission, PermissionSet permissions = null)
         {
-            return httpContext.Permissions().Includes(permission) || permission?.Includes(permission) == true;
+            return httpContext.Permissions().Includes(permission) || permissions?.Includes(permission) == true;
         }
 
         public static bool HasPermission(this HttpContext httpContext, string id, string app = "*", string schema = "*", PermissionSet permissions = null)

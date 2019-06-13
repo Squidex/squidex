@@ -36,7 +36,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     public triggerType: string;
     public trigger: any = {};
 
-    public canUpdate: boolean;
+    public isEditable: boolean;
 
     public step = 1;
 
@@ -64,7 +64,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     }
 
     public ngOnInit() {
-        this.canUpdate = !this.rule || hasLink(this.rule, 'update');
+        this.isEditable = !this.rule || hasLink(this.rule, 'update');
 
         if (this.mode === MODE_EDIT_ACTION) {
             this.step = 4;
@@ -80,7 +80,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     }
 
     public ngAfterViewInit() {
-        if (!this.canUpdate) {
+        if (!this.isEditable) {
             this.actionForm.form.disable();
 
             this.triggerForm.form.disable();
@@ -145,7 +145,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     }
 
     private updateTrigger() {
-        if (!this.canUpdate) {
+        if (!this.isEditable) {
             return;
         }
 
@@ -160,7 +160,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     }
 
     private updateAction() {
-        if (!this.canUpdate) {
+        if (!this.isEditable) {
             return;
         }
 

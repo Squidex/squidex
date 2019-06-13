@@ -17,7 +17,6 @@ import {
     ErrorDto,
     HTTP,
     Metadata,
-    Model,
     pretifyError,
     Resource,
     ResourceLinks,
@@ -32,7 +31,7 @@ export class AssetsDto extends ResultSet<AssetDto> {
     public readonly _links: ResourceLinks = {};
 }
 
-export class AssetDto extends Model<AssetDto> {
+export class AssetDto {
     public get canPreview() {
         return this.isImage || (this.mimeType === 'image/svg+xml' && this.fileSize < 100 * 1024);
     }
@@ -60,7 +59,6 @@ export class AssetDto extends Model<AssetDto> {
         public readonly tags: string[],
         public readonly version: Version
     ) {
-        super();
     }
 }
 

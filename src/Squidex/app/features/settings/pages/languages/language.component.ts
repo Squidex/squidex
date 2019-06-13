@@ -12,6 +12,7 @@ import {
     AppLanguageDto,
     EditLanguageForm,
     fadeAnimation,
+    hasAnyLink,
     ImmutableArray,
     LanguagesState
 } from '@app/shared';
@@ -37,6 +38,7 @@ export class LanguageComponent implements OnChanges {
     public otherLanguage: AppLanguageDto;
 
     public isEditing = false;
+    public isEditable = false;
 
     public editForm = new EditLanguageForm(this.formBuilder);
 
@@ -59,10 +61,14 @@ export class LanguageComponent implements OnChanges {
     }
 
     public save() {
+        if (!this.isEditable) {
+            return;
+        }
+
         const value = this.editForm.submit();
 
         if (value) {
-            const request = { ...value, fallbackLanguages: this.fallbackLanguages.map(x => x.iso2Code).values };
+            const request = { ...value, fallback: this.fallbackLanguages.map(x => x.iso2Code).values };
 
             this.languagesState.update(this.language, request)
                 .subscribe(() => {
@@ -90,9 +96,15 @@ export class LanguageComponent implements OnChanges {
     }
 
     private resetForm() {
-        this.otherLanguage = this.fallbackLanguagesNew.at(0);
+        this.isEditable = hasAnyLink(this.language, 'update');
 
         this.editForm.load(this.language);
+
+        if (!this.isEditable) {
+            this.editForm.form.disable();
+        }
+
+        this.otherLanguage = this.fallbackLanguagesNew.at(0);
     }
 
     public trackByLanguage(index: number, language: AppLanguageDto) {

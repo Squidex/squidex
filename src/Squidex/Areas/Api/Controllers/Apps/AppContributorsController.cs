@@ -61,7 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Contributor object that needs to be added to the app.</param>
         /// <returns>
-        /// 200 => User assigned to app.
+        /// 201 => User assigned to app.
         /// 400 => User is already assigned to the app or not found.
         /// 404 => App not found.
         /// </returns>
@@ -87,7 +87,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
                 response = ContributorsDto.FromApp(invited.App, appPlansProvider, this, true);
             }
 
-            return Ok(response);
+            return CreatedAtAction(nameof(GetContributors), new { app }, response);
         }
 
         /// <summary>

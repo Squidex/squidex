@@ -179,7 +179,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var command = new CreateAsset { File = assetFile };
 
-            var response = await InvokeCommand(app, command);
+            var response = await InvokeCommandAsync(app, command);
 
             return CreatedAtAction(nameof(GetAsset), new { app, id = response.Id }, response);
         }
@@ -210,7 +210,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var command = new UpdateAsset { File = assetFile, AssetId = id };
 
-            var response = await InvokeCommand(app, command);
+            var response = await InvokeCommandAsync(app, command);
 
             return Ok(response);
         }
@@ -237,7 +237,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var command = request.ToCommand(id);
 
-            var response = await InvokeCommand(app, command);
+            var response = await InvokeCommandAsync(app, command);
 
             return Ok(response);
         }
@@ -262,7 +262,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             return NoContent();
         }
 
-        private async Task<AssetDto> InvokeCommand(string app, AssetCommand command)
+        private async Task<AssetDto> InvokeCommandAsync(string app, ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 

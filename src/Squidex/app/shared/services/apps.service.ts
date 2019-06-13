@@ -14,13 +14,12 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
-    Model,
     pretifyError,
     ResourceLinks,
     withLinks
 } from '@app/framework';
 
-export class AppDto extends Model<AppDto> {
+export class AppDto {
     public readonly _links: ResourceLinks = {};
 
     constructor(
@@ -32,7 +31,6 @@ export class AppDto extends Model<AppDto> {
         public readonly planName?: string,
         public readonly planUpgrade?: string
     ) {
-        super();
     }
 }
 

@@ -9,7 +9,6 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    AppLanguageDto,
     AppLanguagesService,
     DialogService,
     ImmutableArray,
@@ -18,6 +17,8 @@ import {
     LanguagesState,
     versioned
 } from '@app/shared/internal';
+
+import { createLanguages } from '../services/app-languages.service.spec';
 
 import { TestValues } from './_test-helpers';
 
@@ -34,10 +35,7 @@ describe('LanguagesState', () => {
     const languageIT = new LanguageDto('it', 'Italian');
     const languageES = new LanguageDto('es', 'Spanish');
 
-    const oldLanguages = [
-        AppLanguageDto.fromLanguage(languageEN, true),
-        AppLanguageDto.fromLanguage(languageDE, false, true,  [languageEN.iso2Code])
-    ];
+    const oldLanguages = createLanguages('en', 'de');
 
     let dialogs: IMock<DialogService>;
     let languagesService: IMock<AppLanguagesService>;
@@ -72,11 +70,11 @@ describe('LanguagesState', () => {
 
             expect(languagesState.snapshot.languages.values).toEqual([
                {
-                   language: oldLanguages[0],
+                   language: oldLanguages.items[0],
                    fallbackLanguages: ImmutableArray.empty(),
                    fallbackLanguagesNew: ImmutableArray.of([oldLanguages[1]])
                }, {
-                   language: oldLanguages[1],
+                   language: oldLanguages.items[1],
                    fallbackLanguages: ImmutableArray.of([oldLanguages[0]]),
                    fallbackLanguagesNew: ImmutableArray.empty()
                }
@@ -103,10 +101,10 @@ describe('LanguagesState', () => {
         });
 
         it('should add language to snapshot when assigned', () => {
-            const newLanguage = new AppLanguageDto(languageIT.iso2Code, languageIT.englishName, false, false, []);
+            const updated = createLanguages('de');
 
             languagesService.setup(x => x.postLanguage(app, It.isAny(), version))
-                .returns(() => of(versioned(newVersion, newLanguage))).verifiable();
+                .returns(() => of(versioned(newVersion, updated))).verifiable();
 
             languagesState.add(languageIT).subscribe();
 
@@ -114,50 +112,39 @@ describe('LanguagesState', () => {
                 {
                     language: oldLanguages[0],
                     fallbackLanguages: ImmutableArray.empty(),
-                    fallbackLanguagesNew: ImmutableArray.of([oldLanguages[1], newLanguage])
-                }, {
-                    language: oldLanguages[1],
-                    fallbackLanguages: ImmutableArray.of([oldLanguages[0]]),
-                    fallbackLanguagesNew: ImmutableArray.of([newLanguage])
-                }, {
-                    language: newLanguage,
-                    fallbackLanguages: ImmutableArray.of(),
-                    fallbackLanguagesNew: ImmutableArray.of([oldLanguages[0], oldLanguages[1]])
+                    fallbackLanguagesNew: ImmutableArray.empty()
                 }
-             ]);
-             expect(languagesState.snapshot.allLanguagesNew.values).toEqual([languageES]);
-             expect(languagesState.snapshot.version).toEqual(newVersion);
+            ]);
+            expect(languagesState.snapshot.allLanguagesNew.values).toEqual([languageDE, languageIT, languageES]);
+            expect(languagesState.snapshot.version).toEqual(newVersion);
         });
 
         it('should update language in snapshot when updated', () => {
+            const updated = createLanguages('de');
+
             const request = { isMaster: true, isOptional: false, fallback: [] };
 
             languagesService.setup(x => x.putLanguage(app, oldLanguages[1].iso2Code, request, version))
-                .returns(() => of(versioned(newVersion))).verifiable();
+                .returns(() => of(versioned(newVersion, updated))).verifiable();
 
             languagesState.update(oldLanguages[1], request).subscribe();
 
-            const newLanguage1 = AppLanguageDto.fromLanguage(languageDE, true);
-            const newLanguage2 = AppLanguageDto.fromLanguage(languageEN);
-
             expect(languagesState.snapshot.languages.values).toEqual([
-               {
-                   language: newLanguage1,
-                   fallbackLanguages: ImmutableArray.empty(),
-                   fallbackLanguagesNew: ImmutableArray.of([newLanguage2])
-               }, {
-                   language: newLanguage2,
-                   fallbackLanguages: ImmutableArray.empty(),
-                   fallbackLanguagesNew: ImmutableArray.of([newLanguage1])
-               }
+                {
+                    language: oldLanguages[0],
+                    fallbackLanguages: ImmutableArray.empty(),
+                    fallbackLanguagesNew: ImmutableArray.empty()
+                }
             ]);
-            expect(languagesState.snapshot.allLanguagesNew.values).toEqual([languageIT, languageES]);
+            expect(languagesState.snapshot.allLanguagesNew.values).toEqual([languageDE, languageIT, languageES]);
             expect(languagesState.snapshot.version).toEqual(newVersion);
         });
 
         it('should remove language from snapshot when deleted', () => {
+            const updated = createLanguages('de');
+
             languagesService.setup(x => x.deleteLanguage(app, oldLanguages[1].iso2Code, version))
-                .returns(() => of(versioned(newVersion))).verifiable();
+                .returns(() => of(versioned(newVersion, updated))).verifiable();
 
             languagesState.remove(oldLanguages[1]).subscribe();
 
