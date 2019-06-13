@@ -8,9 +8,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Assets;
 using Squidex.Areas.Api.Controllers.Backups;
+using Squidex.Areas.Api.Controllers.Ping;
 using Squidex.Areas.Api.Controllers.Plans;
 using Squidex.Areas.Api.Controllers.Rules;
 using Squidex.Areas.Api.Controllers.Schemas;
@@ -60,6 +62,16 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public string[] Permissions { get; set; }
 
         /// <summary>
+        /// Indicates if the user can access the api.
+        /// </summary>
+        public bool CanAccessApi { get; set; }
+
+        /// <summary>
+        /// Indicates if the user can access at least one content.
+        /// </summary>
+        public bool CanAccessContent { get; set; }
+
+        /// <summary>
         /// Gets the current plan name.
         /// </summary>
         public string PlanName { get; set; }
@@ -70,6 +82,26 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public string PlanUpgrade { get; set; }
 
         public static AppDto FromApp(IAppEntity app, string userId, PermissionSet userPermissions, IAppPlansProvider plans, ApiController controller)
+        {
+            var permissions = GetPermissions(app, userId, userPermissions);
+
+            var result = SimpleMapper.Map(app, new AppDto());
+
+            result.Permissions = permissions.ToIds().ToArray();
+            result.PlanName = plans.GetPlanForApp(app)?.Name;
+
+            result.CanAccessApi = controller.HasPermission(AllPermissions.AppApi, app.Name, "*", permissions);
+            result.CanAccessContent = controller.HasPermission(AllPermissions.AppContentsRead, app.Name, "*", permissions);
+
+            if (controller.HasPermission(AllPermissions.AppPlansChange, app.Name))
+            {
+                result.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
+            }
+
+            return CreateLinks(result, controller, permissions);
+        }
+
+        private static PermissionSet GetPermissions(IAppEntity app, string userId, PermissionSet userPermissions)
         {
             var permissions = new List<Permission>();
 
@@ -83,22 +115,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 permissions.AddRange(userPermissions.ToAppPermissions(app.Name));
             }
 
-            var result = SimpleMapper.Map(app, new AppDto());
-
-            result.Permissions = permissions.ToArray(x => x.Id);
-            result.PlanName = plans.GetPlanForApp(app)?.Name;
-
-            if (controller.HasPermission(AllPermissions.AppPlansChange, app.Name))
-            {
-                result.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
-            }
-
-            return CreateLinks(result, controller, new PermissionSet(permissions));
+            return new PermissionSet(permissions);
         }
 
         private static AppDto CreateLinks(AppDto result, ApiController controller, PermissionSet permissions)
         {
             var values = new { app = result.Name };
+
+            result.AddGetLink("ping", controller.Url<PingController>(x => nameof(x.GetAppPing), values));
 
             if (controller.HasPermission(AllPermissions.AppDelete, result.Name, permissions: permissions))
             {

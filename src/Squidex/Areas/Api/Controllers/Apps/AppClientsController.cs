@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
@@ -41,12 +42,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/clients/")]
-        [ProducesResponseType(typeof(ClientDto[]), 200)]
+        [ProducesResponseType(typeof(ClientsDto), 200)]
         [ApiPermission(Permissions.AppClientsRead)]
         [ApiCosts(0)]
         public IActionResult GetClients(string app)
         {
-            var response = App.Clients.Select(ClientDto.FromKvp).ToArray();
+            var response = ClientsDto.FromApp(App, this);
 
             Response.Headers[HeaderNames.ETag] = App.Version.ToString();
 
@@ -60,6 +61,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="request">Client object that needs to be added to the app.</param>
         /// <returns>
         /// 201 => Client generated.
+        /// 400 => Client request not valid.
         /// 404 => App not found.
         /// </returns>
         /// <remarks>
@@ -68,16 +70,15 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/clients/")]
-        [ProducesResponseType(typeof(ClientDto), 201)]
+        [ProducesResponseType(typeof(ClientsDto), 200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppClientsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostClient(string app, [FromBody] CreateClientDto request)
         {
             var command = request.ToCommand();
 
-            await CommandBus.PublishAsync(command);
-
-            var response = ClientDto.FromCommand(command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(GetClients), new { app }, response);
         }
@@ -89,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="clientId">The id of the client that must be updated.</param>
         /// <param name="request">Client object that needs to be updated.</param>
         /// <returns>
-        /// 204 => Client updated.
+        /// 200 => Client updated.
         /// 400 => Client request not valid.
         /// 404 => Client or app not found.
         /// </returns>
@@ -98,13 +99,17 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/clients/{clientId}/")]
+        [ProducesResponseType(typeof(ClientsDto), 200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppClientsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] UpdateClientDto request)
         {
-            await CommandBus.PublishAsync(request.ToCommand(clientId));
+            var command = request.ToCommand(clientId);
 
-            return NoContent();
+            var response = await InvokeCommandAsync(command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -113,7 +118,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="clientId">The id of the client that must be deleted.</param>
         /// <returns>
-        /// 204 => Client revoked.
+        /// 200 => Client revoked.
         /// 404 => Client or app not found.
         /// </returns>
         /// <remarks>
@@ -121,13 +126,26 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpDelete]
         [Route("apps/{app}/clients/{clientId}/")]
+        [ProducesResponseType(typeof(ClientsDto), 200)]
         [ApiPermission(Permissions.AppClientsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteClient(string app, string clientId)
         {
-            await CommandBus.PublishAsync(new RevokeClient { Id = clientId });
+            var command = new RevokeClient { Id = clientId };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(command);
+
+            return Ok(response);
+        }
+
+        private async Task<ClientsDto> InvokeCommandAsync(ICommand command)
+        {
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<IAppEntity>();
+            var response = ClientsDto.FromApp(result, this);
+
+            return response;
         }
     }
 }

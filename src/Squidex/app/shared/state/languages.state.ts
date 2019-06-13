@@ -182,7 +182,7 @@ export class LanguagesState extends State<Snapshot> {
                 ImmutableArray.of(
                     language.fallback
                         .map(l => languages.find(x => x.iso2Code === l)).filter(x => !!x)
-                        .map(x => <AppLanguageDto>x)),
+                        .map(l => l!)),
             fallbackLanguagesNew:
                 languages
                     .filter(l =>

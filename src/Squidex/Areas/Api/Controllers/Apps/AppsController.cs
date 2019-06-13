@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure;
@@ -84,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpPost]
         [Route("apps/")]
-        [ProducesResponseType(typeof(AppCreatedDto), 201)]
+        [ProducesResponseType(typeof(AppDto), 201)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(ErrorDto), 409)]
         [ApiPermission]
@@ -93,8 +94,11 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var context = await CommandBus.PublishAsync(request.ToCommand());
 
-            var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = AppCreatedDto.FromResult(request.Name, result, appPlansProvider);
+            var userOrClientId = HttpContext.User.UserOrClientId();
+            var userPermissions = HttpContext.Permissions();
+
+            var result = context.Result<IAppEntity>();
+            var response = AppDto.FromApp(result, userOrClientId, userPermissions, appPlansProvider, this);
 
             return CreatedAtAction(nameof(GetApps), response);
         }

@@ -9,6 +9,7 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
+    AppLanguagesPayload,
     AppLanguagesService,
     DialogService,
     ImmutableArray,
@@ -71,11 +72,11 @@ describe('LanguagesState', () => {
             expect(languagesState.snapshot.languages.values).toEqual([
                {
                    language: oldLanguages.items[0],
-                   fallbackLanguages: ImmutableArray.empty(),
-                   fallbackLanguagesNew: ImmutableArray.of([oldLanguages[1]])
+                   fallbackLanguages: ImmutableArray.of([oldLanguages.items[1]]),
+                   fallbackLanguagesNew: ImmutableArray.empty()
                }, {
                    language: oldLanguages.items[1],
-                   fallbackLanguages: ImmutableArray.of([oldLanguages[0]]),
+                   fallbackLanguages: ImmutableArray.of([oldLanguages.items[0]]),
                    fallbackLanguagesNew: ImmutableArray.empty()
                }
             ]);
@@ -108,15 +109,7 @@ describe('LanguagesState', () => {
 
             languagesState.add(languageIT).subscribe();
 
-            expect(languagesState.snapshot.languages.values).toEqual([
-                {
-                    language: oldLanguages[0],
-                    fallbackLanguages: ImmutableArray.empty(),
-                    fallbackLanguagesNew: ImmutableArray.empty()
-                }
-            ]);
-            expect(languagesState.snapshot.allLanguagesNew.values).toEqual([languageDE, languageIT, languageES]);
-            expect(languagesState.snapshot.version).toEqual(newVersion);
+            expectUpdated(updated);
         });
 
         it('should update language in snapshot when updated', () => {
@@ -124,39 +117,35 @@ describe('LanguagesState', () => {
 
             const request = { isMaster: true, isOptional: false, fallback: [] };
 
-            languagesService.setup(x => x.putLanguage(app, oldLanguages[1].iso2Code, request, version))
+            languagesService.setup(x => x.putLanguage(app, oldLanguages.items[1], request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
-            languagesState.update(oldLanguages[1], request).subscribe();
+            languagesState.update(oldLanguages.items[1], request).subscribe();
 
-            expect(languagesState.snapshot.languages.values).toEqual([
-                {
-                    language: oldLanguages[0],
-                    fallbackLanguages: ImmutableArray.empty(),
-                    fallbackLanguagesNew: ImmutableArray.empty()
-                }
-            ]);
-            expect(languagesState.snapshot.allLanguagesNew.values).toEqual([languageDE, languageIT, languageES]);
-            expect(languagesState.snapshot.version).toEqual(newVersion);
+            expectUpdated(updated);
         });
 
         it('should remove language from snapshot when deleted', () => {
             const updated = createLanguages('de');
 
-            languagesService.setup(x => x.deleteLanguage(app, oldLanguages[1].iso2Code, version))
+            languagesService.setup(x => x.deleteLanguage(app, oldLanguages.items[1], version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
-            languagesState.remove(oldLanguages[1]).subscribe();
+            languagesState.remove(oldLanguages.items[1]).subscribe();
 
+            expectUpdated(updated);
+        });
+
+        function expectUpdated(updated: AppLanguagesPayload) {
             expect(languagesState.snapshot.languages.values).toEqual([
                 {
-                    language: oldLanguages[0],
+                    language: updated.items[0],
                     fallbackLanguages: ImmutableArray.empty(),
                     fallbackLanguagesNew: ImmutableArray.empty()
                 }
             ]);
-            expect(languagesState.snapshot.allLanguagesNew.values).toEqual([languageDE, languageIT, languageES]);
+            expect(languagesState.snapshot.allLanguagesNew.values).toEqual([languageEN, languageIT, languageES]);
             expect(languagesState.snapshot.version).toEqual(newVersion);
-        });
+        }
     });
 });

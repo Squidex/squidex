@@ -11,10 +11,10 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    AppCreatedDto,
     AppDto,
     AppsService,
-    DateTime
+    DateTime,
+    Resource
 } from '@app/shared/internal';
 
 describe('AppsService', () => {
@@ -50,31 +50,11 @@ describe('AppsService', () => {
         expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush([
-            {
-                id: '123',
-                name: 'name1',
-                permissions: ['Owner'],
-                created: '2016-01-01',
-                lastModified: '2016-02-02',
-                planName: 'Free',
-                planUpgrade: 'Basic'
-            },
-            {
-                id: '456',
-                name: 'name2',
-                permissions: ['Owner'],
-                created: '2017-01-01',
-                lastModified: '2017-02-02',
-                planName: 'Basic',
-                planUpgrade: 'Enterprise'
-            }
+            appResponse(12),
+            appResponse(13)
         ]);
 
-        expect(apps!).toEqual(
-            [
-                new AppDto('123', 'name1', ['Owner'], DateTime.parseISO('2016-01-01'), DateTime.parseISO('2016-02-02'), 'Free', 'Basic'),
-                new AppDto('456', 'name2', ['Owner'], DateTime.parseISO('2017-01-01'), DateTime.parseISO('2017-02-02'), 'Basic', 'Enterprise')
-            ]);
+        expect(apps!).toEqual([createApp(12), createApp(13)]);
     }));
 
     it('should make post request to create app',
@@ -82,7 +62,7 @@ describe('AppsService', () => {
 
         const dto = { name: 'new-app' };
 
-        let app: AppCreatedDto;
+        let app: AppDto;
 
         appsService.postApp(dto).subscribe(result => {
             app = result;
@@ -93,25 +73,21 @@ describe('AppsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({
-            id: '123',
-            permissions: ['Reader'],
-            planName: 'Basic',
-            planUpgrade: 'Enterprise'
-        });
+        req.flush(appResponse(12));
 
-        expect(app!).toEqual({
-            id: '123',
-            permissions: ['Reader'],
-            planName: 'Basic',
-            planUpgrade: 'Enterprise'
-        });
+        expect(app!).toEqual(createApp(12));
     }));
 
     it('should make delete request to archive app',
-    inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
 
-        appsService.deleteApp('my-app').subscribe();
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: '/api/apps/my-app' }
+            }
+        };
+
+        appsService.deleteApp(resource).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app');
 
@@ -120,4 +96,39 @@ describe('AppsService', () => {
 
         req.flush({});
     }));
+
+    function appResponse(id: number, suffix = '') {
+        return {
+            id: `id${id}`,
+            name: `name${id}${suffix}`,
+            permissions: ['Owner'],
+            created: `${id % 1000 + 2000}-12-12T10:10`,
+            lastModified: `${id % 1000 + 2000}-11-11T10:10`,
+            canAccessApi: id % 2 === 0,
+            canAccessContent: id % 2 === 0,
+            planName: 'Free',
+            planUpgrade: 'Basic',
+            _links: {
+                schemas: { method: 'GET', href: '/schemas' }
+            }
+        };
+    }
 });
+
+export function createApp(id: number, suffix = '') {
+    const result = new AppDto(
+        `id${id}`,
+        `name${id}${suffix}`,
+        ['Owner'],
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10`),
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10`),
+        id % 2 === 0,
+        id % 2 === 0,
+        'Free',
+        'Basic'
+    );
+
+    result._links['schemas'] = { method: 'GET', href: '/schemas' };
+
+    return result;
+}

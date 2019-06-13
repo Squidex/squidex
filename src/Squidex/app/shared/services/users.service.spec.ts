@@ -124,7 +124,7 @@ describe('UsersService', () => {
             resources = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/user/resources');
+        const req = httpMock.expectOne('http://service/p/api');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();

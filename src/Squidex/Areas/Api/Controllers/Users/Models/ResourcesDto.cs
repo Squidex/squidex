@@ -7,6 +7,8 @@
 
 using Squidex.Areas.Api.Controllers.Backups;
 using Squidex.Areas.Api.Controllers.EventConsumers;
+using Squidex.Areas.Api.Controllers.Languages;
+using Squidex.Areas.Api.Controllers.Ping;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -17,6 +19,10 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
         public static ResourcesDto FromController(ApiController controller)
         {
             var result = new ResourcesDto();
+
+            result.AddGetLink("ping", controller.Url<PingController>(x => nameof(x.GetPing)));
+
+            result.AddGetLink("languages", controller.Url<LanguagesController>(x => nameof(x.GetLanguages)));
 
             if (controller.HasPermission(Permissions.AdminEventsRead))
             {

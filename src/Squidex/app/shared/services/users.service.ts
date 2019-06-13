@@ -67,7 +67,7 @@ export class UsersService {
     }
 
     public getResources(): Observable<ResourcesDto> {
-        const url = this.apiUrl.buildUrl(`api/user/resources`);
+        const url = this.apiUrl.buildUrl(`api`);
 
         return this.http.get<any>(url).pipe(
                 map(body => {

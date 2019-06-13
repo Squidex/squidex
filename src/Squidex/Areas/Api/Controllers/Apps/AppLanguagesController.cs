@@ -72,7 +72,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var command = request.ToCommand();
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(GetLanguages), new { app }, response);
         }
@@ -98,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var command = request.ToCommand(ParseLanguage(language));
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -121,12 +121,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var command = new RemoveLanguage { Language = ParseLanguage(language) };
 
-            var response = await InvokeCommandAsync(app, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
 
-        private async Task<AppLanguagesDto> InvokeCommandAsync(string app, ICommand command)
+        private async Task<AppLanguagesDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 

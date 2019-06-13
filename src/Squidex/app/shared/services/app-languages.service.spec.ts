@@ -101,7 +101,9 @@ describe('AppLanguagesService', () => {
 
         let languages: AppLanguagesDto;
 
-        appLanguagesService.putLanguage('my-app', resource, dto, version).subscribe();
+        appLanguagesService.putLanguage('my-app', resource, dto, version).subscribe(result => {
+            languages = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/languages/de');
 
@@ -122,7 +124,7 @@ describe('AppLanguagesService', () => {
 
         const resource: Resource = {
             _links: {
-                update: { method: 'PUT', href: 'api/apps/my-app/languages/de' }
+                update: { method: 'DELETE', href: 'api/apps/my-app/languages/de' }
             }
         };
 
@@ -149,7 +151,7 @@ describe('AppLanguagesService', () => {
     function languagesResponse(...codes: string[]) {
         return {
             items: codes.map((code, i) => ({
-                code: code,
+                iso2Code: code,
                 englishName: code,
                 isMaster: i === 0,
                 isOptional: i % 2 === 1,

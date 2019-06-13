@@ -109,11 +109,20 @@ namespace Squidex.Areas.Api.Controllers.Apps
         public async Task<IActionResult> DeleteContributor(string app, string id)
         {
             var command = new RemoveContributor { ContributorId = id };
-            var context = await CommandBus.PublishAsync(command);
 
-            var response = ContributorsDto.FromApp(context.Result<IAppEntity>(), appPlansProvider, this, false);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
+        }
+
+        private async Task<ContributorsDto> InvokeCommandAsync(ICommand command)
+        {
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<IAppEntity>();
+            var response = ContributorsDto.FromApp(result, appPlansProvider, this, false);
+
+            return response;
         }
     }
 }

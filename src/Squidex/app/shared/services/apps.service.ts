@@ -15,6 +15,7 @@ import {
     ApiUrlConfig,
     DateTime,
     pretifyError,
+    Resource,
     ResourceLinks,
     withLinks
 } from '@app/framework';
@@ -28,6 +29,8 @@ export class AppDto {
         public readonly permissions: string[],
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
+        public readonly canAccessApi: boolean,
+        public readonly canAccessContent: boolean,
         public readonly planName?: string,
         public readonly planUpgrade?: string
     ) {
@@ -37,13 +40,6 @@ export class AppDto {
 export interface CreateAppDto {
     readonly name: string;
     readonly template?: string;
-}
-
-export interface AppCreatedDto {
-    readonly id: string;
-    readonly permissions: string[];
-    readonly planName?: string;
-    readonly planUpgrade?: string;
 }
 
 @Injectable()
@@ -67,22 +63,27 @@ export class AppsService {
                 pretifyError('Failed to load apps. Please reload.'));
     }
 
-    public postApp(dto: CreateAppDto): Observable<AppCreatedDto> {
+    public postApp(dto: CreateAppDto): Observable<AppDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
-        return this.http.post<AppCreatedDto>(url, dto).pipe(
+        return this.http.post<any>(url, dto).pipe(
+                map(body => {
+                    return parseApp(body);
+                }),
                 tap(() => {
                     this.analytics.trackEvent('App', 'Created', dto.name);
                 }),
                 pretifyError('Failed to create app. Please reload.'));
     }
 
-    public deleteApp(appName: string): Observable<any> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}`);
+    public deleteApp(resource: Resource): Observable<any> {
+        const link = resource._links['delete'];
 
-        return this.http.delete(url).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url).pipe(
                 tap(() => {
-                    this.analytics.trackEvent('App', 'Archived', appName);
+                    this.analytics.trackEvent('App', 'Archived');
                 }),
                 pretifyError('Failed to archive app. Please reload.'));
     }
@@ -96,6 +97,8 @@ function parseApp(response: any) {
             response.permissions,
             DateTime.parseISO(response.created),
             DateTime.parseISO(response.lastModified),
+            response.canAccessApi,
+            response.canAccessContent,
             response.planName,
             response.planUpgrade),
         response);
