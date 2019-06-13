@@ -1,7 +1,7 @@
 @import '_vars';
 @import '_mixins';
 
-::ng-deep {
+:host ::ng-deep {
     img {
         @include box-shadow(0, 4px, 20px, .2);
         width: 80%;
