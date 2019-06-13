@@ -112,8 +112,11 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public long Version { get; set; }
 
+        /// <summary>
+        /// The metadata.
+        /// </summary>
         [JsonProperty("_meta")]
-        public AssetMetadata Meta { get; set; }
+        public AssetMetadata Metadata { get; set; }
 
         public static AssetDto FromAsset(IAssetEntity asset, ApiController controller, string app, bool isDuplicate = false)
         {
@@ -121,7 +124,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
 
             if (isDuplicate)
             {
-                response.Meta = new AssetMetadata { IsDuplicate = "true" };
+                response.Metadata = new AssetMetadata { IsDuplicate = "true" };
             }
 
             return CreateLinks(response, controller, app);

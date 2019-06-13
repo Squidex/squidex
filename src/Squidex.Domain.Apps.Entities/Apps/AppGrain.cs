@@ -60,11 +60,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
             switch (command)
             {
                 case CreateApp createApp:
-                    return CreateAsync(createApp, c =>
+                    return CreateReturnAsync(createApp, async c =>
                     {
                         GuardApp.CanCreate(c);
 
                         Create(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case AssignContributor assignContributor:
@@ -74,111 +76,137 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                         AssignContributor(c, !Snapshot.Contributors.ContainsKey(assignContributor.ContributorId));
 
-                        return EntityCreatedResult.Create(c.ContributorId, Version);
+                        return await GetRawStateAsync();
                     });
 
                 case RemoveContributor removeContributor:
-                    return UpdateAsync(removeContributor, c =>
+                    return UpdateReturnAsync(removeContributor, async c =>
                     {
                         GuardAppContributors.CanRemove(Snapshot.Contributors, c);
 
                         RemoveContributor(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case AttachClient attachClient:
-                    return UpdateAsync(attachClient, c =>
+                    return UpdateReturnAsync(attachClient, async c =>
                     {
                         GuardAppClients.CanAttach(Snapshot.Clients, c);
 
                         AttachClient(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case UpdateClient updateClient:
-                    return UpdateAsync(updateClient, c =>
+                    return UpdateReturnAsync(updateClient, async c =>
                     {
                         GuardAppClients.CanUpdate(Snapshot.Clients, c, Snapshot.Roles);
 
                         UpdateClient(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case RevokeClient revokeClient:
-                    return UpdateAsync(revokeClient, c =>
+                    return UpdateReturnAsync(revokeClient, async c =>
                     {
                         GuardAppClients.CanRevoke(Snapshot.Clients, c);
 
                         RevokeClient(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case AddLanguage addLanguage:
-                    return UpdateAsync(addLanguage, c =>
+                    return UpdateReturnAsync(addLanguage, async c =>
                     {
                         GuardAppLanguages.CanAdd(Snapshot.LanguagesConfig, c);
 
                         AddLanguage(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case RemoveLanguage removeLanguage:
-                    return UpdateAsync(removeLanguage, c =>
+                    return UpdateReturnAsync(removeLanguage, async c =>
                     {
                         GuardAppLanguages.CanRemove(Snapshot.LanguagesConfig, c);
 
                         RemoveLanguage(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case UpdateLanguage updateLanguage:
-                    return UpdateAsync(updateLanguage, c =>
+                    return UpdateReturnAsync(updateLanguage, async c =>
                     {
                         GuardAppLanguages.CanUpdate(Snapshot.LanguagesConfig, c);
 
                         UpdateLanguage(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case AddRole addRole:
-                    return UpdateAsync(addRole, c =>
+                    return UpdateReturnAsync(addRole, async c =>
                     {
                         GuardAppRoles.CanAdd(Snapshot.Roles, c);
 
                         AddRole(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case DeleteRole deleteRole:
-                    return UpdateAsync(deleteRole, c =>
+                    return UpdateReturnAsync(deleteRole, async c =>
                     {
                         GuardAppRoles.CanDelete(Snapshot.Roles, c, Snapshot.Contributors, Snapshot.Clients);
 
                         DeleteRole(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case UpdateRole updateRole:
-                    return UpdateAsync(updateRole, c =>
+                    return UpdateReturnAsync(updateRole, async c =>
                     {
                         GuardAppRoles.CanUpdate(Snapshot.Roles, c);
 
                         UpdateRole(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case AddPattern addPattern:
-                    return UpdateAsync(addPattern, c =>
+                    return UpdateReturnAsync(addPattern, async c =>
                     {
                         GuardAppPatterns.CanAdd(Snapshot.Patterns, c);
 
                         AddPattern(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case DeletePattern deletePattern:
-                    return UpdateAsync(deletePattern, c =>
+                    return UpdateReturnAsync(deletePattern, async c =>
                     {
                         GuardAppPatterns.CanDelete(Snapshot.Patterns, c);
 
                         DeletePattern(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case UpdatePattern updatePattern:
-                    return UpdateAsync(updatePattern, c =>
+                    return UpdateReturnAsync(updatePattern, async c =>
                     {
                         GuardAppPatterns.CanUpdate(Snapshot.Patterns, c);
 
                         UpdatePattern(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 case ChangePlan changePlan:
@@ -382,6 +410,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private static AppContributorAssigned CreateInitialOwner(RefToken actor)
         {
             return new AppContributorAssigned { ContributorId = actor.Identifier, Role = Role.Owner };
+        }
+
+        public Task<IAppEntity> GetRawStateAsync()
+        {
+            return Task.FromResult<IAppEntity>(Snapshot);
         }
 
         public Task<J<IAppEntity>> GetStateAsync()

@@ -6,13 +6,15 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class ContributorsDto
+    public sealed class ContributorsDto : Resource
     {
         /// <summary>
         /// The contributors.
@@ -25,13 +27,37 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public int MaxContributors { get; set; }
 
-        public static ContributorsDto FromApp(IAppEntity app, IAppPlansProvider plans)
+        /// <summary>
+        /// The metadata.
+        /// </summary>
+        [JsonProperty("_meta")]
+        public ContributorsMetadata Metadata { get; set; }
+
+        public static ContributorsDto FromApp(IAppEntity app, IAppPlansProvider plans, ApiController controller, bool isInvited)
         {
-            var plan = plans.GetPlanForApp(app);
+            var contributors = app.Contributors.ToArray(x => ContributorDto.FromIdAndRole(x.Key, x.Value, controller, app.Name));
 
-            var contributors = app.Contributors.ToArray(x => new ContributorDto { ContributorId = x.Key, Role = x.Value });
+            var result = new ContributorsDto
+            {
+                Contributors = contributors,
+            };
 
-            return new ContributorsDto { Contributors = contributors, MaxContributors = plan.MaxContributors };
+            if (isInvited)
+            {
+                result.Metadata = new ContributorsMetadata
+                {
+                    IsInvited = isInvited.ToString()
+                };
+            }
+
+            result.MaxContributors = plans.GetPlanForApp(app).MaxContributors;
+
+            return CreateLinks(result, controller, app.Name);
+        }
+
+        private static ContributorsDto CreateLinks(ContributorsDto result, ApiController controller, string app)
+        {
+            return result;
         }
     }
 }

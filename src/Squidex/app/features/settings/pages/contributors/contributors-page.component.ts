@@ -37,7 +37,7 @@ export class UsersDataSource implements AutocompleteSource {
                 const results: any[] = [];
 
                 for (let user of users) {
-                    if (!contributors!.find(t => t.contributor.contributorId === user.id)) {
+                    if (!contributors!.find(t => t.contributorId === user.id)) {
                         results.push(user);
                     }
                 }
@@ -110,7 +110,7 @@ export class ContributorsPageComponent implements OnInit {
         }
     }
 
-    public trackByContributor(index: number, contributorInfo: { contributor: ContributorDto }) {
-        return contributorInfo.contributor.contributorId;
+    public trackByContributor(index: number, contributor: ContributorDto) {
+        return contributor.contributorId;
     }
 }

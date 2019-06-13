@@ -5,10 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Invitation
+namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class InvitedResult
+    public sealed class ContributorsMetadata
     {
-        public IAppEntity App { get; set; }
+        /// <summary>
+        /// Indicates whether the user has been invited.
+        /// </summary>
+        public string IsInvited { get; set; }
     }
 }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Invitation;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -47,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetContributors(string app)
         {
-            var response = ContributorsDto.FromApp(App, appPlansProvider);
+            var response = ContributorsDto.FromApp(App, appPlansProvider, this, false);
 
             Response.Headers[HeaderNames.ETag] = App.Version.ToString();
 
@@ -66,7 +67,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/contributors/")]
-        [ProducesResponseType(typeof(ContributorAssignedDto), 201)]
+        [ProducesResponseType(typeof(ContributorsDto), 200)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppContributorsAssign)]
         [ApiCosts(1)]
@@ -75,15 +76,15 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var command = request.ToCommand();
             var context = await CommandBus.PublishAsync(command);
 
-            var response = (ContributorAssignedDto)null;
+            var response = (ContributorsDto)null;
 
-            if (context.PlainResult is EntityCreatedResult<string> idOrValue)
+            if (context.PlainResult is IAppEntity newApp)
             {
-                response = ContributorAssignedDto.FromId(idOrValue.IdOrValue, false);
+                response = ContributorsDto.FromApp(newApp, appPlansProvider, this, false);
             }
             else if (context.PlainResult is InvitedResult invited)
             {
-                response = ContributorAssignedDto.FromId(invited.Id.IdOrValue, true);
+                response = ContributorsDto.FromApp(invited.App, appPlansProvider, this, true);
             }
 
             return Ok(response);
@@ -95,20 +96,24 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the contributor.</param>
         /// <returns>
-        /// 204 => User removed from app.
+        /// 200 => User removed from app.
         /// 400 => User is not assigned to the app.
         /// 404 => Contributor or app not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/contributors/{id}/")]
+        [ProducesResponseType(typeof(ContributorsDto), 200)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppContributorsRevoke)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContributor(string app, string id)
         {
-            await CommandBus.PublishAsync(new RemoveContributor { ContributorId = id });
+            var command = new RemoveContributor { ContributorId = id };
+            var context = await CommandBus.PublishAsync(command);
 
-            return NoContent();
+            var response = ContributorsDto.FromApp(context.Result<IAppEntity>(), appPlansProvider, this, false);
+
+            return Ok(response);
         }
     }
 }

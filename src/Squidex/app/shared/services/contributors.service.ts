@@ -15,29 +15,33 @@ import {
     ApiUrlConfig,
     HTTP,
     mapVersioned,
+    Metadata,
     Model,
     pretifyError,
+    Resource,
+    ResourceLinks,
     Version,
-    Versioned
+    Versioned,
+    withLinks
 } from '@app/framework';
 
-export type ContributorsDto = Versioned<{
+export type ContributorsDto = Versioned<ContributorsPayload>;
+export type ContributorsPayload = {
+    readonly _links?: ResourceLinks,
+    readonly _meta?: Metadata
     readonly contributors: ContributorDto[],
     readonly maxContributors: number
-}>;
+};
 
 export class ContributorDto extends Model<AssignContributorDto> {
+    public readonly _links: ResourceLinks = {};
+
     constructor(
         public readonly contributorId: string,
         public readonly role: string
     ) {
         super();
     }
-}
-
-export interface ContributorAssignedDto {
-    readonly contributorId: string;
-    readonly isCreated?: boolean;
 }
 
 export interface AssignContributorDto  {
@@ -62,25 +66,19 @@ export class ContributorsService {
                 mapVersioned(payload => {
                     const body = payload.body;
 
-                    const items: any[] = body.contributors;
-
-                    const contributors =
-                        items.map(item =>
-                            new ContributorDto(
-                                item.contributorId,
-                                item.role));
-
-                    return { contributors, maxContributors: body.maxContributors };
+                    return parseContributors(body);
                 }),
                 pretifyError('Failed to load contributors. Please reload.'));
     }
 
-    public postContributor(appName: string, dto: AssignContributorDto, version: Version): Observable<Versioned<ContributorAssignedDto>> {
+    public postContributor(appName: string, dto: AssignContributorDto, version: Version): Observable<ContributorsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
                 mapVersioned(payload => {
-                    return <ContributorAssignedDto>payload.body;
+                    const body = payload.body;
+
+                    return parseContributors(body);
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Contributor', 'Configured', appName);
@@ -88,13 +86,34 @@ export class ContributorsService {
                 pretifyError('Failed to add contributors. Please reload.'));
     }
 
-    public deleteContributor(appName: string, contributorId: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors/${contributorId}`);
+    public deleteContributor(appName: string, resource: Resource, version: Version): Observable<ContributorsDto> {
+        const link = resource._links['delete'];
 
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+                mapVersioned(payload => {
+                    const body = payload.body;
+
+                    return parseContributors(body);
+                }),
                 tap(() => {
                     this.analytics.trackEvent('Contributor', 'Deleted', appName);
                 }),
                 pretifyError('Failed to delete contributors. Please reload.'));
     }
+}
+
+function parseContributors(body: any) {
+    const items: any[] = body.contributors;
+
+    const contributors =
+        items.map(item =>
+            withLinks(
+                new ContributorDto(
+                    item.contributorId,
+                    item.role),
+                item));
+
+    return withLinks({ contributors, maxContributors: body.maxContributors, _links: {} }, body);
 }
