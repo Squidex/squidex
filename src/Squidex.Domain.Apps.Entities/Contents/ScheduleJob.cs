@@ -22,10 +22,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Instant DueTime { get; }
 
-        public ScheduleJob(Guid id, Status status, RefToken by, Instant due)
+        public ScheduleJob(Guid id, Status status, RefToken scheduledBy, Instant due)
         {
             Id = id;
-            ScheduledBy = by;
+            ScheduledBy = scheduledBy;
             Status = status;
             DueTime = due;
         }
