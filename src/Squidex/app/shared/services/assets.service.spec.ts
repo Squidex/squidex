@@ -305,9 +305,9 @@ describe('AssetsService', () => {
     function assetResponse(id: number, suffix = '') {
         return {
             id: `id${id}`,
-            created: `${id % 1000 + 2000}-12-12T10:10`,
+            created: `${id % 1000 + 2000}-12-12T10:10:00`,
             createdBy: `creator-${id}`,
-            lastModified: `${id % 1000 + 2000}-11-11T10:10`,
+            lastModified: `${id % 1000 + 2000}-11-11T10:10:00`,
             lastModifiedBy: `modifier-${id}`,
             fileName: `My Name${id}${suffix}.png`,
             fileHash: `My Hash${id}${suffix}`,
@@ -334,10 +334,8 @@ describe('AssetsService', () => {
 export function createAsset(id: number, tags?: string[], suffix = '') {
     const result = new AssetDto(
         `id${id}`,
-        `creator-${id}`,
-        `modifier-${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10`),
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10`),
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
         `My Name${id}${suffix}.png`,
         `My Hash${id}${suffix}`,
         'png',

@@ -42,10 +42,10 @@ export class AssetDto {
 
     constructor(
         public readonly id: string,
-        public readonly createdBy: string,
-        public readonly lastModifiedBy: string,
         public readonly created: DateTime,
+        public readonly createdBy: string,
         public readonly lastModified: DateTime,
+        public readonly lastModifiedBy: string,
         public readonly fileName: string,
         public readonly fileHash: string,
         public readonly fileType: string,
@@ -252,10 +252,8 @@ function parseAsset(response: any) {
     return withLinks(
         new AssetDto(
             response.id,
-            response.createdBy,
-            response.lastModifiedBy,
-            DateTime.parseISO_UTC(response.created),
-            DateTime.parseISO_UTC(response.lastModified),
+            DateTime.parseISO_UTC(response.created), response.createdBy,
+            DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
             response.fileName,
             response.fileHash,
             response.fileType,

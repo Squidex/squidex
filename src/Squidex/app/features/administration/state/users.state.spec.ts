@@ -25,6 +25,8 @@ describe('UsersState', () => {
     const user1 = createUser(1);
     const user2 = createUser(2);
 
+    const oldUsers = new UsersDto(200, [user1, user2]);
+
     const newUser = createUser(3);
 
     let dialogs: IMock<DialogService>;
@@ -45,7 +47,7 @@ describe('UsersState', () => {
     describe('Loading', () => {
         it('should load users', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(new UsersDto(200, [user1, user2]))).verifiable();
+                .returns(() => of(oldUsers)).verifiable();
 
             usersState.load().subscribe();
 
@@ -58,7 +60,7 @@ describe('UsersState', () => {
 
         it('should show notification on load when reload is true', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(new UsersDto(200, [user1, user2]))).verifiable();
+                .returns(() => of(oldUsers)).verifiable();
 
             usersState.load(true).subscribe();
 
@@ -74,7 +76,7 @@ describe('UsersState', () => {
             ];
 
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(new UsersDto(200, [user1, user2]))).verifiable(Times.exactly(2));
+                .returns(() => of(oldUsers)).verifiable(Times.exactly(2));
 
             usersService.setup(x => x.getUsers(10, 0, undefined))
                 .returns(() => of(new UsersDto(200, newUsers)));
@@ -88,7 +90,7 @@ describe('UsersState', () => {
 
         it('should load next page and prev page when paging', () => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(new UsersDto(200, [user1, user2]))).verifiable(Times.exactly(2));
+                .returns(() => of(oldUsers)).verifiable(Times.exactly(2));
 
             usersService.setup(x => x.getUsers(10, 10, undefined))
                 .returns(() => of(new UsersDto(200, []))).verifiable();
@@ -113,7 +115,7 @@ describe('UsersState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(new UsersDto(200, [user1, user2]))).verifiable();
+                .returns(() => of(oldUsers)).verifiable();
 
             usersState.load().subscribe();
         });

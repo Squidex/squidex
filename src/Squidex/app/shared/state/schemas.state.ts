@@ -10,19 +10,15 @@ import { Observable, of } from 'rxjs';
 import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import {
-    DateTime,
     DialogService,
     ImmutableArray,
-    mapVersioned,
+    ResourceLinks,
     shareMapSubscribed,
     shareSubscribed,
     State,
-    Types,
-    Version,
-    Versioned
+    Types
 } from '@app/framework';
 
-import { AuthService } from './../services/auth.service';
 import { AppsState } from './apps.state';
 
 import {
@@ -31,16 +27,12 @@ import {
     FieldDto,
     NestedFieldDto,
     RootFieldDto,
-    SchemaCreatedDto,
     SchemaDetailsDto,
     SchemaDto,
-    SchemaPropertiesDto,
     SchemasService,
     UpdateFieldDto,
     UpdateSchemaDto
 } from './../services/schemas.service';
-
-import { FieldPropertiesDto } from './../services/schemas.types';
 
 type AnyFieldDto = NestedFieldDto | RootFieldDto;
 
@@ -56,6 +48,9 @@ interface Snapshot {
 
     // The selected schema.
     selectedSchema?: SchemaDetailsDto | null;
+
+    // The links.
+    links: ResourceLinks;
 }
 
 export type SchemasList = ImmutableArray<SchemaDto>;
@@ -90,13 +85,16 @@ export class SchemasState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
+    public links =
+        this.changes.pipe(map(x => x.links),
+            distinctUntilChanged());
+
     constructor(
         private readonly appsState: AppsState,
-        private readonly authState: AuthService,
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService
     ) {
-        super({ schemas: ImmutableArray.empty(), categories: buildCategories({}) });
+        super({ schemas: ImmutableArray.empty(), categories: buildCategories({}), links: {} });
     }
 
     public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
@@ -130,19 +128,18 @@ export class SchemasState extends State<Snapshot> {
                 }
 
                 return this.next(s => {
-                    const schemas = ImmutableArray.of(payload).sortByStringAsc(x => x.displayName);
+                    const schemas = ImmutableArray.of(payload.items).sortByStringAsc(x => x.displayName);
 
                     const categories = buildCategories(s.categories, schemas);
 
-                    return { ...s, schemas, isLoaded: true, categories };
+                    return { ...s, schemas, isLoaded: true, categories, links: payload._links };
                 });
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: CreateSchemaDto, now?: DateTime): Observable<SchemaDetailsDto> {
+    public create(request: CreateSchemaDto): Observable<SchemaDetailsDto> {
         return this.schemasService.postSchema(this.appName, request).pipe(
-            map(payload => createSchema(request, payload, this.user, now)),
             tap(created => {
                 this.next(s => {
                     const schemas = s.schemas.push(created).sortByStringAsc(x => x.displayName);
@@ -154,7 +151,7 @@ export class SchemasState extends State<Snapshot> {
     }
 
     public delete(schema: SchemaDto): Observable<any> {
-        return this.schemasService.deleteSchema(this.appName, schema.name, schema.version).pipe(
+        return this.schemasService.deleteSchema(this.appName, schema, schema.version).pipe(
             tap(() => {
                 this.next(s => {
                     const schemas = s.schemas.filter(x => x.id !== schema.id);
@@ -182,189 +179,137 @@ export class SchemasState extends State<Snapshot> {
         });
     }
 
-    public publish(schema: SchemaDto, now?: DateTime): Observable<SchemaDto> {
-        return this.schemasService.publishSchema(this.appName, schema.name, schema.version).pipe(
-            map(({ version }) => setPublished(schema, true, this.user, version, now)),
+    public publish(schema: SchemaDto): Observable<SchemaDto> {
+        return this.schemasService.publishSchema(this.appName, schema, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public unpublish(schema: SchemaDto, now?: DateTime): Observable<SchemaDto> {
-        return this.schemasService.unpublishSchema(this.appName, schema.name, schema.version).pipe(
-            map(({ version }) => setPublished(schema, false, this.user, version, now)),
+    public unpublish(schema: SchemaDto): Observable<SchemaDto> {
+        return this.schemasService.unpublishSchema(this.appName, schema, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public changeCategory(schema: SchemaDto, name: string, now?: DateTime): Observable<SchemaDto> {
-        return this.schemasService.putCategory(this.appName, schema.name, { name }, schema.version).pipe(
-            map(({ version }) => changeCategory(schema, name, this.user, version, now)),
+    public changeCategory(schema: SchemaDto, name: string): Observable<SchemaDto> {
+        return this.schemasService.putCategory(this.appName, schema, { name }, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public configurePreviewUrls(schema: SchemaDetailsDto, request: {}, now?: DateTime): Observable<SchemaDetailsDto> {
-        return this.schemasService.putPreviewUrls(this.appName, schema.name, request, schema.version).pipe(
-            map(({ version }) => configurePreviewUrls(schema, request, this.user, version, now)),
+    public configurePreviewUrls(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
+        return this.schemasService.putPreviewUrls(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public configureScripts(schema: SchemaDetailsDto, request: {}, now?: DateTime): Observable<SchemaDetailsDto> {
-        return this.schemasService.putScripts(this.appName, schema.name, request, schema.version).pipe(
-            map(({ version }) => configureScripts(schema, request, this.user, version, now)),
+    public configureScripts(schema: SchemaDto, request: {}): Observable<SchemaDetailsDto> {
+        return this.schemasService.putScripts(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public update(schema: SchemaDetailsDto, request: UpdateSchemaDto, now?: DateTime): Observable<SchemaDetailsDto> {
-        return this.schemasService.putSchema(this.appName, schema.name, request, schema.version).pipe(
-            map(({ version }) => updateProperties(schema, request, this.user, version, now)),
+    public update(schema: SchemaDto, request: UpdateSchemaDto): Observable<SchemaDetailsDto> {
+        return this.schemasService.putSchema(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public addField(schema: SchemaDetailsDto, request: AddFieldDto, parent?: RootFieldDto, now?: DateTime): Observable<FieldDto> {
-        return this.schemasService.postField(this.appName, schema.name, request, pid(parent), schema.version).pipe(
-            map(({ version, payload }) => {
-                let updated: SchemaDto;
-
-                if (Types.is(payload, NestedFieldDto)) {
-                    updated = updateField(schema, addNested(parent!, payload), this.user, version, now);
-                } else {
-                    updated = addField(schema, payload, this.user, version, now);
-                }
-
-                return { updated, field: payload };
-            }),
-            tap(({ updated }) => {
+    public addField(schema: SchemaDto, request: AddFieldDto, parent?: RootFieldDto): Observable<FieldDto> {
+        return this.schemasService.postField(this.appName, parent || schema, request, schema.version).pipe(
+            tap(updated => {
                 this.replaceSchema(updated);
             }),
-            shareMapSubscribed(this.dialogs, x => x.field, { silent: true }));
+            shareMapSubscribed(this.dialogs, x => getField(x, request, parent), { silent: true }));
     }
 
-    public sortFields(schema: SchemaDetailsDto, fields: any[], parent?: RootFieldDto, now?: DateTime): Observable<SchemaDetailsDto> {
-        return this.schemasService.putFieldOrdering(this.appName, schema.name, fields.map(t => t.fieldId), pid(parent), schema.version).pipe(
-            map(({ version }) => {
-                let updated: SchemaDetailsDto;
-
-                if (!parent) {
-                    updated = replaceFields(schema, fields, this.user, version, now);
-                } else {
-                    updated = updateField(schema, replaceNested(parent, fields), this.user, version, now);
-                }
-
-                return updated;
-            }),
+    public sortFields(schema: SchemaDto, fields: any[], parent?: RootFieldDto): Observable<SchemaDetailsDto> {
+        return this.schemasService.putFieldOrdering(this.appName, parent || schema, fields.map(t => t.fieldId), schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public lockField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
-        return this.schemasService.lockField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
-            mapVersioned(() => setLocked(field, true)),
-            tap(({ version, payload }) => {
-                this.replaceField(schema, payload, version, now);
-            }),
-            shareMapSubscribed(this.dialogs, x => x.payload));
-    }
-
-    public enableField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
-        return this.schemasService.enableField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
-            mapVersioned(() => setDisabled(field, false)),
-            tap(({ version, payload }) => {
-                this.replaceField(schema, payload, version, now);
-            }),
-            shareMapSubscribed(this.dialogs, x => x.payload));
-    }
-
-    public disableField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
-        return this.schemasService.disableField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
-            mapVersioned(() => setDisabled(field, true)),
-            tap(({ version, payload }) => {
-                this.replaceField(schema, payload, version, now);
-            }),
-            shareMapSubscribed(this.dialogs, x => x.payload));
-    }
-
-    public showField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
-        return this.schemasService.showField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
-            mapVersioned(() => setHidden(field, false)),
-            tap(({ version, payload }) => {
-                this.replaceField(schema, payload, version, now);
-            }),
-            shareMapSubscribed(this.dialogs, x => x.payload));
-    }
-
-    public hideField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, now?: DateTime): Observable<T> {
-        return this.schemasService.hideField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
-            mapVersioned(() => setHidden(field, true)),
-            tap(({ version, payload }) => {
-                this.replaceField(schema, payload, version, now);
-            }),
-            shareMapSubscribed(this.dialogs, x => x.payload));
-    }
-
-    public updateField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, request: UpdateFieldDto, now?: DateTime): Observable<T> {
-        return this.schemasService.putField(this.appName, schema.name, field.fieldId, request, pidof(field), schema.version).pipe(
-            mapVersioned(() => update(field, request.properties)),
-            tap(({ version, payload }) => {
-                this.replaceField(schema, payload, version, now);
-            }),
-            shareMapSubscribed(this.dialogs, x => x.payload));
-    }
-
-    public deleteField(schema: SchemaDetailsDto, field: AnyFieldDto, now?: DateTime): Observable<any> {
-        return this.schemasService.deleteField(this.appName, schema.name, field.fieldId, pidof(field), schema.version).pipe(
-            mapVersioned(() => field),
-            tap(({ version, payload }) => {
-                this.removeField(schema, payload, version, now);
+    public lockField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDetailsDto> {
+        return this.schemasService.lockField(this.appName, field, schema.version).pipe(
+            tap(updated => {
+                this.replaceSchema(updated);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    private replaceField<T extends FieldDto>(schema: SchemaDetailsDto, field: T, version: Version, now?: DateTime) {
-        if (Types.is(field, RootFieldDto)) {
-            this.replaceSchema(updateField(schema, field, this.user, version, now));
-        } else if (Types.is(field, NestedFieldDto)) {
-            const parent = schema.fields.find(x => x.fieldId === field.parentId);
-
-            if (parent) {
-                this.replaceSchema(updateField(schema, updatedNested(parent, field), this.user, version, now));
-            }
-        }
+    public enableField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDetailsDto> {
+        return this.schemasService.enableField(this.appName, field, schema.version).pipe(
+            tap(updated => {
+                this.replaceSchema(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
-    private removeField(schema: SchemaDetailsDto, field: AnyFieldDto, version: Version, now?: DateTime) {
-        if (Types.is(field, RootFieldDto)) {
-            this.replaceSchema(removeField(schema, field, this.user, version, now));
-        } else {
-            const parent = schema.fields.find(x => x.fieldId === field.parentId);
+    public disableField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDetailsDto> {
+        return this.schemasService.disableField(this.appName, field, schema.version).pipe(
+            tap(updated => {
+                this.replaceSchema(updated);
+            }),
+            shareSubscribed(this.dialogs));
+    }
 
-            if (parent) {
-                this.replaceSchema(updateField(schema, removeNested(parent, field), this.user, version, now));
-            }
-        }
+    public showField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDetailsDto> {
+        return this.schemasService.showField(this.appName, field, schema.version).pipe(
+            tap(updated => {
+                this.replaceSchema(updated);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public hideField<T extends FieldDto>(schema: SchemaDto, field: T): Observable<SchemaDetailsDto> {
+        return this.schemasService.hideField(this.appName, field, schema.version).pipe(
+            tap(updated => {
+                this.replaceSchema(updated);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public updateField<T extends FieldDto>(schema: SchemaDto, field: T, request: UpdateFieldDto): Observable<SchemaDetailsDto> {
+        return this.schemasService.putField(this.appName, field, request, schema.version).pipe(
+            tap(updated => {
+                this.replaceSchema(updated);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public deleteField(schema: SchemaDto, field: AnyFieldDto): Observable<SchemaDetailsDto> {
+        return this.schemasService.deleteField(this.appName, field, schema.version).pipe(
+            tap(updated => {
+                this.replaceSchema(updated);
+            }),
+            shareSubscribed(this.dialogs));
     }
 
     private replaceSchema(schema: SchemaDto) {
         return this.next(s => {
             const schemas = s.schemas.replaceBy('id', schema).sortByStringAsc(x => x.displayName);
-            const selectedSchema = Types.is(schema, SchemaDetailsDto) && s.selectedSchema && s.selectedSchema.id === schema.id ? schema : s.selectedSchema;
+
+            const selectedSchema =
+                Types.is(schema, SchemaDetailsDto) &&
+                schema &&
+                s.selectedSchema &&
+                s.selectedSchema.id === schema.id ?
+                schema :
+                s.selectedSchema;
 
             const categories = buildCategories(s.categories, schemas);
 
@@ -375,9 +320,13 @@ export class SchemasState extends State<Snapshot> {
     private get appName() {
         return this.appsState.appName;
     }
+}
 
-    private get user() {
-        return this.authState.user!.token;
+function getField(x: SchemaDetailsDto, request: AddFieldDto, parent?: RootFieldDto): FieldDto {
+    if (parent) {
+        return parent.nested.find(f => f.name === request.name)!;
+    } else {
+        return x.fields.find(f => f.name === request.name)!;
     }
 }
 
@@ -417,123 +366,4 @@ function removeCategory(categories: { [name: string]: boolean }, category: strin
     delete categories[category];
 
     return categories;
-}
-
-const setPublished = <T extends SchemaDto>(schema: T, isPublished: boolean, user: string, version: Version, now?: DateTime) =>
-    <T>schema.with({
-        isPublished,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const changeCategory = <T extends SchemaDto>(schema: T, category: string, user: string, version: Version, now?: DateTime) =>
-    <T>schema.with({
-        category,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const configurePreviewUrls = (schema: SchemaDetailsDto, previewUrls: {}, user: string, version: Version, now?: DateTime) =>
-    schema.with({
-        previewUrls,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const configureScripts = (schema: SchemaDetailsDto, scripts: {}, user: string, version: Version, now?: DateTime) =>
-    schema.with({
-        scripts,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const updateProperties = (schema: SchemaDetailsDto, properties: SchemaPropertiesDto, user: string, version: Version, now?: DateTime) =>
-    schema.with({
-        properties,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const addField = (schema: SchemaDetailsDto, field: RootFieldDto, user: string, version: Version, now?: DateTime) =>
-    schema.with({
-        fields: [...schema.fields, field],
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const updateField = (schema: SchemaDetailsDto, field: RootFieldDto, user: string, version: Version, now?: DateTime) =>
-    schema.with({
-        fields: schema.fields.map(f => f.fieldId === field.fieldId ? field : f),
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const replaceFields = (schema: SchemaDetailsDto, fields: RootFieldDto[], user: string, version: Version, now?: DateTime) =>
-    schema.with({
-        fields,
-        version,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user
-    });
-
-const removeField = (schema: SchemaDetailsDto, field: FieldDto, user: string, version: Version, now?: DateTime) =>
-    schema.with({
-        fields: schema.fields.filter(f => f.fieldId !== field.fieldId),
-        version,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user
-    });
-
-const addNested = (parent: RootFieldDto, nested: NestedFieldDto) =>
-    parent.with({ nested: [...parent.nested, nested] });
-
-const updatedNested = (parent: RootFieldDto, nested: NestedFieldDto) =>
-    parent.with({ nested: parent.nested.map(f => f.fieldId === nested.fieldId ? nested : f) });
-
-const replaceNested = (parent: RootFieldDto, nested: NestedFieldDto[]) =>
-    parent.with({ nested });
-
-const removeNested = (parent: RootFieldDto, nested: NestedFieldDto) =>
-    parent.with({ nested: parent.nested.filter(f => f.fieldId !== nested.fieldId) });
-
-const setLocked = <T extends FieldDto>(field: T, isLocked: boolean) =>
-    <T>field.with({ isLocked });
-
-const setHidden = <T extends FieldDto>(field: T, isHidden: boolean) =>
-    <T>field.with({ isHidden });
-
-const setDisabled = <T extends FieldDto>(field: T, isDisabled: boolean) =>
-    <T>field.with({ isDisabled });
-
-const update = <T extends FieldDto>(field: T, properties: FieldPropertiesDto) =>
-    <T>field.with({ properties });
-
-const pidof = <T extends FieldDto>(field: T) =>
-    Types.is(field, NestedFieldDto) ? field.parentId : undefined;
-
-const pid = (field?: RootFieldDto) =>
-    field ? field.fieldId : undefined;
-
-function createSchema(request: CreateSchemaDto, { payload, version }: Versioned<SchemaCreatedDto>, user: string, now?: DateTime) {
-    now = now || DateTime.now();
-
-    const schema = new SchemaDetailsDto(
-        payload.id,
-        request.name, '',
-        request.properties || new SchemaPropertiesDto(),
-        request.isSingleton === true,
-        false,
-        now, user,
-        now, user,
-        version,
-        request.fields || []);
-
-    return schema;
 }

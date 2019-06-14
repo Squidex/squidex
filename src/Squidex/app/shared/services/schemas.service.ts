@@ -15,17 +15,22 @@ import {
     ApiUrlConfig,
     DateTime,
     HTTP,
-    mapVersioned,
-    Model,
     pretifyError,
+    Resource,
+    ResourceLinks,
     StringHelper,
     Version,
-    Versioned
+    Versioned,
+    withLinks
 } from '@app/framework';
 
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
-export class SchemaDto extends Model<SchemaDto> {
+export type SchemasDto = { items: SchemaDto[] } & Resource;
+
+export class SchemaDto {
+    public readonly _links: ResourceLinks = {};
+
     public get displayName() {
         return StringHelper.firstNonEmpty(this.properties.label, this.name);
     }
@@ -43,7 +48,6 @@ export class SchemaDto extends Model<SchemaDto> {
         public readonly lastModifiedBy: string,
         public readonly version: Version
     ) {
-        super();
     }
 }
 
@@ -66,32 +70,26 @@ export class SchemaDetailsDto extends SchemaDto {
     ) {
         super(id, name, category, properties, isSingleton, isPublished, created, createdBy, lastModified, lastModifiedBy, version);
 
-        this.onCloned();
-    }
+        if (fields) {
+            let listFields = this.fields.filter(x => x.properties.isListField && x.properties.isContentField);
 
-    protected onCloned() {
-        if (this.fields) {
-            let fields = this.fields.filter(x => x.properties.isListField && x.properties.isContentField);
-
-            if (fields.length === 0 && this.fields.length > 0) {
-                fields = [this.fields[0]];
+            if (listFields.length === 0 && this.fields.length > 0) {
+                listFields = [this.fields[0]];
             }
 
-            if (fields.length === 0) {
-                fields = NONE_FIELDS;
+            if (listFields.length === 0) {
+                listFields = NONE_FIELDS;
             }
 
-            this.listFields = fields;
-            this.listFieldsEditable = fields.filter(x => x.isInlineEditable);
+            this.listFields = listFields;
+            this.listFieldsEditable = listFields.filter(x => x.isInlineEditable);
         }
-    }
-
-    public with(value: Partial<SchemaDetailsDto>): SchemaDetailsDto {
-        return this.clone(value);
     }
 }
 
-export class FieldDto extends Model<FieldDto> {
+export class FieldDto {
+    public readonly _links: ResourceLinks = {};
+
     public get isInlineEditable(): boolean {
         return !this.isDisabled && this.properties['inlineEditable'] === true;
     }
@@ -112,7 +110,6 @@ export class FieldDto extends Model<FieldDto> {
         public readonly isHidden: boolean = false,
         public readonly isDisabled: boolean = false
     ) {
-        super();
     }
 }
 
@@ -142,10 +139,6 @@ export class RootFieldDto extends FieldDto {
     ) {
         super(fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
-
-    public with(value: Partial<RootFieldDto>): RootFieldDto {
-        return this.clone(value);
-    }
 }
 
 const NONE_FIELD = new RootFieldDto(-1, '', createProperties('String'), 'invariant');
@@ -159,10 +152,6 @@ export class NestedFieldDto extends FieldDto {
         isDisabled: boolean = false
     ) {
         super(fieldId, name, properties, isLocked, isHidden, isDisabled);
-    }
-
-    public with(value: Partial<NestedFieldDto>): NestedFieldDto {
-        return this.clone(value);
     }
 }
 
@@ -187,10 +176,6 @@ export interface CreateSchemaDto {
     readonly isSingleton?: boolean;
 }
 
-export interface SchemaCreatedDto {
-    readonly id: string;
-}
-
 export interface UpdateSchemaCategoryDto {
     readonly name?: string;
 }
@@ -213,192 +198,155 @@ export class SchemasService {
     ) {
     }
 
-    public getSchemas(appName: string): Observable<SchemaDto[]> {
+    public getSchemas(appName: string): Observable<SchemasDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             map(({ payload }) => {
                 const body = payload.body;
 
-                const items: any[] = body;
+                const items: any[] = body.items;
 
-                const schemas = items.map(item => {
-                    const properties = new SchemaPropertiesDto(item.properties.label, item.properties.hints);
+                const schemas = items.map(item =>
+                    withLinks(
+                        new SchemaDto(
+                            item.id,
+                            item.name,
+                            item.category,
+                            new SchemaPropertiesDto(item.properties.label, item.properties.hints),
+                            item.isSingleton,
+                            item.isPublished,
+                            DateTime.parseISO_UTC(item.created), item.createdBy,
+                            DateTime.parseISO_UTC(item.lastModified), item.lastModifiedBy,
+                            new Version(item.version.toString())),
+                        item));
 
-                    return new SchemaDto(
-                        item.id,
-                        item.name,
-                        item.category, properties,
-                        item.isSingleton,
-                        item.isPublished,
-                        DateTime.parseISO_UTC(item.created), item.createdBy,
-                        DateTime.parseISO_UTC(item.lastModified), item.lastModifiedBy,
-                        new Version(item.version.toString()));
-                });
-
-                return schemas;
+                return withLinks({ items: schemas, _links: {} }, body);
             }),
             pretifyError('Failed to load schemas. Please reload.'));
     }
 
-    public getSchema(appName: string, id: string): Observable<SchemaDetailsDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${id}`);
+    public getSchema(appName: string, name: string): Observable<SchemaDetailsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${name}`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             map(({ version, payload }) => {
-                const body = payload.body;
-
-                const fields = body.fields.map((item: any) => {
-                    const propertiesDto =
-                        createProperties(
-                            item.properties.fieldType,
-                            item.properties);
-
-                    let nested: NestedFieldDto[] | null = null;
-
-                    if (item.nested && item.nested.length > 0) {
-                        nested = item.nested.map((nestedItem: any) => {
-                            const nestedPropertiesDto =
-                                createProperties(
-                                    nestedItem.properties.fieldType,
-                                    nestedItem.properties);
-
-                            return new NestedFieldDto(
-                                nestedItem.fieldId,
-                                nestedItem.name,
-                                nestedPropertiesDto,
-                                item.fieldId,
-                                nestedItem.isLocked,
-                                nestedItem.isHidden,
-                                nestedItem.isDisabled);
-                        });
-                    }
-
-                    return new RootFieldDto(
-                        item.fieldId,
-                        item.name,
-                        propertiesDto,
-                        item.partitioning,
-                        item.isLocked,
-                        item.isHidden,
-                        item.isDisabled,
-                        nested || []);
-                });
-
-                const properties = new SchemaPropertiesDto(body.properties.label, body.properties.hints);
-
-                return new SchemaDetailsDto(
-                    body.id,
-                    body.name,
-                    body.category,
-                    properties,
-                    body.isSingleton,
-                    body.isPublished,
-                    DateTime.parseISO_UTC(body.created), body.createdBy,
-                    DateTime.parseISO_UTC(body.lastModified), body.lastModifiedBy,
-                    version,
-                    fields,
-                    body.scripts || {},
-                    body.previewUrls || {});
+                return parseSchemaWithDetails(payload.body, version);
             }),
             pretifyError('Failed to load schema. Please reload.'));
     }
 
-    public postSchema(appName: string, dto: CreateSchemaDto): Observable<Versioned<SchemaCreatedDto>> {
+    public postSchema(appName: string, dto: CreateSchemaDto): Observable<SchemaDetailsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
         return HTTP.postVersioned(this.http, url, dto).pipe(
-            mapVersioned(({ body }) => body!),
+            map(({ version, payload }) => {
+                return parseSchemaWithDetails(payload.body, version);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Created', appName);
             }),
             pretifyError('Failed to create schema. Please reload.'));
     }
 
-    public deleteSchema(appName: string, schemaName: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
+    public putScripts(appName: string, resource: Resource, dto: {}, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['updateScripts'];
 
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'Deleted', appName);
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
             }),
-            pretifyError('Failed to delete schema. Please reload.'));
-    }
-
-    public putScripts(appName: string, schemaName: string, dto: {}, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/scripts`);
-
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
             tap(() => {
                 this.analytics.trackEvent('Schema', 'ScriptsConfigured', appName);
             }),
             pretifyError('Failed to update schema scripts. Please reload.'));
     }
 
-    public putSchema(appName: string, schemaName: string, dto: UpdateSchemaDto, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}`);
+    public putSchema(appName: string, resource: Resource, dto: UpdateSchemaDto, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['update'];
 
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Updated', appName);
             }),
             pretifyError('Failed to update schema. Please reload.'));
     }
 
-    public publishSchema(appName: string, schemaName: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/publish`);
+    public putCategory(appName: string, resource: Resource, dto: UpdateSchemaCategoryDto, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['updateCategory'];
 
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'Published', appName);
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
             }),
-            pretifyError('Failed to publish schema. Please reload.'));
-    }
-
-    public unpublishSchema(appName: string, schemaName: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/unpublish`);
-
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
-            tap(() => {
-                this.analytics.trackEvent('Schema', 'Unpublished', appName);
-            }),
-            pretifyError('Failed to unpublish schema. Please reload.'));
-    }
-
-    public putCategory(appName: string, schemaName: string, dto: UpdateSchemaCategoryDto, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/category`);
-
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
             tap(() => {
                 this.analytics.trackEvent('Schema', 'CategoryChanged', appName);
             }),
             pretifyError('Failed to change category. Please reload.'));
     }
 
-    public putPreviewUrls(appName: string, schemaName: string, dto: {}, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/preview-urls`);
+    public putPreviewUrls(appName: string, resource: Resource, dto: {}, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['updateUrls'];
 
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'PreviewUrlsConfigured', appName);
             }),
             pretifyError('Failed to configure preview urls. Please reload.'));
     }
 
-    public postField(appName: string, schemaName: string, dto: AddFieldDto, parentId: number | undefined, version: Version): Observable<Versioned<RootFieldDto | NestedFieldDto>> {
-        const url = this.buildUrl(appName, schemaName, parentId, '');
+    public publishSchema(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['publish'];
 
-        return HTTP.postVersioned(this.http, url, dto, version).pipe(
-            mapVersioned(({ body }) => {
-                if (parentId) {
-                    const field = new NestedFieldDto(body.id, dto.name, dto.properties, parentId);
+        const url = this.apiUrl.buildUrl(link.href);
 
-                    return field;
-                } else {
-                    const field = new RootFieldDto(body.id, dto.name, dto.properties, dto.partitioning);
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Schema', 'Published', appName);
+            }),
+            pretifyError('Failed to publish schema. Please reload.'));
+    }
 
-                    return field;
-                }
+    public unpublishSchema(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['unpublish'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Schema', 'Unpublished', appName);
+            }),
+            pretifyError('Failed to unpublish schema. Please reload.'));
+    }
+
+    public postField(appName: string, resource: Resource, dto: AddFieldDto, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['addField'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldCreated', appName);
@@ -406,92 +354,192 @@ export class SchemasService {
             pretifyError('Failed to add field. Please reload.'));
     }
 
-    public putFieldOrdering(appName: string, schemaName: string, dto: number[], parentId: number | undefined, version: Version): Observable<Versioned<any>> {
-        const url = this.buildUrl(appName, schemaName, parentId, '/ordering');
+    public putFieldOrdering(appName: string, resource: Resource, dto: number[], version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['order'];
 
-        return HTTP.putVersioned(this.http, url, { fieldIds: dto }, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldsReordered', appName);
             }),
             pretifyError('Failed to reorder fields. Please reload.'));
     }
 
-    public putField(appName: string, schemaName: string, fieldId: number, dto: UpdateFieldDto, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
-        const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}`);
+    public putField(appName: string, resource: Resource, dto: UpdateFieldDto, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['update'];
 
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldUpdated', appName);
             }),
             pretifyError('Failed to update field. Please reload.'));
     }
 
-    public lockField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
-        const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}/lock`);
+    public lockField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['lock'];
 
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldLocked', appName);
             }),
             pretifyError('Failed to lock field. Please reload.'));
     }
 
-    public enableField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
-        const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}/enable`);
+    public enableField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['enable'];
 
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldEnabled', appName);
             }),
             pretifyError('Failed to enable field. Please reload.'));
     }
 
-    public disableField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
-        const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}/disable`);
+    public disableField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['disable'];
 
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldDisabled', appName);
             }),
             pretifyError('Failed to disable field. Please reload.'));
     }
 
-    public showField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
-        const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}/show`);
+    public showField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['show'];
 
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldShown', appName);
             }),
             pretifyError('Failed to show field. Please reload.'));
     }
 
-    public hideField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
-        const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}/hide`);
+    public hideField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['hide'];
 
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldHidden', appName);
             }),
             pretifyError('Failed to hide field. Please reload.'));
     }
 
-    public deleteField(appName: string, schemaName: string, fieldId: number, parentId: number | undefined, version: Version): Observable<Versioned<any>> {
-        const url = this.buildUrl(appName, schemaName, parentId, `/${fieldId}`);
+    public deleteField(appName: string, resource: Resource, version: Version): Observable<SchemaDetailsDto> {
+        const link = resource._links['delete'];
 
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+            map(({ version: newVersion, payload }) => {
+                return parseSchemaWithDetails(payload.body, newVersion);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldDeleted', appName);
             }),
             pretifyError('Failed to delete field. Please reload.'));
     }
 
-    private buildUrl(appName: string, schemaName: string, parentId: number | undefined, suffix: string) {
-        const url =
-            parentId ?
-                this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields/${parentId}/nested${suffix}`) :
-                this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/fields${suffix}`);
+    public deleteSchema(appName: string, resource: Resource, version: Version): Observable<Versioned<any>> {
+        const link = resource._links['delete'];
 
-        return url;
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            tap(() => {
+                this.analytics.trackEvent('Schema', 'Deleted', appName);
+            }),
+            pretifyError('Failed to delete schema. Please reload.'));
     }
+}
+
+function parseSchemaWithDetails(response: any, version: Version) {
+    const fields = response.fields.map((item: any) => {
+        const propertiesDto =
+            createProperties(
+                item.properties.fieldType,
+                item.properties);
+
+        let nested: NestedFieldDto[] | null = null;
+
+        if (item.nested && item.nested.length > 0) {
+            nested = item.nested.map((nestedItem: any) => {
+                const nestedPropertiesDto =
+                    createProperties(
+                        nestedItem.properties.fieldType,
+                        nestedItem.properties);
+
+                return new NestedFieldDto(
+                    nestedItem.fieldId,
+                    nestedItem.name,
+                    nestedPropertiesDto,
+                    item.fieldId,
+                    nestedItem.isLocked,
+                    nestedItem.isHidden,
+                    nestedItem.isDisabled);
+            });
+        }
+
+        return new RootFieldDto(
+            item.fieldId,
+            item.name,
+            propertiesDto,
+            item.partitioning,
+            item.isLocked,
+            item.isHidden,
+            item.isDisabled,
+            nested || []);
+    });
+
+    const properties = new SchemaPropertiesDto(response.properties.label, response.properties.hints);
+
+    return withLinks(
+        new SchemaDetailsDto(
+            response.id,
+            response.name,
+            response.category,
+            properties,
+            response.isSingleton,
+            response.isPublished,
+            DateTime.parseISO_UTC(response.created), response.createdBy,
+            DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
+            version,
+            fields,
+            response.scripts || {},
+            response.previewUrls || {}),
+        response);
 }
