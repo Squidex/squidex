@@ -172,7 +172,7 @@ describe('ClientsService', () => {
 
     function clientsResponse(...ids: number[]) {
         return {
-            contributors:  ids.map(id => ({
+            items:  ids.map(id => ({
                 id: `id${id}`,
                 name: `Client ${id}`,
                 role: `Role${id}`,
@@ -181,12 +181,8 @@ describe('ClientsService', () => {
                     update: { method: 'PUT', href: `/clients/id${id}` }
                 }
             })),
-            maxContributors: ids.length * 13,
             _links: {
-                create: { method: 'POST', href: '/contributors' }
-            },
-            _meta: {
-                isInvited: 'true'
+                create: { method: 'POST', href: '/clients' }
             }
         };
     }
@@ -205,9 +201,6 @@ export function createClients(...ids: number[]): ClientsPayload {
             )),
         _links: {
             create: { method: 'POST', href: '/clients' }
-        },
-        _meta: {
-            isInvited: 'true'
         }
     };
 }

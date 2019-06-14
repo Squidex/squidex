@@ -139,7 +139,7 @@ export class ClientsService {
 }
 
 function parseClients(response: any): ClientsPayload {
-    const items: any[] = response;
+    const items: any[] = response.items;
 
     const clients = items.map(item =>
         withLinks(

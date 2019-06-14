@@ -65,7 +65,7 @@ export class ClientsState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ clients: ImmutableArray.empty(), version: new Version(''), links: {} });
+        super({ clients: ImmutableArray.empty(), version: Version.EMPTY, links: {} });
     }
 
     public load(isReload = false): Observable<any> {

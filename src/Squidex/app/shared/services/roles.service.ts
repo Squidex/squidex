@@ -15,22 +15,28 @@ import {
     ApiUrlConfig,
     HTTP,
     mapVersioned,
-    Model,
     pretifyError,
+    Resource,
+    ResourceLinks,
     Version,
-    Versioned
+    Versioned,
+    withLinks
 } from '@app/framework';
 
-export type RolesDto = Versioned<RoleDto[]>;
+export type RolesDto = Versioned<RolesPayload>;
+export type RolesPayload = {
+    items: RoleDto[]
+} & Resource;
 
-export class RoleDto extends Model<RoleDto> {
+export class RoleDto {
+    public readonly _links: ResourceLinks = {};
+
     constructor(
         public readonly name: string,
         public readonly numClients: number,
         public readonly numContributors: number,
         public readonly permissions: string[]
     ) {
-        super();
     }
 }
 
@@ -56,28 +62,17 @@ export class RolesService {
 
         return HTTP.getVersioned(this.http, url).pipe(
                 mapVersioned(({ body }) => {
-                    const items: any[] = body.roles;
-
-                    const roles = items.map(item =>
-                        new RoleDto(
-                            item.name,
-                            item.numClients,
-                            item.numContributors,
-                            item.permissions));
-
-                    return roles;
+                    return parseRoles(body);
                 }),
                 pretifyError('Failed to load roles. Please reload.'));
     }
 
-    public postRole(appName: string, dto: CreateRoleDto, version: Version): Observable<Versioned<RoleDto>> {
+    public postRole(appName: string, dto: CreateRoleDto, version: Version): Observable<RolesDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
-                mapVersioned(() => {
-                    const role = new RoleDto(dto.name, 0, 0, []);
-
-                    return role;
+                mapVersioned(({ body }) => {
+                    return parseRoles(body);
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Role', 'Created', appName);
@@ -85,20 +80,30 @@ export class RolesService {
                 pretifyError('Failed to add role. Please reload.'));
     }
 
-    public putRole(appName: string, name: string, dto: UpdateRoleDto, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles/${name}`);
+    public putRole(appName: string, resource: Resource, dto: UpdateRoleDto, version: Version): Observable<RolesDto> {
+        const link = resource._links['update'];
 
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+                mapVersioned(({ body }) => {
+                    return parseRoles(body);
+                }),
                 tap(() => {
                     this.analytics.trackEvent('Role', 'Updated', appName);
                 }),
                 pretifyError('Failed to revoke role. Please reload.'));
     }
 
-    public deleteRole(appName: string, name: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles/${name}`);
+    public deleteRole(appName: string, resource: Resource, version: Version): Observable<RolesDto> {
+        const link = resource._links['delete'];
 
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+                mapVersioned(({ body }) => {
+                    return parseRoles(body);
+                }),
                 tap(() => {
                     this.analytics.trackEvent('Role', 'Deleted', appName);
                 }),
@@ -111,4 +116,19 @@ export class RolesService {
         return this.http.get<string[]>(url).pipe(
                 pretifyError('Failed to load permissions. Please reload.'));
     }
+}
+
+export function parseRoles(response: any) {
+    const items: any[] = response.items;
+
+    const roles = items.map(item =>
+        withLinks(
+            new RoleDto(
+                item.name,
+                item.numClients,
+                item.numContributors,
+                item.permissions),
+            item));
+
+    return withLinks({ items: roles, _links: {} }, response);
 }

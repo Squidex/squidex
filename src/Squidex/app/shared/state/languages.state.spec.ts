@@ -109,7 +109,7 @@ describe('LanguagesState', () => {
 
             languagesState.add(languageIT).subscribe();
 
-            expectUpdated(updated);
+            expectNewLanguages(updated);
         });
 
         it('should update languages when language updated', () => {
@@ -122,7 +122,7 @@ describe('LanguagesState', () => {
 
             languagesState.update(oldLanguages.items[1], request).subscribe();
 
-            expectUpdated(updated);
+            expectNewLanguages(updated);
         });
 
         it('should update languages when language deleted', () => {
@@ -133,10 +133,10 @@ describe('LanguagesState', () => {
 
             languagesState.remove(oldLanguages.items[1]).subscribe();
 
-            expectUpdated(updated);
+            expectNewLanguages(updated);
         });
 
-        function expectUpdated(updated: AppLanguagesPayload) {
+        function expectNewLanguages(updated: AppLanguagesPayload) {
             expect(languagesState.snapshot.languages.values).toEqual([
                 {
                     language: updated.items[0],

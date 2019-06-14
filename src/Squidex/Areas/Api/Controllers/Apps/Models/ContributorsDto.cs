@@ -21,7 +21,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// The contributors.
         /// </summary>
         [Required]
-        public ContributorDto[] Contributors { get; set; }
+        public ContributorDto[] Items { get; set; }
 
         /// <summary>
         /// The maximum number of allowed contributors.
@@ -40,7 +40,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             var result = new ContributorsDto
             {
-                Contributors = contributors,
+                Items = contributors,
             };
 
             if (isInvited)

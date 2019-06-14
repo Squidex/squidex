@@ -9,6 +9,7 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
+    ContributorsPayload,
     ContributorsService,
     ContributorsState,
     DialogService,
@@ -81,7 +82,7 @@ describe('ContributorsState', () => {
         });
 
         it('should update contributors when user assigned', () => {
-            const updated = createContributors(1, 2, 3);
+            const updated = createContributors(5, 6);
 
             const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
 
@@ -90,22 +91,24 @@ describe('ContributorsState', () => {
 
             contributorsState.assign(request).subscribe();
 
-            expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.items);
-            expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
-            expect(contributorsState.snapshot.version).toEqual(newVersion);
+            expectNewContributors(updated);
         });
 
         it('should update contributors when contribution revoked', () => {
-            const updated = createContributors(1, 2, 3);
+            const updated = createContributors(5, 6);
 
             contributorsService.setup(x => x.deleteContributor(app, oldContributors.items[0], version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
             contributorsState.revoke(oldContributors.items[0]).subscribe();
 
-            expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.items);
-            expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
-            expect(contributorsState.snapshot.version).toEqual(newVersion);
+            expectNewContributors(updated);
         });
+
+        function expectNewContributors(updated: ContributorsPayload) {
+            expect(contributorsState.snapshot.contributors.values).toEqual(updated.items);
+            expect(contributorsState.snapshot.maxContributors).toBe(updated.maxContributors);
+            expect(contributorsState.snapshot.version).toEqual(newVersion);
+        }
     });
 });

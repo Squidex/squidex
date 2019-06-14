@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
@@ -42,12 +42,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/patterns/")]
-        [ProducesResponseType(typeof(AppPatternDto[]), 200)]
+        [ProducesResponseType(typeof(AppPatternsDto), 200)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public IActionResult GetPatterns(string app)
         {
-            var response = App.Patterns.Select(AppPatternDto.FromKvp).OrderBy(x => x.Name).ToArray();
+            var response = AppPatternsDto.FromApp(App, this);
 
             Response.Headers[HeaderNames.ETag] = App.Version.ToString();
 
@@ -66,16 +66,15 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/patterns/")]
-        [ProducesResponseType(typeof(AppPatternDto), 201)]
+        [ProducesResponseType(typeof(AppPatternsDto), 200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppPatternsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostPattern(string app, [FromBody] UpdatePatternDto request)
         {
             var command = request.ToAddCommand();
 
-            await CommandBus.PublishAsync(command);
-
-            var response = AppPatternDto.FromCommand(command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(GetPatterns), new { app }, response);
         }
@@ -93,14 +92,17 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/patterns/{id}/")]
-        [ProducesResponseType(typeof(AppPatternDto), 201)]
+        [ProducesResponseType(typeof(AppPatternsDto), 200)]
+        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppPatternsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> UpdatePattern(string app, Guid id, [FromBody] UpdatePatternDto request)
         {
-            await CommandBus.PublishAsync(request.ToUpdateCommand(id));
+            var command = request.ToUpdateCommand(id);
 
-            return NoContent();
+            var response = await InvokeCommandAsync(command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -109,7 +111,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the pattern to be deleted.</param>
         /// <returns>
-        /// 204 => Pattern removed.
+        /// 200 => Pattern removed.
         /// 404 => Pattern or app not found.
         /// </returns>
         /// <remarks>
@@ -117,13 +119,26 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpDelete]
         [Route("apps/{app}/patterns/{id}/")]
+        [ProducesResponseType(typeof(AppPatternsDto), 200)]
         [ApiPermission(Permissions.AppPatternsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeletePattern(string app, Guid id)
         {
-            await CommandBus.PublishAsync(new DeletePattern { PatternId = id });
+            var command = new DeletePattern { PatternId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(command);
+
+            return Ok(response);
+        }
+
+        private async Task<AppPatternsDto> InvokeCommandAsync(ICommand command)
+        {
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<IAppEntity>();
+            var response = AppPatternsDto.FromApp(result, this);
+
+            return response;
         }
     }
 }

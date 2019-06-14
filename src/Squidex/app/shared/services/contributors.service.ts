@@ -96,7 +96,7 @@ export class ContributorsService {
 }
 
 function parseContributors(response: any) {
-    const items: any[] = response.contributors;
+    const items: any[] = response.items;
 
     const contributors = items.map(item =>
         withLinks(

@@ -79,7 +79,7 @@ export class PlansState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly plansService: PlansService
     ) {
-        super({ plans: ImmutableArray.empty(), version: new Version('') });
+        super({ plans: ImmutableArray.empty(), version: Version.EMPTY });
     }
 
     public load(isReload = false, overridePlanId?: string): Observable<any> {

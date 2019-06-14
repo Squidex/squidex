@@ -96,7 +96,7 @@ export class LanguagesState extends State<Snapshot> {
             allLanguages: ImmutableArray.empty(),
             allLanguagesNew: ImmutableArray.empty(),
             languages: ImmutableArray.empty(),
-            version: new Version(''),
+            version: Version.EMPTY,
             links: {}
         });
     }

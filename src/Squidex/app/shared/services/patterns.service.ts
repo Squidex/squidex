@@ -15,22 +15,28 @@ import {
     ApiUrlConfig,
     HTTP,
     mapVersioned,
-    Model,
     pretifyError,
+    Resource,
+    ResourceLinks,
     Version,
-    Versioned
+    Versioned,
+    withLinks
 } from '@app/framework';
 
-export type PatternsDto = Versioned<PatternDto[]>;
+export type PatternsDto = Versioned<PatternsPayload>;
+export type PatternsPayload = {
+    items: PatternDto[]
+} & Resource;
 
-export class PatternDto extends Model<PatternDto> {
+export class PatternDto {
+    public readonly _links: ResourceLinks = {};
+
     constructor(
         public readonly id: string,
         public readonly name: string,
         public readonly pattern: string,
         public readonly message?: string
     ) {
-        super();
     }
 }
 
@@ -54,33 +60,17 @@ export class PatternsService {
 
         return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {
-                const items: any[] = body;
-
-                const patterns =
-                    items.map(item =>
-                        new PatternDto(
-                            item.patternId,
-                            item.name,
-                            item.pattern,
-                            item.message));
-
-                return patterns;
+                return parsePatterns(body);
             }),
             pretifyError('Failed to add pattern. Please reload.'));
     }
 
-    public postPattern(appName: string, dto: EditPatternDto, version: Version): Observable<Versioned<PatternDto>> {
+    public postPattern(appName: string, dto: EditPatternDto, version: Version): Observable<PatternsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
             mapVersioned(({ body }) => {
-                const pattern = new PatternDto(
-                    body.patternId,
-                    body.name,
-                    body.pattern,
-                    body.message);
-
-                return pattern;
+                return parsePatterns(body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Patterns', 'Created', appName);
@@ -88,23 +78,48 @@ export class PatternsService {
             pretifyError('Failed to add pattern. Please reload.'));
     }
 
-    public putPattern(appName: string, id: string, dto: EditPatternDto, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
+    public putPattern(appName: string, resource: Resource, dto: EditPatternDto, version: Version): Observable<PatternsDto> {
+        const link = resource._links['update'];
 
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            mapVersioned(({ body }) => {
+                return parsePatterns(body);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Patterns', 'Updated', appName);
             }),
             pretifyError('Failed to update pattern. Please reload.'));
     }
 
-    public deletePattern(appName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
+    public deletePattern(appName: string, resource: Resource, version: Version): Observable<PatternsDto> {
+        const link = resource._links['delete'];
 
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            mapVersioned(({ body }) => {
+                return parsePatterns(body);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Patterns', 'Configured', appName);
             }),
             pretifyError('Failed to remove pattern. Please reload.'));
     }
+}
+
+function parsePatterns(response: any) {
+    const items: any[] = response.items;
+
+    const patterns = items.map(item =>
+        withLinks(
+            new PatternDto(
+                item.patternId,
+                item.name,
+                item.pattern,
+                item.message),
+            item));
+
+    return withLinks({ items: patterns, _links: {} }, response);
 }

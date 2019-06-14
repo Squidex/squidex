@@ -6,15 +6,14 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class AppPatternDto
+    public sealed class AppPatternDto : Resource
     {
         /// <summary>
         /// Unique id of the pattern.
@@ -38,14 +37,16 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string Message { get; set; }
 
-        public static AppPatternDto FromKvp(KeyValuePair<Guid, AppPattern> kvp)
+        public static AppPatternDto FromPattern(Guid id, AppPattern pattern, ApiController controller, string app)
         {
-            return SimpleMapper.Map(kvp.Value, new AppPatternDto { PatternId = kvp.Key });
+            var result = SimpleMapper.Map(pattern, new AppPatternDto { PatternId = id });
+
+            return result.CreateLinks(controller, app);
         }
 
-        public static AppPatternDto FromCommand(AddPattern command)
+        private AppPatternDto CreateLinks(ApiController controller, string app)
         {
-            return SimpleMapper.Map(command, new AppPatternDto());
+            return this;
         }
     }
 }

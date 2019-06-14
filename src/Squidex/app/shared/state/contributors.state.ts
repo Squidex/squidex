@@ -79,7 +79,7 @@ export class ContributorsState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ contributors: ImmutableArray.empty(), version: new Version(''), maxContributors: -1, links: {} });
+        super({ contributors: ImmutableArray.empty(), version: Version.EMPTY, maxContributors: -1, links: {} });
     }
 
     public load(isReload = false): Observable<any> {
