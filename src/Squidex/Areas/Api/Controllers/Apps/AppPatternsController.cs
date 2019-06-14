@@ -42,12 +42,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpGet]
         [Route("apps/{app}/patterns/")]
-        [ProducesResponseType(typeof(AppPatternsDto), 200)]
+        [ProducesResponseType(typeof(PatternsDto), 200)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public IActionResult GetPatterns(string app)
         {
-            var response = AppPatternsDto.FromApp(App, this);
+            var response = PatternsDto.FromApp(App, this);
 
             Response.Headers[HeaderNames.ETag] = App.Version.ToString();
 
@@ -66,7 +66,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/patterns/")]
-        [ProducesResponseType(typeof(AppPatternsDto), 200)]
+        [ProducesResponseType(typeof(PatternsDto), 200)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppPatternsCreate)]
         [ApiCosts(1)]
@@ -92,7 +92,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/patterns/{id}/")]
-        [ProducesResponseType(typeof(AppPatternsDto), 200)]
+        [ProducesResponseType(typeof(PatternsDto), 200)]
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppPatternsUpdate)]
         [ApiCosts(1)]
@@ -119,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpDelete]
         [Route("apps/{app}/patterns/{id}/")]
-        [ProducesResponseType(typeof(AppPatternsDto), 200)]
+        [ProducesResponseType(typeof(PatternsDto), 200)]
         [ApiPermission(Permissions.AppPatternsDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeletePattern(string app, Guid id)
@@ -131,12 +131,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
             return Ok(response);
         }
 
-        private async Task<AppPatternsDto> InvokeCommandAsync(ICommand command)
+        private async Task<PatternsDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<IAppEntity>();
-            var response = AppPatternsDto.FromApp(result, this);
+            var response = PatternsDto.FromApp(result, this);
 
             return response;
         }

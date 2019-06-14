@@ -8,6 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
@@ -24,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var result = new RolesDto
             {
-                Items = app.Roles.Values.Select(x => RoleDto.FromRole(x, app, controller)).ToArray()
+                Items = app.Roles.Values.Select(x => RoleDto.FromRole(x, app, controller)).OrderBy(x => x.Name).ToArray()
             };
 
             return result.CreateLinks(controller, app.Name);
@@ -32,6 +33,15 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         private RolesDto CreateLinks(ApiController controller, string app)
         {
+            var values = new { app };
+
+            AddSelfLink(controller.Url<AppRolesController>(x => nameof(x.GetRoles), values));
+
+            if (controller.HasPermission(Permissions.AppRolesCreate, app))
+            {
+                AddPostLink("create", controller.Url<AppRolesController>(x => nameof(x.PostRole), values));
+            }
+
             return this;
         }
     }

@@ -54,6 +54,10 @@ export class PatternsState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
+    public links =
+        this.changes.pipe(map(x => x.links),
+            distinctUntilChanged());
+
     constructor(
         private readonly patternsService: PatternsService,
         private readonly appsState: AppsState,

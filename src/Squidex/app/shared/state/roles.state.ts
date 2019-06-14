@@ -54,6 +54,10 @@ export class RolesState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
+    public links =
+        this.changes.pipe(map(x => x.links),
+            distinctUntilChanged());
+
     constructor(
         private readonly rolesService: RolesService,
         private readonly appsState: AppsState,

@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Assets;
 using Squidex.Areas.Api.Controllers.Backups;
@@ -18,7 +17,6 @@ using Squidex.Areas.Api.Controllers.Rules;
 using Squidex.Areas.Api.Controllers.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
@@ -59,7 +57,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The permission level of the user.
         /// </summary>
-        public string[] Permissions { get; set; }
+        public IEnumerable<string> Permissions { get; set; }
 
         /// <summary>
         /// Indicates if the user can access the api.
@@ -87,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             var result = SimpleMapper.Map(app, new AppDto());
 
-            result.Permissions = permissions.ToIds().ToArray();
+            result.Permissions = permissions.ToIds();
             result.PlanName = plans.GetPlanForApp(app)?.Name;
 
             result.CanAccessApi = controller.HasPermission(AllPermissions.AppApi, app.Name, "*", permissions);

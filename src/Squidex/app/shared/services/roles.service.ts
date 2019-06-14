@@ -35,7 +35,8 @@ export class RoleDto {
         public readonly name: string,
         public readonly numClients: number,
         public readonly numContributors: number,
-        public readonly permissions: string[]
+        public readonly permissions: string[],
+        public readonly isDefaultRole: boolean
     ) {
     }
 }
@@ -127,7 +128,8 @@ export function parseRoles(response: any) {
                 item.name,
                 item.numClients,
                 item.numContributors,
-                item.permissions),
+                item.permissions,
+                item.isDefaultRole),
             item));
 
     return withLinks({ items: roles, _links: {} }, response);

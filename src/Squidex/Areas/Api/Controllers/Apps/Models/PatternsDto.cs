@@ -8,30 +8,40 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class AppPatternsDto : Resource
+    public sealed class PatternsDto : Resource
     {
         /// <summary>
         /// The patterns.
         /// </summary>
         [Required]
-        public AppPatternDto[] Items { get; set; }
+        public PatternDto[] Items { get; set; }
 
-        public static AppPatternsDto FromApp(IAppEntity app, ApiController controller)
+        public static PatternsDto FromApp(IAppEntity app, ApiController controller)
         {
-            var result = new AppPatternsDto
+            var result = new PatternsDto
             {
-                Items = app.Patterns.Select(x => AppPatternDto.FromPattern(x.Key, x.Value, controller, app.Name)).ToArray()
+                Items = app.Patterns.Select(x => PatternDto.FromPattern(x.Key, x.Value, controller, app.Name)).ToArray()
             };
 
             return result.CreateLinks(controller, app.Name);
         }
 
-        private AppPatternsDto CreateLinks(ApiController controller, string app)
+        private PatternsDto CreateLinks(ApiController controller, string app)
         {
+            var values = new { app };
+
+            AddSelfLink(controller.Url<AppPatternsController>(x => nameof(x.GetPatterns), values));
+
+            if (controller.HasPermission(Permissions.AppPatternsCreate, app))
+            {
+                AddPostLink("create", controller.Url<AppPatternsController>(x => nameof(x.PostPattern), values));
+            }
+
             return this;
         }
     }

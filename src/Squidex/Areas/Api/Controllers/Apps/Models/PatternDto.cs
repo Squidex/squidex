@@ -9,16 +9,17 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class AppPatternDto : Resource
+    public sealed class PatternDto : Resource
     {
         /// <summary>
         /// Unique id of the pattern.
         /// </summary>
-        public Guid PatternId { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// The name of the suggestion.
@@ -37,15 +38,27 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string Message { get; set; }
 
-        public static AppPatternDto FromPattern(Guid id, AppPattern pattern, ApiController controller, string app)
+        public static PatternDto FromPattern(Guid id, AppPattern pattern, ApiController controller, string app)
         {
-            var result = SimpleMapper.Map(pattern, new AppPatternDto { PatternId = id });
+            var result = SimpleMapper.Map(pattern, new PatternDto { Id = id });
 
             return result.CreateLinks(controller, app);
         }
 
-        private AppPatternDto CreateLinks(ApiController controller, string app)
+        private PatternDto CreateLinks(ApiController controller, string app)
         {
+            var values = new { app, id = Id };
+
+            if (controller.HasPermission(Permissions.AppPatternsUpdate, app))
+            {
+                AddPutLink("update", controller.Url<AppPatternsController>(x => nameof(x.UpdatePattern), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppPatternsDelete, app))
+            {
+                AddDeleteLink("delete", controller.Url<AppPatternsController>(x => nameof(x.DeletePattern), values));
+            }
+
             return this;
         }
     }

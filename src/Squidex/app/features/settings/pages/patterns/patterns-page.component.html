@@ -23,7 +23,7 @@
                 [pattern]="pattern">
             </sqx-pattern>
             
-            <sqx-pattern></sqx-pattern>
+            <sqx-pattern *ngIf="patternsState.links | async | sqxHasLink:'create'"></sqx-pattern>
         </ng-container>
     </ng-container>
 

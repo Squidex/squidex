@@ -14,16 +14,10 @@ import {
     AutocompleteSource,
     EditPermissionsForm,
     fadeAnimation,
+    hasAnyLink,
     RoleDto,
     RolesState
 } from '@app/shared';
-
-const DEFAULT_ROLES = [
-    'Owner',
-    'Developer',
-    'Editor',
-    'Reader'
-];
 
 @Component({
     selector: 'sqx-role',
@@ -44,7 +38,7 @@ export class RoleComponent implements OnChanges {
     public addPermissionInput: AutocompleteComponent;
 
     public isEditing = false;
-    public isDefaultRole = false;
+    public isEditable = false;
 
     public addPermissionForm = new AddPermissionForm(this.formBuilder);
 
@@ -57,11 +51,11 @@ export class RoleComponent implements OnChanges {
     }
 
     public ngOnChanges() {
-        this.isDefaultRole = DEFAULT_ROLES.indexOf(this.role.name) >= 0;
+        this.isEditable = hasAnyLink(this.role, 'update');
 
         this.editForm.load(this.role.permissions);
 
-        if (this.isDefaultRole) {
+        if (!this.isEditable) {
             this.editForm.form.disable();
         }
     }

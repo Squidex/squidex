@@ -151,8 +151,8 @@ describe('PatternsService', () => {
     function patternsResponse(...ids: number[]) {
         return {
             items:  ids.map(id => ({
+                id: `id${id}`,
                 name: `Name${id}`,
-                patternId: `id${id}`,
                 pattern: `Pattern${id}`,
                 message: `Message${id}`,
                 _links: {

@@ -174,6 +174,7 @@ describe('RolesService', () => {
                 numClients: id * 2,
                 numContributors: id * 3,
                 permissions: [`permission${id}`],
+                isDefaultRole: id % 2 === 0,
                 _links: {
                     update: { method: 'PUT', href: `/roles/id${id}` }
                 }
@@ -189,7 +190,7 @@ export function createRoles(...ids: number[]): RolesPayload {
     return {
         items: ids.map(id =>
             withLinks(
-                new RoleDto(`name${id}`, id * 2, id * 3, [`permission${id}`]),
+                new RoleDto(`name${id}`, id * 2, id * 3, [`permission${id}`], id % 2 === 0),
                 {
                     _links: {
                         update: { method: 'PUT', href: `/roles/id${id}` }

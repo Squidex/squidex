@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Newtonsoft.Json;
+using Squidex.Infrastructure;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -50,6 +51,10 @@ namespace Squidex.Web
 
         public void AddLink(string rel, string method, string href)
         {
+            Guard.NotNullOrEmpty(rel, nameof(rel));
+            Guard.NotNullOrEmpty(href, nameof(href));
+            Guard.NotNullOrEmpty(method, nameof(method));
+
             Links[rel] = new ResourceLink { Href = href, Method = method };
         }
     }

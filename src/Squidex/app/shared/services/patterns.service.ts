@@ -115,7 +115,7 @@ function parsePatterns(response: any) {
     const patterns = items.map(item =>
         withLinks(
             new PatternDto(
-                item.patternId,
+                item.id,
                 item.name,
                 item.pattern,
                 item.message),
