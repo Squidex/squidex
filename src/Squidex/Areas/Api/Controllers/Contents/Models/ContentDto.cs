@@ -20,7 +20,7 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public sealed class ContentDto : IGenerateETag
+    public sealed class ContentDto : Resource, IGenerateETag
     {
         /// <summary>
         /// The if of the content item.
@@ -99,7 +99,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             return response;
         }
 
-        public static ContentDto FromContent(IContentEntity content, QueryContext context)
+        public static ContentDto FromContent(IContentEntity content, QueryContext context, ApiController controller, string app)
         {
             var response = SimpleMapper.Map(content, new ContentDto());
 
@@ -119,7 +119,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 response.ScheduleJob = SimpleMapper.Map(content.ScheduleJob, new ScheduleJobDto());
             }
 
-            return response;
+            return response.CreateLinks(controller, app);
+        }
+
+        private ContentDto CreateLinks(ApiController controller, object app)
+        {
+            return this;
         }
     }
 }

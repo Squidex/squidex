@@ -128,11 +128,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var result = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).Ids);
 
-            var response = new ContentsDto
-            {
-                Total = result.Count,
-                Items = result.Take(200).Select(x => ContentDto.FromContent(x, context)).ToArray()
-            };
+            var response = ContentsDto.FromContents(result, context, this, app);
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
@@ -168,11 +164,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var result = await contentQuery.QueryAsync(context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 
-            var response = new ContentsDto
-            {
-                Total = result.Total,
-                Items = result.Take(200).Select(x => ContentDto.FromContent(x, context)).ToArray()
-            };
+            var response = ContentsDto.FromContents(result, context, this, app);
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
@@ -206,7 +198,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = Context();
             var content = await contentQuery.FindContentAsync(context, name, id);
 
-            var response = ContentDto.FromContent(content, context);
+            var response = ContentDto.FromContent(content, context, this, app);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
@@ -242,7 +234,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = Context();
             var content = await contentQuery.FindContentAsync(context, name, id, version);
 
-            var response = ContentDto.FromContent(content, context);
+            var response = ContentDto.FromContent(content, context, this, app);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
