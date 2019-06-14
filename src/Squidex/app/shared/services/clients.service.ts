@@ -15,22 +15,28 @@ import {
     ApiUrlConfig,
     HTTP,
     mapVersioned,
-    Model,
     pretifyError,
+    Resource,
+    ResourceLinks,
     Version,
-    Versioned
+    Versioned,
+    withLinks
 } from '@app/framework';
 
-export type ClientsDto = Versioned<ClientDto[]>;
+export type ClientsDto = Versioned<ClientsPayload>;
+export type ClientsPayload = {
+    readonly items: ClientDto[]
+} & Resource;
 
-export class ClientDto extends Model<ClientDto> {
+export class ClientDto {
+    public readonly _links: ResourceLinks = {};
+
     constructor(
         public readonly id: string,
         public readonly name: string,
         public readonly secret: string,
-        public readonly role = 'Developer'
+        public readonly role: string
     ) {
-        super();
     }
 }
 
@@ -63,34 +69,19 @@ export class ClientsService {
     public getClients(appName: string): Observable<ClientsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
                 mapVersioned(({ body }) => {
-                    const items: any[] = body;
-
-                    const clients = items.map(item =>
-                        new ClientDto(
-                            item.id,
-                            item.name || item.id,
-                            item.secret,
-                            item.role));
-
-                    return clients;
+                    return parseClients(body);
                 }),
                 pretifyError('Failed to load clients. Please reload.'));
     }
 
-    public postClient(appName: string, dto: CreateClientDto, version: Version): Observable<Versioned<ClientDto>> {
+    public postClient(appName: string, dto: CreateClientDto, version: Version): Observable<ClientsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
+        return HTTP.postVersioned(this.http, url, dto, version).pipe(
                 mapVersioned(({ body }) => {
-                    const client = new ClientDto(
-                        body.id,
-                        body.name || body.id,
-                        body.secret,
-                        body.role);
-
-                    return client;
+                    return parseClients(body);
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Client', 'Created', appName);
@@ -98,20 +89,30 @@ export class ClientsService {
                 pretifyError('Failed to add client. Please reload.'));
     }
 
-    public putClient(appName: string, id: string, dto: UpdateClientDto, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
+    public putClient(appName: string, resource: Resource, dto: UpdateClientDto, version: Version): Observable<ClientsDto> {
+        const link = resource._links['update'];
 
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+                mapVersioned(({ body }) => {
+                    return parseClients(body);
+                }),
                 tap(() => {
                     this.analytics.trackEvent('Client', 'Updated', appName);
                 }),
                 pretifyError('Failed to revoke client. Please reload.'));
     }
 
-    public deleteClient(appName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients/${id}`);
+    public deleteClient(appName: string, resource: Resource, version: Version): Observable<ClientsDto> {
+        const link = resource._links['delete'];
 
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+                mapVersioned(({ body }) => {
+                    return parseClients(body);
+                }),
                 tap(() => {
                     this.analytics.trackEvent('Client', 'Deleted', appName);
                 }),
@@ -135,4 +136,19 @@ export class ClientsService {
                 }),
                 pretifyError('Failed to create token. Please retry.'));
     }
+}
+
+function parseClients(response: any): ClientsPayload {
+    const items: any[] = response;
+
+    const clients = items.map(item =>
+        withLinks(
+            new ClientDto(
+                item.id,
+                item.name || item.id,
+                item.secret,
+                item.role),
+            item));
+
+    return withLinks({ items: clients, _links: {} }, response);
 }

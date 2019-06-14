@@ -216,7 +216,7 @@ export class SchemasService {
     public getSchemas(appName: string): Observable<SchemaDto[]> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
             map(({ payload }) => {
                 const body = payload.body;
 
@@ -244,7 +244,7 @@ export class SchemasService {
     public getSchema(appName: string, id: string): Observable<SchemaDetailsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${id}`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
             map(({ version, payload }) => {
                 const body = payload.body;
 
@@ -307,7 +307,7 @@ export class SchemasService {
     public postSchema(appName: string, dto: CreateSchemaDto): Observable<Versioned<SchemaCreatedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
+        return HTTP.postVersioned(this.http, url, dto).pipe(
             mapVersioned(({ body }) => body!),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Created', appName);
@@ -388,7 +388,7 @@ export class SchemasService {
     public postField(appName: string, schemaName: string, dto: AddFieldDto, parentId: number | undefined, version: Version): Observable<Versioned<RootFieldDto | NestedFieldDto>> {
         const url = this.buildUrl(appName, schemaName, parentId, '');
 
-        return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
+        return HTTP.postVersioned(this.http, url, dto, version).pipe(
             mapVersioned(({ body }) => {
                 if (parentId) {
                     const field = new NestedFieldDto(body.id, dto.name, dto.properties, parentId);

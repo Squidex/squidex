@@ -71,18 +71,18 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
             SimpleMapper.Map(ruleEvent, result);
             SimpleMapper.Map(ruleEvent.Job, result);
 
-            return CreateLinks(result, controller, app);
+            return result.CreateLinks(controller, app);
         }
 
-        private static RuleEventDto CreateLinks(RuleEventDto result, ApiController controller, string app)
+        private RuleEventDto CreateLinks(ApiController controller, string app)
         {
-            var values = new { app, id = result.Id };
+            var values = new { app, id = Id };
 
-            result.AddPutLink("update", controller.Url<RulesController>(x => nameof(x.PutEvent), values));
+            AddPutLink("update", controller.Url<RulesController>(x => nameof(x.PutEvent), values));
 
-            result.AddDeleteLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteEvent), values));
+            AddDeleteLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteEvent), values));
 
-            return result;
+            return this;
         }
     }
 }

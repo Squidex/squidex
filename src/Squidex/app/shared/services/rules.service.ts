@@ -140,7 +140,7 @@ export class RulesService {
     public getActions(): Observable<{ [name: string]: RuleElementDto }> {
         const url = this.apiUrl.buildUrl('api/rules/actions');
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
             map(({ payload }) => {
                 const items: { [name: string]: any } = payload.body;
 
@@ -176,7 +176,7 @@ export class RulesService {
     public getRules(appName: string): Observable<RulesDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
             map(({ payload }) => {
                 const items: any[] = payload.body.items;
 
@@ -190,7 +190,7 @@ export class RulesService {
     public postRule(appName: string, dto: UpsertRuleDto): Observable<RuleDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
+        return HTTP.postVersioned(this.http, url, dto).pipe(
             map(({ payload }) => {
                 return parseRule(payload.body);
             }),
@@ -263,7 +263,7 @@ export class RulesService {
     public getEvents(appName: string, take: number, skip: number): Observable<RuleEventsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/events?take=${take}&skip=${skip}`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
             map(({ payload }) => {
                 const body = payload.body;
 

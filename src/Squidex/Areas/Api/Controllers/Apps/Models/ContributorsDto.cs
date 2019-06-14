@@ -53,21 +53,21 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             result.MaxContributors = plans.GetPlanForApp(app).MaxContributors;
 
-            return CreateLinks(result, controller, app.Name);
+            return result.CreateLinks(controller, app.Name);
         }
 
-        private static ContributorsDto CreateLinks(ContributorsDto result, ApiController controller, string app)
+        private ContributorsDto CreateLinks(ApiController controller, string app)
         {
             var values = new { app };
 
-            result.AddSelfLink(controller.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
+            AddSelfLink(controller.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
 
             if (controller.HasPermission(Permissions.AppContributorsAssign, app))
             {
-                result.AddPostLink("create", controller.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
+                AddPostLink("create", controller.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
             }
 
-            return result;
+            return this;
         }
     }
 }

@@ -34,14 +34,14 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 Items = items.Select(x => RuleEventDto.FromRuleEvent(x, controller, app)).ToArray()
             };
 
-            return CreateLinks(result, controller, app);
+            return result.CreateLinks(controller, app);
         }
 
-        private static RuleEventsDto CreateLinks(RuleEventsDto result, ApiController controller, string app)
+        private RuleEventsDto CreateLinks(ApiController controller, string app)
         {
-            result.AddSelfLink(controller.Url<RulesController>(x => nameof(x.GetEvents), new { app }));
+            AddSelfLink(controller.Url<RulesController>(x => nameof(x.GetEvents), new { app }));
 
-            return result;
+            return this;
         }
     }
 }

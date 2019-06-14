@@ -36,19 +36,19 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
                 Items = items.Select(x => UserDto.FromUser(x, controller)).ToArray()
             };
 
-            return CreateLinks(result, controller);
+            return result.CreateLinks(controller);
         }
 
-        private static UsersDto CreateLinks(UsersDto result, ApiController controller)
+        private UsersDto CreateLinks(ApiController controller)
         {
-            result.AddSelfLink(controller.Url<UserManagementController>(c => nameof(c.GetUsers)));
+            AddSelfLink(controller.Url<UserManagementController>(c => nameof(c.GetUsers)));
 
             if (controller.HasPermission(CreatePermissions))
             {
-                result.AddPostLink("create", controller.Url<UserManagementController>(c => nameof(c.PostUser)));
+                AddPostLink("create", controller.Url<UserManagementController>(c => nameof(c.PostUser)));
             }
 
-            return result;
+            return this;
         }
     }
 }

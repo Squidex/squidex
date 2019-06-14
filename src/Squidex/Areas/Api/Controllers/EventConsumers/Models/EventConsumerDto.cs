@@ -31,31 +31,31 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
         {
             var result = SimpleMapper.Map(eventConsumerInfo, new EventConsumerDto());
 
-            return CreateLinks(result, controller);
+            return result.CreateLinks(controller);
         }
 
-        private static EventConsumerDto CreateLinks(EventConsumerDto result, ApiController controller)
+        private EventConsumerDto CreateLinks(ApiController controller)
         {
             if (controller.HasPermission(EventsManagePermission))
             {
-                var values = new { name = result.Name };
+                var values = new { name = Name };
 
-                if (!result.IsResetting)
+                if (!IsResetting)
                 {
-                    result.AddPutLink("reset", controller.Url<EventConsumersController>(x => nameof(x.ResetEventConsumer), values));
+                    AddPutLink("reset", controller.Url<EventConsumersController>(x => nameof(x.ResetEventConsumer), values));
                 }
 
-                if (result.IsStopped)
+                if (IsStopped)
                 {
-                    result.AddPutLink("start", controller.Url<EventConsumersController>(x => nameof(x.StartEventConsumer), values));
+                    AddPutLink("start", controller.Url<EventConsumersController>(x => nameof(x.StartEventConsumer), values));
                 }
                 else
                 {
-                    result.AddPutLink("stop", controller.Url<EventConsumersController>(x => nameof(x.StopEventConsumer), values));
+                    AddPutLink("stop", controller.Url<EventConsumersController>(x => nameof(x.StopEventConsumer), values));
                 }
             }
 
-            return result;
+            return this;
         }
     }
 }

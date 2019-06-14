@@ -73,7 +73,7 @@ export class UsersService {
     public getUser(id: string): Observable<UserDto> {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
 
-        return this.http.get<any>(url).pipe(
+        return this.http.get(url).pipe(
                 map(body => {
                     return parseUser(body);
                 }),
@@ -83,7 +83,7 @@ export class UsersService {
     public postUser(dto: CreateUserDto): Observable<UserDto> {
         const url = this.apiUrl.buildUrl('api/user-management');
 
-        return this.http.post<any>(url, dto).pipe(
+        return this.http.post(url, dto).pipe(
                 map(body => {
                     return parseUser(body);
                 }),

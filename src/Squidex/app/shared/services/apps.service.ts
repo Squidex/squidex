@@ -66,7 +66,7 @@ export class AppsService {
     public postApp(dto: CreateAppDto): Observable<AppDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
-        return this.http.post<any>(url, dto).pipe(
+        return this.http.post(url, dto).pipe(
                 map(body => {
                     return parseApp(body);
                 }),

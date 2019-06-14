@@ -17,6 +17,7 @@ import {
     ClientsState,
     DialogModel,
     DialogService,
+    hasAnyLink,
     RenameClientForm,
     RoleDto
 } from '@app/shared';
@@ -36,6 +37,7 @@ export class ClientComponent implements OnChanges {
     public clientRoles: RoleDto[];
 
     public isRenaming = false;
+    public isEditable = false;
 
     public connectToken: AccessTokenDto;
     public connectDialog = new DialogModel();
@@ -59,6 +61,8 @@ export class ClientComponent implements OnChanges {
     }
 
     public ngOnChanges() {
+        this.isEditable = hasAnyLink(this.client, 'update');
+
         this.renameForm.load(this.client);
 
         const app = this.appsState.appName;
@@ -79,16 +83,18 @@ export class ClientComponent implements OnChanges {
     }
 
     public toggleRename() {
+        if (!this.isEditable) {
+            return;
+        }
+
         this.isRenaming = !this.isRenaming;
     }
 
-    public onKeyDown(keyCode: number) {
-        if (keyCode === ESCAPE_KEY) {
-            this.toggleRename();
-        }
-    }
-
     public rename() {
+        if (!this.isEditable) {
+            return;
+        }
+
         const value = this.renameForm.submit();
 
         if (value) {
@@ -116,6 +122,12 @@ export class ClientComponent implements OnChanges {
 
     public trackByRole(index: number, role: RoleDto) {
         return role.name;
+    }
+
+    public onKeyDown(keyCode: number) {
+        if (keyCode === ESCAPE_KEY) {
+            this.toggleRename();
+        }
     }
 }
 

@@ -56,27 +56,27 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                     Fallback = language.LanguageFallbacks.ToArray()
                 });
 
-            return CreateLinks(result, controller, app);
+            return result.CreateLinks(controller, app);
         }
 
-        private static AppLanguageDto CreateLinks(AppLanguageDto result, ApiController controller, IAppEntity app)
+        private AppLanguageDto CreateLinks(ApiController controller, IAppEntity app)
         {
-            var values = new { app = app.Name, language = result.Iso2Code };
+            var values = new { app = app.Name, language = Iso2Code };
 
-            if (!result.IsMaster)
+            if (!IsMaster)
             {
                 if (controller.HasPermission(Permissions.AppLanguagesUpdate, app.Name))
                 {
-                    result.AddPutLink("update", controller.Url<AppLanguagesController>(x => nameof(x.PutLanguage), values));
+                    AddPutLink("update", controller.Url<AppLanguagesController>(x => nameof(x.PutLanguage), values));
                 }
 
                 if (controller.HasPermission(Permissions.AppLanguagesDelete, app.Name) && app.LanguagesConfig.Count > 1)
                 {
-                    result.AddDeleteLink("delete", controller.Url<AppLanguagesController>(x => nameof(x.DeleteLanguage), values));
+                    AddDeleteLink("delete", controller.Url<AppLanguagesController>(x => nameof(x.DeleteLanguage), values));
                 }
             }
 
-            return result;
+            return this;
         }
     }
 }

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Shared;
 using Squidex.Web;
@@ -29,25 +28,25 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var result = new ContributorDto { ContributorId = id, Role = role };
 
-            return CreateLinks(result, controller, app);
+            return result.CreateLinks(controller, app);
         }
 
-        private static ContributorDto CreateLinks(ContributorDto result, ApiController controller, string app)
+        private ContributorDto CreateLinks(ApiController controller, string app)
         {
-            if (!controller.IsUser(result.ContributorId))
+            if (!controller.IsUser(ContributorId))
             {
                 if (controller.HasPermission(Permissions.AppContributorsAssign, app))
                 {
-                    result.AddPostLink("update", controller.Url<AppContributorsController>(x => nameof(x.PostContributor), new { app }));
+                    AddPostLink("update", controller.Url<AppContributorsController>(x => nameof(x.PostContributor), new { app }));
                 }
 
                 if (controller.HasPermission(Permissions.AppContributorsRevoke, app))
                 {
-                    result.AddDeleteLink("delete", controller.Url<AppContributorsController>(x => nameof(x.DeleteContributor), new { app, id = result.ContributorId }));
+                    AddDeleteLink("delete", controller.Url<AppContributorsController>(x => nameof(x.DeleteContributor), new { app, id = ContributorId }));
                 }
             }
 
-            return result;
+            return this;
         }
     }
 }

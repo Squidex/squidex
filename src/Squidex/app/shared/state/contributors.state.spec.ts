@@ -51,7 +51,7 @@ describe('ContributorsState', () => {
 
             contributorsState.load().subscribe();
 
-            expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.contributors);
+            expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.items);
             expect(contributorsState.snapshot.isMaxReached).toBeFalsy();
             expect(contributorsState.snapshot.isLoaded).toBeTruthy();
             expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
@@ -90,7 +90,7 @@ describe('ContributorsState', () => {
 
             contributorsState.assign(request).subscribe();
 
-            expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.contributors);
+            expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.items);
             expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(newVersion);
         });
@@ -98,12 +98,12 @@ describe('ContributorsState', () => {
         it('should update contributors when contribution revoked', () => {
             const updated = createContributors(1, 2, 3);
 
-            contributorsService.setup(x => x.deleteContributor(app, oldContributors.contributors[0], version))
+            contributorsService.setup(x => x.deleteContributor(app, oldContributors.items[0], version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
-            contributorsState.revoke(oldContributors.contributors[0]).subscribe();
+            contributorsState.revoke(oldContributors.items[0]).subscribe();
 
-            expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.contributors);
+            expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.items);
             expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(newVersion);
         });

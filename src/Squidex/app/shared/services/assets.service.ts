@@ -117,7 +117,7 @@ export class AssetsService {
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
                 map(({ payload }) => {
                     const { total, items } = <{ total: number, items: any[] }>payload.body;
 
@@ -133,7 +133,7 @@ export class AssetsService {
 
         const req = new HttpRequest('POST', url, getFormData(file), { reportProgress: true });
 
-        return this.http.request<any>(req).pipe(
+        return this.http.request(req).pipe(
                 filter(event =>
                      event.type === HttpEventType.UploadProgress ||
                      event.type === HttpEventType.Response),
@@ -166,7 +166,7 @@ export class AssetsService {
     public getAsset(appName: string, id: string): Observable<AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
                 map(({ payload }) => {
                     const body = payload.body;
 

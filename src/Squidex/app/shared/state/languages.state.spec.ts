@@ -101,7 +101,7 @@ describe('LanguagesState', () => {
             languagesState.load().subscribe();
         });
 
-        it('should add language to snapshot when assigned', () => {
+        it('should update languages when language added', () => {
             const updated = createLanguages('de');
 
             languagesService.setup(x => x.postLanguage(app, It.isAny(), version))
@@ -112,7 +112,7 @@ describe('LanguagesState', () => {
             expectUpdated(updated);
         });
 
-        it('should update language in snapshot when updated', () => {
+        it('should update languages when language updated', () => {
             const updated = createLanguages('de');
 
             const request = { isMaster: true, isOptional: false, fallback: [] };
@@ -125,7 +125,7 @@ describe('LanguagesState', () => {
             expectUpdated(updated);
         });
 
-        it('should remove language from snapshot when deleted', () => {
+        it('should update languages when language deleted', () => {
             const updated = createLanguages('de');
 
             languagesService.setup(x => x.deleteLanguage(app, oldLanguages.items[1], version))

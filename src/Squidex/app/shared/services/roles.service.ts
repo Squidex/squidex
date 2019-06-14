@@ -54,7 +54,7 @@ export class RolesService {
     public getRoles(appName: string): Observable<RolesDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
                 mapVersioned(({ body }) => {
                     const items: any[] = body.roles;
 
@@ -73,7 +73,7 @@ export class RolesService {
     public postRole(appName: string, dto: CreateRoleDto, version: Version): Observable<Versioned<RoleDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
+        return HTTP.postVersioned(this.http, url, dto, version).pipe(
                 mapVersioned(() => {
                     const role = new RoleDto(dto.name, 0, 0, []);
 

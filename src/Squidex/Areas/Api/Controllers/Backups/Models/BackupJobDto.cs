@@ -50,19 +50,19 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         {
             var result = SimpleMapper.Map(backup, new BackupJobDto());
 
-            return CreateLinks(result, controller, app);
+            return result.CreateLinks(controller, app);
         }
 
-        private static BackupJobDto CreateLinks(BackupJobDto result, ApiController controller, string app)
+        private BackupJobDto CreateLinks(ApiController controller, string app)
         {
-            var values = new { app, id = result.Id };
+            var values = new { app, id = Id };
 
             if (controller.HasPermission(Permissions.AppBackupsDelete, app))
             {
-                result.AddDeleteLink("delete", controller.Url<BackupsController>(x => nameof(x.DeleteBackup), values));
+                AddDeleteLink("delete", controller.Url<BackupsController>(x => nameof(x.DeleteBackup), values));
             }
 
-            return result;
+            return this;
         }
     }
 }

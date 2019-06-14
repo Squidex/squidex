@@ -25,7 +25,7 @@ import {
 
 export type ContributorsDto = Versioned<ContributorsPayload>;
 export type ContributorsPayload = {
-    readonly contributors: ContributorDto[],
+    readonly items: ContributorDto[],
     readonly maxContributors: number
 } & Resource;
 
@@ -57,7 +57,7 @@ export class ContributorsService {
     public getContributors(appName: string): Observable<ContributorsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
                 mapVersioned(({ body }) => {
                     return parseContributors(body);
                 }),
@@ -95,8 +95,8 @@ export class ContributorsService {
     }
 }
 
-function parseContributors(body: any) {
-    const items: any[] = body.contributors;
+function parseContributors(response: any) {
+    const items: any[] = response.contributors;
 
     const contributors = items.map(item =>
         withLinks(
@@ -105,5 +105,5 @@ function parseContributors(body: any) {
                 item.role),
             item));
 
-    return withLinks({ contributors, maxContributors: body.maxContributors, _links: {} }, body);
+    return withLinks({ items: contributors, maxContributors: response.maxContributors, _links: {} }, response);
 }

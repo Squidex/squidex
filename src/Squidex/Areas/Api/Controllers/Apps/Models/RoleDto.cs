@@ -11,6 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -38,17 +39,24 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [Required]
         public IEnumerable<string> Permissions { get; set; }
 
-        public static RoleDto FromRole(Role role, IAppEntity app)
+        public static RoleDto FromRole(Role role, IAppEntity app, ApiController controller)
         {
             var permissions = role.Permissions.WithoutApp(app.Name);
 
-            return new RoleDto
+            var result = new RoleDto
             {
                 Name = role.Name,
                 NumClients = app.Clients.Count(x => string.Equals(x.Value.Role, role.Name, StringComparison.OrdinalIgnoreCase)),
                 NumContributors = app.Contributors.Count(x => string.Equals(x.Value, role.Name, StringComparison.OrdinalIgnoreCase)),
                 Permissions = permissions.ToIds()
             };
+
+            return result.CreateLinks(controller, app.Name);
+        }
+
+        private RoleDto CreateLinks(ApiController controller, string name)
+        {
+            return this;
         }
     }
 }

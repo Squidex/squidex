@@ -26,14 +26,14 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers.Models
                 Items = items.Select(x => EventConsumerDto.FromEventConsumerInfo(x, controller)).ToArray()
             };
 
-            return CreateLinks(result, controller);
+            return result.CreateLinks(controller);
         }
 
-        private static EventConsumersDto CreateLinks(EventConsumersDto result, ApiController controller)
+        private EventConsumersDto CreateLinks(ApiController controller)
         {
-            result.AddSelfLink(controller.Url<EventConsumersController>(c => nameof(c.GetEventConsumers)));
+            AddSelfLink(controller.Url<EventConsumersController>(c => nameof(c.GetEventConsumers)));
 
-            return result;
+            return this;
         }
     }
 }

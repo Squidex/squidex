@@ -52,7 +52,7 @@ export class PatternsService {
     public getPatterns(appName: string): Observable<PatternsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {
                 const items: any[] = body;
 
@@ -72,7 +72,7 @@ export class PatternsService {
     public postPattern(appName: string, dto: EditPatternDto, version: Version): Observable<Versioned<PatternDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
+        return HTTP.postVersioned(this.http, url, dto, version).pipe(
             mapVersioned(({ body }) => {
                 const pattern = new PatternDto(
                     body.patternId,

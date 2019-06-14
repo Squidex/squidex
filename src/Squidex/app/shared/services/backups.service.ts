@@ -82,7 +82,7 @@ export class BackupsService {
     public getRestore(): Observable<RestoreDto | null> {
         const url = this.apiUrl.buildUrl(`api/apps/restore`);
 
-        return this.http.get<any>(url).pipe(
+        return this.http.get(url).pipe(
                 map(body => {
                     const restore = parseRestore(body);
 

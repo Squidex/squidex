@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
@@ -34,21 +33,21 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                     .ToArray()
             };
 
-            return CreateLinks(result, controller, app.Name);
+            return result.CreateLinks(controller, app.Name);
         }
 
-        private static AppLanguagesDto CreateLinks(AppLanguagesDto result, ApiController controller, string app)
+        private AppLanguagesDto CreateLinks(ApiController controller, string app)
         {
             var values = new { app };
 
-            result.AddSelfLink(controller.Url<AppLanguagesController>(x => nameof(x.GetLanguages), values));
+            AddSelfLink(controller.Url<AppLanguagesController>(x => nameof(x.GetLanguages), values));
 
             if (controller.HasPermission(Permissions.AppLanguagesCreate, app))
             {
-                result.AddPostLink("create", controller.Url<AppLanguagesController>(x => nameof(x.PostLanguage), values));
+                AddPostLink("create", controller.Url<AppLanguagesController>(x => nameof(x.PostLanguage), values));
             }
 
-            return result;
+            return this;
         }
     }
 }

@@ -34,26 +34,26 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 Items = items.Select(x => RuleDto.FromRule(x, controller, app)).ToArray()
             };
 
-            return CreateLinks(result, controller, app);
+            return result.CreateLinks(controller, app);
         }
 
-        private static RulesDto CreateLinks(RulesDto result, ApiController controller, string app)
+        private RulesDto CreateLinks(ApiController controller, string app)
         {
             var values = new { app };
 
-            result.AddSelfLink(controller.Url<RulesController>(x => nameof(x.GetRules), values));
+            AddSelfLink(controller.Url<RulesController>(x => nameof(x.GetRules), values));
 
             if (controller.HasPermission(Permissions.AppRulesCreate, app))
             {
-                result.AddPostLink("create", controller.Url<RulesController>(x => nameof(x.PostRule), values));
+                AddPostLink("create", controller.Url<RulesController>(x => nameof(x.PostRule), values));
             }
 
             if (controller.HasPermission(Permissions.AppRulesEvents, app))
             {
-                result.AddGetLink("events", controller.Url<RulesController>(x => nameof(x.GetEvents), values));
+                AddGetLink("events", controller.Url<RulesController>(x => nameof(x.GetEvents), values));
             }
 
-            return result;
+            return this;
         }
     }
 }

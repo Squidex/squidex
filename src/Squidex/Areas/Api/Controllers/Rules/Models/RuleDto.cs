@@ -83,36 +83,36 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                 result.Trigger = RuleTriggerDtoFactory.Create(rule.RuleDef.Trigger);
             }
 
-            return CreateLinks(result, controller, app);
+            return result.CreateLinks(controller, app);
         }
 
-        private static RuleDto CreateLinks(RuleDto result, ApiController controller, string app)
+        private RuleDto CreateLinks(ApiController controller, string app)
         {
-            var values = new { app, id = result.Id };
+            var values = new { app, id = Id };
 
             if (controller.HasPermission(Permissions.AppRulesDisable, app))
             {
-                if (result.IsEnabled)
+                if (IsEnabled)
                 {
-                    result.AddPutLink("disable", controller.Url<RulesController>(x => nameof(x.DisableRule), values));
+                    AddPutLink("disable", controller.Url<RulesController>(x => nameof(x.DisableRule), values));
                 }
                 else
                 {
-                    result.AddPutLink("enable", controller.Url<RulesController>(x => nameof(x.EnableRule), values));
+                    AddPutLink("enable", controller.Url<RulesController>(x => nameof(x.EnableRule), values));
                 }
             }
 
             if (controller.HasPermission(Permissions.AppRulesUpdate))
             {
-                result.AddPutLink("update", controller.Url<RulesController>(x => nameof(x.PutRule), values));
+                AddPutLink("update", controller.Url<RulesController>(x => nameof(x.PutRule), values));
             }
 
             if (controller.HasPermission(Permissions.AppRulesDelete))
             {
-                result.AddPutLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteRule), values));
+                AddPutLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteRule), values));
             }
 
-            return result;
+            return this;
         }
     }
 }

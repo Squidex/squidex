@@ -41,12 +41,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var result = SimpleMapper.Map(client, new ClientDto { Id = id });
 
-            return CreateLinks(result, controller, app);
+            return result.CreateLinks(controller, app);
         }
 
-        private static ClientDto CreateLinks(ClientDto result, ApiController controller, string app)
+        private ClientDto CreateLinks(ApiController controller, string app)
         {
-            return result;
+            return this;
         }
     }
 }

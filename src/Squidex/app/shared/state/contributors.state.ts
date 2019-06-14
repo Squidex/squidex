@@ -126,9 +126,9 @@ export class ContributorsState extends State<Snapshot> {
             const maxContributors = payload.maxContributors || s.maxContributors;
 
             const isLoaded = true;
-            const isMaxReached = maxContributors > 0 && maxContributors <= payload.contributors.length;
+            const isMaxReached = maxContributors > 0 && maxContributors <= payload.items.length;
 
-            const contributors = ImmutableArray.of(payload.contributors);
+            const contributors = ImmutableArray.of(payload.items);
 
             return { ...s, contributors, maxContributors, isLoaded, isMaxReached, version: version, links: payload._links };
         });

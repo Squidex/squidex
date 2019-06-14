@@ -101,7 +101,7 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
                 map(({ payload }) => {
                     const body = payload.body;
 
@@ -132,7 +132,7 @@ export class ContentsService {
     public getContent(appName: string, schemaName: string, id: string): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
                 map(({ version, payload }) => {
                     const body = payload.body;
 
@@ -160,7 +160,7 @@ export class ContentsService {
     public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${version.value}`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
                 mapVersioned(({ body }) => {
                     return body;
                 }),
@@ -170,7 +170,7 @@ export class ContentsService {
     public postContent(appName: string, schemaName: string, dto: any, publish: boolean): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto).pipe(
+        return HTTP.postVersioned(this.http, url, dto).pipe(
                 map(({ version, payload }) => {
                     const body = payload.body;
 

@@ -21,7 +21,7 @@
                         {{client.name}}
                     </h3>
 
-                    <i class="client-edit icon-pencil" (click)="toggleRename()"></i>
+                    <i class="client-edit icon-pencil" *ngIf="isEditable" (click)="toggleRename()"></i>
                 </ng-template>
             </div>
             <div class="col-auto">
@@ -29,6 +29,7 @@
             </div>
             <div class="col-auto cell-actions no-padding">
                 <button type="button" class="btn btn-text-danger"
+                    [disabled]="client | sqxHasNoLink:'delete'"
                     (sqxConfirmClick)="revoke()"
                     confirmTitle="Revoke client" 
                     confirmText="Do you really want to revoke the client?">
@@ -70,7 +71,10 @@
                     Role
                 </label>
                 <div class="col cell-input">
-                    <select class="form-control" [ngModel]="client.role" (ngModelChange)="update($event)">
+                    <select class="form-control"
+                        [disabled]="!isEditable"
+                        [ngModel]="client.role"
+                        (ngModelChange)="update($event)">
                         <option *ngFor="let role of clientRoles; trackBy: trackByRole" [ngValue]="role.name">{{role.name}}</option>
                     </select>
                 </div>

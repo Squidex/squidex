@@ -29,21 +29,21 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
                 Items = backups.Select(x => BackupJobDto.FromBackup(x, controller, app)).ToArray()
             };
 
-            return CreateLinks(result, controller, app);
+            return result.CreateLinks(controller, app);
         }
 
-        private static BackupJobsDto CreateLinks(BackupJobsDto result, ApiController controller, string app)
+        private BackupJobsDto CreateLinks(ApiController controller, string app)
         {
             var values = new { app };
 
-            result.AddSelfLink(controller.Url<BackupsController>(x => nameof(x.GetBackups), values));
+            AddSelfLink(controller.Url<BackupsController>(x => nameof(x.GetBackups), values));
 
             if (controller.HasPermission(Permissions.AppBackupsCreate, app))
             {
-                result.AddPostLink("create", controller.Url<BackupsController>(x => nameof(x.PostBackup), values));
+                AddPostLink("create", controller.Url<BackupsController>(x => nameof(x.PostBackup), values));
             }
 
-            return result;
+            return this;
         }
     }
 }

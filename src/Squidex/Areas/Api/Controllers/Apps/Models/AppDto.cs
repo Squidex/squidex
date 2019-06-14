@@ -98,7 +98,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 result.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
             }
 
-            return CreateLinks(result, controller, permissions);
+            return result.CreateLinks(controller, permissions);
         }
 
         private static PermissionSet GetPermissions(IAppEntity app, string userId, PermissionSet userPermissions)
@@ -118,73 +118,73 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return new PermissionSet(permissions);
         }
 
-        private static AppDto CreateLinks(AppDto result, ApiController controller, PermissionSet permissions)
+        private AppDto CreateLinks(ApiController controller, PermissionSet permissions)
         {
-            var values = new { app = result.Name };
+            var values = new { app = Name };
 
-            result.AddGetLink("ping", controller.Url<PingController>(x => nameof(x.GetAppPing), values));
+            AddGetLink("ping", controller.Url<PingController>(x => nameof(x.GetAppPing), values));
 
-            if (controller.HasPermission(AllPermissions.AppDelete, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppDelete, Name, permissions: permissions))
             {
-                result.AddDeleteLink("delete", controller.Url<AppsController>(x => nameof(x.DeleteApp), values));
+                AddDeleteLink("delete", controller.Url<AppsController>(x => nameof(x.DeleteApp), values));
             }
 
-            if (controller.HasPermission(AllPermissions.AppAssetsRead, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppAssetsRead, Name, permissions: permissions))
             {
-                result.AddGetLink("assets", controller.Url<AssetsController>(x => nameof(x.GetAssets), values));
+                AddGetLink("assets", controller.Url<AssetsController>(x => nameof(x.GetAssets), values));
             }
 
-            if (controller.HasPermission(AllPermissions.AppBackupsRead, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppBackupsRead, Name, permissions: permissions))
             {
-                result.AddGetLink("backups", controller.Url<BackupsController>(x => nameof(x.GetBackups), values));
+                AddGetLink("backups", controller.Url<BackupsController>(x => nameof(x.GetBackups), values));
             }
 
-            if (controller.HasPermission(AllPermissions.AppClientsRead, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppClientsRead, Name, permissions: permissions))
             {
-                result.AddGetLink("clients", controller.Url<AppClientsController>(x => nameof(x.GetClients), values));
+                AddGetLink("clients", controller.Url<AppClientsController>(x => nameof(x.GetClients), values));
             }
 
-            if (controller.HasPermission(AllPermissions.AppContributorsRead, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppContributorsRead, Name, permissions: permissions))
             {
-                result.AddGetLink("contributors", controller.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
+                AddGetLink("contributors", controller.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
             }
 
-            if (controller.HasPermission(AllPermissions.AppCommon, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppCommon, Name, permissions: permissions))
             {
-                result.AddGetLink("languages", controller.Url<AppLanguagesController>(x => nameof(x.GetLanguages), values));
+                AddGetLink("languages", controller.Url<AppLanguagesController>(x => nameof(x.GetLanguages), values));
             }
 
-            if (controller.HasPermission(AllPermissions.AppCommon, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppCommon, Name, permissions: permissions))
             {
-                result.AddGetLink("patterns", controller.Url<AppPatternsController>(x => nameof(x.GetPatterns), values));
+                AddGetLink("patterns", controller.Url<AppPatternsController>(x => nameof(x.GetPatterns), values));
             }
 
-            if (controller.HasPermission(AllPermissions.AppPlansRead, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppPlansRead, Name, permissions: permissions))
             {
-                result.AddGetLink("plans", controller.Url<AppPlansController>(x => nameof(x.GetPlans), values));
+                AddGetLink("plans", controller.Url<AppPlansController>(x => nameof(x.GetPlans), values));
             }
 
-            if (controller.HasPermission(AllPermissions.AppRolesRead, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppRolesRead, Name, permissions: permissions))
             {
-                result.AddGetLink("roles", controller.Url<AppRolesController>(x => nameof(x.GetRoles), values));
+                AddGetLink("roles", controller.Url<AppRolesController>(x => nameof(x.GetRoles), values));
             }
 
-            if (controller.HasPermission(AllPermissions.AppRulesRead, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppRulesRead, Name, permissions: permissions))
             {
-                result.AddGetLink("rules", controller.Url<RulesController>(x => nameof(x.GetRules), values));
+                AddGetLink("rules", controller.Url<RulesController>(x => nameof(x.GetRules), values));
             }
 
-            if (controller.HasPermission(AllPermissions.AppCommon, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppCommon, Name, permissions: permissions))
             {
-                result.AddGetLink("schemas", controller.Url<SchemasController>(x => nameof(x.GetSchemas), values));
+                AddGetLink("schemas", controller.Url<SchemasController>(x => nameof(x.GetSchemas), values));
             }
 
-            if (controller.HasPermission(AllPermissions.AppSchemasCreate, result.Name, permissions: permissions))
+            if (controller.HasPermission(AllPermissions.AppSchemasCreate, Name, permissions: permissions))
             {
-                result.AddPostLink("schemas/create", controller.Url<SchemasController>(x => nameof(x.PostSchema), values));
+                AddPostLink("schemas/create", controller.Url<SchemasController>(x => nameof(x.PostSchema), values));
             }
 
-            return result;
+            return this;
         }
     }
 }

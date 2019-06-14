@@ -57,43 +57,43 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
 
             var result = SimpleMapper.Map(user, new UserDto { DisplayName = userName, Permissions = userPermssions });
 
-            return CreateLinks(result, controller);
+            return result.CreateLinks(controller);
         }
 
-        private static UserDto CreateLinks(UserDto result, ApiController controller)
+        private UserDto CreateLinks(ApiController controller)
         {
-            var values = new { id = result.Id };
+            var values = new { id = Id };
 
             if (controller is UserManagementController)
             {
-                result.AddSelfLink(controller.Url<UserManagementController>(c => nameof(c.GetUser), values));
+                AddSelfLink(controller.Url<UserManagementController>(c => nameof(c.GetUser), values));
             }
             else
             {
-                result.AddSelfLink(controller.Url<UsersController>(c => nameof(c.GetUser), values));
+                AddSelfLink(controller.Url<UsersController>(c => nameof(c.GetUser), values));
             }
 
-            if (!controller.IsUser(result.Id))
+            if (!controller.IsUser(Id))
             {
-                if (controller.HasPermission(LockPermission) && !result.IsLocked)
+                if (controller.HasPermission(LockPermission) && !IsLocked)
                 {
-                    result.AddPutLink("lock", controller.Url<UserManagementController>(c => nameof(c.LockUser), values));
+                    AddPutLink("lock", controller.Url<UserManagementController>(c => nameof(c.LockUser), values));
                 }
 
-                if (controller.HasPermission(UnlockPermission) && result.IsLocked)
+                if (controller.HasPermission(UnlockPermission) && IsLocked)
                 {
-                    result.AddPutLink("unlock", controller.Url<UserManagementController>(c => nameof(c.UnlockUser), values));
+                    AddPutLink("unlock", controller.Url<UserManagementController>(c => nameof(c.UnlockUser), values));
                 }
             }
 
             if (controller.HasPermission(UpdatePermission))
             {
-                result.AddPutLink("update", controller.Url<UserManagementController>(c => nameof(c.PutUser), values));
+                AddPutLink("update", controller.Url<UserManagementController>(c => nameof(c.PutUser), values));
             }
 
-            result.AddGetLink("picture", controller.Url<UsersController>(c => nameof(c.GetUserPicture), values));
+            AddGetLink("picture", controller.Url<UsersController>(c => nameof(c.GetUserPicture), values));
 
-            return result;
+            return this;
         }
     }
 }

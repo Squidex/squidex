@@ -17,37 +17,37 @@ import {
 } from '@app/framework/internal';
 
 export module HTTP {
-    export function getVersioned<T>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {
+    export function getVersioned<T = any>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
         return handleVersion(http.get<T>(url, { observe: 'response', headers }));
     }
 
-    export function postVersioned<T>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
+    export function postVersioned<T = any>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
         return handleVersion(http.post<T>(url, body, { observe: 'response', headers }));
     }
 
-    export function putVersioned<T>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
+    export function putVersioned<T = any>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
         return handleVersion(http.put<T>(url, body, { observe: 'response', headers }));
     }
 
-    export function patchVersioned<T>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
+    export function patchVersioned<T = any>(http: HttpClient, url: string, body: any, version?: Version): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
         return handleVersion(http.request<T>('PATCH', url, { body, observe: 'response', headers }));
     }
 
-    export function deleteVersioned<T>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {
+    export function deleteVersioned<T = any>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
         return handleVersion(http.delete<T>(url, { observe: 'response', headers }));
     }
 
-    export function requestVersioned<T>(http: HttpClient, method: string, url: string, version?: Version, body?: any): Observable<Versioned<HttpResponse<T>>> {
+    export function requestVersioned<T = any>(http: HttpClient, method: string, url: string, version?: Version, body?: any): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
         return handleVersion(http.request<T>(method, url, { observe: 'response', headers, body }));

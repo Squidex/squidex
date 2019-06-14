@@ -63,7 +63,7 @@ export class PlansService {
     public getPlans(appName: string): Observable<PlansDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plans`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
                 mapVersioned(({ body }) => {
                     const items: any[] = body.plans;
 
@@ -93,7 +93,7 @@ export class PlansService {
     public putPlan(appName: string, dto: ChangePlanDto, version: Version): Observable<Versioned<PlanChangedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plan`);
 
-        return HTTP.putVersioned<any>(this.http, url, dto, version).pipe(
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
                 mapVersioned(payload => {
                     return <PlanChangedDto>payload.body;
                 }),

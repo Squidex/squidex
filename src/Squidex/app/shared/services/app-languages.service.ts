@@ -24,7 +24,9 @@ import {
 } from '@app/framework';
 
 export type AppLanguagesDto = Versioned<AppLanguagesPayload>;
-export type AppLanguagesPayload = { items: AppLanguageDto[] } & Resource;
+export type AppLanguagesPayload = {
+    readonly items: AppLanguageDto[]
+} & Resource;
 
 export class AppLanguageDto {
     public readonly _links: ResourceLinks = {};
