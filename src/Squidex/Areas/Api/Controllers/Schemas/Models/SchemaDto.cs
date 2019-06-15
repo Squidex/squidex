@@ -87,12 +87,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
             SimpleMapper.Map(schema.SchemaDef, result);
             SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
 
-            return result.CreateLinks(controller, app);
+            result.CreateLinks(controller, app);
+
+            return result;
         }
 
-        protected virtual SchemaDto CreateLinks(ApiController controller, string app)
+        protected virtual void CreateLinks(ApiController controller, string app)
         {
             var values = new { app, name = Name };
+
+            var allowUpdate = controller.HasPermission(Permissions.AppSchemasUpdate, app, Name);
 
             AddSelfLink(controller.Url<SchemasController>(x => nameof(x.GetSchema), values));
 
@@ -101,7 +105,39 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 AddGetLink("contents", controller.Url<ContentsController>(x => nameof(x.GetContents), values));
             }
 
-            return this;
+            if (controller.HasPermission(Permissions.AppSchemasPublish, app, Name))
+            {
+                if (IsPublished)
+                {
+                    AddPutLink("unpublish", controller.Url<SchemasController>(x => nameof(x.UnpublishSchema), values));
+                }
+                else
+                {
+                    AddPutLink("publish", controller.Url<SchemasController>(x => nameof(x.PublishSchema), values));
+                }
+            }
+
+            if (allowUpdate)
+            {
+                AddPutLink("order", controller.Url<SchemaFieldsController>(x => nameof(x.PutSchemaFieldOrdering), values));
+
+                AddPutLink("update", controller.Url<SchemasController>(x => nameof(x.PutSchema), values));
+                AddPutLink("update/category", controller.Url<SchemasController>(x => nameof(x.PutCategory), values));
+                AddPutLink("update/sync", controller.Url<SchemasController>(x => nameof(x.PutSchemaSync), values));
+                AddPutLink("update/urls", controller.Url<SchemasController>(x => nameof(x.PutPreviewUrls), values));
+
+                AddPostLink("fields/add", controller.Url<SchemaFieldsController>(x => nameof(x.PostField), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppSchemasScripts, app, Name))
+            {
+                AddPutLink("update/scripts", controller.Url<SchemasController>(x => nameof(x.PutScripts), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppSchemasDelete, app, Name))
+            {
+                AddDeleteLink("delete", controller.Url<SchemasController>(x => nameof(x.DeleteSchema), values));
+            }
         }
     }
 }

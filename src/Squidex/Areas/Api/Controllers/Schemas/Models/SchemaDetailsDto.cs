@@ -11,6 +11,7 @@ using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -85,7 +86,24 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 result.Fields.Add(fieldDto);
             }
 
-            return (SchemaDetailsDto)result.CreateLinks(controller, app);
+            result.CreateLinks(controller, app);
+
+            return result;
+        }
+
+        protected override void CreateLinks(ApiController controller, string app)
+        {
+            base.CreateLinks(controller, app);
+
+            var allowUpdate = controller.HasPermission(Permissions.AppSchemasUpdate, app, Name);
+
+            if (Fields != null)
+            {
+                foreach (var nested in Fields)
+                {
+                    nested.CreateLinks(controller, app, Name, allowUpdate);
+                }
+            }
         }
     }
 }

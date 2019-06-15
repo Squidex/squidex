@@ -63,7 +63,7 @@ namespace Squidex.Web
 
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.my-app"));
 
-            var sut = new ApiPermissionAttribute(Permissions.AppSchemasRead);
+            var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -78,7 +78,7 @@ namespace Squidex.Web
 
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
-            var sut = new ApiPermissionAttribute(Permissions.AppSchemasRead);
+            var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -91,7 +91,7 @@ namespace Squidex.Web
         {
             user.AddClaim(new Claim(SquidexClaimTypes.Permissions, "squidex.apps.other-app"));
 
-            var sut = new ApiPermissionAttribute(Permissions.AppSchemasRead);
+            var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
@@ -102,7 +102,7 @@ namespace Squidex.Web
         [Fact]
         public async Task Should_return_forbidden_when_user_has_no_permission()
         {
-            var sut = new ApiPermissionAttribute(Permissions.AppSchemasRead);
+            var sut = new ApiPermissionAttribute(Permissions.AppSchemasCreate);
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 

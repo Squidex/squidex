@@ -22,14 +22,12 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
 
             result.AddGetLink("ping", controller.Url<PingController>(x => nameof(x.GetPing)));
 
-            result.AddGetLink("languages", controller.Url<LanguagesController>(x => nameof(x.GetLanguages)));
-
             if (controller.HasPermission(Permissions.AdminEventsRead))
             {
-                result.AddGetLink("admin/eventConsumers", controller.Url<EventConsumersController>(x => nameof(x.GetEventConsumers)));
+                result.AddGetLink("admin/events", controller.Url<EventConsumersController>(x => nameof(x.GetEventConsumers)));
             }
 
-            if (controller.HasPermission(Permissions.AdminRestoreRead))
+            if (controller.HasPermission(Permissions.AdminRestore))
             {
                 result.AddGetLink("admin/restore", controller.Url<RestoreController>(x => nameof(x.GetJob)));
             }
@@ -38,6 +36,8 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
             {
                 result.AddGetLink("admin/users", controller.Url<UserManagementController>(x => nameof(x.GetUsers)));
             }
+
+            result.AddGetLink("languages", controller.Url<LanguagesController>(x => nameof(x.GetLanguages)));
 
             return result;
         }

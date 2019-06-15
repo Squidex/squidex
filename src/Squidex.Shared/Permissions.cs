@@ -37,8 +37,6 @@ namespace Squidex.Shared
         public const string AdminAppCreate = "squidex.admin.apps.create";
 
         public const string AdminRestore = "squidex.admin.restore";
-        public const string AdminRestoreRead = "squidex.admin.restore.read";
-        public const string AdminRestoreCreate = "squidex.admin.restore.create";
 
         public const string AdminEvents = "squidex.admin.events";
         public const string AdminEventsRead = "squidex.admin.events.read";
@@ -107,7 +105,6 @@ namespace Squidex.Shared
         public const string AppRulesDelete = "squidex.apps.{app}.rules.delete";
 
         public const string AppSchemas = "squidex.apps.{app}.schemas.{name}";
-        public const string AppSchemasRead = "squidex.apps.{app}.schemas.{name}.read";
         public const string AppSchemasCreate = "squidex.apps.{app}.schemas.{name}.create";
         public const string AppSchemasUpdate = "squidex.apps.{app}.schemas.{name}.update";
         public const string AppSchemasScripts = "squidex.apps.{app}.schemas.{name}.scripts";

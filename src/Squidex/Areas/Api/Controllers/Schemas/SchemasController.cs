@@ -242,7 +242,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppSchemasScripts)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutSchemaScripts(string app, string name, [FromBody] SchemaScriptsDto request)
+        public async Task<IActionResult> PutScripts(string app, string name, [FromBody] SchemaScriptsDto request)
         {
             var command = request.ToCommand();
 

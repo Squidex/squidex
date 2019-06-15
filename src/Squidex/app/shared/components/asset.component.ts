@@ -13,7 +13,7 @@ import {
     DialogModel,
     DialogService,
     fadeAnimation,
-    hasLink,
+    hasAnyLink,
     StatefulComponent,
     Types,
     UploadCanceled
@@ -113,7 +113,7 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     }
 
     public updateFile(files: FileList) {
-        if (files.length === 1 && hasLink(this.asset, 'upload')) {
+        if (files.length === 1 && hasAnyLink(this.asset, 'upload')) {
             this.setProgress(1);
 
             this.assetUploader.uploadAsset(this.asset, files[0])

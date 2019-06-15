@@ -48,7 +48,7 @@ export function withLinks<T extends Resource>(value: T, source: Resource) {
     return value;
 }
 
-export function hasLink(value: Resource | ResourceLinks, rel: string): boolean {
+function hasLink(value: Resource | ResourceLinks, rel: string): boolean {
     const link = getLink(value, rel);
 
     return !!(link && link.method && link.href);

@@ -9,6 +9,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 
 import {
     fadeAnimation,
+    hasAnyLink,
     ImmutableArray,
     LocalStoreService,
     SchemaDetailsDto,
@@ -41,7 +42,7 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
     public name: string;
 
     @Input()
-    public isReadonly: boolean;
+    public forContent: boolean;
 
     @Input()
     public routeSingletonToContent = false;
@@ -122,7 +123,7 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
     }
 
     private isSameCategory(schema: SchemaDto): boolean {
-        return (!this.name && !schema.category) || schema.category === this.name;
+        return ((!this.name && !schema.category) || schema.category === this.name) && (!this.forContent || hasAnyLink(schema, 'contents'));
     }
 
     public changeCategory(schema: SchemaDto) {
@@ -135,10 +136,6 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
 
     public trackBySchema(index: number, schema: SchemaDto) {
         return schema.id;
-    }
-
-    public schemaPermission(schema: SchemaDto) {
-        return `?squidex.apps.{app}.schemas.${schema.name}.*;squidex.apps.{app}.contents.${schema.name}.*`;
     }
 
     private configKey(): string {

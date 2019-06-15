@@ -81,6 +81,7 @@
                 [patterns]="patterns"
                 [editForm]="editForm.form"
                 [editFormSubmitted]="editForm.submitted | async"
+                [isEditable]="isEditable"
                 [field]="field">
             </sqx-field-form>
         </form> 
@@ -90,7 +91,10 @@
         <ng-container *ngIf="field['nested']; let nested">
             <span class="nested-field-line-v"></span>
 
-            <div [sqxSortModel]="nested" (sqxSort)="sortFields($event)">
+            <div
+                [sqxSortDisabled]="!isEditable"
+                [sqxSortModel]="nested"
+                (sqxSort)="sortFields($event)">
                 <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByField.bind(this)">
                     <span class="nested-field-line-h"></span>
     

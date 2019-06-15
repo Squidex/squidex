@@ -167,7 +167,7 @@ describe('SchemasService', () => {
 
         const resource: Resource = {
             _links: {
-                updateScripts: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/scripts' }
+                ['update/scripts']: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/scripts' }
             }
         };
 
@@ -260,7 +260,7 @@ describe('SchemasService', () => {
 
         const resource: Resource = {
             _links: {
-                addField: { method: 'POST', href: '/api/apps/my-app/schemas/my-schema/fields' }
+                ['fields/add']: { method: 'POST', href: '/api/apps/my-app/schemas/my-schema/fields' }
             }
         };
 

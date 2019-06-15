@@ -31,11 +31,13 @@
                     Edit Preview Urls
                 </a>
                 
-                <div class="dropdown-divider"></div>
-
-                <a class="dropdown-item" (click)="cloneSchema()">
-                    Clone
-                </a>
+                <ng-container *ngIf="schemasState.links | async | sqxHasLink:'create'">
+                    <div class="dropdown-divider"></div>
+    
+                    <a class="dropdown-item" (click)="cloneSchema()">
+                        Clone
+                    </a>
+                </ng-container>
                 
                 <ng-container *ngIf="schema | sqxHasLink:'delete'">
                     <div class="dropdown-divider"></div>
@@ -63,14 +65,14 @@
         <div class="table-items-row table-items-row-empty" *ngIf="schema && schema.fields.length === 0">
             No field created yet.
             
-            <button type="button" class="btn btn-success btn-sm ml-2" (click)="addFieldDialog.show()" *ngIf="schemasState.links | async | sqxHasLink:'addField'">
+            <button type="button" class="btn btn-success btn-sm ml-2" (click)="addFieldDialog.show()" *ngIf="schemasState.links | async | sqxHasLink:'fields/add'">
                 <i class="icon icon-plus"></i> Add Field
             </button>
         </div>
 
         <ng-container *ngIf="patternsState.patterns | async; let patterns">
             <div class="schemas"
-                [disabled]="schema | sqxHasNoLink:'update'"
+                [sqxSortDisabled]="schema | sqxHasNoLink:'update'"
                 [sqxSortModel]="schema.fields"
                 (sqxSort)="sortFields($event)">
                 <div *ngFor="let field of schema.fields; trackBy: trackByField.bind(this)">
@@ -78,7 +80,7 @@
                 </div>
             </div>
     
-            <button type="button" class="btn btn-success field-button" (click)="addFieldDialog.show()" *ngIf="schemasState.links | async | sqxHasLink:'addField'">
+            <button type="button" class="btn btn-success field-button" (click)="addFieldDialog.show()" *ngIf="schema | sqxHasLink:'fields/add'">
                 <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">Add Field</div>
             </button>
         </ng-container>

@@ -15,29 +15,29 @@
 
     <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="snapshot.isOpen" @fade>
         <ng-container *ngFor="let schema of snapshot.schemasFiltered; trackBy: trackBySchema">
-            <ng-container *ngIf="schemaPermission(schema)">
-                <li class="nav-item" dnd-draggable [dragEnabled]="!isReadonly" [dragData]="schema">
-                    <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active">
-                        <div class="row" *ngIf="!isReadonly">
-                            <div class="col-4">
-                                <span class="schema-name schema-name-accent">{{schema.displayName}}</span> 
-                            </div>
-                            <div class="col-4">
-                                <span class="schema-user">
-                                    <i class="icon-user"></i> {{schema.lastModifiedBy | sqxUserNameRef}}
-                                </span>
-                            </div>
-                            <div class="col-4 schema-modified">
-                                <small class="item-modified">{{schema.lastModified | sqxFromNow}}</small>
-                                
-                                <span class="item-published" [class.unpublished]="!schema.isPublished"></span>
-                            </div>
+            <li class="nav-item" dnd-draggable [dragEnabled]="!forContent && schema | sqxHasLink:'update/category'" [dragData]="schema">
+                <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active">
+                    <div class="row" *ngIf="!forContent; else simpleMode">
+                        <div class="col-4">
+                            <span class="schema-name schema-name-accent">{{schema.displayName}}</span> 
                         </div>
-        
-                        <span class="schema-name" *ngIf="isReadonly">{{schema.displayName}}</span>
-                    </a>
-                </li>
-            </ng-container>
+                        <div class="col-4">
+                            <span class="schema-user">
+                                <i class="icon-user"></i> {{schema.lastModifiedBy | sqxUserNameRef}}
+                            </span>
+                        </div>
+                        <div class="col-4 schema-modified">
+                            <small class="item-modified">{{schema.lastModified | sqxFromNow}}</small>
+                            
+                            <span class="item-published" [class.unpublished]="!schema.isPublished"></span>
+                        </div>
+                    </div>
+
+                    <ng-template #simpleMode>
+                        <span class="schema-name" *ngIf="forContent">{{schema.displayName}}</span>
+                    </ng-template>
+                </a>
+            </li>
         </ng-container>
     </ul>
 </div>

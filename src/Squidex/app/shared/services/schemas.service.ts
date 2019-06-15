@@ -250,7 +250,7 @@ export class SchemasService {
     }
 
     public putScripts(appName: string, resource: Resource, dto: {}, version: Version): Observable<SchemaDetailsDto> {
-        const link = resource._links['updateScripts'];
+        const link = resource._links['update/scripts'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
@@ -340,7 +340,7 @@ export class SchemasService {
     }
 
     public postField(appName: string, resource: Resource, dto: AddFieldDto, version: Version): Observable<SchemaDetailsDto> {
-        const link = resource._links['addField'];
+        const link = resource._links['fields/add'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
@@ -503,26 +503,30 @@ function parseSchemaWithDetails(response: any, version: Version) {
                         nestedItem.properties.fieldType,
                         nestedItem.properties);
 
-                return new NestedFieldDto(
-                    nestedItem.fieldId,
-                    nestedItem.name,
-                    nestedPropertiesDto,
-                    item.fieldId,
-                    nestedItem.isLocked,
-                    nestedItem.isHidden,
-                    nestedItem.isDisabled);
+                return withLinks(
+                    new NestedFieldDto(
+                        nestedItem.fieldId,
+                        nestedItem.name,
+                        nestedPropertiesDto,
+                        item.fieldId,
+                        nestedItem.isLocked,
+                        nestedItem.isHidden,
+                        nestedItem.isDisabled),
+                    nestedItem);
             });
         }
 
-        return new RootFieldDto(
-            item.fieldId,
-            item.name,
-            propertiesDto,
-            item.partitioning,
-            item.isLocked,
-            item.isHidden,
-            item.isDisabled,
-            nested || []);
+        return withLinks(
+            new RootFieldDto(
+                item.fieldId,
+                item.name,
+                propertiesDto,
+                item.partitioning,
+                item.isLocked,
+                item.isHidden,
+                item.isDisabled,
+                nested || []),
+            item);
     });
 
     const properties = new SchemaPropertiesDto(response.properties.label, response.properties.hints);

@@ -5,16 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
 
 import * as Sortable from 'sortablejs';
+
+const DEFAULT_PROPS = { sort: true, animation: 150 };
 
 @Directive({
     selector: '[sqxSortModel]'
 })
-export class SortedDirective implements OnDestroy, OnInit {
+export class SortedDirective implements OnChanges, OnDestroy, OnInit {
     private sortable: Sortable.Ref;
-    private isDisabled: boolean;
 
     @Input()
     public dragHandle = '.drag-handle';
@@ -25,18 +26,18 @@ export class SortedDirective implements OnDestroy, OnInit {
     @Output('sqxSort')
     public sort = new EventEmitter<any[]>();
 
-    @Input('disabled')
-    public setDisabled(value: boolean) {
-        this.isDisabled = value;
-
-        if (this.sortable) {
-            this.sortable.option('disabled', value);
-        }
-    }
+    @Input('sqxSortDisabled')
+    public isDisabled = false;
 
     constructor(
         private readonly elementRef: ElementRef
     ) {
+    }
+
+    public ngOnChanges() {
+        if (this.sortable) {
+            this.sortable.option('disabled', this.isDisabled);
+        }
     }
 
     public ngOnDestroy() {
@@ -47,8 +48,7 @@ export class SortedDirective implements OnDestroy, OnInit {
 
     public ngOnInit() {
         this.sortable = Sortable.create(this.elementRef.nativeElement, {
-            sort: true,
-            animation: 150,
+            ...DEFAULT_PROPS,
 
             onSort: (event: { oldIndex: number, newIndex: number }) => {
                 if (this.sortModel && event.newIndex !== event.oldIndex) {
@@ -63,9 +63,9 @@ export class SortedDirective implements OnDestroy, OnInit {
                 }
             },
 
-            isDisabled: this.isDisabled,
-
             handle: this.dragHandle
         });
+
+        this.sortable.option('disabled', this.isDisabled);
     }
 }

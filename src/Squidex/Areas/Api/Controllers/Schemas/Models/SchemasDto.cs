@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
@@ -37,6 +38,15 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
         private SchemasDto CreateLinks(ApiController controller, string app)
         {
+            var values = new { app };
+
+            AddSelfLink(controller.Url<SchemasController>(x => nameof(x.GetSchemas), values));
+
+            if (controller.HasPermission(Permissions.AppSchemasCreate, app))
+            {
+                AddPostLink("create", controller.Url<SchemasController>(x => nameof(x.PostSchema), values));
+            }
+
             return this;
         }
     }
