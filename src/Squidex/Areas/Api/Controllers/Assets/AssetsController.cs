@@ -109,10 +109,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
-                Response.Headers["Surrogate-Key"] = response.Items.ToSurrogateKeys();
+                Response.Headers["Surrogate-Key"] = response.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = response.Items.ToManyEtag(response.Total);
+            Response.Headers[HeaderNames.ETag] = response.ToEtag();
 
             return Ok(response);
         }

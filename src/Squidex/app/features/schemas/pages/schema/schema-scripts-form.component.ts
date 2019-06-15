@@ -10,6 +10,7 @@ import { FormBuilder } from '@angular/forms';
 
 import {
     EditScriptsForm,
+    hasAnyLink,
     SchemaDetailsDto,
     SchemasState
 } from '@app/shared';
@@ -30,6 +31,8 @@ export class SchemaScriptsFormComponent implements OnInit {
 
     public editForm = new EditScriptsForm(this.formBuilder);
 
+    public isEditable = false;
+
     constructor(
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
@@ -37,7 +40,13 @@ export class SchemaScriptsFormComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.isEditable = hasAnyLink(this.schema, 'update');
+
         this.editForm.load(this.schema.scripts);
+
+        if (!this.isEditable) {
+            this.editForm.form.disable();
+        }
     }
 
     public emitComplete() {
@@ -49,6 +58,10 @@ export class SchemaScriptsFormComponent implements OnInit {
     }
 
     public saveSchema() {
+        if (!this.isEditable) {
+            return;
+        }
+
         const value = this.editForm.submit();
 
         if (value) {

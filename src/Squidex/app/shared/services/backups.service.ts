@@ -14,7 +14,6 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
-    Model,
     pretifyError,
     Resource,
     ResourceLinks,
@@ -41,7 +40,7 @@ export class BackupDto {
     }
 }
 
-export class RestoreDto extends Model<BackupDto> {
+export class RestoreDto {
     constructor(
         public readonly url: string,
         public readonly started: DateTime,
@@ -49,7 +48,6 @@ export class RestoreDto extends Model<BackupDto> {
         public readonly status: string,
         public readonly log: string[]
     ) {
-        super();
     }
 }
 

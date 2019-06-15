@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -132,10 +131,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
-                Response.Headers["Surrogate-Key"] = response.Items.ToSurrogateKeys();
+                Response.Headers["Surrogate-Key"] = response.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = response.Items.ToManyEtag();
+            Response.Headers[HeaderNames.ETag] = response.ToEtag();
 
             return Ok(response);
         }
@@ -168,10 +167,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
-                Response.Headers["Surrogate-Key"] = response.Items.ToSurrogateKeys();
+                Response.Headers["Surrogate-Key"] = response.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = response.Items.ToManyEtag(response.Total);
+            Response.Headers[HeaderNames.ETag] = response.ToEtag();
 
             return Ok(response);
         }

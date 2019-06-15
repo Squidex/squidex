@@ -44,16 +44,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/schemas/")]
-        [ProducesResponseType(typeof(SchemaDto[]), 200)]
+        [ProducesResponseType(typeof(SchemasDto), 200)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchemas(string app)
         {
             var schemas = await appProvider.GetSchemasAsync(AppId);
 
-            var response = schemas.ToArray(x => SchemaDto.FromSchema(x, this, app));
+            var response = SchemasDto.FromSchemas(schemas, this, app);
 
-            Response.Headers[HeaderNames.ETag] = response.ToManyEtag();
+            Response.Headers[HeaderNames.ETag] = response.ToEtag();
 
             return Ok(response);
         }

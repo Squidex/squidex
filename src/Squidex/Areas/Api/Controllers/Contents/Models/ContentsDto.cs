@@ -26,6 +26,16 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public ContentDto[] Items { get; set; }
 
+        public string ToEtag()
+        {
+            return Items.ToManyEtag(Total);
+        }
+
+        public string ToSurrogateKeys()
+        {
+            return Items.ToSurrogateKeys();
+        }
+
         public static ContentsDto FromContents(IList<IContentEntity> contents, QueryContext context, ApiController controller, string app)
         {
             var result = new ContentsDto

@@ -37,19 +37,19 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
         public static SchemaDetailsDto FromSchemaWithDetails(ISchemaEntity schema, ApiController controller, string app)
         {
-            var response = new SchemaDetailsDto();
+            var result = new SchemaDetailsDto();
 
-            SimpleMapper.Map(schema, response);
-            SimpleMapper.Map(schema.SchemaDef, response);
-            SimpleMapper.Map(schema.SchemaDef.Scripts, response.Scripts);
-            SimpleMapper.Map(schema.SchemaDef.Properties, response.Properties);
+            SimpleMapper.Map(schema, result);
+            SimpleMapper.Map(schema.SchemaDef, result);
+            SimpleMapper.Map(schema.SchemaDef.Scripts, result.Scripts);
+            SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
 
             if (schema.SchemaDef.PreviewUrls.Count > 0)
             {
-                response.PreviewUrls = new Dictionary<string, string>(schema.SchemaDef.PreviewUrls);
+                result.PreviewUrls = new Dictionary<string, string>(schema.SchemaDef.PreviewUrls);
             }
 
-            response.Fields = new List<FieldDto>();
+            result.Fields = new List<FieldDto>();
 
             foreach (var field in schema.SchemaDef.Fields)
             {
@@ -82,10 +82,10 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                     }
                 }
 
-                response.Fields.Add(fieldDto);
+                result.Fields.Add(fieldDto);
             }
 
-            return CreateLinks(response, controller, app);
+            return (SchemaDetailsDto)result.CreateLinks(controller, app);
         }
     }
 }

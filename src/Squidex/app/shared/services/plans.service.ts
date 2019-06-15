@@ -15,7 +15,6 @@ import {
     ApiUrlConfig,
     HTTP,
     mapVersioned,
-    Model,
     pretifyError,
     Version,
     Versioned
@@ -28,7 +27,7 @@ export type PlansDto = Versioned<{
     readonly plans: PlanDto[]
 }>;
 
-export class PlanDto extends Model<PlanDto> {
+export class PlanDto {
     constructor(
         public readonly id: string,
         public readonly name: string,
@@ -39,7 +38,6 @@ export class PlanDto extends Model<PlanDto> {
         public readonly maxAssetSize: number,
         public readonly maxContributors: number
     ) {
-        super();
     }
 }
 

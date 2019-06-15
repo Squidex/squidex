@@ -40,7 +40,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// The schema properties.
         /// </summary>
         [Required]
-        public SchemaPropertiesDto Properties { get; set; }
+        public SchemaPropertiesDto Properties { get; set; } = new SchemaPropertiesDto();
 
         /// <summary>
         /// Indicates if the schema is a singleton.
@@ -81,27 +81,27 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
         public static SchemaDto FromSchema(ISchemaEntity schema, ApiController controller, string app)
         {
-            var response = new SchemaDto { Properties = new SchemaPropertiesDto() };
+            var result = new SchemaDto();
 
-            SimpleMapper.Map(schema, response);
-            SimpleMapper.Map(schema.SchemaDef, response);
-            SimpleMapper.Map(schema.SchemaDef.Properties, response.Properties);
+            SimpleMapper.Map(schema, result);
+            SimpleMapper.Map(schema.SchemaDef, result);
+            SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
 
-            return CreateLinks(response, controller, app);
+            return result.CreateLinks(controller, app);
         }
 
-        protected static T CreateLinks<T>(T response, ApiController controller, string app) where T : SchemaDto
+        protected virtual SchemaDto CreateLinks(ApiController controller, string app)
         {
-            var values = new { app, name = response.Name };
+            var values = new { app, name = Name };
 
-            response.AddSelfLink(controller.Url<SchemasController>(x => nameof(x.GetSchema), values));
+            AddSelfLink(controller.Url<SchemasController>(x => nameof(x.GetSchema), values));
 
-            if (controller.HasPermission(Permissions.AppContentsRead, app, response.Name))
+            if (controller.HasPermission(Permissions.AppContentsRead, app, Name))
             {
-                response.AddGetLink("contents", controller.Url<ContentsController>(x => nameof(x.GetContents), values));
+                AddGetLink("contents", controller.Url<ContentsController>(x => nameof(x.GetContents), values));
             }
 
-            return response;
+            return this;
         }
     }
 }

@@ -11,6 +11,7 @@ import { FormBuilder } from '@angular/forms';
 import {
     AddPreviewUrlForm,
     ConfigurePreviewUrlsForm,
+    hasAnyLink,
     SchemaDetailsDto,
     SchemasState
 } from '@app/shared';
@@ -31,6 +32,8 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
 
     public editForm = new ConfigurePreviewUrlsForm(this.formBuilder);
 
+    public isEditable = false;
+
     constructor(
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
@@ -38,7 +41,13 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.isEditable = hasAnyLink(this.schema, 'update');
+
         this.editForm.load(this.schema.previewUrls);
+
+        if (!this.isEditable) {
+            return;
+        }
     }
 
     public emitComplete() {
@@ -50,6 +59,10 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
     }
 
     public add() {
+        if (!this.isEditable) {
+            return;
+        }
+
         const value = this.addForm.submit();
 
         if (value) {
@@ -60,6 +73,10 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
     }
 
     public saveSchema() {
+        if (!this.isEditable) {
+            return;
+        }
+
         const value = this.editForm.submit();
 
         if (value) {

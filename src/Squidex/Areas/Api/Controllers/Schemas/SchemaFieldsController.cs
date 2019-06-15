@@ -541,8 +541,8 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var response = context.Result<ISchemaEntity>();
-            var response = SchemaDetailsDto.FromSchemaWithDetails(response, this, app);
+            var result = context.Result<ISchemaEntity>();
+            var response = SchemaDetailsDto.FromSchemaWithDetails(result, this, app);
 
             return response;
         }

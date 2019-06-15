@@ -13,6 +13,7 @@ import {
     DialogModel,
     EditFieldForm,
     fadeAnimation,
+    hasAnyLink,
     ImmutableArray,
     ModalModel,
     NestedFieldDto,
@@ -45,7 +46,9 @@ export class FieldComponent implements OnChanges {
 
     public dropdown = new ModalModel();
 
-    public editing = false;
+    public isEditing = false;
+    public isEditable = false;
+
     public editForm = new EditFieldForm(this.formBuilder);
 
     public addFieldDialog = new DialogModel();
@@ -58,18 +61,16 @@ export class FieldComponent implements OnChanges {
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['field']) {
-            this.editForm.load(this.field.properties);
+            this.isEditable = hasAnyLink(this.field, 'update');
 
-            if (this.field.isLocked) {
-                this.editForm.form.disable();
-            }
+            this.editForm.load(this.field.properties);
         }
     }
 
     public toggleEditing() {
-        this.editing = !this.editing;
+        this.isEditing = !this.isEditing;
 
-        if (this.editing) {
+        if (this.isEditing) {
             this.editForm.load(this.field.properties);
         }
     }
@@ -102,11 +103,11 @@ export class FieldComponent implements OnChanges {
         this.schemasState.lockField(this.schema, this.field);
     }
 
-    public trackByField(index: number, field: NestedFieldDto) {
-        return field.fieldId + this.schema.id;
-    }
-
     public save() {
+        if (!this.isEditable) {
+            return;
+        }
+
         const value = this.editForm.submit();
 
         if (value) {
@@ -119,6 +120,10 @@ export class FieldComponent implements OnChanges {
                     this.editForm.submitFailed(error);
                 });
         }
+    }
+
+    public trackByField(index: number, field: NestedFieldDto) {
+        return field.fieldId + this.schema.id;
     }
 }
 
