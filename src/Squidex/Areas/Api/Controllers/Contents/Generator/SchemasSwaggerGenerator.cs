@@ -18,6 +18,7 @@ using NSwag.SwaggerGeneration;
 using NSwag.SwaggerGeneration.Processors;
 using NSwag.SwaggerGeneration.Processors.Contexts;
 using Squidex.Areas.Api.Config.Swagger;
+using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
@@ -32,6 +33,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         private readonly SwaggerDocumentSettings settings = new SwaggerDocumentSettings();
         private SwaggerJsonSchemaGenerator schemaGenerator;
         private SwaggerDocument document;
+        private JsonSchema4 statusSchema;
         private JsonSchemaResolver schemaResolver;
 
         public SchemasSwaggerGenerator(IOptions<UrlsOptions> urlOptions, IEnumerable<IDocumentProcessor> documentProcessors)
@@ -53,9 +55,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             schemaGenerator = new SwaggerJsonSchemaGenerator(settings);
             schemaResolver = new SwaggerSchemaResolver(document, settings);
 
-            GenerateSchemasOperations(schemas, app);
+            statusSchema = await GenerateStatusSchemaAsync();
 
-            await GenerateDefaultErrorsAsync();
+            GenerateSchemasOperations(schemas, app);
 
             var context =
                 new DocumentProcessorContext(document,
@@ -73,25 +75,23 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return document;
         }
 
+        private Task<JsonSchema4> GenerateStatusSchemaAsync()
+        {
+            var errorType = typeof(ChangeStatusDto);
+
+            return schemaGenerator.GenerateWithReferenceAsync<JsonSchema4>(errorType, Enumerable.Empty<Attribute>(), schemaResolver);
+        }
+
         private void GenerateSchemasOperations(IEnumerable<ISchemaEntity> schemas, IAppEntity app)
         {
             var appBasePath = $"/content/{app.Name}";
 
             foreach (var schema in schemas.Select(x => x.SchemaDef).Where(x => x.IsPublished))
             {
-                new SchemaSwaggerGenerator(document, app.Name, appBasePath, schema, AppendSchema, app.PartitionResolver()).GenerateSchemaOperations();
-            }
-        }
+                var partition = app.PartitionResolver();
 
-        private async Task GenerateDefaultErrorsAsync()
-        {
-            const string errorDescription = "Operation failed with internal server error.";
-
-            var errorDtoSchema = await schemaGenerator.GetErrorDtoSchemaAsync(schemaResolver);
-
-            foreach (var operation in document.Paths.Values.SelectMany(x => x.Values))
-            {
-                operation.Responses.Add("500", new SwaggerResponse { Description = errorDescription, Schema = errorDtoSchema });
+                new SchemaSwaggerGenerator(document, app.Name, appBasePath, schema, AppendSchema, statusSchema, partition)
+                    .GenerateSchemaOperations();
             }
         }
 

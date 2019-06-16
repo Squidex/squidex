@@ -130,14 +130,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (controller.HasPermission(Permissions.AppContentsUpdate, app, schema))
             {
-                AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
-
                 AddPutLink("update", controller.Url<ContentsController>(x => nameof(x.PutContent), values));
 
                 if (Status == Status.Published)
                 {
                     AddPutLink("draft/propose", controller.Url<ContentsController>(x => nameof(x.PutContent), values) + "?asDraft=true");
                 }
+
+                AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
             }
 
             if (controller.HasPermission(Permissions.AppContentsDelete, app, schema))

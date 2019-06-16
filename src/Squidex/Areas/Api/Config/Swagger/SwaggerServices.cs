@@ -22,6 +22,9 @@ namespace Squidex.Areas.Api.Config.Swagger
     {
         public static void AddMySwaggerSettings(this IServiceCollection services)
         {
+            services.AddSingletonAs<ErrorDtoProcessor>()
+                .As<IDocumentProcessor>();
+
             services.AddSingletonAs<RuleActionProcessor>()
                 .As<IDocumentProcessor>();
 
