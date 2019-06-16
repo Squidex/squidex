@@ -83,16 +83,16 @@ export const pretifyError = (message: string) => <T>(source: Observable<T>) =>
                 let errorDto = Types.isObject(response.error) ? response.error : JSON.parse(response.error);
 
                 if (!errorDto) {
-                    errorDto = { message: 'Failed to make the request.', details: [response] };
+                    errorDto = { message: 'Failed to make the request.', details: [] };
                 }
 
                 if (response.status === 412) {
-                    result = new ErrorDto(response.status, 'Failed to make the update. Another user has made a change. Please reload.');
+                    result = new ErrorDto(response.status, 'Failed to make the update. Another user has made a change. Please reload.', [], response);
                 } else if (response.status !== 500) {
-                    result = new ErrorDto(response.status, errorDto.message, errorDto.details);
+                    result = new ErrorDto(response.status, errorDto.message, errorDto.details, response);
                 }
             } catch (e) {
-                result = new ErrorDto(500, 'Failed to make the request.');
+                result = new ErrorDto(500, 'Failed to make the request.', [], response);
             }
         }
 

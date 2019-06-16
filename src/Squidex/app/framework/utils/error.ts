@@ -11,7 +11,8 @@ export class ErrorDto {
     constructor(
         public readonly statusCode: number,
         public readonly message: string,
-        public readonly details: string[] = []
+        public readonly details: string[] = [],
+        public readonly inner?: any
     ) {
         this.displayMessage = formatMessage(message, details);
     }
