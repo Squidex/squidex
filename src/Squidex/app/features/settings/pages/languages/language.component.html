@@ -14,7 +14,7 @@
                     </button>
 
                     <button type="button" class="btn btn-text-danger"
-                        [disabled]="language | sqxHasNoLink:'delete'"
+                        [disabled]="!language.canDelete"
                         (sqxConfirmClick)="remove()"
                         confirmTitle="Remove language" 
                         confirmText="Do you really want to remove the language?">

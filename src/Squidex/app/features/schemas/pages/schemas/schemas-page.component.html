@@ -8,11 +8,10 @@
     <ng-container secondHeader>
         <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 
-        <ng-container>
-            <sqx-shortcut keys="ctrl+shift+g" (trigger)="addSchemaDialog.show()" [disabled]="schemasState.links | sqxHasNoLink:'create'"></sqx-shortcut>
+        <ng-container *ngIf="schemasState.canCreate | async">
+            <sqx-shortcut keys="ctrl+shift+g" (trigger)="addSchemaDialog.show()"></sqx-shortcut>
 
             <button type="button" class="btn btn-success subheader-button" (click)="createSchema()"
-                [disabled]="schemasState.links | async | sqxHasNoLink:'create'" 
                 title="New Schema (CTRL + SHIFT + G)" 
                 titlePosition="top-left">
                 <i class="icon-plus"></i>          

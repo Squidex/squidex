@@ -15,6 +15,7 @@ import {
     ApiUrlConfig,
     DateTime,
     ErrorDto,
+    hasAnyLink,
     HTTP,
     Metadata,
     pretifyError,
@@ -23,24 +24,22 @@ import {
     ResultSet,
     Types,
     Version,
-    Versioned,
-    withLinks
+    Versioned
 } from '@app/framework';
 
-export class AssetsDto extends ResultSet<AssetDto> {
-    public readonly _links: ResourceLinks = {};
-}
+export class AssetsDto extends ResultSet<AssetDto> {}
 
 export class AssetDto {
-    public get canPreview() {
-        return this.isImage || (this.mimeType === 'image/svg+xml' && this.fileSize < 100 * 1024);
-    }
-
     public readonly _meta: Metadata = {};
 
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
 
-    constructor(
+    public readonly canDelete: boolean;
+    public readonly canPreview: boolean;
+    public readonly canUpdate: boolean;
+    public readonly canUpload: boolean;
+
+    constructor(links: ResourceLinks, meta: Metadata,
         public readonly id: string,
         public readonly created: DateTime,
         public readonly createdBy: string,
@@ -59,6 +58,15 @@ export class AssetDto {
         public readonly tags: string[],
         public readonly version: Version
     ) {
+        this.canPreview = this.isImage || (this.mimeType === 'image/svg+xml' && this.fileSize < 100 * 1024);
+
+        this._links = links;
+
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canUpdate = hasAnyLink(links, 'update');
+        this.canUpload = hasAnyLink(links, 'upload');
+
+        this._meta = meta;
     }
 }
 
@@ -117,13 +125,11 @@ export class AssetsService {
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
-        return HTTP.getVersioned(this.http, url).pipe(
-                map(({ payload }) => {
-                    const { total, items } = <{ total: number, items: any[] }>payload.body;
+        return this.http.get<{ total: number, items: any[] } & Resource>(url).pipe(
+                map(({ total, items, _links }) => {
+                    const assets = items.map(item => parseAsset(item)); ;
 
-                    const assets = new AssetsDto(total, items.map(item => parseAsset(item)));
-
-                    return withLinks(assets, payload.body);
+                    return new AssetsDto(total, assets, _links);
                 }),
                 pretifyError('Failed to load assets. Please reload.'));
     }
@@ -249,22 +255,20 @@ function getFormData(file: File) {
 }
 
 function parseAsset(response: any) {
-    return withLinks(
-        new AssetDto(
-            response.id,
-            DateTime.parseISO_UTC(response.created), response.createdBy,
-            DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
-            response.fileName,
-            response.fileHash,
-            response.fileType,
-            response.fileSize,
-            response.fileVersion,
-            response.mimeType,
-            response.isImage,
-            response.pixelWidth,
-            response.pixelHeight,
-            response.slug,
-            response.tags || [],
-            new Version(response.version.toString())),
-        response);
+    return new AssetDto(response._links, response._meta,
+        response.id,
+        DateTime.parseISO_UTC(response.created), response.createdBy,
+        DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
+        response.fileName,
+        response.fileHash,
+        response.fileType,
+        response.fileSize,
+        response.fileVersion,
+        response.mimeType,
+        response.isImage,
+        response.pixelWidth,
+        response.pixelHeight,
+        response.slug,
+        response.tags || [],
+        new Version(response.version.toString()));
 }

@@ -16,14 +16,25 @@ import {
     DateTime,
     pretifyError,
     Resource,
-    ResourceLinks,
-    withLinks
+    ResourceLinks
 } from '@app/framework';
 
 export class AppDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
 
-    constructor(
+    public readonly canCreateSchema: boolean;
+    public readonly canDelete: boolean;
+    public readonly canReadBackups: boolean;
+    public readonly canReadClients: boolean;
+    public readonly canReadContributors: boolean;
+    public readonly canReadPatterns: boolean;
+    public readonly canReadLanguages: boolean;
+    public readonly canReadPlans: boolean;
+    public readonly canReadRoles: boolean;
+    public readonly canReadRules: boolean;
+    public readonly canReadSchemas: boolean;
+
+    constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly name: string,
         public readonly permissions: string[],
@@ -34,6 +45,7 @@ export class AppDto {
         public readonly planName?: string,
         public readonly planUpgrade?: string
     ) {
+        this._links = links;
     }
 }
 
@@ -90,16 +102,14 @@ export class AppsService {
 }
 
 function parseApp(response: any) {
-    return withLinks(
-        new AppDto(
-            response.id,
-            response.name,
-            response.permissions,
-            DateTime.parseISO_UTC(response.created),
-            DateTime.parseISO_UTC(response.lastModified),
-            response.canAccessApi,
-            response.canAccessContent,
-            response.planName,
-            response.planUpgrade),
-        response);
+    return new AppDto(response._links,
+        response.id,
+        response.name,
+        response.permissions,
+        DateTime.parseISO_UTC(response.created),
+        DateTime.parseISO_UTC(response.lastModified),
+        response.canAccessApi,
+        response.canAccessContent,
+        response.planName,
+        response.planUpgrade);
 }

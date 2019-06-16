@@ -13,30 +13,42 @@ import { tap } from 'rxjs/operators';
 import {
     AnalyticsService,
     ApiUrlConfig,
+    hasAnyLink,
     HTTP,
     mapVersioned,
     pretifyError,
     Resource,
     ResourceLinks,
     Version,
-    Versioned,
-    withLinks
+    Versioned
 } from '@app/framework';
 
 export type PatternsDto = Versioned<PatternsPayload>;
 export type PatternsPayload = {
-    items: PatternDto[]
+    readonly items: PatternDto[],
+
+    readonly canCreate: boolean;
 } & Resource;
 
 export class PatternDto {
     public readonly _links: ResourceLinks = {};
 
+    public readonly canDelete: boolean;
+    public readonly canUpdate: boolean;
+
     constructor(
+        links: ResourceLinks,
         public readonly id: string,
         public readonly name: string,
         public readonly pattern: string,
         public readonly message?: string
     ) {
+        this._links = links;
+
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canUpdate = hasAnyLink(links, 'update');
+
+        Object.freeze(this);
     }
 }
 
@@ -113,13 +125,13 @@ function parsePatterns(response: any) {
     const items: any[] = response.items;
 
     const patterns = items.map(item =>
-        withLinks(
-            new PatternDto(
-                item.id,
-                item.name,
-                item.pattern,
-                item.message),
-            item));
+        new PatternDto(item._links,
+            item.id,
+            item.name,
+            item.pattern,
+            item.message));
 
-    return withLinks({ items: patterns, _links: {} }, response);
+    const _links = response._links;
+
+    return { items: patterns, _links, canCreate: hasAnyLink(_links, 'create') };
 }

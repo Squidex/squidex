@@ -13,8 +13,7 @@ import {
     ResourcesDto,
     UIService,
     UIState,
-    UsersService,
-    withLinks
+    UsersService
 } from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
@@ -38,7 +37,9 @@ describe('UIState', () => {
     };
 
     const resources: ResourceLinks = {
-        schemas: { method: 'GET', href: '/api/schemas' }
+        ['admin/events']: { method: 'GET', href: '/api/events' },
+        ['admin/restore']: { method: 'GET', href: '/api/restore' },
+        ['admin/users']: { method: 'GET', href: '/api/users' },
     };
 
     let usersService: IMock<UsersService>;
@@ -63,7 +64,7 @@ describe('UIState', () => {
         usersService = Mock.ofType<UsersService>();
 
         usersService.setup(x => x.getResources())
-            .returns(() => of(withLinks(new ResourcesDto(), { _links: resources })));
+            .returns(() => of(new ResourcesDto(resources)));
 
         uiState = new UIState(appsState.object, uiService.object, usersService.object);
     });
@@ -76,7 +77,9 @@ describe('UIState', () => {
             canCreateApps: true
         });
 
-        expect(uiState.snapshot.resources).toEqual(resources);
+        expect(uiState.snapshot.canReadEvents).toBeTruthy();
+        expect(uiState.snapshot.canReadUsers).toBeTruthy();
+        expect(uiState.snapshot.canRestore).toBeTruthy();
     });
 
     it('should add value to snapshot when set', () => {

@@ -12,27 +12,38 @@ import { map } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
+    hasAnyLink,
     pretifyError,
     Resource,
     ResourceLinks,
-    ResultSet,
-    withLinks
+    ResultSet
 } from '@app/shared';
 
 export class UsersDto  extends ResultSet<UserDto> {
-    public readonly _links: ResourceLinks = {};
+    public get canCreate() {
+        return hasAnyLink(this._links, 'create');
+    }
 }
 
 export class UserDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
 
-    constructor(
+    public readonly canLock: boolean;
+    public readonly canUnlock: boolean;
+    public readonly canUpdate: boolean;
+
+    constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly email: string,
         public readonly displayName: string,
         public readonly permissions: string[] = [],
         public readonly isLocked?: boolean
     ) {
+        this._links = links;
+
+        this.canLock = hasAnyLink(links, 'lock');
+        this.canUnlock = hasAnyLink(links, 'unlock');
+        this.canUpdate = hasAnyLink(links, 'update');
     }
 }
 
@@ -62,10 +73,10 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
 
         return this.http.get<{ total: number, items: any[] } & Resource>(url).pipe(
-                map(body => {
-                    const users = body.items.map(item => parseUser(item));
+                map(({ total, items, _links }) => {
+                    const users = items.map(item => parseUser(item));
 
-                    return withLinks(new UsersDto(body.total, users), body);
+                    return new UsersDto(total, users, _links);
                 }),
                 pretifyError('Failed to load users. Please reload.'));
     }
@@ -128,12 +139,11 @@ export class UsersService {
 }
 
 function parseUser(response: any) {
-    return withLinks(
-        new UserDto(
-            response.id,
-            response.email,
-            response.displayName,
-            response.permissions,
-            response.isLocked),
-        response);
+    return new UserDto(
+        response._links,
+        response.id,
+        response.email,
+        response.displayName,
+        response.permissions,
+        response.isLocked);
 }

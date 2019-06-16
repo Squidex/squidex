@@ -16,7 +16,6 @@ import {
     UsersService
 } from '@app/features/administration/internal';
 
-
 import { UsersState } from './users.state';
 
 import { createUser } from './../services/users.service.spec';

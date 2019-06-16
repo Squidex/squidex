@@ -46,8 +46,11 @@ interface Snapshot {
     // The app version.
     version: Version;
 
+    // Indicates if the user can add a contributor.
+    canCreate?: boolean;
+
     // The links.
-    links: ResourceLinks;
+    _links?: ResourceLinks;
 }
 
 type ContributorsList = ImmutableArray<ContributorDto>;
@@ -58,10 +61,6 @@ export class ContributorsState extends State<Snapshot> {
         this.changes.pipe(map(x => x.contributors),
             distinctUntilChanged());
 
-    public isMaxReached =
-        this.changes.pipe(map(x => x.isMaxReached),
-            distinctUntilChanged());
-
     public isLoaded =
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
@@ -70,8 +69,8 @@ export class ContributorsState extends State<Snapshot> {
         this.changes.pipe(map(x => x.maxContributors),
             distinctUntilChanged());
 
-    public links =
-        this.changes.pipe(map(x => x.links),
+    public canCreate =
+        this.changes.pipe(map(x => !!x.canCreate),
             distinctUntilChanged());
 
     constructor(
@@ -79,7 +78,7 @@ export class ContributorsState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ contributors: ImmutableArray.empty(), version: Version.EMPTY, maxContributors: -1, links: {} });
+        super({ contributors: ImmutableArray.empty(), version: Version.EMPTY, maxContributors: -1 });
     }
 
     public load(isReload = false): Observable<any> {
@@ -130,7 +129,9 @@ export class ContributorsState extends State<Snapshot> {
 
             const contributors = ImmutableArray.of(payload.items);
 
-            return { ...s, contributors, maxContributors, isLoaded, isMaxReached, version: version, links: payload._links };
+            const { _links, canCreate } = payload;
+
+            return { ...s, contributors, maxContributors, isLoaded, isMaxReached, version: version, _links, canCreate };
         });
     }
 

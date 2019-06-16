@@ -16,8 +16,8 @@ import {
     AppLanguagesPayload,
     AppLanguagesService,
     Resource,
-    Version,
-    withLinks
+    ResourceLinks,
+    Version
 } from '@app/shared/internal';
 
 describe('AppLanguagesService', () => {
@@ -169,19 +169,17 @@ describe('AppLanguagesService', () => {
 
 export function createLanguages(...codes: string[]): AppLanguagesPayload {
     return {
-        items: codes.map((code, i) =>
-            withLinks(
-                new AppLanguageDto(code, code,
-                    i === 0,
-                    i % 2 === 1,
-                    codes.filter(x => x !== code)),
-                {
-                    _links: {
-                        update: { method: 'PUT', href: `/languages/${code}` }
-                    }
-                })),
+        items: codes.map((code, i) => createLanguage(code, codes, i)),
         _links: {
             create: { method: 'POST', href: '/languages' }
-        }
+        },
+        canCreate: true
     };
+}
+function createLanguage(code: string, codes: string[], i: number) {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/languages/${code}` }
+    };
+
+    return new AppLanguageDto(links, code, code, i === 0, i % 2 === 1, codes.filter(x => x !== code))
 }

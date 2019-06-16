@@ -17,11 +17,11 @@
 
         <ng-container menu>
             <ng-container *ngIf="!content; else notNew">
-                <button type="button" class="btn btn-secondary" (click)="save()" *ngIf="contentsState.links | async | sqxHasLink:'create'">
+                <button type="button" class="btn btn-secondary" (click)="save()" *ngIf="contentsState.canCreate | async">
                     Save
                 </button>
 
-                <button type="submit" class="btn btn-primary ml-1" title="CTRL + S" *ngIf="contentsState.links | async | sqxHasLink:'create/publish'">
+                <button type="submit" class="btn btn-primary ml-1" title="CTRL + S" *ngIf="contentsState.canCreateAndPublish | async">
                     Save and Publish
                 </button>
 
@@ -45,13 +45,13 @@
 
                     <ng-container *ngIf="content.isPending || !schema.isSingleton">
                         <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
-                            <a class="dropdown-item" (click)="discardChanges()" *ngIf="content | sqxHasLink:'changes/discard'">
+                            <a class="dropdown-item" (click)="discardChanges()" *ngIf="content.canDiscardChanges">
                                 Discard changes
                             </a>
 
                             <div class="dropdown-divider"></div>
                             
-                            <a class="dropdown-item" (click)="publishChanges()" *ngIf="content | sqxHasLink:'changes/publish'">
+                            <a class="dropdown-item" (click)="publishChanges()" *ngIf="content.canPublishChanges">
                                 Publish changes
                             </a>
 
@@ -63,7 +63,7 @@
                                 <div class="dropdown-divider"></div>
 
                                 <a class="dropdown-item dropdown-item-delete"
-                                    [class.disabled]="content | sqxHasNoLink:'delete'"
+                                    [class.disabled]="!content.canDelete"
                                     (sqxConfirmClick)="delete()"
                                     confirmTitle="Delete content" 
                                     confirmText="Do you really want to delete the content?">
@@ -74,13 +74,12 @@
                     </ng-container>
                 </div>
                 
-
-                <ng-container *ngIf="content | sqxHasLink:'update'">
-                    <button type="button" class="btn btn-secondary ml-1" (click)="saveAsProposal()" *ngIf="content | sqxHasLink:'update/change'">
-                        Save as Proposal
-                    </button>
+                <button type="button" class="btn btn-secondary ml-1" (click)="saveAsProposal()" *ngIf="content.canProposeChange">
+                    Save as Proposal
+                </button>
                     
-                    <button type="submit" class="btn btn-primary ml-1" title="CTRL + S" *ngIf="content | sqxHasLink:'update'">
+                <ng-container *ngIf="content.canUpdate">
+                    <button type="submit" class="btn btn-primary ml-1" title="CTRL + S">
                         Save
                     </button>
 

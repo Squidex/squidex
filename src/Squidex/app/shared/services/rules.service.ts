@@ -14,14 +14,14 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
+    hasAnyLink,
     HTTP,
     Model,
     pretifyError,
     Resource,
     ResourceLinks,
     ResultSet,
-    Version,
-    withLinks
+    Version
 } from '@app/framework';
 
 export const ALL_TRIGGERS = {
@@ -76,18 +76,26 @@ export class RuleElementPropertyDto {
 }
 
 export class RulesDto extends ResultSet<RuleDto> {
-    public readonly _links: ResourceLinks = {};
+    constructor(items: RuleDto[], links?: {}) {
+        super(items.length, items, links);
+    }
 }
 
 export class RuleDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
+
+    public readonly canDelete: boolean;
+    public readonly canDisable: boolean;
+    public readonly canEnable: boolean;
+    public readonly canUpdate: boolean;
 
     constructor(
+        links: ResourceLinks,
         public readonly id: string,
-        public readonly createdBy: string,
-        public readonly lastModifiedBy: string,
         public readonly created: DateTime,
+        public readonly createdBy: string,
         public readonly lastModified: DateTime,
+        public readonly lastModifiedBy: string,
         public readonly version: Version,
         public readonly isEnabled: boolean,
         public readonly trigger: any,
@@ -95,15 +103,19 @@ export class RuleDto {
         public readonly action: any,
         public readonly actionType: string
     ) {
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canDisable = hasAnyLink(links, 'disable');
+        this.canEnable = hasAnyLink(links, 'enable');
+        this.canUpdate = hasAnyLink(links, 'update');
     }
 }
 
 export class RuleEventsDto extends ResultSet<RuleEventDto> {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
 }
 
 export class RuleEventDto extends Model<RuleEventDto> {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
 
     constructor(
         public readonly id: string,
@@ -176,13 +188,11 @@ export class RulesService {
     public getRules(appName: string): Observable<RulesDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return HTTP.getVersioned(this.http, url).pipe(
-            map(({ payload }) => {
-                const items: any[] = payload.body.items;
-
+        return this.http.get<{ items: [] } & Resource>(url).pipe(
+            map(({ items, _links }) => {
                 const rules = items.map(item => parseRule(item));
 
-                return withLinks(new RulesDto(rules.length, rules), payload.body);
+                return new RulesDto(rules, _links);
             }),
             pretifyError('Failed to load Rules. Please reload.'));
     }
@@ -311,19 +321,15 @@ export class RulesService {
     }
 }
 
-function parseRule(resource: any) {
-    return withLinks(
-        new RuleDto(
-            resource.id,
-            resource.createdBy,
-            resource.lastModifiedBy,
-            DateTime.parseISO_UTC(resource.created),
-            DateTime.parseISO_UTC(resource.lastModified),
-            new Version(resource.version.toString()),
-            resource.isEnabled,
-            resource.trigger,
-            resource.trigger.triggerType,
-            resource.action,
-            resource.action.actionType),
-        resource);
+function parseRule(response: any) {
+    return new RuleDto(response._links,
+        response.id,
+        DateTime.parseISO_UTC(response.created), response.createdBy,
+        DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
+        new Version(response.version.toString()),
+        response.isEnabled,
+        response.trigger,
+        response.trigger.triggerType,
+        response.action,
+        response.action.actionType);
 }

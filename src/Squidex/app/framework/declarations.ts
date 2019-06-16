@@ -31,7 +31,6 @@ export * from './angular/forms/validators';
 
 export * from './angular/http/caching.interceptor';
 export * from './angular/http/loading.interceptor';
-export * from './angular/http/hateos.pipes';
 export * from './angular/http/http-extensions';
 
 export * from './angular/modals/dialog-renderer.component';

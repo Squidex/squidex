@@ -38,8 +38,11 @@ interface Snapshot {
     // Indicates if the roles are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the user can add a role.
+    canCreate?: boolean;
+
     // The links.
-    links: ResourceLinks;
+    _links?: ResourceLinks;
 }
 
 type RolesList = ImmutableArray<RoleDto>;
@@ -54,8 +57,8 @@ export class RolesState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
-    public links =
-        this.changes.pipe(map(x => x.links),
+    public canCreate =
+        this.changes.pipe(map(x => !!x.canCreate),
             distinctUntilChanged());
 
     constructor(
@@ -63,7 +66,7 @@ export class RolesState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ roles: ImmutableArray.empty(), version: Version.EMPTY, links: {} });
+        super({ roles: ImmutableArray.empty(), version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -109,8 +112,10 @@ export class RolesState extends State<Snapshot> {
     private replaceRoles(payload: RolesPayload, version: Version) {
         const roles = ImmutableArray.of(payload.items);
 
+        const { _links, canCreate } = payload;
+
         this.next(s => {
-            return { ...s, roles, isLoaded: true, version, links: payload._links };
+            return { ...s, roles, isLoaded: true, version, _links, canCreate };
         });
     }
 

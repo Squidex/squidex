@@ -12,31 +12,41 @@ import { map } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
+    hasAnyLink,
     pretifyError,
     Resource,
-    ResourceLinks,
-    withLinks
+    ResourceLinks
 } from '@app/shared';
 
 export class EventConsumersDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
 
     constructor(
-        public readonly items: EventConsumerDto[]
+        public readonly items: EventConsumerDto[], links?: ResourceLinks
     ) {
+        this._links = links || {};
     }
 }
 
 export class EventConsumerDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
 
-    constructor(
+    public readonly canStop: boolean;
+    public readonly canStart: boolean;
+    public readonly canRestart: boolean;
+
+    constructor(links: ResourceLinks,
         public readonly name: string,
         public readonly isStopped?: boolean,
         public readonly isResetting?: boolean,
         public readonly error?: string,
         public readonly position?: string
     ) {
+        this._links = links;
+
+        this.canStop = hasAnyLink(links, 'stop');
+        this.canStart = hasAnyLink(links, 'start');
+        this.canRestart = hasAnyLink(links, 'canReset');
     }
 }
 
@@ -52,10 +62,10 @@ export class EventConsumersService {
         const url = this.apiUrl.buildUrl('/api/event-consumers');
 
         return this.http.get<{ items: any[] } & Resource>(url).pipe(
-                map(body => {
-                    const eventConsumers = body.items.map(item => parseEventConsumer(item));
+                map(({ items, _links }) => {
+                    const eventConsumers = items.map(item => parseEventConsumer(item));
 
-                    return withLinks(new EventConsumersDto(eventConsumers), body);
+                    return new EventConsumersDto(eventConsumers, _links);
                 }),
                 pretifyError('Failed to load event consumers. Please reload.'));
     }
@@ -98,12 +108,11 @@ export class EventConsumersService {
 }
 
 function parseEventConsumer(response: any): EventConsumerDto {
-    return withLinks(
-        new EventConsumerDto(
-            response.name,
-            response.isStopped,
-            response.isResetting,
-            response.error,
-            response.position),
-        response);
+    return new EventConsumerDto(
+        response._links,
+        response.name,
+        response.isStopped,
+        response.isResetting,
+        response.error,
+        response.position);
 }

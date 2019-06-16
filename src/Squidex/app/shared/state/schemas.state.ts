@@ -49,8 +49,11 @@ interface Snapshot {
     // The selected schema.
     selectedSchema?: SchemaDetailsDto | null;
 
+    // Indicates if the user can create a schema.
+    canCreate?: boolean;
+
     // The links.
-    links: ResourceLinks;
+    _links?: ResourceLinks;
 }
 
 export type SchemasList = ImmutableArray<SchemaDto>;
@@ -85,8 +88,8 @@ export class SchemasState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
-    public links =
-        this.changes.pipe(map(x => x.links),
+    public canCreate =
+        this.changes.pipe(map(x => !!x.canCreate),
             distinctUntilChanged());
 
     constructor(
@@ -94,7 +97,7 @@ export class SchemasState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService
     ) {
-        super({ schemas: ImmutableArray.empty(), categories: buildCategories({}), links: {} });
+        super({ schemas: ImmutableArray.empty(), categories: buildCategories({}) });
     }
 
     public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
@@ -128,11 +131,13 @@ export class SchemasState extends State<Snapshot> {
                 }
 
                 return this.next(s => {
-                    const schemas = ImmutableArray.of(payload.items).sortByStringAsc(x => x.displayName);
+                    const { _links, canCreate, items } = payload;
+
+                    const schemas = ImmutableArray.of(items).sortByStringAsc(x => x.displayName);
 
                     const categories = buildCategories(s.categories, schemas);
 
-                    return { ...s, schemas, isLoaded: true, categories, links: payload._links };
+                    return { ...s, schemas, isLoaded: true, categories, _links, canCreate };
                 });
             }),
             shareSubscribed(this.dialogs));

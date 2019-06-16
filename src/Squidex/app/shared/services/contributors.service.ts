@@ -13,29 +13,40 @@ import { tap } from 'rxjs/operators';
 import {
     AnalyticsService,
     ApiUrlConfig,
+    hasAnyLink,
     HTTP,
     mapVersioned,
     pretifyError,
     Resource,
     ResourceLinks,
     Version,
-    Versioned,
-    withLinks
+    Versioned
 } from '@app/framework';
 
 export type ContributorsDto = Versioned<ContributorsPayload>;
 export type ContributorsPayload = {
-    readonly items: ContributorDto[],
-    readonly maxContributors: number
+    readonly items: ContributorDto[];
+
+    readonly maxContributors: number;
+
+    readonly canCreate: boolean;
 } & Resource;
 
 export class ContributorDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
+
+    public readonly canUpdate: boolean;
+    public readonly canRevoke: boolean;
 
     constructor(
+        links: ResourceLinks,
         public readonly contributorId: string,
         public readonly role: string
     ) {
+        this._links = links;
+
+        this.canUpdate = hasAnyLink(links, 'update');
+        this.canRevoke = hasAnyLink(links, 'delete');
     }
 }
 
@@ -99,11 +110,11 @@ function parseContributors(response: any) {
     const items: any[] = response.items;
 
     const contributors = items.map(item =>
-        withLinks(
-            new ContributorDto(
-                item.contributorId,
-                item.role),
-            item));
+        new ContributorDto(item._links,
+            item.contributorId,
+            item.role));
 
-    return withLinks({ items: contributors, maxContributors: response.maxContributors, _links: {} }, response);
+    const { maxContributors, _links, _meta }= response;
+
+    return { items: contributors, maxContributors, _links, _meta, canCreate: hasAnyLink(_links, 'create') };
 }

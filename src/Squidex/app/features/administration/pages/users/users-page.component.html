@@ -17,7 +17,7 @@
             <input class="form-control" #inputFind [formControl]="usersFilter" placeholder="Search for user" />
         </form>
 
-        <ng-container *ngIf="usersState.links | async | sqxHasLink: 'create'">
+        <ng-container *ngIf="usersState.canCreate | async">
             <sqx-shortcut keys="ctrl+shift+n" (trigger)="buttonNew.click()"></sqx-shortcut>
 
             <button type="button" class="btn btn-success" #buttonNew routerLink="new" title="New User (CTRL + N)">
@@ -63,10 +63,10 @@
                                 <span class="user-email table-cell">{{user.email}}</span>
                             </td>
                             <td class="cell-actions">
-                                <button type="button" class="btn btn-text" (click)="lock(user)" sqxStopClick *ngIf="user | sqxHasLink:'lock'" title="Lock User">
+                                <button type="button" class="btn btn-text" (click)="lock(user)" sqxStopClick *ngIf="user.canLock" title="Lock User">
                                     <i class="icon icon-unlocked"></i>
                                 </button>
-                                <button type="button" class="btn btn-text" (click)="unlock(user)" sqxStopClick *ngIf="user | sqxHasLink:'unlock'" title="Unlock User">
+                                <button type="button" class="btn btn-text" (click)="unlock(user)" sqxStopClick *ngIf="user.canUnlock" title="Unlock User">
                                     <i class="icon icon-lock"></i>
                                 </button>
                             </td>

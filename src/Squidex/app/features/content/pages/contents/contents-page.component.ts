@@ -16,7 +16,6 @@ import {
     ContentQueryStatus,
     ContentsState,
     FilterState,
-    hasAnyLink,
     ImmutableArray,
     LanguagesState,
     ModalModel,
@@ -231,7 +230,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     }
                 }
 
-                if (!hasAnyLink(content, 'delete')) {
+                if (!content.canDelete) {
                     this.selectionCanDelete = false;
                 }
             } else {

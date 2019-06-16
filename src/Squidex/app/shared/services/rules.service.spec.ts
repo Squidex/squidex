@@ -14,6 +14,7 @@ import {
     ApiUrlConfig,
     DateTime,
     Resource,
+    ResourceLinks,
     RuleDto,
     RuleElementDto,
     RuleElementPropertyDto,
@@ -126,7 +127,7 @@ describe('RulesService', () => {
         });
 
         expect(rules!).toEqual(
-            new RulesDto(2, [
+            new RulesDto([
                 createRule(12),
                 createRule(13)
             ]));
@@ -390,12 +391,14 @@ describe('RulesService', () => {
 });
 
 export function createRule(id: number, suffix = '') {
-    const result = new RuleDto(
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/rules/${id}` }
+    };
+
+    return new RuleDto(links,
         `id${id}`,
-        `creator-${id}`,
-        `modifier-${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10`),
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10`),
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
         new Version(`${id}`),
         id % 2 === 0,
         {
@@ -410,10 +413,4 @@ export function createRule(id: number, suffix = '') {
             actionType: `Webhook${id}${suffix}`
         },
         `Webhook${id}${suffix}`);
-
-    result._links['update'] = {
-        method: 'PUT', href: `/rules/${id}`
-    };
-
-    return result;
 }

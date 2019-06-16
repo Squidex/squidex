@@ -8,7 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 
-import { ApiUrlConfig, Resource } from '@app/framework';
+import { ApiUrlConfig, Resource, ResourceLinks } from '@app/framework';
 
 import {
     UserDto,
@@ -227,7 +227,11 @@ describe('UsersService', () => {
 });
 
 export function createUser(id: number, suffix = '') {
-    const result = new UserDto(
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/users/${id}` }
+    };
+
+    return new UserDto(links,
         `${id}`,
         `user${id}${suffix}@domain.com`,
         `user${id}${suffix}`,
@@ -235,10 +239,4 @@ export function createUser(id: number, suffix = '') {
             `Permission${id}${suffix}`
         ],
         true);
-
-    result._links['update'] = {
-        method: 'PUT', href: `/users/${id}`
-    };
-
-    return result;
 }

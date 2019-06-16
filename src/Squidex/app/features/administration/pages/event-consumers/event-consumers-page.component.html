@@ -42,13 +42,13 @@
                         <span>{{eventConsumer.position}}</span>
                     </td>
                     <td class="cell-actions-lg">
-                        <button type="button" class="btn btn-text" (click)="reset(eventConsumer)" *ngIf="eventConsumer | sqxHasLink:'reset'" title="Reset Event Consumer">
+                        <button type="button" class="btn btn-text" (click)="reset(eventConsumer)" *ngIf="eventConsumer.canReset" title="Reset Event Consumer">
                             <i class="icon icon-reset"></i>
                         </button>
-                        <button type="button" class="btn btn-text" (click)="start(eventConsumer)" *ngIf="eventConsumer | sqxHasLink:'start'" title="Start Event Consumer">
+                        <button type="button" class="btn btn-text" (click)="start(eventConsumer)" *ngIf="eventConsumer.canStart" title="Start Event Consumer">
                             <i class="icon icon-play"></i>
                         </button>
-                        <button type="button" class="btn btn-text" (click)="stop(eventConsumer)" *ngIf="eventConsumer | sqxHasLink:'stop'" title="Stop Event Consumer">
+                        <button type="button" class="btn btn-text" (click)="stop(eventConsumer)" *ngIf="eventConsumer.canStop" title="Stop Event Consumer">
                             <i class="icon icon-pause"></i>
                         </button>
                     </td>

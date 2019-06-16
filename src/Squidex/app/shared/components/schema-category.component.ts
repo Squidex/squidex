@@ -9,7 +9,6 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, In
 
 import {
     fadeAnimation,
-    hasAnyLink,
     ImmutableArray,
     LocalStoreService,
     SchemaDetailsDto,
@@ -123,7 +122,7 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
     }
 
     private isSameCategory(schema: SchemaDto): boolean {
-        return ((!this.name && !schema.category) || schema.category === this.name) && (!this.forContent || hasAnyLink(schema, 'contents'));
+        return ((!this.name && !schema.category) || schema.category === this.name) && (!this.forContent || schema.canReadContents);
     }
 
     public changeCategory(schema: SchemaDto) {

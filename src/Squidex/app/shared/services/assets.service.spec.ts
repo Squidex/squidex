@@ -17,6 +17,7 @@ import {
     DateTime,
     ErrorDto,
     Resource,
+    ResourceLinks,
     Version
 } from '@app/shared/internal';
 
@@ -332,7 +333,15 @@ describe('AssetsService', () => {
 });
 
 export function createAsset(id: number, tags?: string[], suffix = '') {
-    const result = new AssetDto(
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/assets/${id}` }
+    };
+
+    const meta = {
+        isDuplicate: 'true'
+    };
+
+    return new AssetDto(links, meta,
         `id${id}`,
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
@@ -348,12 +357,4 @@ export function createAsset(id: number, tags?: string[], suffix = '') {
         `my-name${id}${suffix}.png`,
         tags || ['tag1', 'tag2'],
         new Version(`${id}`));
-
-    result._links['update'] = {
-        method: 'PUT', href: `/assets/${id}`
-    };
-
-    result._meta['isDuplicate'] = 'true';
-
-    return result;
 }

@@ -28,8 +28,11 @@ interface Snapshot {
     // Indicates if the backups are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the user can create new backups.
+    canCreate?: boolean;
+
     // The links.
-    links: ResourceLinks;
+    _links?: ResourceLinks;
 }
 
 type BackupsList = ImmutableArray<BackupDto>;
@@ -48,8 +51,8 @@ export class BackupsState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
-    public links =
-        this.changes.pipe(map(x => x.links),
+    public canCreate =
+        this.changes.pipe(map(x => !!x.canCreate),
             distinctUntilChanged());
 
     constructor(
@@ -57,7 +60,7 @@ export class BackupsState extends State<Snapshot> {
         private readonly backupsService: BackupsService,
         private readonly dialogs: DialogService
     ) {
-        super({ backups: ImmutableArray.empty(), links: {} });
+        super({ backups: ImmutableArray.empty() });
     }
 
     public load(isReload = false, silent = false): Observable<any> {
@@ -66,15 +69,15 @@ export class BackupsState extends State<Snapshot> {
         }
 
         return this.backupsService.getBackups(this.appName).pipe(
-            tap(({ items, _links: links }) => {
+            tap(({ items, _links, canCreate }) => {
                 if (isReload && !silent) {
                     this.dialogs.notifyInfo('Backups reloaded.');
                 }
+                const backups = ImmutableArray.of(items);
 
                 this.next(s => {
-                    const backups = ImmutableArray.of(items);
 
-                    return { ...s, backups, isLoaded: true, links };
+                    return { ...s, backups, isLoaded: true, _links, canCreate };
                 });
             }),
             shareSubscribed(this.dialogs, { silent }));

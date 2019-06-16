@@ -16,6 +16,7 @@ import {
     ContentsService,
     DateTime,
     Resource,
+    ResourceLinks,
     ScheduleDto,
     Version,
     Versioned
@@ -123,7 +124,7 @@ describe('ContentsService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush(createContent(12));
+        req.flush(contentResponse(12));
 
         expect(content!).toEqual(createContent(12));
     }));
@@ -144,7 +145,7 @@ describe('ContentsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush(createContent(12));
+        req.flush(contentResponse(12));
 
         expect(content!).toEqual(createContent(12));
     }));
@@ -192,7 +193,7 @@ describe('ContentsService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(createContent(12));
+        req.flush(contentResponse(12));
 
         expect(content!).toEqual(createContent(12));
     }));
@@ -219,7 +220,7 @@ describe('ContentsService', () => {
         expect(req.request.method).toEqual('PATCH');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(createContent(12));
+        req.flush(contentResponse(12));
 
         expect(content!).toEqual(createContent(12));
     }));
@@ -244,7 +245,7 @@ describe('ContentsService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush(createContent(12));
+        req.flush(contentResponse(12));
 
         expect(content!).toEqual(createContent(12));
     }));
@@ -269,7 +270,7 @@ describe('ContentsService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush(createContent(12));
+        req.flush(contentResponse(12));
 
         expect(content!).toEqual(createContent(12));
     }));
@@ -309,7 +310,7 @@ describe('ContentsService', () => {
             isPending: true,
             data: {},
             dataDraft: {},
-            version: id,
+            version: `${id}`,
             _links: {
                 update: { method: 'PUT', href: `/contents/id${id}` }
             }
@@ -318,7 +319,11 @@ describe('ContentsService', () => {
 });
 
 export function createContent(id: number, suffix = '') {
-    const result = new ContentDto(
+    const links: ResourceLinks = {
+        update:  { method: 'PUT', href: `/contents/id${id}` }
+    };
+
+    return new ContentDto(links,
         `id${id}`,
         `Status${id}${suffix}`,
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
@@ -328,8 +333,4 @@ export function createContent(id: number, suffix = '') {
         {},
         {},
         new Version(`${id}`));
-
-    result._links['update'] = { method: 'PUT', href: `/contents/id${id}` };
-
-    return result;
 }

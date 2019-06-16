@@ -62,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             AddSelfLink(controller.Url<AppContributorsController>(x => nameof(x.GetContributors), values));
 
-            if (controller.HasPermission(Permissions.AppContributorsAssign, app))
+            if (controller.HasPermission(Permissions.AppContributorsAssign, app) && Items.Length < MaxContributors)
             {
                 AddPostLink("create", controller.Url<AppContributorsController>(x => nameof(x.PostContributor), values));
             }

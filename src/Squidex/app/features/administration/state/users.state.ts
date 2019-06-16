@@ -37,14 +37,17 @@ interface Snapshot {
     // The query to filter users.
     usersQuery?: string;
 
-    // The resource links.
-    links: ResourceLinks;
-
     // Indicates if the users are loaded.
     isLoaded?: boolean;
 
     // The selected user.
     selectedUser?: UserDto | null;
+
+    // Indicates if the user can create a user.
+    canCreate?: boolean;
+
+    // The resource links.
+    _links?: ResourceLinks;
 }
 
 export type UsersList = ImmutableArray<UserDto>;
@@ -68,15 +71,15 @@ export class UsersState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
-    public links =
-        this.changes.pipe(map(x => x.links),
+    public canCreate =
+        this.changes.pipe(map(x => !!x.canCreate),
             distinctUntilChanged());
 
     constructor(
         private readonly dialogs: DialogService,
         private readonly usersService: UsersService
     ) {
-        super({ users: ImmutableArray.empty(), usersPager: new Pager(0), links: {} });
+        super({ users: ImmutableArray.empty(), usersPager: new Pager(0) });
     }
 
     public select(id: string | null): Observable<UserDto | null> {
@@ -116,7 +119,7 @@ export class UsersState extends State<Snapshot> {
                 this.snapshot.usersPager.pageSize,
                 this.snapshot.usersPager.skip,
                 this.snapshot.usersQuery).pipe(
-            tap(({ total, items, _links: links }) => {
+            tap(({ total, items, _links, canCreate }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Users reloaded.');
                 }
@@ -131,7 +134,7 @@ export class UsersState extends State<Snapshot> {
                         selectedUser = users.find(x => x.id === selectedUser!.id) || selectedUser;
                     }
 
-                    return { ...s, users, usersPager, selectedUser, isLoaded: true, links };
+                    return { ...s, users, usersPager, selectedUser, isLoaded: true, _links };
                 });
             }),
             shareSubscribed(this.dialogs));

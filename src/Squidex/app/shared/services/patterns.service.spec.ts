@@ -16,8 +16,8 @@ import {
     PatternsPayload,
     PatternsService,
     Resource,
-    Version,
-    withLinks
+    ResourceLinks,
+    Version
 } from '@app/shared/internal';
 
 describe('PatternsService', () => {
@@ -168,17 +168,18 @@ describe('PatternsService', () => {
 
 export function createPatterns(...ids: number[]): PatternsPayload {
     return {
-        items: ids.map(id =>
-            withLinks(
-                new PatternDto(`id${id}`,  `Name${id}`, `Pattern${id}`, `Message${id}`),
-                {
-                    _links: {
-                        update: { method: 'PUT', href: `/patterns/id${id}` }
-                    }
-                }
-            )),
+        items: ids.map(id => createPattern(id)),
         _links: {
             create: { method: 'POST', href: '/patterns' }
-        }
+        },
+        canCreate: true
     };
+}
+
+export function createPattern(id: number) {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/patterns/id${id}` }
+    };
+
+    return new PatternDto(links, `id${id}`,  `Name${id}`, `Pattern${id}`, `Message${id}`);
 }

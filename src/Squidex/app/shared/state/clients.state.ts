@@ -40,8 +40,11 @@ interface Snapshot {
     // Indicates if the clients are loaded.
     isLoaded?: boolean;
 
+    // Indicates if the user can create new clients.
+    canCreate?: boolean;
+
     // The links.
-    links: ResourceLinks;
+    _links?: ResourceLinks;
 }
 
 type ClientsList = ImmutableArray<ClientDto>;
@@ -56,8 +59,8 @@ export class ClientsState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
-    public links =
-        this.changes.pipe(map(x => x.links),
+    public canCreate =
+        this.changes.pipe(map(x => !!x.canCreate),
             distinctUntilChanged());
 
     constructor(
@@ -65,7 +68,7 @@ export class ClientsState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ clients: ImmutableArray.empty(), version: Version.EMPTY, links: {} });
+        super({ clients: ImmutableArray.empty(), version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -111,8 +114,10 @@ export class ClientsState extends State<Snapshot> {
     private replaceClients(payload: ClientsPayload, version: Version) {
         const clients = ImmutableArray.of(payload.items);
 
+        const { _links, canCreate } = payload;
+
         this.next(s => {
-            return { ...s, clients, isLoaded: true, version, links: payload._links };
+            return { ...s, clients, isLoaded: true, version, _links, canCreate };
         });
     }
 

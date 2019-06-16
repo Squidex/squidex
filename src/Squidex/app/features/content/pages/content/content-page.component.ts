@@ -24,7 +24,6 @@ import {
     EditContentForm,
     fadeAnimation,
     FieldDto,
-    hasAnyLink,
     ImmutableArray,
     LanguagesState,
     MessageBus,
@@ -175,7 +174,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     private loadContent(data: any) {
-        this.contentForm.loadContent(data, this.content && !hasAnyLink(this.content, 'update'));
+        this.contentForm.loadContent(data, this.content && !this.content.canUpdate);
     }
 
     public discardChanges() {

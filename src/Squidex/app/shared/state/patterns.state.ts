@@ -38,6 +38,9 @@ interface Snapshot {
     // Indicates if the patterns are loaded.
     isLoaded?: boolean;
 
+    // Indicates if patterns can be created.
+    canCreate?: boolean;
+
     // The links.
     links: ResourceLinks;
 }
@@ -54,8 +57,8 @@ export class PatternsState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
-    public links =
-        this.changes.pipe(map(x => x.links),
+    public canCreate =
+        this.changes.pipe(map(x => !!x.canCreate),
             distinctUntilChanged());
 
     constructor(
@@ -109,8 +112,10 @@ export class PatternsState extends State<Snapshot> {
     private replacePatterns(payload: PatternsPayload, version: Version) {
         const patterns = ImmutableArray.of(payload.items);
 
+        const { _links: links, canCreate } = payload;
+
         this.next(s => {
-            return { ...s, patterns, isLoaded: true, version, links: payload._links };
+            return { ...s, patterns, isLoaded: true, version, links, canCreate };
         });
     }
 

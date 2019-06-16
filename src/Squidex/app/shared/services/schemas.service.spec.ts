@@ -15,6 +15,7 @@ import {
     DateTime,
     NestedFieldDto,
     Resource,
+    ResourceLinks,
     RootFieldDto,
     SchemaDetailsDto,
     SchemaDto,
@@ -69,15 +70,21 @@ describe('SchemasService', () => {
             items: [
                 schemaResponse(12),
                 schemaResponse(13)
-            ]
+            ],
+            _links: {
+                create: { method: 'POST', href: '/schemas' }
+            }
         });
 
         expect(schemas!).toEqual({
+            canCreate: true,
             items: [
                 createSchema(12),
                 createSchema(13)
             ],
-            _links: {}
+            _links: {
+                create: { method: 'POST', href: '/schemas' }
+            }
         });
     }));
 
@@ -657,7 +664,8 @@ describe('SchemasService', () => {
                             isDisabled: true,
                             properties: {
                                 fieldType: 'String'
-                            }
+                            },
+                            _links: {}
                         },
                         {
                             fieldId: 102,
@@ -667,9 +675,11 @@ describe('SchemasService', () => {
                             isDisabled: true,
                             properties: {
                                 fieldType: 'Number'
-                            }
+                            },
+                            _links: {}
                         }
-                    ]
+                    ],
+                    _links: {}
                 },
                 {
                     fieldId: 12,
@@ -680,7 +690,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Assets'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 13,
@@ -691,7 +702,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Boolean'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 14,
@@ -702,7 +714,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'DateTime'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 15,
@@ -713,7 +726,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Geolocation'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 16,
@@ -724,7 +738,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Json'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 17,
@@ -735,7 +750,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Number'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 18,
@@ -746,7 +762,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'References'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 19,
@@ -757,7 +774,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'String'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 20,
@@ -768,7 +786,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Tags'
-                    }
+                    },
+                    _links: {}
                 }
             ],
             scripts: {
@@ -786,7 +805,11 @@ describe('SchemasService', () => {
 });
 
 export function createSchema(id: number, suffix = '') {
-    const result = new SchemaDto(
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/schemas/${id}` }
+    };
+
+    return new SchemaDto(links,
         `schema-id${id}`,
         `schema-name${id}${suffix}`,
         `category${id}${suffix}`,
@@ -796,14 +819,14 @@ export function createSchema(id: number, suffix = '') {
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
         new Version(`${id}`));
-
-    result._links['update'] = { method: 'PUT', href: `/schemas/${id}` };
-
-    return result;
 }
 
 export function createSchemaDetails(id: number, version: Version, suffix = '') {
-    const result = new SchemaDetailsDto(
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/schemas/${id}` }
+    };
+
+    return new SchemaDetailsDto(links,
         `schema-id${id}`,
         `schema-name${id}${suffix}`,
         `category${id}${suffix}`,
@@ -814,19 +837,19 @@ export function createSchemaDetails(id: number, version: Version, suffix = '') {
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
         version,
         [
-            new RootFieldDto(11, 'field11', createProperties('Array'), 'language', true, true, true, [
-                new NestedFieldDto(101, 'field101', createProperties('String'), 11, true, true, true),
-                new NestedFieldDto(102, 'field102', createProperties('Number'), 11, true, true, true)
+            new RootFieldDto({}, 11, 'field11', createProperties('Array'), 'language', true, true, true, [
+                new NestedFieldDto({}, 101, 'field101', createProperties('String'), 11, true, true, true),
+                new NestedFieldDto({}, 102, 'field102', createProperties('Number'), 11, true, true, true)
             ]),
-            new RootFieldDto(12, 'field12', createProperties('Assets'), 'language', true, true, true),
-            new RootFieldDto(13, 'field13', createProperties('Boolean'), 'language', true, true, true),
-            new RootFieldDto(14, 'field14', createProperties('DateTime'), 'language', true, true, true),
-            new RootFieldDto(15, 'field15', createProperties('Geolocation'), 'language', true, true, true),
-            new RootFieldDto(16, 'field16', createProperties('Json'), 'language', true, true, true),
-            new RootFieldDto(17, 'field17', createProperties('Number'), 'language', true, true, true),
-            new RootFieldDto(18, 'field18', createProperties('References'), 'language', true, true, true),
-            new RootFieldDto(19, 'field19', createProperties('String'), 'language', true, true, true),
-            new RootFieldDto(20, 'field20', createProperties('Tags'), 'language', true, true, true)
+            new RootFieldDto({}, 12, 'field12', createProperties('Assets'), 'language', true, true, true),
+            new RootFieldDto({}, 13, 'field13', createProperties('Boolean'), 'language', true, true, true),
+            new RootFieldDto({}, 14, 'field14', createProperties('DateTime'), 'language', true, true, true),
+            new RootFieldDto({}, 15, 'field15', createProperties('Geolocation'), 'language', true, true, true),
+            new RootFieldDto({}, 16, 'field16', createProperties('Json'), 'language', true, true, true),
+            new RootFieldDto({}, 17, 'field17', createProperties('Number'), 'language', true, true, true),
+            new RootFieldDto({}, 18, 'field18', createProperties('References'), 'language', true, true, true),
+            new RootFieldDto({}, 19, 'field19', createProperties('String'), 'language', true, true, true),
+            new RootFieldDto({}, 20, 'field20', createProperties('Tags'), 'language', true, true, true)
         ],
         {
             query: '<script-query>',
@@ -838,8 +861,4 @@ export function createSchemaDetails(id: number, version: Version, suffix = '') {
         {
             'Default': 'url'
         });
-
-    result._links['update'] = { method: 'PUT', href: `/schemas/${id}` };
-
-    return result;
 }

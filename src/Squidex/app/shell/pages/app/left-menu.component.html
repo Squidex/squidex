@@ -1,5 +1,5 @@
 <ul class="nav flex-column" *ngIf="appsState.selectedValidApp | async; let selectedApp">
-    <li class="nav-item" *ngIf="selectedApp | sqxHasLink:'schemas'">
+    <li class="nav-item" *ngIf="selectedApp.canReadSchemas">
         <a class="nav-link" routerLink="schemas" routerLinkActive="active">
             <i class="nav-icon icon-schemas"></i> <div class="nav-text">Schemas</div>
         </a>
@@ -9,12 +9,12 @@
             <i class="nav-icon icon-contents"></i> <div class="nav-text">Content</div>
         </a>
     </li>
-    <li class="nav-item" *ngIf="selectedApp | sqxHasLink:'assets'">
+    <li class="nav-item" *ngIf="selectedApp.canReadAssets">
         <a class="nav-link" routerLink="assets/filters" routerLinkActive="active">
             <i class="nav-icon icon-assets"></i> <div class="nav-text">Assets</div> 
         </a>
     </li>
-    <li class="nav-item" *ngIf="selectedApp | sqxHasLink:'rules'">
+    <li class="nav-item" *ngIf="selectedApp.canReadRules">
         <a class="nav-link" routerLink="rules" routerLinkActive="active">
             <i class="nav-icon icon-rules"></i> <div class="nav-text">Rules</div>
         </a>

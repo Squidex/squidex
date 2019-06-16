@@ -13,7 +13,6 @@ import {
     DialogModel,
     EditFieldForm,
     fadeAnimation,
-    hasAnyLink,
     ImmutableArray,
     ModalModel,
     NestedFieldDto,
@@ -61,7 +60,7 @@ export class FieldComponent implements OnChanges {
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['field']) {
-            this.isEditable = hasAnyLink(this.field, 'update');
+            this.isEditable = this.field.canUpdate;
 
             this.editForm.load(this.field.properties);
         }

@@ -10,7 +10,6 @@ import { FormGroup } from '@angular/forms';
 
 import {
     Form,
-    hasAnyLink,
     ImmutableArray,
     RuleDto,
     RuleElementDto,
@@ -64,7 +63,7 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     }
 
     public ngOnInit() {
-        this.isEditable = !this.rule || hasAnyLink(this.rule, 'update');
+        this.isEditable = !this.rule || this.rule.canUpdate;
 
         if (this.mode === MODE_EDIT_ACTION) {
             this.step = 4;

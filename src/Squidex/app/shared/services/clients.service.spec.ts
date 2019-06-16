@@ -17,8 +17,8 @@ import {
     ClientsPayload,
     ClientsService,
     Resource,
-    Version,
-    withLinks
+    ResourceLinks,
+    Version
 } from '@app/shared/internal';
 
 describe('ClientsService', () => {
@@ -154,11 +154,11 @@ describe('ClientsService', () => {
 
         let accessTokenDto: AccessTokenDto;
 
-        clientsService.createToken('my-app', new ClientDto('myClientId', 'myClient', 'mySecret', 'Editor')).subscribe(result => {
+        clientsService.createToken('my-app', createClient(13)).subscribe(result => {
             accessTokenDto = result;
         });
 
-        const body = 'grant_type=client_credentials&scope=squidex-api&client_id=my-app:myClientId&client_secret=mySecret';
+        const body = 'grant_type=client_credentials&scope=squidex-api&client_id=my-app:id13&client_secret=secret13';
 
         const req = httpMock.expectOne('http://service/p/identity-server/connect/token');
 
@@ -190,17 +190,18 @@ describe('ClientsService', () => {
 
 export function createClients(...ids: number[]): ClientsPayload {
     return {
-        items: ids.map(id =>
-            withLinks(
-                new ClientDto(`id${id}`,  `Client ${id}`, `secret${id}`, `Role${id}`),
-                {
-                    _links: {
-                        update: { method: 'PUT', href: `/clients/id${id}` }
-                    }
-                }
-            )),
+        items: ids.map(id => createClient(id)),
         _links: {
             create: { method: 'POST', href: '/clients' }
-        }
+        },
+        canCreate: true
     };
+}
+
+export function createClient(id: number) {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/clients/id${id}` }
+    };
+
+    return new ClientDto(links, `id${id}`,  `Client ${id}`, `secret${id}`, `Role${id}`);
 }

@@ -9,7 +9,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { hasAnyLink, ResourceOwner } from '@app/shared';
+import { ResourceOwner } from '@app/shared';
 
 import {
     CreateUserDto,
@@ -47,7 +47,7 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
                     if (selectedUser) {
                         this.userForm.load(selectedUser);
 
-                        this.isEditable = hasAnyLink(this.user, 'update');
+                        this.isEditable = this.user.canUpdate;
 
                         if (!this.isEditable) {
                             this.userForm.form.disable();

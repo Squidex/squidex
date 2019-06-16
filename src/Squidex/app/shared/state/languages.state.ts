@@ -59,8 +59,11 @@ interface Snapshot {
     // Indicates if the languages are loaded.
     isLoaded?: boolean;
 
+    // Inedicates if the user can add a language.
+    canCreate?: boolean;
+
     // The links.
-    links: ResourceLinks;
+    _links?: ResourceLinks;
 }
 
 type AppLanguagesList = ImmutableArray<AppLanguageDto>;
@@ -81,8 +84,8 @@ export class LanguagesState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
-    public links =
-        this.changes.pipe(map(x => x.links),
+    public canCreate =
+        this.changes.pipe(map(x => !!x.canCreate),
             distinctUntilChanged());
 
     constructor(
@@ -96,8 +99,7 @@ export class LanguagesState extends State<Snapshot> {
             allLanguages: ImmutableArray.empty(),
             allLanguagesNew: ImmutableArray.empty(),
             languages: ImmutableArray.empty(),
-            version: Version.EMPTY,
-            links: {}
+            version: Version.EMPTY
         });
     }
 
@@ -154,14 +156,17 @@ export class LanguagesState extends State<Snapshot> {
 
             const languages = ImmutableArray.of(payload.items);
 
+            const { _links, canCreate } = payload;
+
             return {
                 ...s,
+                canCreate,
                 languages: languages.map(x => this.createLanguage(x, languages)),
                 plainLanguages: payload,
                 allLanguages: allLanguages,
                 allLanguagesNew: allLanguages.filter(x => !languages.find(l => l.iso2Code === x.iso2Code)),
                 isLoaded: true,
-                links: payload._links,
+                _links,
                 version: version
             };
         });

@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
 import {
-    ResourceLinks,
+    hasAnyLink,
     State,
     Types
 } from '@app/framework';
@@ -30,7 +30,17 @@ interface Snapshot {
     // The merged settings of app and common settings.
     settings: object & any;
 
-    resources: ResourceLinks;
+    // Indicates if the user can read events.
+    canReadEvents?: boolean;
+
+    // Indicates if the user can read users.
+    canReadUsers?: boolean;
+
+    // Indicates if the user can restore backups.
+    canRestore?: boolean;
+
+    // Indicates if the user can use at least one admin resource.
+    canUserAdminResource?: boolean;
 }
 
 @Injectable()
@@ -39,8 +49,20 @@ export class UIState extends State<Snapshot> {
         this.changes.pipe(map(x => x.settings),
             distinctUntilChanged());
 
-    public resources =
-        this.changes.pipe(map(x => x.resources),
+    public canReadEvents =
+        this.changes.pipe(map(x => !!x.canReadEvents),
+            distinctUntilChanged());
+
+    public canReadUsers =
+        this.changes.pipe(map(x => !!x.canReadUsers),
+            distinctUntilChanged());
+
+    public canRestore =
+        this.changes.pipe(map(x => !!x.canRestore),
+            distinctUntilChanged());
+
+    public canUserAdminResource =
+        this.changes.pipe(map(x => !!x.canRestore || !!x.canReadUsers || !!x.canReadEvents),
             distinctUntilChanged());
 
     public get<T>(path: string, defaultValue: T) {
@@ -53,7 +75,7 @@ export class UIState extends State<Snapshot> {
         private readonly uiService: UIService,
         private readonly usersService: UsersService
     ) {
-        super({ settings: {}, settingsCommon: {}, settingsApp: {}, resources: {} });
+        super({ settings: {}, settingsCommon: {}, settingsApp: {} });
 
         this.loadResources();
         this.loadCommon();
@@ -82,7 +104,11 @@ export class UIState extends State<Snapshot> {
     private loadResources() {
         this.usersService.getResources()
             .subscribe(payload => {
-                this.next(s => ({ ...s, resources: payload._links }));
+                this.next(s => ({ ...s,
+                    canReadEvents: hasAnyLink(payload, 'admin/events'),
+                    canReadUsers: hasAnyLink(payload, 'admin/users'),
+                    canRestore: hasAnyLink(payload, 'admin/restore')
+                }));
             });
     }
 

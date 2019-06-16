@@ -12,7 +12,7 @@
 
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
-        <ng-container *ngIf="rulesState.links | async | sqxHasLink:'create'">
+        <ng-container *ngIf="rulesState.canCreate | async">
             <sqx-shortcut keys="ctrl+shift+g" (trigger)="buttonNew.click()"></sqx-shortcut>
     
             <button type="button" class="btn btn-success" #buttonNew (click)="createNew()" title="New Rule (CTRL + M)">
@@ -26,7 +26,7 @@
             <div class="table-items-row table-items-row-empty" *ngIf="rules.length === 0">
                 No rule created yet.
 
-                <button type="button" class="btn btn-success btn-sm ml-2" (click)="createNew()" *ngIf="rulesState.links | async | sqxHasLink:'create'">
+                <button type="button" class="btn btn-success btn-sm ml-2" (click)="createNew()" *ngIf="rulesState.canCreate | async">
                     <i class="icon icon-plus"></i> Add Rule
                 </button>
             </div>
@@ -51,11 +51,11 @@
                             </span>
                         </td>
                         <td class="cell-actions">
-                            <sqx-toggle [disabled]="rule | sqxHasNoLink:'delete'" [ngModel]="rule.isEnabled" (ngModelChange)="toggle(rule)"></sqx-toggle>
+                            <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle(rule)"></sqx-toggle>
                         </td>
                         <td class="cell-actions">
                             <button type="button" class="btn btn-text-danger"
-                                [disabled]="rule | sqxHasNoLink:'delete'"
+                                [disabled]="!rule.canDelete"
                                 (sqxConfirmClick)="delete(rule)"
                                 confirmTitle="Delete rule" 
                                 confirmText="Do you really want to delete the rule?">
@@ -82,7 +82,7 @@
 
     <ng-container sidebar>
         <div class="panel-nav">
-            <ng-container *ngIf="rulesState.links | async | sqxHasLink:'create'">
+            <ng-container *ngIf="rulesState.canCreate | async">
                 <a class="panel-link panel-link-gray" routerLink="events" routerLinkActive="active" title="History" titlePosition="left">
                     <i class="icon-time"></i>
                 </a>

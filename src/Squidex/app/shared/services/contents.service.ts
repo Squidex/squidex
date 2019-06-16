@@ -14,6 +14,7 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
+    hasAnyLink,
     HTTP,
     mapVersioned,
     pretifyError,
@@ -21,8 +22,7 @@ import {
     ResourceLinks,
     ResultSet,
     Version,
-    Versioned,
-    withLinks
+    Versioned
 } from '@app/framework';
 
 export class ScheduleDto {
@@ -35,15 +35,27 @@ export class ScheduleDto {
 }
 
 export class ContentsDto extends ResultSet<ContentDto> {
-    public readonly _links: ResourceLinks = {};
+    public get canCreate() {
+        return hasAnyLink(this._links, 'create');
+    }
+
+    public get canCreateAndPublish() {
+        return hasAnyLink(this._links, 'create/publish');
+    }
 }
 
 export class ContentDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
 
-    public readonly statusUpdates: string[] = [];
+    public readonly statusUpdates: string[];
 
-    constructor(
+    public readonly canDelete: boolean;
+    public readonly canDiscardChanges: boolean;
+    public readonly canProposeChange: boolean;
+    public readonly canPublishChanges: boolean;
+    public readonly canUpdate: boolean;
+
+    constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly status: string,
         public readonly created: DateTime,
@@ -56,6 +68,9 @@ export class ContentDto {
         public readonly dataDraft: object,
         public readonly version: Version
     ) {
+        this._links = links;
+
+        this.statusUpdates = Object.keys(links).filter(x => x.startsWith('status/')).map(x => x.substr(7));
     }
 }
 
@@ -103,15 +118,11 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
-        return HTTP.getVersioned(this.http, url).pipe(
-                map(({ payload }) => {
-                    const body = payload.body;
-
-                    const items: any[] = body.items;
-
+        return this.http.get<{ total: number, items: [] } & Resource>(url).pipe(
+                map(({ total, items, _links }) => {
                     const contents = items.map(x => parseContent(x));
 
-                    return withLinks(new ContentsDto(body.total, contents), body);
+                    return new ContentsDto(total, contents, _links);
                 }),
                 pretifyError('Failed to load contents. Please reload.'));
     }
@@ -223,31 +234,19 @@ export class ContentsService {
 }
 
 function parseContent(response: any) {
-    return nextStatuses(withLinks(
-        new ContentDto(
-            response.id,
-            response.status,
-            DateTime.parseISO_UTC(response.created), response.createdBy,
-            DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
-            response.scheduleJob
-                ? new ScheduleDto(
-                    response.scheduleJob.status,
-                    response.scheduleJob.scheduledBy,
-                    DateTime.parseISO_UTC(response.scheduleJob.dueTime))
-                : null,
-            response.isPending === true,
-            response.data,
-            response.dataDraft,
-            new Version(response.version)),
-        response));
-}
-
-function nextStatuses(content: ContentDto) {
-    const nexts = Object.keys(content._links).filter(x => x.startsWith('status/')).map(x => x.substr(7));
-
-    for (let next of nexts) {
-        content.statusUpdates.push(next);
-    }
-
-    return content;
+    return new ContentDto(response._links,
+        response.id,
+        response.status,
+        DateTime.parseISO_UTC(response.created), response.createdBy,
+        DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
+        response.scheduleJob
+            ? new ScheduleDto(
+                response.scheduleJob.status,
+                response.scheduleJob.scheduledBy,
+                DateTime.parseISO_UTC(response.scheduleJob.dueTime))
+            : null,
+        response.isPending === true,
+        response.data,
+        response.dataDraft,
+        new Version(response.version));
 }

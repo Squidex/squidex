@@ -14,28 +14,41 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
+    hasAnyLink,
     HTTP,
     pretifyError,
     Resource,
     ResourceLinks,
     StringHelper,
     Version,
-    Versioned,
-    withLinks
+    Versioned
 } from '@app/framework';
 
 import { createProperties, FieldPropertiesDto } from './schemas.types';
 
-export type SchemasDto = { items: SchemaDto[] } & Resource;
+export type SchemasDto = {
+    readonly items: SchemaDto[];
+
+    readonly canCreate: boolean;
+} & Resource;
 
 export class SchemaDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
 
-    public get displayName() {
-        return StringHelper.firstNonEmpty(this.properties.label, this.name);
-    }
+    public readonly canAddField: boolean;
+    public readonly canDelete: boolean;
+    public readonly canOrderFields: boolean;
+    public readonly canPublish: boolean;
+    public readonly canReadContents: boolean;
+    public readonly canUnpublish: boolean;
+    public readonly canUpdate: boolean;
+    public readonly canUpdateCategory: boolean;
+    public readonly canUpdateScripts: boolean;
+    public readonly canUpdateUrls: boolean;
 
-    constructor(
+    public readonly displayName: string;
+
+    constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly name: string,
         public readonly category: string,
@@ -48,6 +61,20 @@ export class SchemaDto {
         public readonly lastModifiedBy: string,
         public readonly version: Version
     ) {
+        this._links = links;
+
+        this.canAddField = hasAnyLink(links, 'fields/add');
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canOrderFields = hasAnyLink(links, 'fields/order');
+        this.canPublish = hasAnyLink(links, 'publish');
+        this.canReadContents = hasAnyLink(links, 'contents');
+        this.canUnpublish = hasAnyLink(links, 'unpublish');
+        this.canUpdate = hasAnyLink(links, 'update');
+        this.canUpdateCategory = hasAnyLink(links, 'update/category');
+        this.canUpdateScripts = hasAnyLink(links, 'update/scripts');
+        this.canUpdateUrls = hasAnyLink(links, 'update/urls');
+
+        this.displayName = StringHelper.firstNonEmpty(this.properties.label, this.name);
     }
 }
 
@@ -55,7 +82,7 @@ export class SchemaDetailsDto extends SchemaDto {
     public listFields: RootFieldDto[];
     public listFieldsEditable: RootFieldDto[];
 
-    constructor(id: string, name: string, category: string,
+    constructor(links: ResourceLinks, id: string, name: string, category: string,
         properties: SchemaPropertiesDto,
         isSingleton: boolean,
         isPublished: boolean,
@@ -68,7 +95,7 @@ export class SchemaDetailsDto extends SchemaDto {
         public readonly scripts = {},
         public readonly previewUrls = {}
     ) {
-        super(id, name, category, properties, isSingleton, isPublished, created, createdBy, lastModified, lastModifiedBy, version);
+        super(links, id, name, category, properties, isSingleton, isPublished, created, createdBy, lastModified, lastModifiedBy, version);
 
         if (fields) {
             let listFields = this.fields.filter(x => x.properties.isListField && x.properties.isContentField);
@@ -88,7 +115,17 @@ export class SchemaDetailsDto extends SchemaDto {
 }
 
 export class FieldDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
+
+    public readonly canAddField: boolean;
+    public readonly canDelete: boolean;
+    public readonly canDisable: boolean;
+    public readonly canEnable: boolean;
+    public readonly canHide: boolean;
+    public readonly canLock: boolean;
+    public readonly canOrderFields: boolean;
+    public readonly canShow: boolean;
+    public readonly canUpdate: boolean;
 
     public get isInlineEditable(): boolean {
         return !this.isDisabled && this.properties['inlineEditable'] === true;
@@ -102,7 +139,7 @@ export class FieldDto {
         return this.properties.placeholder || '';
     }
 
-    constructor(
+    constructor(links: ResourceLinks,
         public readonly fieldId: number,
         public readonly name: string,
         public readonly properties: FieldPropertiesDto,
@@ -110,6 +147,17 @@ export class FieldDto {
         public readonly isHidden: boolean = false,
         public readonly isDisabled: boolean = false
     ) {
+        this._links = links;
+
+        this.canAddField = hasAnyLink(links, 'fields/add');
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canDisable = hasAnyLink(links, 'disable');
+        this.canEnable = hasAnyLink(links, 'enable');
+        this.canOrderFields = hasAnyLink(links, 'fields/order');
+        this.canHide = hasAnyLink(links, 'hide');
+        this.canLock = hasAnyLink(links, 'lock');
+        this.canShow = hasAnyLink(links, 'show');
+        this.canUpdate = hasAnyLink(links, 'update');
     }
 }
 
@@ -130,28 +178,28 @@ export class RootFieldDto extends FieldDto {
         return this.isLocalizable && this.isString && (this.properties.editor === 'Input' || this.properties.editor === 'Textarea');
     }
 
-    constructor(fieldId: number, name: string, properties: FieldPropertiesDto,
+    constructor(links: ResourceLinks, fieldId: number, name: string, properties: FieldPropertiesDto,
         public readonly partitioning: string,
         isLocked: boolean = false,
         isHidden: boolean = false,
         isDisabled: boolean = false,
         public readonly nested: NestedFieldDto[] = []
     ) {
-        super(fieldId, name, properties, isLocked, isHidden, isDisabled);
+        super(links, fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
 }
 
-const NONE_FIELD = new RootFieldDto(-1, '', createProperties('String'), 'invariant');
+const NONE_FIELD = new RootFieldDto({}, -1, '', createProperties('String'), 'invariant');
 const NONE_FIELDS = [NONE_FIELD];
 
 export class NestedFieldDto extends FieldDto {
-    constructor(fieldId: number, name: string, properties: FieldPropertiesDto,
+    constructor(links: ResourceLinks, fieldId: number, name: string, properties: FieldPropertiesDto,
         public readonly parentId: number,
         isLocked: boolean = false,
         isHidden: boolean = false,
         isDisabled: boolean = false
     ) {
-        super(fieldId, name, properties, isLocked, isHidden, isDisabled);
+        super(links, fieldId, name, properties, isLocked, isHidden, isDisabled);
     }
 }
 
@@ -203,25 +251,7 @@ export class SchemasService {
 
         return HTTP.getVersioned(this.http, url).pipe(
             map(({ payload }) => {
-                const body = payload.body;
-
-                const items: any[] = body.items;
-
-                const schemas = items.map(item =>
-                    withLinks(
-                        new SchemaDto(
-                            item.id,
-                            item.name,
-                            item.category,
-                            new SchemaPropertiesDto(item.properties.label, item.properties.hints),
-                            item.isSingleton,
-                            item.isPublished,
-                            DateTime.parseISO_UTC(item.created), item.createdBy,
-                            DateTime.parseISO_UTC(item.lastModified), item.lastModifiedBy,
-                            new Version(item.version.toString())),
-                        item));
-
-                return withLinks({ items: schemas, _links: {} }, body);
+                return parseSchemas(payload.body);
             }),
             pretifyError('Failed to load schemas. Please reload.'));
     }
@@ -487,6 +517,26 @@ export class SchemasService {
     }
 }
 
+function parseSchemas(response: any) {
+    const items: any[] = response.items;
+
+    const schemas = items.map(item =>
+        new SchemaDto(item._links,
+            item.id,
+            item.name,
+            item.category,
+            new SchemaPropertiesDto(item.properties.label, item.properties.hints),
+            item.isSingleton,
+            item.isPublished,
+            DateTime.parseISO_UTC(item.created), item.createdBy,
+            DateTime.parseISO_UTC(item.lastModified), item.lastModifiedBy,
+            new Version(item.version.toString())));
+
+    const _links = response._links;
+
+    return { items: schemas, _links, canCreate: hasAnyLink(_links, 'create') };
+}
+
 function parseSchemaWithDetails(response: any, version: Version) {
     const fields = response.fields.map((item: any) => {
         const propertiesDto =
@@ -503,47 +553,41 @@ function parseSchemaWithDetails(response: any, version: Version) {
                         nestedItem.properties.fieldType,
                         nestedItem.properties);
 
-                return withLinks(
-                    new NestedFieldDto(
-                        nestedItem.fieldId,
-                        nestedItem.name,
-                        nestedPropertiesDto,
-                        item.fieldId,
-                        nestedItem.isLocked,
-                        nestedItem.isHidden,
-                        nestedItem.isDisabled),
-                    nestedItem);
+                return new NestedFieldDto(nestedItem._links,
+                    nestedItem.fieldId,
+                    nestedItem.name,
+                    nestedPropertiesDto,
+                    item.fieldId,
+                    nestedItem.isLocked,
+                    nestedItem.isHidden,
+                    nestedItem.isDisabled);
             });
         }
 
-        return withLinks(
-            new RootFieldDto(
-                item.fieldId,
-                item.name,
-                propertiesDto,
-                item.partitioning,
-                item.isLocked,
-                item.isHidden,
-                item.isDisabled,
-                nested || []),
-            item);
+        return new RootFieldDto(item._links,
+            item.fieldId,
+            item.name,
+            propertiesDto,
+            item.partitioning,
+            item.isLocked,
+            item.isHidden,
+            item.isDisabled,
+            nested || []);
     });
 
     const properties = new SchemaPropertiesDto(response.properties.label, response.properties.hints);
 
-    return withLinks(
-        new SchemaDetailsDto(
-            response.id,
-            response.name,
-            response.category,
-            properties,
-            response.isSingleton,
-            response.isPublished,
-            DateTime.parseISO_UTC(response.created), response.createdBy,
-            DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
-            version,
-            fields,
-            response.scripts || {},
-            response.previewUrls || {}),
-        response);
+    return new SchemaDetailsDto(response._links,
+        response.id,
+        response.name,
+        response.category,
+        properties,
+        response.isSingleton,
+        response.isPublished,
+        DateTime.parseISO_UTC(response.created), response.createdBy,
+        DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
+        version,
+        fields,
+        response.scripts || {},
+        response.previewUrls || {});
 }

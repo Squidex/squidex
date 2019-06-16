@@ -14,7 +14,6 @@ import {
     AutocompleteSource,
     EditPermissionsForm,
     fadeAnimation,
-    hasAnyLink,
     RoleDto,
     RolesState
 } from '@app/shared';
@@ -51,7 +50,7 @@ export class RoleComponent implements OnChanges {
     }
 
     public ngOnChanges() {
-        this.isEditable = hasAnyLink(this.role, 'update');
+        this.isEditable = this.role.canUpdate;
 
         this.editForm.load(this.role.permissions);
 

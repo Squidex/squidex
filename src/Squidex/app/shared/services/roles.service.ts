@@ -13,31 +13,41 @@ import { tap } from 'rxjs/operators';
 import {
     AnalyticsService,
     ApiUrlConfig,
+    hasAnyLink,
     HTTP,
     mapVersioned,
     pretifyError,
     Resource,
     ResourceLinks,
     Version,
-    Versioned,
-    withLinks
+    Versioned
 } from '@app/framework';
 
 export type RolesDto = Versioned<RolesPayload>;
 export type RolesPayload = {
-    items: RoleDto[]
+    readonly items: RoleDto[];
+
+    readonly canCreate: boolean;
 } & Resource;
 
 export class RoleDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
+
+    public readonly canDelete: boolean;
+    public readonly canUpdate: boolean;
 
     constructor(
+        links: ResourceLinks,
         public readonly name: string,
         public readonly numClients: number,
         public readonly numContributors: number,
         public readonly permissions: string[],
         public readonly isDefaultRole: boolean
     ) {
+        this._links = links;
+
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canUpdate = hasAnyLink(links, 'update');
     }
 }
 
@@ -123,14 +133,14 @@ export function parseRoles(response: any) {
     const items: any[] = response.items;
 
     const roles = items.map(item =>
-        withLinks(
-            new RoleDto(
-                item.name,
-                item.numClients,
-                item.numContributors,
-                item.permissions,
-                item.isDefaultRole),
-            item));
+        new RoleDto(item._links,
+            item.name,
+            item.numClients,
+            item.numContributors,
+            item.permissions,
+            item.isDefaultRole));
 
-    return withLinks({ items: roles, _links: {} }, response);
+    const _links = response._links;
+
+    return { items: roles, _links, canCreate: hasAnyLink(_links, 'create') };
 }

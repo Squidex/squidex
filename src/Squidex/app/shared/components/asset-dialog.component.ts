@@ -13,7 +13,6 @@ import {
     AppsState,
     AssetDto,
     AssetsService,
-    hasAnyLink,
     StatefulComponent
 } from '@app/shared/internal';
 
@@ -55,7 +54,7 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
     public ngOnInit() {
         this.annotateForm.load(this.asset);
 
-        this.isReadOnly = !hasAnyLink(this.asset, 'update');
+        this.isReadOnly = !this.asset.canUpdate;
 
         if (this.isReadOnly) {
             this.annotateForm.form.disable();

@@ -58,7 +58,8 @@ describe('BackupsService', () => {
                 stopped: '2017-02-04',
                 handledEvents: 13,
                 handledAssets: 17,
-                status: 'Failed'
+                status: 'Failed',
+                _links: {}
             },
             {
                 id: '2',
@@ -66,18 +67,16 @@ describe('BackupsService', () => {
                 stopped: null,
                 handledEvents: 23,
                 handledAssets: 27,
-                status: 'Completed'
+                status: 'Completed',
+                _links: {}
             }]
         });
 
         expect(backups!).toEqual(
-            new BackupsDto(
-                2,
-                [
-                    new BackupDto('1', DateTime.parseISO_UTC('2017-02-03'), DateTime.parseISO_UTC('2017-02-04'), 13, 17, 'Failed'),
-                    new BackupDto('2', DateTime.parseISO_UTC('2018-02-03'), null, 23, 27, 'Completed')
-                ]
-            ));
+            new BackupsDto([
+                new BackupDto({}, '1', DateTime.parseISO_UTC('2017-02-03'), DateTime.parseISO_UTC('2017-02-04'), 13, 17, 'Failed'),
+                new BackupDto({}, '2', DateTime.parseISO_UTC('2018-02-03'), null, 23, 27, 'Completed')
+            ]));
     }));
 
     it('should make get request to get restore',

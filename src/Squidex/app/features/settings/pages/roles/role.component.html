@@ -17,7 +17,7 @@
                     </button>
 
                     <button type="button" class="btn btn-text-danger"
-                        [disabled]="role | sqxHasNoLink:'delete'"
+                        [disabled]="!role.canDelete"
                         (sqxConfirmClick)="remove()"
                         confirmTitle="Delete role" 
                         confirmText="Do you really want to delete the role?">

@@ -13,30 +13,40 @@ import { map, tap } from 'rxjs/operators';
 import {
     AnalyticsService,
     ApiUrlConfig,
+    hasAnyLink,
     HTTP,
     mapVersioned,
     pretifyError,
     Resource,
     ResourceLinks,
     Version,
-    Versioned,
-    withLinks
+    Versioned
 } from '@app/framework';
 
 export type ClientsDto = Versioned<ClientsPayload>;
 export type ClientsPayload = {
-    readonly items: ClientDto[]
+    readonly items: ClientDto[];
+
+    readonly canCreate: boolean;
 } & Resource;
 
 export class ClientDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
+
+    public readonly canUpdate: boolean;
+    public readonly canRevoke: boolean;
 
     constructor(
+        links: ResourceLinks,
         public readonly id: string,
         public readonly name: string,
         public readonly secret: string,
         public readonly role: string
     ) {
+        this._links = links;
+
+        this.canUpdate = hasAnyLink(links, 'update');
+        this.canRevoke = hasAnyLink(links, 'delete');
     }
 }
 
@@ -142,13 +152,13 @@ function parseClients(response: any): ClientsPayload {
     const items: any[] = response.items;
 
     const clients = items.map(item =>
-        withLinks(
-            new ClientDto(
-                item.id,
-                item.name || item.id,
-                item.secret,
-                item.role),
-            item));
+        new ClientDto(item._links,
+            item.id,
+            item.name || item.id,
+            item.secret,
+            item.role));
 
-    return withLinks({ items: clients, _links: {} }, response);
+    const _links = response._links;
+
+    return { items: clients, _links, canCreate: hasAnyLink(_links, 'create') };
 }

@@ -16,8 +16,8 @@ import {
     ContributorsPayload,
     ContributorsService,
     Resource,
-    Version,
-    withLinks
+    ResourceLinks,
+    Version
 } from '@app/shared/internal';
 
 describe('ContributorsService', () => {
@@ -138,21 +138,22 @@ describe('ContributorsService', () => {
 
 export function createContributors(...ids: number[]): ContributorsPayload {
     return {
-        items: ids.map(id =>
-            withLinks(
-                new ContributorDto(`id${id}`, id % 2 === 0 ? 'Owner' : 'Developer'),
-                {
-                    _links: {
-                        update: { method: 'PUT', href: `/contributors/id${id}` }
-                    }
-                }
-            )),
+        items: ids.map(id => createContributor(id)),
         maxContributors: ids.length * 13,
         _links: {
             create: { method: 'POST', href: '/contributors' }
         },
         _meta: {
             isInvited: 'true'
-        }
+        },
+        canCreate: true
     };
+}
+
+export function createContributor(id: number) {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/contributors/id${id}` }
+    };
+
+    return new ContributorDto(links, `id${id}`, id % 2 === 0 ? 'Owner' : 'Developer');
 }

@@ -13,8 +13,7 @@ import { map } from 'rxjs/operators';
 import {
     ApiUrlConfig,
     pretifyError,
-    ResourceLinks,
-    withLinks
+    ResourceLinks
 } from '@app/framework';
 
 export class UserDto {
@@ -26,7 +25,11 @@ export class UserDto {
 }
 
 export class ResourcesDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
+
+    constructor(links: ResourceLinks) {
+        this._links = links;
+    }
 }
 
 @Injectable()
@@ -69,9 +72,9 @@ export class UsersService {
     public getResources(): Observable<ResourcesDto> {
         const url = this.apiUrl.buildUrl(`api`);
 
-        return this.http.get<any>(url).pipe(
-                map(body => {
-                    return withLinks(new ResourcesDto(), body);
+        return this.http.get<{ _links: {} }>(url).pipe(
+                map(({ _links }) => {
+                    return new ResourcesDto(_links);
                 }),
                 pretifyError('Failed to load user. Please reload.'));
     }

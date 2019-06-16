@@ -35,6 +35,7 @@ describe('SchemasState', () => {
     const schema2 = createSchema(2);
 
     const oldSchemas = {
+        canCreate: true,
         items: [
             schema1,
             schema2

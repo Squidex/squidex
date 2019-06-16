@@ -12,7 +12,6 @@ import {
     AppLanguageDto,
     EditLanguageForm,
     fadeAnimation,
-    hasAnyLink,
     ImmutableArray,
     LanguagesState
 } from '@app/shared';
@@ -96,7 +95,7 @@ export class LanguageComponent implements OnChanges {
     }
 
     private resetForm() {
-        this.isEditable = hasAnyLink(this.language, 'update');
+        this.isEditable = this.language.canUpdate;
 
         this.editForm.load(this.language);
 

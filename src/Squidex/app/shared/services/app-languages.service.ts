@@ -13,31 +13,41 @@ import { tap } from 'rxjs/operators';
 import {
     AnalyticsService,
     ApiUrlConfig,
+    hasAnyLink,
     HTTP,
     mapVersioned,
     pretifyError,
     Resource,
     ResourceLinks,
     Version,
-    Versioned,
-    withLinks
+    Versioned
 } from '@app/framework';
 
 export type AppLanguagesDto = Versioned<AppLanguagesPayload>;
 export type AppLanguagesPayload = {
-    readonly items: AppLanguageDto[]
+    readonly items: AppLanguageDto[];
+
+    readonly canCreate: boolean;
 } & Resource;
 
 export class AppLanguageDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
+
+    public readonly canUpdate: boolean;
+    public readonly canDelete: boolean;
 
     constructor(
+        links: ResourceLinks,
         public readonly iso2Code: string,
         public readonly englishName: string,
         public readonly isMaster: boolean,
         public readonly isOptional: boolean,
         public readonly fallback: string[]
     ) {
+        this._links = links;
+
+        this.canUpdate = hasAnyLink(links, 'update');
+        this.canDelete = hasAnyLink(links, 'delete');
     }
 }
 
@@ -114,18 +124,18 @@ export class AppLanguagesService {
     }
 }
 
-function parseLanguages(body: any) {
-    const items: any[] = body.items;
+function parseLanguages(response: any) {
+    const items: any[] = response.items;
 
     const languages = items.map(item =>
-        withLinks(
-            new AppLanguageDto(
-                item.iso2Code,
-                item.englishName,
-                item.isMaster,
-                item.isOptional,
-                item.fallback || []),
-            item));
+        new AppLanguageDto(item._links,
+            item.iso2Code,
+            item.englishName,
+            item.isMaster,
+            item.isOptional,
+            item.fallback || []));
 
-    return withLinks({ items: languages, _links: {} }, body);
+    const _links = response._links;
+
+    return { items: languages, _links, canCreate: hasAnyLink(_links, 'create') };
 }

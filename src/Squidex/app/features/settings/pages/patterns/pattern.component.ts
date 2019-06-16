@@ -10,7 +10,6 @@ import { FormBuilder } from '@angular/forms';
 
 import {
     EditPatternForm,
-    hasAnyLink,
     PatternDto,
     PatternsState
 } from '@app/shared';
@@ -36,8 +35,8 @@ export class PatternComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.isEditable = !this.pattern || hasAnyLink(this.pattern, 'update');
-        this.isDeletable = !this.pattern && hasAnyLink(this.pattern, 'delete');
+        this.isEditable = !this.pattern || this.pattern.canUpdate;
+        this.isDeletable = this.pattern && this.pattern.canDelete;
 
         this.editForm.load(this.pattern);
 

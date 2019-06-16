@@ -14,22 +14,35 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
+    hasAnyLink,
     pretifyError,
     Resource,
     ResourceLinks,
     ResultSet,
-    Types,
-    withLinks
+    Types
 } from '@app/framework';
 
 export class BackupsDto extends ResultSet<BackupDto> {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
+
+    constructor(items: BackupDto[], links?: {}) {
+        super(items.length, items);
+
+        this._links = links || {};
+    }
+
+    public get canCreate() {
+        return hasAnyLink(this._links, 'create');
+    }
 }
 
 export class BackupDto {
-    public readonly _links: ResourceLinks = {};
+    public readonly _links: ResourceLinks;
+
+    public readonly canDelete: boolean;
 
     constructor(
+        links: ResourceLinks,
         public readonly id: string,
         public readonly started: DateTime,
         public readonly stopped: DateTime | null,
@@ -37,6 +50,9 @@ export class BackupDto {
         public readonly handledAssets: number,
         public readonly status: string
     ) {
+        this._links = links;
+
+        this.canDelete = hasAnyLink(links, 'delete');
     }
 }
 
@@ -68,11 +84,11 @@ export class BackupsService {
     public getBackups(appName: string): Observable<BackupsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups`);
 
-        return this.http.get<{ items: any[] } & Resource>(url).pipe(
-                map(body => {
-                    const backups = body.items.map(item => parseBackup(item));
+        return this.http.get<{ items: any[], _links: {} } & Resource>(url).pipe(
+                map(({ items, _links }) => {
+                    const backups = items.map(item => parseBackup(item));
 
-                    return withLinks(new BackupsDto(backups.length, backups), body);
+                    return new BackupsDto(backups, _links);
                 }),
                 pretifyError('Failed to load backups.'));
     }
@@ -139,13 +155,11 @@ function parseRestore(response: any) {
 }
 
 function parseBackup(response: any) {
-    return withLinks(
-        new BackupDto(
-            response.id,
-            DateTime.parseISO_UTC(response.started),
-            response.stopped ? DateTime.parseISO_UTC(response.stopped) : null,
-            response.handledEvents,
-            response.handledAssets,
-            response.status),
-        response);
+    return new BackupDto(response._links,
+        response.id,
+        DateTime.parseISO_UTC(response.started),
+        response.stopped ? DateTime.parseISO_UTC(response.stopped) : null,
+        response.handledEvents,
+        response.handledAssets,
+        response.status);
 }

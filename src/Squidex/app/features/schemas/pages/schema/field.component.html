@@ -30,21 +30,21 @@
                         </button>
                         <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
                             <ng-container *ngIf="field.properties.isContentField">
-                                <a class="dropdown-item" (click)="enableField()" *ngIf="field | sqxHasLink:'enable'">
+                                <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
                                     Enable in UI
                                 </a>
-                                <a class="dropdown-item" (click)="disableField()" *ngIf="field | sqxHasLink:'disable'">
+                                <a class="dropdown-item" (click)="disableField()" *ngIf="field.canDisable">
                                     Disable in UI
                                 </a>
-                                <a class="dropdown-item" (click)="hideField()" *ngIf="field | sqxHasLink:'hide'">
+                                <a class="dropdown-item" (click)="hideField()" *ngIf="field.canHide">
                                     Hide in API
                                 </a>
-                                <a class="dropdown-item" (click)="showField()" *ngIf="field | sqxHasLink:'show'">
+                                <a class="dropdown-item" (click)="showField()" *ngIf="field.canShow">
                                     Show in API
                                 </a>
                             </ng-container>                
                             
-                            <ng-container *ngIf="field | sqxHasLink:'lock'">
+                            <ng-container *ngIf="field.canLock">
                                 <div class="dropdown-divider"></div>
                         
                                 <a class="dropdown-item" 
@@ -59,7 +59,7 @@
                                 <div class="dropdown-divider"></div>
 
                                 <a class="dropdown-item dropdown-item-delete"
-                                    [class.disabled]="field | sqxHasNoLink:'delete'"
+                                    [class.disabled]="!field.canDelete"
                                     (sqxConfirmClick)="deleteField()"
                                     confirmTitle="Delete field" 
                                     confirmText="Do you really want to delete the field?">

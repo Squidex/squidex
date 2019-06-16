@@ -10,7 +10,6 @@ import { FormBuilder } from '@angular/forms';
 
 import {
     EditSchemaForm,
-    hasAnyLink,
     SchemaDetailsDto,
     SchemasState
 } from '@app/shared';
@@ -38,7 +37,7 @@ export class SchemaEditFormComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.isEditable = hasAnyLink(this.schema, 'update');
+        this.isEditable = this.schema.canUpdate;
 
         this.editForm.load(this.schema.properties);
 

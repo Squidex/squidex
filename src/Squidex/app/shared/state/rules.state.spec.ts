@@ -52,7 +52,7 @@ describe('RulesState', () => {
     describe('Loading', () => {
         it('should load rules', () => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto(2, [rule1, rule2]))).verifiable();
+                .returns(() => of(new RulesDto([rule1, rule2]))).verifiable();
 
             rulesState.load().subscribe();
 
@@ -64,7 +64,7 @@ describe('RulesState', () => {
 
         it('should show notification on load when reload is true', () => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto(2, [rule1, rule2]))).verifiable();
+                .returns(() => of(new RulesDto([rule1, rule2]))).verifiable();
 
             rulesState.load(true).subscribe();
 
@@ -78,7 +78,7 @@ describe('RulesState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto(2, [rule1, rule2]))).verifiable();
+                .returns(() => of(new RulesDto([rule1, rule2]))).verifiable();
 
             rulesState.load().subscribe();
         });

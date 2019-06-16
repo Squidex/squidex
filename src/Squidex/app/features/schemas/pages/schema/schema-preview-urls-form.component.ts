@@ -11,7 +11,6 @@ import { FormBuilder } from '@angular/forms';
 import {
     AddPreviewUrlForm,
     ConfigurePreviewUrlsForm,
-    hasAnyLink,
     SchemaDetailsDto,
     SchemasState
 } from '@app/shared';
@@ -41,7 +40,7 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.isEditable = hasAnyLink(this.schema, 'update');
+        this.isEditable = this.schema.canUpdateUrls;
 
         this.editForm.load(this.schema.previewUrls);
 

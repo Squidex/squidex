@@ -55,19 +55,10 @@
             <i class="icon-dots"></i>
         </button>
         <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
-            <a class="dropdown-item" (click)="emitPublish()" *ngIf="content.status === 'Draft'">
-                Publish
+            <a class="dropdown-item" *ngFor="let status of content.statusUpdates" (click)="emitChangeStatus(status)">
+                Status to {{status}}
             </a>
-            <a class="dropdown-item" (click)="emitUnpublish()" *ngIf="content.status === 'Published'">
-                Unpublish
-            </a>
-            <a class="dropdown-item" (click)="emitArchive()" *ngIf="content.status !== 'Archived'">
-                Archive
-            </a>
-            <a class="dropdown-item" (click)="emitRestore()" *ngIf="content.status === 'Archived'">
-                Restore
-            </a>
-            <a class="dropdown-item" (click)="emitClone(); dropdown.hide()" *ngIf="content.status !== 'Archived'">
+            <a class="dropdown-item" (click)="emitClone(); dropdown.hide()" *ngIf="canClone">
                 Clone
             </a>
             

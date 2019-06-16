@@ -8,7 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 
-import { ApiUrlConfig, Resource } from '@app/framework';
+import { ApiUrlConfig, Resource, ResourceLinks } from '@app/framework';
 
 import {
     EventConsumerDto,
@@ -151,16 +151,14 @@ describe('EventConsumersService', () => {
 });
 
 export function createEventConsumer(id: number, suffix = '') {
-    const result = new EventConsumerDto(
+    const links: ResourceLinks = {
+        reset: { method: 'PUT', href: `/event-consumers/${id}/reset` }
+    };
+
+    return new EventConsumerDto(links,
         `event-consumer${id}`,
         true,
         true,
         `failure-${id}${suffix}`,
         `position-${id}${suffix}`);
-
-    result._links['reset'] = {
-        method: 'PUT', href: `/event-consumers/${id}/reset`
-    };
-
-    return result;
 }

@@ -47,8 +47,14 @@ interface Snapshot {
     // The selected content.
     selectedContent?: ContentDto | null;
 
+    // Indicates if the user can create a content.
+    canCreate?: boolean;
+
+    // Indicates if the user can create and publish a content.
+    canCreateAndPublish?: boolean;
+
     // The links.
-    links: ResourceLinks;
+    _links?: ResourceLinks;
 }
 
 export const CONTENT_STATUSES = {
@@ -90,8 +96,16 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         this.changes.pipe(map(x => x.status),
             distinctUntilChanged());
 
-    public links =
-        this.changes.pipe(map(x => x.links),
+    public canCreateAny =
+        this.changes.pipe(map(x => !!x.canCreate || !!x.canCreateAndPublish),
+            distinctUntilChanged());
+
+    public canCreate =
+        this.changes.pipe(map(x => !!x.canCreate),
+            distinctUntilChanged());
+
+    public canCreateAndPublish =
+        this.changes.pipe(map(x => !!x.canCreateAndPublish),
             distinctUntilChanged());
 
     constructor(
@@ -99,7 +113,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService
     ) {
-        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0), status: 'PublishedDraft', links: {} });
+        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0), status: 'PublishedDraft' });
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -144,7 +158,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.snapshot.contentsPager.skip,
                 this.snapshot.contentsQuery, undefined,
                 this.snapshot.status).pipe(
-            tap(({ total, items, _links: links }) => {
+            tap(({ total, items, _links, canCreate, canCreateAndPublish }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contents reloaded.');
                 }
@@ -158,8 +172,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     if (selectedContent) {
                         selectedContent = contents.find(x => x.id === selectedContent!.id) || selectedContent;
                     }
-
-                    return { ...s, contents, contentsPager, selectedContent, isLoaded: true, links };
+                    return { ...s, contents, contentsPager, selectedContent, isLoaded: true, _links, canCreate, canCreateAndPublish };
                 });
             }));
     }

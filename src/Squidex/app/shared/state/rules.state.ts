@@ -48,7 +48,7 @@ export class RulesState extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
-    public links =
+    public canCreate =
         this.changes.pipe(map(x => x.links),
             distinctUntilChanged());
 

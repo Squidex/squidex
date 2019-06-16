@@ -59,6 +59,9 @@ export class ContentItemComponent implements OnChanges {
     public schema: SchemaDetailsDto;
 
     @Input()
+    public canClone: boolean;
+
+    @Input()
     public isReadOnly = false;
 
     @Input()

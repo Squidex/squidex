@@ -14,6 +14,7 @@ import { ErrorDto } from './utils/error';
 import { Types } from './utils/types';
 
 import { fullValue } from './angular/forms/forms-helper';
+import { ResourceLinks } from '@app/shared';
 
 export interface FormState {
     submitted: boolean;
@@ -108,10 +109,6 @@ export class Form<T extends AbstractControl, V> {
     }
 }
 
-export function createModel<T>(c: { new(): T; }, values: Partial<T>): T {
-    return Object.assign(new c(), values);
-}
-
 export class Model<T> {
     public with(value: Partial<T>, validOnly = false): T {
         return this.clone(value, validOnly);
@@ -145,12 +142,15 @@ export class Model<T> {
     }
 }
 
-export class ResultSet<T> extends Model<ResultSet<T>> {
+export class ResultSet<T> {
+    public readonly _links: ResourceLinks;
+
     constructor(
         public readonly total: number,
-        public readonly items: T[]
+        public readonly items: T[],
+        links?: ResourceLinks
     ) {
-        super();
+        this._links = links || {};
     }
 }
 

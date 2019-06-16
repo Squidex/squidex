@@ -14,7 +14,8 @@ import {
     AppDto,
     AppsService,
     DateTime,
-    Resource
+    Resource,
+    ResourceLinks
 } from '@app/shared/internal';
 
 describe('AppsService', () => {
@@ -116,19 +117,17 @@ describe('AppsService', () => {
 });
 
 export function createApp(id: number, suffix = '') {
-    const result = new AppDto(
-        `id${id}`,
-        `name${id}${suffix}`,
+    const links: ResourceLinks = {
+        schemas: { method: 'GET', href: '/schemas' }
+    };
+
+    return new AppDto(links,
+        `id${id}`, `name${id}${suffix}`,
         ['Owner'],
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`),
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`),
         id % 2 === 0,
         id % 2 === 0,
         'Free',
-        'Basic'
-    );
-
-    result._links['schemas'] = { method: 'GET', href: '/schemas' };
-
-    return result;
+        'Basic');
 }

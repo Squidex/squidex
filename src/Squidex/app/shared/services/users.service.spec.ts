@@ -135,9 +135,9 @@ describe('UsersService', () => {
             }
         });
 
-        const expected = new ResourcesDto();
-
-        expected._links['schemas'] = { method: 'GET', href: '/api/schemas' };
+        const expected = new ResourcesDto({
+            schemas: { method: 'GET', href: '/api/schemas' }
+        });
 
         expect(resources!).toEqual(expected);
     }));

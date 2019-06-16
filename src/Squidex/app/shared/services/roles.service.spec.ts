@@ -12,12 +12,12 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     Resource,
+    ResourceLinks,
     RoleDto,
     RolesDto,
     RolesPayload,
     RolesService,
-    Version,
-    withLinks
+    Version
 } from '@app/shared/internal';
 
 describe('RolesService', () => {
@@ -188,17 +188,18 @@ describe('RolesService', () => {
 
 export function createRoles(...ids: number[]): RolesPayload {
     return {
-        items: ids.map(id =>
-            withLinks(
-                new RoleDto(`name${id}`, id * 2, id * 3, [`permission${id}`], id % 2 === 0),
-                {
-                    _links: {
-                        update: { method: 'PUT', href: `/roles/id${id}` }
-                    }
-                }
-            )),
+        items: ids.map(id => createRole(id)),
         _links: {
             create: { method: 'POST', href: '/roles' }
-        }
+        },
+        canCreate: true
     };
+}
+
+export function createRole(id: number) {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/roles/id${id}` }
+    };
+
+    return new RoleDto(links, `name${id}`, id * 2, id * 3, [`permission${id}`], id % 2 === 0);
 }
