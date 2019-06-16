@@ -15,6 +15,10 @@ export class ErrorDto {
     ) {
         this.displayMessage = formatMessage(message, details);
     }
+
+    public toString() {
+        return `ErrorDto(${JSON.stringify(this)})`;
+    }
 }
 
 
