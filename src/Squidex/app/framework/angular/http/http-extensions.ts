@@ -83,7 +83,7 @@ export const pretifyError = (message: string) => <T>(source: Observable<T>) =>
                 let errorDto = Types.isObject(response.error) ? response.error : JSON.parse(response.error);
 
                 if (!errorDto) {
-                    errorDto = { message: 'Failed to make the request.', details: [] };
+                    errorDto = { message: 'Failed to make the request.', details: [response] };
                 }
 
                 if (response.status === 412) {
