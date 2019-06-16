@@ -74,13 +74,14 @@ export class ContentItemComponent implements OnChanges {
     public content: ContentDto;
 
     public patchForm: PatchContentForm;
+    public patchAllowed = false;
 
     public dropdown = new ModalModel();
 
     public values: any[] = [];
 
     public get isDirty() {
-        return this.patchForm.form.dirty;
+        return this.patchForm && this.patchForm.form.dirty;
     }
 
     constructor(
@@ -90,8 +91,14 @@ export class ContentItemComponent implements OnChanges {
     }
 
     public ngOnChanges(changes: SimpleChanges) {
+        if (changes['content']) {
+            this.patchAllowed = !this.isReadOnly && this.content.canUpdate;
+        }
+
         if (changes['schema'] || changes['language']) {
-            this.patchForm = new PatchContentForm(this.schema, this.language);
+            if (this.patchAllowed) {
+                this.patchForm = new PatchContentForm(this.schema, this.language);
+            }
         }
 
         if (changes['content'] || changes['language']) {
@@ -100,6 +107,10 @@ export class ContentItemComponent implements OnChanges {
     }
 
     public save() {
+        if (!this.content.canUpdate) {
+            return;
+        }
+
         const value = this.patchForm.submit();
 
         if (value) {

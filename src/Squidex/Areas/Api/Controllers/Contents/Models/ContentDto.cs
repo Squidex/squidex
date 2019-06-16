@@ -130,6 +130,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (controller.HasPermission(Permissions.AppContentsUpdate, app, schema))
             {
+                AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
+
                 AddPutLink("update", controller.Url<ContentsController>(x => nameof(x.PutContent), values));
 
                 if (Status == Status.Published)
