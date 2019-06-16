@@ -178,8 +178,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Publish a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content published.");
-
-                AddSecurity(operation, Permissions.AppContentsPublish);
             });
         }
 
@@ -191,8 +189,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Unpublish a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content unpublished.");
-
-                AddSecurity(operation, Permissions.AppContentsUnpublish);
             });
         }
 
@@ -217,8 +213,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.Summary = $"Restore a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content restored.");
-
-                AddSecurity(operation, Permissions.AppContentsRestore);
             });
         }
 

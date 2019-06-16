@@ -12,10 +12,9 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
@@ -80,30 +79,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static ContentDto FromCommand(CreateContent command, EntityCreatedResult<NamedContentData> result)
-        {
-            var now = SystemClock.Instance.GetCurrentInstant();
-
-            var response = new ContentDto
-            {
-                Id = command.ContentId,
-                Data = result.IdOrValue,
-                Version = result.Version,
-                Created = now,
-                CreatedBy = command.Actor,
-                LastModified = now,
-                LastModifiedBy = command.Actor,
-                Status = command.Publish ? Status.Published : Status.Draft
-            };
-
-            return response;
-        }
-
-        public static ContentDto FromContent(IContentEntity content, QueryContext context, ApiController controller, string app)
+        public static ContentDto FromContent(IContentEntity content, QueryContext context, ApiController controller, string app, string schema)
         {
             var response = SimpleMapper.Map(content, new ContentDto());
 
-            if (context.Flatten)
+            if (context?.Flatten == true)
             {
                 response.Data = content.Data?.ToFlatten();
                 response.DataDraft = content.DataDraft?.ToFlatten();
@@ -119,11 +99,58 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 response.ScheduleJob = SimpleMapper.Map(content.ScheduleJob, new ScheduleJobDto());
             }
 
-            return response.CreateLinks(controller, app);
+            return response.CreateLinks(controller, app, schema);
         }
 
-        private ContentDto CreateLinks(ApiController controller, object app)
+        private ContentDto CreateLinks(ApiController controller, string app, string schema)
         {
+            var values = new { app, name = schema, id = Id };
+
+            AddSelfLink(controller.Url<ContentsController>(x => nameof(x.GetContent), values));
+
+            if (Version > 0)
+            {
+                var versioned = new { app, name = schema, id = Id, version = Version - 1 };
+
+                AddGetLink("prev", controller.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
+            }
+
+            if (IsPending)
+            {
+                if (controller.HasPermission(Permissions.AppContentsDiscard, app, schema))
+                {
+                    AddPutLink("changes/discard", controller.Url<ContentsController>(x => nameof(x.DiscardChanges), values));
+                }
+
+                if (controller.HasPermission(Helper.StatusPermission(app, schema, Status.Published)))
+                {
+                    AddPutLink("changes/publish", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values));
+                }
+            }
+
+            if (controller.HasPermission(Permissions.AppContentsUpdate, app, schema))
+            {
+                AddPutLink("update", controller.Url<ContentsController>(x => nameof(x.PutContent), values));
+
+                if (Status == Status.Published)
+                {
+                    AddPutLink("update/change", controller.Url<ContentsController>(x => nameof(x.PutContent), values) + "?asDraft");
+                }
+            }
+
+            if (controller.HasPermission(Permissions.AppContentsDelete, app, schema))
+            {
+                AddPutLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
+            }
+
+            foreach (var next in StatusFlow.Next(Status))
+            {
+                if (controller.HasPermission(Helper.StatusPermission(app, schema, next)))
+                {
+                    AddPutLink($"status/{next}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values));
+                }
+            }
+
             return this;
         }
     }

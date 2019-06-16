@@ -36,7 +36,7 @@
             <div class="col-auto pl-1" *ngIf="languages.length > 1">
                 <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.mutableValues"></sqx-language-selector>
             </div>
-            <div class="col-auto pl-1">
+            <div class="col-auto pl-1" *ngIf="contentsState.links | async | sqxHasLink:'create'">
                 <button type="button" class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
                     <i class="icon-plus"></i> New
                 </button>
@@ -80,25 +80,13 @@
         </div>
 
         <div class="selection" *ngIf="selectionCount > 0">
-            {{selectionCount}} items selected:&nbsp;&nbsp;
+            {{selectionCount}} items selected&nbsp;&nbsp;
 
-            <button type="button" class="btn btn-secondary mr-1" (click)="publishSelected()" *ngIf="canPublish">
-                Publish
+            <button type="button" class="btn btn-secondary mr-1" *ngFor="let status of nextStatuses" (click)="changeSelectedStatus(status)">
+                Status to {{status}}
             </button>
             
-            <button type="button" class="btn btn-secondary mr-1" (click)="unpublishSelected()" *ngIf="canUnpublish">
-                Unpublish
-            </button>
-            
-            <button type="button" class="btn btn-secondary mr-1" (click)="archiveSelected()" *ngIf="(contentsState.isArchive | async) === false">
-                Archive
-            </button>
-            
-            <button type="button" class="btn btn-secondary mr-1" (click)="restoreSelected()" *ngIf="contentsState.isArchive | async">
-                Restore
-            </button>
-            
-            <button type="button" class="btn btn-danger"
+            <button type="button" class="btn btn-danger" *ngIf="selectionCanDelete"
                 (sqxConfirmClick)="deleteSelected()"
                 confirmTitle="Delete content" 
                 confirmText="Do you really want to delete the selected content items?">
@@ -115,10 +103,7 @@
                             [schema]="schema"
                             [selected]="isItemSelected(content)"
                             (selectedChange)="selectItem(content, $event)"
-                            (unpublish)="unpublish(content)"
-                            (publish)="publish(content)"
-                            (archive)="archive(content)"
-                            (restore)="restore(content)"
+                            (statusChange)="changeStatus(content, $event)"
                             (delete)="delete(content)"
                             (clone)="clone(content)">
                         </tr>

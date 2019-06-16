@@ -41,16 +41,7 @@ export class ContentItemComponent implements OnChanges {
     public delete = new EventEmitter();
 
     @Output()
-    public archive = new EventEmitter();
-
-    @Output()
-    public restore = new EventEmitter();
-
-    @Output()
-    public publish = new EventEmitter();
-
-    @Output()
-    public unpublish = new EventEmitter();
+    public statusChange = new EventEmitter<string>();
 
     @Output()
     public selectedChange = new EventEmitter();
@@ -132,20 +123,8 @@ export class ContentItemComponent implements OnChanges {
         this.delete.emit();
     }
 
-    public emitPublish() {
-        this.publish.emit();
-    }
-
-    public emitUnpublish() {
-        this.unpublish.emit();
-    }
-
-    public emitArchive() {
-        this.archive.emit();
-    }
-
-    public emitRestore() {
-        this.unpublish.emit();
+    public emitChangeStatus(status: string) {
+        this.statusChange.emit(status);
     }
 
     public emitClone() {

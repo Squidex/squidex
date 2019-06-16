@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         Create(c);
 
-                        return EntityCreatedResult.Create(c.Data, Version);
+                        return await GetRawStateAsync();
                     });
 
                 case UpdateContent updateContent:
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     });
 
                 case ChangeContentStatus changeContentStatus:
-                    return UpdateAsync(changeContentStatus, async c =>
+                    return UpdateReturnAsync(changeContentStatus, async c =>
                     {
                         try
                         {
@@ -157,6 +157,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 throw;
                             }
                         }
+
+                        return await GetRawStateAsync();
                     });
 
                 case DeleteContent deleteContent:
@@ -172,11 +174,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     });
 
                 case DiscardChanges discardChanges:
-                    return UpdateAsync(discardChanges, c =>
+                    return UpdateReturnAsync(discardChanges, async c =>
                     {
                         GuardContent.CanDiscardChanges(Snapshot.IsPending, c);
 
                         DiscardChanges(c);
+
+                        return await GetRawStateAsync();
                     });
 
                 default:
@@ -220,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 }
             }
 
-            return new ContentDataChangedResult(newData, Version);
+            return Snapshot;
         }
 
         public void Create(CreateContent command)
@@ -303,6 +307,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     appProvider, assetRepository, contentRepository, scriptEngine, message);
 
             return operationContext;
+        }
+
+        public Task<IContentEntity> GetRawStateAsync()
+        {
+            return Task.FromResult<IContentEntity>(Snapshot);
         }
 
         public Task<J<IContentEntity>> GetStateAsync(long version = EtagVersion.Any)

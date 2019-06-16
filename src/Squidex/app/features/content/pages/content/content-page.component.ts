@@ -24,6 +24,7 @@ import {
     EditContentForm,
     fadeAnimation,
     FieldDto,
+    hasAnyLink,
     ImmutableArray,
     LanguagesState,
     MessageBus,
@@ -64,7 +65,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,
         public readonly appsState: AppsState,
-        private readonly contentsState: ContentsState,
+        public readonly contentsState: ContentsState,
         private readonly dialogs: DialogService,
         private readonly languagesState: LanguagesState,
         private readonly messageBus: MessageBus,
@@ -174,27 +175,11 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     private loadContent(data: any) {
-        this.contentForm.loadContent(data, this.content && this.content.status === 'Archived');
+        this.contentForm.loadContent(data, this.content && !hasAnyLink(this.content, 'update'));
     }
 
     public discardChanges() {
         this.contentsState.discardChanges(this.content);
-    }
-
-    public publish() {
-        this.changeContentItems('Publish', 'Published');
-    }
-
-    public unpublish() {
-        this.changeContentItems('Unpublish', 'Draft');
-    }
-
-    public archive() {
-        this.changeContentItems('Archive', 'Archived');
-    }
-
-    public restore() {
-        this.changeContentItems('Restore', 'Draft');
     }
 
     public delete() {
@@ -210,9 +195,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             .subscribe();
     }
 
-    private changeContentItems(action: string, status: string) {
-        this.dueTimeSelector.selectDueTime(action).pipe(
-                switchMap(d => this.contentsState.changeStatus(this.content, action, status, d)), onErrorResumeNext())
+    public changeStatus(status: string) {
+        this.dueTimeSelector.selectDueTime(status).pipe(
+                switchMap(d => this.contentsState.changeStatus(this.content, status, d)), onErrorResumeNext())
             .subscribe();
     }
 

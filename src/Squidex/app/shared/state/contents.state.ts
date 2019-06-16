@@ -15,18 +15,18 @@ import {
     ErrorDto,
     ImmutableArray,
     Pager,
+    ResourceLinks,
     shareSubscribed,
     State,
     Version,
     Versioned
 } from '@app/framework';
 
-import { AuthService } from './../services/auth.service';
 import { SchemaDto } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 import { SchemasState } from './schemas.state';
 
-import { ContentDto, ContentQueryStatus, ContentsService, ScheduleDto } from './../services/contents.service';
+import { ContentDto, ContentQueryStatus, ContentsService } from './../services/contents.service';
 
 interface Snapshot {
     // The current comments.
@@ -46,6 +46,9 @@ interface Snapshot {
 
     // The selected content.
     selectedContent?: ContentDto | null;
+
+    // The links.
+    links: ResourceLinks;
 }
 
 export const CONTENT_STATUSES = {
@@ -87,13 +90,16 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         this.changes.pipe(map(x => x.status),
             distinctUntilChanged());
 
+    public links =
+        this.changes.pipe(map(x => x.links),
+            distinctUntilChanged());
+
     constructor(
         private readonly appsState: AppsState,
-        private readonly authState: AuthService,
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService
     ) {
-        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0), status: 'PublishedDraft' });
+        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0), status: 'PublishedDraft', links: {} });
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -138,7 +144,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.snapshot.contentsPager.skip,
                 this.snapshot.contentsQuery, undefined,
                 this.snapshot.status).pipe(
-            tap(({ total, items }) => {
+            tap(({ total, items, _links: links }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contents reloaded.');
                 }
@@ -153,7 +159,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         selectedContent = contents.find(x => x.id === selectedContent!.id) || selectedContent;
                     }
 
-                    return { ...s, contents, contentsPager, selectedContent, isLoaded: true };
+                    return { ...s, contents, contentsPager, selectedContent, isLoaded: true, links };
                 });
             }));
     }
@@ -173,10 +179,10 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public changeManyStatus(contents: ContentDto[], action: string, dueTime: string | null): Observable<any> {
+    public changeManyStatus(contents: ContentDto[], status: string, dueTime: string | null): Observable<any> {
         return forkJoin(
             contents.map(c =>
-                this.contentsService.changeContentStatus(this.appName, this.schemaName, c.id, action, dueTime, c.version).pipe(
+                this.contentsService.putStatus(this.appName, c, status, dueTime, c.version).pipe(
                     catchError(error => of(error))))).pipe(
             tap(results => {
                 const error = results.find(x => x instanceof ErrorDto);
@@ -194,7 +200,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public deleteMany(contents: ContentDto[]): Observable<any> {
         return forkJoin(
             contents.map(c =>
-                this.contentsService.deleteContent(this.appName, this.schemaName, c.id, c.version).pipe(
+                this.contentsService.deleteContent(this.appName, c, c.version).pipe(
                     catchError(error => of(error))))).pipe(
             tap(results => {
                 const error = results.find(x => x instanceof ErrorDto);
@@ -209,15 +215,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public publishChanges(content: ContentDto, dueTime: string | null, now?: DateTime): Observable<ContentDto> {
-        return this.contentsService.changeContentStatus(this.appName, this.schemaName, content.id, 'Publish', dueTime, content.version).pipe(
-            map(({ version }) => {
-                if (dueTime) {
-                    return changeScheduleStatus(content, 'Published', dueTime, this.user, version, now);
-                } else {
-                    return confirmChanges(content, this.user, version, now);
-                }
-            }),
+    public publishChanges(content: ContentDto, dueTime: string | null): Observable<ContentDto> {
+        return this.contentsService.putStatus(this.appName, content, 'Published', dueTime, content.version).pipe(
             tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
@@ -226,15 +225,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public changeStatus(content: ContentDto, action: string, status: string, dueTime: string | null, now?: DateTime): Observable<ContentDto> {
-        return this.contentsService.changeContentStatus(this.appName, this.schemaName, content.id, action, dueTime, content.version).pipe(
-            map(({ version }) => {
-                if (dueTime) {
-                    return changeScheduleStatus(content, status, dueTime, this.user, version, now);
-                } else {
-                    return changeStatus(content, status, this.user, version, now);
-                }
-            }),
+    public changeStatus(content: ContentDto, status: string, dueTime: string | null): Observable<ContentDto> {
+        return this.contentsService.putStatus(this.appName, content, status, dueTime, content.version).pipe(
             tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
@@ -244,8 +236,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public update(content: ContentDto, request: any, now?: DateTime): Observable<ContentDto> {
-        return this.contentsService.putContent(this.appName, this.schemaName, content.id, request, false, content.version).pipe(
-            map(({ payload, version }) => updateData(content, payload, this.user, version, now)),
+        return this.contentsService.putContent(this.appName, content, request, false, content.version).pipe(
             tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
@@ -254,9 +245,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public proposeUpdate(content: ContentDto, request: any, now?: DateTime): Observable<ContentDto> {
-        return this.contentsService.putContent(this.appName, this.schemaName, content.id, request, true, content.version).pipe(
-            map(({ payload, version }) => updateDataDraft(content, payload, this.user, version, now)),
+    public proposeUpdate(content: ContentDto, request: any): Observable<ContentDto> {
+        return this.contentsService.putContent(this.appName, content, request, true, content.version).pipe(
             tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
@@ -266,8 +256,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public discardChanges(content: ContentDto, now?: DateTime): Observable<ContentDto> {
-        return this.contentsService.discardChanges(this.appName, this.schemaName, content.id, content.version).pipe(
-            map(({ version }) => discardChanges(content, this.user, version, now)),
+        return this.contentsService.discardChanges(this.appName, content, content.version).pipe(
             tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
@@ -277,8 +266,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public patch(content: ContentDto, request: any, now?: DateTime): Observable<ContentDto> {
-        return this.contentsService.patchContent(this.appName, this.schemaName, content.id, request, content.version).pipe(
-            map(({ payload, version }) => updateData(content, payload, this.user, version, now)),
+        return this.contentsService.patchContent(this.appName, content, request, content.version).pipe(
             tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
@@ -331,19 +319,15 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    private get user() {
-        return this.authState.user!.token;
-    }
-
     protected abstract get schemaName(): string;
 }
 
 @Injectable()
 export class ContentsState extends ContentsStateBase {
-    constructor(appsState: AppsState, authState: AuthService, contentsService: ContentsService, dialogs: DialogService,
+    constructor(appsState: AppsState, contentsService: ContentsService, dialogs: DialogService,
         private readonly schemasState: SchemasState
     ) {
-        super(appsState, authState, contentsService, dialogs);
+        super(appsState, contentsService, dialogs);
     }
 
     protected get schemaName() {
@@ -356,65 +340,12 @@ export class ManualContentsState extends ContentsStateBase {
     public schema: SchemaDto;
 
     constructor(
-        appsState: AppsState, authState: AuthService, contentsService: ContentsService, dialogs: DialogService
+        appsState: AppsState, contentsService: ContentsService, dialogs: DialogService
     ) {
-        super(appsState, authState, contentsService, dialogs);
+        super(appsState, contentsService, dialogs);
     }
 
     protected get schemaName() {
         return this.schema.name;
     }
 }
-
-const changeScheduleStatus = (content: ContentDto, status: string, dueTime: string, user: string, version: Version, now?: DateTime) =>
-    content.with({
-        scheduleJob: new ScheduleDto(status, user, DateTime.parseISO_UTC(dueTime)),
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const changeStatus = (content: ContentDto, status: string, user: string, version: Version, now?: DateTime) =>
-    content.with({
-        status,
-        scheduleJob: null,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const updateData = (content: ContentDto, data: any, user: string, version: Version, now?: DateTime) =>
-    content.with({
-        data,
-        dataDraft: data,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const updateDataDraft = (content: ContentDto, data: any, user: string, version: Version, now?: DateTime) =>
-    content.with({
-        isPending: true,
-        dataDraft: data,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const confirmChanges = (content: ContentDto, user: string, version: Version, now?: DateTime) =>
-    content.with({
-        isPending: false,
-        data: content.dataDraft,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });
-
-const discardChanges = (content: ContentDto, user: string, version: Version, now?: DateTime) =>
-    content.with({
-        isPending: false,
-        dataDraft: content.data,
-        lastModified: now || DateTime.now(),
-        lastModifiedBy: user,
-        version
-    });

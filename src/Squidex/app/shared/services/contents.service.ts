@@ -16,26 +16,33 @@ import {
     DateTime,
     HTTP,
     mapVersioned,
-    Model,
     pretifyError,
+    Resource,
+    ResourceLinks,
     ResultSet,
     Version,
-    Versioned
+    Versioned,
+    withLinks
 } from '@app/framework';
 
-export class ScheduleDto extends Model<ScheduleDto> {
+export class ScheduleDto {
     constructor(
         public readonly status: string,
         public readonly scheduledBy: string,
         public readonly dueTime: DateTime
     ) {
-        super();
     }
 }
 
-export class ContentsDto extends ResultSet<ContentDto> { }
+export class ContentsDto extends ResultSet<ContentDto> {
+    public readonly _links: ResourceLinks = {};
+}
 
-export class ContentDto extends Model<ContentDto> {
+export class ContentDto {
+    public readonly _links: ResourceLinks = {};
+
+    public readonly statusUpdates: string[] = [];
+
     constructor(
         public readonly id: string,
         public readonly status: string,
@@ -49,11 +56,6 @@ export class ContentDto extends Model<ContentDto> {
         public readonly dataDraft: object,
         public readonly version: Version
     ) {
-        super();
-    }
-
-    public with(value: Partial<ContentDto>): ContentDto {
-        return this.clone(value);
     }
 }
 
@@ -107,24 +109,9 @@ export class ContentsService {
 
                     const items: any[] = body.items;
 
-                    const contents = new ContentsDto(body.total, items.map(item =>
-                        new ContentDto(
-                            item.id,
-                            item.status,
-                            DateTime.parseISO_UTC(item.created), item.createdBy,
-                            DateTime.parseISO_UTC(item.lastModified), item.lastModifiedBy,
-                            item.scheduleJob
-                                ? new ScheduleDto(
-                                    item.scheduleJob.status,
-                                    item.scheduleJob.scheduledBy,
-                                    DateTime.parseISO_UTC(item.scheduleJob.dueTime))
-                                : null,
-                            item.isPending === true,
-                            item.data,
-                            item.dataDraft,
-                            new Version(item.version.toString()))));
+                    const contents = items.map(x => parseContent(x));
 
-                    return contents;
+                    return withLinks(new ContentsDto(body.total, contents), body);
                 }),
                 pretifyError('Failed to load contents. Please reload.'));
     }
@@ -133,26 +120,8 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return HTTP.getVersioned(this.http, url).pipe(
-                map(({ version, payload }) => {
-                    const body = payload.body;
-
-                    const content = new ContentDto(
-                        body.id,
-                        body.status,
-                        DateTime.parseISO_UTC(body.created), body.createdBy,
-                        DateTime.parseISO_UTC(body.lastModified), body.lastModifiedBy,
-                        body.scheduleJob
-                            ? new ScheduleDto(
-                                body.scheduleJob.status,
-                                body.scheduleJob.scheduledBy,
-                                DateTime.parseISO_UTC(body.scheduleJob.dueTime))
-                            : null,
-                        body.isPending === true,
-                        body.data,
-                        body.dataDraft,
-                        version);
-
-                    return content;
+                map(({ payload }) => {
+                    return parseContent(payload.body);
                 }),
                 pretifyError('Failed to load content. Please reload.'));
     }
@@ -171,21 +140,8 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}`);
 
         return HTTP.postVersioned(this.http, url, dto).pipe(
-                map(({ version, payload }) => {
-                    const body = payload.body;
-
-                    const content = new ContentDto(
-                        body.id,
-                        body.status,
-                        DateTime.parseISO_UTC(body.created), body.createdBy,
-                        DateTime.parseISO_UTC(body.lastModified), body.lastModifiedBy,
-                        null,
-                        body.isPending,
-                        null,
-                        body.data,
-                        version);
-
-                    return content;
+                map(({ payload }) => {
+                    return parseContent(payload.body);
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Content', 'Created', appName);
@@ -193,12 +149,14 @@ export class ContentsService {
                 pretifyError('Failed to create content. Please reload.'));
     }
 
-    public putContent(appName: string, schemaName: string, id: string, dto: any, asDraft: boolean, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}?asDraft=${asDraft}`);
+    public putContent(appName: string, resource: Resource, dto: any, asDraft: boolean, version: Version): Observable<ContentDto> {
+        const link = resource._links[asDraft ? 'update/change' : 'update'];
+
+        const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(
-                mapVersioned(payload => {
-                    return payload.body;
+                map(({ payload }) => {
+                    return parseContent(payload.body);
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Content', 'Updated', appName);
@@ -206,12 +164,14 @@ export class ContentsService {
                 pretifyError('Failed to update content. Please reload.'));
     }
 
-    public patchContent(appName: string, schemaName: string, id: string, dto: any, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
+    public patchContent(appName: string, resource: Resource, dto: any, version: Version): Observable<ContentDto> {
+        const link = resource._links['patch'];
 
-        return HTTP.patchVersioned(this.http, url, dto, version).pipe(
-                mapVersioned(payload => {
-                    return payload.body;
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+                map(({ payload }) => {
+                    return parseContent(payload.body);
                 }),
                 tap(() => {
                     this.analytics.trackEvent('Content', 'Updated', appName);
@@ -219,37 +179,75 @@ export class ContentsService {
                 pretifyError('Failed to update content. Please reload.'));
     }
 
-    public discardChanges(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/discard`);
+    public discardChanges(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
+        const link = resource._links['discard'];
 
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+                map(({ payload }) => {
+                    return parseContent(payload.body);
+                }),
                 tap(() => {
                     this.analytics.trackEvent('Content', 'Discarded', appName);
                 }),
                 pretifyError('Failed to discard changes. Please reload.'));
     }
 
-    public deleteContent(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
+    public putStatus(appName: string, resource: Resource, status: string, dueTime: string | null, version: Version): Observable<ContentDto> {
+        const link = resource._links[`status/${status}`];
 
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, { status, dueTime }).pipe(
+                map(({ payload }) => {
+                    return parseContent(payload.body);
+                }),
+                tap(() => {
+                    this.analytics.trackEvent('Content', 'Archived', appName);
+                }),
+                pretifyError(`Failed to ${status} content. Please reload.`));
+    }
+
+    public deleteContent(appName: string, resource: Resource, version: Version): Observable<Versioned<any>> {
+        const link = resource._links['delete'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
                 tap(() => {
                     this.analytics.trackEvent('Content', 'Deleted', appName);
                 }),
                 pretifyError('Failed to delete content. Please reload.'));
     }
+}
 
-    public changeContentStatus(appName: string, schemaName: string, id: string, action: string, dueTime: string | null, version: Version): Observable<Versioned<any>> {
-        let url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${action}`);
+function parseContent(response: any) {
+    return nextStatuses(withLinks(
+        new ContentDto(
+            response.id,
+            response.status,
+            DateTime.parseISO_UTC(response.created), response.createdBy,
+            DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
+            response.scheduleJob
+                ? new ScheduleDto(
+                    response.scheduleJob.status,
+                    response.scheduleJob.scheduledBy,
+                    DateTime.parseISO_UTC(response.scheduleJob.dueTime))
+                : null,
+            response.isPending === true,
+            response.data,
+            response.dataDraft,
+            new Version(response.version)),
+        response));
+}
 
-        if (dueTime) {
-            url += `?dueTime=${dueTime}`;
-        }
+function nextStatuses(content: ContentDto) {
+    const nexts = Object.keys(content._links).filter(x => x.startsWith('status/')).map(x => x.substr(7));
 
-        return HTTP.putVersioned(this.http, url, {}, version).pipe(
-                tap(() => {
-                    this.analytics.trackEvent('Content', 'Archived', appName);
-                }),
-                pretifyError(`Failed to ${action} content. Please reload.`));
+    for (let next of nexts) {
+        content.statusUpdates.push(next);
     }
+
+    return content;
 }
