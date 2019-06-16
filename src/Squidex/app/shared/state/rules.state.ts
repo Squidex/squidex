@@ -29,11 +29,17 @@ interface Snapshot {
     // The current rules.
     rules: RulesList;
 
-    // The resource links.
-    links: ResourceLinks;
-
     // Indicates if the rules are loaded.
     isLoaded?: boolean;
+
+    // Indicates if the user can create rules.
+    canCreate?: boolean;
+
+    // Indicates if the user can read events.
+    canReadEvents?: boolean;
+
+    // The resource links.
+    _links?: ResourceLinks;
 }
 
 type RulesList = ImmutableArray<RuleDto>;
@@ -49,7 +55,11 @@ export class RulesState extends State<Snapshot> {
             distinctUntilChanged());
 
     public canCreate =
-        this.changes.pipe(map(x => x.links),
+        this.changes.pipe(map(x => !!x.canCreate),
+            distinctUntilChanged());
+
+    public canReadEvents =
+        this.changes.pipe(map(x => !!x.canReadEvents),
             distinctUntilChanged());
 
     constructor(
@@ -57,7 +67,7 @@ export class RulesState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly rulesService: RulesService
     ) {
-        super({ rules: ImmutableArray.empty(), links: {} });
+        super({ rules: ImmutableArray.empty() });
     }
 
     public load(isReload = false): Observable<any> {
@@ -66,7 +76,7 @@ export class RulesState extends State<Snapshot> {
         }
 
         return this.rulesService.getRules(this.appName).pipe(
-            tap(({ items, _links: links }) => {
+            tap(({ items, _links, canCreate, canReadEvents }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Rules reloaded.');
                 }
@@ -74,7 +84,7 @@ export class RulesState extends State<Snapshot> {
                 this.next(s => {
                     const rules = ImmutableArray.of(items);
 
-                    return { ...s, rules, isLoaded: true, links };
+                    return { ...s, rules, isLoaded: true, _links, canCreate, canReadEvents };
                 });
             }),
             shareSubscribed(this.dialogs));

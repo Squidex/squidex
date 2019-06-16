@@ -10,11 +10,10 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { ErrorDto } from './utils/error';
-
+import { ResourceLinks } from './utils/hateos';
 import { Types } from './utils/types';
 
 import { fullValue } from './angular/forms/forms-helper';
-import { ResourceLinks } from '@app/shared';
 
 export interface FormState {
     submitted: boolean;

@@ -39,7 +39,7 @@ describe('UIState', () => {
     const resources: ResourceLinks = {
         ['admin/events']: { method: 'GET', href: '/api/events' },
         ['admin/restore']: { method: 'GET', href: '/api/restore' },
-        ['admin/users']: { method: 'GET', href: '/api/users' },
+        ['admin/users']: { method: 'GET', href: '/api/users' }
     };
 
     let usersService: IMock<UsersService>;

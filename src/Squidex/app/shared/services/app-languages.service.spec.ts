@@ -181,5 +181,5 @@ function createLanguage(code: string, codes: string[], i: number) {
         update: { method: 'PUT', href: `/languages/${code}` }
     };
 
-    return new AppLanguageDto(links, code, code, i === 0, i % 2 === 1, codes.filter(x => x !== code))
+    return new AppLanguageDto(links, code, code, i === 0, i % 2 === 1, codes.filter(x => x !== code));
 }

@@ -14,6 +14,7 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
+    hasAnyLink,
     pretifyError,
     Resource,
     ResourceLinks
@@ -27,8 +28,8 @@ export class AppDto {
     public readonly canReadBackups: boolean;
     public readonly canReadClients: boolean;
     public readonly canReadContributors: boolean;
-    public readonly canReadPatterns: boolean;
     public readonly canReadLanguages: boolean;
+    public readonly canReadPatterns: boolean;
     public readonly canReadPlans: boolean;
     public readonly canReadRoles: boolean;
     public readonly canReadRules: boolean;
@@ -46,6 +47,18 @@ export class AppDto {
         public readonly planUpgrade?: string
     ) {
         this._links = links;
+
+        this.canCreateSchema = hasAnyLink(links, 'schemas/create');
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canReadBackups = hasAnyLink(links, 'backups');
+        this.canReadClients = hasAnyLink(links, 'clients');
+        this.canReadContributors = hasAnyLink(links, 'contributors');
+        this.canReadLanguages = hasAnyLink(links, 'languages');
+        this.canReadPatterns = hasAnyLink(links, 'patterns');
+        this.canReadPlans = hasAnyLink(links, 'plans');
+        this.canReadRoles = hasAnyLink(links, 'roles');
+        this.canReadRules = hasAnyLink(links, 'rules');
+        this.canReadSchemas = hasAnyLink(links, 'schemas');
     }
 }
 

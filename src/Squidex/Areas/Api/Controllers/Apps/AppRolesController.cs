@@ -89,7 +89,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/roles/")]
         [ProducesResponseType(typeof(RolesDto), 200)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppRolesCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostRole(string app, [FromBody] AddRoleDto request)
@@ -139,7 +138,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/roles/{name}/")]
         [ProducesResponseType(typeof(RolesDto), 200)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppRolesDelete)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteRole(string app, string name)

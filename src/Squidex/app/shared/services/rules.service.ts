@@ -76,6 +76,14 @@ export class RuleElementPropertyDto {
 }
 
 export class RulesDto extends ResultSet<RuleDto> {
+    public get canCreate() {
+        return hasAnyLink(this._links, 'create');
+    }
+
+    public get canReadEvents() {
+        return hasAnyLink(this._links, 'events');
+    }
+
     constructor(items: RuleDto[], links?: {}) {
         super(items.length, items, links);
     }

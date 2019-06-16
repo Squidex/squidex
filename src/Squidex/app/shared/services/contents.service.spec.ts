@@ -178,13 +178,13 @@ describe('ContentsService', () => {
 
         const resource: Resource = {
             _links: {
-                ['update/change']: { method: 'PUT', href: '/api/content/my-app/my-schema/content1?asDraft=true' }
+                update: { method: 'PUT', href: '/api/content/my-app/my-schema/content1?asDraft=true' }
             }
         };
 
         let content: ContentDto;
 
-        contentsService.putContent('my-app', resource, dto, true, version).subscribe(result => {
+        contentsService.putContent('my-app', resource, dto, version).subscribe(result => {
             content = result;
         });
 
@@ -225,22 +225,74 @@ describe('ContentsService', () => {
         expect(content!).toEqual(createContent(12));
     }));
 
-    it('should make put request to discard changes',
+    it('should make put request to discard draft',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
         const resource: Resource = {
             _links: {
-                discard: { method: 'PUT', href: '/api/content/my-app/my-schema/content1/discard' }
+                ['draft/discard']: { method: 'PUT', href: '/api/content/my-app/my-schema/content1/discard' }
             }
         };
 
         let content: ContentDto;
 
-        contentsService.discardChanges('my-app', resource, version).subscribe(result => {
+        contentsService.discardDraft('my-app', resource, version).subscribe(result => {
             content = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/discard');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(contentResponse(12));
+
+        expect(content!).toEqual(createContent(12));
+    }));
+
+    it('should make put request to propose draft',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const dto = {};
+
+        const resource: Resource = {
+            _links: {
+                ['draft/propose']: { method: 'PUT', href: '/api/content/my-app/my-schema/content1/status' }
+            }
+        };
+
+        let content: ContentDto;
+
+        contentsService.proposeDraft('my-app', resource, dto, version).subscribe(result => {
+            content = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/status');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(contentResponse(12));
+
+        expect(content!).toEqual(createContent(12));
+    }));
+
+    it('should make put request to publish draft',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                ['draft/publish']: { method: 'PUT', href: '/api/content/my-app/my-schema/content1/status' }
+            }
+        };
+
+        let content: ContentDto;
+
+        contentsService.publishDraft('my-app', resource, null, version).subscribe(result => {
+            content = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/status');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);

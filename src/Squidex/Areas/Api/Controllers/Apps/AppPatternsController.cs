@@ -67,7 +67,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/patterns/")]
         [ProducesResponseType(typeof(PatternsDto), 200)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppPatternsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostPattern(string app, [FromBody] UpdatePatternDto request)
@@ -86,14 +85,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="id">The id of the pattern to be updated.</param>
         /// <param name="request">Pattern to be updated for the app.</param>
         /// <returns>
-        /// 204 => Pattern updated.
+        /// 200 => Pattern updated.
         /// 400 => Pattern request not valid.
         /// 404 => Pattern or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/patterns/{id}/")]
         [ProducesResponseType(typeof(PatternsDto), 200)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppPatternsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> UpdatePattern(string app, Guid id, [FromBody] UpdatePatternDto request)

@@ -1,3 +1,4 @@
+
 /*
  * Squidex Headless CMS
  *
@@ -16,24 +17,22 @@ export type ResourceLink = { href: string; method: ResourceMethod; };
 
 export type Metadata = { [rel: string]: string };
 
-function hasLink(value: Resource | ResourceLinks, rel: string): boolean {
-    const link = getLink(value, rel);
-
-    return !!(link && link.method && link.href);
-}
-
 export function hasAnyLink(value: Resource | ResourceLinks,  ...rels: string[]) {
+    if (!value) {
+        return false;
+    }
+
+    const links = value._links || value;
+
     for (let rel of rels) {
-        if (hasLink(value, rel)) {
+        const link = links[rel];
+
+        if (link && link.method && link.href) {
             return true;
         }
     }
 
     return false;
-}
-
-export function getLink(value: Resource | ResourceLinks, rel: string): ResourceLink {
-    return value ? (value._links ? value._links[rel] : value[rel]) : undefined;
 }
 
 export type ResourceMethod =

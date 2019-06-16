@@ -70,7 +70,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/clients/")]
         [ProducesResponseType(typeof(ClientsDto), 200)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppClientsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostClient(string app, [FromBody] CreateClientDto request)
@@ -86,7 +85,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Updates an app client.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="clientId">The id of the client that must be updated.</param>
+        /// <param name="id">The id of the client that must be updated.</param>
         /// <param name="request">Client object that needs to be updated.</param>
         /// <returns>
         /// 200 => Client updated.
@@ -97,14 +96,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Only the display name can be changed, create a new client if necessary.
         /// </remarks>
         [HttpPut]
-        [Route("apps/{app}/clients/{clientId}/")]
+        [Route("apps/{app}/clients/{id}/")]
         [ProducesResponseType(typeof(ClientsDto), 200)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppClientsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutClient(string app, string clientId, [FromBody] UpdateClientDto request)
+        public async Task<IActionResult> PutClient(string app, string id, [FromBody] UpdateClientDto request)
         {
-            var command = request.ToCommand(clientId);
+            var command = request.ToCommand(id);
 
             var response = await InvokeCommandAsync(command);
 
@@ -115,7 +113,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// Revoke an app client.
         /// </summary>
         /// <param name="app">The name of the app.</param>
-        /// <param name="clientId">The id of the client that must be deleted.</param>
+        /// <param name="id">The id of the client that must be deleted.</param>
         /// <returns>
         /// 200 => Client revoked.
         /// 404 => Client or app not found.
@@ -124,13 +122,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// The application that uses this client credentials cannot access the API after it has been revoked.
         /// </remarks>
         [HttpDelete]
-        [Route("apps/{app}/clients/{clientId}/")]
+        [Route("apps/{app}/clients/{id}/")]
         [ProducesResponseType(typeof(ClientsDto), 200)]
         [ApiPermission(Permissions.AppClientsDelete)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DeleteClient(string app, string clientId)
+        public async Task<IActionResult> DeleteClient(string app, string id)
         {
-            var command = new RevokeClient { Id = clientId };
+            var command = new RevokeClient { Id = id };
 
             var response = await InvokeCommandAsync(command);
 

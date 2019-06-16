@@ -127,7 +127,7 @@ export class AssetsService {
 
         return this.http.get<{ total: number, items: any[] } & Resource>(url).pipe(
                 map(({ total, items, _links }) => {
-                    const assets = items.map(item => parseAsset(item)); ;
+                    const assets = items.map(item => parseAsset(item));
 
                     return new AssetsDto(total, assets, _links);
                 }),

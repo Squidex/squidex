@@ -65,7 +65,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/languages/")]
         [ProducesResponseType(typeof(AppLanguagesDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppLanguagesCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostLanguage(string app, [FromBody] AddLanguageDto request)
@@ -91,7 +90,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/languages/{language}/")]
         [ProducesResponseType(typeof(AppLanguagesDto), 200)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppLanguagesUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutLanguage(string app, string language, [FromBody] UpdateLanguageDto request)

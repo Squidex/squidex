@@ -124,7 +124,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.saveContent(true, false);
     }
 
-    public saveAsProposal() {
+    public saveAsDraft() {
         this.saveContent(false, true);
     }
 
@@ -132,23 +132,27 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.saveContent(false, false);
     }
 
-    private saveContent(publish: boolean, asProposal: boolean) {
-        if (this.content && this.content.status === 'Archived') {
-            return;
-        }
-
+    private saveContent(publish: boolean, asDraft: boolean) {
         const value = this.contentForm.submit();
 
         if (value) {
             if (this.content) {
-                if (asProposal) {
-                    this.contentsState.proposeUpdate(this.content, value)
+                if (asDraft) {
+                    if (this.content && !this.content.canDraftPropose) {
+                        return;
+                    }
+
+                    this.contentsState.proposeDraft(this.content, value)
                         .subscribe(() => {
                             this.contentForm.submitCompleted({ noReset: true });
                         }, error => {
                             this.contentForm.submitFailed(error);
                         });
                 } else {
+                    if (this.content && !this.content.canUpdate) {
+                        return;
+                    }
+
                     this.contentsState.update(this.content, value)
                         .subscribe(() => {
                             this.contentForm.submitCompleted({ noReset: true });
@@ -157,6 +161,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         });
                 }
             } else {
+                if ((publish && !this.contentsState.snapshot.canCreate) || (!publish && !this.contentsState.snapshot.canCreateAndPublish)) {
+                    return;
+                }
+
                 this.contentsState.create(value, publish)
                     .subscribe(() => {
                         this.back();
@@ -178,7 +186,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public discardChanges() {
-        this.contentsState.discardChanges(this.content);
+        this.contentsState.discardDraft(this.content);
     }
 
     public delete() {
@@ -190,7 +198,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     public publishChanges() {
         this.dueTimeSelector.selectDueTime('Publish').pipe(
-                switchMap(d => this.contentsState.publishChanges(this.content, d)), onErrorResumeNext())
+                switchMap(d => this.contentsState.publishDraft(this.content, d)), onErrorResumeNext())
             .subscribe();
     }
 

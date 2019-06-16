@@ -50,9 +50,9 @@ export class ContentDto {
     public readonly statusUpdates: string[];
 
     public readonly canDelete: boolean;
-    public readonly canDiscardChanges: boolean;
-    public readonly canProposeChange: boolean;
-    public readonly canPublishChanges: boolean;
+    public readonly canDraftDiscard: boolean;
+    public readonly canDraftPropose: boolean;
+    public readonly canDraftPublish: boolean;
     public readonly canUpdate: boolean;
 
     constructor(links: ResourceLinks,
@@ -69,6 +69,12 @@ export class ContentDto {
         public readonly version: Version
     ) {
         this._links = links;
+
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canDraftDiscard = hasAnyLink(links, 'draft/discard');
+        this.canDraftPropose = hasAnyLink(links, 'draft/propose');
+        this.canDraftPublish = hasAnyLink(links, 'draft/publish');
+        this.canUpdate = hasAnyLink(links, 'update');
 
         this.statusUpdates = Object.keys(links).filter(x => x.startsWith('status/')).map(x => x.substr(7));
     }
@@ -160,8 +166,8 @@ export class ContentsService {
                 pretifyError('Failed to create content. Please reload.'));
     }
 
-    public putContent(appName: string, resource: Resource, dto: any, asDraft: boolean, version: Version): Observable<ContentDto> {
-        const link = resource._links[asDraft ? 'update/change' : 'update'];
+    public putContent(appName: string, resource: Resource, dto: any, version: Version): Observable<ContentDto> {
+        const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
@@ -190,8 +196,8 @@ export class ContentsService {
                 pretifyError('Failed to update content. Please reload.'));
     }
 
-    public discardChanges(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
-        const link = resource._links['discard'];
+    public discardDraft(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
+        const link = resource._links['draft/discard'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
@@ -202,7 +208,37 @@ export class ContentsService {
                 tap(() => {
                     this.analytics.trackEvent('Content', 'Discarded', appName);
                 }),
-                pretifyError('Failed to discard changes. Please reload.'));
+                pretifyError('Failed to discard draft. Please reload.'));
+    }
+
+    public proposeDraft(appName: string, resource: Resource, dto: any, version: Version): Observable<ContentDto> {
+        const link = resource._links['draft/propose'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+                map(({ payload }) => {
+                    return parseContent(payload.body);
+                }),
+                tap(() => {
+                    this.analytics.trackEvent('Content', 'Updated', appName);
+                }),
+                pretifyError('Failed to propose draft. Please reload.'));
+    }
+
+    public publishDraft(appName: string, resource: Resource, dueTime: string | null, version: Version): Observable<ContentDto> {
+        const link = resource._links['draft/publish'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, { status: 'Published', dueTime }).pipe(
+                map(({ payload }) => {
+                    return parseContent(payload.body);
+                }),
+                tap(() => {
+                    this.analytics.trackEvent('Content', 'Discarded', appName);
+                }),
+                pretifyError('Failed to publish draft. Please reload.'));
     }
 
     public putStatus(appName: string, resource: Resource, status: string, dueTime: string | null, version: Version): Observable<ContentDto> {
@@ -248,5 +284,5 @@ function parseContent(response: any) {
         response.isPending === true,
         response.data,
         response.dataDraft,
-        new Version(response.version));
+        new Version(response.version.toString()));
 }

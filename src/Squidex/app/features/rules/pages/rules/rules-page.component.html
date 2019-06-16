@@ -82,7 +82,7 @@
 
     <ng-container sidebar>
         <div class="panel-nav">
-            <ng-container *ngIf="rulesState.canCreate | async">
+            <ng-container *ngIf="rulesState.canReadEvents | async">
                 <a class="panel-link panel-link-gray" routerLink="events" routerLinkActive="active" title="History" titlePosition="left">
                     <i class="icon-time"></i>
                 </a>

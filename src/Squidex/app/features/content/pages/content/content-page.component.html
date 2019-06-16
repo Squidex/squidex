@@ -45,13 +45,13 @@
 
                     <ng-container *ngIf="content.isPending || !schema.isSingleton">
                         <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
-                            <a class="dropdown-item" (click)="discardChanges()" *ngIf="content.canDiscardChanges">
+                            <a class="dropdown-item" (click)="discardChanges()" *ngIf="content.canDraftDiscard">
                                 Discard changes
                             </a>
 
                             <div class="dropdown-divider"></div>
                             
-                            <a class="dropdown-item" (click)="publishChanges()" *ngIf="content.canPublishChanges">
+                            <a class="dropdown-item" (click)="publishChanges()" *ngIf="content.canDraftPublish">
                                 Publish changes
                             </a>
 
@@ -74,8 +74,8 @@
                     </ng-container>
                 </div>
                 
-                <button type="button" class="btn btn-secondary ml-1" (click)="saveAsProposal()" *ngIf="content.canProposeChange">
-                    Save as Proposal
+                <button type="button" class="btn btn-secondary ml-1" (click)="saveAsDraft()" *ngIf="content.canDraftPropose">
+                    Save as Draft
                 </button>
                     
                 <ng-container *ngIf="content.canUpdate">

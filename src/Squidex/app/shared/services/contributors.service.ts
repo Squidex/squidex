@@ -114,7 +114,7 @@ function parseContributors(response: any) {
             item.contributorId,
             item.role));
 
-    const { maxContributors, _links, _meta }= response;
+    const { maxContributors, _links, _meta } = response;
 
     return { items: contributors, maxContributors, _links, _meta, canCreate: hasAnyLink(_links, 'create') };
 }

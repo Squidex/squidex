@@ -117,6 +117,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
         public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids, [FromQuery] string status = null)
@@ -153,6 +154,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null, [FromQuery] string status = null)
@@ -188,6 +190,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string name, Guid id)
@@ -260,6 +263,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
@@ -296,6 +300,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
@@ -327,6 +332,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPatch]
         [Route("content/{app}/{name}/{id}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
@@ -348,7 +354,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="id">The id of the content item to publish.</param>
         /// <param name="request">The status request.</param>
         /// <returns>
-        /// 204 => Content published.
+        /// 200 => Content published.
         /// 404 => Content, schema or app not found.
         /// 400 => Request is not valid.
         /// </returns>
@@ -357,6 +363,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/status/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContentStatus(string app, string name, Guid id, ChangeStatusDto request)
@@ -382,7 +389,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content item to discard changes.</param>
         /// <returns>
-        /// 204 => Content restored.
+        /// 200 => Content restored.
         /// 404 => Content, schema or app not found.
         /// 400 => Content was not archived.
         /// </returns>
@@ -391,17 +398,18 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/discard/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsDiscard)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DiscardChanges(string app, string name, Guid id)
+        public async Task<IActionResult> DiscardDraft(string app, string name, Guid id)
         {
             await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
 
             var command = new DiscardChanges { ContentId = id };
 
-            await CommandBus.PublishAsync(command);
+            var response = await InvokeCommandAsync(app, name, command);
 
-            return NoContent();
+            return Ok(response);
         }
 
         /// <summary>
@@ -411,7 +419,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content item to delete.</param>
         /// <returns>
-        /// 204 => Content has been deleted.
+        /// 204 => Content deleted.
         /// 404 => Content, schema or app not found.
         /// </returns>
         /// <remarks>
@@ -427,9 +435,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var command = new DeleteContent { ContentId = id };
 
-            var response = await InvokeCommandAsync(app, name, command);
+            await CommandBus.PublishAsync(command);
 
-            return Ok(response);
+            return NoContent();
         }
 
         private async Task<ContentDto> InvokeCommandAsync(string app, string schema, ICommand command)

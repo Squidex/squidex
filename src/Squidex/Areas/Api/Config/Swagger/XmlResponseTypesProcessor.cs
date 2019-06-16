@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -26,20 +27,30 @@ namespace Squidex.Areas.Api.Config.Swagger
         {
             var operation = context.OperationDescription.Operation;
 
-            var returnsDescription = await context.MethodInfo.GetXmlDocumentationTagAsync("returns") ?? string.Empty;
+            var returnsDescription = await context.MethodInfo.GetXmlDocumentationTagAsync("returns");
 
-            foreach (Match match in ResponseRegex.Matches(returnsDescription))
+            if (!string.IsNullOrWhiteSpace(returnsDescription))
             {
-                var statusCode = match.Groups["Code"].Value;
-
-                if (!operation.Responses.TryGetValue(statusCode, out var response))
+                foreach (Match match in ResponseRegex.Matches(returnsDescription))
                 {
-                    response = new SwaggerResponse();
+                    var statusCode = match.Groups["Code"].Value;
 
-                    operation.Responses[statusCode] = response;
+                    if (!operation.Responses.TryGetValue(statusCode, out var response))
+                    {
+                        response = new SwaggerResponse();
+
+                        operation.Responses[statusCode] = response;
+                    }
+
+                    var description = match.Groups["Description"].Value;
+
+                    if (description.Contains("=&gt;"))
+                    {
+                        throw new InvalidOperationException("Description not formatted correcly.");
+                    }
+
+                    response.Description = description;
                 }
-
-                response.Description = match.Groups["Description"].Value;
             }
 
             await AddInternalErrorResponseAsync(context, operation);
@@ -51,9 +62,19 @@ namespace Squidex.Areas.Api.Config.Swagger
 
         private static async Task AddInternalErrorResponseAsync(OperationProcessorContext context, SwaggerOperation operation)
         {
+            var errorSchema = await context.SchemaGenerator.GetErrorDtoSchemaAsync(context.SchemaResolver);
+
             if (!operation.Responses.ContainsKey("500"))
             {
-                operation.AddResponse("500", "Operation failed", await context.SchemaGenerator.GetErrorDtoSchemaAsync(context.SchemaResolver));
+                operation.AddResponse("500", "Operation failed", errorSchema);
+            }
+
+            foreach (var (code, response) in operation.Responses)
+            {
+                if (code != "404" && code.StartsWith("4", StringComparison.OrdinalIgnoreCase) && response.Schema == null)
+                {
+                    response.Schema = errorSchema;
+                }
             }
         }
 
@@ -61,7 +82,9 @@ namespace Squidex.Areas.Api.Config.Swagger
         {
             foreach (var (code, response) in operation.Responses.ToList())
             {
-                if (string.IsNullOrWhiteSpace(response.Description) || response.Description?.Contains("=>") == true)
+                if (string.IsNullOrWhiteSpace(response.Description) ||
+                    response.Description?.Contains("=&gt;") == true ||
+                    response.Description?.Contains("=>") == true)
                 {
                     operation.Responses.Remove(code);
                 }

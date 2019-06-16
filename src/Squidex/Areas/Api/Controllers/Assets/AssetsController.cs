@@ -200,7 +200,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/assets/{id}/content/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(AssetDto), 200)]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
@@ -228,7 +227,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/assets/{id}/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ProducesResponseType(typeof(AssetDto), 200)]
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsUpdate)]
@@ -248,7 +246,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the asset to delete.</param>
         /// <returns>
-        /// 204 => Asset has been deleted.
+        /// 204 => Asset deleted.
         /// 404 => Asset or app not found.
         /// </returns>
         [HttpDelete]

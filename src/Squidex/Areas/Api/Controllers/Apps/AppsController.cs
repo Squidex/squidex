@@ -85,8 +85,6 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/")]
         [ProducesResponseType(typeof(AppDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
-        [ProducesResponseType(typeof(ErrorDto), 409)]
         [ApiPermission]
         [ApiCosts(1)]
         public async Task<IActionResult> PostApp([FromBody] CreateAppDto request)

@@ -10,7 +10,6 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
 
 import {
-    DateTime,
     DialogService,
     ErrorDto,
     ImmutableArray,
@@ -228,8 +227,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public publishChanges(content: ContentDto, dueTime: string | null): Observable<ContentDto> {
-        return this.contentsService.putStatus(this.appName, content, 'Published', dueTime, content.version).pipe(
+    public publishDraft(content: ContentDto, dueTime: string | null): Observable<ContentDto> {
+        return this.contentsService.publishDraft(this.appName, content, dueTime, content.version).pipe(
             tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
@@ -248,8 +247,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(content: ContentDto, request: any, now?: DateTime): Observable<ContentDto> {
-        return this.contentsService.putContent(this.appName, content, request, false, content.version).pipe(
+    public update(content: ContentDto, request: any): Observable<ContentDto> {
+        return this.contentsService.putContent(this.appName, content, request, content.version).pipe(
             tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
@@ -258,8 +257,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public proposeUpdate(content: ContentDto, request: any): Observable<ContentDto> {
-        return this.contentsService.putContent(this.appName, content, request, true, content.version).pipe(
+    public proposeDraft(content: ContentDto, request: any): Observable<ContentDto> {
+        return this.contentsService.proposeDraft(this.appName, content, request, content.version).pipe(
             tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
@@ -268,8 +267,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public discardChanges(content: ContentDto, now?: DateTime): Observable<ContentDto> {
-        return this.contentsService.discardChanges(this.appName, content, content.version).pipe(
+    public discardDraft(content: ContentDto): Observable<ContentDto> {
+        return this.contentsService.discardDraft(this.appName, content, content.version).pipe(
             tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
 
@@ -278,7 +277,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public patch(content: ContentDto, request: any, now?: DateTime): Observable<ContentDto> {
+    public patch(content: ContentDto, request: any): Observable<ContentDto> {
         return this.contentsService.patchContent(this.appName, content, request, content.version).pipe(
             tap(updated => {
                 this.dialogs.notifyInfo('Content updated successfully.');
