@@ -269,9 +269,6 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
-            map(({ payload }) => {
-                return parseRule(payload.body);
-            }),
             tap(() => {
                 this.analytics.trackEvent('Rule', 'Deleted', appName);
             }),
