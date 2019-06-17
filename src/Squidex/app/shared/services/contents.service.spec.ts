@@ -62,7 +62,7 @@ describe('ContentsService', () => {
                 contentResponse(12),
                 contentResponse(13)
             ],
-            es: ['Draft', 'Published']
+            statuses: ['Draft', 'Published']
         });
 
         expect(contents!).toEqual(

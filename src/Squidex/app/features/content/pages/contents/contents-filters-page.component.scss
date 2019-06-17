@@ -1,2 +1,6 @@
 @import '_vars';
 @import '_mixins';
+
+.text-muted {
+    pointer-events: none;
+}
