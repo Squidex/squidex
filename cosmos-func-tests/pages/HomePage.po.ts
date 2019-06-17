@@ -29,9 +29,9 @@ export class HomePage {
   }
 
   userLogout() {
-    const userProfile = element(by.css(".ng-tns-c7-3"));
+    const userProfile = element(by.xpath("//span[@class='ng-tns-c7-3']"));
     const logoutButton = userProfile.element(
-      by.cssContainingText(".dropdown-item", "Logout")
+      by.xpath("//a[contains(text(),'Logout')]")
     );
     userProfile.click().then(async () => {
       await logoutButton.click();

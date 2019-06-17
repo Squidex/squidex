@@ -30,4 +30,14 @@ export class LoginPage extends BasePage {
   navigateTo() {
     browser.get(config.params.baseUrl);
   }
+
+  closePopUp() {
+    element(by.xpath("//span[@class='ng-tns-c3-5']")).click();
+  }
+
+  skipTour() {
+    element(
+      by.linkText('Skip Tour')
+    ).click();
+  }
 }

@@ -50,6 +50,9 @@ namespace Squidex
                 {
                     options.Listen(
                         IPAddress.Any,
+                        5001);
+                    options.Listen(
+                        IPAddress.Any,
                         hostContext.Configuration.GetValue<int>("hostings:devPort"),
                         listenOptions => listenOptions.UseHttps("localhost.pfx", "password"));
                 })

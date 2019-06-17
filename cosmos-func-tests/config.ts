@@ -5,14 +5,14 @@ declare const allure: any;
 export let config: Config = {
   //to auto start Selenium server every time before test through config, we can use the below command instead of the above one
   directConnect: true,
-  framework: "jasmine2", // set to "jasmine" for using Jasmine framework
+  framework: "jasmine2",
   capabilities: {
     maxInstances: 1,
-    browserName: "chrome"
+    browserName: "chrome",
     //for running in headless mode
-    // chromeOptions: {
-    //   args: ["--headless", "--disable-gpu", "--window-size=800,600"]
-    // }
+    chromeOptions: {
+      //args: ["--headless", "--disable-gpu", "--window-size=800,600"]
+    }
   },
 
   //options for Jasmine
@@ -25,9 +25,6 @@ export let config: Config = {
   specs: ["../JSFiles/specs/login/*.spec.js"],
 
   onPrepare: () => {
-    // to work with non-angular pages. deprecated
-    browser.ignoreSynchronization = true;
-    // Use `jasmine-allure-reporter` as the spec result reporter
     var AllureReporter = require("jasmine-allure-reporter");
     jasmine.getEnv().addReporter(
       new AllureReporter({
@@ -63,12 +60,12 @@ export let config: Config = {
       .maximize();
   },
   params: {
-    baseUrl: "https://vega.systest.cha.rbxd.ds/",
-    expectedUrlAfterNavigation: "https://vega.systest.cha.rbxd.ds/app"
+    baseUrl: "http://localhost:5001",
+    expectedUrlAfterNavigation: "http://localhost:5001/app"
   },
   //protractor timeouts
-  getPageTimeout: 30000,
-  allScriptsTimeout: 30000,
+  getPageTimeout: 50000,
+  allScriptsTimeout: 50000,
   plugins: [],
 
   onComplete: () => {
