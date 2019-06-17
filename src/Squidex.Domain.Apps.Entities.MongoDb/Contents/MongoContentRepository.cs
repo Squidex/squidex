@@ -64,7 +64,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(status, nameof(status));
             Guard.NotNull(query, nameof(query));
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))

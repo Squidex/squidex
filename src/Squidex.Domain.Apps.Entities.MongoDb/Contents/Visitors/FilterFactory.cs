@@ -162,7 +162,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             }
 
             filters.Add(Filter.Ne(x => x.IsDeleted, true));
-            filters.Add(Filter.In(x => x.Status, status));
+
+            if (status != null)
+            {
+                filters.Add(Filter.In(x => x.Status, status));
+            }
 
             if (ids != null && ids.Count > 0)
             {
