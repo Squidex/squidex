@@ -182,7 +182,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     private loadContent(data: any) {
-        this.contentForm.loadContent(data, this.content && !this.content.canUpdate);
+        this.contentForm.loadContent(data);
+        this.contentForm.setEnabled(!this.content || this.content.canUpdate);
     }
 
     public discardChanges() {
@@ -219,13 +220,12 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     if (compare) {
                         if (this.contentFormCompare === null) {
                             this.contentFormCompare = new EditContentForm(this.schema, this.languages);
-                            this.contentFormCompare.form.disable();
                         }
 
-                        const isArchive = this.content && this.content.status === 'Archived';
+                        this.contentFormCompare.loadContent(dto.payload);
+                        this.contentFormCompare.setEnabled(false);
 
-                        this.contentFormCompare.loadContent(dto.payload, true);
-                        this.contentForm.loadContent(this.content.dataDraft, isArchive);
+                        this.loadContent(this.content.dataDraft);
                     } else {
                         if (this.contentFormCompare) {
                             this.contentFormCompare = null;

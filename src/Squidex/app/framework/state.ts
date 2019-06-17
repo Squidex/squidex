@@ -35,12 +35,20 @@ export class Form<T extends AbstractControl, V> {
     ) {
     }
 
-    protected disable() {
-        this.form.disable();
+    public setEnabled(isEnabled: boolean) {
+        if (isEnabled) {
+            this.enable();
+        } else {
+            this.disable();
+        }
     }
 
     protected enable() {
         this.form.enable();
+    }
+
+    protected disable() {
+        this.form.disable();
     }
 
     protected setValue(value?: V) {

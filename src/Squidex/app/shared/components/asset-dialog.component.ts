@@ -35,7 +35,7 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
     @Output()
     public complete = new EventEmitter<AssetDto>();
 
-    public isReadOnly = false;
+    public isEditable = false;
 
     public annotateForm = new AnnotateAssetForm(this.formBuilder);
 
@@ -52,13 +52,10 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.isEditable = this.asset.canUpdate;
+
         this.annotateForm.load(this.asset);
-
-        this.isReadOnly = !this.asset.canUpdate;
-
-        if (this.isReadOnly) {
-            this.annotateForm.form.disable();
-        }
+        this.annotateForm.setEnabled(!this.isEditable);
     }
 
     public generateSlug() {
@@ -74,7 +71,7 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
     }
 
     public annotateAsset() {
-        if (this.isReadOnly) {
+        if (!this.isEditable) {
             return;
         }
 

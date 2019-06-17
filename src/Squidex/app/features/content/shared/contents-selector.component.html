@@ -15,7 +15,7 @@
                     [filter]="filter"
                     (statusChange)="filterStatus($event)"
                     [status]="contentsState.status | async"
-                    [statuses]="statuses"
+                    [statuses]="contentsState.statuses | async"
                     (querySubmit)="search()"
                     expandable="true">
                 </sqx-search-form>

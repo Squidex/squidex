@@ -11,9 +11,7 @@ import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 import {
     AppLanguageDto,
     AppsState,
-    CONTENT_STATUSES,
     ContentDto,
-    ContentQueryStatus,
     ContentsState,
     FilterState,
     ImmutableArray,
@@ -46,8 +44,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public selectionCanDelete = false;
 
     public nextStatuses: string[] = [];
-
-    public statuses = CONTENT_STATUSES;
 
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
@@ -144,7 +140,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             .subscribe();
     }
 
-    public filterStatus(status: ContentQueryStatus) {
+    public filterStatus(status: string[]) {
         this.contentsState.filterStatus(status);
     }
 

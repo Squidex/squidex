@@ -25,7 +25,7 @@ import { SchemaDto } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 import { SchemasState } from './schemas.state';
 
-import { ContentDto, ContentQueryStatus, ContentsService } from './../services/contents.service';
+import { ContentDto, ContentsService } from './../services/contents.service';
 
 interface Snapshot {
     // The current comments.
@@ -40,8 +40,11 @@ interface Snapshot {
     // Indicates if the contents are loaded.
     isLoaded?: boolean;
 
+    // All statuses.
+    statuses?: string[];
+
     // Indicates which status is shown.
-    status: ContentQueryStatus;
+    status?: string[];
 
     // The selected content.
     selectedContent?: ContentDto | null;
@@ -55,12 +58,6 @@ interface Snapshot {
     // The links.
     _links?: ResourceLinks;
 }
-
-export const CONTENT_STATUSES = {
-    'PublishedDraft': 'Published and Drafts (Default)',
-    'PublishedOnly': 'Published only',
-    'Archived': 'Archived'
-};
 
 function sameContent(lhs: ContentDto, rhs?: ContentDto): boolean {
     return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version === rhs.version);
@@ -87,12 +84,12 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         this.changes.pipe(map(x => !!x.isLoaded),
             distinctUntilChanged());
 
-    public isArchive =
-        this.changes.pipe(map(x => x.status === 'Archived'),
-            distinctUntilChanged());
-
     public status =
         this.changes.pipe(map(x => x.status),
+            distinctUntilChanged());
+
+    public statuses =
+        this.changes.pipe(map(x => x.statuses),
             distinctUntilChanged());
 
     public canCreateAny =
@@ -112,7 +109,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService
     ) {
-        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0), status: 'PublishedDraft' });
+        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0) });
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -157,7 +154,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.snapshot.contentsPager.skip,
                 this.snapshot.contentsQuery, undefined,
                 this.snapshot.status).pipe(
-            tap(({ total, items, _links, canCreate, canCreateAndPublish }) => {
+            tap(({ total, items, _links, statuses, canCreate, canCreateAndPublish }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contents reloaded.');
                 }
@@ -166,12 +163,29 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     const contents = ImmutableArray.of(items);
                     const contentsPager = s.contentsPager.setCount(total);
 
+                    statuses = s.statuses || statuses;
+
+                    const status =
+                        s.statuses ?
+                        s.status :
+                        statuses;
+
                     let selectedContent = s.selectedContent;
 
                     if (selectedContent) {
                         selectedContent = contents.find(x => x.id === selectedContent!.id) || selectedContent;
                     }
-                    return { ...s, contents, contentsPager, selectedContent, isLoaded: true, _links, canCreate, canCreateAndPublish };
+                    return { ...s,
+                        canCreate,
+                        canCreateAndPublish,
+                        contents,
+                        contentsPager,
+                        isLoaded: true,
+                        selectedContent,
+                        status,
+                        statuses,
+                        _links
+                    };
                 });
             }));
     }
@@ -298,14 +312,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         }
     }
 
-    public filterStatus(status: ContentQueryStatus): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: undefined, status }));
+    public filterStatus(status: string[]): Observable<any> {
+        this.next(s => ({ ...s, contentsPager: new Pager(0), status }));
 
         return this.loadInternal();
     }
 
-    public search(query?: string): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery: query }));
+    public search(contentsQuery?: string): Observable<any> {
+        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery }));
 
         return this.loadInternal();
     }

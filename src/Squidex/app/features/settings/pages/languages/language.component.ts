@@ -98,10 +98,7 @@ export class LanguageComponent implements OnChanges {
         this.isEditable = this.language.canUpdate;
 
         this.editForm.load(this.language);
-
-        if (!this.isEditable) {
-            this.editForm.form.disable();
-        }
+        this.editForm.setEnabled(this.isEditable);
 
         this.otherLanguage = this.fallbackLanguagesNew.at(0);
     }

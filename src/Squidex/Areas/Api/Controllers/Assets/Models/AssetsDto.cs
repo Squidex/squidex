@@ -17,15 +17,15 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
     public sealed class AssetsDto : Resource
     {
         /// <summary>
+        /// The total number of assets.
+        /// </summary>
+        public long Total { get; set; }
+
+        /// <summary>
         /// The assets.
         /// </summary>
         [Required]
         public AssetDto[] Items { get; set; }
-
-        /// <summary>
-        /// The total number of assets.
-        /// </summary>
-        public long Total { get; set; }
 
         public string ToEtag()
         {

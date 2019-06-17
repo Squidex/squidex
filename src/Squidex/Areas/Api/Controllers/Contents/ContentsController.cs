@@ -120,9 +120,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids, [FromQuery] string status = null)
+        public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids, [FromQuery] string[] status = null)
         {
-            var context = Context().WithFrontendStatus(status);
+            var context = Context();
 
             var result = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).Ids);
 
@@ -157,9 +157,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null, [FromQuery] string status = null)
+        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null, [FromQuery] string[] status = null)
         {
-            var context = Context().WithFrontendStatus(status);
+            var context = Context();
 
             var result = await contentQuery.QueryAsync(context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 

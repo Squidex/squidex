@@ -42,10 +42,7 @@ export class SchemaScriptsFormComponent implements OnInit {
         this.isEditable = this.schema.canUpdateScripts;
 
         this.editForm.load(this.schema.scripts);
-
-        if (!this.isEditable) {
-            this.editForm.form.disable();
-        }
+        this.editForm.setEnabled(this.isEditable);
     }
 
     public emitComplete() {

@@ -21,7 +21,7 @@
                     [queries]="schemaQueries"
                     (statusChange)="filterStatus($event)"
                     [status]="contentsState.status | async"
-                    [statuses]="statuses"
+                    [statuses]="contentsState.statuses | async"
                     expandable="true"
                     enableArchive="true"
                     enableShortcut="true">

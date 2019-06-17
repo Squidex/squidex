@@ -40,10 +40,7 @@ export class SchemaEditFormComponent implements OnInit {
         this.isEditable = this.schema.canUpdate;
 
         this.editForm.load(this.schema.properties);
-
-        if (!this.isEditable) {
-            this.editForm.form.disable();
-        }
+        this.editForm.setEnabled(this.isEditable);
     }
 
     public emitComplete() {

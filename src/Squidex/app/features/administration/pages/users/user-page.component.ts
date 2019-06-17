@@ -45,13 +45,10 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
                     this.user = selectedUser!;
 
                     if (selectedUser) {
-                        this.userForm.load(selectedUser);
-
                         this.isEditable = this.user.canUpdate;
 
-                        if (!this.isEditable) {
-                            this.userForm.form.disable();
-                        }
+                        this.userForm.load(selectedUser);
+                        this.userForm.setEnabled(this.isEditable);
                     }
                 }));
     }

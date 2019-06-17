@@ -47,11 +47,11 @@ describe('ContentsService', () => {
 
         let contents: ContentsDto;
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, undefined, 'Archived').subscribe(result => {
+        contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, undefined, ['Draft', 'Published']).subscribe(result => {
             contents = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&status=Archived');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&status=Draft&status=Published');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -61,11 +61,12 @@ describe('ContentsService', () => {
             items: [
                 contentResponse(12),
                 contentResponse(13)
-            ]
+            ],
+            es: ['Draft', 'Published']
         });
 
         expect(contents!).toEqual(
-            new ContentsDto(10, [
+            new ContentsDto(['Draft', 'Published'], 10, [
                 createContent(12),
                 createContent(13)
             ]));
@@ -76,7 +77,7 @@ describe('ContentsService', () => {
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, 'my-query').subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$search="my-query"&$top=17&$skip=13&status=PublishedDraft');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$search="my-query"&$top=17&$skip=13');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -89,7 +90,7 @@ describe('ContentsService', () => {
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, ['id1', 'id2']).subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&ids=id1,id2&status=PublishedDraft');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&ids=id1,id2');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -102,7 +103,7 @@ describe('ContentsService', () => {
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, '$filter=my-filter').subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$filter=my-filter&$top=17&$skip=13&status=PublishedDraft');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$filter=my-filter&$top=17&$skip=13');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();

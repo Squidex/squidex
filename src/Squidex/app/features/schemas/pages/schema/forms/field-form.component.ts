@@ -76,6 +76,8 @@ export class FieldFormComponent implements AfterViewInit {
     public ngAfterViewInit() {
         if (!this.isEditable) {
             this.editForm.disable();
+        } else {
+            this.editForm.enable();
         }
     }
 

@@ -39,10 +39,7 @@ export class PatternComponent implements OnInit {
         this.isDeletable = this.pattern && this.pattern.canDelete;
 
         this.editForm.load(this.pattern);
-
-        if (!this.isEditable) {
-            this.editForm.form.disable();
-        }
+        this.editForm.setEnabled(this.isEditable);
     }
 
     public cancel() {

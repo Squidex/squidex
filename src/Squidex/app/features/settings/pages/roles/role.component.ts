@@ -53,10 +53,7 @@ export class RoleComponent implements OnChanges {
         this.isEditable = this.role.canUpdate;
 
         this.editForm.load(this.role.permissions);
-
-        if (!this.isEditable) {
-            this.editForm.form.disable();
-        }
+        this.editForm.setEnabled(this.isEditable);
     }
 
     public toggleEditing() {

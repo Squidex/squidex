@@ -79,11 +79,9 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
     }
 
     public ngAfterViewInit() {
-        if (!this.isEditable) {
-            this.actionForm.form.disable();
+        this.actionForm.setEnabled(this.isEditable);
 
-            this.triggerForm.form.disable();
-        }
+        this.triggerForm.setEnabled(this.isEditable);
     }
 
     public emitComplete() {

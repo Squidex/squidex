@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
@@ -26,7 +27,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// <summary>
         /// The content items.
         /// </summary>
+        [Required]
         public ContentDto[] Items { get; set; }
+
+        /// <summary>
+        /// All available statuses.
+        /// </summary>
+        [Required]
+        public string[] Statuses { get; set; }
 
         public string ToEtag()
         {
@@ -54,7 +62,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             var result = new ContentsDto
             {
                 Total = contents.Total,
-                Items = contents.Select(x => ContentDto.FromContent(x, context, controller, app, schema)).ToArray()
+                Items = contents.Select(x => ContentDto.FromContent(x, context, controller, app, schema)).ToArray(),
+                Statuses = new[] { "Published", "Draft", "Archived" }
             };
 
             return result.CreateLinks(controller, app, schema);
