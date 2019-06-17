@@ -19,9 +19,6 @@
                     [filter]="filter"
                     (querySubmit)="search()" 
                     [queries]="schemaQueries"
-                    (statusChange)="filterStatus($event)"
-                    [status]="contentsState.status | async"
-                    [statuses]="contentsState.statuses | async"
                     expandable="true"
                     enableArchive="true"
                     enableShortcut="true">

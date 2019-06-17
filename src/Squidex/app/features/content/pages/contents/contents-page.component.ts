@@ -140,10 +140,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             .subscribe();
     }
 
-    public filterStatus(status: string[]) {
-        this.contentsState.filterStatus(status);
-    }
-
     public goPrev() {
         this.contentsState.goPrev();
     }

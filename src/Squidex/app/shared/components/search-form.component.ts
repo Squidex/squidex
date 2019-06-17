@@ -40,15 +40,6 @@ export class SearchFormComponent implements OnInit {
     public filter: FilterState;
 
     @Input()
-    public statuses: [] = [];
-
-    @Input()
-    public status: string[];
-
-    @Output()
-    public statusChange = new EventEmitter<[]>();
-
-    @Input()
     public schemaName = '';
 
     @Input()

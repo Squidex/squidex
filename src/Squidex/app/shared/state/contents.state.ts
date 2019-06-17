@@ -40,12 +40,6 @@ interface Snapshot {
     // Indicates if the contents are loaded.
     isLoaded?: boolean;
 
-    // All statuses.
-    statuses?: string[];
-
-    // Indicates which status is shown.
-    status?: string[];
-
     // The selected content.
     selectedContent?: ContentDto | null;
 
@@ -82,14 +76,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
 
     public isLoaded =
         this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
-
-    public status =
-        this.changes.pipe(map(x => x.status),
-            distinctUntilChanged());
-
-    public statuses =
-        this.changes.pipe(map(x => x.statuses),
             distinctUntilChanged());
 
     public canCreateAny =
@@ -152,9 +138,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.contentsService.getContents(this.appName, this.schemaName,
                 this.snapshot.contentsPager.pageSize,
                 this.snapshot.contentsPager.skip,
-                this.snapshot.contentsQuery, undefined,
-                this.snapshot.status).pipe(
-            tap(({ total, items, _links, statuses, canCreate, canCreateAndPublish }) => {
+                this.snapshot.contentsQuery, undefined).pipe(
+            tap(({ total, items, _links, canCreate, canCreateAndPublish }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contents reloaded.');
                 }
@@ -162,13 +147,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 return this.next(s => {
                     const contents = ImmutableArray.of(items);
                     const contentsPager = s.contentsPager.setCount(total);
-
-                    statuses = s.statuses || statuses;
-
-                    const status =
-                        s.statuses ?
-                        s.status :
-                        statuses;
 
                     let selectedContent = s.selectedContent;
 
@@ -182,8 +160,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         contentsPager,
                         isLoaded: true,
                         selectedContent,
-                        status,
-                        statuses,
                         _links
                     };
                 });
@@ -305,17 +281,16 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         if (!oldVersion || !oldVersion.eq(content.version)) {
             return this.next(s => {
                 const contents = s.contents.replaceBy('id', content);
-                const selectedContent = s.selectedContent && s.selectedContent.id === content.id ? content : s.selectedContent;
+
+                const selectedContent =
+                    s.selectedContent &&
+                    s.selectedContent.id === content.id ?
+                    content :
+                    s.selectedContent;
 
                 return { ...s, contents, selectedContent };
             });
         }
-    }
-
-    public filterStatus(status: string[]): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: new Pager(0), status }));
-
-        return this.loadInternal();
     }
 
     public search(contentsQuery?: string): Observable<any> {

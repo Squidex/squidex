@@ -33,9 +33,9 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [ApiPermission(Permissions.AdminEventsRead)]
         public async Task<IActionResult> GetEventConsumers()
         {
-            var entities = await GetGrain().GetConsumersAsync();
+            var eventConsumers = await GetGrain().GetConsumersAsync();
 
-            var response = EventConsumersDto.FromResults(entities.Value, this);
+            var response = EventConsumersDto.FromResults(eventConsumers.Value, this);
 
             return Ok(response);
         }
@@ -46,9 +46,9 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [ApiPermission(Permissions.AdminEventsManage)]
         public async Task<IActionResult> StartEventConsumer(string name)
         {
-            var entity = await GetGrain().StartAsync(name);
+            var eventConsumer = await GetGrain().StartAsync(name);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(entity.Value, this);
+            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, this);
 
             return Ok(response);
         }
@@ -59,9 +59,9 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [ApiPermission(Permissions.AdminEventsManage)]
         public async Task<IActionResult> StopEventConsumer(string name)
         {
-            var entity = await GetGrain().StopAsync(name);
+            var eventConsumer = await GetGrain().StopAsync(name);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(entity.Value, this);
+            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, this);
 
             return Ok(response);
         }
@@ -72,9 +72,9 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers
         [ApiPermission(Permissions.AdminEventsManage)]
         public async Task<IActionResult> ResetEventConsumer(string name)
         {
-            var entity = await GetGrain().ResetAsync(name);
+            var eventConsumer = await GetGrain().ResetAsync(name);
 
-            var response = EventConsumerDto.FromEventConsumerInfo(entity.Value, this);
+            var response = EventConsumerDto.FromEventConsumerInfo(eventConsumer.Value, this);
 
             return Ok(response);
         }

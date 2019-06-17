@@ -82,9 +82,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(1)]
         public async Task<IActionResult> GetRules(string app)
         {
-            var entities = await appProvider.GetRulesAsync(AppId);
+            var rules = await appProvider.GetRulesAsync(AppId);
 
-            var response = RulesDto.FromRules(entities, this, app);
+            var response = RulesDto.FromRules(rules, this, app);
 
             Response.Headers[HeaderNames.ETag] = response.GenerateEtag();
 
@@ -253,9 +253,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public async Task<IActionResult> PutEvent(string app, Guid id)
         {
-            var entity = await ruleEventsRepository.FindAsync(id);
+            var ruleEvent = await ruleEventsRepository.FindAsync(id);
 
-            if (entity == null)
+            if (ruleEvent == null)
             {
                 return NotFound();
             }
@@ -280,9 +280,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteEvent(string app, Guid id)
         {
-            var entity = await ruleEventsRepository.FindAsync(id);
+            var ruleEvent = await ruleEventsRepository.FindAsync(id);
 
-            if (entity == null)
+            if (ruleEvent == null)
             {
                 return NotFound();
             }

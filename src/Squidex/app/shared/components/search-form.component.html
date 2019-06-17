@@ -68,15 +68,6 @@
                     (ngModelChange)="filter.setOrder($event)" />
             </div>
         </div>
-        
-        <div class="form-group row" *ngIf="statuses && statuses.length > 0">
-            <div class="col-10 offset-2">
-                <sqx-checkbox-group [values]="statuses"
-                    [ngModel]="status"
-                    (ngModelChange)="statusChange.emit($event)">
-                </sqx-checkbox-group>
-            </div>
-        </div>
 
         <div class="link">
             Read more about filtering in the <a href="https://docs.squidex.io/04-guides/02-api.html" sqxExternalLink>Documentation</a>.

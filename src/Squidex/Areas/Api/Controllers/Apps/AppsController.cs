@@ -60,9 +60,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var userOrClientId = HttpContext.User.UserOrClientId();
             var userPermissions = HttpContext.Permissions();
 
-            var entities = await appProvider.GetUserApps(userOrClientId, userPermissions);
+            var apps = await appProvider.GetUserApps(userOrClientId, userPermissions);
 
-            var response = entities.ToArray(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this));
+            var response = apps.ToArray(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this));
 
             Response.Headers[HeaderNames.ETag] = response.ToManyEtag();
 

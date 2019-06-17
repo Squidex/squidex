@@ -47,11 +47,11 @@ describe('ContentsService', () => {
 
         let contents: ContentsDto;
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, undefined, ['Draft', 'Published']).subscribe(result => {
+        contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, undefined).subscribe(result => {
             contents = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&status=Draft&status=Published');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -66,7 +66,7 @@ describe('ContentsService', () => {
         });
 
         expect(contents!).toEqual(
-            new ContentsDto(['Draft', 'Published'], 10, [
+            new ContentsDto(10, [
                 createContent(12),
                 createContent(13)
             ]));

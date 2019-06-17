@@ -134,7 +134,14 @@ export class UsersState extends State<Snapshot> {
                         selectedUser = users.find(x => x.id === selectedUser!.id) || selectedUser;
                     }
 
-                    return { ...s, users, usersPager, selectedUser, isLoaded: true, _links };
+                    return { ...s,
+                        canCreate,
+                        isLoaded: true,
+                        selectedUser,
+                        users,
+                        usersPager,
+                        _links
+                    };
                 });
             }),
             shareSubscribed(this.dialogs));

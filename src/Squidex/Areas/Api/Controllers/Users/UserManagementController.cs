@@ -52,14 +52,14 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersRead)]
         public async Task<IActionResult> GetUser(string id)
         {
-            var entity = await userManager.FindByIdWithClaimsAsync(id);
+            var user = await userManager.FindByIdWithClaimsAsync(id);
 
-            if (entity == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            var response = UserDto.FromUser(entity, this);
+            var response = UserDto.FromUser(user, this);
 
             return Ok(response);
         }
@@ -70,9 +70,9 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersCreate)]
         public async Task<IActionResult> PostUser([FromBody] CreateUserDto request)
         {
-            var entity = await userManager.CreateAsync(userFactory, request.ToValues());
+            var user = await userManager.CreateAsync(userFactory, request.ToValues());
 
-            var response = UserDto.FromUser(entity, this);
+            var response = UserDto.FromUser(user, this);
 
             return Ok(response);
         }
@@ -83,9 +83,9 @@ namespace Squidex.Areas.Api.Controllers.Users
         [ApiPermission(Permissions.AdminUsersUpdate)]
         public async Task<IActionResult> PutUser(string id, [FromBody] UpdateUserDto request)
         {
-            var entity = await userManager.UpdateAsync(id, request.ToValues());
+            var user = await userManager.UpdateAsync(id, request.ToValues());
 
-            var response = UserDto.FromUser(entity, this);
+            var response = UserDto.FromUser(user, this);
 
             return Ok(response);
         }
@@ -101,9 +101,9 @@ namespace Squidex.Areas.Api.Controllers.Users
                 throw new ValidationException("Locking user failed.", new ValidationError("You cannot lock yourself."));
             }
 
-            var entity = await userManager.LockAsync(id);
+            var user = await userManager.LockAsync(id);
 
-            var response = UserDto.FromUser(entity, this);
+            var response = UserDto.FromUser(user, this);
 
             return Ok(response);
         }
@@ -119,9 +119,9 @@ namespace Squidex.Areas.Api.Controllers.Users
                 throw new ValidationException("Unlocking user failed.", new ValidationError("You cannot unlock yourself."));
             }
 
-            var entity = await userManager.UnlockAsync(id);
+            var user = await userManager.UnlockAsync(id);
 
-            var response = UserDto.FromUser(entity, this);
+            var response = UserDto.FromUser(user, this);
 
             return Ok(response);
         }

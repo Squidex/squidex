@@ -91,9 +91,9 @@ namespace Squidex.Areas.Api.Controllers.Users
         {
             try
             {
-                var entities = await userResolver.QueryByEmailAsync(query);
+                var users = await userResolver.QueryByEmailAsync(query);
 
-                var response = entities.Where(x => !x.IsHidden()).Select(x => UserDto.FromUser(x, this)).ToArray();
+                var response = users.Where(x => !x.IsHidden()).Select(x => UserDto.FromUser(x, this)).ToArray();
 
                 return Ok(response);
             }

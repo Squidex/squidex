@@ -135,21 +135,21 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var context = Context();
 
-            var entity = await assetQuery.FindAssetAsync(context, id);
+            var asset = await assetQuery.FindAssetAsync(context, id);
 
-            if (entity == null)
+            if (asset == null)
             {
                 return NotFound();
             }
 
-            var response = AssetDto.FromAsset(entity, this, app);
+            var response = AssetDto.FromAsset(asset, this, app);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
-                Response.Headers["Surrogate-Key"] = entity.Id.ToString();
+                Response.Headers["Surrogate-Key"] = asset.Id.ToString();
             }
 
-            Response.Headers[HeaderNames.ETag] = entity.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = asset.Version.ToString();
 
             return Ok(response);
         }

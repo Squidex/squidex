@@ -107,7 +107,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="ids">The optional ids of the content to fetch.</param>
-        /// <param name="status">The requested status, only for frontend client.</param>
         /// <returns>
         /// 200 => Contents retrieved.
         /// 404 => App not found.
@@ -120,13 +119,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids, [FromQuery] string[] status = null)
+        public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids)
         {
             var context = Context();
+            var contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).Ids);
 
-            var result = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).Ids);
-
-            var response = ContentsDto.FromContents(result, context, this, app, null);
+            var response = ContentsDto.FromContents(contents, context, this, app, null);
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
@@ -144,7 +142,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="ids">The optional ids of the content to fetch.</param>
-        /// <param name="status">The requested status, only for frontend client.</param>
         /// <returns>
         /// 200 => Contents retrieved.
         /// 404 => Schema or app not found.
@@ -157,13 +154,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null, [FromQuery] string[] status = null)
+        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null)
         {
             var context = Context();
+            var contents = await contentQuery.QueryAsync(context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 
-            var result = await contentQuery.QueryAsync(context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
-
-            var response = ContentsDto.FromContents(result, context, this, app, name);
+            var response = ContentsDto.FromContents(contents, context, this, app, name);
 
             if (ShouldProvideSurrogateKeys(response))
             {

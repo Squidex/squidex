@@ -73,25 +73,25 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(0)]
         public async Task<IActionResult> GetSchema(string app, string name)
         {
-            ISchemaEntity entity;
+            ISchemaEntity schema;
 
             if (Guid.TryParse(name, out var id))
             {
-                entity = await appProvider.GetSchemaAsync(AppId, id);
+                schema = await appProvider.GetSchemaAsync(AppId, id);
             }
             else
             {
-                entity = await appProvider.GetSchemaAsync(AppId, name);
+                schema = await appProvider.GetSchemaAsync(AppId, name);
             }
 
-            if (entity == null || entity.IsDeleted)
+            if (schema == null || schema.IsDeleted)
             {
                 return NotFound();
             }
 
-            var response = SchemaDetailsDto.FromSchemaWithDetails(entity, this, app);
+            var response = SchemaDetailsDto.FromSchemaWithDetails(schema, this, app);
 
-            Response.Headers[HeaderNames.ETag] = entity.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = schema.Version.ToString();
 
             return Ok(response);
         }

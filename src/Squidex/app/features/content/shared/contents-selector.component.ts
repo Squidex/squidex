@@ -70,10 +70,6 @@ export class ContentsSelectorComponent implements OnInit {
         this.contentsState.search(this.filter.apiFilter);
     }
 
-    public filterStatus(status: string[]) {
-        this.contentsState.filterStatus(status);
-    }
-
     public goNext() {
         this.contentsState.goNext();
     }

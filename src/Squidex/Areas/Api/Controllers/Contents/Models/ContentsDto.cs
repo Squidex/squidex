@@ -30,12 +30,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         [Required]
         public ContentDto[] Items { get; set; }
 
-        /// <summary>
-        /// All available statuses.
-        /// </summary>
-        [Required]
-        public string[] Statuses { get; set; }
-
         public string ToEtag()
         {
             return Items.ToManyEtag(Total);
@@ -62,8 +56,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             var result = new ContentsDto
             {
                 Total = contents.Total,
-                Items = contents.Select(x => ContentDto.FromContent(x, context, controller, app, schema)).ToArray(),
-                Statuses = new[] { "Published", "Draft", "Archived" }
+                Items = contents.Select(x => ContentDto.FromContent(x, context, controller, app, schema)).ToArray()
             };
 
             return result.CreateLinks(controller, app, schema);
