@@ -8,7 +8,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Security;
 using Squidex.Shared.Users;
 using Squidex.Web;
 using AllPermissions = Squidex.Shared.Permissions;

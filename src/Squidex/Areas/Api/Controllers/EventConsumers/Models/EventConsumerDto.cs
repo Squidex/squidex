@@ -7,7 +7,6 @@
 
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
 

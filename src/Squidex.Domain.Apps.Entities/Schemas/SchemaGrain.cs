@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             switch (command)
             {
                 case AddField addField:
-                    return UpdateReturnAsync(addField, async c =>
+                    return UpdateReturn(addField, c =>
                     {
                         GuardSchemaField.CanAdd(Snapshot.SchemaDef, c);
 

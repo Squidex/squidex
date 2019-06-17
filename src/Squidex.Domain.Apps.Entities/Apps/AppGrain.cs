@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
             switch (command)
             {
                 case CreateApp createApp:
-                    return CreateReturnAsync(createApp, async c =>
+                    return CreateReturn(createApp, c =>
                     {
                         GuardApp.CanCreate(c);
 

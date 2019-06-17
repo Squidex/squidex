@@ -8,7 +8,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Squidex.Domain.Users;
-using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
 
