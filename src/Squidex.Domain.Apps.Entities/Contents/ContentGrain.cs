@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         Create(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case UpdateContent updateContent:
@@ -158,7 +158,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             }
                         }
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
+                    });
+
+                case DiscardChanges discardChanges:
+                    return UpdateReturn(discardChanges, c =>
+                    {
+                        GuardContent.CanDiscardChanges(Snapshot.IsPending, c);
+
+                        DiscardChanges(c);
+
+                        return Snapshot;
                     });
 
                 case DeleteContent deleteContent:
@@ -171,16 +181,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         await ctx.ExecuteScriptAsync(s => s.Delete, "Delete", c, Snapshot.Data);
 
                         Delete(c);
-                    });
-
-                case DiscardChanges discardChanges:
-                    return UpdateReturnAsync(discardChanges, async c =>
-                    {
-                        GuardContent.CanDiscardChanges(Snapshot.IsPending, c);
-
-                        DiscardChanges(c);
-
-                        return await GetRawStateAsync();
                     });
 
                 default:
@@ -307,11 +307,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     appProvider, assetRepository, contentRepository, scriptEngine, message);
 
             return operationContext;
-        }
-
-        public Task<IContentEntity> GetRawStateAsync()
-        {
-            return Task.FromResult<IContentEntity>(Snapshot);
         }
 
         public Task<J<IContentEntity>> GetStateAsync(long version = EtagVersion.Any)

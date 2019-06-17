@@ -51,16 +51,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         Create(c, tagIds);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
                 case UpdateAsset updateRule:
-                    return UpdateReturnAsync(updateRule, async c =>
+                    return UpdateReturn(updateRule, c =>
                     {
                         GuardAsset.CanUpdate(c);
 
                         Update(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
                 case AnnotateAsset annotateAsset:
                     return UpdateReturnAsync(annotateAsset, async c =>
@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         Annotate(c, tagIds);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
                 case DeleteAsset deleteAsset:
                     return UpdateAsync(deleteAsset, async c =>
@@ -163,11 +163,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             {
                 throw new DomainException("Asset has already been deleted");
             }
-        }
-
-        public Task<IAssetEntity> GetRawStateAsync()
-        {
-            return Task.FromResult<IAssetEntity>(Snapshot);
         }
 
         public Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any)

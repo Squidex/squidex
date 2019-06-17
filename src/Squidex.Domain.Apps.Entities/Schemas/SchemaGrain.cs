@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                             id = ((IArrayField)Snapshot.SchemaDef.FieldsById[c.ParentFieldId.Value]).FieldsByName[c.Name].Id;
                         }
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case CreateSchema createSchema:
@@ -75,161 +75,161 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
                         Create(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case SynchronizeSchema synchronizeSchema:
-                    return UpdateReturnAsync(synchronizeSchema, async c =>
+                    return UpdateReturn(synchronizeSchema, c =>
                     {
                         GuardSchema.CanSynchronize(c);
 
                         Synchronize(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case DeleteField deleteField:
-                    return UpdateReturnAsync(deleteField, async c =>
+                    return UpdateReturn(deleteField, c =>
                     {
                         GuardSchemaField.CanDelete(Snapshot.SchemaDef, deleteField);
 
                         DeleteField(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case LockField lockField:
-                    return UpdateReturnAsync(lockField, async c =>
+                    return UpdateReturn(lockField, c =>
                     {
                         GuardSchemaField.CanLock(Snapshot.SchemaDef, lockField);
 
                         LockField(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case HideField hideField:
-                    return UpdateReturnAsync(hideField, async c =>
+                    return UpdateReturn(hideField, c =>
                     {
                         GuardSchemaField.CanHide(Snapshot.SchemaDef, c);
 
                         HideField(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case ShowField showField:
-                    return UpdateReturnAsync(showField, async c =>
+                    return UpdateReturn(showField, c =>
                     {
                         GuardSchemaField.CanShow(Snapshot.SchemaDef, c);
 
                         ShowField(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case DisableField disableField:
-                    return UpdateReturnAsync(disableField, async c =>
+                    return UpdateReturn(disableField, c =>
                     {
                         GuardSchemaField.CanDisable(Snapshot.SchemaDef, c);
 
                         DisableField(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case EnableField enableField:
-                    return UpdateReturnAsync(enableField, async c =>
+                    return UpdateReturn(enableField, c =>
                     {
                         GuardSchemaField.CanEnable(Snapshot.SchemaDef, c);
 
                         EnableField(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case UpdateField updateField:
-                    return UpdateReturnAsync(updateField, async c =>
+                    return UpdateReturn(updateField, c =>
                     {
                         GuardSchemaField.CanUpdate(Snapshot.SchemaDef, c);
 
                         UpdateField(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case ReorderFields reorderFields:
-                    return UpdateReturnAsync(reorderFields, async c =>
+                    return UpdateReturn(reorderFields, c =>
                     {
                         GuardSchema.CanReorder(Snapshot.SchemaDef, c);
 
                         Reorder(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case UpdateSchema updateSchema:
-                    return UpdateReturnAsync(updateSchema, async c =>
+                    return UpdateReturn(updateSchema, c =>
                     {
                         GuardSchema.CanUpdate(Snapshot.SchemaDef, c);
 
                         Update(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case PublishSchema publishSchema:
-                    return UpdateReturnAsync(publishSchema, async c =>
+                    return UpdateReturn(publishSchema, c =>
                     {
                         GuardSchema.CanPublish(Snapshot.SchemaDef, c);
 
                         Publish(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case UnpublishSchema unpublishSchema:
-                    return UpdateReturnAsync(unpublishSchema, async c =>
+                    return UpdateReturn(unpublishSchema, c =>
                     {
                         GuardSchema.CanUnpublish(Snapshot.SchemaDef, c);
 
                         Unpublish(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case ConfigureScripts configureScripts:
-                    return UpdateReturnAsync(configureScripts, async c =>
+                    return UpdateReturn(configureScripts, c =>
                     {
                         GuardSchema.CanConfigureScripts(Snapshot.SchemaDef, c);
 
                         ConfigureScripts(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case ChangeCategory changeCategory:
-                    return UpdateReturnAsync(changeCategory, async c =>
+                    return UpdateReturn(changeCategory, c =>
                     {
                         GuardSchema.CanChangeCategory(Snapshot.SchemaDef, c);
 
                         ChangeCategory(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case ConfigurePreviewUrls configurePreviewUrls:
-                    return UpdateReturnAsync(configurePreviewUrls, async c =>
+                    return UpdateReturn(configurePreviewUrls, c =>
                     {
                         GuardSchema.CanConfigurePreviewUrls(c);
 
                         ConfigurePreviewUrls(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
 
                 case DeleteSchema deleteSchema:
-                    return UpdateAsync(deleteSchema, c =>
+                    return Update(deleteSchema, c =>
                     {
                         GuardSchema.CanDelete(Snapshot.SchemaDef, c);
 
@@ -411,11 +411,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             {
                 throw new DomainException("Schema has already been deleted.");
             }
-        }
-
-        public Task<ISchemaEntity> GetRawStateAsync()
-        {
-            return Task.FromResult<ISchemaEntity>(Snapshot);
         }
 
         public Task<J<ISchemaEntity>> GetStateAsync()

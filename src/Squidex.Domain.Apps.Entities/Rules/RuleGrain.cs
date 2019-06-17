@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                         Create(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
                 case UpdateRule updateRule:
                     return UpdateReturnAsync(updateRule, async c =>
@@ -56,28 +56,28 @@ namespace Squidex.Domain.Apps.Entities.Rules
 
                         Update(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
                 case EnableRule enableRule:
-                    return UpdateReturnAsync(enableRule, async c =>
+                    return UpdateReturn(enableRule, c =>
                     {
                         GuardRule.CanEnable(c, Snapshot.RuleDef);
 
                         Enable(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
                 case DisableRule disableRule:
-                    return UpdateReturnAsync(disableRule, async c =>
+                    return UpdateReturn(disableRule, c =>
                     {
                         GuardRule.CanDisable(c, Snapshot.RuleDef);
 
                         Disable(c);
 
-                        return await GetRawStateAsync();
+                        return Snapshot;
                     });
                 case DeleteRule deleteRule:
-                    return UpdateAsync(deleteRule, c =>
+                    return Update(deleteRule, c =>
                     {
                         GuardRule.CanDelete(deleteRule);
 
@@ -129,11 +129,6 @@ namespace Squidex.Domain.Apps.Entities.Rules
             {
                 throw new DomainException("Rule has already been deleted.");
             }
-        }
-
-        public Task<IRuleEntity> GetRawStateAsync()
-        {
-            return Task.FromResult<IRuleEntity>(Snapshot);
         }
 
         public Task<J<IRuleEntity>> GetStateAsync()
