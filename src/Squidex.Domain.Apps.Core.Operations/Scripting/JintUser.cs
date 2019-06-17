@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.Scripting
             var claims =
                 allClaims.GroupBy(x => x.Type.Split(ClaimSeparators).Last())
                     .ToDictionary(
-                        x => x,
+                        x => x.Key,
                         x => x.Select(y => y.Value).ToArray());
 
             return new ObjectWrapper(engine, new { id, isClient, email, name, claims });
