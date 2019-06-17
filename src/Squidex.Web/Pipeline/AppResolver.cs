@@ -65,7 +65,10 @@ namespace Squidex.Web.Pipeline
                 {
                     var identity = user.Identities.First();
 
-                    identity.AddClaim(new Claim(ClaimTypes.Role, role));
+                    if (!string.IsNullOrWhiteSpace(role))
+                    {
+                        identity.AddClaim(new Claim(ClaimTypes.Role, role));
+                    }
 
                     foreach (var permission in permissions)
                     {
