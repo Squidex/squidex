@@ -10,7 +10,7 @@
     "appstart": "start dotnet run --project ../../cosmos/src/Squidex",
     "deploymentscriptsrun": "wait-on http://localhost:5001/ && cd ../../cosmos/deploymentscripts && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./Deployment.ps1 -identityServiceBaseUrl 'http://identityservice.systest.tesla.cha.rbxd.ds' -apiBaseUrl 'http://localhost:5001/api' -tokenUser 'CMSDeployer' -tokenPassword 'p@55w0rd' -appName 'commentary'",
     "test": "protractor ../cosmos-func-tests/JSFiles/config.js",
-    "posttest": "cd ./utils/ && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./TerminateTask.ps1 && del /s /q C:\\Users\\sattirajur\\Desktop\\cosmos\\cosmos-func-tests\\database > NUL",
+    "posttest": "cd ./utils/ && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./TerminateTask.ps1 && rm -r ../database/*",
     "protractor": "./node_modules/protractor/built/cli.js",
     "webdriver-update": "./node_modules/.bin/webdriver-manager update"
   },
