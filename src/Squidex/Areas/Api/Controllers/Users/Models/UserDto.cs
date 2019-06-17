@@ -11,15 +11,12 @@ using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared.Users;
 using Squidex.Web;
+using AllPermissions = Squidex.Shared.Permissions;
 
 namespace Squidex.Areas.Api.Controllers.Users.Models
 {
     public sealed class UserDto : Resource
     {
-        private static readonly Permission LockPermission = new Permission(Shared.Permissions.AdminUsersLock);
-        private static readonly Permission UnlockPermission = new Permission(Shared.Permissions.AdminUsersUnlock);
-        private static readonly Permission UpdatePermission = new Permission(Shared.Permissions.AdminUsersUpdate);
-
         /// <summary>
         /// The id of the user.
         /// </summary>
@@ -75,18 +72,18 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
 
             if (!controller.IsUser(Id))
             {
-                if (controller.HasPermission(LockPermission) && !IsLocked)
+                if (controller.HasPermission(AllPermissions.AdminUsersLock) && !IsLocked)
                 {
                     AddPutLink("lock", controller.Url<UserManagementController>(c => nameof(c.LockUser), values));
                 }
 
-                if (controller.HasPermission(UnlockPermission) && IsLocked)
+                if (controller.HasPermission(AllPermissions.AdminUsersUnlock) && IsLocked)
                 {
                     AddPutLink("unlock", controller.Url<UserManagementController>(c => nameof(c.UnlockUser), values));
                 }
             }
 
-            if (controller.HasPermission(UpdatePermission))
+            if (controller.HasPermission(AllPermissions.AdminUsersUpdate))
             {
                 AddPutLink("update", controller.Url<UserManagementController>(c => nameof(c.PutUser), values));
             }
