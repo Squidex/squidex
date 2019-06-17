@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -41,9 +41,6 @@ interface SnapshotLanguage {
 }
 
 interface Snapshot {
-    // the configured languages as plan format.
-    plainLanguages: AppLanguagesList;
-
     // All supported languages.
     allLanguages: LanguageList;
 
@@ -73,20 +70,16 @@ type LanguageResultList = ImmutableArray<SnapshotLanguage>;
 @Injectable()
 export class LanguagesState extends State<Snapshot> {
     public languages =
-        this.changes.pipe(map(x => x.languages),
-            distinctUntilChanged());
+        this.project(x => x.languages);
 
     public newLanguages =
-        this.changes.pipe(map(x => x.allLanguagesNew),
-            distinctUntilChanged());
+        this.project(x => x.allLanguagesNew);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     public canCreate =
-        this.changes.pipe(map(x => !!x.canCreate),
-            distinctUntilChanged());
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly appLanguagesService: AppLanguagesService,
@@ -95,7 +88,6 @@ export class LanguagesState extends State<Snapshot> {
         private readonly languagesService: LanguagesService
     ) {
         super({
-            plainLanguages: ImmutableArray.empty(),
             allLanguages: ImmutableArray.empty(),
             allLanguagesNew: ImmutableArray.empty(),
             languages: ImmutableArray.empty(),
@@ -154,15 +146,14 @@ export class LanguagesState extends State<Snapshot> {
         this.next(s => {
             allLanguages = allLanguages || s.allLanguages;
 
-            const languages = ImmutableArray.of(payload.items);
+            const { canCreate, items, _links } = payload;
 
-            const { _links, canCreate } = payload;
+            const languages = ImmutableArray.of(items);
 
             return {
                 ...s,
                 canCreate,
                 languages: languages.map(x => this.createLanguage(x, languages)),
-                plainLanguages: payload,
                 allLanguages: allLanguages,
                 allLanguagesNew: allLanguages.filter(x => !languages.find(l => l.iso2Code === x.iso2Code)),
                 isLoaded: true,

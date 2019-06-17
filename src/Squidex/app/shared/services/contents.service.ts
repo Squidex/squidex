@@ -35,6 +35,15 @@ export class ScheduleDto {
 }
 
 export class ContentsDto extends ResultSet<ContentDto> {
+    constructor(
+        public readonly statuses: string[],
+        total: number,
+        items: ContentDto[],
+        links?: ResourceLinks
+    ) {
+        super(total, items, links);
+    }
+
     public get canCreate() {
         return hasAnyLink(this._links, 'create');
     }
@@ -89,7 +98,7 @@ export class ContentsService {
     ) {
     }
 
-    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: string, ids?: string[]): Observable<ContentsDto> {
+    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: string, ids?: string[], status?: string[]): Observable<ContentsDto> {
         const queryParts: string[] = [];
 
         if (query && query.length > 0) {
@@ -114,15 +123,21 @@ export class ContentsService {
             queryParts.push(`ids=${ids.join(',')}`);
         }
 
+        if (status) {
+            for (let s of status) {
+                queryParts.push(`status=${s}`);
+            }
+        }
+
         const fullQuery = queryParts.join('&');
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
-        return this.http.get<{ total: number, items: [] } & Resource>(url).pipe(
-                map(({ total, items, _links }) => {
+        return this.http.get<{ total: number, items: [], statuses: string[] } & Resource>(url).pipe(
+                map(({ total, items, statuses, _links }) => {
                     const contents = items.map(x => parseContent(x));
 
-                    return new ContentsDto(total, contents, _links);
+                    return new ContentsDto(statuses, total, contents, _links);
                 }),
                 pretifyError('Failed to load contents. Please reload.'));
     }

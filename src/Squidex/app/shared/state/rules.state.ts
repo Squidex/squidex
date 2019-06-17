@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -47,20 +47,16 @@ type RulesList = ImmutableArray<RuleDto>;
 @Injectable()
 export class RulesState extends State<Snapshot> {
     public rules =
-        this.changes.pipe(map(x => x.rules),
-            distinctUntilChanged());
+        this.project(x => x.rules);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     public canCreate =
-        this.changes.pipe(map(x => !!x.canCreate),
-            distinctUntilChanged());
+        this.project(x => !!x.canCreate);
 
     public canReadEvents =
-        this.changes.pipe(map(x => !!x.canReadEvents),
-            distinctUntilChanged());
+        this.project(x => !!x.canReadEvents);
 
     constructor(
         private readonly appsState: AppsState,
@@ -76,7 +72,7 @@ export class RulesState extends State<Snapshot> {
         }
 
         return this.rulesService.getRules(this.appName).pipe(
-            tap(({ items, _links, canCreate, canReadEvents }) => {
+            tap(({ items, canCreate, canReadEvents, _links }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Rules reloaded.');
                 }
@@ -84,7 +80,7 @@ export class RulesState extends State<Snapshot> {
                 this.next(s => {
                     const rules = ImmutableArray.of(items);
 
-                    return { ...s, rules, isLoaded: true, _links, canCreate, canReadEvents };
+                    return { ...s, rules, isLoaded: true, canCreate, canReadEvents, _links };
                 });
             }),
             shareSubscribed(this.dialogs));

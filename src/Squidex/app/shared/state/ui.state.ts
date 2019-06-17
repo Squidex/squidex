@@ -46,24 +46,19 @@ interface Snapshot {
 @Injectable()
 export class UIState extends State<Snapshot> {
     public settings =
-        this.changes.pipe(map(x => x.settings),
-            distinctUntilChanged());
+        this.project(x => x.settings);
 
     public canReadEvents =
-        this.changes.pipe(map(x => !!x.canReadEvents),
-            distinctUntilChanged());
+        this.project(x => !!x.canReadEvents);
 
     public canReadUsers =
-        this.changes.pipe(map(x => !!x.canReadUsers),
-            distinctUntilChanged());
+        this.project(x => !!x.canReadUsers);
 
     public canRestore =
-        this.changes.pipe(map(x => !!x.canRestore),
-            distinctUntilChanged());
+        this.project(x => !!x.canRestore);
 
     public canUserAdminResource =
-        this.changes.pipe(map(x => !!x.canRestore || !!x.canReadUsers || !!x.canReadEvents),
-            distinctUntilChanged());
+        this.project(x => !!x.canRestore || !!x.canReadUsers || !!x.canReadEvents);
 
     public get<T>(path: string, defaultValue: T) {
         return this.settings.pipe(map(x => this.getValue(x, path, defaultValue)),

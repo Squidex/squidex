@@ -12,6 +12,18 @@
         <hr />
 
         <div class="sidebar-section">
+            <h3>Status Queries</h3>
+
+            <a class="sidebar-item" *ngFor="let query of contentsState.statusQueries | async; trackBy: trackByQuery" (click)="search(query.filter)"
+                [class.active]="isSelectedQuery(query.filter)">
+                
+                {{query.name}}
+            </a>
+        </div>
+
+        <hr />
+
+        <div class="sidebar-section">
             <h3>Saved queries</h3>
 
             <a class="sidebar-item" *ngFor="let query of schemaQueries.queries | async; trackBy: trackByQuery" (click)="search(query.filter)"

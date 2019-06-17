@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable, of } from 'rxjs';
-import { catchError, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -40,6 +40,9 @@ interface Snapshot {
     // Indicates if the contents are loaded.
     isLoaded?: boolean;
 
+    // The statuses.
+    statuses?: string[];
+
     // The selected content.
     selectedContent?: ContentDto | null;
 
@@ -59,36 +62,31 @@ function sameContent(lhs: ContentDto, rhs?: ContentDto): boolean {
 
 export abstract class ContentsStateBase extends State<Snapshot> {
     public selectedContent =
-        this.changes.pipe(map(x => x.selectedContent),
-            distinctUntilChanged(sameContent));
+        this.project(x => x.selectedContent, sameContent);
 
     public contents =
-        this.changes.pipe(map(x => x.contents),
-            distinctUntilChanged());
+        this.project(x => x.contents);
 
     public contentsPager =
-        this.changes.pipe(map(x => x.contentsPager),
-            distinctUntilChanged());
+        this.project(x => x.contentsPager);
 
     public contentsQuery =
-        this.changes.pipe(map(x => x.contentsQuery),
-            distinctUntilChanged());
+        this.project(x => x.contentsQuery);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
-
-    public canCreateAny =
-        this.changes.pipe(map(x => !!x.canCreate || !!x.canCreateAndPublish),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     public canCreate =
-        this.changes.pipe(map(x => !!x.canCreate),
-            distinctUntilChanged());
+        this.project(x => !!x.canCreate);
 
     public canCreateAndPublish =
-        this.changes.pipe(map(x => !!x.canCreateAndPublish),
-            distinctUntilChanged());
+        this.project(x => !!x.canCreateAndPublish);
+
+    public canCreateAny =
+        this.project(x => !!x.canCreate || !!x.canCreateAndPublish);
+
+    public statusQueries =
+        this.project2(x => x.statuses, x => buildQueries(x));
 
     constructor(
         private readonly appsState: AppsState,
@@ -139,7 +137,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.snapshot.contentsPager.pageSize,
                 this.snapshot.contentsPager.skip,
                 this.snapshot.contentsQuery, undefined).pipe(
-            tap(({ total, items, _links, canCreate, canCreateAndPublish }) => {
+            tap(({ total, items, canCreate, canCreateAndPublish, statuses, _links }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contents reloaded.');
                 }
@@ -148,11 +146,14 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     const contents = ImmutableArray.of(items);
                     const contentsPager = s.contentsPager.setCount(total);
 
+                    statuses = s.statuses || statuses;
+
                     let selectedContent = s.selectedContent;
 
                     if (selectedContent) {
                         selectedContent = contents.find(x => x.id === selectedContent!.id) || selectedContent;
                     }
+
                     return { ...s,
                         canCreate,
                         canCreateAndPublish,
@@ -160,6 +161,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         contentsPager,
                         isLoaded: true,
                         selectedContent,
+                        statuses,
                         _links
                     };
                 });
@@ -349,4 +351,12 @@ export class ManualContentsState extends ContentsStateBase {
     protected get schemaName() {
         return this.schema.name;
     }
+}
+
+function buildQueries(x: string[] | undefined): { name: string; filter: string; }[] {
+    return x ? x.map(s => buildQuery(s)) : [];
+}
+
+function buildQuery(s: string) {
+    return ({ name: s, filter: `$filter=status eq '${s}'` });
 }

@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -31,12 +31,10 @@ type EventConsumersList = ImmutableArray<EventConsumerDto>;
 @Injectable()
 export class EventConsumersState extends State<Snapshot> {
     public eventConsumers =
-        this.changes.pipe(map(x => x.eventConsumers),
-            distinctUntilChanged());
+        this.project(x => x.eventConsumers);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     constructor(
         private readonly dialogs: DialogService,

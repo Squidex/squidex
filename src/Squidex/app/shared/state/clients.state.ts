@@ -9,7 +9,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -52,16 +52,13 @@ type ClientsList = ImmutableArray<ClientDto>;
 @Injectable()
 export class ClientsState extends State<Snapshot> {
     public clients =
-        this.changes.pipe(map(x => x.clients),
-            distinctUntilChanged());
+        this.project(x => x.clients);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     public canCreate =
-        this.changes.pipe(map(x => !!x.canCreate),
-            distinctUntilChanged());
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly clientsService: ClientsService,
@@ -112,12 +109,12 @@ export class ClientsState extends State<Snapshot> {
     }
 
     private replaceClients(payload: ClientsPayload, version: Version) {
-        const clients = ImmutableArray.of(payload.items);
+        const { canCreate, items, _links } = payload;
 
-        const { _links, canCreate } = payload;
+        const clients = ImmutableArray.of(items);
 
         this.next(s => {
-            return { ...s, clients, isLoaded: true, version, _links, canCreate };
+            return { ...s, clients, isLoaded: true, version, canCreate, _links };
         });
     }
 

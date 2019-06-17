@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -35,16 +35,13 @@ interface Snapshot {
 @Injectable()
 export class RuleEventsState extends State<Snapshot> {
     public ruleEvents =
-        this.changes.pipe(map(x => x.ruleEvents),
-            distinctUntilChanged());
+        this.project(x => x.ruleEvents);
 
     public ruleEventsPager =
-        this.changes.pipe(map(x => x.ruleEventsPager),
-            distinctUntilChanged());
+        this.project(x => x.ruleEventsPager);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     constructor(
         private readonly appsState: AppsState,

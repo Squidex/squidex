@@ -7,9 +7,10 @@
 
 import { Injectable } from '@angular/core';
 import { combineLatest, Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
+    compareStringsAsc,
     DialogService,
     ImmutableArray,
     Pager,
@@ -43,32 +44,25 @@ interface Snapshot {
 @Injectable()
 export class AssetsState extends State<Snapshot> {
     public tags =
-        this.changes.pipe(map(x => x.tags),
-            distinctUntilChanged(), map(x => sort(x)));
+        this.project2(x => x.tags, x => sort(x));
 
     public tagsNames =
-        this.tags.pipe(
-            distinctUntilChanged(), map(x => x.map(t => t.name)));
+        this.project2(x => x.tags, x => Object.keys(x));
 
     public selectedTagNames =
-        this.changes.pipe(
-            distinctUntilChanged(), map(x => Object.keys(x.tagsSelected)));
+        this.project2(x => x.tagsSelected, x => Object.keys(x));
 
     public assets =
-        this.changes.pipe(map(x => x.assets),
-            distinctUntilChanged());
+        this.project(x => x.assets);
 
     public assetsQuery =
-        this.changes.pipe(map(x => x.assetsQuery),
-            distinctUntilChanged());
+        this.project(x => x.assetsQuery);
 
     public assetsPager =
-        this.changes.pipe(map(x => x.assetsPager),
-            distinctUntilChanged());
+        this.project(x => x.assetsPager);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     constructor(
         private readonly appsState: AppsState,
@@ -251,17 +245,7 @@ function removeTags(previous: AssetDto, tags: { [x: string]: number; }, tagsSele
 }
 
 function sort(tags: { [name: string]: number }) {
-    return Object.keys(tags).sort((a, b) => {
-        if (a < b) {
-            return -1;
-        }
-        if (a > b) {
-            return 1;
-        }
-        return 0;
-    }).map(key => {
-        return { name: key, count: tags[key] };
-    });
+    return Object.keys(tags).sort(compareStringsAsc).map(name => ({ name, count: tags[name] }));
 }
 
 @Injectable()

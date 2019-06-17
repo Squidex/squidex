@@ -130,9 +130,9 @@ export class RolesService {
 }
 
 export function parseRoles(response: any) {
-    const items: any[] = response.items;
+    const raw: any[] = response.items;
 
-    const roles = items.map(item =>
+    const items = raw.map(item =>
         new RoleDto(item._links,
             item.name,
             item.numClients,
@@ -142,5 +142,5 @@ export function parseRoles(response: any) {
 
     const _links = response._links;
 
-    return { items: roles, _links, canCreate: hasAnyLink(_links, 'create') };
+    return { items, _links, canCreate: hasAnyLink(_links, 'create') };
 }

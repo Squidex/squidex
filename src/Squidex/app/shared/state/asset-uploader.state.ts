@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { distinctUntilChanged, map, publishReplay, refCount, takeUntil } from 'rxjs/operators';
+import { map, publishReplay, refCount, takeUntil } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -51,8 +51,7 @@ type UploadResult = AssetDto | number;
 @Injectable()
 export class AssetUploaderState extends State<Snapshot> {
     public uploads =
-        this.changes.pipe(map(x => x.uploads),
-            distinctUntilChanged());
+        this.project(x => x.uploads);
 
     constructor(
         private readonly appsState: AppsState,

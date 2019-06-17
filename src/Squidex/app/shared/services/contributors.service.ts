@@ -107,14 +107,14 @@ export class ContributorsService {
 }
 
 function parseContributors(response: any) {
-    const items: any[] = response.items;
+    const raw: any[] = response.items;
 
-    const contributors = items.map(item =>
+    const items = raw.map(item =>
         new ContributorDto(item._links,
             item.contributorId,
             item.role));
 
     const { maxContributors, _links, _meta } = response;
 
-    return { items: contributors, maxContributors, _links, _meta, canCreate: hasAnyLink(_links, 'create') };
+    return { items, maxContributors, _links, _meta, canCreate: hasAnyLink(_links, 'create') };
 }

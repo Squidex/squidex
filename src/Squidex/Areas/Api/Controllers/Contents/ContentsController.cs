@@ -124,7 +124,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = Context();
             var contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).Ids);
 
-            var response = ContentsDto.FromContents(contents, context, this, app, null);
+            var response = ContentsDto.FromContents(contents.Count, contents, context, this, app, null);
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
@@ -159,7 +159,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = Context();
             var contents = await contentQuery.QueryAsync(context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 
-            var response = ContentsDto.FromContents(contents, context, this, app, name);
+            var response = ContentsDto.FromContents(contents.Total, contents, context, this, app, name);
 
             if (ShouldProvideSurrogateKeys(response))
             {

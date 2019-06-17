@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -42,7 +42,7 @@ interface Snapshot {
     canCreate?: boolean;
 
     // The links.
-    links: ResourceLinks;
+    _links: ResourceLinks;
 }
 
 type PatternsList = ImmutableArray<PatternDto>;
@@ -50,23 +50,20 @@ type PatternsList = ImmutableArray<PatternDto>;
 @Injectable()
 export class PatternsState extends State<Snapshot> {
     public patterns =
-        this.changes.pipe(map(x => x.patterns),
-            distinctUntilChanged());
+        this.project(x => x.patterns);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     public canCreate =
-        this.changes.pipe(map(x => !!x.canCreate),
-            distinctUntilChanged());
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly patternsService: PatternsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ patterns: ImmutableArray.empty(), version: Version.EMPTY, links: {} });
+        super({ patterns: ImmutableArray.empty(), version: Version.EMPTY, _links: {} });
     }
 
     public load(isReload = false): Observable<any> {
@@ -115,7 +112,7 @@ export class PatternsState extends State<Snapshot> {
         const { _links: links, canCreate } = payload;
 
         this.next(s => {
-            return { ...s, patterns, isLoaded: true, version, links, canCreate };
+            return { ...s, patterns, isLoaded: true, version, _links: links, canCreate };
         });
     }
 

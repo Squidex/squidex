@@ -44,16 +44,14 @@ export class AppsState extends State<Snapshot> {
         return this.snapshot.selectedApp;
     }
 
+    public apps =
+        this.project(s => s.apps);
+
     public selectedApp =
-        this.changes.pipe(map(s => s.selectedApp),
-            distinctUntilChanged(sameApp));
+        this.project(s => s.selectedApp, sameApp);
 
     public selectedValidApp =
         this.selectedApp.pipe(filter(x => !!x), map(x => <AppDto>x),
-            distinctUntilChanged());
-
-    public apps =
-        this.changes.pipe(map(s => s.apps),
             distinctUntilChanged());
 
     constructor(

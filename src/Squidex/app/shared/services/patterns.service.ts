@@ -122,9 +122,9 @@ export class PatternsService {
 }
 
 function parsePatterns(response: any) {
-    const items: any[] = response.items;
+    const raw: any[] = response.items;
 
-    const patterns = items.map(item =>
+    const items = raw.map(item =>
         new PatternDto(item._links,
             item.id,
             item.name,
@@ -133,5 +133,5 @@ function parsePatterns(response: any) {
 
     const _links = response._links;
 
-    return { items: patterns, _links, canCreate: hasAnyLink(_links, 'create') };
+    return { items, _links, canCreate: hasAnyLink(_links, 'create') };
 }

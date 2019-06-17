@@ -30,6 +30,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         [Required]
         public ContentDto[] Items { get; set; }
 
+        /// <summary>
+        /// The possible statuses.
+        /// </summary>
+        [Required]
+        public string[] Statuses { get; set; }
+
         public string ToEtag()
         {
             return Items.ToManyEtag(Total);
@@ -40,24 +46,18 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             return Items.ToSurrogateKeys();
         }
 
-        public static ContentsDto FromContents(IList<IContentEntity> contents, QueryContext context, ApiController controller, string app, string schema)
+        public static ContentsDto FromContents(long total, IEnumerable<IContentEntity> contents, QueryContext context,
+            ApiController controller,
+            string app,
+            string schema)
         {
             var result = new ContentsDto
             {
-                Total = contents.Count,
-                Items = contents.Select(x => ContentDto.FromContent(x, context, controller, app, schema)).ToArray()
+                Total = total,
+                Items = contents.Select(x => ContentDto.FromContent(x, context, controller, app, schema)).ToArray(),
             };
 
-            return result.CreateLinks(controller, app, schema);
-        }
-
-        public static ContentsDto FromContents(IResultList<IContentEntity> contents, QueryContext context, ApiController controller, string app, string schema)
-        {
-            var result = new ContentsDto
-            {
-                Total = contents.Total,
-                Items = contents.Select(x => ContentDto.FromContent(x, context, controller, app, schema)).ToArray()
-            };
+            result.Statuses = new string[] { "Archived", "Draft", "Published" };
 
             return result.CreateLinks(controller, app, schema);
         }

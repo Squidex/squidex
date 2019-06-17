@@ -518,9 +518,9 @@ export class SchemasService {
 }
 
 function parseSchemas(response: any) {
-    const items: any[] = response.items;
+    const raw: any[] = response.items;
 
-    const schemas = items.map(item =>
+    const items = raw.map(item =>
         new SchemaDto(item._links,
             item.id,
             item.name,
@@ -534,7 +534,7 @@ function parseSchemas(response: any) {
 
     const _links = response._links;
 
-    return { items: schemas, _links, canCreate: hasAnyLink(_links, 'create') };
+    return { items, _links, canCreate: hasAnyLink(_links, 'create') };
 }
 
 function parseSchemaWithDetails(response: any, version: Version) {

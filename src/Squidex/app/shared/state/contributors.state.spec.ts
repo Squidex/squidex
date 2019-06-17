@@ -53,7 +53,6 @@ describe('ContributorsState', () => {
             contributorsState.load().subscribe();
 
             expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.items);
-            expect(contributorsState.snapshot.isMaxReached).toBeFalsy();
             expect(contributorsState.snapshot.isLoaded).toBeTruthy();
             expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(version);

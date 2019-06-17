@@ -7,9 +7,10 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 
 import {
+    compareStringsAsc,
     DialogService,
     ImmutableArray,
     ResourceLinks,
@@ -58,6 +59,8 @@ interface Snapshot {
 
 export type SchemasList = ImmutableArray<SchemaDto>;
 
+export type Categories = { [name: string]: boolean };
+
 function sameSchema(lhs: SchemaDetailsDto | null, rhs?: SchemaDetailsDto | null): boolean {
     return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version === rhs.version);
 }
@@ -68,29 +71,23 @@ export class SchemasState extends State<Snapshot> {
         return this.snapshot.selectedSchema ? this.snapshot.selectedSchema.name : '';
     }
 
-    public selectedSchema =
-        this.changes.pipe(map(x => x.selectedSchema),
-            distinctUntilChanged(sameSchema));
-
     public categories =
-        this.changes.pipe(map(x => ImmutableArray.of(Object.keys(x.categories)).sortByStringAsc(s => s)),
-            distinctUntilChanged());
+        this.project2(x => x.categories, x => sortedCategoryNames(x));
+
+    public selectedSchema =
+        this.project(x => x.selectedSchema, sameSchema);
 
     public schemas =
-        this.changes.pipe(map(x => x.schemas),
-            distinctUntilChanged());
+        this.project(x => x.schemas);
 
     public publishedSchemas =
-        this.changes.pipe(map(x => x.schemas.filter(s => s.isPublished)),
-            distinctUntilChanged());
+        this.project2(x => x.schemas, x => x.filter(s => s.isPublished));
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     public canCreate =
-        this.changes.pipe(map(x => !!x.canCreate),
-            distinctUntilChanged());
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly appsState: AppsState,
@@ -125,19 +122,17 @@ export class SchemasState extends State<Snapshot> {
         }
 
         return this.schemasService.getSchemas(this.appName).pipe(
-            tap(payload => {
+            tap(({ items, canCreate, _links }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Schemas reloaded.');
                 }
 
                 return this.next(s => {
-                    const { _links, canCreate, items } = payload;
-
                     const schemas = ImmutableArray.of(items).sortByStringAsc(x => x.displayName);
 
                     const categories = buildCategories(s.categories, schemas);
 
-                    return { ...s, schemas, isLoaded: true, categories, _links, canCreate };
+                    return { ...s, schemas, isLoaded: true, categories, canCreate, _links };
                 });
             }),
             shareSubscribed(this.dialogs));
@@ -357,7 +352,7 @@ function buildCategories(categories: { [name: string]: boolean }, schemas?: Sche
     return categories;
 }
 
-function addCategory(categories: { [name: string]: boolean }, category: string) {
+function addCategory(categories: Categories, category: string) {
     categories = { ...categories };
 
     categories[category] = true;
@@ -365,10 +360,18 @@ function addCategory(categories: { [name: string]: boolean }, category: string) 
     return categories;
 }
 
-function removeCategory(categories: { [name: string]: boolean }, category: string) {
+function removeCategory(categories: Categories, category: string) {
     categories = { ...categories };
 
     delete categories[category];
 
     return categories;
+}
+
+function sortedCategoryNames(categories: Categories) {
+    const names = Object.keys(categories);
+
+    names.sort(compareStringsAsc);
+
+    return names;
 }

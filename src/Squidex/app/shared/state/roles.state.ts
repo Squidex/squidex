@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -50,16 +50,13 @@ type RolesList = ImmutableArray<RoleDto>;
 @Injectable()
 export class RolesState extends State<Snapshot> {
     public roles =
-        this.changes.pipe(map(x => x.roles),
-            distinctUntilChanged());
+        this.project(x => x.roles);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     public canCreate =
-        this.changes.pipe(map(x => !!x.canCreate),
-            distinctUntilChanged());
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly rolesService: RolesService,
@@ -110,12 +107,12 @@ export class RolesState extends State<Snapshot> {
     }
 
     private replaceRoles(payload: RolesPayload, version: Version) {
-        const roles = ImmutableArray.of(payload.items);
+        const { canCreate, items, _links } = payload;
 
-        const { _links, canCreate } = payload;
+        const roles = ImmutableArray.of(items);
 
         this.next(s => {
-            return { ...s, roles, isLoaded: true, version, _links, canCreate };
+            return { ...s, roles, isLoaded: true, version, canCreate, _links };
         });
     }
 

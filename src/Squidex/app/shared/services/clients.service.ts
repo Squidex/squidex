@@ -149,9 +149,9 @@ export class ClientsService {
 }
 
 function parseClients(response: any): ClientsPayload {
-    const items: any[] = response.items;
+    const raw: any[] = response.items;
 
-    const clients = items.map(item =>
+    const items = raw.map(item =>
         new ClientDto(item._links,
             item.id,
             item.name || item.id,
@@ -160,5 +160,5 @@ function parseClients(response: any): ClientsPayload {
 
     const _links = response._links;
 
-    return { items: clients, _links, canCreate: hasAnyLink(_links, 'create') };
+    return { items, _links, canCreate: hasAnyLink(_links, 'create') };
 }
