@@ -35,11 +35,12 @@ RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p --verbosity qui
 
 COPY . .
 
-# Install dependencies
-RUN dotnet restore
-
 # Test Backend
-RUN bash -c 'for p in **/*.csproj; do dotnet test $p --filter Category!=Dependencies; true; done;'
+RUN dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj --filter Category!=Dependencies \ 
+ && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj \ 
+ && dotnet test tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj \
+ && dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj \
+ && dotnet test tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj
 
 COPY --from=frontend-builder /frontend/src/Squidex/wwwroot src/Squidex/wwwroot
 
