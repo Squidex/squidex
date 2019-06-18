@@ -43,6 +43,8 @@ RUN bash -c 'for p in **/*.csproj; do dotnet test $p --filter Category!=Dependen
 
 COPY --from=frontend-builder /frontend/src/Squidex/wwwroot src/Squidex/wwwroot
 
+RUN cd src/Squidex/wwwroot && ls
+
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64
 
