@@ -29,7 +29,7 @@ steps:
       - name: docker2
         path: /var/lib/docker
       - name: nuget
-        path: ~/.nuget/packages
+        path: /home/.nuget/packages
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
@@ -54,7 +54,7 @@ steps:
       - name: docker2
         path: /var/lib/docker
       - name: nuget
-        path: ~/.nuget/packages
+        path: /home/.nuget/packages
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
