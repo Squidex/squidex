@@ -5,6 +5,8 @@ FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as frontend-builder
 
 WORKDIR /src
 
+COPY /**/*.csproj /tmp/
+
 COPY src/Squidex/package*.json /tmp/
 
 # Install Node packages 
@@ -24,7 +26,9 @@ RUN cp -a /tmp/node_modules src/Squidex/ \
 #
 FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as backend-builder
 
-COPY **/*.csproj /tmp/
+WORKDIR /
+
+COPY /**/*.csproj /tmp/
 
 # Install Nuget packages
 RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p; true; done; popd'
