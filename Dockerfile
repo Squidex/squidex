@@ -28,7 +28,7 @@ WORKDIR /
 
 COPY /**/**/*.csproj /tmp/
 # Also copy nuget.config for package sources.
-COPY NuGet.,config /tmp/
+COPY NuGet.config /tmp/
 
 # Install Nuget packages
 RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p --verbosity quiet; true; done; popd'
@@ -36,7 +36,8 @@ RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p --verbosity qui
 COPY . .
 
 # Test Backend
-RUN bash -c 'for p in tests/**/*.csproj; do dotnet test $p --filter Category!=Dependencies; done'
+RUN dotnet restore \
+ && dotnet test --filter Category!=Dependencies -- xunit.parallelizeAssembly=true
 
 COPY --from=frontend-builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
 
