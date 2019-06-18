@@ -12,8 +12,6 @@ steps:
         path: /var/run/docker.sock
       - name: docker2
         path: /var/lib/docker
-      - name: nuget
-        path: /root/.nuget/packages
     when:
       event:
         - pull_request
@@ -30,8 +28,6 @@ steps:
         path: /var/run/docker.sock
       - name: docker2
         path: /var/lib/docker
-      - name: nuget
-        path: /root/.nuget/packages
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
@@ -55,8 +51,6 @@ steps:
         path: /var/run/docker.sock
       - name: docker2
         path: /var/lib/docker
-      - name: nuget
-        path: /root/.nuget/packages
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
@@ -79,8 +73,6 @@ steps:
         path: /var/run/docker.sock
       - name: docker2
         path: /var/lib/docker
-      - name: nuget
-        path: /root/.nuget/packages
     when:
       event:
         - tag
@@ -163,6 +155,3 @@ volumes:
   - name: docker2
     host:
       path: /var/lib/docker
-  - name: nuget
-    host:
-      path: /var/lib/nuget
