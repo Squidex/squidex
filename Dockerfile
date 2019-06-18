@@ -5,10 +5,6 @@ FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as builder
 
 WORKDIR /src
 
-COPY . . 
-
-RUN dotnet restore
-
 COPY src/Squidex/package*.json /tmp/
 
 # Install Node packages 
