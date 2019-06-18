@@ -13,7 +13,7 @@ steps:
       - name: docker2
         path: /var/lib/docker
       - name: nuget
-        path: /home/.nuget/packages
+        path: /root/.nuget/packages/
     when:
       event:
         - pull_request
@@ -31,7 +31,7 @@ steps:
       - name: docker2
         path: /var/lib/docker
       - name: nuget
-        path: /home/.nuget/packages
+        path: /root/.nuget/packages/
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
@@ -56,7 +56,7 @@ steps:
       - name: docker2
         path: /var/lib/docker
       - name: nuget
-        path: /home/.nuget/packages
+        path: /root/.nuget/packages/
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
@@ -80,7 +80,7 @@ steps:
       - name: docker2
         path: /var/lib/docker
       - name: nuget
-        path: ~/.nuget/packages
+        path: /root/.nuget/packages/
     when:
       event:
         - tag
