@@ -28,7 +28,7 @@ WORKDIR /
 
 COPY /**/**/*.csproj /tmp/
 # Also copy nuget.config for package sources.
-COPY NuGet.config /tmp/
+COPY NuGet.Config /tmp/
 
 # Install Nuget packages
 RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p --verbosity quiet; true; done; popd'
