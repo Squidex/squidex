@@ -103,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchemaFound();
 
-            var result = await sut.GetSchemaAsync(context, schemaId.Name);
+            var result = await sut.GetSchemaOrThrowAsync(context, schemaId.Name);
 
             Assert.Equal(schema, result);
         }
@@ -113,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchemaFound();
 
-            var result = await sut.GetSchemaAsync(context, schemaId.Name);
+            var result = await sut.GetSchemaOrThrowAsync(context, schemaId.Name);
 
             Assert.Equal(schema, result);
         }
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ctx = context;
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaAsync(ctx, schemaId.Name));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(ctx, schemaId.Name));
         }
 
         [Fact]
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ctx = context;
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.ThrowIfSchemaNotExistsAsync(ctx, schemaId.Name));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(ctx, schemaId.Name));
         }
 
         [Fact]

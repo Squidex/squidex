@@ -73,16 +73,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.scriptEngine = scriptEngine;
         }
 
-        public Task ThrowIfSchemaNotExistsAsync(QueryContext context, string schemaIdOrName)
-        {
-            return GetSchemaAsync(context, schemaIdOrName);
-        }
-
         public async Task<IContentEntity> FindContentAsync(QueryContext context, string schemaIdOrName, Guid id, long version = -1)
         {
             Guard.NotNull(context, nameof(context));
 
-            var schema = await GetSchemaAsync(context, schemaIdOrName);
+            var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
             CheckPermission(context.User, schema);
 
@@ -110,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             Guard.NotNull(context, nameof(context));
 
-            var schema = await GetSchemaAsync(context, schemaIdOrName);
+            var schema = await GetSchemaOrThrowAsync(context, schemaIdOrName);
 
             CheckPermission(context.User, schema);
 
@@ -136,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public async Task<IList<IContentEntity>> QueryAsync(QueryContext context, IReadOnlyList<Guid> ids)
+        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(QueryContext context, IReadOnlyList<Guid> ids)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -295,7 +290,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        public async Task<ISchemaEntity> GetSchemaAsync(QueryContext context, string schemaIdOrName)
+        public async Task<ISchemaEntity> GetSchemaOrThrowAsync(QueryContext context, string schemaIdOrName)
         {
             ISchemaEntity schema = null;
 
