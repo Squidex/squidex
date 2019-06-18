@@ -44,7 +44,26 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Task<Status2[]> GetNextsAsync(IContentEntity content)
         {
-            return Task.FromResult(Flow.TryGetValue(content.Status2, out var result) ? result : Array.Empty<Status2>());
+            Status2 statusToCheck;
+            switch (content.Status)
+            {
+                case Status.Draft:
+                    statusToCheck = Draft;
+                    break;
+                case Status.Archived:
+                    statusToCheck = Archived;
+                    break;
+                case Status.Published:
+                    statusToCheck = Published;
+                    break;
+                default:
+                {
+                    statusToCheck = Draft;
+                    break;
+                }
+            }
+
+            return Task.FromResult(Flow.TryGetValue(statusToCheck, out var result) ? result : Array.Empty<Status2>());
         }
 
         public Task<Status2[]> GetAllAsync(ISchemaEntity schema)
