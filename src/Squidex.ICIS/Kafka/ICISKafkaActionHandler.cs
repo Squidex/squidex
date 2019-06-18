@@ -15,39 +15,37 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Extensions.Actions.Kafka.Entities;
+using Squidex.ICIS.Actions.Kafka.Entities;
 
-namespace Squidex.Extensions.Actions.Kafka
+namespace Squidex.ICIS.Actions.Kafka
 {
-    public sealed class KafkaActionHandler : RuleActionHandler<KafkaAction, KafkaJob>
+    public sealed class ICISKafkaActionHandler : RuleActionHandler<ICISKafkaAction, ICISKafkaJob>
     {
         private const string DescriptionIgnore = "Ignore";
-        public KafkaActionHandler(RuleEventFormatter formatter)
+        public ICISKafkaActionHandler(RuleEventFormatter formatter)
             : base(formatter)
         {
         }
 
-        protected override (string Description, KafkaJob Data) CreateJob(EnrichedEvent @event, KafkaAction action)
+        protected override (string Description, ICISKafkaJob Data) CreateJob(EnrichedEvent @event, ICISKafkaAction action)
         {
             if (@event is EnrichedContentEvent contentEvent)
             {
-                if (contentEvent.Type == EnrichedContentEventType.Published || (contentEvent.Type == EnrichedContentEventType.Updated && contentEvent.Status == Status.Published))
+                var ruleJob = new ICISKafkaJob
                 {
-                    var ruleJob = new KafkaJob
-                    {
-                        Broker = action.Broker,
-                        SchemaRegistry = action.SchemaRegistry,
-                        TopicName = action.TopicName,
-                        Message = contentEvent
-                    };
-                    return ("Push to Kafka", ruleJob);
-                }
+                    Broker = action.Broker,
+                    SchemaRegistry = action.SchemaRegistry,
+                    TopicName = action.TopicName,
+                    Message = contentEvent
+                };
+
+                return ("Push to Kafka", ruleJob);
             }
 
-            return (DescriptionIgnore, new KafkaJob());
+            return (DescriptionIgnore, new ICISKafkaJob());
         }
 
-        protected override async Task<Result> ExecuteJobAsync(KafkaJob job, CancellationToken ct)
+        protected override async Task<Result> ExecuteJobAsync(ICISKafkaJob job, CancellationToken ct)
         {
             if (string.IsNullOrEmpty(job.TopicName))
             {
@@ -87,7 +85,7 @@ namespace Squidex.Extensions.Actions.Kafka
         }
     }
 
-    public sealed class KafkaJob
+    public sealed class ICISKafkaJob
     {
         public Uri Broker { get; set; }
 

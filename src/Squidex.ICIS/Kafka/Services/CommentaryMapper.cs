@@ -14,10 +14,10 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Extensions.Actions.Kafka.Entities;
+using Squidex.ICIS.Actions.Kafka.Entities;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Extensions.Actions.Kafka
+namespace Squidex.ICIS.Actions.Kafka
 {
     public class CommentaryMapper : IKafkaMessageMapper
     {

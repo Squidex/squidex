@@ -9,11 +9,8 @@ using System;
 using System.Threading.Tasks;
 using Avro.Specific;
 using Confluent.Kafka;
-using Confluent.SchemaRegistry;
-using Confluent.SchemaRegistry.Serdes;
-using Newtonsoft.Json;
 
-namespace Squidex.Extensions.Actions.Kafka
+namespace Squidex.ICIS.Actions.Kafka
 {
     public interface IKafkaProducer<T> : IDisposable where T : ISpecificRecord
     {
