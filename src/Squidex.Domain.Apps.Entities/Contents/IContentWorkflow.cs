@@ -17,6 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         Task<bool> IsValidNextStatus(IContentEntity content, Status2 next);
 
+        Task<bool> CanUpdateAsync(IContentEntity content);
+
         Task<Status2[]> GetNextsAsync(IContentEntity content);
 
         Task<Status2[]> GetAllAsync(ISchemaEntity schema);
