@@ -3,7 +3,7 @@
 #
 FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as frontend-builder
 
-WORKDIR /src
+WORKDIR /frontend
 
 COPY src/Squidex/package*.json /tmp/
 
@@ -24,7 +24,7 @@ RUN cp -a /tmp/node_modules src/Squidex/ \
 #
 FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as backend-builder
 
-WORKDIR /
+WORKDIR /backend
 
 COPY /**/**/*.csproj /tmp/
 # Also copy nuget.config for package sources.
@@ -35,11 +35,13 @@ RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p --verbosity qui
 
 COPY . .
 
-# Test Backend
-RUN dotnet restore \
- && dotnet test --filter Category!=Dependencies -- xunit.parallelizeAssembly=true
+# Install dependencies
+RUN dotnet restore
 
-COPY --from=frontend-builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
+# Test Backend
+RUN bash -c 'for p in **/*.csproj; do dotnet test $p --filter Category!=Dependencies; true; done;'
+
+COPY --from=frontend-builder /frontend/src/Squidex/wwwroot src/Squidex/wwwroot
 
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64
