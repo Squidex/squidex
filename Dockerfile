@@ -5,6 +5,10 @@ FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as builder
 
 WORKDIR /src
 
+COPY . . 
+
+RUN dotnet restore
+
 COPY src/Squidex/package*.json /tmp/
 
 # Install Node packages 
@@ -17,8 +21,6 @@ RUN cp -a /tmp/node_modules src/Squidex/ \
  && cd src/Squidex \
  && npm run test:coverage \
  && npm run build
-
-RUN find / -name "*.nupkg"
  
 # Test Backend
 RUN dotnet restore && dotnet test -s ../../.testrunsettings --filter Category!=Dependencies
