@@ -27,6 +27,8 @@ FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as backend-builder
 WORKDIR /
 
 COPY /**/**/*.csproj /tmp/
+# Also copy nuget.config for package sources.
+COPY NuGet.,config /tmp/
 
 # Install Nuget packages
 RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p --verbosity quiet; true; done; popd'
@@ -34,9 +36,7 @@ RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p --verbosity qui
 COPY . .
 
 # Test Backend
-RUN cd tests \
- && dotnet restore \
- && dotnet test -s ../../.testrunsettings --filter Category!=Dependencies
+RUN bash -c 'for p in tests/**/*.csproj; do dotnet test $p --filter Category!=Dependencies; done'
 
 COPY --from=frontend-builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
 
