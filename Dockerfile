@@ -17,6 +17,8 @@ RUN cp -a /tmp/node_modules src/Squidex/ \
  && cd src/Squidex \
  && npm run test:coverage \
  && npm run build
+
+RUN find / -name "*.nupkg"
  
 # Test Backend
 RUN dotnet restore && dotnet test -s ../../.testrunsettings --filter Category!=Dependencies
