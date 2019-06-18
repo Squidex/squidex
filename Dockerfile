@@ -44,8 +44,6 @@ RUN dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.
 
 COPY --from=frontend-builder /frontend/src/Squidex/wwwroot src/Squidex/wwwroot
 
-RUN cd src/Squidex/wwwroot && ls
-
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64
 
