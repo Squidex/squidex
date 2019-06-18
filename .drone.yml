@@ -6,14 +6,14 @@ steps:
   - name: test_pull_request
     image: docker
     commands:
-      - docker build -t squidex/squidex:test_pull_request .
+      - docker build -v /nuget:/root/.nuget/packages -t squidex/squidex:test_pull_request .
     volumes:
       - name: docker1
         path: /var/run/docker.sock
       - name: docker2
         path: /var/lib/docker
       - name: nuget
-        path: /root/.nuget/packages
+        path: /nuget
     when:
       event:
         - pull_request
@@ -22,7 +22,7 @@ steps:
     image: docker
     commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker build -t squidex/squidex:dev -t squidex/squidex:dev-$${DRONE_BUILD_NUMBER} .
+      - docker build -v /nuget:/root/.nuget/packages -t squidex/squidex:dev -t squidex/squidex:dev-$${DRONE_BUILD_NUMBER} .
       - docker push squidex/squidex:dev
       - docker push squidex/squidex:dev-$${DRONE_BUILD_NUMBER}
     volumes:
@@ -31,7 +31,7 @@ steps:
       - name: docker2
         path: /var/lib/docker
       - name: nuget
-        path: /root/.nuget/packages
+        path: /nuget
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
@@ -47,7 +47,7 @@ steps:
     image: docker
     commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker build -t squidex/squidex:latest -t squidex/squidex:$${DRONE_TAG} .
+      - docker build -v /nuget:/root/.nuget/packages -t squidex/squidex:latest -t squidex/squidex:$${DRONE_TAG} .
       - docker push squidex/squidex:latest
       - docker push squidex/squidex:$${DRONE_TAG}
     volumes:
@@ -56,7 +56,7 @@ steps:
       - name: docker2
         path: /var/lib/docker
       - name: nuget
-        path: /root/.nuget/packages
+        path: /nuget
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
@@ -69,7 +69,7 @@ steps:
   - name: build_binaries
     image: docker
     commands:
-      - docker build . -t squidex-build-image -f Dockerfile.build
+      - docker build -v /nuget:/root/.nuget/packages -t squidex-build-image -f Dockerfile.build .
       - docker create --name squidex-build-container squidex-build-image
       - docker cp squidex-build-container:/out /build
     volumes:
@@ -80,7 +80,7 @@ steps:
       - name: docker2
         path: /var/lib/docker
       - name: nuget
-        path: /root/.nuget/packages
+        path: /nuget
     when:
       event:
         - tag
