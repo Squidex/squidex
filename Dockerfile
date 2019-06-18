@@ -29,12 +29,13 @@ WORKDIR /
 COPY /**/**/*.csproj /tmp/
 
 # Install Nuget packages
-RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p; true; done; popd'
+RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p --verbosity quiet; true; done; popd'
 
 COPY . .
 
 # Test Backend
-RUN dotnet restore \
+RUN cd tests \
+ && dotnet restore \
  && dotnet test -s ../../.testrunsettings --filter Category!=Dependencies
 
 COPY --from=frontend-builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
