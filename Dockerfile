@@ -5,7 +5,7 @@ FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as frontend-builder
 
 WORKDIR /src
 
-COPY */*.csproj /tmp/
+COPY /**/**/*.csproj /tmp/
 
 COPY src/Squidex/package*.json /tmp/
 
