@@ -25,12 +25,12 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public override bool Equals(object obj)
         {
-            return base.Equals(obj);
+            return obj is Status2 status && Equals(status);
         }
 
         public bool Equals(Status2 other)
         {
-            throw new NotImplementedException();
+            return Name.Equals(other.Name);
         }
 
         public override int GetHashCode()

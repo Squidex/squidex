@@ -36,6 +36,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly string typeContentDeleted;
         private readonly MongoContentCollection contents;
 
+        static MongoContentRepository()
+        {
+            StatusSerializer.Register();
+        }
+
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer, TypeNameRegistry typeNameRegistry)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
