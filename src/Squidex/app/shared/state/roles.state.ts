@@ -12,7 +12,6 @@ import { tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    ResourceLinks,
     shareSubscribed,
     State,
     Version
@@ -40,9 +39,6 @@ interface Snapshot {
 
     // Indicates if the user can add a role.
     canCreate?: boolean;
-
-    // The links.
-    _links?: ResourceLinks;
 }
 
 type RolesList = ImmutableArray<RoleDto>;
@@ -107,12 +103,12 @@ export class RolesState extends State<Snapshot> {
     }
 
     private replaceRoles(payload: RolesPayload, version: Version) {
-        const { canCreate, items, _links } = payload;
+        const { canCreate, items } = payload;
 
         const roles = ImmutableArray.of(items);
 
         this.next(s => {
-            return { ...s, roles, isLoaded: true, version, canCreate, _links };
+            return { ...s, roles, isLoaded: true, version, canCreate };
         });
     }
 

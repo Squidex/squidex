@@ -13,7 +13,6 @@ import {
     compareStringsAsc,
     DialogService,
     ImmutableArray,
-    ResourceLinks,
     shareMapSubscribed,
     shareSubscribed,
     State,
@@ -52,9 +51,6 @@ interface Snapshot {
 
     // Indicates if the user can create a schema.
     canCreate?: boolean;
-
-    // The links.
-    _links?: ResourceLinks;
 }
 
 export type SchemasList = ImmutableArray<SchemaDto>;
@@ -122,7 +118,7 @@ export class SchemasState extends State<Snapshot> {
         }
 
         return this.schemasService.getSchemas(this.appName).pipe(
-            tap(({ items, canCreate, _links }) => {
+            tap(({ items, canCreate }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Schemas reloaded.');
                 }
@@ -132,7 +128,7 @@ export class SchemasState extends State<Snapshot> {
 
                     const categories = buildCategories(s.categories, schemas);
 
-                    return { ...s, schemas, isLoaded: true, categories, canCreate, _links };
+                    return { ...s, schemas, isLoaded: true, categories, canCreate };
                 });
             }),
             shareSubscribed(this.dialogs));

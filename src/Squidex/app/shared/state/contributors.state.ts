@@ -13,7 +13,6 @@ import {
     DialogService,
     ErrorDto,
     ImmutableArray,
-    ResourceLinks,
     shareMapSubscribed,
     shareSubscribed,
     State,
@@ -45,9 +44,6 @@ interface Snapshot {
 
     // Indicates if the user can add a contributor.
     canCreate?: boolean;
-
-    // The links.
-    _links?: ResourceLinks;
 }
 
 type ContributorsList = ImmutableArray<ContributorDto>;
@@ -115,11 +111,11 @@ export class ContributorsState extends State<Snapshot> {
 
     private replaceContributors(version: Version, payload: ContributorsPayload) {
         this.next(s => {
-            const { canCreate, items, maxContributors, _links } = payload;
+            const { canCreate, items, maxContributors } = payload;
 
             const contributors = ImmutableArray.of(items);
 
-            return { ...s, contributors, maxContributors, isLoaded: true, version, canCreate, _links };
+            return { ...s, contributors, maxContributors, isLoaded: true, version, canCreate };
         });
     }
 

@@ -14,7 +14,6 @@ import {
     ErrorDto,
     ImmutableArray,
     Pager,
-    ResourceLinks,
     shareSubscribed,
     State,
     Version,
@@ -51,9 +50,6 @@ interface Snapshot {
 
     // Indicates if the user can create and publish a content.
     canCreateAndPublish?: boolean;
-
-    // The links.
-    _links?: ResourceLinks;
 }
 
 function sameContent(lhs: ContentDto, rhs?: ContentDto): boolean {
@@ -137,7 +133,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.snapshot.contentsPager.pageSize,
                 this.snapshot.contentsPager.skip,
                 this.snapshot.contentsQuery, undefined).pipe(
-            tap(({ total, items, canCreate, canCreateAndPublish, statuses, _links }) => {
+            tap(({ total, items, canCreate, canCreateAndPublish, statuses }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Contents reloaded.');
                 }
@@ -161,8 +157,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         contentsPager,
                         isLoaded: true,
                         selectedContent,
-                        statuses,
-                        _links
+                        statuses
                     };
                 });
             }));

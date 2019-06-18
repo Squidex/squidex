@@ -12,7 +12,6 @@ import { map, tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    ResourceLinks,
     shareMapSubscribed,
     shareSubscribed,
     State,
@@ -58,9 +57,6 @@ interface Snapshot {
 
     // Inedicates if the user can add a language.
     canCreate?: boolean;
-
-    // The links.
-    _links?: ResourceLinks;
 }
 
 type AppLanguagesList = ImmutableArray<AppLanguageDto>;
@@ -146,7 +142,7 @@ export class LanguagesState extends State<Snapshot> {
         this.next(s => {
             allLanguages = allLanguages || s.allLanguages;
 
-            const { canCreate, items, _links } = payload;
+            const { canCreate, items } = payload;
 
             const languages = ImmutableArray.of(items);
 
@@ -157,7 +153,6 @@ export class LanguagesState extends State<Snapshot> {
                 allLanguages: allLanguages,
                 allLanguagesNew: allLanguages.filter(x => !languages.find(l => l.iso2Code === x.iso2Code)),
                 isLoaded: true,
-                _links,
                 version: version
             };
         });

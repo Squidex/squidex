@@ -201,7 +201,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         let content = '';
 
         for (let asset of assets) {
-            content += `![${asset.fileName}](${asset._links['content'].href} '${asset.fileName}')`;
+            content += `![${asset.fileName}](${asset.contentUrl} '${asset.fileName}')`;
         }
 
         if (content.length > 0) {
@@ -244,7 +244,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                    replaceText(`![${asset.fileName}](${asset._links['content'].href} '${asset.fileName}')`);
+                    replaceText(`![${asset.fileName}](${asset.contentUrl} '${asset.fileName}')`);
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {

@@ -14,7 +14,6 @@ import { tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    ResourceLinks,
     shareSubscribed,
     State,
     Version
@@ -42,9 +41,6 @@ interface Snapshot {
 
     // Indicates if the user can create new clients.
     canCreate?: boolean;
-
-    // The links.
-    _links?: ResourceLinks;
 }
 
 type ClientsList = ImmutableArray<ClientDto>;
@@ -109,12 +105,12 @@ export class ClientsState extends State<Snapshot> {
     }
 
     private replaceClients(payload: ClientsPayload, version: Version) {
-        const { canCreate, items, _links } = payload;
+        const { canCreate, items } = payload;
 
         const clients = ImmutableArray.of(items);
 
         this.next(s => {
-            return { ...s, clients, isLoaded: true, version, canCreate, _links };
+            return { ...s, clients, isLoaded: true, version, canCreate };
         });
     }
 

@@ -12,7 +12,6 @@ import { tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    ResourceLinks,
     shareMapSubscribed,
     shareSubscribed,
     State,
@@ -40,9 +39,6 @@ interface Snapshot {
 
     // Indicates if patterns can be created.
     canCreate?: boolean;
-
-    // The links.
-    _links: ResourceLinks;
 }
 
 type PatternsList = ImmutableArray<PatternDto>;
@@ -63,7 +59,7 @@ export class PatternsState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ patterns: ImmutableArray.empty(), version: Version.EMPTY, _links: {} });
+        super({ patterns: ImmutableArray.empty(), version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -109,10 +105,10 @@ export class PatternsState extends State<Snapshot> {
     private replacePatterns(payload: PatternsPayload, version: Version) {
         const patterns = ImmutableArray.of(payload.items);
 
-        const { _links: links, canCreate } = payload;
+        const { canCreate } = payload;
 
         this.next(s => {
-            return { ...s, patterns, isLoaded: true, version, _links: links, canCreate };
+            return { ...s, patterns, isLoaded: true, version, canCreate };
         });
     }
 

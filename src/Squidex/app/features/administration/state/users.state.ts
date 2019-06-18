@@ -15,7 +15,6 @@ import {
     DialogService,
     ImmutableArray,
     Pager,
-    ResourceLinks,
     shareSubscribed,
     State
 } from '@app/shared';
@@ -45,9 +44,6 @@ interface Snapshot {
 
     // Indicates if the user can create a user.
     canCreate?: boolean;
-
-    // The resource links.
-    _links?: ResourceLinks;
 }
 
 export type UsersList = ImmutableArray<UserDto>;
@@ -114,7 +110,7 @@ export class UsersState extends State<Snapshot> {
                 this.snapshot.usersPager.pageSize,
                 this.snapshot.usersPager.skip,
                 this.snapshot.usersQuery).pipe(
-            tap(({ total, items, canCreate, _links }) => {
+            tap(({ total, items, canCreate }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Users reloaded.');
                 }
@@ -134,8 +130,7 @@ export class UsersState extends State<Snapshot> {
                         isLoaded: true,
                         selectedUser,
                         users,
-                        usersPager,
-                        _links
+                        usersPager
                     };
                 });
             }),

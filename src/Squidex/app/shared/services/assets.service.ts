@@ -39,6 +39,10 @@ export class AssetDto {
     public readonly canUpdate: boolean;
     public readonly canUpload: boolean;
 
+    public get contentUrl() {
+        return this._links['content'].href;
+    }
+
     constructor(links: ResourceLinks, meta: Metadata,
         public readonly id: string,
         public readonly created: DateTime,

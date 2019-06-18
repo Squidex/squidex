@@ -12,7 +12,6 @@ import { tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    ResourceLinks,
     shareSubscribed,
     State
 } from '@app/framework';
@@ -37,9 +36,6 @@ interface Snapshot {
 
     // Indicates if the user can read events.
     canReadEvents?: boolean;
-
-    // The resource links.
-    _links?: ResourceLinks;
 }
 
 type RulesList = ImmutableArray<RuleDto>;
@@ -72,7 +68,7 @@ export class RulesState extends State<Snapshot> {
         }
 
         return this.rulesService.getRules(this.appName).pipe(
-            tap(({ items, canCreate, canReadEvents, _links }) => {
+            tap(({ items, canCreate, canReadEvents }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Rules reloaded.');
                 }
@@ -80,7 +76,7 @@ export class RulesState extends State<Snapshot> {
                 this.next(s => {
                     const rules = ImmutableArray.of(items);
 
-                    return { ...s, rules, isLoaded: true, canCreate, canReadEvents, _links };
+                    return { ...s, rules, isLoaded: true, canCreate, canReadEvents };
                 });
             }),
             shareSubscribed(this.dialogs));

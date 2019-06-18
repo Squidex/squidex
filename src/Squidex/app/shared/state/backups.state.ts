@@ -12,7 +12,6 @@ import { tap } from 'rxjs/operators';
 import {
     DialogService,
     ImmutableArray,
-    ResourceLinks,
     shareSubscribed,
     State
 } from '@app/framework';
@@ -30,9 +29,6 @@ interface Snapshot {
 
     // Indicates if the user can create new backups.
     canCreate?: boolean;
-
-    // The links.
-    _links?: ResourceLinks;
 }
 
 type BackupsList = ImmutableArray<BackupDto>;
@@ -65,7 +61,7 @@ export class BackupsState extends State<Snapshot> {
         }
 
         return this.backupsService.getBackups(this.appName).pipe(
-            tap(({ items, canCreate, _links }) => {
+            tap(({ items, canCreate }) => {
                 if (isReload && !silent) {
                     this.dialogs.notifyInfo('Backups reloaded.');
                 }
@@ -73,7 +69,7 @@ export class BackupsState extends State<Snapshot> {
 
                 this.next(s => {
 
-                    return { ...s, backups, isLoaded: true, canCreate, _links };
+                    return { ...s, backups, isLoaded: true, canCreate };
                 });
             }),
             shareSubscribed(this.dialogs, { silent }));

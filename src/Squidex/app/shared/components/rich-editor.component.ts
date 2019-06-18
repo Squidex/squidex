@@ -98,7 +98,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
                 this.assetUploader.uploadFile(file)
                     .subscribe(asset => {
                         if (Types.is(asset, AssetDto)) {
-                            success(asset._links['content'].href);
+                            success(asset.contentUrl);
                         }
                     }, error => {
                         if (!Types.is(error, UploadCanceled)) {
@@ -186,7 +186,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
         let content = '';
 
         for (let asset of assets) {
-            content += `<img src="${asset._links['content'].href}" alt="${asset.fileName}" />`;
+            content += `<img src="${asset.contentUrl}" alt="${asset.fileName}" />`;
         }
 
         if (content.length > 0) {
@@ -216,7 +216,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                    replaceText(`<img src="${asset._links['content'].href}" alt="${asset.fileName}" />`);
+                    replaceText(`<img src="${asset.contentUrl}" alt="${asset.fileName}" />`);
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {
