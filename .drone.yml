@@ -12,6 +12,8 @@ steps:
         path: /var/run/docker.sock
       - name: docker2
         path: /var/lib/docker
+      - name: nuget
+        path: /home/.nuget/packages
     when:
       event:
         - pull_request
