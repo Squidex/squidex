@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
@@ -58,16 +58,18 @@ export class ClientComponent implements OnChanges {
     ) {
     }
 
-    public ngOnChanges() {
-        this.renameForm.load(this.client);
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['client']) {
+            this.renameForm.load(this.client);
 
-        const app = this.appsState.appName;
+            const app = this.appsState.appName;
 
-        this.connectHttpText = connectHttpText(this.apiUrl, app, this.client);
-        this.connectCLINetText = connectCLINetText(app, this.client, this.apiUrl);
-        this.connectCLINixText = connectCLINixText(app, this.client, this.apiUrl);
-        this.connectCLIWinText = connectCLIWinText(app, this.client, this.apiUrl);
-        this.connectLibraryText = connectLibrary(this.apiUrl, app, this.client);
+            this.connectHttpText = connectHttpText(this.apiUrl, app, this.client);
+            this.connectCLINetText = connectCLINetText(app, this.client, this.apiUrl);
+            this.connectCLINixText = connectCLINixText(app, this.client, this.apiUrl);
+            this.connectCLIWinText = connectCLIWinText(app, this.client, this.apiUrl);
+            this.connectLibraryText = connectLibrary(this.apiUrl, app, this.client);
+        }
     }
 
     public revoke() {

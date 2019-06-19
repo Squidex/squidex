@@ -55,7 +55,7 @@ export class AssetDialogComponent extends StatefulComponent implements OnInit {
         this.isEditable = this.asset.canUpdate;
 
         this.annotateForm.load(this.asset);
-        this.annotateForm.setEnabled(!this.isEditable);
+        this.annotateForm.setEnabled(this.isEditable);
     }
 
     public generateSlug() {

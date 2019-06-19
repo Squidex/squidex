@@ -39,6 +39,9 @@ interface Snapshot {
 
     // Indicates if the assets are loaded.
     isLoaded?: boolean;
+
+    // Indicates if the user can create assets.
+    canCreate?: boolean;
 }
 
 @Injectable()
@@ -63,6 +66,9 @@ export class AssetsState extends State<Snapshot> {
 
     public isLoaded =
         this.project(x => !!x.isLoaded);
+
+    public canCreate =
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly appsState: AppsState,
@@ -89,7 +95,7 @@ export class AssetsState extends State<Snapshot> {
                 Object.keys(this.snapshot.tagsSelected)),
             this.assetsService.getTags(this.appName)
         ).pipe(
-            tap(([ { items, total }, tags ]) => {
+            tap(([ { items, total, canCreate }, tags ]) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
@@ -98,7 +104,7 @@ export class AssetsState extends State<Snapshot> {
                     const assets = ImmutableArray.of(items);
                     const assetsPager = s.assetsPager.setCount(total);
 
-                    return { ...s, assets, assetsPager, isLoaded: true, tags };
+                    return { ...s, assets, assetsPager, isLoaded: true, tags, canCreate };
                 });
             }),
             shareSubscribed(this.dialogs));

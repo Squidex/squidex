@@ -27,7 +27,11 @@ import {
     Versioned
 } from '@app/framework';
 
-export class AssetsDto extends ResultSet<AssetDto> {}
+export class AssetsDto extends ResultSet<AssetDto> {
+    public get canCreate() {
+        return hasAnyLink(this._links, 'create');
+    }
+}
 
 export class AssetDto {
     public readonly _meta: Metadata = {};
