@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
@@ -15,73 +14,79 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class DefaultContentWorkflowTests
     {
-        private static readonly DefaultContentWorkflow Sut = new DefaultContentWorkflow();
+        private readonly DefaultContentWorkflow sut = new DefaultContentWorkflow();
 
         [Fact]
-        public async Task Should_draft_as_initial_status_async_tests()
+        public async Task Should_draft_as_initial_status()
         {
-            var result = await Sut.GetInitialStatusAsync(null);
+            var result = await sut.GetInitialStatusAsync(null);
 
-            Assert.IsType<Status2>(result);
-            Assert.Equal("Draft", result.Name);
+            Assert.Equal(new Status2("Draft"), result);
         }
 
         [Fact]
-        public async Task Should_check_is_valid_next_status_tests()
+        public async Task Should_check_is_valid_next()
         {
             var entity = CreateMockContentEntity(Status.Draft);
 
-            var status = new Status2("Draft");
+            var result = await sut.IsValidNextStatus(entity, new Status2("Draft"));
 
-            var result = await Sut.IsValidNextStatus(entity, status);
-
-            Assert.IsType<bool>(result);
             Assert.True(result);
         }
 
         [Fact]
-        public async Task Should_update_async_tests()
+        public async Task Should_always_be_able_to_update()
         {
             var entity = CreateMockContentEntity(Status.Draft);
 
-            var result = await Sut.CanUpdateAsync(entity);
+            var result = await sut.CanUpdateAsync(entity);
 
-            Assert.IsType<bool>(result);
             Assert.True(result);
         }
 
         [Fact]
-        public async Task Should_get_nexts_async_tests()
+        public async Task Should_get_next_statuses_for_draft()
         {
-            var draftContent = CreateMockContentEntity(Status.Draft);
-            var archivedContent = CreateMockContentEntity(Status.Archived);
-            var publishedContent = CreateMockContentEntity(Status.Published);
+            var content = CreateMockContentEntity(Status.Draft);
 
-            var draftExpected = new[] { new Status2("Published"), new Status2("Archived") };
-            var archivedExpected = new[] { new Status2("Draft") };
-            var publishedExpected = new[] { new Status2("Draft"), new Status2("Archived") };
+            var expected = new[] { new Status2("Published"), new Status2("Archived") };
 
-            var draftResult = await Sut.GetNextsAsync(draftContent);
-            var archivedResult = await Sut.GetNextsAsync(archivedContent);
-            var publishedResult = await Sut.GetNextsAsync(publishedContent);
+            var result = await sut.GetNextsAsync(content);
 
-            Assert.IsType<Status2[]>(draftResult);
-            Assert.IsType<Status2[]>(archivedResult);
-            Assert.IsType<Status2[]>(publishedResult);
-
-            Assert.Equal(draftExpected, draftResult);
-            Assert.Equal(archivedExpected, archivedResult);
-            Assert.Equal(publishedExpected, publishedResult);
+            Assert.Equal(expected, result);
         }
 
         [Fact]
-        public async Task Should_get_all_async_tests()
+        public async Task Should_get_next_statuses_for_archived()
+        {
+            var content = CreateMockContentEntity(Status.Archived);
+
+            var expected = new[] { new Status2("Draft") };
+
+            var result = await sut.GetNextsAsync(content);
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_get_next_statuses_for_published()
+        {
+            var content = CreateMockContentEntity(Status.Published);
+
+            var expected = new[] { new Status2("Draft"), new Status2("Archived") };
+
+            var result = await sut.GetNextsAsync(content);
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public async Task Should_return_all_statuses()
         {
             var expected = new[] { new Status2("Draft"), new Status2("Archived"), new Status2("Published") };
 
-            var result = await Sut.GetAllAsync(null);
+            var result = await sut.GetAllAsync(null);
 
-            Assert.IsType<Status2[]>(result);
             Assert.Equal(expected, result);
         }
 
@@ -89,10 +94,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = A.Fake<IContentEntity>();
 
-            A.CallTo(() => content.Id).Returns(default(Guid));
-            A.CallTo(() => content.Data).Returns(null);
-            A.CallTo(() => content.DataDraft).Returns(null);
-            A.CallTo(() => content.SchemaId).Returns(null);
             A.CallTo(() => content.Status).Returns(status);
 
             return content;
