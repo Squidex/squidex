@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -23,9 +24,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
-        public MongoAssetRepository(IMongoDatabase database)
+        private readonly MongoDbOptions options;
+
+        public MongoAssetRepository(IMongoDatabase database, IOptions<MongoDbOptions> options)
             : base(database)
         {
+            Guard.NotNull(options, nameof(options));
+
+            this.options = options.Value;
         }
 
         protected override string CollectionName()
@@ -44,17 +50,29 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             .Ascending(x => x.IsDeleted)
                             .Ascending(x => x.FileName)
                             .Ascending(x => x.Tags)
-                            .Descending(x => x.LastModified)),
+                            .Descending(x => x.LastModified),
+                        new CreateIndexOptions
+                        {
+                            Name = options.IsDocumentDb ? "FileName_Tags" : null
+                        }),
                     new CreateIndexModel<MongoAssetEntity>(
                         Index
                             .Ascending(x => x.AppId)
                             .Ascending(x => x.IsDeleted)
-                            .Ascending(x => x.FileHash)),
+                            .Ascending(x => x.FileHash),
+                        new CreateIndexOptions
+                        {
+                            Name = options.IsDocumentDb ? "FileHash" : null
+                        }),
                     new CreateIndexModel<MongoAssetEntity>(
                         Index
                             .Ascending(x => x.AppId)
                             .Ascending(x => x.IsDeleted)
-                            .Ascending(x => x.Slug))
+                            .Ascending(x => x.Slug),
+                        new CreateIndexOptions
+                        {
+                            Name = options.IsDocumentDb ? "Slug" : null
+                        })
                 },
                 ct);
         }

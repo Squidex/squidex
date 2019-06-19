@@ -140,6 +140,16 @@
     }
 }
 
+label {
+    & {
+        color: black;
+    }
+
+    .hint {
+        color: $color-text-decent2;
+    }
+}
+
 //
 // Custom search form.
 //

@@ -66,6 +66,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return new RootField<TagsFieldProperties>(id, name, partitioning, properties, settings);
         }
 
+        public static RootField<UIFieldProperties> UI(long id, string name, Partitioning partitioning, UIFieldProperties properties = null, IFieldSettings settings = null)
+        {
+            return new RootField<UIFieldProperties>(id, name, partitioning, properties, settings);
+        }
+
         public static NestedField<AssetsFieldProperties> Assets(long id, string name, AssetsFieldProperties properties = null, IFieldSettings settings = null)
         {
             return new NestedField<AssetsFieldProperties>(id, name, properties, settings);
@@ -109,6 +114,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public static NestedField<TagsFieldProperties> Tags(long id, string name, TagsFieldProperties properties = null, IFieldSettings settings = null)
         {
             return new NestedField<TagsFieldProperties>(id, name, properties, settings);
+        }
+
+        public static NestedField<UIFieldProperties> UI(long id, string name, UIFieldProperties properties = null, IFieldSettings settings = null)
+        {
+            return new NestedField<UIFieldProperties>(id, name, properties, settings);
         }
 
         public static Schema AddArray(this Schema schema, long id, string name, Partitioning partitioning, Func<ArrayField, ArrayField> handler = null, ArrayFieldProperties properties = null, IFieldSettings settings = null)
@@ -168,6 +178,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
             return schema.AddField(Tags(id, name, partitioning, properties, settings));
         }
 
+        public static Schema AddUI(this Schema schema, long id, string name, Partitioning partitioning, UIFieldProperties properties = null, IFieldSettings settings = null)
+        {
+            return schema.AddField(UI(id, name, partitioning, properties, settings));
+        }
+
         public static ArrayField AddAssets(this ArrayField field, long id, string name, AssetsFieldProperties properties = null, IFieldSettings settings = null)
         {
             return field.AddField(Assets(id, name, properties, settings));
@@ -211,6 +226,11 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public static ArrayField AddTags(this ArrayField field, long id, string name, TagsFieldProperties properties = null, IFieldSettings settings = null)
         {
             return field.AddField(Tags(id, name, properties, settings));
+        }
+
+        public static ArrayField AddUI(this ArrayField field, long id, string name, UIFieldProperties properties = null, IFieldSettings settings = null)
+        {
+            return field.AddField(UI(id, name, properties, settings));
         }
     }
 }

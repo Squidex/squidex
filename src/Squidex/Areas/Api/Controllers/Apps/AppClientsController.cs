@@ -108,7 +108,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Revoke an app client
+        /// Revoke an app client.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="clientId">The id of the client that must be deleted.</param>

@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { ExternalControlComponent, Types } from '@app/framework/internal';
@@ -30,6 +30,12 @@ export class IFrameEditorComponent extends ExternalControlComponent<any> impleme
     public iframe: ElementRef<HTMLIFrameElement>;
 
     @Input()
+    public context: any = {};
+
+    @Input()
+    public formValue: any;
+
+    @Input()
     public url: string;
 
     constructor(changeDetector: ChangeDetectorRef,
@@ -38,8 +44,14 @@ export class IFrameEditorComponent extends ExternalControlComponent<any> impleme
         super(changeDetector);
     }
 
-    public ngOnChanges() {
-        this.iframe.nativeElement.src = this.url;
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['url']) {
+            this.iframe.nativeElement.src = this.url;
+        }
+
+        if (changes['formValue'] && this.formValue) {
+            this.sendFormValue();
+        }
     }
 
     public ngOnInit(): void {
@@ -51,8 +63,10 @@ export class IFrameEditorComponent extends ExternalControlComponent<any> impleme
                     if (type === 'started') {
                         this.isInitialized = true;
 
-                        this.sendMessage({ type: 'disabled', isDisabled: this.isDisabled });
-                        this.sendMessage({ type: 'valueChanged', value: this.value });
+                        this.sendMessage('init', { context: this.context || {} });
+                        this.sendFormValue();
+                        this.sendDisabled();
+                        this.sendValue();
                     } else if (type === 'resize') {
                         const { height } = event.data;
 
@@ -75,19 +89,33 @@ export class IFrameEditorComponent extends ExternalControlComponent<any> impleme
     public writeValue(obj: any) {
         this.value = obj;
 
-        this.sendMessage({ type: 'valueChanged', value: this.value });
+        this.sendValue();
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
 
-        this.sendMessage({ type: 'disabled', isDisabled: this.isDisabled });
+        this.sendDisabled();
     }
 
-    private sendMessage(message: any) {
+    private sendValue() {
+        this.sendMessage('valueChanged', { value: this.value });
+    }
+
+    private sendDisabled() {
+        this.sendMessage('disabled', { isDisabled: this.isDisabled });
+    }
+
+    private sendFormValue() {
+        this.sendMessage('formValueChanged', { formValue: this.formValue });
+    }
+
+    private sendMessage(type: string, payload: any) {
         const iframe = this.iframe.nativeElement;
 
         if (this.isInitialized && iframe.contentWindow && Types.isFunction(iframe.contentWindow.postMessage)) {
+            const message = { type, ...payload };
+
             iframe.contentWindow.postMessage(message, '*');
         }
     }

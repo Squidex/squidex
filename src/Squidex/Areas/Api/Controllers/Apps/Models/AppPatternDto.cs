@@ -17,7 +17,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
     public sealed class AppPatternDto
     {
         /// <summary>
-        /// Identifier for Pattern
+        /// Unique id of the pattern.
         /// </summary>
         public Guid PatternId { get; set; }
 

@@ -101,6 +101,10 @@
             overflow-y: scroll;
         }
 
+        &-scroll-x {
+            overflow-y: auto;
+        }
+
         & .nav-panel {
             & {
                 margin-left: -$panel-padding;

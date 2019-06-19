@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    /* Basic Options */
+    "target": "es6",                          
+    "module": "commonjs",         
+    "moduleResolution": "node",
+    "inlineSourceMap": true,
+    "declaration": false,
+    "noImplicitAny": false,       
+    "removeComments": false,             
+    "preserveConstEnums": true,    
+    "outDir": "JSFiles",                     
+    "esModuleInterop": true    ,
+    //"types": ["node", "chai", "mocha", "lodash"],                   
+  },
+  "exclude": [
+    "node_modules",
+    "asyncAwait",
+  ],
+  "compileOnSave": false
+}

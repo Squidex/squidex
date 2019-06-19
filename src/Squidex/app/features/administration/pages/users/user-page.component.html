@@ -36,14 +36,14 @@
             <sqx-form-error [error]="userForm.error | async"></sqx-form-error>
 
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="email">Email <small class="hint">(required)</small></label>
 
                 <sqx-control-errors for="email" [submitted]="userForm.submitted | async"></sqx-control-errors>
 
                 <input type="email" class="form-control" id="email" maxlength="100" formControlName="email" autocomplete="false"  />
             </div>
             <div class="form-group">
-                <label for="displayName">Display Name</label>
+                <label for="displayName">Display Name <small class="hint">(required)</small></label>
 
                 <sqx-control-errors for="displayName" [submitted]="userForm.submitted | async"></sqx-control-errors>
 
@@ -68,9 +68,7 @@
                 </div>
             </div>
 
-            <hr />
-
-            <div class="form-group">
+            <div class="form-group form-group-permissions">
                 <label for="permissions">Permissions</label>
 
                 <sqx-control-errors for="permissions" [submitted]="userForm.submitted | async"></sqx-control-errors>

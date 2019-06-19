@@ -37,15 +37,57 @@ namespace Squidex.Infrastructure.Assets
         public abstract T CreateStore();
 
         [Fact]
-        public virtual Task Should_throw_exception_if_asset_to_download_is_not_found()
+        public virtual async Task Should_throw_exception_if_asset_to_download_is_not_found()
         {
-            return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.DownloadAsync(fileName, new MemoryStream()));
+            await Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.DownloadAsync(fileName, new MemoryStream()));
         }
 
         [Fact]
-        public Task Should_throw_exception_if_asset_to_copy_is_not_found()
+        public async Task Should_throw_exception_if_asset_to_copy_is_not_found()
         {
-            return Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.CopyAsync(fileName, sourceFile));
+            await Assert.ThrowsAsync<AssetNotFoundException>(() => Sut.CopyAsync(fileName, sourceFile));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_stream_to_download_is_null()
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => Sut.DownloadAsync("File", null));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_stream_to_upload_is_null()
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => Sut.UploadAsync("File", null));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_source_file_name_to_copy_is_empty()
+        {
+            await CheckEmpty(v => Sut.CopyAsync(v, "Target"));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_target_file_name_to_copy_is_empty()
+        {
+            await CheckEmpty(v => Sut.CopyAsync("Source", v));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_file_name_to_delete_is_empty()
+        {
+            await CheckEmpty(v => Sut.DeleteAsync(v));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_file_name_to_download_is_empty()
+        {
+            await CheckEmpty(v => Sut.DownloadAsync(v, new MemoryStream()));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_file_name_to_upload_is_empty()
+        {
+            await CheckEmpty(v => Sut.UploadAsync(v, new MemoryStream()));
         }
 
         [Fact]
@@ -110,6 +152,13 @@ namespace Squidex.Infrastructure.Assets
             await Sut.UploadAsync(sourceFile, assetData);
             await Sut.DeleteAsync(sourceFile);
             await Sut.DeleteAsync(sourceFile);
+        }
+
+        private async Task CheckEmpty(Func<string, Task> action)
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => action(null));
+            await Assert.ThrowsAsync<ArgumentException>(() => action(string.Empty));
+            await Assert.ThrowsAsync<ArgumentException>(() => action(" "));
         }
     }
 }

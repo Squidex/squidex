@@ -81,6 +81,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return ResolveDefault(AllTypes.NoopTags);
         }
 
+        public (IGraphType ResolveType, ValueResolver Resolver) Visit(IField<UIFieldProperties> field)
+        {
+            return (null, null);
+        }
+
         private static (IGraphType ResolveType, ValueResolver Resolver) ResolveDefault(IGraphType type)
         {
             return (type, NoopResolver);

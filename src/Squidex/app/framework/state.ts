@@ -71,7 +71,9 @@ export class Form<T extends AbstractControl, V> {
         if (this.form.valid) {
             const value = this.transformSubmit(fullValue(this.form));
 
-            this.disable();
+            if (value) {
+                this.disable();
+            }
 
             return value;
         } else {

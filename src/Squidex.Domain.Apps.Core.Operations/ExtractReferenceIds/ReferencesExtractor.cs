@@ -101,5 +101,10 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             return Enumerable.Empty<Guid>();
         }
+
+        public IEnumerable<Guid> Visit(IField<UIFieldProperties> field)
+        {
+            return Enumerable.Empty<Guid>();
+        }
     }
 }
