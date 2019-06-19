@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Core.Operations\Squidex.Domain.Apps.Core.Operations.csproj" />
+    <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
