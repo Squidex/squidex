@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Task<bool> CanUpdateAsync(IContentEntity content)
         {
-            return TaskHelper.True;
+            return Task.FromResult(content.Status != Status.Archived);
         }
 
         public Task<Status[]> GetNextsAsync(IContentEntity content)

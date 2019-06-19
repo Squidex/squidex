@@ -35,13 +35,33 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_always_be_able_to_update()
+        public async Task Should_be_able_to_update_published()
         {
             var entity = CreateContent(Status.Published);
 
             var result = await sut.CanUpdateAsync(entity);
 
             Assert.True(result);
+        }
+
+        [Fact]
+        public async Task Should_be_able_to_update_draft()
+        {
+            var entity = CreateContent(Status.Published);
+
+            var result = await sut.CanUpdateAsync(entity);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task Should_not_be_able_to_update_archived()
+        {
+            var entity = CreateContent(Status.Archived);
+
+            var result = await sut.CanUpdateAsync(entity);
+
+            Assert.False(result);
         }
 
         [Fact]
