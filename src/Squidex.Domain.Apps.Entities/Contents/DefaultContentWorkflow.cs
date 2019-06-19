@@ -45,6 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public Task<Status2[]> GetNextsAsync(IContentEntity content)
         {
             Status2 statusToCheck;
+
             switch (content.Status)
             {
                 case Status.Draft:
