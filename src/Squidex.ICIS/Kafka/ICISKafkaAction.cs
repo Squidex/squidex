@@ -21,18 +21,6 @@ namespace Squidex.ICIS.Actions.Kafka
         ReadMore = "https://kafka.apache.org/quickstart")]
     public sealed class ICISKafkaAction : RuleAction
     {
-        [AbsoluteUrl]
-        [Required]
-        [Display(Name = "Broker Url", Description = "The url to the broker.")]
-        [DataType(DataType.Url)]
-        public Uri Broker { get; set; }
-
-        [AbsoluteUrl]
-        [Required]
-        [Display(Name = "Schema Registry Url", Description = "The url to the schema registry.")]
-        [DataType(DataType.Url)]
-        public Uri SchemaRegistry { get; set; }
-
         [Required]
         [Display(Name = "Topic Name", Description = "The name of the topic.")]
         [DataType(DataType.Text)]

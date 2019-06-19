@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Squidex.ICIS.Actions.Kafka;
+using Squidex.ICIS.Actions.Kafka.Entities;
 using Squidex.ICIS.Handlers;
 using Squidex.ICIS.Interfaces;
 
@@ -44,7 +45,8 @@ namespace Squidex.ICIS.Extensions
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsConfigured())
             {
-                services.Configure<ICISKafkaOptions>(config.GetSection("kafka"));
+                services.AddSingleton(new KafkaProducer<Commentary>("Commentary", kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
+                services.AddSingleton(new KafkaProducer<CommentaryType>("CommentaryType", kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
                 services.AddRuleAction<ICISKafkaAction, ICISKafkaActionHandler>();
             }
         }

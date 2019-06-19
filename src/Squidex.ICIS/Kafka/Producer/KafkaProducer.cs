@@ -20,23 +20,12 @@ namespace Squidex.ICIS.Actions.Kafka
         private readonly string topicName;
         private readonly IProducer<string, T> producer;
 
-        public KafkaProducer(string topicName, string brokerUrl, string schemaRegistryUrl)
+        public KafkaProducer(string topicName, ProducerConfig producerConfig, SchemaRegistryConfig schemaRegistryConfig)
         {
             this.topicName = topicName;
-            schemaRegistry = new CachedSchemaRegistryClient(new SchemaRegistryConfig
-            {
-                SchemaRegistryUrl = schemaRegistryUrl,
-                SchemaRegistryRequestTimeoutMs = 5000,
-                SchemaRegistryMaxCachedSchemas = 10
-            });
+            schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
 
-            var config = new ProducerConfig
-            {
-                BootstrapServers = brokerUrl,
-                Partitioner = Partitioner.Murmur2Random,
-            };
-
-            producer = new ProducerBuilder<string, T>(config)
+            producer = new ProducerBuilder<string, T>(producerConfig)
                 .SetKeySerializer(new AvroSerializer<string>(schemaRegistry))
                 .SetValueSerializer(new AvroSerializer<T>(schemaRegistry))
                 .Build();

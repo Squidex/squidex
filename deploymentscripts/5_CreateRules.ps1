@@ -12,14 +12,6 @@ param(
     $appName,
 
     [Parameter(Mandatory=$true)]
-    [string]
-    $broker,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $schemaRegistry,
-
-    [Parameter(Mandatory=$true)]
     [object]
     $schemaIds
 )
@@ -32,8 +24,6 @@ Function CreateRule($rule, $schemaId, $schemaName) {
     }
 
     $rule.trigger.schemas[0] | Add-Member -Name "schemaId" -value $schemaId -MemberType NoteProperty
-    $rule.action | Add-Member -Name "broker" -value $broker -MemberType NoteProperty
-    $rule.action | Add-Member -Name "schemaRegistry" -value $schemaRegistry -MemberType NoteProperty
     $rule.action | Add-Member -Name "topicName" -value $schemaName -MemberType NoteProperty
 
     $body = $rule | ConvertTo-Json -Depth 32 | % { [System.Text.RegularExpressions.Regex]::Unescape($_) }

@@ -25,13 +25,14 @@ namespace Squidex.ICIS.Actions.Kafka
     public sealed class ICISKafkaActionHandler : RuleActionHandler<ICISKafkaAction, ICISKafkaJob>
     {
         private const string DescriptionIgnore = "Ignore";
-        private readonly ICISKafkaOptions kafkaOptions;
+        private readonly KafkaProducer<Commentary> kafkaCommentaryProducer;
+        private readonly KafkaProducer<CommentaryType> kafkaCommentaryTypeProducer;
 
-        public ICISKafkaActionHandler(RuleEventFormatter formatter, IOptions<ICISKafkaOptions> kafkaOptions)
+        public ICISKafkaActionHandler(RuleEventFormatter formatter, KafkaProducer<Commentary> kafkaCommentaryProducer, KafkaProducer<CommentaryType> kafkaCommentaryTypeProducer)
             : base(formatter)
         {
-            Guard.NotNull(kafkaOptions, nameof(kafkaOptions));
-            this.kafkaOptions = kafkaOptions.Value;
+            this.kafkaCommentaryProducer = kafkaCommentaryProducer;
+            this.kafkaCommentaryTypeProducer = kafkaCommentaryTypeProducer;
         }
 
         protected override (string Description, ICISKafkaJob Data) CreateJob(EnrichedEvent @event, ICISKafkaAction action)
@@ -40,8 +41,6 @@ namespace Squidex.ICIS.Actions.Kafka
             {
                 var ruleJob = new ICISKafkaJob
                 {
-                    Broker = kafkaOptions.Broker,
-                    SchemaRegistry = kafkaOptions.SchemaRegistry,
                     TopicName = action.TopicName,
                     Message = contentEvent
                 };
@@ -64,20 +63,12 @@ namespace Squidex.ICIS.Actions.Kafka
                 switch (job.TopicName)
                 {
                     case "Commentary":
-                        using (var commentaryProducer = new KafkaProducer<Commentary>(job.TopicName, job.Broker, job.SchemaRegistry))
-                        {
-                            var commentaryData = (Commentary)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message);
-                            await commentaryProducer.Send(commentaryData.Id, commentaryData);
-                        }
-
+                        var commentaryData = (Commentary)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message);
+                        await kafkaCommentaryProducer.Send(commentaryData.Id, commentaryData);
                         break;
                     case "CommentaryType":
-                        using (var commentaryTypeProducer = new KafkaProducer<CommentaryType>(job.TopicName, job.Broker, job.SchemaRegistry))
-                        {
-                            var commentaryTypeData = (CommentaryType)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message);
-                            await commentaryTypeProducer.Send(commentaryTypeData.Id, commentaryTypeData);
-                        }
-
+                        var commentaryTypeData = (CommentaryType)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message);
+                        await kafkaCommentaryTypeProducer.Send(commentaryTypeData.Id, commentaryTypeData);
                         break;
                     default:
                         throw new Exception("kafka Topic not configured.");
@@ -94,10 +85,6 @@ namespace Squidex.ICIS.Actions.Kafka
 
     public sealed class ICISKafkaJob
     {
-        public string Broker { get; set; }
-
-        public string SchemaRegistry { get; set; }
-
         public string TopicName { get; set; }
 
         public EnrichedContentEvent Message { get; set; }
