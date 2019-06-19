@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Orleans;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -59,8 +60,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case ContentUpdated _:
                     result.Type = EnrichedContentEventType.Updated;
                     break;
-                case ContentStatusChanged _:
-                    result.Type = EnrichedContentEventType.StatusChanged;
+                case ContentStatusChanged contentStatusChanged:
+                    switch (contentStatusChanged.Change)
+                    {
+                        case StatusChange.Published:
+                            result.Type = EnrichedContentEventType.Published;
+                            break;
+                        case StatusChange.Unpublished:
+                            result.Type = EnrichedContentEventType.Unpublished;
+                            break;
+                        default:
+                            result.Type = EnrichedContentEventType.StatusChanged;
+                            break;
+                    }
+
                     break;
             }
 

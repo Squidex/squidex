@@ -113,7 +113,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(status, nameof(status));
 
             using (Profiler.TraceMethod<MongoContentRepository>())
             {

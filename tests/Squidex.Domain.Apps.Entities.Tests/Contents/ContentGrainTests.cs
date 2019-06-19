@@ -343,7 +343,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published })
+                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published, Change = StatusChange.Published })
                 );
 
             A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>"))
@@ -388,7 +388,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentStatusChanged { Status = Status.Draft })
+                    CreateContentEvent(new ContentStatusChanged { Status = Status.Draft, Change = StatusChange.Unpublished })
                 );
 
             A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>"))

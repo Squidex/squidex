@@ -127,11 +127,24 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 }
                                 else
                                 {
-                                    var operation = c.Status == Status.Published ? "Published" : "StatusChanged";
+                                    StatusChange reason;
 
-                                    await ctx.ExecuteScriptAsync(s => s.Change, operation, c, Snapshot.Data);
+                                    if (c.Status == Status.Published)
+                                    {
+                                        reason = StatusChange.Published;
+                                    }
+                                    else if (Snapshot.Status == Status.Published)
+                                    {
+                                        reason = StatusChange.Unpublished;
+                                    }
+                                    else
+                                    {
+                                        reason = StatusChange.Change;
+                                    }
 
-                                    ChangeStatus(c);
+                                    await ctx.ExecuteScriptAsync(s => s.Change, reason, c, Snapshot.Data);
+
+                                    ChangeStatus(c, reason);
                                 }
                             }
                         }
@@ -261,9 +274,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = command.DueTime.Value }));
         }
 
-        public void ChangeStatus(ChangeContentStatus command)
+        public void ChangeStatus(ChangeContentStatus command, StatusChange change)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged()));
+            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Change = change }));
         }
 
         private void RaiseEvent(SchemaEvent @event)
