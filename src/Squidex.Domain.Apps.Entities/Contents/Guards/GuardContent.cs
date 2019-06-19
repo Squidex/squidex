@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 
             return Validate.It(() => "Cannot change status.", async e =>
             {
-                if (!await contentWorkflow.IsValidNextStatus(content, command.Status))
+                if (!await contentWorkflow.CanMoveToAsync(content, command.Status))
                 {
                     if (content.Status == command.Status && content.Status == Status.Published)
                     {

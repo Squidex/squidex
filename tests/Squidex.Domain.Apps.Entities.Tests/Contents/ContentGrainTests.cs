@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentWorkflow.CanUpdateAsync(A<IContentEntity>.Ignored))
                 .Returns(true);
 
-            A.CallTo(() => contentWorkflow.IsValidNextStatus(A<IContentEntity>.Ignored, A<Status>.Ignored))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>.Ignored, A<Status>.Ignored))
                 .Returns(true);
 
             patched = patch.MergeInto(data);
@@ -476,7 +476,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new ChangeContentStatus { Status = Status.Draft, JobId = sut.Snapshot.ScheduleJob.Id };
 
-            A.CallTo(() => contentWorkflow.IsValidNextStatus(sut.Snapshot, command.Status))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(sut.Snapshot, command.Status))
                 .Returns(false);
 
             var result = await sut.ExecuteAsync(CreateContentCommand(command));

@@ -182,7 +182,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Draft, false);
             var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast };
 
-            A.CallTo(() => contentWorkflow.IsValidNextStatus(content, command.Status))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status))
                 .Returns(true);
 
             await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command),
@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Draft, false);
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            A.CallTo(() => contentWorkflow.IsValidNextStatus(content, command.Status))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status))
                 .Returns(false);
 
             await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command),
@@ -212,7 +212,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Draft, false);
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            A.CallTo(() => contentWorkflow.IsValidNextStatus(content, command.Status))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status))
                 .Returns(true);
 
             await GuardContent.CanChangeStatus(schema, content, contentWorkflow, command);

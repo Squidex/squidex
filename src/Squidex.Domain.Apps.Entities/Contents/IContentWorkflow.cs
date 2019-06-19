@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         Task<Status> GetInitialStatusAsync(ISchemaEntity schema);
 
-        Task<bool> IsValidNextStatus(IContentEntity content, Status next);
+        Task<bool> CanMoveToAsync(IContentEntity content, Status next);
 
         Task<bool> CanUpdateAsync(IContentEntity content);
 

@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Task.FromResult(Status.Draft);
         }
 
-        public Task<bool> IsValidNextStatus(IContentEntity content, Status next)
+        public Task<bool> CanMoveToAsync(IContentEntity content, Status next)
         {
             return Task.FromResult(Flow.TryGetValue(content.Status, out var state) && state.Contains(next));
         }

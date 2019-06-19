@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var entity = CreateContent(Status.Published);
 
-            var result = await sut.IsValidNextStatus(entity, Status.Draft);
+            var result = await sut.CanMoveToAsync(entity, Status.Draft);
 
             Assert.True(result);
         }
