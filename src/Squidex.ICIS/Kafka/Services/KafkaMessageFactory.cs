@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 
-namespace Squidex.Extensions.Actions.Kafka
+namespace Squidex.ICIS.Actions.Kafka
 {
     public static class KafkaMessageFactory
     {

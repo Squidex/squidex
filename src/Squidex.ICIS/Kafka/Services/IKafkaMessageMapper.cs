@@ -10,7 +10,7 @@ using Avro.Specific;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 
-namespace Squidex.Extensions.Actions.Kafka
+namespace Squidex.ICIS.Actions.Kafka
 {
     public interface IKafkaMessageMapper
     {

@@ -8,7 +8,7 @@
 using Avro;
 using Avro.Specific;
 
-namespace Squidex.Extensions.Actions.Kafka.Entities
+namespace Squidex.ICIS.Actions.Kafka.Entities
 {
     public class Commentary : ISpecificRecord
     {

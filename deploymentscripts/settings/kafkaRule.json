@@ -9,6 +9,6 @@
        "triggerType":"ContentChanged"
     },
     "action":{
-       "actionType":"Kafka"
+       "actionType":"ICISKafka"
     }
  }

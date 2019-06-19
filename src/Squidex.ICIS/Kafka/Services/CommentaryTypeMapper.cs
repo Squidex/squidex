@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using Avro.Specific;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Extensions.Actions.Kafka.Entities;
+using Squidex.ICIS.Actions.Kafka.Entities;
 
-namespace Squidex.Extensions.Actions.Kafka
+namespace Squidex.ICIS.Actions.Kafka
 {
     public class CommentaryTypeMapper : IKafkaMessageMapper
     {
@@ -20,7 +20,7 @@ namespace Squidex.Extensions.Actions.Kafka
             var commentaryType = new CommentaryType();
             commentaryType.LastModified = contentEvent.LastModified.ToUnixTimeSeconds();
 
-            if (!contentEvent.Data.TryGetValue("Id", out var idData))
+            if (!contentEvent.Data.TryGetValue("ID", out var idData))
             {
                 throw new System.Exception("Unable to find Id field.");
             }
