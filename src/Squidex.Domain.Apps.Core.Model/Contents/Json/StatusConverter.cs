@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
     {
         public IEnumerable<Type> SupportedTypes
         {
-            get { yield return typeof(Status2); }
+            get { yield return typeof(Status); }
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -31,12 +31,12 @@ namespace Squidex.Domain.Apps.Core.Contents.Json
                 throw new JsonException($"Expected String, but got {reader.TokenType}.");
             }
 
-            return new Status2(reader.Value.ToString());
+            return new Status(reader.Value.ToString());
         }
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType == typeof(Status2);
+            return objectType == typeof(Status);
         }
     }
 }

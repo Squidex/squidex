@@ -373,7 +373,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.GetSchemaOrThrowAsync(Context(), name);
 
-            if (!this.HasPermission(Helper.StatusPermission(app, name, Status2.Published)))
+            if (!this.HasPermission(Helper.StatusPermission(app, name, Status.Published)))
             {
                 return new ForbidResult();
             }

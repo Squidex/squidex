@@ -11,7 +11,6 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -54,10 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             new object[] { new ContentCreated(), EnrichedContentEventType.Created },
             new object[] { new ContentUpdated(), EnrichedContentEventType.Updated },
             new object[] { new ContentDeleted(), EnrichedContentEventType.Deleted },
-            new object[] { new ContentStatusChanged { Change = StatusChange.Archived }, EnrichedContentEventType.Archived },
-            new object[] { new ContentStatusChanged { Change = StatusChange.Published }, EnrichedContentEventType.Published },
-            new object[] { new ContentStatusChanged { Change = StatusChange.Restored }, EnrichedContentEventType.Restored },
-            new object[] { new ContentStatusChanged { Change = StatusChange.Unpublished }, EnrichedContentEventType.Unpublished }
+            new object[] { new ContentStatusChanged(), EnrichedContentEventType.StatusChanged }
         };
 
         [Theory]

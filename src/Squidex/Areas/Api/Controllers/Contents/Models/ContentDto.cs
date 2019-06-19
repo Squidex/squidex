@@ -131,7 +131,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                     AddPutLink("draft/discard", controller.Url<ContentsController>(x => nameof(x.DiscardDraft), values));
                 }
 
-                if (controller.HasPermission(Helper.StatusPermission(app, schema, Status2.Published)))
+                if (controller.HasPermission(Helper.StatusPermission(app, schema, Status.Published)))
                 {
                     AddPutLink("draft/publish", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values));
                 }
@@ -146,7 +146,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
                 if (Status == Status.Published)
                 {
-                    AddPutLink("draft/propose", controller.Url<ContentsController>(x => nameof(x.PutContent), values) + "?asDraft=true");
+                    AddPutLink("draft/propose", controller.Url((ContentsController x) => nameof(x.PutContent), values) + "?asDraft=true");
                 }
 
                 AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));

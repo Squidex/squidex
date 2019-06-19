@@ -51,7 +51,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         [BsonRequired]
         [BsonElement("ss")]
-        [BsonRepresentation(BsonType.String)]
         public Status Status { get; set; }
 
         [BsonIgnoreIfNull]

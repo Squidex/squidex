@@ -21,15 +21,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var result = await sut.GetInitialStatusAsync(null);
 
-            Assert.Equal(new Status2("Draft"), result);
+            Assert.Equal(Status.Draft, result);
         }
 
         [Fact]
         public async Task Should_check_is_valid_next()
         {
-            var entity = CreateMockContentEntity(Status.Draft);
+            var entity = CreateContent(Status.Published);
 
-            var result = await sut.IsValidNextStatus(entity, new Status2("Draft"));
+            var result = await sut.IsValidNextStatus(entity, Status.Draft);
 
             Assert.True(result);
         }
@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_always_be_able_to_update()
         {
-            var entity = CreateMockContentEntity(Status.Draft);
+            var entity = CreateContent(Status.Published);
 
             var result = await sut.CanUpdateAsync(entity);
 
@@ -47,9 +47,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_get_next_statuses_for_draft()
         {
-            var content = CreateMockContentEntity(Status.Draft);
+            var content = CreateContent(Status.Draft);
 
-            var expected = new[] { new Status2("Published"), new Status2("Archived") };
+            var expected = new[] { Status.Archived, Status.Published };
 
             var result = await sut.GetNextsAsync(content);
 
@@ -59,9 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_get_next_statuses_for_archived()
         {
-            var content = CreateMockContentEntity(Status.Archived);
+            var content = CreateContent(Status.Archived);
 
-            var expected = new[] { new Status2("Draft") };
+            var expected = new[] { Status.Draft };
 
             var result = await sut.GetNextsAsync(content);
 
@@ -71,9 +71,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_get_next_statuses_for_published()
         {
-            var content = CreateMockContentEntity(Status.Published);
+            var content = CreateContent(Status.Published);
 
-            var expected = new[] { new Status2("Draft"), new Status2("Archived") };
+            var expected = new[] { Status.Draft, Status.Archived };
 
             var result = await sut.GetNextsAsync(content);
 
@@ -83,14 +83,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_return_all_statuses()
         {
-            var expected = new[] { new Status2("Draft"), new Status2("Archived"), new Status2("Published") };
+            var expected = new[] { Status.Archived, Status.Draft, Status.Published };
 
             var result = await sut.GetAllAsync(null);
 
             Assert.Equal(expected, result);
         }
 
-        private IContentEntity CreateMockContentEntity(Status status)
+        private IContentEntity CreateContent(Status status)
         {
             var content = A.Fake<IContentEntity>();
 

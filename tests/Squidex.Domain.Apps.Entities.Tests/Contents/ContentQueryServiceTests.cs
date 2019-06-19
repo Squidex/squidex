@@ -520,7 +520,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns((ISchemaEntity)null);
         }
 
-        private IContentEntity CreateContent(Guid id, Status status = Status.Published)
+        private IContentEntity CreateContent(Guid id)
+        {
+            return CreateContent(id, Status.Published);
+        }
+
+        private IContentEntity CreateContent(Guid id, Status status)
         {
             var content = A.Fake<IContentEntity>();
 

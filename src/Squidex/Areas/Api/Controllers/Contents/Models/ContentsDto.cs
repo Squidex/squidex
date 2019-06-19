@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// The possible statuses.
         /// </summary>
         [Required]
-        public Status2[] Statuses { get; set; }
+        public Status[] Statuses { get; set; }
 
         public string ToEtag()
         {

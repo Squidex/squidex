@@ -15,13 +15,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
     {
         public static Permission StatusPermission(string app, string schema, Status status)
         {
-            var id = Permissions.AppContentsStatus.Replace("{status}", status.ToString());
-
-            return Permissions.ForApp(id, app, schema);
-        }
-
-        public static Permission StatusPermission(string app, string schema, Status2 status)
-        {
             var id = Permissions.AppContentsStatus.Replace("{status}", status.Name);
 
             return Permissions.ForApp(id, app, schema);
