@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Schemas.State;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
