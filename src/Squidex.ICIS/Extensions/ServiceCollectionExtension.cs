@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Squidex.ICIS.Actions.Kafka;
@@ -19,7 +20,7 @@ namespace Squidex.ICIS.Extensions
         public static void AddGenesisAuthentication(this IServiceCollection services, string authServer)
         {
             services.AddSingleton<IClaimsManager, ClaimsManager>();
-            services.AddRuleAction<ICISKafkaAction, ICISKafkaActionHandler>();
+            
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -36,6 +37,16 @@ namespace Squidex.ICIS.Extensions
                     options.Events = new AuthEventsHandler();
                 })
                 .AddCookie();
+        }
+
+        public static void AddKafkaRuleExtention(this IServiceCollection services, IConfiguration config)
+        {
+            var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
+            if (kafkaOptions.IsConfigured())
+            {
+                services.Configure<ICISKafkaOptions>(config.GetSection("kafka"));
+                services.AddRuleAction<ICISKafkaAction, ICISKafkaActionHandler>();
+            }
         }
     }
 }
