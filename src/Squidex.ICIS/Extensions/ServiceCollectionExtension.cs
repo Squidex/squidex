@@ -45,8 +45,8 @@ namespace Squidex.ICIS.Extensions
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsConfigured())
             {
-                services.AddSingleton(new KafkaProducer<Commentary>("Commentary", kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
-                services.AddSingleton(new KafkaProducer<CommentaryType>("CommentaryType", kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
+                services.AddSingleton(new KafkaProducer<Commentary>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
+                services.AddSingleton(new KafkaProducer<CommentaryType>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
                 services.AddRuleAction<ICISKafkaAction, ICISKafkaActionHandler>();
             }
         }

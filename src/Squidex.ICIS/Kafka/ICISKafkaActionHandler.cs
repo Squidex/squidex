@@ -25,12 +25,14 @@ namespace Squidex.ICIS.Actions.Kafka
     public sealed class ICISKafkaActionHandler : RuleActionHandler<ICISKafkaAction, ICISKafkaJob>
     {
         private const string DescriptionIgnore = "Ignore";
+        private readonly IAppProvider appProvider;
         private readonly KafkaProducer<Commentary> kafkaCommentaryProducer;
         private readonly KafkaProducer<CommentaryType> kafkaCommentaryTypeProducer;
 
-        public ICISKafkaActionHandler(RuleEventFormatter formatter, KafkaProducer<Commentary> kafkaCommentaryProducer, KafkaProducer<CommentaryType> kafkaCommentaryTypeProducer)
+        public ICISKafkaActionHandler(RuleEventFormatter formatter, IAppProvider appProvider, KafkaProducer<Commentary> kafkaCommentaryProducer, KafkaProducer<CommentaryType> kafkaCommentaryTypeProducer)
             : base(formatter)
         {
+            this.appProvider = appProvider;
             this.kafkaCommentaryProducer = kafkaCommentaryProducer;
             this.kafkaCommentaryTypeProducer = kafkaCommentaryTypeProducer;
         }
@@ -60,18 +62,20 @@ namespace Squidex.ICIS.Actions.Kafka
 
             try
             {
-                switch (job.TopicName)
+                var schema = await this.appProvider.GetSchemaAsync(job.Message.AppId.Id, job.Message.SchemaId.Id);
+                
+                switch (schema.SchemaDef.Name)
                 {
-                    case "Commentary":
-                        var commentaryData = (Commentary)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message);
-                        await kafkaCommentaryProducer.Send(commentaryData.Id, commentaryData);
+                    case "commentary":
+                        var commentaryData = (Commentary)KafkaMessageFactory.GetKafkaMessage(schema.SchemaDef.Name, job.Message);
+                        await kafkaCommentaryProducer.Send(job.TopicName, commentaryData.Id, commentaryData);
                         break;
-                    case "CommentaryType":
-                        var commentaryTypeData = (CommentaryType)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message);
-                        await kafkaCommentaryTypeProducer.Send(commentaryTypeData.Id, commentaryTypeData);
+                    case "commentary-type":
+                        var commentaryTypeData = (CommentaryType)KafkaMessageFactory.GetKafkaMessage(schema.SchemaDef.Name, job.Message);
+                        await kafkaCommentaryTypeProducer.Send(job.TopicName, commentaryTypeData.Id, commentaryTypeData);
                         break;
                     default:
-                        throw new Exception("kafka Topic not configured.");
+                        throw new Exception($"Schema {schema.SchemaDef.Name} not configured for Kafka Integration.");
                 }
 
                 return Result.Success("Event pushed to Kafka");
