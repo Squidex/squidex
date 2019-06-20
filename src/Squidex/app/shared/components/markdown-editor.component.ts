@@ -78,6 +78,10 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     }
 
     private showSelector = () => {
+        if (this.isDisabled) {
+            return;
+        }
+
         this.assetsDialog.show();
     }
 
@@ -220,6 +224,10 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     }
 
     private uploadFile(doc: any, file: File) {
+        if (this.isDisabled) {
+            return;
+        }
+
         const uploadCursor = doc.getCursor();
         const uploadText = `![Uploading file...${new Date()}]()`;
 

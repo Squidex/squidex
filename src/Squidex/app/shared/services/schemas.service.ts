@@ -310,7 +310,7 @@ export class SchemasService {
     }
 
     public putCategory(appName: string, resource: Resource, dto: UpdateSchemaCategoryDto, version: Version): Observable<SchemaDetailsDto> {
-        const link = resource._links['updateCategory'];
+        const link = resource._links['update/category'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
@@ -325,7 +325,7 @@ export class SchemasService {
     }
 
     public putPreviewUrls(appName: string, resource: Resource, dto: {}, version: Version): Observable<SchemaDetailsDto> {
-        const link = resource._links['updateUrls'];
+        const link = resource._links['update/urls'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
@@ -385,11 +385,11 @@ export class SchemasService {
     }
 
     public putFieldOrdering(appName: string, resource: Resource, dto: number[], version: Version): Observable<SchemaDetailsDto> {
-        const link = resource._links['order'];
+        const link = resource._links['fields/order'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, { fieldIds: dto }).pipe(
             map(({ version: newVersion, payload }) => {
                 return parseSchemaWithDetails(payload.body, newVersion);
             }),

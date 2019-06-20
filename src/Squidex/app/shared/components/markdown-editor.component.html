@@ -1,4 +1,4 @@
-<div #container class="drop-container" (sqxFileDrop)="insertFiles($event)" [onlyImages]="true">
+<div #container class="drop-container" (sqxDropFile)="insertFiles($event)" [onlyImages]="true">
     <div #inner [class.fullscreen]="snapshot.isFullscreen">
         <textarea class="form-control" #editor></textarea>
     </div>

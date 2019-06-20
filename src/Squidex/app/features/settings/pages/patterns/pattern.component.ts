@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
@@ -19,13 +19,13 @@ import {
     styleUrls: ['./pattern.component.scss'],
     templateUrl: './pattern.component.html'
 })
-export class PatternComponent implements OnInit {
+export class PatternComponent implements OnChanges {
     @Input()
     public pattern: PatternDto;
 
     public editForm = new EditPatternForm(this.formBuilder);
 
-    public isEditable = false;
+    public isEditable = true;
     public isDeletable = false;
 
     constructor(
@@ -34,12 +34,14 @@ export class PatternComponent implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
-        this.isEditable = !this.pattern || this.pattern.canUpdate;
-        this.isDeletable = this.pattern && this.pattern.canDelete;
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['pattern']) {
+            this.isEditable = !this.pattern || this.pattern.canUpdate;
+            this.isDeletable = this.pattern && this.pattern.canDelete;
 
-        this.editForm.load(this.pattern);
-        this.editForm.setEnabled(this.isEditable);
+            this.editForm.load(this.pattern);
+            this.editForm.setEnabled(this.isEditable);
+        }
     }
 
     public cancel() {
@@ -61,7 +63,7 @@ export class PatternComponent implements OnInit {
             if (this.pattern) {
                 this.patternsState.update(this.pattern, value)
                     .subscribe(newPattern => {
-                        this.editForm.submitCompleted({ newValue: newPattern });
+                        this.editForm.submitCompleted(newPattern);
                     }, error => {
                         this.editForm.submitFailed(error);
                     });

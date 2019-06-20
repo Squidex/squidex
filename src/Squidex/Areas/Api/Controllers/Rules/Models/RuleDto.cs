@@ -109,7 +109,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
             if (controller.HasPermission(Permissions.AppRulesDelete))
             {
-                AddPutLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteRule), values));
+                AddDeleteLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteRule), values));
             }
 
             return this;

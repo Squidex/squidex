@@ -182,6 +182,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 AddPostLink("schemas/create", controller.Url<SchemasController>(x => nameof(x.PostSchema), values));
             }
 
+            if (controller.HasPermission(AllPermissions.AppAssetsCreate, Name, permissions: permissions))
+            {
+                AddPostLink("assets/create", controller.Url<SchemasController>(x => nameof(x.PostSchema), values));
+            }
+
             return this;
         }
     }

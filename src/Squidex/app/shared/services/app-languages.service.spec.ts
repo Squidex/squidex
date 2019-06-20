@@ -124,7 +124,7 @@ describe('AppLanguagesService', () => {
 
         const resource: Resource = {
             _links: {
-                update: { method: 'DELETE', href: 'api/apps/my-app/languages/de' }
+                delete: { method: 'DELETE', href: 'api/apps/my-app/languages/de' }
             }
         };
 

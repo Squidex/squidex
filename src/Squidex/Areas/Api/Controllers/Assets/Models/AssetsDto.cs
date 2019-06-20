@@ -59,7 +59,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
                 response.AddPostLink("create", controller.Url<AssetsController>(x => nameof(x.PostAsset), values));
             }
 
-            response.AddDeleteLink("tags", controller.Url<AssetsController>(x => nameof(x.GetTags), values));
+            response.AddGetLink("tags", controller.Url<AssetsController>(x => nameof(x.GetTags), values));
 
             return response;
         }

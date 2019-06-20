@@ -140,7 +140,9 @@ export class SchemasState extends State<Snapshot> {
                 this.next(s => {
                     const schemas = s.schemas.push(created).sortByStringAsc(x => x.displayName);
 
-                    return { ...s, schemas };
+                    const categories = buildCategories(s.categories, schemas);
+
+                    return { ...s, schemas, categories };
                 });
             }),
             shareSubscribed(this.dialogs, { silent: true }));
@@ -231,7 +233,7 @@ export class SchemasState extends State<Snapshot> {
             shareMapSubscribed(this.dialogs, x => getField(x, request, parent), { silent: true }));
     }
 
-    public sortFields(schema: SchemaDto, fields: any[], parent?: RootFieldDto): Observable<SchemaDetailsDto> {
+    public orderFields(schema: SchemaDto, fields: any[], parent?: RootFieldDto): Observable<SchemaDetailsDto> {
         return this.schemasService.putFieldOrdering(this.appName, parent || schema, fields.map(t => t.fieldId), schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
@@ -342,8 +344,6 @@ function buildCategories(categories: { [name: string]: boolean }, schemas?: Sche
             categories[schema.category || ''] = false;
         }
     }
-
-    categories[''] = true;
 
     return categories;
 }

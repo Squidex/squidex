@@ -154,7 +154,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (controller.HasPermission(Permissions.AppContentsDelete, app, schema))
             {
-                AddPutLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
+                AddDeleteLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
             }
 
             var nextStatuses = await contentWorkflow.GetNextsAsync(content);

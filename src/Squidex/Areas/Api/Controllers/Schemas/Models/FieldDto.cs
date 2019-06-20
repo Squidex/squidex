@@ -83,14 +83,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 }
                 else
                 {
-                    AddPutLink("show", controller.Url<SchemaFieldsController>(x => nameof(x.DisableField), values));
+                    AddPutLink("disable", controller.Url<SchemaFieldsController>(x => nameof(x.DisableField), values));
                 }
 
                 if (Properties is ArrayFieldPropertiesDto)
                 {
-                    AddPostLink("fields/add", controller.Url<SchemaFieldsController>(x => nameof(x.PostNestedField), values));
+                    var parentValues = new { app, name = schema, parentId = FieldId };
 
-                    AddPutLink("order", controller.Url<SchemaFieldsController>(x => nameof(x.PutNestedFieldOrdering), values));
+                    AddPostLink("fields/add", controller.Url<SchemaFieldsController>(x => nameof(x.PostNestedField), parentValues));
+
+                    AddPutLink("fields/order", controller.Url<SchemaFieldsController>(x => nameof(x.PutNestedFieldOrdering), parentValues));
                 }
 
                 AddPutLink("lock", controller.Url<SchemaFieldsController>(x => nameof(x.LockField), values));

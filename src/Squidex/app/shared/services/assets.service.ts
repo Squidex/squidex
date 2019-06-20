@@ -27,7 +27,11 @@ import {
     Versioned
 } from '@app/framework';
 
-export class AssetsDto extends ResultSet<AssetDto> {}
+export class AssetsDto extends ResultSet<AssetDto> {
+    public get canCreate() {
+        return hasAnyLink(this._links, 'create');
+    }
+}
 
 export class AssetDto {
     public readonly _meta: Metadata = {};
@@ -38,6 +42,10 @@ export class AssetDto {
     public readonly canPreview: boolean;
     public readonly canUpdate: boolean;
     public readonly canUpload: boolean;
+
+    public get isDuplicate() {
+        return this._meta && this._meta['isDuplicate'] === 'true';
+    }
 
     public get contentUrl() {
         return this._links['content'].href;
