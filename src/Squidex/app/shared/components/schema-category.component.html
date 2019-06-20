@@ -1,4 +1,4 @@
-<div *ngIf="!forContent || snapshot.schemasFiltered.length > 0" dnd-droppable class="droppable category" [allowDrop]="allowDrop" (onDropSuccess)="changeCategory($event.dragData)">
+<div *ngIf="!forContent || snapshot.filtered.length > 0" dnd-droppable class="droppable category" [allowDrop]="allowDrop" (onDropSuccess)="changeCategory($event.dragData)">
     <div class="drop-indicator"></div>
 
     <div class="header clearfix">
@@ -6,18 +6,18 @@
             <i [class.icon-caret-right]="!snapshot.isOpen" [class.icon-caret-down]="snapshot.isOpen"></i> 
         </button>
 
-        <h3>{{snapshot.displayName}} ({{snapshot.schemasFiltered.length}})</h3>
+        <h3>{{schemaCategory.name}} ({{snapshot.filtered.length}})</h3>
         
-        <button type="button" class="btn btn-sm btn-text-secondary float-right" *ngIf="snapshot.schemasForCategory.length === 0 && !forContent" (click)="emitRemove()">
+        <button type="button" class="btn btn-sm btn-text-secondary float-right" *ngIf="schemaCategory.schemas.length === 0 && !forContent" (click)="emitRemove()">
             <i class="icon-bin2"></i> 
         </button>
     </div>
 
     <ul class="nav nav-panel nav-dark nav-dark-bordered flex-column" *ngIf="snapshot.isOpen" @fade>
-        <ng-container *ngFor="let schema of snapshot.schemasFiltered; trackBy: trackBySchema">
-            <li class="nav-item" dnd-draggable [dragEnabled]="!forContent && schema.canUpdateCategory" [dragData]="schema">
+        <ng-container *ngIf="!forContent; else simpleMode">
+            <li *ngFor="let schema of snapshot.filtered; trackBy: trackBySchema" class="nav-item" dnd-draggable [dragEnabled]="schema.canUpdateCategory" [dragData]="schema">
                 <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active">
-                    <div class="row" *ngIf="!forContent; else simpleMode">
+                    <div class="row">
                         <div class="col-4">
                             <span class="schema-name schema-name-accent">{{schema.displayName}}</span> 
                         </div>
@@ -32,12 +32,16 @@
                             <span class="item-published" [class.unpublished]="!schema.isPublished"></span>
                         </div>
                     </div>
-
-                    <ng-template #simpleMode>
-                        <span class="schema-name" *ngIf="forContent">{{schema.displayName}}</span>
-                    </ng-template>
                 </a>
             </li>
         </ng-container>
+
+        <ng-template #simpleMode>
+            <li *ngFor="let schema of snapshot.filtered; trackBy: trackBySchema" class="nav-item">
+                <a class="nav-link" [routerLink]="schemaRoute(schema)" routerLinkActive="active">
+                    <span class="schema-name" *ngIf="forContent">{{schema.displayName}}</span>
+                </a>
+            </li>
+        </ng-template>
     </ul>
 </div>
