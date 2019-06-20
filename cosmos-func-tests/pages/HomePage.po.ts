@@ -29,7 +29,7 @@ export class HomePage {
   }
 
   userLogout() {
-    const userProfile = element(by.xpath("//span[@class='ng-tns-c7-3']"));
+    const userProfile = element(by.css(".user"));
     const logoutButton = userProfile.element(
       by.xpath("//a[contains(text(),'Logout')]")
     );
