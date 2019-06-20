@@ -24,8 +24,6 @@ interface State {
     schemasFiltered: ImmutableArray<SchemaDto>;
     schemasForCategory: ImmutableArray<SchemaDto>;
 
-    isDeletable: boolean;
-
     isOpen: boolean;
 }
 
@@ -66,7 +64,6 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
         private readonly schemasState: SchemasState
     ) {
         super(changeDetector, {
-            isDeletable: true,
             schemasFiltered: ImmutableArray.empty(),
             schemasForCategory: ImmutableArray.empty(),
             isOpen: true
@@ -107,15 +104,12 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
 
         if (changes['name']) {
             let displayName = 'Schemas';
-            let isDeletable = true;
 
             if (this.name && this.name.length > 0) {
                 displayName = this.name;
-            } else {
-                isDeletable = false;
             }
 
-            this.next(s => ({ ...s, isDeletable, displayName }));
+            this.next(s => ({ ...s, displayName }));
         }
     }
 

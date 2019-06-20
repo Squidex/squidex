@@ -140,7 +140,9 @@ export class SchemasState extends State<Snapshot> {
                 this.next(s => {
                     const schemas = s.schemas.push(created).sortByStringAsc(x => x.displayName);
 
-                    return { ...s, schemas };
+                    const categories = buildCategories(s.categories, schemas);
+
+                    return { ...s, schemas, categories };
                 });
             }),
             shareSubscribed(this.dialogs, { silent: true }));
@@ -342,8 +344,6 @@ function buildCategories(categories: { [name: string]: boolean }, schemas?: Sche
             categories[schema.category || ''] = false;
         }
     }
-
-    categories[''] = true;
 
     return categories;
 }
