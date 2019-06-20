@@ -8,7 +8,7 @@
 
         <h3>{{snapshot.displayName}} ({{snapshot.schemasFiltered.length}})</h3>
         
-        <button type="button" class="btn btn-sm btn-text-secondary float-right" *ngIf="snapshot.schemasForCategory.length === 0 && !forContent" (click)="emitRemove()">
+        <button type="button" class="btn btn-sm btn-text-secondary float-right" *ngIf="snapshot.schemasForCategory.length === 0 && snapshot.isDeletable && !forContent" (click)="emitRemove()">
             <i class="icon-bin2"></i> 
         </button>
     </div>

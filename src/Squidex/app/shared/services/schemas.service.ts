@@ -310,7 +310,7 @@ export class SchemasService {
     }
 
     public putCategory(appName: string, resource: Resource, dto: UpdateSchemaCategoryDto, version: Version): Observable<SchemaDetailsDto> {
-        const link = resource._links['updateCategory'];
+        const link = resource._links['update/category'];
 
         const url = this.apiUrl.buildUrl(link.href);
 

@@ -205,7 +205,7 @@ describe('SchemasService', () => {
 
         const resource: Resource = {
             _links: {
-                updateCategory: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/category' }
+                ['update/category']: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/category' }
             }
         };
 
