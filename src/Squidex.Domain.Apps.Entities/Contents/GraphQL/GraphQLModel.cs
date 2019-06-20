@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Utils;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 using GraphQLSchema = GraphQL.Types.Schema;
 
 #pragma warning disable IDE0003
@@ -171,7 +172,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return contentTypes.GetOrAdd(schema, s => new ContentGraphType());
         }
 
-        public async Task<(object Data, object[] Errors)> ExecuteAsync(GraphQLExecutionContext context, GraphQLQuery query)
+        public async Task<(object Data, object[] Errors)> ExecuteAsync(GraphQLExecutionContext context, GraphQLQuery query, ISemanticLog log)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -179,6 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var result = await new DocumentExecuter().ExecuteAsync(options =>
             {
+                options.FieldMiddleware.Use(LoggingMiddleware.Create(log));
                 options.OperationName = query.OperationName;
                 options.UserContext = context;
                 options.Schema = graphQLSchema;

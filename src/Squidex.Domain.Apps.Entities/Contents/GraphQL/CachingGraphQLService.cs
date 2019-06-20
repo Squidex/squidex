@@ -12,6 +12,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
@@ -20,6 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
         private readonly IContentQueryService contentQuery;
         private readonly IGraphQLUrlGenerator urlGenerator;
+        private readonly ISemanticLog log;
         private readonly IAssetQueryService assetQuery;
         private readonly IAppProvider appProvider;
 
@@ -28,18 +30,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             IAppProvider appProvider,
             IAssetQueryService assetQuery,
             IContentQueryService contentQuery,
-            IGraphQLUrlGenerator urlGenerator)
+            IGraphQLUrlGenerator urlGenerator,
+            ISemanticLog log)
             : base(cache)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(contentQuery, nameof(contentQuery));
             Guard.NotNull(urlGenerator, nameof(urlGenerator));
+            Guard.NotNull(log, nameof(log));
 
             this.appProvider = appProvider;
             this.assetQuery = assetQuery;
             this.contentQuery = contentQuery;
             this.urlGenerator = urlGenerator;
+            this.log = log;
         }
 
         public async Task<(bool HasError, object Response)> QueryAsync(QueryContext context, params GraphQLQuery[] queries)
@@ -70,14 +75,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return result;
         }
 
-        private static async Task<(bool HasError, object Response)> QueryInternalAsync(GraphQLModel model, GraphQLExecutionContext ctx, GraphQLQuery query)
+        private async Task<(bool HasError, object Response)> QueryInternalAsync(GraphQLModel model, GraphQLExecutionContext ctx, GraphQLQuery query)
         {
             if (string.IsNullOrWhiteSpace(query.Query))
             {
                 return (false, new { data = new object() });
             }
 
-            var result = await model.ExecuteAsync(ctx, query);
+            var result = await model.ExecuteAsync(ctx, query, log);
 
             if (result.Errors?.Any() == true)
             {
