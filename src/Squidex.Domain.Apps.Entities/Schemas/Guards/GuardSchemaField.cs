@@ -121,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                 throw new DomainException("Schema field is already disabled.");
             }
 
-            if (!field.IsForApi())
+            if (!field.IsForApi(true))
             {
                 throw new DomainException("UI field cannot be disabled.");
             }

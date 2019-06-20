@@ -83,7 +83,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 }
                 else
                 {
-                    AddPutLink("show", controller.Url<SchemaFieldsController>(x => nameof(x.DisableField), values));
+                    AddPutLink("disable", controller.Url<SchemaFieldsController>(x => nameof(x.DisableField), values));
                 }
 
                 if (Properties is ArrayFieldPropertiesDto)
