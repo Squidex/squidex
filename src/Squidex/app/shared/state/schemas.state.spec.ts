@@ -373,7 +373,7 @@ describe('SchemasState', () => {
                 schemasService.setup(x => x.putFieldOrdering(app, schema1, [schema.fields[1].fieldId, schema.fields[2].fieldId], version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.sortFields(schema1, [schema.fields[1], schema.fields[2]]).subscribe();
+                schemasState.orderFields(schema1, [schema.fields[1], schema.fields[2]]).subscribe();
 
                 const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
 
@@ -387,7 +387,7 @@ describe('SchemasState', () => {
                 schemasService.setup(x => x.putFieldOrdering(app, schema.fields[0], [schema.fields[1].fieldId, schema.fields[2].fieldId], version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.sortFields(schema1, [schema.fields[1], schema.fields[2]], schema.fields[0]).subscribe();
+                schemasState.orderFields(schema1, [schema.fields[1], schema.fields[2]], schema.fields[0]).subscribe();
 
                 const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
 

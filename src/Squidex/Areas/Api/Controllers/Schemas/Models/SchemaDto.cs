@@ -119,7 +119,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
             if (allowUpdate)
             {
-                AddPutLink("order", controller.Url<SchemaFieldsController>(x => nameof(x.PutSchemaFieldOrdering), values));
+                AddPutLink("fields/order", controller.Url<SchemaFieldsController>(x => nameof(x.PutSchemaFieldOrdering), values));
 
                 AddPutLink("update", controller.Url<SchemasController>(x => nameof(x.PutSchema), values));
                 AddPutLink("update/category", controller.Url<SchemasController>(x => nameof(x.PutCategory), values));

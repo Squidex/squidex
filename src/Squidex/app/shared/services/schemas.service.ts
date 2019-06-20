@@ -385,11 +385,11 @@ export class SchemasService {
     }
 
     public putFieldOrdering(appName: string, resource: Resource, dto: number[], version: Version): Observable<SchemaDetailsDto> {
-        const link = resource._links['order'];
+        const link = resource._links['fields/order'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, { fieldIds: dto }).pipe(
             map(({ version: newVersion, payload }) => {
                 return parseSchemaWithDetails(payload.body, newVersion);
             }),
