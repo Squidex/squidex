@@ -25,7 +25,7 @@ export class PatternComponent implements OnChanges {
 
     public editForm = new EditPatternForm(this.formBuilder);
 
-    public isEditable = false;
+    public isEditable = true;
     public isDeletable = false;
 
     constructor(
