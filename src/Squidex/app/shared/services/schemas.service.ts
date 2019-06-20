@@ -325,7 +325,7 @@ export class SchemasService {
     }
 
     public putPreviewUrls(appName: string, resource: Resource, dto: {}, version: Version): Observable<SchemaDetailsDto> {
-        const link = resource._links['updateUrls'];
+        const link = resource._links['update/urls'];
 
         const url = this.apiUrl.buildUrl(link.href);
 

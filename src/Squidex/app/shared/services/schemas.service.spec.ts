@@ -236,7 +236,7 @@ describe('SchemasService', () => {
 
         const resource: Resource = {
             _links: {
-                updateUrls: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/preview-urls' }
+                ['update/urls'] { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/preview-urls' }
             }
         };
 
