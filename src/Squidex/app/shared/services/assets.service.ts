@@ -43,6 +43,10 @@ export class AssetDto {
     public readonly canUpdate: boolean;
     public readonly canUpload: boolean;
 
+    public get isDuplicate() {
+        return this._meta && this._meta['isDuplicate'] === 'true';
+    }
+
     public get contentUrl() {
         return this._links['content'].href;
     }

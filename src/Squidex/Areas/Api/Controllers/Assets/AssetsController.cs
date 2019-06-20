@@ -179,7 +179,10 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var command = new CreateAsset { File = assetFile };
 
-            var response = await InvokeCommandAsync(app, command);
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<AssetCreatedResult>();
+            var response = AssetDto.FromAsset(result.Asset, this, app, result.IsDuplicate);
 
             return CreatedAtAction(nameof(GetAsset), new { app, id = response.Id }, response);
         }
