@@ -111,6 +111,8 @@ export class RuleDto {
         public readonly action: any,
         public readonly actionType: string
     ) {
+        this._links = links;
+
         this.canDelete = hasAnyLink(links, 'delete');
         this.canDisable = hasAnyLink(links, 'disable');
         this.canEnable = hasAnyLink(links, 'enable');
