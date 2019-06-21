@@ -24,6 +24,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Log;
 using Xunit;
 
 #pragma warning disable SA1311 // Static readonly fields must begin with upper-case letter
@@ -96,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             A.CallTo(() => appProvider.GetSchemasAsync(appId)).Returns(allSchemas);
 
-            sut = new CachingGraphQLService(cache, appProvider, assetQuery, contentQuery, new FakeUrlGenerator());
+            sut = new CachingGraphQLService(cache, appProvider, assetQuery, contentQuery, new FakeUrlGenerator(), A.Fake<ISemanticLog>());
         }
 
         protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null, NamedContentData dataDraft = null)
