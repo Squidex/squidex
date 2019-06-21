@@ -39,6 +39,10 @@ export class WorkflowDto extends Model<WorkflowDto> {
         return this.updateStep(name, x => x.changeName(newName));
     }
 
+    public changeTransition(from: string, to: string, expression?: string) {
+        return this.updateStep(from, x => x.changeExpression(to, expression));
+    }
+
     public removeStep(name: string) {
         const steps = this.steps.filter(x => x.name !== name).map(x => x.removeTransition(name));
 
@@ -77,6 +81,10 @@ export class WorkflowStepDto extends Model<WorkflowStepDto> {
         return this.with({ color });
     }
 
+    public changeExpression(to: string, expression?: string) {
+        return this.updateTransition(to, x => x.changeExpression(expression));
+    }
+
     public addTransition(step: WorkflowStepDto) {
         let found = this.transitions.find(x => x.step.name === step.name);
 
@@ -95,24 +103,24 @@ export class WorkflowStepDto extends Model<WorkflowStepDto> {
         return this.with({ transitions });
     }
 
-    public removeTransition(name: string) {
-        const transitions = this.transitions.filter(x => x.step.name !== name);
+    public removeTransition(to: string) {
+        const transitions = this.transitions.filter(x => x.step.name !== to);
 
         return this.with({ transitions });
     }
 
-    private updateStep(name: string, updater: (step: WorkflowStepDto) => WorkflowStepDto) {
-        let found = this.steps.find(x => x.name === name);
+    private updateTransition(to: string, updater: (step: WorkflowTransitionDto) => WorkflowTransitionDto) {
+        let found = this.transitions.find(x => x.step.name === to);
 
         if (!found) {
             return this;
         }
 
-        const newStep = updater(found);
+        const newTransition = updater(found);
 
-        const steps = this.steps.map(x => x.name === name ? newStep : x.replaceTransition(newStep));
+        const transitions = this.transitions.map(x => x === found ? newTransition : x);
 
-        return this.with({ steps });
+        return this.with({ transitions });
     }
 }
 
@@ -124,7 +132,7 @@ export class WorkflowTransitionDto extends Model<WorkflowTransitionDto> {
         super();
     }
 
-    public updateExpression(expression?: string) {
+    public changeExpression(expression?: string) {
         return this.with({ expression });
     }
 }
