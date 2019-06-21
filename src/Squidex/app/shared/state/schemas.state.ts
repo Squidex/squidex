@@ -322,7 +322,7 @@ export class SchemasState extends State<Snapshot> {
 
 function getField(x: SchemaDetailsDto, request: AddFieldDto, parent?: RootFieldDto): FieldDto {
     if (parent) {
-        return parent.nested.find(f => f.name === request.name)!;
+        return x.fields.find(f => f.fieldId === parent.fieldId)!.nested.find(f => f.name === request.name)!;
     } else {
         return x.fields.find(f => f.name === request.name)!;
     }

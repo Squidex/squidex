@@ -96,7 +96,7 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
             if (query) {
                 isOpen = true;
             } else {
-                isOpen = this.localStore.get(`schema-category.${this.name}`) !== 'false';
+                isOpen = !this.localStore.getBoolean(this.configKey());
             }
 
             this.next(s => ({ ...s, isOpen, schemasFiltered, schemasForCategory }));

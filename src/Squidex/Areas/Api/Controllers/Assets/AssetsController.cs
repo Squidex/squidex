@@ -182,7 +182,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<AssetCreatedResult>();
-            var response = AssetDto.FromAsset(result.Asset, this, app, result.IsDuplicate);
+            var response = AssetDto.FromAsset(result.Asset, this, app, result.Tags, result.IsDuplicate);
 
             return CreatedAtAction(nameof(GetAsset), new { app, id = response.Id }, response);
         }
@@ -267,8 +267,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<IAssetEntity>();
-            var response = AssetDto.FromAsset(result, this, app);
+            var result = context.Result<AssetResult>();
+            var response = AssetDto.FromAsset(result.Asset, this, app, result.Tags);
 
             return response;
         }
