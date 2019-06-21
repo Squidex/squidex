@@ -288,41 +288,15 @@ describe('RulesService', () => {
         req.flush({
             total: 20,
             items: [
-                {
-                    id: 'id1',
-                    created: '2017-12-12T10:10',
-                    eventName: 'event1',
-                    nextAttempt: '2017-12-12T12:10',
-                    jobResult: 'Failed',
-                    lastDump: 'dump1',
-                    numCalls: 1,
-                    description: 'url1',
-                    result: 'Failed'
-                },
-                {
-                    id: 'id2',
-                    created: '2017-12-13T10:10',
-                    eventName: 'event2',
-                    nextAttempt: '2017-12-13T12:10',
-                    jobResult: 'Failed',
-                    lastDump: 'dump2',
-                    numCalls: 2,
-                    description: 'url2',
-                    result: 'Failed'
-                }
+                ruleEventResponse(1),
+                ruleEventResponse(2)
             ]
         });
 
         expect(rules!).toEqual(
             new RuleEventsDto(20, [
-                new RuleEventDto('id1',
-                    DateTime.parseISO_UTC('2017-12-12T10:10'),
-                    DateTime.parseISO_UTC('2017-12-12T12:10'),
-                    'event1', 'url1', 'dump1', 'Failed', 'Failed', 1),
-                new RuleEventDto('id2',
-                    DateTime.parseISO_UTC('2017-12-13T10:10'),
-                    DateTime.parseISO_UTC('2017-12-13T12:10'),
-                    'event2', 'url2', 'dump2', 'Failed', 'Failed', 2)
+                createRuleEvent(1),
+                createRuleEvent(2)
             ]));
     }));
 
@@ -364,6 +338,23 @@ describe('RulesService', () => {
         req.flush({});
     }));
 
+    function ruleEventResponse(id: number, suffix = '') {
+        return {
+            id: `id${id}`,
+            created: `${id % 1000 + 2000}-12-12T10:10:00`,
+            eventName: `event${id}${suffix}`,
+            nextAttempt: `${id % 1000 + 2000}-11-11T10:10`,
+            jobResult: `Failed${id}${suffix}`,
+            lastDump: `dump${id}${suffix}`,
+            numCalls: id,
+            description: `url${id}${suffix}`,
+            result: `Failed${id}${suffix}`,
+            _links: {
+                update: { method: 'PUT', href: `/rules/events/${id}` }
+            }
+        };
+    }
+
     function ruleResponse(id: number, suffix = '') {
         return {
             id: `id${id}`,
@@ -389,6 +380,22 @@ describe('RulesService', () => {
         };
     }
 });
+
+export function createRuleEvent(id: number, suffix = '') {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/rules/events/${id}` }
+    };
+
+    return new RuleEventDto(links, `id${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`),
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`),
+        `event${id}${suffix}`,
+        `url${id}${suffix}`,
+        `dump${id}${suffix}`,
+        `Failed${id}${suffix}`,
+        `Failed${id}${suffix}`,
+        id);
+}
 
 export function createRule(id: number, suffix = '') {
     const links: ResourceLinks = {
