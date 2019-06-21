@@ -23,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             var fieldName = field.DisplayName();
 
-            Name = $"{schemaType}{fieldName}ChildDto";
+            Name = $"{schemaType}{field.Name.ToCamelCase()}ChildDto";
 
             foreach (var (nestedField, nestedName, _) in field.Fields.SafeFields())
             {
