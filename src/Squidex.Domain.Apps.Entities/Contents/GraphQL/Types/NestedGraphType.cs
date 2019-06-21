@@ -16,18 +16,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
     public sealed class NestedGraphType : ObjectGraphType<JsonObject>
     {
-        public NestedGraphType(IGraphModel model, ISchemaEntity schema, IArrayField field)
+        public NestedGraphType(IGraphModel model, ISchemaEntity schema, IArrayField field, string fieldName)
         {
             var schemaType = schema.TypeName();
             var schemaName = schema.DisplayName();
 
-            var fieldName = field.DisplayName();
+            var fieldDisplayName = field.DisplayName();
 
             Name = $"{schemaType}{fieldName}ChildDto";
 
             foreach (var (nestedField, nestedName, _) in field.Fields.SafeFields())
             {
-                var fieldInfo = model.GetGraphType(schema, nestedField);
+                var fieldInfo = model.GetGraphType(schema, nestedField, nestedName);
 
                 if (fieldInfo.ResolveType != null)
                 {
@@ -38,12 +38,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                         Name = nestedName,
                         Resolver = resolver,
                         ResolvedType = fieldInfo.ResolveType,
-                        Description = $"The {fieldName}/{nestedField.DisplayName()} nested field."
+                        Description = $"The {fieldDisplayName}/{nestedField.DisplayName()} nested field."
                     });
                 }
             }
 
-            Description = $"The structure of the {schemaName}.{fieldName} nested schema.";
+            Description = $"The structure of the {schemaName}.{fieldDisplayName} nested schema.";
         }
 
         private static FuncFieldResolver<object> ValueResolver(NestedField nestedField, (IGraphType ResolveType, ValueResolver Resolver) fieldInfo)

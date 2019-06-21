@@ -27,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             foreach (var (field, fieldName, typeName) in schema.SchemaDef.Fields.SafeFields())
             {
-                var (resolvedType, valueResolver) = model.GetGraphType(schema, field);
+                var (resolvedType, valueResolver) = model.GetGraphType(schema, field, fieldName);
 
                 if (valueResolver != null)
                 {
