@@ -183,7 +183,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     private loadContent(data: any) {
         this.contentForm.loadContent(data);
-        this.contentForm.setEnabled(this.content && !this.content.canUpdate);
+        this.contentForm.setEnabled(!this.content || this.content.canUpdate);
     }
 
     public discardChanges() {

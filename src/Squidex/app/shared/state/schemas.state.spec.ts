@@ -13,6 +13,7 @@ import { SchemasState } from './schemas.state';
 
 import {
     DialogService,
+    FieldDto,
     SchemaDetailsDto,
     SchemasService,
     UpdateSchemaCategoryDto,
@@ -69,7 +70,7 @@ describe('SchemasState', () => {
 
             expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas.items);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
-            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, '': true });
+            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false });
 
             schemasService.verifyAll();
         });
@@ -83,7 +84,7 @@ describe('SchemasState', () => {
 
             expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas.items);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
-            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true, '': true });
+            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true });
 
             schemasService.verifyAll();
         });
@@ -111,13 +112,13 @@ describe('SchemasState', () => {
         it('should add category', () => {
             schemasState.addCategory('category3');
 
-            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true, '': true });
+            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true });
         });
 
         it('should remove category', () => {
             schemasState.removeCategory('category1');
 
-            expect(schemasState.snapshot.categories).toEqual({ 'category2': false, '': true });
+            expect(schemasState.snapshot.categories).toEqual({ 'category2': false });
         });
 
         it('should return schema on select and reload when already loaded', () => {
@@ -329,28 +330,38 @@ describe('SchemasState', () => {
                 schemasService.setup(x => x.postField(app, schema1, It.isAny(), version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.addField(schema1, request).subscribe();
+                let newField: FieldDto;
+
+                schemasState.addField(schema1, request).subscribe(result => {
+                    newField = result;
+                });
 
                 const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
+                expect(newField!).toBeDefined();
             });
 
             it('should update schema and selected schema when nested field added', () => {
-                const request = { ...schema.fields[0] };
+                const request = { ...schema.fields[0].nested[0] };
 
                 const updated = createSchemaDetails(1, newVersion, '-new');
 
                 schemasService.setup(x => x.postField(app, schema.fields[0], It.isAny(), version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.addField(schema1, request, schema.fields[0]).subscribe();
+                let newField: FieldDto;
+
+                schemasState.addField(schema1, request, schema.fields[0]).subscribe(result => {
+                    newField = result;
+                });
 
                 const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
+                expect(newField!).toBeDefined();
             });
 
             it('should update schema and selected schema when field removed', () => {
@@ -373,7 +384,7 @@ describe('SchemasState', () => {
                 schemasService.setup(x => x.putFieldOrdering(app, schema1, [schema.fields[1].fieldId, schema.fields[2].fieldId], version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.sortFields(schema1, [schema.fields[1], schema.fields[2]]).subscribe();
+                schemasState.orderFields(schema1, [schema.fields[1], schema.fields[2]]).subscribe();
 
                 const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
 
@@ -387,7 +398,7 @@ describe('SchemasState', () => {
                 schemasService.setup(x => x.putFieldOrdering(app, schema.fields[0], [schema.fields[1].fieldId, schema.fields[2].fieldId], version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.sortFields(schema1, [schema.fields[1], schema.fields[2]], schema.fields[0]).subscribe();
+                schemasState.orderFields(schema1, [schema.fields[1], schema.fields[2]], schema.fields[0]).subscribe();
 
                 const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
 

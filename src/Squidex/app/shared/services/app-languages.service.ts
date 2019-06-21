@@ -109,7 +109,7 @@ export class AppLanguagesService {
     }
 
     public deleteLanguage(appName: string, resource: Resource, version: Version): Observable<AppLanguagesDto> {
-        const link = resource._links['update'];
+        const link = resource._links['delete'];
 
         const url = this.apiUrl.buildUrl(link.href);
 

@@ -43,6 +43,10 @@ export class AssetDto {
     public readonly canUpdate: boolean;
     public readonly canUpload: boolean;
 
+    public get isDuplicate() {
+        return this._meta && this._meta['isDuplicate'] === 'true';
+    }
+
     public get contentUrl() {
         return this._links['content'].href;
     }
@@ -238,7 +242,7 @@ export class AssetsService {
                 tap(() => {
                     this.analytics.trackEvent('Analytics', 'Updated', appName);
                 }),
-                pretifyError('Failed to delete asset. Please reload.'));
+                pretifyError('Failed to update asset. Please reload.'));
     }
 
     public deleteAsset(appName: string, asset: Resource, version: Version): Observable<Versioned<any>> {

@@ -111,6 +111,8 @@ export class RuleDto {
         public readonly action: any,
         public readonly actionType: string
     ) {
+        this._links = links;
+
         this.canDelete = hasAnyLink(links, 'delete');
         this.canDisable = hasAnyLink(links, 'disable');
         this.canEnable = hasAnyLink(links, 'enable');
@@ -125,7 +127,10 @@ export class RuleEventsDto extends ResultSet<RuleEventDto> {
 export class RuleEventDto extends Model<RuleEventDto> {
     public readonly _links: ResourceLinks;
 
-    constructor(
+    public readonly canDelete: boolean;
+    public readonly canUpdate: boolean;
+
+    constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly created: DateTime,
         public readonly nextAttempt: DateTime | null,
@@ -137,6 +142,11 @@ export class RuleEventDto extends Model<RuleEventDto> {
         public readonly numCalls: number
     ) {
         super();
+
+        this._links = links;
+
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canUpdate = hasAnyLink(links, 'update');
     }
 }
 
@@ -285,7 +295,7 @@ export class RulesService {
                 const items: any[] = body.items;
 
                 const ruleEvents = new RuleEventsDto(body.total, items.map(item =>
-                    new RuleEventDto(
+                    new RuleEventDto(item._links,
                         item.id,
                         DateTime.parseISO_UTC(item.created),
                         item.nextAttempt ? DateTime.parseISO_UTC(item.nextAttempt) : null,

@@ -87,7 +87,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
     }
 
     public sortFields(fields: FieldDto[]) {
-        this.schemasState.sortFields(this.schema, fields).subscribe();
+        this.schemasState.orderFields(this.schema, fields).subscribe();
     }
 
     public trackByField(index: number, field: FieldDto) {

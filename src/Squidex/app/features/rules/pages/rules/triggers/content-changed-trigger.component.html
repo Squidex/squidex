@@ -22,13 +22,13 @@
             </td>
             <td class="text-center">
                 <input type="text" class="form-control code" placeholder="Optional condition as javascript expression"
-                    [disabled]="!isEditable"
+                    [disabled]="triggerForm.disabled"
                     [ngModelOptions]="{ updateOn: 'blur' }"
                     [ngModel]="triggerSchema.condition" 
                     (ngModelChange)="updateCondition(triggerSchema.schema, $event)" />
             </td>
             <td class="text-center">
-                <button type="button" class="btn btn-text-secondary" (click)="removeSchema(triggerSchema)" [disabled]="!isEditable">
+                <button type="button" class="btn btn-text-secondary" (click)="removeSchema(triggerSchema)" [disabled]="triggerForm.disabled">
                     <i class="icon-close"></i>
                 </button>
             </td>
@@ -38,12 +38,12 @@
     <div class="section" *ngIf="schemasToAdd.length > 0">
         <form class="form-inline" (ngSubmit)="addSchema()">
             <div class="form-group mr-1">
-                <select class="form-control schemas-control" [disabled]="!isEditable" [(ngModel)]="schemaToAdd" name="schema">
+                <select class="form-control schemas-control" [disabled]="triggerForm.disabled" [(ngModel)]="schemaToAdd" name="schema">
                     <option *ngFor="let schema of schemasToAdd; trackBy: trackBySchema" [ngValue]="schema">{{schema.displayName}}</option>
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-success" [disabled]="!isEditable">Add Schema</button>
+            <button type="submit" class="btn btn-success" [disabled]="triggerForm.disabled">Add Schema</button>
         </form>
     </div>
     

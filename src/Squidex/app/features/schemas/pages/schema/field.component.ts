@@ -95,7 +95,7 @@ export class FieldComponent implements OnChanges {
     }
 
     public sortFields(fields: NestedFieldDto[]) {
-        this.schemasState.sortFields(this.schema, fields, <any>this.field).subscribe();
+        this.schemasState.orderFields(this.schema, fields, <any>this.field).subscribe();
     }
 
     public lockField() {

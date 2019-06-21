@@ -78,6 +78,10 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
     }
 
     private showSelector = () => {
+        if (this.isDisabled) {
+            return;
+        }
+
         this.assetsDialog.show();
     }
 

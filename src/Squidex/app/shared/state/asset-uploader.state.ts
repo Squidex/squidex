@@ -75,7 +75,7 @@ export class AssetUploaderState extends State<Snapshot> {
         const stream = this.assetsService.uploadFile(this.appName, file);
 
         return this.upload(stream, MathHelper.guid(), file, asset  => {
-            if (asset._meta && asset._meta['isDuplicate'] === 'true') {
+            if (asset.isDuplicate) {
                 this.dialogs.notifyError('Asset has already been uploaded.');
             } else if (target) {
                 target.add(asset);
