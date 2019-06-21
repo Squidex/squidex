@@ -17,12 +17,10 @@ namespace Squidex.ICIS.Actions.Kafka
     public class KafkaProducer<T> : IKafkaProducer<T> where T : ISpecificRecord
     {
         private readonly CachedSchemaRegistryClient schemaRegistry;
-        private readonly string topicName;
         private readonly IProducer<string, T> producer;
 
-        public KafkaProducer(string topicName, ProducerConfig producerConfig, SchemaRegistryConfig schemaRegistryConfig)
+        public KafkaProducer(ProducerConfig producerConfig, SchemaRegistryConfig schemaRegistryConfig)
         {
-            this.topicName = topicName;
             schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
 
             producer = new ProducerBuilder<string, T>(producerConfig)
@@ -31,7 +29,7 @@ namespace Squidex.ICIS.Actions.Kafka
                 .Build();
         }
 
-        public async Task<DeliveryResult<string, T>> Send(string key, T val)
+        public async Task<DeliveryResult<string, T>> Send(string topicName, string key, T val)
         {
             var message = new Message<string, T>
             {

@@ -57,21 +57,21 @@ namespace Squidex.ICIS.Actions.Kafka
             {
                 return Result.Ignored();
             }
-
+            
             try
             {
-                switch (job.TopicName)
+                switch (job.Message.SchemaId.Name)
                 {
-                    case "Commentary":
-                        var commentaryData = (Commentary)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message);
-                        await kafkaCommentaryProducer.Send(commentaryData.Id, commentaryData);
+                    case "commentary":
+                        var commentaryData = (Commentary)KafkaMessageFactory.GetKafkaMessage(job.Message.SchemaId.Name, job.Message);
+                        await kafkaCommentaryProducer.Send(job.TopicName, commentaryData.Id, commentaryData);
                         break;
-                    case "CommentaryType":
-                        var commentaryTypeData = (CommentaryType)KafkaMessageFactory.GetKafkaMessage(job.TopicName, job.Message);
-                        await kafkaCommentaryTypeProducer.Send(commentaryTypeData.Id, commentaryTypeData);
+                    case "commentary-type":
+                        var commentaryTypeData = (CommentaryType)KafkaMessageFactory.GetKafkaMessage(job.Message.SchemaId.Name, job.Message);
+                        await kafkaCommentaryTypeProducer.Send(job.TopicName, commentaryTypeData.Id, commentaryTypeData);
                         break;
                     default:
-                        throw new Exception("kafka Topic not configured.");
+                        throw new Exception($"Schema {job.Message.SchemaId.Name} not configured for Kafka Integration.");
                 }
 
                 return Result.Success("Event pushed to Kafka");

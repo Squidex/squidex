@@ -14,6 +14,6 @@ namespace Squidex.ICIS.Actions.Kafka
 {
     public interface IKafkaProducer<T> : IDisposable where T : ISpecificRecord
     {
-        Task<DeliveryResult<string, T>> Send(string key, T val);
+        Task<DeliveryResult<string, T>> Send(string topicName, string key, T val);
     }
 }

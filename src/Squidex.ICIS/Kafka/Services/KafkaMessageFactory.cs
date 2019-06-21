@@ -16,19 +16,19 @@ namespace Squidex.ICIS.Actions.Kafka
 {
     public static class KafkaMessageFactory
     {
-        public static ISpecificRecord GetKafkaMessage(string topicName, EnrichedContentEvent contentEvent)
+        public static ISpecificRecord GetKafkaMessage(string schemaName, EnrichedContentEvent contentEvent)
         {
             ISpecificRecord entity = null;
-            switch (topicName)
+            switch (schemaName)
             {
-                case "Commentary":
+                case "commentary":
                     entity = new CommentaryMapper().ToAvro(contentEvent);
                     break;
-                case "CommentaryType":
+                case "commentary-type":
                     entity = new CommentaryTypeMapper().ToAvro(contentEvent);
                     break;
                 default:
-                    throw new Exception("kafka Topic not configured.");
+                    throw new Exception($"Schema {schemaName} not configured for Kafka Integration.");
             }
 
             return entity;
