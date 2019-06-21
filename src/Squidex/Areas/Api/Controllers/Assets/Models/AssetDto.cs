@@ -118,9 +118,14 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [JsonProperty("_meta")]
         public AssetMetadata Metadata { get; set; }
 
-        public static AssetDto FromAsset(IAssetEntity asset, ApiController controller, string app, bool isDuplicate = false)
+        public static AssetDto FromAsset(IAssetEntity asset, ApiController controller, string app, HashSet<string> tags = null, bool isDuplicate = false)
         {
             var response = SimpleMapper.Map(asset, new AssetDto { FileType = asset.FileName.FileType() });
+
+            if (tags != null)
+            {
+                response.Tags = tags;
+            }
 
             if (isDuplicate)
             {
