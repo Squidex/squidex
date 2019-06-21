@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.context = context;
         }
 
-        public async Task<IAssetEntity> FindAssetAsync(Guid id)
+        public virtual async Task<IAssetEntity> FindAssetAsync(Guid id)
         {
             var asset = cachedAssets.GetOrDefault(id);
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return asset;
         }
 
-        public async Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id)
+        public virtual async Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id)
         {
             var content = cachedContents.GetOrDefault(id);
 

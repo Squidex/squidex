@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.DataLoader;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 
@@ -52,6 +53,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             execution.UserContext = this;
         }
 
+        public override Task<IAssetEntity> FindAssetAsync(Guid id)
+        {
+            var dataLoader = GetAssetsLoader();
+
+            return dataLoader.LoadAsync(id);
+        }
+
+        public override Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id)
+        {
+            var dataLoader = GetContentsLoader(schemaId);
+
+            return dataLoader.LoadAsync(id);
+        }
+
         public async Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(IJsonValue value)
         {
             var ids = ParseIds(value);
@@ -61,18 +76,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 return EmptyAssets;
             }
 
-            var dataLoader =
-                dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IAssetEntity>("Assets",
-                    async batch =>
-                    {
-                        var result = await GetReferencedAssetsAsync(new List<Guid>(batch));
+            var dataLoader = GetAssetsLoader();
 
-                        return result.ToDictionary(x => x.Id);
-                    });
-
-            var assets = await Task.WhenAll(ids.Select(x => dataLoader.LoadAsync(x)));
-
-            return assets.Where(x => x != null).ToList();
+            return await dataLoader.LoadManyAsync(ids);
         }
 
         public async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, IJsonValue value)
@@ -84,18 +90,31 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 return EmptyContents;
             }
 
-            var dataLoader =
-                dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IContentEntity>($"Schema_{schemaId}",
-                    async batch =>
-                    {
-                        var result = await GetReferencedContentsAsync(schemaId, new List<Guid>(batch));
+            var dataLoader = GetContentsLoader(schemaId);
 
-                        return result.ToDictionary(x => x.Id);
-                    });
+            return await dataLoader.LoadManyAsync(ids);
+        }
 
-            var contents = await Task.WhenAll(ids.Select(x => dataLoader.LoadAsync(x)));
+        private IDataLoader<Guid, IAssetEntity> GetAssetsLoader()
+        {
+            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IAssetEntity>("Assets",
+                async batch =>
+                {
+                    var result = await GetReferencedAssetsAsync(new List<Guid>(batch));
 
-            return contents.Where(x => x != null).ToList();
+                    return result.ToDictionary(x => x.Id);
+                });
+        }
+
+        private IDataLoader<Guid, IContentEntity> GetContentsLoader(Guid schemaId)
+        {
+            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IContentEntity>($"Schema_{schemaId}",
+                async batch =>
+                {
+                    var result = await GetReferencedContentsAsync(schemaId, new List<Guid>(batch));
+
+                    return result.ToDictionary(x => x.Id);
+                });
         }
 
         private static ICollection<Guid> ParseIds(IJsonValue value)
