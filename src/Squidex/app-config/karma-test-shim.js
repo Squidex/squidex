@@ -19,7 +19,7 @@ testing.TestBed.initTestEnvironment(
     browser.platformBrowserDynamicTesting()
 );
 
-var testContext = require.context('../app', true, /\.spec\.ts/);
+var testContext = require.context('../app', true, /workflows\.service\.spec\.ts/);
 
 /**
  * Get all the files, for each file, call the context function

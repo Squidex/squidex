@@ -10,10 +10,10 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import {
     ApiUrlConfig,
+    ResourcesDto,
     UserDto,
     UsersService
 } from '@app/shared/internal';
-import { ResourcesDto } from './users.service';
 
 describe('UsersService', () => {
     beforeEach(() => {
