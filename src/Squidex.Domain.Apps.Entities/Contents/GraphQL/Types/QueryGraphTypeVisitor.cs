@@ -22,18 +22,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         private readonly Func<Guid, IGraphType> schemaResolver;
         private readonly IGraphModel model;
         private readonly IGraphType assetListType;
+        private readonly string fieldName;
 
-        public QueryGraphTypeVisitor(ISchemaEntity schema, Func<Guid, IGraphType> schemaResolver, IGraphModel model, IGraphType assetListType)
+        public QueryGraphTypeVisitor(ISchemaEntity schema, Func<Guid, IGraphType> schemaResolver, IGraphModel model, IGraphType assetListType, string fieldName)
         {
             this.model = model;
             this.assetListType = assetListType;
             this.schema = schema;
             this.schemaResolver = schemaResolver;
+            this.fieldName = fieldName;
         }
 
         public (IGraphType ResolveType, ValueResolver Resolver) Visit(IArrayField field)
         {
-            return ResolveNested(field);
+            return ResolveNested(field, this.fieldName);
         }
 
         public (IGraphType ResolveType, ValueResolver Resolver) Visit(IField<AssetsFieldProperties> field)
@@ -91,9 +93,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             return (type, NoopResolver);
         }
 
-        private (IGraphType ResolveType, ValueResolver Resolver) ResolveNested(IArrayField field)
+        private (IGraphType ResolveType, ValueResolver Resolver) ResolveNested(IArrayField field, string fieldName)
         {
-            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedGraphType(model, schema, field)));
+            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedGraphType(model, schema, field, fieldName)));
 
             return (schemaFieldType, NoopResolver);
         }
