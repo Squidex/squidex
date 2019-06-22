@@ -30,7 +30,9 @@ import {
     PlansPageComponent,
     RoleComponent,
     RolesPageComponent,
-    SettingsAreaComponent
+    SettingsAreaComponent,
+    WorkflowsPageComponent,
+    WorkflowStepComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -170,6 +172,10 @@ const routes: Routes = [
                         }
                     }
                 ]
+            },
+            {
+                path: 'workflows',
+                component: WorkflowsPageComponent
             }
         ]
     }
@@ -196,7 +202,9 @@ const routes: Routes = [
         PlansPageComponent,
         RoleComponent,
         RolesPageComponent,
-        SettingsAreaComponent
+        SettingsAreaComponent,
+        WorkflowsPageComponent,
+        WorkflowStepComponent
     ]
 })
 export class SqxFeatureSettingsModule { }
