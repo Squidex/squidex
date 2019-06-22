@@ -5,7 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Model, ResourceLinks } from '@app/framework';
+import {
+    compareStringsAsc,
+    Model,
+    ResourceLinks
+} from '@app/framework';
 
 export class WorkflowDto extends Model<WorkflowDto> {
     public readonly _links: ResourceLinks;
@@ -20,8 +24,12 @@ export class WorkflowDto extends Model<WorkflowDto> {
         this._links = links;
     }
 
+    public onCloned() {
+        this.steps.sort((a, b) => compareStringsAsc(a.name, b.name));
+    }
+
     public getOpenSteps(step: WorkflowStep) {
-        return this.steps.filter(x => !this.transitions.find(y => y.from === step.name && y.to === x.name));
+        return this.steps.filter(x => x.name !== step.name && !this.transitions.find(y => y.from === step.name && y.to === x.name));
     }
 
     public getTransitions(step: WorkflowStep): WorkflowTransitionView[] {

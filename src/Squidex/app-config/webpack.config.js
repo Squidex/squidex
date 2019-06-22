@@ -1,5 +1,5 @@
 const webpack = require('webpack'),
-         path = require('path');
+    path = require('path');
 
 const appRoot = path.resolve(__dirname, '..');
 
@@ -28,12 +28,12 @@ const plugins = {
     TsLintPlugin: require('tslint-webpack-plugin')
 };
 
-module.exports = function(env) {
+module.exports = function (env) {
     const isDevServer = path.basename(require.main.filename) === 'webpack-dev-server.js';
     const isProduction = env && env.production;
     const isTests = env && env.target === 'tests';
     const isCoverage = env && env.coverage;
-    const isJit = env && env.jit;
+    const isAot = isProduction;
 
     const config = {
         mode: isProduction ? 'production' : 'development',
@@ -56,7 +56,7 @@ module.exports = function(env) {
              *
              * See: https://webpack.js.org/configuration/resolve/#resolve-extensions
              */
-            extensions: ['.js', '.mjs', '.ts', '.css', '.scss'],
+            extensions: ['.ts', '.js', '.mjs', '.css', '.scss'],
             modules: [
                 root('app'),
                 root('app', 'theme'),
@@ -103,7 +103,7 @@ module.exports = function(env) {
                 use: [{
                     loader: 'file-loader?name=[name].[hash].[ext]',
                     options: {
-                        outputPath: 'assets', 
+                        outputPath: 'assets',
                         /*
                         * Use custom public path as ./ is not supported by fonts.
                         */
@@ -122,9 +122,9 @@ module.exports = function(env) {
                 test: /\.css$/,
                 use: [
                     plugins.MiniCssExtractPlugin.loader,
-                {
-                    loader: 'css-loader'
-                }]
+                    {
+                        loader: 'css-loader'
+                    }]
             }, {
                 test: /\.scss$/,
                 use: [{
@@ -172,7 +172,7 @@ module.exports = function(env) {
                 failOnError: true
             }),
         ],
-        
+
         devServer: {
             headers: {
                 'Access-Control-Allow-Origin': '*'
@@ -180,8 +180,6 @@ module.exports = function(env) {
             historyApiFallback: true
         }
     };
-
-    console.log(JSON.stringify(config, null, 2));
 
     if (!isTests) {
         /**
@@ -202,16 +200,16 @@ module.exports = function(env) {
                  * See: https://webpack.js.org/configuration/output/#output-path
                  */
                 path: root('wwwroot/build/'),
-        
+
                 publicPath: './build/',
-        
+
                 /**
                  * Specifies the name of each output file on disk.
                  *
                  * See: https://webpack.js.org/configuration/output/#output-filename
                  */
                 filename: '[name].js',
-        
+
                 /**
                  * The filename of non-entry chunks as relative path inside the output.path directory.
                  *
@@ -222,7 +220,7 @@ module.exports = function(env) {
         } else {
             config.output = {
                 filename: '[name].js',
-        
+
                 /**
                  * Set the public path, because we are running the website from another port (5000).
                  */
@@ -258,6 +256,15 @@ module.exports = function(env) {
                 waitForLinting: isProduction
             })
         );
+
+        config.plugins.push(
+            new plugins.NgToolsWebpack.AngularCompilerPlugin({
+                entryModule: 'app/app.module#AppModule',
+                sourceMap: !isProduction,
+                skipSourceGeneration: !isAot,
+                tsConfigPath: './tsconfig.json'
+            })
+        );
     }
 
     if (isProduction) {
@@ -280,18 +287,12 @@ module.exports = function(env) {
         };
 
         config.performance = {
-            hints: false 
+            hints: false
         };
     }
 
-    if (!isCoverage) {
-        config.module.rules.push({
-            test: /\.ts$/,
-            use: [{
-                loader: 'awesome-typescript-loader', options: { useCache: true, useBabel: true }
-            }]
-        })
-    } else {
+    if (isCoverage) {
+        // Do not instrument tests.
         config.module.rules.push({
             test: /\.ts$/,
             use: [{
@@ -300,7 +301,7 @@ module.exports = function(env) {
             include: [/\.(e2e|spec)\.ts$/],
         });
 
-        // Use instrument loader for all normal builds.
+        // Use instrument loader for all normal files.
         config.module.rules.push({
             test: /\.ts$/,
             use: [{
@@ -310,6 +311,13 @@ module.exports = function(env) {
             }],
             exclude: [/\.(e2e|spec)\.ts$/]
         });
+    } else {
+        config.module.rules.push({
+            test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
+            use: [{
+                loader: plugins.NgToolsWebpack.NgToolsLoader
+            }]
+        })
     }
 
     if (isProduction) {
@@ -322,11 +330,11 @@ module.exports = function(env) {
              */
             use: [
                 plugins.MiniCssExtractPlugin.loader,
-            {
-                loader: 'css-loader'
-            }, {
-                loader: 'sass-loader'
-            }],
+                {
+                    loader: 'css-loader'
+                }, {
+                    loader: 'sass-loader'
+                }],
             /*
              * Do not include component styles.
              */
@@ -347,24 +355,6 @@ module.exports = function(env) {
              */
             include: root('app', 'theme')
         });
-    }
-
-    if (!isJit) {
-        config.module.rules.push({ 
-            test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
-            use: [{
-                loader: '@ngtools/webpack'
-            }]
-        });
-
-        config.plugins.push(
-            new plugins.NgToolsWebpack.AngularCompilerPlugin({
-                entryModule: 'app/app.module#AppModule',
-                sourceMap: !isProduction,
-                skipSourceGeneration: false,
-                tsConfigPath: './tsconfig.json'
-            })
-        );
     }
 
     return config;

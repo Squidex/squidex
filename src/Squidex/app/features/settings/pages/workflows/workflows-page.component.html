@@ -20,12 +20,14 @@
     </ng-container>
 
     <ng-container content>
-        <sqx-workflow-step *ngFor="let step of workflow.steps"
+        <sqx-workflow-step *ngFor="let step of workflow.steps; trackBy: trackByStep"
             [workflow]="workflow"
             [step]="step"
-            (update)="updateStep(step, $event)"
             (rename)="renameStep(step, $event)"
-            (remove)="removeStep(step)">
+            (remove)="removeStep(step)"
+            (transitionAdd)="addTransiton(step, $event)"
+            (transitionRemove)="removeTransition(step, $event)"
+            (update)="updateStep(step, $event)">
         </sqx-workflow-step>
 
         <button class="btn btn-success" (click)="addStep()">

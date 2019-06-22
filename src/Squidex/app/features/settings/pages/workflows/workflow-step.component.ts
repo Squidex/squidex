@@ -28,6 +28,9 @@ export class WorkflowStepComponent implements OnChanges {
     public step: WorkflowStep;
 
     @Output()
+    public transitionAdd = new EventEmitter<WorkflowStep>();
+
+    @Output()
     public transitionRemove = new EventEmitter<WorkflowTransition>();
 
     @Output()
@@ -39,13 +42,17 @@ export class WorkflowStepComponent implements OnChanges {
     @Output()
     public remove = new EventEmitter();
 
+    public onBlur = { updateOn: 'blur' };
+
     public openSteps: WorkflowStep[];
+    public openStep: WorkflowStep;
 
     public transitions: WorkflowTransitionView[];
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes['workflow'] || changes['step']) {
+        if (changes['workflow'] || changes['step'] || false) {
             this.openSteps = this.workflow.getOpenSteps(this.step);
+            this.openStep = this.openSteps[0];
 
             this.transitions = this.workflow.getTransitions(this.step);
         }

@@ -26,13 +26,18 @@ $color-input-disabled: #eef1f4;
     .control-dropdown-item {
         @include absolute(0, 1rem, 0, 0);
         pointer-events: none;
+        position: absolute;
+        line-height: 1.2rem;
     }
 
     .icon-caret-down {
         @include absolute(30%, .4rem, auto, auto);
-        cursor: pointer;
         font-size: .9rem;
         font-weight: normal;
         pointer-events: none;
+    }
+
+    .form-control {
+        cursor: default;
     }
 }

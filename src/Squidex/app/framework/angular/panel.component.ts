@@ -89,17 +89,25 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
         if (this.styleWidth !== size) {
             this.styleWidth = size;
 
-            this.renderer.setStyle(this.panel.nativeElement, 'width', size);
-            this.renderer.setStyle(this.panel.nativeElement, 'minWidth', this.minWidth);
-            this.renderWidth = this.panel.nativeElement.offsetWidth;
+            const element = this.panel ? this.panel.nativeElement : undefined;
+
+            if (element) {
+                this.renderer.setStyle(element, 'width', size);
+                this.renderer.setStyle(element, 'minWidth', this.minWidth);
+                this.renderWidth = element.offsetWidth;
+            }
         }
     }
 
     public arrange(left: any, layer: any) {
-        this.renderer.setStyle(this.panel.nativeElement, 'top', '0px');
-        this.renderer.setStyle(this.panel.nativeElement, 'left', left);
-        this.renderer.setStyle(this.panel.nativeElement, 'bottom', '0px');
-        this.renderer.setStyle(this.panel.nativeElement, 'position', 'absolute');
-        this.renderer.setStyle(this.panel.nativeElement, 'z-index', layer);
+        const element = this.panel ? this.panel.nativeElement : undefined;
+
+        if (element) {
+            this.renderer.setStyle(element, 'top', '0px');
+            this.renderer.setStyle(element, 'left', left);
+            this.renderer.setStyle(element, 'bottom', '0px');
+            this.renderer.setStyle(element, 'position', 'absolute');
+            this.renderer.setStyle(element, 'z-index', layer);
+        }
     }
 }

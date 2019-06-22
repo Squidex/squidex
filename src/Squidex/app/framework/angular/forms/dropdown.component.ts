@@ -35,9 +35,8 @@ export class DropdownComponent extends StatefulControlComponent<State, any[]> im
 
     public dropdown = new ModalModel();
 
-    public selectionTemplate: TemplateRef<any>;
-
-    public itemTemplate: TemplateRef<any>;
+    public templateSelection: TemplateRef<any>;
+    public templateItem: TemplateRef<any>;
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
@@ -48,15 +47,19 @@ export class DropdownComponent extends StatefulControlComponent<State, any[]> im
 
     public ngAfterContentInit() {
         if (this.templates.length === 1) {
-            this.itemTemplate = this.selectionTemplate = this.templates.first;
+            this.templateItem = this.templateSelection = this.templates.first;
         } else {
             this.templates.forEach(template => {
                 if (template.name === 'selection') {
-                    this.selectionTemplate = template;
+                    this.templateSelection = template;
                 } else {
-                    this.itemTemplate = template;
+                    this.templateItem = template;
                 }
             });
+        }
+
+        if (this.templateItem) {
+            this.detectChanges();
         }
     }
 

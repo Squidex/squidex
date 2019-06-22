@@ -12,12 +12,23 @@
     display: inline-block;
 }
 
+.dashed {
+    border-style: dashed;
+}
+
 .transition {
     & {
         padding-left: 1rem;
         margin-top: .25rem;
         margin-bottom: .5rem;
         line-height: 2rem;
+    }
+
+    &-to {
+        padding: .5rem .75rem;
+        background: transparent;
+        border: 1px solid transparent;
+        line-height: 1.2rem;
     }
 }
 
