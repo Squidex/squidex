@@ -8,6 +8,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
@@ -40,17 +41,14 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/")]
-        [ProducesResponseType(typeof(EntityCreatedDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 409)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto request)
         {
-            var context = await CommandBus.PublishAsync(request.ToCommand());
+            var command = request.ToCommand();
 
-            var result = context.Result<EntityCreatedResult<long>>();
-            var response = EntityCreatedDto.FromResult(result);
+            var response = await InvokeCommandAsync(app, command);
 
             return StatusCode(201, response);
         }
@@ -70,17 +68,14 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/")]
-        [ProducesResponseType(typeof(EntityCreatedDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 409)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostNestedField(string app, string name, long parentId, [FromBody] AddFieldDto request)
         {
-            var context = await CommandBus.PublishAsync(request.ToCommand(parentId));
+            var command = request.ToCommand(parentId);
 
-            var result = context.Result<EntityCreatedResult<long>>();
-            var response = EntityCreatedDto.FromResult(result);
+            var response = await InvokeCommandAsync(app, command);
 
             return StatusCode(201, response);
         }
@@ -92,20 +87,22 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="request">The request that contains the field ids.</param>
         /// <returns>
-        /// 204 => Schema fields reorderd.
+        /// 200 => Schema fields reordered.
         /// 400 => Schema field ids do not cover the fields of the schema.
         /// 404 => Schema or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/ordering/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutSchemaFieldOrdering(string app, string name, [FromBody] ReorderFieldsDto request)
         {
-            await CommandBus.PublishAsync(request.ToCommand());
+            var command = request.ToCommand();
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -116,20 +113,22 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="parentId">The parent field id.</param>
         /// <param name="request">The request that contains the field ids.</param>
         /// <returns>
-        /// 204 => Schema fields reorderd.
+        /// 200 => Schema fields reordered.
         /// 400 => Schema field ids do not cover the fields of the schema.
         /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/ordering/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutNestedFieldOrdering(string app, string name, long parentId, [FromBody] ReorderFieldsDto request)
         {
-            await CommandBus.PublishAsync(request.ToCommand(parentId));
+            var command = request.ToCommand(parentId);
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -140,20 +139,22 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to update.</param>
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
-        /// 204 => Schema field updated.
+        /// 200 => Schema field updated.
         /// 400 => Schema field properties not valid or field is locked.
         /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutField(string app, string name, long id, [FromBody] UpdateFieldDto request)
         {
-            await CommandBus.PublishAsync(request.ToCommand(id));
+            var command = request.ToCommand(id);
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -165,20 +166,22 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="id">The id of the field to update.</param>
         /// <param name="request">The field object that needs to be added to the schema.</param>
         /// <returns>
-        /// 204 => Schema field updated.
+        /// 200 => Schema field updated.
         /// 400 => Schema field properties not valid or field is locked.
         /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutNestedField(string app, string name, long parentId, long id, [FromBody] UpdateFieldDto request)
         {
-            await CommandBus.PublishAsync(request.ToCommand(id, parentId));
+            var command = request.ToCommand(id, parentId);
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -188,7 +191,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to lock.</param>
         /// <returns>
-        /// 204 => Schema field shown.
+        /// 200 => Schema field shown.
         /// 400 => Schema field already locked.
         /// 404 => Schema, field or app not found.
         /// </returns>
@@ -197,14 +200,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/lock/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> LockField(string app, string name, long id)
         {
-            await CommandBus.PublishAsync(new LockField { FieldId = id });
+            var command = new LockField { FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -215,7 +220,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="parentId">The parent field id.</param>
         /// <param name="id">The id of the field to lock.</param>
         /// <returns>
-        /// 204 => Schema field hidden.
+        /// 200 => Schema field hidden.
         /// 400 => Schema field already hidden.
         /// 404 => Field, schema, or app not found.
         /// </returns>
@@ -224,14 +229,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/lock/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> LockNestedField(string app, string name, long parentId, long id)
         {
-            await CommandBus.PublishAsync(new LockField { ParentFieldId = parentId, FieldId = id });
+            var command = new LockField { ParentFieldId = parentId, FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -241,7 +248,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to hide.</param>
         /// <returns>
-        /// 204 => Schema field hidden.
+        /// 200 => Schema field hidden.
         /// 400 => Schema field already hidden.
         /// 404 => Schema, field or app not found.
         /// </returns>
@@ -250,14 +257,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/hide/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> HideField(string app, string name, long id)
         {
-            await CommandBus.PublishAsync(new HideField { FieldId = id });
+            var command = new HideField { FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -268,7 +277,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="parentId">The parent field id.</param>
         /// <param name="id">The id of the field to hide.</param>
         /// <returns>
-        /// 204 => Schema field hidden.
+        /// 200 => Schema field hidden.
         /// 400 => Schema field already hidden.
         /// 404 => Field, schema, or app not found.
         /// </returns>
@@ -277,14 +286,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/hide/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> HideNestedField(string app, string name, long parentId, long id)
         {
-            await CommandBus.PublishAsync(new HideField { ParentFieldId = parentId, FieldId = id });
+            var command = new HideField { ParentFieldId = parentId, FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -294,7 +305,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to show.</param>
         /// <returns>
-        /// 204 => Schema field shown.
+        /// 200 => Schema field shown.
         /// 400 => Schema field already visible.
         /// 404 => Schema, field or app not found.
         /// </returns>
@@ -303,14 +314,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/show/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> ShowField(string app, string name, long id)
         {
-            await CommandBus.PublishAsync(new ShowField { FieldId = id });
+            var command = new ShowField { FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -321,7 +334,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="parentId">The parent field id.</param>
         /// <param name="id">The id of the field to show.</param>
         /// <returns>
-        /// 204 => Schema field shown.
+        /// 200 => Schema field shown.
         /// 400 => Schema field already visible.
         /// 404 => Schema, field or app not found.
         /// </returns>
@@ -330,14 +343,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/show/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> ShowNestedField(string app, string name, long parentId, long id)
         {
-            await CommandBus.PublishAsync(new ShowField { ParentFieldId = parentId, FieldId = id });
+            var command = new ShowField { ParentFieldId = parentId, FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -347,7 +362,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to enable.</param>
         /// <returns>
-        /// 204 => Schema field enabled.
+        /// 200 => Schema field enabled.
         /// 400 => Schema field already enabled.
         /// 404 => Schema, field or app not found.
         /// </returns>
@@ -356,14 +371,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/enable/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> EnableField(string app, string name, long id)
         {
-            await CommandBus.PublishAsync(new EnableField { FieldId = id });
+            var command = new EnableField { FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -374,7 +391,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="parentId">The parent field id.</param>
         /// <param name="id">The id of the field to enable.</param>
         /// <returns>
-        /// 204 => Schema field enabled.
+        /// 200 => Schema field enabled.
         /// 400 => Schema field already enabled.
         /// 404 => Schema, field or app not found.
         /// </returns>
@@ -383,14 +400,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/enable/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> EnableNestedField(string app, string name, long parentId, long id)
         {
-            await CommandBus.PublishAsync(new EnableField { ParentFieldId = parentId, FieldId = id });
+            var command = new EnableField { ParentFieldId = parentId, FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -400,7 +419,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to disable.</param>
         /// <returns>
-        /// 204 => Schema field disabled.
+        /// 200 => Schema field disabled.
         /// 400 => Schema field already disabled.
         /// 404 => Schema, field or app not found.
         /// </returns>
@@ -409,14 +428,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/disable/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DisableField(string app, string name, long id)
         {
-            await CommandBus.PublishAsync(new DisableField { FieldId = id });
+            var command = new DisableField { FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -427,7 +448,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="parentId">The parent field id.</param>
         /// <param name="id">The id of the field to disable.</param>
         /// <returns>
-        /// 204 => Schema field disabled.
+        /// 200 => Schema field disabled.
         /// 400 => Schema field already disabled.
         /// 404 => Schema, field or app not found.
         /// </returns>
@@ -436,14 +457,16 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/disable/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DisableNestedField(string app, string name, long parentId, long id)
         {
-            await CommandBus.PublishAsync(new DisableField { ParentFieldId = parentId, FieldId = id });
+            var command = new DisableField { ParentFieldId = parentId, FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -453,19 +476,22 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the field to disable.</param>
         /// <returns>
-        /// 204 => Schema field deleted.
+        /// 200 => Schema field deleted.
         /// 400 => Field is locked.
         /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{id:long}/")]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteField(string app, string name, long id)
         {
-            await CommandBus.PublishAsync(new DeleteField { FieldId = id });
+            var command = new DeleteField { FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -476,19 +502,32 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// <param name="parentId">The parent field id.</param>
         /// <param name="id">The id of the field to disable.</param>
         /// <returns>
-        /// 204 => Schema field deleted.
+        /// 200 => Schema field deleted.
         /// 400 => Field is locked.
         /// 404 => Schema, field or app not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/{id:long}/")]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteNestedField(string app, string name, long parentId, long id)
         {
-            await CommandBus.PublishAsync(new DeleteField { ParentFieldId = parentId, FieldId = id });
+            var command = new DeleteField { ParentFieldId = parentId, FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
+        }
+
+        private async Task<SchemaDetailsDto> InvokeCommandAsync(string app, ICommand command)
+        {
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<ISchemaEntity>();
+            var response = SchemaDetailsDto.FromSchemaWithDetails(result, this, app);
+
+            return response;
         }
     }
 }

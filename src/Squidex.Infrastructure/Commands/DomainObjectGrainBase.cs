@@ -93,7 +93,7 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(command, handler, Mode.Create);
         }
 
-        protected Task<object> CreateReturnAsync<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
+        protected Task<object> CreateReturn<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler?.ToAsync(), Mode.Create);
         }
@@ -103,7 +103,7 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(command, handler.ToDefault<TCommand, object>(), Mode.Create);
         }
 
-        protected Task<object> CreateAsync<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
+        protected Task<object> Create<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync(), Mode.Create);
         }
@@ -113,7 +113,7 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(command, handler, Mode.Update);
         }
 
-        protected Task<object> UpdateAsync<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
+        protected Task<object> UpdateReturn<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler?.ToAsync(), Mode.Update);
         }
@@ -123,7 +123,7 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(command, handler?.ToDefault<TCommand, object>(), Mode.Update);
         }
 
-        protected Task<object> UpdateAsync<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
+        protected Task<object> Update<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync(), Mode.Update);
         }
@@ -133,7 +133,7 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(command, handler, Mode.Upsert);
         }
 
-        protected Task<object> UpsertAsync<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
+        protected Task<object> UpsertReturn<TCommand>(TCommand command, Func<TCommand, object> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler?.ToAsync(), Mode.Upsert);
         }
@@ -143,7 +143,7 @@ namespace Squidex.Infrastructure.Commands
             return InvokeAsync(command, handler?.ToDefault<TCommand, object>(), Mode.Upsert);
         }
 
-        protected Task<object> UpsertAsync<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
+        protected Task<object> Upsert<TCommand>(TCommand command, Action<TCommand> handler) where TCommand : class, IAggregateCommand
         {
             return InvokeAsync(command, handler?.ToDefault<TCommand, object>()?.ToAsync(), Mode.Upsert);
         }

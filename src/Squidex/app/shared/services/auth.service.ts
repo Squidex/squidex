@@ -16,15 +16,9 @@ import {
     WebStorageStateStore
 } from 'oidc-client';
 
-import {
-    ApiUrlConfig,
-    Permission,
-    Types
-} from '@app/framework';
+import { ApiUrlConfig, Types } from '@app/framework';
 
 export class Profile {
-    public readonly permissions: Permission[];
-
     public get id(): string {
         return this.user.profile['sub'];
     }
@@ -56,19 +50,6 @@ export class Profile {
     constructor(
         public readonly user: User
     ) {
-        const permissions = this.user.profile['urn:squidex:permissions'];
-
-        if (Types.isArrayOfString(permissions)) {
-            this.permissions = permissions.map(x => new Permission(x));
-        } else if (Types.isString(permissions)) {
-            this.permissions = [new Permission(permissions)];
-        } else {
-            this.permissions = [];
-        }
-
-        if (this.user.profile['role'] === 'ADMINISTRATOR') {
-            this.permissions.push( new Permission('squidex.admin'));
-        }
     }
 }
 

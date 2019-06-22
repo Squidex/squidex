@@ -8,11 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NJsonSchema;
-using NJsonSchema.Generation;
 using NSwag;
 using Squidex.Web;
 
@@ -67,13 +64,6 @@ namespace Squidex.Pipeline.Swagger
             }
 
             return document;
-        }
-
-        public static async Task<JsonSchema4> GetErrorDtoSchemaAsync(this JsonSchemaGenerator schemaGenerator, JsonSchemaResolver resolver)
-        {
-            var errorType = typeof(ErrorDto);
-
-            return await schemaGenerator.GenerateWithReferenceAsync<JsonSchema4>(errorType, Enumerable.Empty<Attribute>(), resolver);
         }
 
         public static void AddQueryParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description = null)

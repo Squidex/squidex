@@ -6,7 +6,7 @@
  */
 
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 import {
     DateTime,
@@ -35,12 +35,10 @@ type CommentsList = ImmutableArray<CommentDto>;
 
 export class CommentsState extends State<Snapshot> {
     public comments =
-        this.changes.pipe(map(x => x.comments),
-            distinctUntilChanged());
+        this.project(x => x.comments);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     constructor(
         private readonly appsState: AppsState,

@@ -8,9 +8,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import {
-    CONTENT_STATUSES,
     ContentDto,
-    ContentQueryStatus,
     FilterState,
     LanguageDto,
     ManualContentsState,
@@ -48,8 +46,6 @@ export class ContentsSelectorComponent implements OnInit {
 
     public filter = new FilterState();
 
-    public statuses = CONTENT_STATUSES;
-
     public selectedItems:  { [id: string]: ContentDto; } = {};
     public selectionCount = 0;
 
@@ -72,10 +68,6 @@ export class ContentsSelectorComponent implements OnInit {
 
     public search() {
         this.contentsState.search(this.filter.apiFilter);
-    }
-
-    public filterStatus(status: ContentQueryStatus) {
-        this.contentsState.filterStatus(status);
     }
 
     public goNext() {

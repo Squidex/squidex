@@ -33,10 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentQueryService : IContentQueryService
     {
-        private static readonly Status[] StatusAll = { Status.Archived, Status.Draft, Status.Published };
-        private static readonly Status[] StatusArchived = { Status.Archived };
         private static readonly Status[] StatusPublishedOnly = { Status.Published };
-        private static readonly Status[] StatusPublishedDraft = { Status.Published, Status.Draft };
         private readonly IContentRepository contentRepository;
         private readonly IContentVersionLoader contentVersionLoader;
         private readonly IAppProvider appProvider;
@@ -93,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var isVersioned = version > EtagVersion.Empty;
 
-                var status = GetFindStatus(context);
+                var status = GetStatus(context);
 
                 var content =
                     isVersioned ?
@@ -119,7 +116,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var status = GetQueryStatus(context);
+                var status = GetStatus(context);
 
                 IResultList<IContentEntity> contents;
 
@@ -145,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var status = GetQueryStatus(context);
+                var status = GetStatus(context);
 
                 List<IContentEntity> result;
 
@@ -217,7 +214,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         result.Data = result.Data.ConvertName2Name(schema.SchemaDef, converters);
                     }
 
-                    if (result.DataDraft != null && (context.ApiStatus == StatusForApi.PublishedDraft || context.IsFrontendClient))
+                    if (result.DataDraft != null && (context.ApiStatus == StatusForApi.All || context.IsFrontendClient))
                     {
                         result.DataDraft = result.DataDraft.ConvertName2Name(schema.SchemaDef, converters);
                     }
@@ -340,45 +337,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return permissions.Allows(permission);
         }
 
-        private static Status[] GetFindStatus(QueryContext context)
+        private static Status[] GetStatus(QueryContext context)
         {
-            if (context.IsFrontendClient)
+            if (context.IsFrontendClient || context.ApiStatus == StatusForApi.All)
             {
-                return StatusAll;
-            }
-            else if (context.ApiStatus == StatusForApi.PublishedDraft)
-            {
-                return StatusPublishedDraft;
+                return null;
             }
             else
             {
                 return StatusPublishedOnly;
-            }
-        }
-
-        private static Status[] GetQueryStatus(QueryContext context)
-        {
-            if (context.IsFrontendClient)
-            {
-                switch (context.FrontendStatus)
-                {
-                    case StatusForFrontend.Archived:
-                        return StatusArchived;
-                    case StatusForFrontend.PublishedOnly:
-                        return StatusPublishedOnly;
-                    default:
-                        return StatusPublishedDraft;
-                }
-            }
-            else
-            {
-                switch (context.ApiStatus)
-                {
-                    case StatusForApi.PublishedDraft:
-                        return StatusPublishedDraft;
-                    default:
-                        return StatusPublishedOnly;
-                }
             }
         }
 
@@ -409,7 +376,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private static bool ShouldIncludeDraft(QueryContext context)
         {
-            return context.ApiStatus == StatusForApi.PublishedDraft || context.IsFrontendClient;
+            return context.ApiStatus == StatusForApi.All || context.IsFrontendClient;
         }
     }
 }

@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Squidex.Areas.Api.Controllers.Backups.Models;
 using Squidex.Domain.Apps.Entities.Backup;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Shared;
@@ -44,16 +43,16 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/backups/")]
-        [ProducesResponseType(typeof(List<BackupJobDto>), 200)]
+        [ProducesResponseType(typeof(BackupJobsDto), 200)]
         [ApiPermission(Permissions.AppBackupsRead)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetJobs(string app)
+        public async Task<IActionResult> GetBackups(string app)
         {
             var backupGrain = grainFactory.GetGrain<IBackupGrain>(AppId);
 
             var jobs = await backupGrain.GetStateAsync();
 
-            var response = jobs.Value.ToArray(BackupJobDto.FromBackup);
+            var response = BackupJobsDto.FromBackups(jobs.Value, this, app);
 
             return Ok(response);
         }

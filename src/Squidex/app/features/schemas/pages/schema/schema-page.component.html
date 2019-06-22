@@ -11,10 +11,10 @@
         </button>
 
         <div class="btn-group mr-1" #buttonPublish>
-            <button type="button" class="btn btn-publishing btn-toggle" [class.btn-success]="schema.isPublished" [disabled]="schema.isPublished" (click)="publish()">
+            <button type="button" class="btn btn-publishing btn-toggle" [class.btn-success]="schema.isPublished" [disabled]="!schema.canPublish" (click)="publish()">
                 Published
             </button>
-            <button type="button" class="btn btn-publishing btn-toggle" [class.btn-danger]="!schema.isPublished" [disabled]="!schema.isPublished" (click)="unpublish()">
+            <button type="button" class="btn btn-publishing btn-toggle" [class.btn-danger]="!schema.isPublished" [disabled]="!schema.canUnpublish" (click)="unpublish()">
                 Unpublished
             </button>
         </div>
@@ -31,20 +31,25 @@
                     Edit Preview Urls
                 </a>
                 
-                <div class="dropdown-divider"></div>
-
-                <a class="dropdown-item" (click)="cloneSchema()">
-                    Clone
-                </a>
+                <ng-container *ngIf="schemasState.canCreate">
+                    <div class="dropdown-divider"></div>
+    
+                    <a class="dropdown-item" (click)="cloneSchema()">
+                        Clone
+                    </a>
+                </ng-container>
                 
-                <div class="dropdown-divider"></div>
-
-                <a class="dropdown-item dropdown-item-delete" 
-                    (sqxConfirmClick)="deleteSchema()" 
-                    confirmTitle="Delete schema" 
-                    confirmText="Do you really want to delete the schema?">
-                    Delete
-                </a>
+                <ng-container>
+                    <div class="dropdown-divider"></div>
+    
+                    <a class="dropdown-item dropdown-item-delete"
+                        [class.disabled]="!schema.canDelete"
+                        (sqxConfirmClick)="deleteSchema()" 
+                        confirmTitle="Delete schema" 
+                        confirmText="Do you really want to delete the schema?">
+                        Delete
+                    </a>
+                </ng-container>
             </div>
         </div>
 
@@ -61,13 +66,14 @@
         <div class="table-items-row table-items-row-empty" *ngIf="schema && schema.fields.length === 0">
             No field created yet.
             
-            <button type="button" class="btn btn-success btn-sm ml-2" (click)="addFieldDialog.show()">
+            <button type="button" class="btn btn-success btn-sm ml-2" (click)="addFieldDialog.show()" *ngIf="schema.canAddField">
                 <i class="icon icon-plus"></i> Add Field
             </button>
         </div>
 
         <ng-container *ngIf="patternsState.patterns | async; let patterns">
             <div class="schemas"
+                [sqxSortDisabled]="!schema.canOrderFields"
                 [sqxSortModel]="schema.fields"
                 (sqxSort)="sortFields($event)">
                 <div *ngFor="let field of schema.fields; trackBy: trackByField.bind(this)">
@@ -75,7 +81,7 @@
                 </div>
             </div>
     
-            <button type="button" class="btn btn-success field-button" (click)="addFieldDialog.show()">
+            <button type="button" class="btn btn-success field-button" (click)="addFieldDialog.show()" *ngIf="schema.canAddField">
                 <i class="icon icon-plus field-button-icon"></i> <div class="field-button-text">Add Field</div>
             </button>
         </ng-container>

@@ -76,7 +76,6 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [HttpPost]
         [Route("apps/{app}/comments/{commentsId}")]
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> PostComment(string app, Guid commentsId, [FromBody] UpsertCommentDto request)
@@ -104,7 +103,6 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutComment(string app, Guid commentsId, Guid commentId, [FromBody] UpsertCommentDto request)
@@ -126,7 +124,6 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteComment(string app, Guid commentsId, Guid commentId)

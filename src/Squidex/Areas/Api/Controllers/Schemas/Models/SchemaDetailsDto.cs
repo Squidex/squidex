@@ -5,48 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using NodaTime;
 using Squidex.Areas.Api.Controllers.Schemas.Models.Converters;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public sealed class SchemaDetailsDto
+    public sealed class SchemaDetailsDto : SchemaDto
     {
         private static readonly Dictionary<string, string> EmptyPreviewUrls = new Dictionary<string, string>();
-
-        /// <summary>
-        /// The id of the schema.
-        /// </summary>
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// The name of the schema. Unique within the app.
-        /// </summary>
-        [Required]
-        [RegularExpression("^[a-z0-9]+(\\-[a-z0-9]+)*$")]
-        public string Name { get; set; }
-
-        /// <summary>
-        /// The name of the category.
-        /// </summary>
-        public string Category { get; set; }
-
-        /// <summary>
-        /// Indicates if the schema is a singleton.
-        /// </summary>
-        public bool IsSingleton { get; set; }
-
-        /// <summary>
-        /// Indicates if the schema is published.
-        /// </summary>
-        public bool IsPublished { get; set; }
 
         /// <summary>
         /// The scripts.
@@ -64,54 +36,21 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         [Required]
         public List<FieldDto> Fields { get; set; }
 
-        /// <summary>
-        /// The schema properties.
-        /// </summary>
-        [Required]
-        public SchemaPropertiesDto Properties { get; set; } = new SchemaPropertiesDto();
-
-        /// <summary>
-        /// The user that has created the schema.
-        /// </summary>
-        [Required]
-        public RefToken CreatedBy { get; set; }
-
-        /// <summary>
-        /// The user that has updated the schema.
-        /// </summary>
-        [Required]
-        public RefToken LastModifiedBy { get; set; }
-
-        /// <summary>
-        /// The date and time when the schema has been created.
-        /// </summary>
-        public Instant Created { get; set; }
-
-        /// <summary>
-        /// The date and time when the schema has been modified last.
-        /// </summary>
-        public Instant LastModified { get; set; }
-
-        /// <summary>
-        /// The version of the schema.
-        /// </summary>
-        public long Version { get; set; }
-
-        public static SchemaDetailsDto FromSchema(ISchemaEntity schema)
+        public static SchemaDetailsDto FromSchemaWithDetails(ISchemaEntity schema, ApiController controller, string app)
         {
-            var response = new SchemaDetailsDto();
+            var result = new SchemaDetailsDto();
 
-            SimpleMapper.Map(schema, response);
-            SimpleMapper.Map(schema.SchemaDef, response);
-            SimpleMapper.Map(schema.SchemaDef.Scripts, response.Scripts);
-            SimpleMapper.Map(schema.SchemaDef.Properties, response.Properties);
+            SimpleMapper.Map(schema, result);
+            SimpleMapper.Map(schema.SchemaDef, result);
+            SimpleMapper.Map(schema.SchemaDef.Scripts, result.Scripts);
+            SimpleMapper.Map(schema.SchemaDef.Properties, result.Properties);
 
             if (schema.SchemaDef.PreviewUrls.Count > 0)
             {
-                response.PreviewUrls = new Dictionary<string, string>(schema.SchemaDef.PreviewUrls);
+                result.PreviewUrls = new Dictionary<string, string>(schema.SchemaDef.PreviewUrls);
             }
 
-            response.Fields = new List<FieldDto>();
+            result.Fields = new List<FieldDto>();
 
             foreach (var field in schema.SchemaDef.Fields)
             {
@@ -144,10 +83,27 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                     }
                 }
 
-                response.Fields.Add(fieldDto);
+                result.Fields.Add(fieldDto);
             }
 
-            return response;
+            result.CreateLinks(controller, app);
+
+            return result;
+        }
+
+        protected override void CreateLinks(ApiController controller, string app)
+        {
+            base.CreateLinks(controller, app);
+
+            var allowUpdate = controller.HasPermission(Permissions.AppSchemasUpdate, app, Name);
+
+            if (Fields != null)
+            {
+                foreach (var nested in Fields)
+                {
+                    nested.CreateLinks(controller, app, Name, allowUpdate);
+                }
+            }
         }
     }
 }

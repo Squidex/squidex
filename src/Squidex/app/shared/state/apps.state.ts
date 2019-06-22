@@ -7,19 +7,16 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
 
 import {
-    DateTime,
     DialogService,
     ImmutableArray,
-    Permission,
     shareSubscribed,
     State
 } from '@app/framework';
 
 import {
-    AppCreatedDto,
     AppDto,
     AppsService,
     CreateAppDto
@@ -43,12 +40,18 @@ export class AppsState extends State<Snapshot> {
         return this.snapshot.selectedApp ? this.snapshot.selectedApp.name : '';
     }
 
-    public selectedApp =
-        this.changes.pipe(map(s => s.selectedApp),
-            distinctUntilChanged(sameApp));
+    public get selectedAppState() {
+        return this.snapshot.selectedApp;
+    }
 
     public apps =
-        this.changes.pipe(map(s => s.apps),
+        this.project(s => s.apps);
+
+    public selectedApp =
+        this.project(s => s.selectedApp, sameApp);
+
+    public selectedValidApp =
+        this.selectedApp.pipe(filter(x => !!x), map(x => <AppDto>x),
             distinctUntilChanged());
 
     constructor(
@@ -82,9 +85,8 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: CreateAppDto, now?: DateTime): Observable<AppDto> {
+    public create(request: CreateAppDto): Observable<AppDto> {
         return this.appsService.postApp(request).pipe(
-            map(payload => createApp(request, payload, now)),
             tap(created => {
                 this.next(s => {
                     const apps = s.apps.push(created).sortByStringAsc(x => x.name);
@@ -95,32 +97,21 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public delete(name: string): Observable<any> {
-        return this.appsService.deleteApp(name).pipe(
+    public delete(app: AppDto): Observable<any> {
+        return this.appsService.deleteApp(app).pipe(
             tap(() => {
                 this.next(s => {
-                    const apps = s.apps.filter(x => x.name !== name);
+                    const apps = s.apps.filter(x => x.name !== app.name);
 
-                    const selectedApp = s.selectedApp && s.selectedApp.name === name ? null : s.selectedApp;
+                    const selectedApp =
+                        s.selectedApp &&
+                        s.selectedApp.name === app.name ?
+                        null :
+                        s.selectedApp;
 
                     return { ...s, apps, selectedApp };
                 });
             }),
             shareSubscribed(this.dialogs));
     }
-}
-
-function createApp(request: CreateAppDto, response: AppCreatedDto, now?: DateTime) {
-    now = now || DateTime.now();
-
-    const app = new AppDto(
-        response.id,
-        request.name,
-        response.permissions.map(x => new Permission(x)),
-        now,
-        now,
-        response.planName,
-        response.planUpgrade);
-
-    return app;
 }

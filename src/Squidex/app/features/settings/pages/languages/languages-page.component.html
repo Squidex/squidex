@@ -22,7 +22,7 @@
             </sqx-language>
 
             <ng-container *ngIf="languagesState.newLanguages | async; let newLanguages">
-                <div class="table-items-footer">
+                <div class="table-items-footer" *ngIf="languagesState.canCreate | async">
                     <form [formGroup]="addLanguageForm.form" (ngSubmit)="addLanguage()">
                         <div class="row no-gutters">
                             <div class="col">

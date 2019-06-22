@@ -74,18 +74,18 @@ namespace Squidex.Areas.Api.Controllers.Assets
             [FromQuery] int? quality = null,
             [FromQuery] string mode = null)
         {
-            IAssetEntity entity;
+            IAssetEntity asset;
 
             if (Guid.TryParse(idOrSlug, out var guid))
             {
-                entity = await assetRepository.FindAssetAsync(guid);
+                asset = await assetRepository.FindAssetAsync(guid);
             }
             else
             {
-                entity = await assetRepository.FindAssetBySlugAsync(App.Id, idOrSlug);
+                asset = await assetRepository.FindAssetBySlugAsync(App.Id, idOrSlug);
             }
 
-            return DeliverAsset(entity, version, width, height, quality, mode, dl);
+            return DeliverAsset(asset, version, width, height, quality, mode, dl);
         }
 
         /// <summary>
@@ -115,25 +115,25 @@ namespace Squidex.Areas.Api.Controllers.Assets
             [FromQuery] int? quality = null,
             [FromQuery] string mode = null)
         {
-            var entity = await assetRepository.FindAssetAsync(id);
+            var asset = await assetRepository.FindAssetAsync(id);
 
-            return DeliverAsset(entity, version, width, height, quality, mode, dl);
+            return DeliverAsset(asset, version, width, height, quality, mode, dl);
         }
 
-        private IActionResult DeliverAsset(IAssetEntity entity, long version, int? width, int? height, int? quality, string mode, int download = 1)
+        private IActionResult DeliverAsset(IAssetEntity asset, long version, int? width, int? height, int? quality, string mode, int download = 1)
         {
-            if (entity == null || entity.FileVersion < version || width == 0 || height == 0 || quality == 0)
+            if (asset == null || asset.FileVersion < version || width == 0 || height == 0 || quality == 0)
             {
                 return NotFound();
             }
 
-            Response.Headers[HeaderNames.ETag] = entity.FileVersion.ToString();
+            Response.Headers[HeaderNames.ETag] = asset.FileVersion.ToString();
 
             var handler = new Func<Stream, Task>(async bodyStream =>
             {
-                var assetId = entity.Id.ToString();
+                var assetId = asset.Id.ToString();
 
-                if (entity.IsImage && (width.HasValue || height.HasValue || quality.HasValue))
+                if (asset.IsImage && (width.HasValue || height.HasValue || quality.HasValue))
                 {
                     var assetSuffix = $"{width}_{height}_{mode}";
 
@@ -144,7 +144,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                     try
                     {
-                        await assetStore.DownloadAsync(assetId, entity.FileVersion, assetSuffix, bodyStream);
+                        await assetStore.DownloadAsync(assetId, asset.FileVersion, assetSuffix, bodyStream);
                     }
                     catch (AssetNotFoundException)
                     {
@@ -156,7 +156,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                                 {
                                     using (Profiler.Trace("ResizeDownload"))
                                     {
-                                        await assetStore.DownloadAsync(assetId, entity.FileVersion, null, sourceStream);
+                                        await assetStore.DownloadAsync(assetId, asset.FileVersion, null, sourceStream);
                                         sourceStream.Position = 0;
                                     }
 
@@ -168,7 +168,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                                     using (Profiler.Trace("ResizeUpload"))
                                     {
-                                        await assetStore.UploadAsync(assetId, entity.FileVersion, assetSuffix, destinationStream);
+                                        await assetStore.UploadAsync(assetId, asset.FileVersion, assetSuffix, destinationStream);
                                         destinationStream.Position = 0;
                                     }
 
@@ -180,17 +180,17 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
                 else
                 {
-                    await assetStore.DownloadAsync(assetId, entity.FileVersion, null, bodyStream);
+                    await assetStore.DownloadAsync(assetId, asset.FileVersion, null, bodyStream);
                 }
             });
 
             if (download == 1)
             {
-                return new FileCallbackResult(entity.MimeType, entity.FileName, true, handler);
+                return new FileCallbackResult(asset.MimeType, asset.FileName, true, handler);
             }
             else
             {
-                return new FileCallbackResult(entity.MimeType, null, true, handler);
+                return new FileCallbackResult(asset.MimeType, null, true, handler);
             }
         }
 

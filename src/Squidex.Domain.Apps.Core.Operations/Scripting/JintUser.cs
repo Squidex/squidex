@@ -48,9 +48,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
         private static ObjectWrapper CreateUser(Engine engine, string id, bool isClient, string email, string name, IEnumerable<Claim> allClaims)
         {
             var claims =
-                allClaims.GroupBy(x => x.Type)
+                allClaims.GroupBy(x => x.Type.Split(ClaimSeparators).Last())
                     .ToDictionary(
-                        x => x.Key.Split(ClaimSeparators).Last(),
+                        x => x.Key,
                         x => x.Select(y => y.Value).ToArray());
 
             return new ObjectWrapper(engine, new { id, isClient, email, name, claims });

@@ -28,5 +28,10 @@ namespace Squidex.Domain.Apps.Core.Contents
         {
             return Flow.TryGetValue(status, out var state) && state.Contains(toStatus);
         }
+
+        public static IEnumerable<Status> Next(Status status)
+        {
+            return Flow.TryGetValue(status, out var result) ? result : Enumerable.Empty<Status>();
+        }
     }
 }

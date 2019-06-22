@@ -8,11 +8,17 @@
 import { Injectable } from '@angular/core';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-import { State, Types } from '@app/framework';
+import {
+    hasAnyLink,
+    State,
+    Types
+} from '@app/framework';
 
 import { AppsState } from './apps.state';
 
 import { UIService, UISettingsDto } from './../services/ui.service';
+
+import { UsersService } from './../services/users.service';
 
 interface Snapshot {
     // All common settings.
@@ -23,13 +29,36 @@ interface Snapshot {
 
     // The merged settings of app and common settings.
     settings: object & any;
+
+    // Indicates if the user can read events.
+    canReadEvents?: boolean;
+
+    // Indicates if the user can read users.
+    canReadUsers?: boolean;
+
+    // Indicates if the user can restore backups.
+    canRestore?: boolean;
+
+    // Indicates if the user can use at least one admin resource.
+    canUserAdminResource?: boolean;
 }
 
 @Injectable()
 export class UIState extends State<Snapshot> {
     public settings =
-        this.changes.pipe(map(x => x.settings),
-            distinctUntilChanged());
+        this.project(x => x.settings);
+
+    public canReadEvents =
+        this.project(x => !!x.canReadEvents);
+
+    public canReadUsers =
+        this.project(x => !!x.canReadUsers);
+
+    public canRestore =
+        this.project(x => !!x.canRestore);
+
+    public canUserAdminResource =
+        this.project(x => !!x.canRestore || !!x.canReadUsers || !!x.canReadEvents);
 
     public get<T>(path: string, defaultValue: T) {
         return this.settings.pipe(map(x => this.getValue(x, path, defaultValue)),
@@ -38,16 +67,16 @@ export class UIState extends State<Snapshot> {
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly uiService: UIService
+        private readonly uiService: UIService,
+        private readonly usersService: UsersService
     ) {
-        super({ settings: { }, settingsCommon: { }, settingsApp: { } });
+        super({ settings: {}, settingsCommon: {}, settingsApp: {} });
 
+        this.loadResources();
         this.loadCommon();
 
-        appsState.selectedApp.subscribe(app => {
-            if (app) {
-                this.load();
-            }
+        appsState.selectedValidApp.subscribe(app => {
+            this.load();
         });
     }
 
@@ -64,6 +93,17 @@ export class UIState extends State<Snapshot> {
         this.uiService.getCommonSettings()
             .subscribe(payload => {
                 this.next(s => updateCommonSettings(s, payload));
+            });
+    }
+
+    private loadResources() {
+        this.usersService.getResources()
+            .subscribe(payload => {
+                this.next(s => ({ ...s,
+                    canReadEvents: hasAnyLink(payload, 'admin/events'),
+                    canReadUsers: hasAnyLink(payload, 'admin/users'),
+                    canRestore: hasAnyLink(payload, 'admin/restore')
+                }));
             });
     }
 
@@ -151,11 +191,11 @@ export class UIState extends State<Snapshot> {
 function updateAppSettings(state: Snapshot, settingsApp: object & any) {
     const { settingsCommon } = state;
 
-    return { settings: { ...settingsCommon, ...settingsApp }, settingsApp, settingsCommon };
+    return { ...state, settings: { ...settingsCommon, ...settingsApp }, settingsApp, settingsCommon };
 }
 
 function updateCommonSettings(state: Snapshot, settingsCommon: object & any) {
     const { settingsApp } = state;
 
-    return { settings: { ...settingsCommon, ...settingsApp }, settingsApp, settingsCommon };
+    return { ...state, settings: { ...settingsCommon, ...settingsApp }, settingsApp, settingsCommon };
 }

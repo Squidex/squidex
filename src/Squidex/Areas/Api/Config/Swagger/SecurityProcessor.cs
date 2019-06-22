@@ -15,7 +15,7 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
-    public class SecurityProcessor : SecurityDefinitionAppender
+    public sealed class SecurityProcessor : SecurityDefinitionAppender
     {
         public SecurityProcessor(IOptions<UrlsOptions> urlOptions)
             : base(Constants.SecurityDefinition, Enumerable.Empty<string>(), CreateOAuthSchema(urlOptions.Value))
@@ -24,26 +24,33 @@ namespace Squidex.Areas.Api.Config.Swagger
 
         private static SwaggerSecurityScheme CreateOAuthSchema(UrlsOptions urlOptions)
         {
-            var securityScheme = new SwaggerSecurityScheme();
+            var security = new SwaggerSecurityScheme
+            {
+                Type = SwaggerSecuritySchemeType.OAuth2
+            };
 
             var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token", false);
 
-            securityScheme.TokenUrl = tokenUrl;
+            security.TokenUrl = tokenUrl;
 
-            var securityDocs = NSwagHelper.LoadDocs("security");
-            var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
+            SetupDescription(security, tokenUrl);
 
-            securityScheme.Description = securityText;
+            security.Flow = SwaggerOAuth2Flow.Application;
 
-            securityScheme.Type = SwaggerSecuritySchemeType.OAuth2;
-            securityScheme.Flow = SwaggerOAuth2Flow.Application;
-
-            securityScheme.Scopes = new Dictionary<string, string>
+            security.Scopes = new Dictionary<string, string>
             {
                 [Constants.ApiScope] = "Read and write access to the API"
             };
 
-            return securityScheme;
+            return security;
+        }
+
+        private static void SetupDescription(SwaggerSecurityScheme securityScheme, string tokenUrl)
+        {
+            var securityDocs = NSwagHelper.LoadDocs("security");
+            var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
+
+            securityScheme.Description = securityText;
         }
     }
 }

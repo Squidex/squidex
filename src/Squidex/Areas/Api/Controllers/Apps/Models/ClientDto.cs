@@ -5,16 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Reflection;
-using Roles = Squidex.Domain.Apps.Core.Apps.Role;
+using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class ClientDto
+    public sealed class ClientDto : Resource
     {
         /// <summary>
         /// The client id.
@@ -39,14 +38,28 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string Role { get; set; }
 
-        public static ClientDto FromKvp(KeyValuePair<string, AppClient> kvp)
+        public static ClientDto FromClient(string id, AppClient client, ApiController controller, string app)
         {
-            return SimpleMapper.Map(kvp.Value, new ClientDto { Id = kvp.Key });
+            var result = SimpleMapper.Map(client, new ClientDto { Id = id });
+
+            return result.CreateLinks(controller, app);
         }
 
-        public static ClientDto FromCommand(AttachClient command)
+        private ClientDto CreateLinks(ApiController controller, string app)
         {
-            return SimpleMapper.Map(command, new ClientDto { Name = command.Id, Role = Roles.Editor });
+            var values = new { app, id = Id };
+
+            if (controller.HasPermission(Permissions.AppClientsUpdate, app))
+            {
+                AddPutLink("update", controller.Url<AppClientsController>(x => nameof(x.PutClient), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppClientsDelete, app))
+            {
+                AddDeleteLink("delete", controller.Url<AppClientsController>(x => nameof(x.DeleteClient), values));
+            }
+
+            return this;
         }
     }
 }

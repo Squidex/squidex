@@ -81,7 +81,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         Create(c);
 
-                        return EntityCreatedResult.Create(c.Data, Version);
+                        return Snapshot;
                     });
 
                 case UpdateContent updateContent:
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     });
 
                 case ChangeContentStatus changeContentStatus:
-                    return UpdateAsync(changeContentStatus, async c =>
+                    return UpdateReturnAsync(changeContentStatus, async c =>
                     {
                         try
                         {
@@ -157,6 +157,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 throw;
                             }
                         }
+
+                        return Snapshot;
+                    });
+
+                case DiscardChanges discardChanges:
+                    return UpdateReturn(discardChanges, c =>
+                    {
+                        GuardContent.CanDiscardChanges(Snapshot.IsPending, c);
+
+                        DiscardChanges(c);
+
+                        return Snapshot;
                     });
 
                 case DeleteContent deleteContent:
@@ -169,14 +181,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         await ctx.ExecuteScriptAsync(s => s.Delete, "Delete", c, Snapshot.Data);
 
                         Delete(c);
-                    });
-
-                case DiscardChanges discardChanges:
-                    return UpdateAsync(discardChanges, c =>
-                    {
-                        GuardContent.CanDiscardChanges(Snapshot.IsPending, c);
-
-                        DiscardChanges(c);
                     });
 
                 default:
@@ -220,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 }
             }
 
-            return new ContentDataChangedResult(newData, Version);
+            return Snapshot;
         }
 
         public void Create(CreateContent command)

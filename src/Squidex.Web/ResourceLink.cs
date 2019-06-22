@@ -7,20 +7,16 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Areas.Api.Controllers.Users.Models
+namespace Squidex.Web
 {
-    public sealed class UserCreatedDto
+    public class ResourceLink
     {
-        /// <summary>
-        /// The id of the user.
-        /// </summary>
         [Required]
-        public string Id { get; set; }
+        [Display(Description = "The link url.")]
+        public string Href { get; set; }
 
-        /// <summary>
-        /// Additional permissions for the user.
-        /// </summary>
         [Required]
-        public string[] Permissions { get; set; }
+        [Display(Description = "The link method.")]
+        public string Method { get; set; } 
     }
 }

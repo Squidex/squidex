@@ -13,7 +13,8 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-text-danger" [class.invisible]="language.isMaster"
+                    <button type="button" class="btn btn-text-danger"
+                        [disabled]="!language.canDelete"
                         (sqxConfirmClick)="remove()"
                         confirmTitle="Remove language" 
                         confirmText="Do you really want to remove the language?">
@@ -29,25 +30,28 @@
             <div class="table-items-row-details-tabs clearfix">
                 <div class="float-right">
                     <button type="reset" class="btn btn-text" (click)="toggleEditing()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="submit" class="btn btn-primary" *ngIf="isEditable">Save</button>
                 </div>
             </div>
 
             <div class="table-items-row-details-tab">
-                <div class="form-group row">
+                <div class="form-group row" *ngIf="isEditable || fallbackLanguages.length > 0">
                     <label class="col-3 col-form-label fallback-label">Fallback</label>
 
                     <div class="col-9">
-                        <div class="fallback-languages" [sqxSortModel]="fallbackLanguages.mutableValues" *ngIf="fallbackLanguages.length > 0">
+                        <div class="fallback-languages" 
+                            [sqxSortModel]="fallbackLanguages.mutableValues" 
+                            [sqxSortDisabled]="!isEditable" 
+                            *ngIf="fallbackLanguages.length > 0">
                             <div class="fallback-language" *ngFor="let language of fallbackLanguages">
                                 <div class="row no-gutters">
-                                    <div class="col-auto">
+                                    <div class="col-auto" *ngIf="isEditable">
                                         <i class="icon-drag2 drag-handle mr-1"></i>
                                     </div>
                                     <div class="col">
                                         {{language.englishName}}
                                     </div>
-                                    <div class="col-auto">
+                                    <div class="col-auto" *ngIf="isEditable">
                                         <button type="button" class="btn btn-text-secondary btn-sm" (click)="removeFallbackLanguage(language)">
                                             <i class="icon-close"></i>
                                         </button>
@@ -56,7 +60,7 @@
                             </div>
                         </div>
 
-                        <form class="form fallback-form" (ngSubmit)="addFallbackLanguage()" *ngIf="otherLanguage">
+                        <form class="form fallback-form" (ngSubmit)="addFallbackLanguage()" *ngIf="otherLanguage && isEditable">
                             <div class="row no-gutters">
                                 <div class="col">
                                     <select class="form-control fallback-select" [(ngModel)]="otherLanguage" name="otherLanguage">

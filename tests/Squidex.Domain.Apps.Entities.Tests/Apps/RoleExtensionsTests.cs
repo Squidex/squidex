@@ -67,5 +67,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             Assert.Equal(Permission.Any, result.First().Id);
         }
+
+        [Fact]
+        public void Should_remove_common_permission()
+        {
+            var source = new PermissionSet("squidex.apps.my-app.common");
+            var result = source.WithoutApp("my-app");
+
+            Assert.Empty(result);
+        }
     }
 }

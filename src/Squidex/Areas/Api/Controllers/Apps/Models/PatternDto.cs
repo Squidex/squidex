@@ -6,20 +6,20 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class AppPatternDto
+    public sealed class PatternDto : Resource
     {
         /// <summary>
         /// Unique id of the pattern.
         /// </summary>
-        public Guid PatternId { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// The name of the suggestion.
@@ -38,14 +38,28 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string Message { get; set; }
 
-        public static AppPatternDto FromKvp(KeyValuePair<Guid, AppPattern> kvp)
+        public static PatternDto FromPattern(Guid id, AppPattern pattern, ApiController controller, string app)
         {
-            return SimpleMapper.Map(kvp.Value, new AppPatternDto { PatternId = kvp.Key });
+            var result = SimpleMapper.Map(pattern, new PatternDto { Id = id });
+
+            return result.CreateLinks(controller, app);
         }
 
-        public static AppPatternDto FromCommand(AddPattern command)
+        private PatternDto CreateLinks(ApiController controller, string app)
         {
-            return SimpleMapper.Map(command, new AppPatternDto());
+            var values = new { app, id = Id };
+
+            if (controller.HasPermission(Permissions.AppPatternsUpdate, app))
+            {
+                AddPutLink("update", controller.Url<AppPatternsController>(x => nameof(x.UpdatePattern), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppPatternsDelete, app))
+            {
+                AddDeleteLink("delete", controller.Url<AppPatternsController>(x => nameof(x.DeletePattern), values));
+            }
+
+            return this;
         }
     }
 }

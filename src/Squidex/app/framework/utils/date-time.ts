@@ -110,7 +110,7 @@ export class DateTime {
         if (parsedMoment.isValid()) {
             return new DateTime(parsedMoment.toDate());
         } else {
-            throw `${value} is not a valid date time string`;
+            throw Error(`DateTime: ${value} is not a valid date time string`);
         }
     }
 
@@ -120,7 +120,7 @@ export class DateTime {
         if (parsedMoment.isValid()) {
             return new DateTime(parsedMoment.toDate());
         } else {
-            throw `${value} is not a valid date time string`;
+            throw Error(`DateTime: ${value} is not a valid date time string`);
         }
     }
 
