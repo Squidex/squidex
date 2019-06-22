@@ -59,7 +59,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
 
-    @ViewChild('dueTimeSelector')
+    @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,

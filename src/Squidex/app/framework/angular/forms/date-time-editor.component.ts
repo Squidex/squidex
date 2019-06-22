@@ -41,7 +41,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     @Input()
     public hideClear: boolean;
 
-    @ViewChild('dateInput')
+    @ViewChild('dateInput', { static: false })
     public dateInput: ElementRef;
 
     public timeControl = new FormControl();

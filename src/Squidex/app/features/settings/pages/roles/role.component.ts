@@ -33,7 +33,7 @@ export class RoleComponent implements OnChanges {
     @Input()
     public allPermissions: AutocompleteSource;
 
-    @ViewChild('addInput')
+    @ViewChild('addInput', { static: false })
     public addPermissionInput: AutocompleteComponent;
 
     public isEditing = false;

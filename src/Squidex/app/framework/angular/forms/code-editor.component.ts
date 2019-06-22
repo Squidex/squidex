@@ -35,7 +35,7 @@ export class CodeEditorComponent extends ExternalControlComponent<string> implem
     private value: string;
     private isDisabled = false;
 
-    @ViewChild('editor')
+    @ViewChild('editor', { static: false })
     public editor: ElementRef;
 
     @Input()

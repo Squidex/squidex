@@ -64,10 +64,10 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
             ]
         });
 
-    @ViewChild('editor')
+    @ViewChild('editor', { static: false })
     public editor: ElementRef<HTMLElement>;
 
-    @ViewChild('searchBox')
+    @ViewChild('searchBox', { static: false })
     public searchBoxInput: ElementRef<HTMLInputElement>;
 
     constructor(changeDetector: ChangeDetectorRef,

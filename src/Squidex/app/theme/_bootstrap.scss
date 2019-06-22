@@ -162,7 +162,7 @@ a {
 .dropdown-menu {
     // White dropdown menu without border and shadow.
     & {
-        @include box-shadow(0, 3px, 16px, .2px);
+        @include box-shadow(0, 3px, 16px, .2);
         border: 0;
         background: $panel-light-background;
     }

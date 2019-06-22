@@ -16,6 +16,7 @@ import {
     DialogModel,
     MessageBus,
     ResourceOwner,
+    SchemaCategory,
     SchemaDto,
     SchemasState
 } from '@app/shared';
@@ -94,8 +95,8 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
         this.addSchemaDialog.show();
     }
 
-    public trackByCategory(index: number, category: string) {
-        return category;
+    public trackByCategory(index: number, category: SchemaCategory) {
+        return category.name;
     }
 }
 

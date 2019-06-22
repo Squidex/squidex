@@ -18,10 +18,8 @@
     <ng-container content>
         <ng-container *ngIf="schemasState.publishedSchemas | async; let schemas">
             <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
-                [name]="category"
-                [schemas]="schemas"
+                [schemaCategory]="category"
                 [schemasFilter]="schemasFilter.valueChanges | async"
-                [routeSingletonToContent]="true"
                 [forContent]="true">
             </sqx-schema-category>
         </ng-container>
