@@ -58,8 +58,6 @@
     "@types/react": "16.8.22",
     "@types/react-dom": "16.8.4",
     "@types/sortablejs": "1.7.2",
-    "awesome-typescript-loader": "5.2.1",
-    "babel-core": "6.26.3",
     "browserslist": "^4.6.3",
     "caniuse-lite": "^1.0.30000976",
     "circular-dependency-plugin": "5.0.2",
