@@ -156,7 +156,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 LastModified = now,
                 LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
                 Data = data,
-                DataDraft = dataDraft
+                DataDraft = dataDraft,
+                Status = Status.Draft
             };
 
             return content;

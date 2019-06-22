@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -21,6 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
     public class GuardContentTests
     {
         private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
+        private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
         private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
 
         [Fact]
@@ -65,119 +67,155 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         }
 
         [Fact]
-        public void CanUpdate_should_throw_exception_if_data_is_null()
+        public async Task CanUpdate_should_throw_exception_if_data_is_null()
         {
             SetupSingleton(false);
+            SetupCanUpdate(true);
 
+            var content = CreateContent(Status.Draft, false);
             var command = new UpdateContent();
 
-            ValidationAssert.Throws(() => GuardContent.CanUpdate(command),
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanUpdate(content, contentWorkflow, command),
                 new ValidationError("Data is required.", "Data"));
         }
 
         [Fact]
-        public void CanUpdate_should_not_throw_exception_if_data_is_not_null()
+        public async Task CanUpdate_should_throw_exception_if_workflow_blocks_it()
         {
             SetupSingleton(false);
+            SetupCanUpdate(false);
 
+            var content = CreateContent(Status.Draft, false);
             var command = new UpdateContent { Data = new NamedContentData() };
 
-            GuardContent.CanUpdate(command);
+            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanUpdate(content, contentWorkflow, command));
         }
 
         [Fact]
-        public void CanPatch_should_throw_exception_if_data_is_null()
+        public async Task CanUpdate_should_not_throw_exception_if_data_is_not_null()
         {
             SetupSingleton(false);
+            SetupCanUpdate(true);
 
+            var content = CreateContent(Status.Draft, false);
+            var command = new UpdateContent { Data = new NamedContentData() };
+
+            await GuardContent.CanUpdate(content, contentWorkflow, command);
+        }
+
+        [Fact]
+        public async Task CanPatch_should_throw_exception_if_data_is_null()
+        {
+            SetupSingleton(false);
+            SetupCanUpdate(true);
+
+            var content = CreateContent(Status.Draft, false);
             var command = new PatchContent();
 
-            ValidationAssert.Throws(() => GuardContent.CanPatch(command),
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanPatch(content, contentWorkflow, command),
                 new ValidationError("Data is required.", "Data"));
         }
 
         [Fact]
-        public void CanPatch_should_not_throw_exception_if_data_is_not_null()
+        public async Task CanPatch_should_throw_exception_if_workflow_blocks_it()
         {
             SetupSingleton(false);
+            SetupCanUpdate(false);
 
+            var content = CreateContent(Status.Draft, false);
             var command = new PatchContent { Data = new NamedContentData() };
 
-            GuardContent.CanPatch(command);
+            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanPatch(content, contentWorkflow, command));
         }
 
         [Fact]
-        public void CanChangeContentStatus_should_throw_exception_if_status_not_valid()
+        public async Task CanPatch_should_not_throw_exception_if_data_is_not_null()
         {
             SetupSingleton(false);
+            SetupCanUpdate(true);
 
-            var command = new ChangeContentStatus { Status = (Status)10 };
+            var content = CreateContent(Status.Draft, false);
+            var command = new PatchContent { Data = new NamedContentData() };
 
-            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Archived, command),
-                new ValidationError("Status is not a valid value.", "Status"));
+            await GuardContent.CanPatch(content, contentWorkflow, command);
         }
 
         [Fact]
-        public void CanChangeContentStatus_should_throw_exception_if_status_flow_not_valid()
+        public async Task CanChangeStatus_should_throw_exception_if_publishing_without_pending_changes()
         {
             SetupSingleton(false);
 
+            var content = CreateContent(Status.Published, false);
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Archived, command),
-                new ValidationError("Cannot change status from Archived to Published.", "Status"));
-        }
-
-        [Fact]
-        public void CanChangeContentStatus_should_throw_exception_if_due_date_in_past()
-        {
-            SetupSingleton(false);
-
-            var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast };
-
-            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Draft, command),
-                new ValidationError("Due time must be in the future.", "DueTime"));
-        }
-
-        [Fact]
-        public void CanChangeContentStatus_should_throw_exception_if_publishing_without_pending_changes()
-        {
-            SetupSingleton(false);
-
-            var command = new ChangeContentStatus { Status = Status.Published };
-
-            ValidationAssert.Throws(() => GuardContent.CanChangeContentStatus(schema, false, Status.Published, command),
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command),
                 new ValidationError("Content has no changes to publish.", "Status"));
         }
 
         [Fact]
-        public void CanChangeContentStatus_should_throw_exception_if_singleton()
+        public async Task CanChangeStatus_should_throw_exception_if_singleton()
         {
             SetupSingleton(true);
 
+            var content = CreateContent(Status.Published, false);
             var command = new ChangeContentStatus { Status = Status.Draft };
 
-            Assert.Throws<DomainException>(() => GuardContent.CanChangeContentStatus(schema, false, Status.Published, command));
+            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command));
         }
 
         [Fact]
-        public void CanChangeContentStatus_should_not_throw_exception_if_publishing_with_pending_changes()
+        public async Task CanChangeStatus_should_not_throw_exception_if_publishing_with_pending_changes()
         {
             SetupSingleton(true);
 
+            var content = CreateContent(Status.Published, true);
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            GuardContent.CanChangeContentStatus(schema, true, Status.Published, command);
+            await GuardContent.CanChangeStatus(schema, content, contentWorkflow, command);
         }
 
         [Fact]
-        public void CanChangeContentStatus_should_not_throw_exception_if_status_flow_valid()
+        public async Task CanChangeStatus_should_throw_exception_if_due_date_in_past()
         {
             SetupSingleton(false);
 
+            var content = CreateContent(Status.Draft, false);
+            var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast };
+
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status))
+                .Returns(true);
+
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command),
+                new ValidationError("Due time must be in the future.", "DueTime"));
+        }
+
+        [Fact]
+        public async Task CanChangeStatus_should_throw_exception_if_status_flow_not_valid()
+        {
+            SetupSingleton(false);
+
+            var content = CreateContent(Status.Draft, false);
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            GuardContent.CanChangeContentStatus(schema, false, Status.Draft, command);
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status))
+                .Returns(false);
+
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command),
+                new ValidationError("Cannot change status from Draft to Published.", "Status"));
+        }
+
+        [Fact]
+        public async Task CanChangeStatus_should_not_throw_exception_if_status_flow_valid()
+        {
+            SetupSingleton(false);
+
+            var content = CreateContent(Status.Draft, false);
+            var command = new ChangeContentStatus { Status = Status.Published };
+
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status))
+                .Returns(true);
+
+            await GuardContent.CanChangeStatus(schema, content, contentWorkflow, command);
         }
 
         [Fact]
@@ -218,10 +256,26 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             GuardContent.CanDelete(schema, command);
         }
 
+        private void SetupCanUpdate(bool canUpdate)
+        {
+            A.CallTo(() => contentWorkflow.CanUpdateAsync(A<IContentEntity>.Ignored))
+                .Returns(canUpdate);
+        }
+
         private void SetupSingleton(bool isSingleton)
         {
             A.CallTo(() => schema.SchemaDef)
                 .Returns(new Schema("schema", isSingleton: isSingleton));
+        }
+
+        private IContentEntity CreateContent(Status status, bool isPending)
+        {
+            var content = A.Fake<IContentEntity>();
+
+            A.CallTo(() => content.Status).Returns(status);
+            A.CallTo(() => content.IsPending).Returns(isPending);
+
+            return content;
         }
     }
 }

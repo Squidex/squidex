@@ -14,6 +14,7 @@ using NSwag.SwaggerGeneration;
 using NSwag.SwaggerGeneration.Processors;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.Rules.Models;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
 namespace Squidex.Areas.Api.Config.Swagger
@@ -76,7 +77,8 @@ namespace Squidex.Areas.Api.Config.Swagger
                 }),
 
                 new PrimitiveTypeMapper(typeof(Language), s => s.Type = JsonObjectType.String),
-                new PrimitiveTypeMapper(typeof(RefToken), s => s.Type = JsonObjectType.String)
+                new PrimitiveTypeMapper(typeof(RefToken), s => s.Type = JsonObjectType.String),
+                new PrimitiveTypeMapper(typeof(Status), s => s.Type = JsonObjectType.String),
             };
         }
     }

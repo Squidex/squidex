@@ -28,8 +28,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static readonly IGraphType Float = new FloatGraphType();
 
-        public static readonly IGraphType Status = new EnumerationGraphType<Status>();
-
         public static readonly IGraphType String = new StringGraphType();
 
         public static readonly IGraphType Boolean = new BooleanGraphType();
@@ -45,8 +43,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
         public static readonly IGraphType NonNullString = new NonNullGraphType(String);
 
         public static readonly IGraphType NonNullBoolean = new NonNullGraphType(Boolean);
-
-        public static readonly IGraphType NonNullStatusType = new NonNullGraphType(Status);
 
         public static readonly IGraphType NoopDate = new NoopGraphType(Date);
 

@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Events.Contents
     [EventType(nameof(ContentCreated))]
     public sealed class ContentCreated : ContentEvent
     {
+        public Status Status { get; set; }
+
         public NamedContentData Data { get; set; }
     }
 }

@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
-    public sealed class StatusSerializer : SerializerBase<Status2>
+    public sealed class StatusSerializer : SerializerBase<Status>
     {
         private static volatile int isRegistered;
 
@@ -24,14 +24,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             }
         }
 
-        public override Status2 Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+        public override Status Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             var value = context.Reader.ReadString();
 
-            return new Status2(value);
+            return new Status(value);
         }
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Status2 value)
+        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Status value)
         {
             context.Writer.WriteString(value.Name);
         }
