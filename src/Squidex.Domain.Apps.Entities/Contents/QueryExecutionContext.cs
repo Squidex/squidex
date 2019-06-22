@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.context = context;
         }
 
-        public async Task<IAssetEntity> FindAssetAsync(Guid id)
+        public virtual async Task<IAssetEntity> FindAssetAsync(Guid id)
         {
             var asset = cachedAssets.GetOrDefault(id);
 
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return asset;
         }
 
-        public async Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id)
+        public virtual async Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id)
         {
             var content = cachedContents.GetOrDefault(id);
 
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return content;
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAssetsAsync(string query)
+        public virtual async Task<IResultList<IAssetEntity>> QueryAssetsAsync(string query)
         {
             var assets = await assetQuery.QueryAsync(context, Q.Empty.WithODataQuery(query));
 
@@ -80,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return assets;
         }
 
-        public async Task<IResultList<IContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
+        public virtual async Task<IResultList<IContentEntity>> QueryContentsAsync(string schemaIdOrName, string query)
         {
             var result = await contentQuery.QueryAsync(context, schemaIdOrName, Q.Empty.WithODataQuery(query));
 
@@ -92,7 +92,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result;
         }
 
-        public async Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(ICollection<Guid> ids)
+        public virtual async Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(ICollection<Guid> ids)
         {
             Guard.NotNull(ids, nameof(ids));
 
@@ -111,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return ids.Select(cachedAssets.GetOrDefault).Where(x => x != null).ToList();
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, ICollection<Guid> ids)
+        public virtual async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, ICollection<Guid> ids)
         {
             Guard.NotNull(ids, nameof(ids));
 

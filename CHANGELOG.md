@@ -1,5 +1,33 @@
 # Changelog
 
+## v2.1.0 - 2019-06-22
+
+## Features
+
+* **Assets**: Parameter to prevent download in Browser.
+* **Assets**: FTP asset store.
+* **GraphQL**: Logging for field resolvers
+* **GraphQL**: Performance optimizations for asset fields and references with DataLoader.
+* **MongoDB**: Performance optimizations.
+* **MongoDB**: Support for AWS DocumentDB.
+* **Schemas**: Separator field.
+* **Schemas**: Setting to prevent duplicate references.
+* **UI**: Improved styling of DateTime editor.
+* **UI**: Custom Editors: Provide all values.
+* **UI**: Custom Editors: Provide context with user information and auth token.
+* **UI**: Filter by status.
+* **UI**: Dropdown field for references.
+* **Users**: Email notifications when contributors is added.
+
+## Bugfixes
+
+* **Contents**: Fix for scheduled publishing.
+* **GraphQL**: Fix query parameters for assets.
+* **GraphQL**: Fix for duplicate field names in GraphQL.
+* **GraphQL**: Fix for invalid field names.
+* **Plans**: Fix when plans reset and extra events.
+* **UI**: Unify slugify in Frontend and Backend.
+
 ## v2.0.5 - 2019-04-21
 
 ## Features

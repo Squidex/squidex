@@ -7,6 +7,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using GraphQL.DataLoader;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
@@ -36,6 +38,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             }
 
             return value;
+        }
+
+        public static async Task<IReadOnlyList<T>> LoadManyAsync<TKey, T>(this IDataLoader<TKey, T> dataLoader, ICollection<TKey> keys) where T : class
+        {
+            var contents = await Task.WhenAll(keys.Select(x => dataLoader.LoadAsync(x)));
+
+            return contents.Where(x => x != null).ToList();
         }
     }
 }

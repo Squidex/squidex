@@ -13,6 +13,7 @@ import { SchemaCategory, SchemasState } from './schemas.state';
 
 import {
     DialogService,
+    FieldDto,
     ImmutableArray,
     SchemaDetailsDto,
     SchemasService,
@@ -366,28 +367,38 @@ describe('SchemasState', () => {
                 schemasService.setup(x => x.postField(app, schema1, It.isAny(), version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.addField(schema1, request).subscribe();
+                let newField: FieldDto;
+
+                schemasState.addField(schema1, request).subscribe(result => {
+                    newField = result;
+                });
 
                 const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
+                expect(newField!).toBeDefined();
             });
 
             it('should update schema and selected schema when nested field added', () => {
-                const request = { ...schema.fields[0] };
+                const request = { ...schema.fields[0].nested[0] };
 
                 const updated = createSchemaDetails(1, newVersion, '-new');
 
                 schemasService.setup(x => x.postField(app, schema.fields[0], It.isAny(), version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.addField(schema1, request, schema.fields[0]).subscribe();
+                let newField: FieldDto;
+
+                schemasState.addField(schema1, request, schema.fields[0]).subscribe(result => {
+                    newField = result;
+                });
 
                 const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
 
                 expect(schema1New).toEqual(updated);
                 expect(schemasState.snapshot.selectedSchema).toEqual(updated);
+                expect(newField!).toBeDefined();
             });
 
             it('should update schema and selected schema when field removed', () => {

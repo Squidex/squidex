@@ -53,22 +53,22 @@
 {
         if (Model.IsLogin)
         {
-        if (Model.IsFailed)
-        {
-            <div class="form-alert form-alert-error">Email or password not correct.</div>
-        }
+            if (Model.IsFailed)
+            {
+                <div class="form-alert form-alert-error">Email or password not correct.</div>
+            }
 
-        <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
-            <div class="form-group">
-                <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email" />
-            </div>
+            <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl" method="post">
+                <div class="form-group">
+                    <input type="email" class="form-control" name="email" id="email" placeholder="Enter Email" />
+                </div>
 
-            <div class="form-group">
-                <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password" />
-            </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="Enter Password" />
+                </div>
 
-            <button type="submit" class="btn btn-block btn-primary">@type</button>
-        </form>
+                <button type="submit" class="btn btn-block btn-primary">@type</button>
+            </form>
         }
         else
         {
@@ -95,7 +95,6 @@ else
         var redirectButtons = document.getElementsByClassName("redirect-button");
 
         if (redirectButtons.length === 1) {
-            debugger;
             redirectButtons[0].click();
         }
     </script>

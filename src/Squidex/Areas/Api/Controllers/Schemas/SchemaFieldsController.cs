@@ -513,9 +513,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteNestedField(string app, string name, long parentId, long id)
         {
-            await CommandBus.PublishAsync(new DeleteField { ParentFieldId = parentId, FieldId = id });
+            var command = new DeleteField { ParentFieldId = parentId, FieldId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         private async Task<SchemaDetailsDto> InvokeCommandAsync(string app, ICommand command)
