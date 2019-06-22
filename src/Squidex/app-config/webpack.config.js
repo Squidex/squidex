@@ -31,7 +31,7 @@ const plugins = {
 module.exports = function(env) {
     const isDevServer = path.basename(require.main.filename) === 'webpack-dev-server.js';
     const isProduction = env && env.production;
-    const isTesting = env && env.target === 'tests';
+    const isTests = env && env.target === 'tests';
     const isCoverage = env && env.coverage;
     const isJit = env && env.jit;
 
@@ -43,7 +43,7 @@ module.exports = function(env) {
          *
          * See: https://webpack.js.org/configuration/devtool/
          */
-        devtool: isProduction ? undefined : (isTesting ? 'inline-source-map' : 'source-map'),
+        devtool: isProduction ? false : (isTests ? 'inline-source-map' : 'source-map'),
 
         /**
          * Options affecting the resolving of modules.
@@ -181,7 +181,9 @@ module.exports = function(env) {
         }
     };
 
-    if (!isTesting) {
+    console.log(JSON.stringify(config, null, 2));
+
+    if (!isTests) {
         /**
          * The entry point for the bundle. Our Angular app.
          *
@@ -286,9 +288,8 @@ module.exports = function(env) {
         config.module.rules.push({
             test: /\.ts$/,
             use: [{
-                loader: 'awesome-typescript-loader'
-            }],
-            exclude: [/node_modules/]
+                loader: 'awesome-typescript-loader', options: { useCache: true, useBabel: true }
+            }]
         })
     } else {
         config.module.rules.push({

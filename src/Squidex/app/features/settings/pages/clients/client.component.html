@@ -2,27 +2,13 @@
     <div class="card-header">
         <div class="row no-gutters">
             <div class="col col-name">
-                <form *ngIf="isRenaming; else noRenaming" class="form-inline" [formGroup]="renameForm.form" (ngSubmit)="rename()">
-                    <div class="form-group mr-1">
-                        <sqx-control-errors for="name"></sqx-control-errors>
-                        
-                        <input type="text" class="form-control client-name form-underlined" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" [disabled]="!renameForm.form.valid || !renameForm.form.dirty">Save</button>
-
-                    <button type="button" class="btn btn-text-secondary btn-cancel" (click)="toggleRename()">
-                        <i class="icon-close"></i>
-                    </button>
-                </form>
-
-                <ng-template #noRenaming>
-                    <h3 class="client-name" (dblclick)="toggleRename()">
-                        {{client.name}}
-                    </h3>
-
-                    <i class="client-edit icon-pencil" *ngIf="client.canUpdate" (click)="toggleRename()"></i>
-                </ng-template>
+                <div class="row">
+                    <sqx-editable-title 
+                        [name]="client.name"
+                        (nameChanged)="rename($event)"
+                        [disabled]="!client.canUpdate">
+                    </sqx-editable-title>
+                </div>
             </div>
             <div class="col-auto">
                 <button type="button" class="btn btn-primary" (click)="connect()">Connect</button>

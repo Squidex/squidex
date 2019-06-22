@@ -1,0 +1,59 @@
+<div class="step">
+    <div class="row no-gutters">
+        <div class="col-auto color pr-2">
+            <sqx-color-picker mode="Circle"
+                [ngModel]="step.color"
+                (ngModelChange)="changeColor($event)">
+            </sqx-color-picker>
+        </div>
+        <div class="col">
+            <sqx-editable-title 
+                [name]="step.name"
+                (nameChanged)="changeName($event)"
+                [disabled]="step.isLocked">
+            </sqx-editable-title>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-text-danger" (click)="remove.emit()" *ngIf="!step.isLocked">
+                <i class="icon-bin2"></i>
+            </button>
+        </div>
+    </div>
+        
+    <div class="row transition no-gutters">
+        <div class="col-auto">
+            <i class="icon-arrow-right text-decent"></i>
+        </div>
+        <div class="col-3 pl-2">
+            <div class="color-circle" [style.background]="'red'"></div> In Progress
+        </div>
+        <div class="col pl-2">
+            <input class="form-control" placeholder="Expression" />
+        </div>
+        <div class="col-auto pl-2">
+            <button type="button" class="btn btn-text-danger" (click)="remove.emit()">
+                <i class="icon-bin2"></i>
+            </button>
+        </div>
+    </div>
+        
+    <div class="row transition no-gutters" *ngIf="openSteps.length > 0">
+        <div class="col-auto">
+            <i class="icon-arrow-right text-decent"></i>
+        </div>
+        <div class="col-3 pl-2">
+            <sqx-dropdown [items]="openSteps">
+                <ng-template let-target="$implicit">
+                    <span class="autocomplete-user">
+                        <div class="color-circle" [style.background]="target.color"></div> {{target.name}}
+                    </span>
+                </ng-template>
+            </sqx-dropdown>
+        </div>
+        <div class="col pl-2">
+            <button class="btn btn-success">
+                Add Transition
+            </button>
+        </div>
+    </div>
+</div>

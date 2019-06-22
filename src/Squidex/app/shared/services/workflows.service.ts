@@ -20,6 +20,18 @@ export class WorkflowDto extends Model<WorkflowDto> {
         this._links = links;
     }
 
+    public getOpenSteps(step: WorkflowStep) {
+        return this.steps.filter(x => !this.transitions.find(y => y.from === step.name && y.to === x.name));
+    }
+
+    public getTransitions(step: WorkflowStep): WorkflowTransitionView[] {
+        return this.transitions.filter(x => x.from === step.name).map(x => ({ step: this.getStep(x.to), ...x }));
+    }
+
+    public getStep(name: string): WorkflowStep {
+        return this.steps.find(x => x.name === name)!;
+    }
+
     public setStep(name: string, values: Partial<WorkflowStepValues>) {
         const steps = [...this.steps.filter(s => s.name !== name), { name, ...values }];
 
@@ -97,3 +109,5 @@ export type WorkflowStep = { name: string } & WorkflowStepValues;
 
 export type WorkflowTransitionValues = { expression?: string };
 export type WorkflowTransition = { from: string; to: string } & WorkflowTransitionValues;
+
+export type WorkflowTransitionView = { step: WorkflowStep } & WorkflowTransition;

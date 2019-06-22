@@ -1,0 +1,28 @@
+@import '_vars';
+@import '_mixins';
+
+.color {
+    line-height: 2.8rem;
+}
+
+.color-circle {
+    @include circle(12px);
+    border: 1px solid $color-border-dark;
+    background: $color-border;
+    display: inline-block;
+}
+
+.transition {
+    & {
+        padding-left: 1rem;
+        margin-top: .25rem;
+        margin-bottom: .5rem;
+        line-height: 2rem;
+    }
+}
+
+.step {
+    & {
+        margin-bottom: 1rem;
+    }
+}

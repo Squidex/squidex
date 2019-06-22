@@ -35,6 +35,9 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
     @Input()
     public placeholder = '';
 
+    @Input()
+    public mode: 'Input' | 'Circle' = 'Input';
+
     public modal = new ModalModel();
 
     constructor(changeDetector: ChangeDetectorRef) {

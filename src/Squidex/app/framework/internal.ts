@@ -26,6 +26,7 @@ export * from './utils/error';
 export * from './utils/hateos';
 export * from './utils/interpolator';
 export * from './utils/immutable-array';
+export * from './utils/keys';
 export * from './utils/math-helper';
 export * from './utils/modal-positioner';
 export * from './utils/modal-view';

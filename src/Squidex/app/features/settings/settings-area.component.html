@@ -43,6 +43,12 @@
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
+            <li class="nav-item" *ngIf="selectedApp.canReadWorkflows">
+                <a class="nav-link" routerLink="workflows" routerLinkActive="active">
+                    Workflows
+                    <i class="icon-angle-right"></i>
+                </a>
+            </li>
             <li class="nav-item" *ngIf="selectedApp.canReadPlans">
                 <a class="nav-link" routerLink="plans" routerLinkActive="active">
                     Subscription

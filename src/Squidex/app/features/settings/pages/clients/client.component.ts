@@ -6,7 +6,6 @@
  */
 
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 
 import {
     AccessTokenDto,
@@ -17,11 +16,8 @@ import {
     ClientsState,
     DialogModel,
     DialogService,
-    RenameClientForm,
     RoleDto
 } from '@app/shared';
-
-const ESCAPE_KEY = 27;
 
 @Component({
     selector: 'sqx-client',
@@ -35,12 +31,8 @@ export class ClientComponent implements OnChanges {
     @Input()
     public clientRoles: RoleDto[];
 
-    public isRenaming = false;
-
     public connectToken: AccessTokenDto;
     public connectDialog = new DialogModel();
-
-    public renameForm = new RenameClientForm(this.formBuilder);
 
     public connectHttpText: string;
     public connectCLINixText: string;
@@ -53,15 +45,12 @@ export class ClientComponent implements OnChanges {
         private readonly apiUrl: ApiUrlConfig,
         private readonly clientsService: ClientsService,
         private readonly clientsState: ClientsState,
-        private readonly dialogs: DialogService,
-        private readonly formBuilder: FormBuilder
+        private readonly dialogs: DialogService
     ) {
     }
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['client']) {
-            this.renameForm.load(this.client);
-
             const app = this.appsState.appName;
 
             this.connectHttpText = connectHttpText(this.apiUrl, app, this.client);
@@ -80,31 +69,8 @@ export class ClientComponent implements OnChanges {
         this.clientsState.update(this.client, { role });
     }
 
-    public toggleRename() {
-        if (!this.client.canUpdate) {
-            return;
-        }
-
-        this.isRenaming = !this.isRenaming;
-    }
-
-    public rename() {
-        if (!this.client.canUpdate) {
-            return;
-        }
-
-        const value = this.renameForm.submit();
-
-        if (value) {
-            this.clientsState.update(this.client, value)
-                .subscribe(() => {
-                    this.renameForm.submitCompleted();
-
-                    this.toggleRename();
-                }, error => {
-                    this.renameForm.submitFailed(error);
-                });
-        }
+    public rename(name: string) {
+        this.clientsState.update(this.client, { name });
     }
 
     public connect() {
@@ -120,12 +86,6 @@ export class ClientComponent implements OnChanges {
 
     public trackByRole(index: number, role: RoleDto) {
         return role.name;
-    }
-
-    public onKeyDown(keyCode: number) {
-        if (keyCode === ESCAPE_KEY) {
-            this.toggleRename();
-        }
     }
 }
 

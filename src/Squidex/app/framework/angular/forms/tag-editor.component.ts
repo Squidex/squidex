@@ -11,13 +11,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
-import { StatefulControlComponent, Types } from '@app/framework/internal';
-
-const KEY_COMMA = 188;
-const KEY_DELETE = 8;
-const KEY_ENTER = 13;
-const KEY_UP = 38;
-const KEY_DOWN = 40;
+import { Keys, StatefulControlComponent, Types } from '@app/framework/internal';
 
 export interface Converter {
     convert(input: string): any;
@@ -265,11 +259,11 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public onKeyDown(event: KeyboardEvent) {
         const key = event.keyCode;
 
-        if (key === KEY_COMMA) {
+        if (key === Keys.COMMA) {
             if (this.selectValue(this.addInput.value)) {
                 return false;
             }
-        } else if (key === KEY_DELETE) {
+        } else if (key === Keys.DELETE) {
             const value = <string>this.addInput.value;
 
             if (!value || value.length === 0) {
@@ -277,13 +271,13 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
 
                 return false;
             }
-        } else if (key === KEY_UP) {
+        } else if (key === Keys.UP) {
             this.up();
             return false;
-        } else if (key === KEY_DOWN) {
+        } else if (key === Keys.DOWN) {
             this.down();
             return false;
-        } else if (key === KEY_ENTER) {
+        } else if (key === Keys.ENTER) {
             if (this.snapshot.suggestedIndex >= 0) {
                 if (this.selectValue(this.snapshot.suggestedItems[this.snapshot.suggestedIndex])) {
                     return false;

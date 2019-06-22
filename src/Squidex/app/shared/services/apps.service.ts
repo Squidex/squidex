@@ -35,6 +35,7 @@ export class AppDto {
     public readonly canReadRoles: boolean;
     public readonly canReadRules: boolean;
     public readonly canReadSchemas: boolean;
+    public readonly canReadWorkflows: boolean = true;
     public readonly canUploadAssets: boolean;
 
     constructor(links: ResourceLinks,
