@@ -29,7 +29,7 @@ const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createP
     templateUrl: './field-wizard.component.html'
 })
 export class FieldWizardComponent implements OnInit {
-    @ViewChild('nameInput')
+    @ViewChild('nameInput', { static: false })
     public nameInput: ElementRef<HTMLElement>;
 
     @Input()

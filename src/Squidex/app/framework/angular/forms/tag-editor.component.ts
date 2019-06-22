@@ -93,10 +93,10 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TagEditorComponent extends StatefulControlComponent<State, any[]> implements AfterViewInit, OnInit {
-    @ViewChild('form')
+    @ViewChild('form', { static: false })
     public formElement: ElementRef<HTMLElement>;
 
-    @ViewChild('input')
+    @ViewChild('input', { static: false })
     public inputElement: ElementRef<HTMLInputElement>;
 
     @Input()

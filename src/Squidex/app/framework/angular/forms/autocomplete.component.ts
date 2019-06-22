@@ -52,10 +52,10 @@ export class AutocompleteComponent extends StatefulControlComponent<State, any[]
     @Input()
     public placeholder = '';
 
-    @ContentChild(TemplateRef)
+    @ContentChild(TemplateRef, { static: false })
     public itemTemplate: TemplateRef<any>;
 
-    @ViewChild('input')
+    @ViewChild('input', { static: false })
     public inputControl: ElementRef<HTMLInputElement>;
 
     public queryInput = new FormControl();
