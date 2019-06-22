@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (value == null)
+            if (value.IsNullOrUndefined())
             {
                 value = DefaultValue;
             }
@@ -49,17 +49,22 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 {
                     var name = field.Key;
 
-                    if (!values.TryGetValue(name, out var fieldValue))
+                    var (isOptional, validator) = field.Value;
+
+                    var fieldValue = Undefined.Value;
+
+                    if (!values.TryGetValue(name, out var temp))
                     {
                         if (isPartial)
                         {
                             continue;
                         }
-
-                        fieldValue = default;
+                    }
+                    else
+                    {
+                        fieldValue = temp;
                     }
 
-                    var (isOptional, validator) = field.Value;
                     var fieldContext = context.Nested(name).Optional(isOptional);
 
                     tasks.Add(validator.ValidateAsync(fieldValue, fieldContext, addError));

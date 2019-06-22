@@ -44,7 +44,7 @@ $list-height: 2.375rem;
     padding: 0;
 }
 
-::ng-deep {
+:host ::ng-deep {
     .form-control {
         &.disabled,
         &:disabled {
@@ -107,8 +107,7 @@ $list-height: 2.375rem;
         background: $color-dark-black;
     }
 
-    &-name,
-    &-info {
+    &-name, &-info {
         @include truncate;
     }
 

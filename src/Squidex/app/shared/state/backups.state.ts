@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -26,6 +26,9 @@ interface Snapshot {
 
     // Indicates if the backups are loaded.
     isLoaded?: boolean;
+
+    // Indicates if the user can create new backups.
+    canCreate?: boolean;
 }
 
 type BackupsList = ImmutableArray<BackupDto>;
@@ -33,16 +36,16 @@ type BackupsList = ImmutableArray<BackupDto>;
 @Injectable()
 export class BackupsState extends State<Snapshot> {
     public backups =
-        this.changes.pipe(map(x => x.backups),
-            distinctUntilChanged());
+        this.project(x => x.backups);
 
     public maxBackupsReached =
-        this.changes.pipe(map(x => x.backups.length >= 10),
-            distinctUntilChanged());
+        this.project(x => x.backups.length >= 10);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
+
+    public canCreate =
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly appsState: AppsState,
@@ -58,15 +61,15 @@ export class BackupsState extends State<Snapshot> {
         }
 
         return this.backupsService.getBackups(this.appName).pipe(
-            tap(items => {
+            tap(({ items, canCreate }) => {
                 if (isReload && !silent) {
                     this.dialogs.notifyInfo('Backups reloaded.');
                 }
+                const backups = ImmutableArray.of(items);
 
                 this.next(s => {
-                    const backups = ImmutableArray.of(items);
 
-                    return { ...s, backups, isLoaded: true };
+                    return { ...s, backups, isLoaded: true, canCreate };
                 });
             }),
             shareSubscribed(this.dialogs, { silent }));
@@ -81,7 +84,7 @@ export class BackupsState extends State<Snapshot> {
     }
 
     public delete(backup: BackupDto): Observable<any> {
-        return this.backupsService.deleteBackup(this.appsState.appName, backup.id).pipe(
+        return this.backupsService.deleteBackup(this.appsState.appName, backup).pipe(
             tap(() => {
                 this.dialogs.notifyInfo('Backup is about to be deleted.');
             }),

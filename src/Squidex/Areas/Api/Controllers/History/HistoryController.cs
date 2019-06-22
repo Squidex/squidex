@@ -46,9 +46,9 @@ namespace Squidex.Areas.Api.Controllers.History
         [ApiCosts(0.1)]
         public async Task<IActionResult> GetHistory(string app, string channel)
         {
-            var entities = await historyService.QueryByChannelAsync(AppId, channel, 100);
+            var events = await historyService.QueryByChannelAsync(AppId, channel, 100);
 
-            var response = entities.ToArray(HistoryEventDto.FromHistoryEvent);
+            var response = events.ToArray(HistoryEventDto.FromHistoryEvent);
 
             return Ok(response);
         }

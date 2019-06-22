@@ -50,19 +50,9 @@ namespace Migrate_01.OldTriggers
                 conditions.Add($"event.type == '{EnrichedContentEventType.Published}'");
             }
 
-            if (SendUnpublish)
-            {
-                conditions.Add($"event.type == '{EnrichedContentEventType.Unpublished}'");
-            }
-
             if (SendArchived)
             {
-                conditions.Add($"event.type == '{EnrichedContentEventType.Archived}'");
-            }
-
-            if (SendRestore)
-            {
-                conditions.Add($"event.type == '{EnrichedContentEventType.Restored}'");
+                conditions.Add($"event.status == 'Archived'");
             }
 
             if (SendDelete)

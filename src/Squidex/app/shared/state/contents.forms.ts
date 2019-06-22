@@ -331,7 +331,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         super(new FormGroup({}));
 
         for (const field of schema.fields) {
-            if (field.properties.fieldType !== 'UI') {
+            if (field.properties.isContentField) {
                 const fieldForm = new FormGroup({});
                 const fieldDefault = FieldDefaultValue.get(field);
 
@@ -378,7 +378,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         let isOptional = field.isLocalizable && !!language && language.isOptional;
 
         for (let nested of field.nested) {
-            if (nested.properties.fieldType !== 'UI') {
+            if (nested.properties.isContentField) {
                 const nestedValidators = FieldValidatorsFactory.createValidators(nested, isOptional);
 
                 let value = FieldDefaultValue.get(nested);
@@ -408,7 +408,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         }
     }
 
-    public loadContent(value: any, disable: boolean) {
+    public loadContent(value: any) {
         for (let field of this.schema.fields) {
             if (field.isArray && field.nested.length > 0) {
                 const fieldForm = <FormGroup>this.form.get(field.name);
@@ -445,12 +445,6 @@ export class EditContentForm extends Form<FormGroup, any> {
         }
 
         super.load(value);
-
-        if (disable) {
-            this.disable();
-        } else {
-            this.enable();
-        }
     }
 
     protected enable() {

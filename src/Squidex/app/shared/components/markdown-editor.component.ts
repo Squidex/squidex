@@ -78,6 +78,10 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     }
 
     private showSelector = () => {
+        if (this.isDisabled) {
+            return;
+        }
+
         this.assetsDialog.show();
     }
 
@@ -201,7 +205,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         let content = '';
 
         for (let asset of assets) {
-            content += `![${asset.fileName}](${asset.url} '${asset.fileName}')`;
+            content += `![${asset.fileName}](${asset.contentUrl} '${asset.fileName}')`;
         }
 
         if (content.length > 0) {
@@ -220,6 +224,10 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     }
 
     private uploadFile(doc: any, file: File) {
+        if (this.isDisabled) {
+            return;
+        }
+
         const uploadCursor = doc.getCursor();
         const uploadText = `![Uploading file...${new Date()}]()`;
 
@@ -244,7 +252,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                    replaceText(`![${asset.fileName}](${asset.url} '${asset.fileName}')`);
+                    replaceText(`![${asset.fileName}](${asset.contentUrl} '${asset.fileName}')`);
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {

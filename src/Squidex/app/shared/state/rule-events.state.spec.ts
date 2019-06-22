@@ -9,13 +9,13 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    DateTime,
     DialogService,
-    RuleEventDto,
     RuleEventsDto,
     RuleEventsState,
     RulesService
 } from '@app/shared/internal';
+
+import { createRuleEvent } from '../services/rules.service.spec';
 
 import { TestValues } from './_test-helpers';
 
@@ -26,8 +26,8 @@ describe('RuleEventsState', () => {
     } = TestValues;
 
     const oldRuleEvents = [
-        new RuleEventDto('id1', DateTime.now(), null, 'event1', 'description', 'dump1', 'result1', 'result1', 1),
-        new RuleEventDto('id2', DateTime.now(), null, 'event2', 'description', 'dump2', 'result2', 'result2', 2)
+         createRuleEvent(1),
+         createRuleEvent(2)
     ];
 
     let dialogs: IMock<DialogService>;
@@ -76,24 +76,24 @@ describe('RuleEventsState', () => {
     });
 
     it('should call service when enqueuing event', () => {
-        rulesService.setup(x => x.enqueueEvent(app, oldRuleEvents[0].id))
+        rulesService.setup(x => x.enqueueEvent(app, oldRuleEvents[0]))
             .returns(() => of({}));
 
         ruleEventsState.enqueue(oldRuleEvents[0]).subscribe();
 
         expect().nothing();
 
-        rulesService.verify(x => x.enqueueEvent(app, oldRuleEvents[0].id), Times.once());
+        rulesService.verify(x => x.enqueueEvent(app, oldRuleEvents[0]), Times.once());
     });
 
     it('should call service when cancelling event', () => {
-        rulesService.setup(x => x.cancelEvent(app, oldRuleEvents[0].id))
+        rulesService.setup(x => x.cancelEvent(app, oldRuleEvents[0]))
             .returns(() => of({}));
 
         ruleEventsState.cancel(oldRuleEvents[0]).subscribe();
 
         expect().nothing();
 
-        rulesService.verify(x => x.cancelEvent(app, oldRuleEvents[0].id), Times.once());
+        rulesService.verify(x => x.cancelEvent(app, oldRuleEvents[0]), Times.once());
     });
 });

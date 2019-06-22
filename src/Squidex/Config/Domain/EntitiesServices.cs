@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System;
+using GraphQL;
+using GraphQL.DataLoader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -74,6 +76,18 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetUsageTracker>()
                 .As<IEventConsumer>().As<IAssetUsageTracker>();
 
+            services.AddSingletonAs(x => new FuncDependencyResolver(t => x.GetRequiredService(t)))
+                .As<IDependencyResolver>();
+
+            services.AddSingletonAs<DataLoaderContextAccessor>()
+                .As<IDataLoaderContextAccessor>();
+
+            services.AddSingletonAs<DataLoaderDocumentListener>()
+                .AsSelf();
+
+            services.AddSingletonAs<CachingGraphQLService>()
+                .As<IGraphQLService>();
+
             services.AddSingletonAs<CachingGraphQLService>()
                 .As<IGraphQLService>();
 
@@ -100,6 +114,9 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<SchemaHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
+
+            services.AddSingletonAs<DefaultContentWorkflow>()
+                .AsOptional<IContentWorkflow>();
 
             services.AddSingletonAs<RolePermissionsProvider>()
                 .AsSelf();

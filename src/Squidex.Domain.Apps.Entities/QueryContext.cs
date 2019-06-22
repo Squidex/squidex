@@ -27,8 +27,6 @@ namespace Squidex.Domain.Apps.Entities
 
         public StatusForApi ApiStatus { get; private set; }
 
-        public StatusForFrontend FrontendStatus { get; private set; }
-
         public IReadOnlyCollection<string> AssetUrlsToResolve { get; private set; }
 
         public IReadOnlyCollection<Language> Languages { get; private set; }
@@ -49,27 +47,12 @@ namespace Squidex.Domain.Apps.Entities
 
         public QueryContext WithUnpublished(bool unpublished)
         {
-            return WithApiStatus(unpublished ? StatusForApi.PublishedDraft : StatusForApi.PublishedOnly);
+            return WithApiStatus(unpublished ? StatusForApi.All : StatusForApi.PublishedOnly);
         }
 
         public QueryContext WithApiStatus(StatusForApi status)
         {
             return Clone(c => c.ApiStatus = status);
-        }
-
-        public QueryContext WithFrontendStatus(StatusForFrontend status)
-        {
-            return Clone(c => c.FrontendStatus = status);
-        }
-
-        public QueryContext WithFrontendStatus(string status)
-        {
-            if (status != null && Enum.TryParse<StatusForFrontend>(status, out var result))
-            {
-                return WithFrontendStatus(result);
-            }
-
-            return this;
         }
 
         public QueryContext WithAssetUrlsToResolve(IEnumerable<string> fieldNames)

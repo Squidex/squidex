@@ -54,6 +54,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly QueryContext context;
         private readonly ContentQueryService sut;
 
+        public static IEnumerable<object[]> ApiStatusTests = new[]
+        {
+            new object[] { StatusForApi.PublishedOnly,  0, new[] { Status.Published } },
+            new object[] { StatusForApi.All, 1, null }
+        };
+
         public ContentQueryServiceTests()
         {
             user = new ClaimsPrincipal(identity);
@@ -97,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchemaFound();
 
-            var result = await sut.GetSchemaAsync(context, schemaId.Name);
+            var result = await sut.GetSchemaOrThrowAsync(context, schemaId.Name);
 
             Assert.Equal(schema, result);
         }
@@ -107,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchemaFound();
 
-            var result = await sut.GetSchemaAsync(context, schemaId.Name);
+            var result = await sut.GetSchemaOrThrowAsync(context, schemaId.Name);
 
             Assert.Equal(schema, result);
         }
@@ -119,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ctx = context;
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaAsync(ctx, schemaId.Name));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(ctx, schemaId.Name));
         }
 
         [Fact]
@@ -129,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ctx = context;
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.ThrowIfSchemaNotExistsAsync(ctx, schemaId.Name));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(ctx, schemaId.Name));
         }
 
         [Fact]
@@ -187,31 +193,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindContentAsync(ctx, schemaId.Name, contentId));
         }
 
-        public static IEnumerable<object[]> SingleDataFrontend = new[]
-        {
-            new object[] { StatusForFrontend.PublishedOnly,  new[] { Status.Archived, Status.Draft, Status.Published } },
-            new object[] { StatusForFrontend.PublishedDraft, new[] { Status.Archived, Status.Draft, Status.Published } },
-            new object[] { StatusForFrontend.Archived,       new[] { Status.Archived, Status.Draft, Status.Published } },
-        };
-
-        public static IEnumerable<object[]> SingleDataApi = new[]
-        {
-            new object[] { StatusForApi.PublishedOnly,  0, new[] { Status.Published } },
-            new object[] { StatusForApi.PublishedDraft, 1, new[] { Status.Published, Status.Draft } }
-        };
-
-        [Theory]
-        [MemberData(nameof(SingleDataFrontend))]
-        public async Task Should_return_single_content_for_frontend_without_transform(StatusForFrontend request, Status[] status)
+        [Fact]
+        public async Task Should_return_single_content_for_frontend_without_transform()
         {
             var content = CreateContent(contentId);
 
             SetupClaims(isFrontend: true);
             SetupSchemaFound();
             SetupScripting(contentId);
-            SetupContent(status, content, includeDraft: true);
+            SetupContent(null, content, includeDraft: true);
 
-            var ctx = context.WithFrontendStatus(request);
+            var ctx = context;
 
             var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
 
@@ -223,7 +215,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Theory]
-        [MemberData(nameof(SingleDataApi))]
+        [MemberData(nameof(ApiStatusTests))]
         public async Task Should_return_single_content_for_api_with_transform(StatusForApi request, int includeDraft, Status[] status)
         {
             var content = CreateContent(contentId);
@@ -275,9 +267,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.QueryAsync(ctx, schemaId.Name, Q.Empty));
         }
 
-        [Theory]
-        [MemberData(nameof(ManyDataFrontend))]
-        public async Task Should_query_contents_by_query_for_frontend_without_transform(StatusForFrontend request, Status[] status)
+        [Fact]
+        public async Task Should_query_contents_by_query_for_frontend_without_transform()
         {
             const int count = 5, total = 200;
 
@@ -286,9 +277,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupClaims(isFrontend: true);
             SetupSchemaFound();
             SetupScripting(contentId);
-            SetupContents(status, count, total, content, inDraft: true, includeDraft: true);
+            SetupContents(null, count, total, content, inDraft: true, includeDraft: true);
 
-            var ctx = context.WithFrontendStatus(request);
+            var ctx = context;
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
 
@@ -302,7 +293,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Theory]
-        [MemberData(nameof(ManyDataApi))]
+        [MemberData(nameof(ApiStatusTests))]
         public async Task Should_query_contents_by_query_for_api_and_transform(StatusForApi request, int includeDraft, Status[] status)
         {
             const int count = 5, total = 200;
@@ -338,22 +329,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context, schemaId.Name, query));
         }
 
-        public static IEnumerable<object[]> ManyDataFrontend = new[]
-        {
-            new object[] { StatusForFrontend.PublishedOnly,  new[] { Status.Published } },
-            new object[] { StatusForFrontend.PublishedDraft, new[] { Status.Published, Status.Draft } },
-            new object[] { StatusForFrontend.Archived,       new[] { Status.Archived } }
-        };
-
-        public static IEnumerable<object[]> ManyDataApi = new[]
-        {
-            new object[] { StatusForApi.PublishedOnly,  0, new[] { Status.Published } },
-            new object[] { StatusForApi.PublishedDraft, 1, new[] { Status.Published, Status.Draft } }
-        };
-
-        [Theory]
-        [MemberData(nameof(ManyDataFrontend))]
-        public async Task Should_query_contents_by_id_for_frontend_and_transform(StatusForFrontend request, Status[] status)
+        [Fact]
+        public async Task Should_query_contents_by_id_for_frontend_and_transform()
         {
             const int count = 5, total = 200;
 
@@ -362,9 +339,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupClaims(isFrontend: true);
             SetupSchemaFound();
             SetupScripting(ids.ToArray());
-            SetupContents(status, total, ids, includeDraft: true);
+            SetupContents(null, total, ids, includeDraft: true);
 
-            var ctx = context.WithFrontendStatus(request);
+            var ctx = context;
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty.WithIds(ids));
 
@@ -376,7 +353,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Theory]
-        [MemberData(nameof(ManyDataApi))]
+        [MemberData(nameof(ApiStatusTests))]
         public async Task Should_query_contents_by_id_for_api_and_transform(StatusForApi request, int includeDraft, Status[] status)
         {
             const int count = 5, total = 200;
@@ -399,9 +376,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .MustHaveHappened(count, Times.Exactly);
         }
 
-        [Theory]
-        [MemberData(nameof(ManyDataFrontend))]
-        public async Task Should_query_all_contents_by_id_for_frontend_and_transform(StatusForFrontend request, Status[] status)
+        [Fact]
+        public async Task Should_query_all_contents_by_id_for_frontend_and_transform()
         {
             const int count = 5;
 
@@ -410,9 +386,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             SetupClaims(isFrontend: true);
             SetupSchemaFound();
             SetupScripting(ids.ToArray());
-            SetupContents(status, ids, includeDraft: true);
+            SetupContents(null, ids, includeDraft: true);
 
-            var ctx = context.WithFrontendStatus(request);
+            var ctx = context;
 
             var result = await sut.QueryAsync(ctx, ids);
 
@@ -423,7 +399,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Theory]
-        [MemberData(nameof(ManyDataApi))]
+        [MemberData(nameof(ApiStatusTests))]
         public async Task Should_query_all_contents_by_id_for_api_and_transform(StatusForApi request, int includeDraft, Status[] status)
         {
             const int count = 5;
@@ -544,7 +520,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns((ISchemaEntity)null);
         }
 
-        private IContentEntity CreateContent(Guid id, Status status = Status.Published)
+        private IContentEntity CreateContent(Guid id)
+        {
+            return CreateContent(id, Status.Published);
+        }
+
+        private IContentEntity CreateContent(Guid id, Status status)
         {
             var content = A.Fake<IContentEntity>();
 

@@ -8,7 +8,7 @@ $icon-size: 4.5rem;
     margin-left: -.5rem;
 }
 
-::ng-deep  {
+:host ::ng-deep {
     .editor {
         height: 15rem !important;
         margin-bottom: .5rem;

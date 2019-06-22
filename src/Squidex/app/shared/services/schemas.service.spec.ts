@@ -13,20 +13,21 @@ import {
     ApiUrlConfig,
     createProperties,
     DateTime,
-    FieldDto,
     NestedFieldDto,
+    Resource,
+    ResourceLinks,
     RootFieldDto,
     SchemaDetailsDto,
     SchemaDto,
     SchemaPropertiesDto,
+    SchemasDto,
     SchemasService,
-    Version,
-    Versioned
+    Version
 } from '@app/shared/internal';
-import { SchemaCreatedDto } from './schemas.service';
 
 describe('SchemasService', () => {
     const version = new Version('1');
+    const versionNew = new Version('2');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -54,7 +55,7 @@ describe('SchemasService', () => {
     it('should make get request to get schemas',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
 
-        let schemas: SchemaDto[];
+        let schemas: SchemasDto;
 
         schemasService.getSchemas('my-app').subscribe(result => {
             schemas = result;
@@ -65,54 +66,26 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush([
-            {
-                id: 'id1',
-                name: 'name1',
-                category: 'category1',
-                properties: {
-                    label: 'label1',
-                    hints: 'hints1'
-                },
-                isSingleton: true,
-                isPublished: true,
-                created: '2016-12-12T10:10',
-                createdBy: 'Created1',
-                lastModified: '2017-12-12T10:10',
-                lastModifiedBy: 'LastModifiedBy1',
-                version: 11,
-                data: {}
-            },
-            {
-                id: 'id2',
-                name: 'name2',
-                category: 'category2',
-                properties: {
-                    label: 'label2',
-                    hints: 'hints2'
-                },
-                isSingleton: true,
-                isPublished: true,
-                created: '2016-10-12T10:10',
-                createdBy: 'Created2',
-                lastModified: '2017-10-12T10:10',
-                lastModifiedBy: 'LastModifiedBy2',
-                version: 22,
-                data: {}
+        req.flush({
+            items: [
+                schemaResponse(12),
+                schemaResponse(13)
+            ],
+            _links: {
+                create: { method: 'POST', href: '/schemas' }
             }
-        ]);
+        });
 
-        expect(schemas!).toEqual(
-            [
-                new SchemaDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true, true,
-                    DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
-                    DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
-                    new Version('11')),
-                new SchemaDto('id2', 'name2', 'category2', new SchemaPropertiesDto('label2', 'hints2'), true, true,
-                    DateTime.parseISO_UTC('2016-10-12T10:10'), 'Created2',
-                    DateTime.parseISO_UTC('2017-10-12T10:10'), 'LastModifiedBy2',
-                    new Version('22'))
-            ]);
+        expect(schemas!).toEqual({
+            canCreate: true,
+            items: [
+                createSchema(12),
+                createSchema(13)
+            ],
+            _links: {
+                create: { method: 'POST', href: '/schemas' }
+            }
+        });
     }));
 
     it('should make get request to get schema',
@@ -129,19 +102,544 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({
-            id: 'id1',
-            name: 'name1',
-            category: 'category1',
-            isSingleton: true,
-            isPublished: true,
-            created: '2016-12-12T10:10',
-            createdBy: 'Created1',
-            lastModified: '2017-12-12T10:10',
-            lastModifiedBy: 'LastModifiedBy1',
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make post request to create schema',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = { name: 'name' };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.postSchema('my-app', dto).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to update schema',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = { label: 'label1' };
+
+        const resource: Resource = {
+            _links: {
+                update: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.putSchema('my-app', resource, dto, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to update schema scripts',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = {};
+
+        const resource: Resource = {
+            _links: {
+                ['update/scripts']: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/scripts' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.putScripts('my-app', resource, dto, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/scripts');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to update category',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = {};
+
+        const resource: Resource = {
+            _links: {
+                ['update/category']: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/category' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.putCategory('my-app', resource, dto, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/category');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to update preview urls',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = {};
+
+        const resource: Resource = {
+            _links: {
+                ['update/urls']: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/preview-urls' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.putPreviewUrls('my-app', resource, dto, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/preview-urls');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make post request to add field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = { name: 'name', partitioning: 'invariant', properties: createProperties('Number') };
+
+        const resource: Resource = {
+            _links: {
+                ['fields/add']: { method: 'POST', href: '/api/apps/my-app/schemas/my-schema/fields' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.postField('my-app', resource, dto, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to publish schema',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                publish: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/publish' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.publishSchema('my-app', resource, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/publish');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to unpublish schema',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                unpublish: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/unpublish' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.unpublishSchema('my-app', resource, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/unpublish');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to update field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = { properties: createProperties('Number') };
+
+        const resource: Resource = {
+            _links: {
+                update: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/fields/1' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.putField('my-app', resource, dto, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to update field ordering',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const dto = [1, 2, 3];
+
+        const resource: Resource = {
+            _links: {
+                ['fields/order']: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/fields/ordering' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.putFieldOrdering('my-app', resource, dto, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/ordering');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to lock field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                lock: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/fields/1/lock' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.lockField('my-app', resource, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/lock');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to enable field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                enable: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/fields/1/enable' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.enableField('my-app', resource, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/enable');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to disable field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                disable: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/fields/1/disable' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.disableField('my-app', resource, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/disable');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to show field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                show: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/fields/1/show' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.showField('my-app', resource, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/show');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make put request to hide field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                hide: { method: 'PUT', href: '/api/apps/my-app/schemas/my-schema/fields/1/hide' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.hideField('my-app', resource, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/hide');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make delete request to delete field',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: '/api/apps/my-app/schemas/my-schema/fields/1' }
+            }
+        };
+
+        let schema: SchemaDetailsDto;
+
+        schemasService.deleteField('my-app', resource, version).subscribe(result => {
+            schema = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1');
+
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(schemaDetailsResponse(12), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(schema!).toEqual(createSchemaDetails(12, versionNew));
+    }));
+
+    it('should make delete request to delete schema',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: '/api/apps/my-app/schemas/my-schema' }
+            }
+        };
+
+        schemasService.deleteSchema('my-app', resource, version).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema');
+
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush({});
+    }));
+
+    function schemaResponse(id: number, suffix = '') {
+        return {
+            id: `schema-id${id}${suffix}`,
+            name: `schema-name${id}${suffix}`,
+            category: `category${id}${suffix}`,
+            isSingleton: id % 2 === 0,
+            isPublished: id % 3 === 0,
+            created: `${id % 1000 + 2000}-12-12T10:10:00`,
+            createdBy: `creator-${id}`,
+            lastModified: `${id % 1000 + 2000}-11-11T10:10:00`,
+            lastModifiedBy: `modifier-${id}`,
             properties: {
-                label: 'label1',
-                hints: 'hints1'
+                label: `label${id}${suffix}`,
+                hints: `hints${id}${suffix}`
+            },
+            version: `${id}`,
+            _links: {
+                update: { method: 'PUT', href: `/schemas/${id}` }
+            }
+        };
+    }
+
+    function schemaDetailsResponse(id: number, suffix = '') {
+        return {
+            id: `schema-id${id}`,
+            name: `schema-name${id}${suffix}`,
+            category: `category${id}${suffix}`,
+            isSingleton: id % 2 === 0,
+            isPublished: id % 3 === 0,
+            created: `${id % 1000 + 2000}-12-12T10:10:00`,
+            createdBy: `creator-${id}`,
+            lastModified: `${id % 1000 + 2000}-11-11T10:10:00`,
+            lastModifiedBy: `modifier-${id}`,
+            properties: {
+                label: `label${id}${suffix}`,
+                hints: `hints${id}${suffix}`
             },
             previewUrls: {
                 'Default': 'url'
@@ -166,7 +664,8 @@ describe('SchemasService', () => {
                             isDisabled: true,
                             properties: {
                                 fieldType: 'String'
-                            }
+                            },
+                            _links: {}
                         },
                         {
                             fieldId: 102,
@@ -176,9 +675,11 @@ describe('SchemasService', () => {
                             isDisabled: true,
                             properties: {
                                 fieldType: 'Number'
-                            }
+                            },
+                            _links: {}
                         }
-                    ]
+                    ],
+                    _links: {}
                 },
                 {
                     fieldId: 12,
@@ -189,7 +690,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Assets'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 13,
@@ -200,7 +702,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Boolean'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 14,
@@ -211,7 +714,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'DateTime'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 15,
@@ -222,7 +726,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Geolocation'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 16,
@@ -233,7 +738,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Json'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 17,
@@ -244,7 +750,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Number'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 18,
@@ -255,7 +762,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'References'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 19,
@@ -266,7 +774,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'String'
-                    }
+                    },
+                    _links: {}
                 },
                 {
                     fieldId: 20,
@@ -277,7 +786,8 @@ describe('SchemasService', () => {
                     partitioning: 'language',
                     properties: {
                         fieldType: 'Tags'
-                    }
+                    },
+                    _links: {}
                 }
             ],
             scripts: {
@@ -286,431 +796,69 @@ describe('SchemasService', () => {
                 change: '<script-change>',
                 delete: '<script-delete>',
                 update: '<script-update>'
-            }
-        }, {
-            headers: {
-                etag: '2'
-            }
-        });
-
-        expect(schema!).toEqual(
-            new SchemaDetailsDto('id1', 'name1', 'category1', new SchemaPropertiesDto('label1', 'hints1'), true, true,
-                DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
-                DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
-                new Version('2'),
-                [
-                    new RootFieldDto(11, 'field11', createProperties('Array'), 'language', true, true, true, [
-                        new NestedFieldDto(101, 'field101', createProperties('String'), 11, true, true, true),
-                        new NestedFieldDto(102, 'field102', createProperties('Number'), 11, true, true, true)
-                    ]),
-                    new RootFieldDto(12, 'field12', createProperties('Assets'), 'language', true, true, true),
-                    new RootFieldDto(13, 'field13', createProperties('Boolean'), 'language', true, true, true),
-                    new RootFieldDto(14, 'field14', createProperties('DateTime'), 'language', true, true, true),
-                    new RootFieldDto(15, 'field15', createProperties('Geolocation'), 'language', true, true, true),
-                    new RootFieldDto(16, 'field16', createProperties('Json'), 'language', true, true, true),
-                    new RootFieldDto(17, 'field17', createProperties('Number'), 'language', true, true, true),
-                    new RootFieldDto(18, 'field18', createProperties('References'), 'language', true, true, true),
-                    new RootFieldDto(19, 'field19', createProperties('String'), 'language', true, true, true),
-                    new RootFieldDto(20, 'field20', createProperties('Tags'), 'language', true, true, true)
-                ],
-                {
-                    query: '<script-query>',
-                    create: '<script-create>',
-                    change: '<script-change>',
-                    delete: '<script-delete>',
-                    update: '<script-update>'
-                },
-                {
-                    'Default': 'url'
-                }));
-    }));
-
-    it('should make post request to create schema',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = { name: 'name' };
-
-        let schema: Versioned<SchemaCreatedDto>;
-
-        schemasService.postSchema('my-app', dto).subscribe(result => {
-            schema = result;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas');
-
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBeNull();
-
-        req.flush({
-            id: '1'
-        }, {
-            headers: {
-                etag: '1'
-            }
-        });
-
-        expect(schema!).toEqual({
-            payload: {
-                id: '1'
             },
-            version
-        });
-    }));
-
-    it('should make put request to update schema',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = { label: 'label1' };
-
-        schemasService.putSchema('my-app', 'my-schema', dto, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to update schema scripts',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = {};
-
-        schemasService.putScripts('my-app', 'my-schema', dto, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/scripts');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to update category',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = {};
-
-        schemasService.putCategory('my-app', 'my-schema', dto, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/category');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to update preview urls',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = {};
-
-        schemasService.putPreviewUrls('my-app', 'my-schema', dto, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/preview-urls');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make post request to add field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = { name: 'name', partitioning: 'invariant', properties: createProperties('Number') };
-
-        let field: FieldDto;
-
-        schemasService.postField('my-app', 'my-schema', dto, undefined, version).subscribe(result => {
-            field = result.payload;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields');
-
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({ id: 123 });
-
-        expect(field!).toEqual(new RootFieldDto(123, dto.name, dto.properties, dto.partitioning));
-    }));
-
-    it('should make put request to publish schema',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.publishSchema('my-app', 'my-schema', version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/publish');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to unpublish schema',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.unpublishSchema('my-app', 'my-schema', version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/unpublish');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make post request to add nested field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = { name: 'name', partitioning: 'invariant', properties: createProperties('Number') };
-
-        let field: FieldDto;
-
-        schemasService.postField('my-app', 'my-schema', dto, 13, version).subscribe(result => {
-            field = result.payload;
-        });
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested');
-
-        expect(req.request.method).toEqual('POST');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({ id: 123 });
-
-        expect(field!).toEqual(new NestedFieldDto(123, dto.name, dto.properties, 13));
-    }));
-
-    it('should make put request to update field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = { properties: createProperties('Number') };
-
-        schemasService.putField('my-app', 'my-schema', 1, dto, undefined, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to update nested field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = { properties: createProperties('Number') };
-
-        schemasService.putField('my-app', 'my-schema', 1, dto, 13, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to update field ordering',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = [1, 2, 3];
-
-        schemasService.putFieldOrdering('my-app', 'my-schema', dto, undefined, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/ordering');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to update nested field ordering',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        const dto = [1, 2, 3];
-
-        schemasService.putFieldOrdering('my-app', 'my-schema', dto, 13, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/ordering');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to lock field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.lockField('my-app', 'my-schema', 1, undefined, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/lock');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to lock nested field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.lockField('my-app', 'my-schema', 1, 13, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1/lock');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to enable field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.enableField('my-app', 'my-schema', 1, undefined, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/enable');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to enable nested field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.enableField('my-app', 'my-schema', 1, 13, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1/enable');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to disable field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.disableField('my-app', 'my-schema', 1, undefined, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/disable');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to disable nested field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.disableField('my-app', 'my-schema', 1, 13, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1/disable');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to show field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.showField('my-app', 'my-schema', 1, undefined, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/show');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to show nested field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.showField('my-app', 'my-schema', 1, 13, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1/show');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to hide field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.hideField('my-app', 'my-schema', 1, undefined, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1/hide');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make put request to hide nested field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.hideField('my-app', 'my-schema', 1, 13, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1/hide');
-
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make delete request to delete field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.deleteField('my-app', 'my-schema', 1, undefined, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/1');
-
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make delete request to delete nested field',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.deleteField('my-app', 'my-schema', 1, 13, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/fields/13/nested/1');
-
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
-
-    it('should make delete request to delete schema',
-        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-
-        schemasService.deleteSchema('my-app', 'my-schema', version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema');
-
-        expect(req.request.method).toEqual('DELETE');
-        expect(req.request.headers.get('If-Match')).toBe(version.value);
-
-        req.flush({});
-    }));
+            _links: {
+                update: { method: 'PUT', href: `/schemas/${id}` }
+            }
+        };
+    }
 });
+
+export function createSchema(id: number, suffix = '') {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/schemas/${id}` }
+    };
+
+    return new SchemaDto(links,
+        `schema-id${id}`,
+        `schema-name${id}${suffix}`,
+        `category${id}${suffix}`,
+        new SchemaPropertiesDto(`label${id}${suffix}`, `hints${id}${suffix}`),
+        id % 2 === 0,
+        id % 3 === 0,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
+        new Version(`${id}`));
+}
+
+export function createSchemaDetails(id: number, version: Version, suffix = '') {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/schemas/${id}` }
+    };
+
+    return new SchemaDetailsDto(links,
+        `schema-id${id}`,
+        `schema-name${id}${suffix}`,
+        `category${id}${suffix}`,
+        new SchemaPropertiesDto(`label${id}${suffix}`, `hints${id}${suffix}`),
+        id % 2 === 0,
+        id % 3 === 0,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
+        version,
+        [
+            new RootFieldDto({}, 11, 'field11', createProperties('Array'), 'language', true, true, true, [
+                new NestedFieldDto({}, 101, 'field101', createProperties('String'), 11, true, true, true),
+                new NestedFieldDto({}, 102, 'field102', createProperties('Number'), 11, true, true, true)
+            ]),
+            new RootFieldDto({}, 12, 'field12', createProperties('Assets'), 'language', true, true, true),
+            new RootFieldDto({}, 13, 'field13', createProperties('Boolean'), 'language', true, true, true),
+            new RootFieldDto({}, 14, 'field14', createProperties('DateTime'), 'language', true, true, true),
+            new RootFieldDto({}, 15, 'field15', createProperties('Geolocation'), 'language', true, true, true),
+            new RootFieldDto({}, 16, 'field16', createProperties('Json'), 'language', true, true, true),
+            new RootFieldDto({}, 17, 'field17', createProperties('Number'), 'language', true, true, true),
+            new RootFieldDto({}, 18, 'field18', createProperties('References'), 'language', true, true, true),
+            new RootFieldDto({}, 19, 'field19', createProperties('String'), 'language', true, true, true),
+            new RootFieldDto({}, 20, 'field20', createProperties('Tags'), 'language', true, true, true)
+        ],
+        {
+            query: '<script-query>',
+            create: '<script-create>',
+            change: '<script-change>',
+            delete: '<script-delete>',
+            update: '<script-update>'
+        },
+        {
+            'Default': 'url'
+        });
+}

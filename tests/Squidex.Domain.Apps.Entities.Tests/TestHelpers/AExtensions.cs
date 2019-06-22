@@ -19,6 +19,11 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         public static T[] Is<T>(this INegatableArgumentConstraintManager<T[]> that, params T[] values)
         {
+            if (values == null)
+            {
+                return that.IsNull();
+            }
+
             return that.IsSameSequenceAs(values);
         }
     }

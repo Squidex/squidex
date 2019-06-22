@@ -73,8 +73,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "status",
-                ResolvedType = AllTypes.NonNullStatusType,
-                Resolver = Resolve(x => x.Status),
+                ResolvedType = AllTypes.NonNullString,
+                Resolver = Resolve(x => x.Status.Name.ToUpperInvariant()),
                 Description = $"The the status of the {schemaName} content."
             });
 

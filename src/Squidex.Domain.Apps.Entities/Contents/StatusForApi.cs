@@ -10,6 +10,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public enum StatusForApi
     {
         PublishedOnly,
-        PublishedDraft,
+        All,
     }
 }

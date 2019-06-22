@@ -20,11 +20,12 @@
         </div>
 
         <div class="col-auto pl-1 col-options" *ngIf="pattern">
-            <button type="submit" class="btn btn-primary mr-1" [class.disabled]="!editForm.form.dirty">
+            <button type="submit" class="btn btn-primary mr-1" [disabled]="!editForm.form.dirty || !isEditable">
                 <i class="icon-checkmark"></i>
             </button>
 
             <button type="button" class="btn btn-text-danger"
+                [disabled]="!isDeletable"
                 (sqxConfirmClick)="delete()"
                 confirmTitle="Remove pattern" 
                 confirmText="Do you really want to remove this pattern?">

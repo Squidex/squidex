@@ -5,26 +5,30 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.ComponentModel.DataAnnotations;
+using NodaTime;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
 
-namespace Squidex.Areas.Api.Controllers.Apps.Models
+namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public sealed class ContributorAssignedDto
+    public sealed class ChangeStatusDto
     {
         /// <summary>
-        /// The id of the user that has been assigned as contributor.
+        /// The new status.
         /// </summary>
         [Required]
-        public string ContributorId { get; set; }
+        public Status Status { get; set; }
 
         /// <summary>
-        /// Indicates if the user was created.
+        /// The due time.
         /// </summary>
-        public bool IsCreated { get; set; }
+        public Instant? DueTime { get; set; }
 
-        public static ContributorAssignedDto FromId(string id, bool isCreated)
+        public ChangeContentStatus ToCommand(Guid id)
         {
-            return new ContributorAssignedDto { ContributorId = id, IsCreated = isCreated };
+            return new ChangeContentStatus { ContentId = id, Status = Status, DueTime = DueTime };
         }
     }
 }

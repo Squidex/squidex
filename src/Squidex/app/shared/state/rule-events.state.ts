@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -35,16 +35,13 @@ interface Snapshot {
 @Injectable()
 export class RuleEventsState extends State<Snapshot> {
     public ruleEvents =
-        this.changes.pipe(map(x => x.ruleEvents),
-            distinctUntilChanged());
+        this.project(x => x.ruleEvents);
 
     public ruleEventsPager =
-        this.changes.pipe(map(x => x.ruleEventsPager),
-            distinctUntilChanged());
+        this.project(x => x.ruleEventsPager);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     constructor(
         private readonly appsState: AppsState,
@@ -82,7 +79,7 @@ export class RuleEventsState extends State<Snapshot> {
     }
 
     public enqueue(event: RuleEventDto): Observable<any> {
-        return this.rulesService.enqueueEvent(this.appsState.appName, event.id).pipe(
+        return this.rulesService.enqueueEvent(this.appsState.appName, event).pipe(
             tap(() => {
                 this.dialogs.notifyInfo('Events enqueued. Will be resend in a few seconds.');
             }),
@@ -90,7 +87,7 @@ export class RuleEventsState extends State<Snapshot> {
     }
 
     public cancel(event: RuleEventDto): Observable<any> {
-        return this.rulesService.cancelEvent(this.appsState.appName, event.id).pipe(
+        return this.rulesService.cancelEvent(this.appsState.appName, event).pipe(
             tap(() => {
                 return this.next(s => {
                     const ruleEvents = s.ruleEvents.replaceBy('id', setCancelled(event));

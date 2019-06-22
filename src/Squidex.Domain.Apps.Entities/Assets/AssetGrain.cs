@@ -51,16 +51,27 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         Create(c, tagIds);
 
-                        return new AssetSavedResult(Version, Snapshot.FileVersion, Snapshot.FileHash);
+                        return Snapshot;
                     });
                 case UpdateAsset updateRule:
-                    return UpdateAsync(updateRule, c =>
+                    return UpdateReturn(updateRule, c =>
                     {
                         GuardAsset.CanUpdate(c);
 
                         Update(c);
 
-                        return new AssetSavedResult(Version, Snapshot.FileVersion, Snapshot.FileHash);
+                        return Snapshot;
+                    });
+                case AnnotateAsset annotateAsset:
+                    return UpdateReturnAsync(annotateAsset, async c =>
+                    {
+                        GuardAsset.CanAnnotate(c, Snapshot.FileName, Snapshot.Slug);
+
+                        var tagIds = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
+
+                        Annotate(c, tagIds);
+
+                        return Snapshot;
                     });
                 case DeleteAsset deleteAsset:
                     return UpdateAsync(deleteAsset, async c =>
@@ -70,15 +81,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         await tagService.NormalizeTagsAsync(Snapshot.AppId.Id, TagGroups.Assets, null, Snapshot.Tags);
 
                         Delete(c);
-                    });
-                case AnnotateAsset annotateAsset:
-                    return UpdateAsync(annotateAsset, async c =>
-                    {
-                        GuardAsset.CanAnnotate(c, Snapshot.FileName, Snapshot.Slug);
-
-                        var tagIds = await NormalizeTagsAsync(Snapshot.AppId.Id, c.Tags);
-
-                        Annotate(c, tagIds);
                     });
                 default:
                     throw new NotSupportedException();

@@ -19,10 +19,12 @@
     }
 }
 
-::ng-deep canvas {
-    height: 12rem !important;
-    margin-top: -1rem;
-    margin-bottom: 0;
+:host ::ng-deep {
+    canvas {
+        height: 12rem !important;
+        margin-top: -1rem;
+        margin-bottom: 0;
+    }
 }
 
 .subtext {
@@ -72,7 +74,7 @@
         }
 
         &:hover {
-            @include box-shadow(0, 3px, 16px, .2);
+            @include box-shadow(0, 3px, 16px, .2px);
         }
 
         &:focus {

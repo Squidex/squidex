@@ -27,9 +27,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         private readonly MyUIOptions uiOptions;
         private readonly IGrainFactory grainFactory;
 
-        public UIController(ICommandBus commandBus,
-            IOptions<MyUIOptions> uiOptions,
-            IGrainFactory grainFactory)
+        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IGrainFactory grainFactory)
             : base(commandBus)
         {
             this.uiOptions = uiOptions.Value;

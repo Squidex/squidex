@@ -15,6 +15,7 @@ using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Infrastructure;
@@ -76,16 +77,16 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpGet]
         [Route("apps/{app}/rules/")]
-        [ProducesResponseType(typeof(RuleDto[]), 200)]
+        [ProducesResponseType(typeof(RulesDto), 200)]
         [ApiPermission(Permissions.AppRulesRead)]
         [ApiCosts(1)]
         public async Task<IActionResult> GetRules(string app)
         {
-            var entities = await appProvider.GetRulesAsync(AppId);
+            var rules = await appProvider.GetRulesAsync(AppId);
 
-            var response = entities.Select(RuleDto.FromRule).ToArray();
+            var response = RulesDto.FromRules(rules, this, app);
 
-            Response.Headers[HeaderNames.ETag] = response.ToManyEtag(0);
+            Response.Headers[HeaderNames.ETag] = response.GenerateEtag();
 
             return Ok(response);
         }
@@ -102,16 +103,14 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/rules/")]
-        [ProducesResponseType(typeof(EntityCreatedDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(RuleDto), 201)]
         [ApiPermission(Permissions.AppRulesCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostRule(string app, [FromBody] CreateRuleDto request)
         {
-            var context = await CommandBus.PublishAsync(request.ToCommand());
+            var command = request.ToCommand();
 
-            var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = EntityCreatedDto.FromResult(result);
+            var response = await InvokeCommandAsync(app, command);
 
             return CreatedAtAction(nameof(GetRules), new { app }, response);
         }
@@ -123,7 +122,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// <param name="id">The id of the rule to update.</param>
         /// <param name="request">The rule object that needs to be added to the app.</param>
         /// <returns>
-        /// 204 => Rule updated.
+        /// 200 => Rule updated.
         /// 400 => Rule is not valid.
         /// 404 => Rule or app not found.
         /// </returns>
@@ -132,14 +131,16 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/rules/{id}/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(RuleDto), 400)]
         [ApiPermission(Permissions.AppRulesUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutRule(string app, Guid id, [FromBody] UpdateRuleDto request)
         {
-            await CommandBus.PublishAsync(request.ToCommand(id));
+            var command = request.ToCommand(id);
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -148,19 +149,22 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the rule to enable.</param>
         /// <returns>
-        /// 204 => Rule enabled.
+        /// 200 => Rule enabled.
         /// 400 => Rule already enabled.
         /// 404 => Rule or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/rules/{id}/enable/")]
+        [ProducesResponseType(typeof(RuleDto), 200)]
         [ApiPermission(Permissions.AppRulesDisable)]
         [ApiCosts(1)]
         public async Task<IActionResult> EnableRule(string app, Guid id)
         {
-            await CommandBus.PublishAsync(new EnableRule { RuleId = id });
+            var command = new EnableRule { RuleId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -169,19 +173,22 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the rule to disable.</param>
         /// <returns>
-        /// 204 => Rule disabled.
+        /// 200 => Rule disabled.
         /// 400 => Rule already disabled.
         /// 404 => Rule or app not found.
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/rules/{id}/disable/")]
+        [ProducesResponseType(typeof(RuleDto), 200)]
         [ApiPermission(Permissions.AppRulesDisable)]
         [ApiCosts(1)]
         public async Task<IActionResult> DisableRule(string app, Guid id)
         {
-            await CommandBus.PublishAsync(new DisableRule { RuleId = id });
+            var command = new DisableRule { RuleId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(app, command);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -190,7 +197,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the rule to delete.</param>
         /// <returns>
-        /// 204 => Rule has been deleted.
+        /// 204 => Rule deleted.
         /// 404 => Rule or app not found.
         /// </returns>
         [HttpDelete]
@@ -226,7 +233,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
 
             await Task.WhenAll(taskForItems, taskForCount);
 
-            var response = RuleEventsDto.FromRuleEvents(taskForItems.Result, taskForCount.Result);
+            var response = RuleEventsDto.FromRuleEvents(taskForItems.Result, taskForCount.Result, this, app);
 
             return Ok(response);
         }
@@ -237,7 +244,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The event to enqueue.</param>
         /// <returns>
-        /// 200 => Rule enqueued.
+        /// 204 => Rule enqueued.
         /// 404 => App or rule event not found.
         /// </returns>
         [HttpPut]
@@ -246,9 +253,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public async Task<IActionResult> PutEvent(string app, Guid id)
         {
-            var entity = await ruleEventsRepository.FindAsync(id);
+            var ruleEvent = await ruleEventsRepository.FindAsync(id);
 
-            if (entity == null)
+            if (ruleEvent == null)
             {
                 return NotFound();
             }
@@ -264,7 +271,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The event to enqueue.</param>
         /// <returns>
-        /// 200 => Rule deqeued.
+        /// 204 => Rule deqeued.
         /// 404 => App or rule event not found.
         /// </returns>
         [HttpDelete]
@@ -273,9 +280,9 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteEvent(string app, Guid id)
         {
-            var entity = await ruleEventsRepository.FindAsync(id);
+            var ruleEvent = await ruleEventsRepository.FindAsync(id);
 
-            if (entity == null)
+            if (ruleEvent == null)
             {
                 return NotFound();
             }
@@ -283,6 +290,16 @@ namespace Squidex.Areas.Api.Controllers.Rules
             await ruleEventsRepository.CancelAsync(id);
 
             return NoContent();
+        }
+
+        private async Task<RuleDto> InvokeCommandAsync(string app, ICommand command)
+        {
+            var context = await CommandBus.PublishAsync(command);
+
+            var result = context.Result<IRuleEntity>();
+            var response = RuleDto.FromRule(result, this, app);
+
+            return response;
         }
     }
 }

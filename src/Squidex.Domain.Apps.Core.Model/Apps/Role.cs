@@ -7,6 +7,7 @@
 
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using P = Squidex.Shared.Permissions;
@@ -20,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         public const string Owner = "Owner";
         public const string Reader = "Reader";
 
-        private static readonly HashSet<string> DefaultRolesSet = new HashSet<string>
+        private static readonly HashSet<string> DefaultRolesSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             Editor,
             Developer,
@@ -52,6 +53,11 @@ namespace Squidex.Domain.Apps.Core.Apps
         public static bool IsDefaultRole(string role)
         {
             return role != null && DefaultRolesSet.Contains(role);
+        }
+
+        public static bool IsRole(string name, string expected)
+        {
+            return name != null && string.Equals(name, expected, StringComparison.OrdinalIgnoreCase);
         }
 
         public static Role CreateOwner(string app)

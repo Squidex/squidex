@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Areas.Api.Config.Swagger
 {
-    public class FixProcessor : IOperationProcessor
+    public sealed class FixProcessor : IOperationProcessor
     {
         private static readonly JsonSchema4 StringSchema = new JsonSchema4 { Type = JsonObjectType.String };
 

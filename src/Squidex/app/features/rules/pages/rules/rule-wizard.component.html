@@ -22,6 +22,10 @@
 
     <ng-container content>
         <div class="row no-gutters" *ngIf="step === 1">
+            <sqx-form-alert marginTop="0">
+                The selection of the trigger type cannot be changed later.
+            </sqx-form-alert>
+
             <div *ngFor="let triggerType of ruleTriggers | sqxKeys" class="col-12 col-md-6">
                 <div class="rule-element" (click)="selectTriggerType(triggerType)">
                     <sqx-rule-element [type]="triggerType" [isSmall]="false" [element]="ruleTriggers[triggerType]"></sqx-rule-element>
@@ -68,6 +72,10 @@
         </ng-container>
     
         <div class="row no-gutters" *ngIf="step === 3">
+            <sqx-form-alert marginTop="0">
+                The selection of the action type cannot be changed later.
+            </sqx-form-alert>
+
             <div *ngFor="let actionType of ruleActions | sqxKeys" class="col-12 col-md-6">
                 <div class="rule-element" (click)="selectActionType(actionType)">
                     <sqx-rule-element [type]="actionType" [isSmall]="false" [element]="ruleActions[actionType]"></sqx-rule-element>
@@ -98,12 +106,12 @@
             
             <ng-container *ngIf="mode !== 'Wizard' && step === 2">
                 <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
-                <button type="submit" class="float-right btn btn-primary" (click)="saveTrigger()">Save</button>
+                <button type="submit" class="float-right btn btn-primary" (click)="saveTrigger()" *ngIf="isEditable">Save</button>
             </ng-container>
 
             <ng-container *ngIf="step === 4">
                 <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
-                <button type="submit" class="float-right btn btn-primary" (click)="saveAction()">Save</button>
+                <button type="submit" class="float-right btn btn-primary" (click)="saveAction()" *ngIf="isEditable">Save</button>
             </ng-container>
         </div>
     </ng-container>

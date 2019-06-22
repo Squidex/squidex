@@ -49,6 +49,48 @@ namespace Squidex.Infrastructure.Assets
         }
 
         [Fact]
+        public async Task Should_throw_exception_if_stream_to_download_is_null()
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => Sut.DownloadAsync("File", null));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_stream_to_upload_is_null()
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => Sut.UploadAsync("File", null));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_source_file_name_to_copy_is_empty()
+        {
+            await CheckEmpty(v => Sut.CopyAsync(v, "Target"));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_target_file_name_to_copy_is_empty()
+        {
+            await CheckEmpty(v => Sut.CopyAsync("Source", v));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_file_name_to_delete_is_empty()
+        {
+            await CheckEmpty(v => Sut.DeleteAsync(v));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_file_name_to_download_is_empty()
+        {
+            await CheckEmpty(v => Sut.DownloadAsync(v, new MemoryStream()));
+        }
+
+        [Fact]
+        public async Task Should_throw_exception_if_file_name_to_upload_is_empty()
+        {
+            await CheckEmpty(v => Sut.UploadAsync(v, new MemoryStream()));
+        }
+
+        [Fact]
         public async Task Should_write_and_read_file()
         {
             await Sut.UploadAsync(fileName, assetData);
@@ -110,6 +152,13 @@ namespace Squidex.Infrastructure.Assets
             await Sut.UploadAsync(sourceFile, assetData);
             await Sut.DeleteAsync(sourceFile);
             await Sut.DeleteAsync(sourceFile);
+        }
+
+        private async Task CheckEmpty(Func<string, Task> action)
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(() => action(null));
+            await Assert.ThrowsAsync<ArgumentException>(() => action(string.Empty));
+            await Assert.ThrowsAsync<ArgumentException>(() => action(" "));
         }
     }
 }

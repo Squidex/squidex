@@ -6,22 +6,19 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
-using NodaTime;
-using NodaTime.Text;
 using Squidex.Areas.Api.Controllers.Contents.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents
@@ -30,15 +27,18 @@ namespace Squidex.Areas.Api.Controllers.Contents
     {
         private readonly IOptions<MyContentsControllerOptions> controllerOptions;
         private readonly IContentQueryService contentQuery;
+        private readonly IContentWorkflow contentWorkflow;
         private readonly IGraphQLService graphQl;
 
         public ContentsController(ICommandBus commandBus,
             IContentQueryService contentQuery,
+            IContentWorkflow contentWorkflow,
             IGraphQLService graphQl,
             IOptions<MyContentsControllerOptions> controllerOptions)
             : base(commandBus)
         {
             this.contentQuery = contentQuery;
+            this.contentWorkflow = contentWorkflow;
             this.controllerOptions = controllerOptions;
 
             this.graphQl = graphQl;
@@ -111,7 +111,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="ids">The optional ids of the content to fetch.</param>
-        /// <param name="status">The requested status, only for frontend client.</param>
         /// <returns>
         /// 200 => Contents retrieved.
         /// 404 => App not found.
@@ -121,26 +120,23 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids, [FromQuery] string status = null)
+        public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids)
         {
-            var context = Context().WithFrontendStatus(status);
+            var context = Context();
+            var contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).Ids);
+            var contentsList = ResultList.Create<IContentEntity>(contents.Count, contents);
 
-            var result = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).Ids);
-
-            var response = new ContentsDto
-            {
-                Total = result.Count,
-                Items = result.Take(200).Select(x => ContentDto.FromContent(x, context)).ToArray()
-            };
+            var response = await ContentsDto.FromContentsAsync(contentsList, context, this, null, contentWorkflow);
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
-                Response.Headers["Surrogate-Key"] = response.Items.ToSurrogateKeys();
+                Response.Headers["Surrogate-Key"] = response.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = response.Items.ToManyEtag();
+            Response.Headers[HeaderNames.ETag] = response.ToEtag();
 
             return Ok(response);
         }
@@ -151,7 +147,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="ids">The optional ids of the content to fetch.</param>
-        /// <param name="status">The requested status, only for frontend client.</param>
         /// <returns>
         /// 200 => Contents retrieved.
         /// 404 => Schema or app not found.
@@ -161,26 +156,24 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null, [FromQuery] string status = null)
+        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null)
         {
-            var context = Context().WithFrontendStatus(status);
+            var context = Context();
+            var contents = await contentQuery.QueryAsync(context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 
-            var result = await contentQuery.QueryAsync(context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
+            var schema = await contentQuery.GetSchemaOrThrowAsync(context, name);
 
-            var response = new ContentsDto
+            var response = await ContentsDto.FromContentsAsync(contents, context, this, schema, contentWorkflow);
+
+            if (ShouldProvideSurrogateKeys(response))
             {
-                Total = result.Total,
-                Items = result.Take(200).Select(x => ContentDto.FromContent(x, context)).ToArray()
-            };
-
-            if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
-            {
-                Response.Headers["Surrogate-Key"] = response.Items.ToSurrogateKeys();
+                Response.Headers["Surrogate-Key"] = response.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = response.Items.ToManyEtag(response.Total);
+            Response.Headers[HeaderNames.ETag] = response.ToEtag();
 
             return Ok(response);
         }
@@ -200,6 +193,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpGet]
         [Route("content/{app}/{name}/{id}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string name, Guid id)
@@ -207,7 +201,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = Context();
             var content = await contentQuery.FindContentAsync(context, name, id);
 
-            var response = ContentDto.FromContent(content, context);
+            var response = await ContentDto.FromContentAsync(context, content, contentWorkflow, this);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
@@ -243,7 +237,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = Context();
             var content = await contentQuery.FindContentAsync(context, name, id, version);
 
-            var response = ContentDto.FromContent(content, context);
+            var response = await ContentDto.FromContentAsync(context, content, contentWorkflow, this);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
@@ -272,25 +266,21 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
 
-            var publishPermission = Permissions.ForApp(Permissions.AppContentsPublish, app, name);
-
-            if (publish && !User.Permissions().Includes(publishPermission))
+            if (publish && !this.HasPermission(Helper.StatusPermission(app, name, Status.Published)))
             {
-                return new StatusCodeResult(123);
+                return new ForbidResult();
             }
 
             var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
 
-            var context = await CommandBus.PublishAsync(command);
-
-            var result = context.Result<EntityCreatedResult<NamedContentData>>();
-            var response = ContentDto.FromCommand(command, result);
+            var response = await InvokeCommandAsync(app, name, command);
 
             return CreatedAtAction(nameof(GetContent), new { id = command.ContentId }, response);
         }
@@ -313,17 +303,16 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
 
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned(), AsDraft = asDraft };
-            var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<ContentDataChangedResult>();
-            var response = result.Data;
+            var response = await InvokeCommandAsync(app, name, command);
 
             return Ok(response);
         }
@@ -346,17 +335,16 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPatch]
         [Route("content/{app}/{name}/{id}/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
 
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned(), AsDraft = asDraft };
-            var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<ContentDataChangedResult>();
-            var response = result.Data;
+            var response = await InvokeCommandAsync(app, name, command);
 
             return Ok(response);
         }
@@ -367,118 +355,34 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content item to publish.</param>
-        /// <param name="dueTime">The date and time when the content should be published.</param>
+        /// <param name="request">The status request.</param>
         /// <returns>
-        /// 204 => Content published.
+        /// 200 => Content published.
         /// 404 => Content, schema or app not found.
-        /// 400 => Content was already published.
+        /// 400 => Request is not valid.
         /// </returns>
         /// <remarks>
         /// You can read the generated documentation for your app at /api/content/{appName}/docs.
         /// </remarks>
         [HttpPut]
-        [Route("content/{app}/{name}/{id}/publish/")]
-        [ApiPermission(Permissions.AppContentsPublish)]
+        [Route("content/{app}/{name}/{id}/status/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> PublishContent(string app, string name, Guid id, string dueTime = null)
+        public async Task<IActionResult> PutContentStatus(string app, string name, Guid id, ChangeStatusDto request)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
 
-            var command = CreateCommand(id, Status.Published, dueTime);
+            if (!this.HasPermission(Helper.StatusPermission(app, name, Status.Published)))
+            {
+                return new ForbidResult();
+            }
 
-            await CommandBus.PublishAsync(command);
+            var command = request.ToCommand(id);
 
-            return NoContent();
-        }
+            var response = await InvokeCommandAsync(app, name, command);
 
-        /// <summary>
-        /// Unpublish a content item.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
-        /// <param name="id">The id of the content item to unpublish.</param>
-        /// <param name="dueTime">The date and time when the content should be unpublished.</param>
-        /// <returns>
-        /// 204 => Content unpublished.
-        /// 404 => Content, schema or app not found.
-        /// 400 => Content was not published.
-        /// </returns>
-        /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
-        /// </remarks>
-        [HttpPut]
-        [Route("content/{app}/{name}/{id}/unpublish/")]
-        [ApiPermission(Permissions.AppContentsUnpublish)]
-        [ApiCosts(1)]
-        public async Task<IActionResult> UnpublishContent(string app, string name, Guid id, string dueTime = null)
-        {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
-
-            var command = CreateCommand(id, Status.Draft, dueTime);
-
-            await CommandBus.PublishAsync(command);
-
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Archive a content item.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
-        /// <param name="id">The id of the content item to archive.</param>
-        /// <param name="dueTime">The date and time when the content should be archived.</param>
-        /// <returns>
-        /// 204 => Content archived.
-        /// 404 => Content, schema or app not found.
-        /// 400 => Content was already archived.
-        /// </returns>
-        /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
-        /// </remarks>
-        [HttpPut]
-        [Route("content/{app}/{name}/{id}/archive/")]
-        [ApiPermission(Permissions.AppContentsArchive)]
-        [ApiCosts(1)]
-        public async Task<IActionResult> ArchiveContent(string app, string name, Guid id, string dueTime = null)
-        {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
-
-            var command = CreateCommand(id, Status.Archived, dueTime);
-
-            await CommandBus.PublishAsync(command);
-
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Restore a content item.
-        /// </summary>
-        /// <param name="app">The name of the app.</param>
-        /// <param name="name">The name of the schema.</param>
-        /// <param name="id">The id of the content item to restore.</param>
-        /// <param name="dueTime">The date and time when the content should be restored.</param>
-        /// <returns>
-        /// 204 => Content restored.
-        /// 404 => Content, schema or app not found.
-        /// 400 => Content was not archived.
-        /// </returns>
-        /// <remarks>
-        /// You can read the generated documentation for your app at /api/content/{appName}/docs.
-        /// </remarks>
-        [HttpPut]
-        [Route("content/{app}/{name}/{id}/restore/")]
-        [ApiPermission(Permissions.AppContentsRestore)]
-        [ApiCosts(1)]
-        public async Task<IActionResult> RestoreContent(string app, string name, Guid id, string dueTime = null)
-        {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
-
-            var command = CreateCommand(id, Status.Draft, dueTime);
-
-            await CommandBus.PublishAsync(command);
-
-            return NoContent();
+            return Ok(response);
         }
 
         /// <summary>
@@ -488,7 +392,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content item to discard changes.</param>
         /// <returns>
-        /// 204 => Content restored.
+        /// 200 => Content restored.
         /// 404 => Content, schema or app not found.
         /// 400 => Content was not archived.
         /// </returns>
@@ -497,17 +401,18 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPut]
         [Route("content/{app}/{name}/{id}/discard/")]
+        [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission(Permissions.AppContentsDiscard)]
         [ApiCosts(1)]
-        public async Task<IActionResult> DiscardChanges(string app, string name, Guid id)
+        public async Task<IActionResult> DiscardDraft(string app, string name, Guid id)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
 
             var command = new DiscardChanges { ContentId = id };
 
-            await CommandBus.PublishAsync(command);
+            var response = await InvokeCommandAsync(app, name, command);
 
-            return NoContent();
+            return Ok(response);
         }
 
         /// <summary>
@@ -517,7 +422,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="name">The name of the schema.</param>
         /// <param name="id">The id of the content item to delete.</param>
         /// <returns>
-        /// 204 => Content has been deleted.
+        /// 204 => Content deleted.
         /// 404 => Content, schema or app not found.
         /// </returns>
         /// <remarks>
@@ -529,7 +434,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContent(string app, string name, Guid id)
         {
-            await contentQuery.ThrowIfSchemaNotExistsAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
 
             var command = new DeleteContent { ContentId = id };
 
@@ -538,21 +443,14 @@ namespace Squidex.Areas.Api.Controllers.Contents
             return NoContent();
         }
 
-        private static ChangeContentStatus CreateCommand(Guid id, Status status, string dueTime)
+        private async Task<ContentDto> InvokeCommandAsync(string app, string schema, ICommand command)
         {
-            Instant? dt = null;
+            var context = await CommandBus.PublishAsync(command);
 
-            if (!string.IsNullOrWhiteSpace(dueTime))
-            {
-                var parseResult = InstantPattern.General.Parse(dueTime);
+            var result = context.Result<IContentEntity>();
+            var response = await ContentDto.FromContentAsync(null, result, contentWorkflow, this);
 
-                if (parseResult.Success)
-                {
-                    dt = parseResult.Value;
-                }
-            }
-
-            return new ChangeContentStatus { Status = status, ContentId = id, DueTime = dt };
+            return response;
         }
 
         private QueryContext Context()
@@ -562,6 +460,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 .WithFlatten(Request.Headers.ContainsKey("X-Flatten"))
                 .WithLanguages(Request.Headers["X-Languages"])
                 .WithUnpublished(Request.Headers.ContainsKey("X-Unpublished"));
+        }
+
+        private bool ShouldProvideSurrogateKeys(ContentsDto response)
+        {
+            return controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys;
         }
     }
 }

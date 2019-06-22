@@ -52,6 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="idOrSlug">The id or slug of the asset.</param>
         /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="version">The optional version of the asset.</param>
+        /// <param name="dl">Set it to 0 to prevent download.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
         /// <param name="height">The target height of the asset, if it is an image.</param>
         /// <param name="quality">Optional image quality, it is is an jpeg image.</param>
@@ -67,23 +68,24 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AllowAnonymous]
         public async Task<IActionResult> GetAssetContentBySlug(string app, string idOrSlug, string more,
             [FromQuery] long version = EtagVersion.Any,
+            [FromQuery] int dl = 1,
             [FromQuery] int? width = null,
             [FromQuery] int? height = null,
             [FromQuery] int? quality = null,
             [FromQuery] string mode = null)
         {
-            IAssetEntity entity;
+            IAssetEntity asset;
 
             if (Guid.TryParse(idOrSlug, out var guid))
             {
-                entity = await assetRepository.FindAssetAsync(guid);
+                asset = await assetRepository.FindAssetAsync(guid);
             }
             else
             {
-                entity = await assetRepository.FindAssetBySlugAsync(App.Id, idOrSlug);
+                asset = await assetRepository.FindAssetBySlugAsync(App.Id, idOrSlug);
             }
 
-            return DeliverAsset(entity, version, width, height, quality, mode);
+            return DeliverAsset(asset, version, width, height, quality, mode, dl);
         }
 
         /// <summary>
@@ -92,6 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// <param name="id">The id of the asset.</param>
         /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="version">The optional version of the asset.</param>
+        /// <param name="dl">Set it to 0 to prevent download.</param>
         /// <param name="width">The target width of the asset, if it is an image.</param>
         /// <param name="height">The target height of the asset, if it is an image.</param>
         /// <param name="quality">Optional image quality, it is is an jpeg image.</param>
@@ -106,30 +109,31 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(0.5)]
         public async Task<IActionResult> GetAssetContent(Guid id, string more,
             [FromQuery] long version = EtagVersion.Any,
+            [FromQuery] int dl = 1,
             [FromQuery] int? width = null,
             [FromQuery] int? height = null,
             [FromQuery] int? quality = null,
             [FromQuery] string mode = null)
         {
-            var entity = await assetRepository.FindAssetAsync(id);
+            var asset = await assetRepository.FindAssetAsync(id);
 
-            return DeliverAsset(entity, version, width, height, quality, mode);
+            return DeliverAsset(asset, version, width, height, quality, mode, dl);
         }
 
-        private IActionResult DeliverAsset(IAssetEntity entity, long version, int? width, int? height, int? quality, string mode)
+        private IActionResult DeliverAsset(IAssetEntity asset, long version, int? width, int? height, int? quality, string mode, int download = 1)
         {
-            if (entity == null || entity.FileVersion < version || width == 0 || height == 0 || quality == 0)
+            if (asset == null || asset.FileVersion < version || width == 0 || height == 0 || quality == 0)
             {
                 return NotFound();
             }
 
-            Response.Headers[HeaderNames.ETag] = entity.FileVersion.ToString();
+            Response.Headers[HeaderNames.ETag] = asset.FileVersion.ToString();
 
-            return new FileCallbackResult(entity.MimeType, entity.FileName, true, async bodyStream =>
+            var handler = new Func<Stream, Task>(async bodyStream =>
             {
-                var assetId = entity.Id.ToString();
+                var assetId = asset.Id.ToString();
 
-                if (entity.IsImage && (width.HasValue || height.HasValue || quality.HasValue))
+                if (asset.IsImage && (width.HasValue || height.HasValue || quality.HasValue))
                 {
                     var assetSuffix = $"{width}_{height}_{mode}";
 
@@ -140,7 +144,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                     try
                     {
-                        await assetStore.DownloadAsync(assetId, entity.FileVersion, assetSuffix, bodyStream);
+                        await assetStore.DownloadAsync(assetId, asset.FileVersion, assetSuffix, bodyStream);
                     }
                     catch (AssetNotFoundException)
                     {
@@ -152,7 +156,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                                 {
                                     using (Profiler.Trace("ResizeDownload"))
                                     {
-                                        await assetStore.DownloadAsync(assetId, entity.FileVersion, null, sourceStream);
+                                        await assetStore.DownloadAsync(assetId, asset.FileVersion, null, sourceStream);
                                         sourceStream.Position = 0;
                                     }
 
@@ -164,7 +168,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
                                     using (Profiler.Trace("ResizeUpload"))
                                     {
-                                        await assetStore.UploadAsync(assetId, entity.FileVersion, assetSuffix, destinationStream);
+                                        await assetStore.UploadAsync(assetId, asset.FileVersion, assetSuffix, destinationStream);
                                         destinationStream.Position = 0;
                                     }
 
@@ -176,9 +180,18 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 }
                 else
                 {
-                    await assetStore.DownloadAsync(assetId, entity.FileVersion, null, bodyStream);
+                    await assetStore.DownloadAsync(assetId, asset.FileVersion, null, bodyStream);
                 }
             });
+
+            if (download == 1)
+            {
+                return new FileCallbackResult(asset.MimeType, asset.FileName, true, handler);
+            }
+            else
+            {
+                return new FileCallbackResult(asset.MimeType, null, true, handler);
+            }
         }
 
         private static FileStream GetTempStream()

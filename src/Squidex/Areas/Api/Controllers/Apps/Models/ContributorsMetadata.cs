@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public enum StatusForFrontend
+    public sealed class ContributorsMetadata
     {
-        PublishedDraft,
-        PublishedOnly,
-        Archived
+        /// <summary>
+        /// Indicates whether the user has been invited.
+        /// </summary>
+        public string IsInvited { get; set; }
     }
 }

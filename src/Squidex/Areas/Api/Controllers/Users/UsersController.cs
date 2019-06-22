@@ -57,6 +57,23 @@ namespace Squidex.Areas.Api.Controllers.Users
         }
 
         /// <summary>
+        /// Get the user resources.
+        /// </summary>
+        /// <returns>
+        /// 200 => User resources returned.
+        /// </returns>
+        [HttpGet]
+        [Route("/")]
+        [ProducesResponseType(typeof(ResourcesDto), 200)]
+        [ApiPermission]
+        public IActionResult GetUserResources()
+        {
+            var response = ResourcesDto.FromController(this);
+
+            return Ok(response);
+        }
+
+        /// <summary>
         /// Get users by query.
         /// </summary>
         /// <param name="query">The query to search the user by email address. Case invariant.</param>
@@ -68,17 +85,17 @@ namespace Squidex.Areas.Api.Controllers.Users
         /// </returns>
         [HttpGet]
         [Route("users/")]
-        [ProducesResponseType(typeof(PublicUserDto[]), 200)]
+        [ProducesResponseType(typeof(UserDto[]), 200)]
         [ApiPermission]
         public async Task<IActionResult> GetUsers(string query)
         {
             try
             {
-                var entities = await userResolver.QueryByEmailAsync(query);
+                var users = await userResolver.QueryByEmailAsync(query);
 
-                var models = entities.Where(x => !x.IsHidden()).Select(UserDto.FromUser).ToArray();
+                var response = users.Where(x => !x.IsHidden()).Select(x => UserDto.FromUser(x, this)).ToArray();
 
-                return Ok(models);
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -100,7 +117,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         /// </returns>
         [HttpGet]
         [Route("users/{id}/")]
-        [ProducesResponseType(typeof(PublicUserDto), 200)]
+        [ProducesResponseType(typeof(UserDto), 200)]
         [ApiPermission]
         public async Task<IActionResult> GetUser(string id)
         {
@@ -110,7 +127,7 @@ namespace Squidex.Areas.Api.Controllers.Users
 
                 if (entity != null)
                 {
-                    var response = UserDto.FromUser(entity);
+                    var response = UserDto.FromUser(entity, this);
 
                     return Ok(response);
                 }
