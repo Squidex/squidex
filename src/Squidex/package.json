@@ -11,7 +11,7 @@
     "test:coverage": "karma start karma.coverage.conf.js",
     "test:clean": "rimraf _test-output",
     "tslint": "tslint -c tslint.json -p tsconfig.json app/**/*.ts",
-    "build": "npm run copy && webpack --config app-config/webpack.config.js --env.production",
+    "build": "npm run copy && node --max_old_space_size=4096 node_modules/webpack/bin/webpack.js --config app-config/webpack.config.js --env.production",
     "build:clean": "rimraf wwwroot/build"
   },
   "dependencies": {
