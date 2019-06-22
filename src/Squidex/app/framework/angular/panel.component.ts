@@ -25,6 +25,8 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
 
     public renderWidth = 0;
 
+    public isViewInit = false;
+
     @Input()
     public theme = 'light';
 
@@ -82,32 +84,38 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     }
 
     public ngAfterViewInit() {
+        this.isViewInit = true;
+
         this.container.invalidate();
     }
 
     public measure(size: string) {
-        if (this.styleWidth !== size) {
+        if (this.styleWidth !== size && this.isViewInit) {
             this.styleWidth = size;
 
-            const element = this.panel ? this.panel.nativeElement : undefined;
+            const element = this.panel.nativeElement;
 
             if (element) {
                 this.renderer.setStyle(element, 'width', size);
                 this.renderer.setStyle(element, 'minWidth', this.minWidth);
+
                 this.renderWidth = element.offsetWidth;
             }
         }
     }
 
     public arrange(left: any, layer: any) {
-        const element = this.panel ? this.panel.nativeElement : undefined;
+        if (this.isViewInit) {
+            const element = this.panel.nativeElement;
 
-        if (element) {
-            this.renderer.setStyle(element, 'top', '0px');
-            this.renderer.setStyle(element, 'left', left);
-            this.renderer.setStyle(element, 'bottom', '0px');
-            this.renderer.setStyle(element, 'position', 'absolute');
-            this.renderer.setStyle(element, 'z-index', layer);
+            if (element) {
+                this.renderer.setStyle(element, 'top', '0px');
+                this.renderer.setStyle(element, 'left', left);
+                this.renderer.setStyle(element, 'bottom', '0px');
+                this.renderer.setStyle(element, 'position', 'absolute');
+
+                this.renderer.setStyle(element, 'z-index', layer);
+            }
         }
     }
 }
