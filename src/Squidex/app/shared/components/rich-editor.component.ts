@@ -46,7 +46,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
     private value: string;
     private isDisabled = false;
 
-    @ViewChild('editor')
+    @ViewChild('editor', { static: false })
     public editor: ElementRef;
 
     @Output()

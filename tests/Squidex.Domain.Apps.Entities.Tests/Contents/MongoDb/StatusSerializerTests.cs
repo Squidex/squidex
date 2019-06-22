@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
     {
         private sealed class TestObject
         {
-            public Status2 Status { get; set; }
+            public Status Status { get; set; }
         }
 
         [Fact]
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
 
             var source = new TestObject
             {
-                Status = new Status2("Published")
+                Status = Status.Published
             };
 
             var document = new BsonDocument();

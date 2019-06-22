@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Shared;
 using Squidex.Web;
@@ -34,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// The possible statuses.
         /// </summary>
         [Required]
-        public string[] Statuses { get; set; }
+        public Status[] Statuses { get; set; }
 
         public string ToEtag()
         {
@@ -46,20 +47,37 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             return Items.ToSurrogateKeys();
         }
 
-        public static ContentsDto FromContents(long total, IEnumerable<IContentEntity> contents, QueryContext context,
+        public static async Task<ContentsDto> FromContentsAsync(IResultList<IContentEntity> contents, QueryContext context,
             ApiController controller,
-            string app,
-            string schema)
+            ISchemaEntity schema,
+            IContentWorkflow contentWorkflow)
         {
             var result = new ContentsDto
             {
-                Total = total,
-                Items = contents.Select(x => ContentDto.FromContent(x, context, controller, app, schema)).ToArray(),
+                Total = contents.Total,
+                Items = new ContentDto[contents.Count]
             };
 
-            result.Statuses = new string[] { "Archived", "Draft", "Published" };
+            await Task.WhenAll(
+                result.AssignContentsAsync(contentWorkflow, contents, context, controller),
+                result.AssignStatusesAsync(contentWorkflow, schema));
 
-            return result.CreateLinks(controller, app, schema);
+            return result.CreateLinks(controller, schema.AppId.Name, schema.SchemaDef.Name);
+        }
+
+        private async Task AssignStatusesAsync(IContentWorkflow contentWorkflow, ISchemaEntity schema)
+        {
+            var allStatuses = await contentWorkflow.GetAllAsync(schema);
+
+            Statuses = allStatuses.ToArray();
+        }
+
+        private async Task AssignContentsAsync(IContentWorkflow contentWorkflow, IResultList<IContentEntity> contents, QueryContext context, ApiController controller)
+        {
+            for (var i = 0; i < Items.Length; i++)
+            {
+                Items[i] = await ContentDto.FromContentAsync(context, contents[i], contentWorkflow, controller);
+            }
         }
 
         private ContentsDto CreateLinks(ApiController controller, string app, string schema)

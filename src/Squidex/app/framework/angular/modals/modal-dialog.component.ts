@@ -51,10 +51,10 @@ export class ModalDialogComponent extends StatefulComponent<State> implements Af
     @Output()
     public close = new EventEmitter();
 
-    @ViewChild('tabsElement')
+    @ViewChild('tabsElement', { static: false })
     public tabsElement: ElementRef<ParentNode>;
 
-    @ViewChild('footerElement')
+    @ViewChild('footerElement', { static: false })
     public footerElement: ElementRef<ParentNode>;
 
     constructor(changeDetector: ChangeDetectorRef) {

@@ -242,7 +242,7 @@ export class AssetsService {
                 tap(() => {
                     this.analytics.trackEvent('Analytics', 'Updated', appName);
                 }),
-                pretifyError('Failed to delete asset. Please reload.'));
+                pretifyError('Failed to update asset. Please reload.'));
     }
 
     public deleteAsset(appName: string, asset: Resource, version: Version): Observable<Versioned<any>> {

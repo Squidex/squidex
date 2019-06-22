@@ -13,12 +13,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentWorkflow
     {
-        Task<Status2> GetInitialStatusAsync(ISchemaEntity schema);
+        Task<Status> GetInitialStatusAsync(ISchemaEntity schema);
 
-        Task<bool> IsValidNextStatus(IContentEntity content, Status2 next);
+        Task<bool> CanMoveToAsync(IContentEntity content, Status next);
 
-        Task<Status2[]> GetNextsAsync(IContentEntity content);
+        Task<bool> CanUpdateAsync(IContentEntity content);
 
-        Task<Status2[]> GetAllAsync(ISchemaEntity schema);
+        Task<Status[]> GetNextsAsync(IContentEntity content);
+
+        Task<Status[]> GetAllAsync(ISchemaEntity schema);
     }
 }

@@ -1,7 +1,6 @@
 ﻿Error.stackTraceLimit = Infinity;
 
-require('core-js/es6');
-require('core-js/es7/reflect');
+require('core-js/proposals/reflect-metadata');
 
 require('zone.js/dist/zone');
 require('zone.js/dist/long-stack-trace-zone');

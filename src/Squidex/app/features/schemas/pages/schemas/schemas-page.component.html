@@ -27,10 +27,9 @@
 
     <ng-container content>
         <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
-            [name]="category"
-            [schemas]="schemasState.schemas | async"
+            [schemaCategory]="category"
             [schemasFilter]="schemasFilter.valueChanges | async"
-            (remove)="removeCategory(category)">
+            (remove)="removeCategory(category.name)">
         </sqx-schema-category>
 
         <form [formGroup]="addCategoryForm.form" (ngSubmit)="addCategory()">

@@ -8,9 +8,7 @@
 using System;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -41,24 +39,5 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public Status Status { get; set; }
 
         public bool IsPending { get; set; }
-
-        public static ContentEntity Create(CreateContent command, EntityCreatedResult<NamedContentData> result)
-        {
-            var now = SystemClock.Instance.GetCurrentInstant();
-
-            var response = new ContentEntity
-            {
-                Id = command.ContentId,
-                Data = result.IdOrValue,
-                Version = result.Version,
-                Created = now,
-                CreatedBy = command.Actor,
-                LastModified = now,
-                LastModifiedBy = command.Actor,
-                Status = command.Publish ? Status.Published : Status.Draft
-            };
-
-            return response;
-        }
     }
 }

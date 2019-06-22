@@ -213,7 +213,7 @@ export class SchemaPropertiesDto {
 
 export interface AddFieldDto {
     readonly name: string;
-    readonly partitioning: string;
+    readonly partitioning?: string;
     readonly properties: FieldPropertiesDto;
 }
 

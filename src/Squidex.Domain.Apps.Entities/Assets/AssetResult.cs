@@ -5,15 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
+using System.Collections.Generic;
+
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public enum EnrichedContentEventType
+    public class AssetResult
     {
-        Created,
-        Deleted,
-        Published,
-        StatusChanged,
-        Updated,
-        Unpublished,
+        public IAssetEntity Asset { get; }
+
+        public HashSet<string> Tags { get; }
+
+        public AssetResult(IAssetEntity asset, HashSet<string> tags)
+        {
+            Asset = asset;
+
+            Tags = tags;
+        }
     }
 }

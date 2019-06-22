@@ -38,7 +38,7 @@ type AnyFieldDto = NestedFieldDto | RootFieldDto;
 
 interface Snapshot {
     // The schema categories.
-    categories: { [name: string]: boolean };
+    categories: string[];
 
     // The current schemas.
     schemas: SchemasList;
@@ -54,8 +54,7 @@ interface Snapshot {
 }
 
 export type SchemasList = ImmutableArray<SchemaDto>;
-
-export type Categories = { [name: string]: boolean };
+export type SchemaCategory = { name: string; schemas: SchemasList; upper: string; };
 
 function sameSchema(lhs: SchemaDetailsDto | null, rhs?: SchemaDetailsDto | null): boolean {
     return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id && lhs.version === rhs.version);
@@ -68,7 +67,7 @@ export class SchemasState extends State<Snapshot> {
     }
 
     public categories =
-        this.project2(x => x.categories, x => sortedCategoryNames(x));
+        this.project2(x => x, x => buildCategories(x.categories, x.schemas));
 
     public selectedSchema =
         this.project(x => x.selectedSchema, sameSchema);
@@ -90,7 +89,7 @@ export class SchemasState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly schemasService: SchemasService
     ) {
-        super({ schemas: ImmutableArray.empty(), categories: buildCategories({}) });
+        super({ schemas: ImmutableArray.empty(), categories: [] });
     }
 
     public select(idOrName: string | null): Observable<SchemaDetailsDto | null> {
@@ -126,9 +125,7 @@ export class SchemasState extends State<Snapshot> {
                 return this.next(s => {
                     const schemas = ImmutableArray.of(items).sortByStringAsc(x => x.displayName);
 
-                    const categories = buildCategories(s.categories, schemas);
-
-                    return { ...s, schemas, isLoaded: true, categories, canCreate };
+                    return { ...s, schemas, isLoaded: true, canCreate };
                 });
             }),
             shareSubscribed(this.dialogs));
@@ -140,9 +137,7 @@ export class SchemasState extends State<Snapshot> {
                 this.next(s => {
                     const schemas = s.schemas.push(created).sortByStringAsc(x => x.displayName);
 
-                    const categories = buildCategories(s.categories, schemas);
-
-                    return { ...s, schemas, categories };
+                    return { ...s, schemas };
                 });
             }),
             shareSubscribed(this.dialogs, { silent: true }));
@@ -163,7 +158,7 @@ export class SchemasState extends State<Snapshot> {
 
     public addCategory(name: string) {
         this.next(s => {
-            const categories = addCategory(s.categories, name);
+            const categories = [...s.categories, name];
 
             return { ...s, categories: categories };
         });
@@ -171,7 +166,7 @@ export class SchemasState extends State<Snapshot> {
 
     public removeCategory(name: string) {
         this.next(s => {
-            const categories = removeCategory(s.categories, name);
+            const categories = s.categories.filter(x => x !== name);
 
             return { ...s, categories: categories };
         });
@@ -309,9 +304,7 @@ export class SchemasState extends State<Snapshot> {
                 schema :
                 s.selectedSchema;
 
-            const categories = buildCategories(s.categories, schemas);
-
-            return { ...s, schemas, selectedSchema, categories };
+            return { ...s, schemas, selectedSchema };
         });
     }
 
@@ -322,52 +315,38 @@ export class SchemasState extends State<Snapshot> {
 
 function getField(x: SchemaDetailsDto, request: AddFieldDto, parent?: RootFieldDto): FieldDto {
     if (parent) {
-        return parent.nested.find(f => f.name === request.name)!;
+        return x.fields.find(f => f.fieldId === parent.fieldId)!.nested.find(f => f.name === request.name)!;
     } else {
         return x.fields.find(f => f.name === request.name)!;
     }
 }
 
-function buildCategories(categories: { [name: string]: boolean }, schemas?: SchemasList) {
-    categories = { ...categories };
+function buildCategories(categories: string[], schemas: SchemasList): SchemaCategory[] {
+    const uniqueCategories: { [name: string]: string } = {};
 
-    for (let category in categories) {
-        if (categories.hasOwnProperty(category)) {
-            if (!categories[category]) {
-                delete categories[category];
-            }
+    for (let category of categories) {
+        uniqueCategories[category] = category;
+    }
+
+    for (let schema of schemas.values) {
+        uniqueCategories[schema.category || 'Schemas'] = schema.category;
+    }
+
+    const result: SchemaCategory[] = [];
+
+    for (let name in uniqueCategories) {
+        if (uniqueCategories.hasOwnProperty(name)) {
+            const key = uniqueCategories[name];
+
+            result.push({ name, upper: name.toUpperCase(), schemas: schemas.filter(x => isSameCategory(key, x))});
         }
     }
 
-    if (schemas) {
-        for (let schema of schemas.values) {
-            categories[schema.category || ''] = false;
-        }
-    }
+    result.sort((a, b) => compareStringsAsc(a.upper, b.upper));
 
-    return categories;
+    return result;
 }
 
-function addCategory(categories: Categories, category: string) {
-    categories = { ...categories };
-
-    categories[category] = true;
-
-    return categories;
-}
-
-function removeCategory(categories: Categories, category: string) {
-    categories = { ...categories };
-
-    delete categories[category];
-
-    return categories;
-}
-
-function sortedCategoryNames(categories: Categories) {
-    const names = Object.keys(categories);
-
-    names.sort(compareStringsAsc);
-
-    return names;
+export function isSameCategory(name: string, schema: SchemaDto): boolean {
+    return (!name && !schema.category) || schema.category === name;
 }

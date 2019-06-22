@@ -26,7 +26,7 @@ export class IFrameEditorComponent extends ExternalControlComponent<any> impleme
     private isDisabled = false;
     private isInitialized = false;
 
-    @ViewChild('iframe')
+    @ViewChild('iframe', { static: false })
     public iframe: ElementRef<HTMLIFrameElement>;
 
     @Input()

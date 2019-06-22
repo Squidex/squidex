@@ -52,7 +52,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public isAllSelected = false;
 
-    @ViewChild('dueTimeSelector')
+    @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(

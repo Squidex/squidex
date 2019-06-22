@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps.Json;
+using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
@@ -44,6 +45,7 @@ namespace Squidex.Config.Domain
                 new RolesConverter(),
                 new RuleConverter(),
                 new SchemaConverter(),
+                new StatusConverter(),
                 new StringEnumConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;
