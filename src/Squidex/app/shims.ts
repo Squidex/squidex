@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import 'reflect-metadata';
+
 // ES2015 symbol capabilities
 import 'core-js/modules/es.symbol';
 
