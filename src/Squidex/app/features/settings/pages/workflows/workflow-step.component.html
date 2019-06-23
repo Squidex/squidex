@@ -25,53 +25,40 @@
         </div>
     </div>
         
-    <div class="row transition no-gutters" *ngFor="let transition of transitions">
-        <div class="col-auto">
-            <i class="icon-arrow-right text-decent"></i>
-        </div>
-        <div class="col col-step">
-            <div class="transition-to">
-                <div class="color-circle" [style.background]="transition.step.color"></div> {{transition.to}}
+    <div class="step-inner">
+        <sqx-workflow-transition *ngFor="let transition of transitions; trackBy: trackByTransition" 
+            [transition]="transition"
+            [roles]="roles"
+            (remove)="transitionRemove.emit(transition)"
+            (update)="changeTransition(transition, $event)">
+        </sqx-workflow-transition>
+            
+        <div class="row transition no-gutters" *ngIf="openSteps.length > 0">
+            <div class="col-auto">
+                <i class="icon-arrow-right text-decent"></i>
+            </div>
+            <div class="col col-step">
+                <sqx-dropdown [items]="openSteps" [(ngModel)]="openStep">
+                    <ng-template let-target="$implicit">
+                        <div class="color-circle" [style.background]="target.color"></div> {{target.name}}
+                    </ng-template>
+                </sqx-dropdown>
+            </div>
+            <div class="col pl-2">
+                <button class="btn btn-outline-secondary" (click)="transitionAdd.emit(openStep)">
+                    <i class="icon-plus"></i>
+                </button>
             </div>
         </div>
-        <div class="col-auto col-label">
-            <span class="text-decent">when</span>
-        </div>
-        <div class="col">
-            <button class="btn btn-block btn-outline-secondary dashed">
-                Add Expression
-            </button>
-        </div>
-        <div class="col-auto col-label">
-            <span class="text-decent">for</span>
-        </div>
-        <div class="col">
-            <button class="btn btn-block btn-outline-secondary dashed">
-                Add Role
-            </button>
-        </div>
-        <div class="col-auto pl-2">
-            <button type="button" class="btn btn-text-danger" (click)="transitionRemove.emit(transition)">
-                <i class="icon-bin2"></i>
-            </button>
-        </div>
-    </div>
-        
-    <div class="row transition no-gutters" *ngIf="openSteps.length > 0">
-        <div class="col-auto">
-            <i class="icon-arrow-right text-decent"></i>
-        </div>
-        <div class="col col-step">
-            <sqx-dropdown [items]="openSteps" [(ngModel)]="openStep">
-                <ng-template let-target="$implicit">
-                    <div class="color-circle" [style.background]="target.color"></div> {{target.name}}
-                </ng-template>
-            </sqx-dropdown>
-        </div>
-        <div class="col pl-2">
-            <button class="btn btn-outline-secondary" (click)="transitionAdd.emit(openStep)">
-                <i class="icon-plus"></i>
-            </button>
-        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="preventUpdates_{{step.name}}"
+                [ngModel]="step.noUpdate"
+                (ngModelChange)="changeNoUpdate($event)" />
+
+            <label class="form-check-label" for="preventUpdates_{{step.name}}">
+                Prevent updates
+            </label>
+        </div> 
     </div>
 </div>

@@ -8,10 +8,12 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import {
+    RoleDto,
     WorkflowDto,
     WorkflowStep,
     WorkflowStepValues,
     WorkflowTransition,
+    WorkflowTransitionValues,
     WorkflowTransitionView
 } from '@app/shared';
 
@@ -27,11 +29,17 @@ export class WorkflowStepComponent implements OnChanges {
     @Input()
     public step: WorkflowStep;
 
+    @Input()
+    public roles: RoleDto[];
+
     @Output()
     public transitionAdd = new EventEmitter<WorkflowStep>();
 
     @Output()
     public transitionRemove = new EventEmitter<WorkflowTransition>();
+
+    @Output()
+    public transitionUpdate = new EventEmitter<{ transition: WorkflowTransition, values: WorkflowTransitionValues }>();
 
     @Output()
     public update = new EventEmitter<WorkflowStepValues>();
@@ -58,12 +66,24 @@ export class WorkflowStepComponent implements OnChanges {
         }
     }
 
+    public changeTransition(transition: WorkflowTransition, values: WorkflowTransitionValues) {
+        this.transitionUpdate.emit({ transition, values });
+    }
+
     public changeName(name: string) {
         this.rename.emit(name);
     }
 
     public changeColor(color: string) {
         this.update.emit({ color });
+    }
+
+    public changeNoUpdate(noUpdate: boolean) {
+        this.update.emit({ noUpdate });
+    }
+
+    public trackByTransition(index: number, transition: WorkflowTransition) {
+        return transition.to;
     }
 }
 

@@ -26,6 +26,8 @@ export class WorkflowDto extends Model<WorkflowDto> {
 
     public onCloned() {
         this.steps.sort((a, b) => compareStringsAsc(a.name, b.name));
+
+        this.transitions.sort((a, b) => compareStringsAsc(a.to, b.to));
     }
 
     public getOpenSteps(step: WorkflowStep) {
@@ -41,7 +43,19 @@ export class WorkflowDto extends Model<WorkflowDto> {
     }
 
     public setStep(name: string, values: Partial<WorkflowStepValues>) {
-        const steps = [...this.steps.filter(s => s.name !== name), { name, ...values }];
+        const found = this.getStep(name);
+
+        if (found) {
+            const { name: _, ...existing } = found;
+
+            if (found.isLocked) {
+                return this;
+            }
+
+            values = { ...values, ...existing };
+        }
+
+        const steps = [...this.steps.filter(s => s !== found), { name, ...values }];
 
         return this.with({ steps });
     }
@@ -93,29 +107,37 @@ export class WorkflowDto extends Model<WorkflowDto> {
         return this.with({ transitions });
     }
 
-    public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues>) {
-        const stepFrom = this.steps.find(s => s.name === from);
+    public setTransition(from: string, to: string, values?: Partial<WorkflowTransitionValues>) {
+        const stepFrom = this.getStep(from);
 
         if (!stepFrom) {
             return this;
         }
 
-        const stepTo = this.steps.find(s => s.name === to);
+        const stepTo = this.getStep(to);
 
         if (!stepTo) {
             return this;
         }
 
-        const transitions = [...this.transitions.filter(t => t.from  !== from || t.to !== to), { from, to, ...values }];
+        const found = this.transitions.find(x => x.from === from && x.to === to);
+
+        if (found) {
+            const { from: _, to: __, ...existing } = found;
+
+            values = { ...values, ...existing };
+        }
+
+        const transitions = [...this.transitions.filter(t => t !== found), { from, to, ...values }];
 
         return this.with({ transitions });
     }
 }
 
-export type WorkflowStepValues = { color?: string; isLocked?: boolean; };
+export type WorkflowStepValues = { color?: string; isLocked?: boolean; noUpdate?: boolean; };
 export type WorkflowStep = { name: string } & WorkflowStepValues;
 
-export type WorkflowTransitionValues = { expression?: string };
+export type WorkflowTransitionValues = { expression?: string; role?: string; };
 export type WorkflowTransition = { from: string; to: string } & WorkflowTransitionValues;
 
 export type WorkflowTransitionView = { step: WorkflowStep } & WorkflowTransition;

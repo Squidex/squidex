@@ -1,0 +1,52 @@
+<div class="row transition no-gutters">
+    <div class="col-auto">
+        <i class="icon-arrow-right text-decent"></i>
+    </div>
+    <div class="col col-step">
+        <div class="transition-to">
+            <div class="color-circle" [style.background]="transition.step.color"></div> {{transition.to}}
+        </div>
+    </div>
+    <div class="col-auto col-label">
+        <span class="text-decent">when</span>
+    </div>
+    <div class="col">
+        <ng-container *ngIf="elementsActive['expression']; else noExpression">
+            <input class="form-control" sqxFocusOnInit (focus)="focusElement('expression')" (blur)="blurElement('expression')" spellcheck="false"
+                [ngModelOptions]="onBlur"
+                [ngModel]="transition.expression"
+                (ngModelChange)="changeExpression($event)" /> 
+        </ng-container>
+
+        <ng-template #noExpression>
+            <button class="btn btn-block btn-outline-secondary dashed" (click)="showElement('expression')">
+                Add Expression
+            </button>
+        </ng-template>
+    </div>
+    <div class="col-auto col-label">
+        <span class="text-decent">for</span>
+    </div>
+    <div class="col">
+        <ng-container *ngIf="elementsActive['role']; else noRole">
+            <select class="form-control" sqxFocusOnInit (focus)="focusElement('role')" (blur)="blurElement('role')" 
+                [ngModelOptions]="onBlur"
+                [ngModel]="transition.role"
+                (ngModelChange)="changeRole($event)">
+                <option *ngFor="let role of roles; trackBy: trackByRole" [ngValue]="role.name">{{role.name}}</option>
+                <option [ngValue]="null">- All Roles -</option>
+            </select>
+        </ng-container>
+
+        <ng-template #noRole>
+            <button class="btn btn-block btn-outline-secondary dashed" (click)="showElement('role')">
+                Add Role
+            </button>
+        </ng-template>
+    </div>
+    <div class="col-auto pl-2">
+        <button type="button" class="btn btn-text-danger" (click)="remove.emit()">
+            <i class="icon-bin2"></i>
+        </button>
+    </div>
+</div>
