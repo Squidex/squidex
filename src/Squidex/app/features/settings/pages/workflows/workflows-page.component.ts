@@ -8,6 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
+    MathHelper,
     WorkflowDto,
     WorkflowStep,
     WorkflowStepValues,
@@ -20,6 +21,8 @@ import {
     templateUrl: './workflows-page.component.html'
 })
 export class WorkflowsPageComponent implements OnInit {
+    private maxSteps = 1;
+
     public workflow: WorkflowDto;
 
     public ngOnInit() {
@@ -35,7 +38,9 @@ export class WorkflowsPageComponent implements OnInit {
     }
 
     public addStep() {
-        this.workflow = this.workflow.setStep(`Step${this.workflow.steps.length + 1}`, {});
+        this.workflow = this.workflow.setStep(`Step${this.maxSteps}`, { color: MathHelper.randomColor() });
+
+        this.maxSteps++;
     }
 
     public addTransiton(from: WorkflowStep, to: WorkflowStep) {

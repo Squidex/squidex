@@ -21,13 +21,12 @@
         padding-left: 1rem;
         margin-top: .25rem;
         margin-bottom: .5rem;
-        line-height: 2rem;
+        line-height: 2.2rem;
     }
 
     &-to {
         padding: .5rem .75rem;
-        background: transparent;
-        border: 1px solid transparent;
+        padding-right: 0;
         line-height: 1.2rem;
     }
 }
@@ -36,4 +35,14 @@
     & {
         margin-bottom: 1rem;
     }
+}
+
+.col-label {
+    padding: 0 .5rem;
+}
+
+.col-step {
+    min-width: 10rem;
+    max-width: 10rem;
+    padding-left: .5rem;
 }

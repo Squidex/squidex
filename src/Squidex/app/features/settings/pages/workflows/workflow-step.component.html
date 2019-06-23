@@ -15,6 +15,9 @@
                 [disabled]="step.isLocked">
             </sqx-editable-title>
         </div>
+        <div class="col-auto" *ngIf="step.isLocked">
+            <small class="text-decent">(Cannot be removed)</small>
+        </div>
         <div class="col-auto">
             <button type="button" class="btn btn-text-danger" (click)="remove.emit()" *ngIf="!step.isLocked">
                 <i class="icon-bin2"></i>
@@ -26,14 +29,25 @@
         <div class="col-auto">
             <i class="icon-arrow-right text-decent"></i>
         </div>
-        <div class="col-3 pl-2">
+        <div class="col col-step">
             <div class="transition-to">
                 <div class="color-circle" [style.background]="transition.step.color"></div> {{transition.to}}
             </div>
         </div>
-        <div class="col pl-2">
+        <div class="col-auto col-label">
+            <span class="text-decent">when</span>
+        </div>
+        <div class="col">
             <button class="btn btn-block btn-outline-secondary dashed">
                 Add Expression
+            </button>
+        </div>
+        <div class="col-auto col-label">
+            <span class="text-decent">for</span>
+        </div>
+        <div class="col">
+            <button class="btn btn-block btn-outline-secondary dashed">
+                Add Role
             </button>
         </div>
         <div class="col-auto pl-2">
@@ -47,7 +61,7 @@
         <div class="col-auto">
             <i class="icon-arrow-right text-decent"></i>
         </div>
-        <div class="col-3 pl-2">
+        <div class="col col-step">
             <sqx-dropdown [items]="openSteps" [(ngModel)]="openStep">
                 <ng-template let-target="$implicit">
                     <div class="color-circle" [style.background]="target.color"></div> {{target.name}}
