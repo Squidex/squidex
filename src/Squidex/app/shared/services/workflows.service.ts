@@ -65,8 +65,8 @@ export class WorkflowDto extends Model<WorkflowDto> {
 
         const transitions =
             steps.length !== this.steps.length ?
-            this.transitions.filter(t => t.from !== name && t.to !== name) :
-            this.transitions;
+                this.transitions.filter(t => t.from !== name && t.to !== name) :
+                this.transitions;
 
         return this.with({ steps, transitions });
     }
@@ -125,7 +125,7 @@ export class WorkflowDto extends Model<WorkflowDto> {
         if (found) {
             const { from: _, to: __, ...existing } = found;
 
-            values = { ...values, ...existing };
+            values = { ...existing, ...values };
         }
 
         const transitions = [...this.transitions.filter(t => t !== found), { from, to, ...values }];

@@ -2,5 +2,16 @@
 @import '_mixins';
 
 .dashed {
+    @include placeholder-color($color-theme-secondary);
     border-style: dashed;
+    border-width: 1px;
+}
+
+.select-placeholder {
+    @include absolute(0, 0, 0, 0);
+    color: $color-theme-secondary;
+    padding: .5rem .75rem;
+    pointer-events: none;
+    line-height: 1.2rem;
+    border: 1px solid transparent;
 }
