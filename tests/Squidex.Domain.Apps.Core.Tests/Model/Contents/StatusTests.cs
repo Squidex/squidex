@@ -13,39 +13,48 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
     public class StatusTests
     {
         [Fact]
+        public void Should_initialize_default()
+        {
+            Status status = default;
+
+            Assert.Equal("Unknown", status.Name);
+            Assert.Equal("Unknown", status.ToString());
+        }
+
+        [Fact]
         public void Should_initialize_status_from_string()
         {
-            var result = new Status("Custom");
+            var status = new Status("Custom");
 
-            Assert.Equal("Custom", result.Name);
-            Assert.Equal("Custom", result.ToString());
+            Assert.Equal("Custom", status.Name);
+            Assert.Equal("Custom", status.ToString());
         }
 
         [Fact]
         public void Should_provide_draft_status()
         {
-            var result = Status.Draft;
+            var status = Status.Draft;
 
-            Assert.Equal("Draft", result.Name);
-            Assert.Equal("Draft", result.ToString());
+            Assert.Equal("Draft", status.Name);
+            Assert.Equal("Draft", status.ToString());
         }
 
         [Fact]
         public void Should_provide_archived_status()
         {
-            var result = Status.Archived;
+            var status = Status.Archived;
 
-            Assert.Equal("Archived", result.Name);
-            Assert.Equal("Archived", result.ToString());
+            Assert.Equal("Archived", status.Name);
+            Assert.Equal("Archived", status.ToString());
         }
 
         [Fact]
         public void Should_provide_published_status()
         {
-            var result = Status.Published;
+            var status = Status.Published;
 
-            Assert.Equal("Published", result.Name);
-            Assert.Equal("Published", result.ToString());
+            Assert.Equal("Published", status.Name);
+            Assert.Equal("Published", status.ToString());
         }
 
         [Fact]

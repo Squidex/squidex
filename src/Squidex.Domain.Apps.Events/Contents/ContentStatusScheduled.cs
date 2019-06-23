@@ -16,6 +16,8 @@ namespace Squidex.Domain.Apps.Events.Contents
     {
         public Status Status { get; set; }
 
+        public string StatusColor { get; set; }
+
         public Instant DueTime { get; set; }
     }
 }

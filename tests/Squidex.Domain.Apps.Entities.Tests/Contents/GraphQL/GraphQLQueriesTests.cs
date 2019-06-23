@@ -262,6 +262,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     lastModified
                     lastModifiedBy
                     status
+                    statusColor
                     url
                     data {
                       myString {
@@ -320,6 +321,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             lastModified = content.LastModified,
                             lastModifiedBy = "subject:user2",
                             status = "DRAFT",
+                            statusColor = "red",
                             url = $"contents/my-schema/{content.Id}",
                             data = new
                             {
@@ -406,6 +408,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       lastModified
                       lastModifiedBy
                       status
+                      statusColor
                       url
                       data {
                         myString {
@@ -462,6 +465,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 lastModified = content.LastModified,
                                 lastModifiedBy = "subject:user2",
                                 status = "DRAFT",
+                                statusColor = "red",
                                 url = $"contents/my-schema/{content.Id}",
                                 data = new
                                 {
@@ -605,6 +609,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     lastModified
                     lastModifiedBy
                     status
+                    statusColor
                     url
                     data {
                       myString {
@@ -653,6 +658,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         lastModified = content.LastModified,
                         lastModifiedBy = "subject:user2",
                         status = "DRAFT",
+                        statusColor = "red",
                         url = $"contents/my-schema/{content.Id}",
                         data = new
                         {

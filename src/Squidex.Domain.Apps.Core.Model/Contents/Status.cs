@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 using System;
 
 namespace Squidex.Domain.Apps.Core.Contents
@@ -15,6 +14,8 @@ namespace Squidex.Domain.Apps.Core.Contents
         public static readonly Status Archived = new Status("Archived");
         public static readonly Status Draft = new Status("Draft");
         public static readonly Status Published = new Status("Published");
+
+        public const string FallbackColor = "#8091a5";
 
         private readonly string name;
 
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public override string ToString()
         {
-            return name;
+            return Name;
         }
 
         public static bool operator ==(Status lhs, Status rhs)

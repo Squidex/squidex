@@ -80,6 +80,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             AddField(new FieldType
             {
+                Name = "statusColor",
+                ResolvedType = AllTypes.NonNullString,
+                Resolver = Resolve(x => x.StatusColor),
+                Description = $"The color status of the {schemaName} content."
+            });
+
+            AddField(new FieldType
+            {
                 Name = "url",
                 ResolvedType = AllTypes.NonNullString,
                 Resolver = model.ResolveContentUrl(schema),

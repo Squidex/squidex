@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// The possible statuses.
         /// </summary>
         [Required]
-        public Status[] Statuses { get; set; }
+        public StatusInfoDto[] Statuses { get; set; }
 
         public string ToEtag()
         {
@@ -69,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         {
             var allStatuses = await contentWorkflow.GetAllAsync(schema);
 
-            Statuses = allStatuses.ToArray();
+            Statuses = allStatuses.Select(StatusInfoDto.FromStatusInfo).ToArray();
         }
 
         private async Task AssignContentsAsync(IContentWorkflow contentWorkflow, IResultList<IContentEntity> contents, QueryContext context, ApiController controller)

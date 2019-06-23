@@ -62,11 +62,13 @@ describe('ContentsService', () => {
                 contentResponse(12),
                 contentResponse(13)
             ],
-            statuses: ['Draft', 'Published']
+            statuses: [{
+                status: 'Draft', color: 'Gray'
+            }]
         });
 
         expect(contents!).toEqual(
-            new ContentsDto(['Draft', 'Published'], 10, [
+            new ContentsDto([{ status: 'Draft', color: 'Gray' }], 10, [
                 createContent(12),
                 createContent(13)
             ]));

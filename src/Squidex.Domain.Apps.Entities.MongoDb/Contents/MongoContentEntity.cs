@@ -54,6 +54,10 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public Status Status { get; set; }
 
         [BsonIgnoreIfNull]
+        [BsonElement("sc")]
+        public string StatusColor { get; set; }
+
+        [BsonIgnoreIfNull]
         [BsonElement("do")]
         [BsonJson]
         public IdContentData DataByIds { get; set; }

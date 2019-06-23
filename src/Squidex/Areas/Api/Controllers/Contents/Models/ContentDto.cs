@@ -71,9 +71,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public Instant LastModified { get; set; }
 
         /// <summary>
-        /// The the status of the content.
+        /// The status of the content.
         /// </summary>
         public Status Status { get; set; }
+
+        /// <summary>
+        /// The color of the status.
+        /// </summary>
+        public string StatusColor { get; set; }
 
         /// <summary>
         /// The version of the content.
@@ -161,9 +166,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             foreach (var next in nextStatuses)
             {
-                if (controller.HasPermission(Helper.StatusPermission(app, schema, next)))
+                if (controller.HasPermission(Helper.StatusPermission(app, schema, next.Status)))
                 {
-                    AddPutLink($"status/{next}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values));
+                    AddPutLink($"status/{next.Status}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
                 }
             }
 

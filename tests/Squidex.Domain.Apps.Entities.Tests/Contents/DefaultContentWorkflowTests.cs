@@ -7,6 +7,7 @@
 
 using System.Threading.Tasks;
 using FakeItEasy;
+using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Xunit;
 
@@ -19,9 +20,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_draft_as_initial_status()
         {
+            var expected = new StatusInfo(Status.Draft, StatusColors.Draft);
+
             var result = await sut.GetInitialStatusAsync(null);
 
-            Assert.Equal(Status.Draft, result);
+            result.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -69,11 +72,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft);
 
-            var expected = new[] { Status.Archived, Status.Published };
+            var expected = new[]
+            {
+                new StatusInfo(Status.Archived, StatusColors.Archived),
+                new StatusInfo(Status.Published, StatusColors.Published)
+            };
 
             var result = await sut.GetNextsAsync(content);
 
-            Assert.Equal(expected, result);
+            result.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -81,11 +88,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Archived);
 
-            var expected = new[] { Status.Draft };
+            var expected = new[]
+            {
+                new StatusInfo(Status.Draft, StatusColors.Draft)
+            };
 
             var result = await sut.GetNextsAsync(content);
 
-            Assert.Equal(expected, result);
+            result.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
@@ -93,21 +103,30 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Published);
 
-            var expected = new[] { Status.Draft, Status.Archived };
+            var expected = new[]
+            {
+                new StatusInfo(Status.Archived, StatusColors.Archived),
+                new StatusInfo(Status.Draft, StatusColors.Draft)
+            };
 
             var result = await sut.GetNextsAsync(content);
 
-            Assert.Equal(expected, result);
+            result.Should().BeEquivalentTo(expected);
         }
 
         [Fact]
         public async Task Should_return_all_statuses()
         {
-            var expected = new[] { Status.Archived, Status.Draft, Status.Published };
+            var expected = new[]
+            {
+                new StatusInfo(Status.Archived, StatusColors.Archived),
+                new StatusInfo(Status.Draft, StatusColors.Draft),
+                new StatusInfo(Status.Published, StatusColors.Published)
+            };
 
             var result = await sut.GetAllAsync(null);
 
-            Assert.Equal(expected, result);
+            result.Should().BeEquivalentTo(expected);
         }
 
         private IContentEntity CreateContent(Status status)

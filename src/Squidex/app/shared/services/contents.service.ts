@@ -34,9 +34,11 @@ export class ScheduleDto {
     }
 }
 
+export type StatusInfo = { status: string; color: string; };
+
 export class ContentsDto extends ResultSet<ContentDto> {
     constructor(
-        public readonly statuses: string[],
+        public readonly statuses: StatusInfo[],
         total: number,
         items: ContentDto[],
         links?: ResourceLinks
@@ -133,7 +135,7 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
-        return this.http.get<{ total: number, items: [], statuses: string[] } & Resource>(url).pipe(
+        return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
                 map(({ total, items, statuses, _links }) => {
                     const contents = items.map(x => parseContent(x));
 

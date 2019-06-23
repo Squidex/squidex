@@ -24,6 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         Status Status { get; }
 
+        string StatusColor { get; }
+
         ScheduleJob ScheduleJob { get; }
 
         NamedContentData Data { get; }
