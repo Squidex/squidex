@@ -59,7 +59,6 @@ RUN update-ca-certificates
 
 EXPOSE 80
 EXPOSE 5000
-# EXPOSE 33333
-# EXPOSE 40000
+EXPOSE 11111
 
 ENTRYPOINT ["./Squidex"] 
