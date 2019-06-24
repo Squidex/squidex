@@ -45,27 +45,7 @@ namespace Squidex.ICIS
         {
             var userInfo = new UserInfo(identity, userManager, appProvider, config);
             CreateUser(userInfo);
-            CreateClaims(identity, userInfo);
-
             return userInfo;
-        }
-
-        private void CreateClaims(ClaimsIdentity identity, UserInfo userInfo)
-        {
-            var squidexClaims = userInfo.ToUserValues().ToClaims();
-            foreach (var squidexClaim in from squidexClaim in squidexClaims
-                let found = identity.HasClaim((claim) => AreClaimsEqual(claim, squidexClaim))
-                where !found
-                select squidexClaim)
-            {
-                identity.AddClaim(squidexClaim);
-            }
-        }
-
-        private bool AreClaimsEqual(Claim identityClaim, Claim squidexClaim)
-        {
-            return identityClaim.Type.Equals(squidexClaim.Type, StringComparison.OrdinalIgnoreCase) &&
-                   identityClaim.Value.Equals(squidexClaim.Value, StringComparison.OrdinalIgnoreCase);
         }
 
         private void CreateUser(UserInfo userInfo)
