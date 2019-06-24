@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentEntity : IEnrichedContentEntity
+    public sealed class ContentEntity : IContentEntityEnriched
     {
         public Guid Id { get; set; }
 
@@ -38,9 +38,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Status Status { get; set; }
 
-        public StatusInfo StatusInfo { get; set; }
-
         public StatusInfo[] Nexts { get; set; }
+
+        public string StatusColor { get; set; }
+
+        public bool CanUpdate { get; set; }
 
         public bool IsPending { get; set; }
     }

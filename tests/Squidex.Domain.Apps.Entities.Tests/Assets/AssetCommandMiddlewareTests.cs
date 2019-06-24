@@ -11,8 +11,10 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using FluentAssertions;
 using Orleans;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Assets.State;
 using Squidex.Domain.Apps.Entities.Tags;
@@ -20,6 +22,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Reflection;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -52,8 +55,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
             asset = new AssetGrain(Store, tagService, A.Dummy<ISemanticLog>());
             asset.ActivateAsync(Id).Wait();
 
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IAssetEntity>.Ignored))
+                .ReturnsLazily(() => SimpleMapper.Map(asset.Snapshot, new AssetEntity()));
+
             A.CallTo(() => assetQuery.QueryByHashAsync(AppId, A<string>.Ignored))
-                .Returns(new List<IEnrichedAssetEntity>());
+                .Returns(new List<IAssetEntityEnriched>());
 
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
                 .Returns(asset);
@@ -63,6 +69,40 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 assetQuery,
                 assetStore,
                 assetThumbnailGenerator, new[] { tagGenerator });
+        }
+
+        [Fact]
+        public async Task Should_not_invoke_enricher_for_other_result()
+        {
+            var command = CreateCommand(new CreateApp());
+            var context = CreateContextForCommand(command);
+
+            context.Complete(12);
+
+            await sut.HandleAsync(context);
+
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IAssetEntityEnriched>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_enrich_asset_result()
+        {
+            var result = new AssetEntity();
+
+            var command = CreateCommand(new CreateAsset());
+            var context = CreateContextForCommand(command);
+
+            context.Complete(result);
+
+            var enriched = new AssetEntity();
+
+            A.CallTo(() => assetEnricher.EnrichAsync(result))
+                .Returns(enriched);
+
+            await sut.HandleAsync(context);
+
+            Assert.Equal(enriched, context.Result<IAssetEntityEnriched>());
         }
 
         [Fact]
@@ -78,12 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = context.Result<AssetCreatedResult>();
 
-            Assert.Equal(assetId, result.Asset.Id);
-            Assert.Contains("tag1", command.Tags);
-            Assert.Contains("tag2", command.Tags);
-
-            AssertAssetHasBeenUploaded(0, context.ContextId);
-            AssertAssetImageChecked();
+            result.Asset.Should().BeEquivalentTo(asset.Snapshot, x => x.ExcludingMissingMembers());
         }
 
         [Fact]
@@ -132,19 +167,21 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Create_should_resolve_tag_names_for_duplicate()
+        public async Task Create_should_pass_through_duplicate()
         {
             var command = CreateCommand(new CreateAsset { AssetId = assetId, File = file });
             var context = CreateContextForCommand(command);
 
-            SetupSameHashAsset(file.FileName, file.FileSize, out _);
+            SetupSameHashAsset(file.FileName, file.FileSize, out var duplicate);
             SetupImageInfo();
 
             await sut.HandleAsync(context);
 
-           // var result = context.Result<AssetCreatedResult>();
+            var result = context.Result<AssetCreatedResult>();
 
-           // Assert.Equal(new HashSet<string> { "foundTag1", "foundTag2" }, result.Tags);
+            Assert.True(result.IsDuplicate);
+
+            result.Should().BeEquivalentTo(duplicate, x => x.ExcludingMissingMembers());
         }
 
         [Fact]
@@ -193,7 +230,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Update_should_resolve_tags()
+        public async Task Update_should_enrich_asset()
         {
             var command = CreateCommand(new UpdateAsset { AssetId = assetId, File = file });
             var context = CreateContextForCommand(command);
@@ -204,13 +241,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.HandleAsync(context);
 
-            // var result = context.Result<AssetResult>();
+            var result = context.Result<IAssetEntityEnriched>();
 
-            // Assert.Equal(new HashSet<string> { "foundTag1", "foundTag2" }, result.Tags);
+            result.Should().BeEquivalentTo(asset.Snapshot, x => x.ExcludingMissingMembers());
         }
 
         [Fact]
-        public async Task AnnotateAsset_should_resolve_tags()
+        public async Task AnnotateAsset_should_enrich_asset()
         {
             var command = CreateCommand(new AnnotateAsset { AssetId = assetId, FileName = "newName" });
             var context = CreateContextForCommand(command);
@@ -221,9 +258,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.HandleAsync(context);
 
-            // var result = context.Result<AssetResult>();
+            var result = context.Result<IAssetEntityEnriched>();
 
-            // Assert.Equal(new HashSet<string> { "foundTag1", "foundTag2" }, result.Tags);
+            result.Should().BeEquivalentTo(asset.Snapshot, x => x.ExcludingMissingMembers());
         }
 
         private Task ExecuteCreateAsync()
@@ -253,15 +290,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .MustHaveHappened();
         }
 
-        private void SetupSameHashAsset(string fileName, long fileSize, out IEnrichedAssetEntity existing)
+        private void SetupSameHashAsset(string fileName, long fileSize, out IAssetEntityEnriched duplicate)
         {
-            var temp = existing = A.Fake<IEnrichedAssetEntity>();
-
-            A.CallTo(() => temp.FileName).Returns(fileName);
-            A.CallTo(() => temp.FileSize).Returns(fileSize);
+            duplicate = new AssetEntity
+            {
+                FileName = fileName,
+                FileSize = fileSize
+            };
 
             A.CallTo(() => assetQuery.QueryByHashAsync(A<Guid>.Ignored, A<string>.Ignored))
-                .Returns(new List<IEnrichedAssetEntity> { existing });
+                .Returns(new List<IAssetEntityEnriched> { duplicate });
         }
 
         private void SetupImageInfo()

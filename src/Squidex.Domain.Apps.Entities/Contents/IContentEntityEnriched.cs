@@ -9,9 +9,11 @@ using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public interface IEnrichedContentEntity : IContentEntity
+    public interface IContentEntityEnriched : IContentEntity
     {
-        StatusInfo StatusInfo { get; }
+        bool CanUpdate { get; }
+
+        string StatusColor { get; }
 
         StatusInfo[] Nexts { get; }
     }

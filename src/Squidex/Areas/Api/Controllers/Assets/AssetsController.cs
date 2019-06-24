@@ -265,7 +265,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<IEnrichedAssetEntity>();
+            var result = context.Result<IAssetEntityEnriched>();
             var response = AssetDto.FromAsset(result, this, app);
 
             return response;

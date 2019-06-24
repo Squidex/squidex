@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
@@ -50,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.options = options.Value;
         }
 
-        public async Task<IEnrichedAssetEntity> FindAssetAsync( Guid id)
+        public async Task<IAssetEntityEnriched> FindAssetAsync( Guid id)
         {
             var asset = await assetRepository.FindAssetAsync(id);
 
@@ -62,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return null;
         }
 
-        public async Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Guid appId, string hash)
+        public async Task<IReadOnlyList<IAssetEntityEnriched>> QueryByHashAsync(Guid appId, string hash)
         {
             Guard.NotNull(hash, nameof(hash));
 
@@ -71,14 +70,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return await assetEnricher.EnrichAsync(assets);
         }
 
-        public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(QueryContext context, Q query)
+        public async Task<IResultList<IAssetEntityEnriched>> QueryAsync(QueryContext context, Q query)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(query, nameof(query));
 
             IResultList<IAssetEntity> assets;
 
-            if (query.Ids != null)
+            if (query.Ids != null && query.Ids.Count > 0)
             {
                 assets = await QueryByIdsAsync(context, query);
             }
@@ -89,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var enriched = await assetEnricher.EnrichAsync(assets);
 
-            return ResultList.Create<IEnrichedAssetEntity>(assets.Total, enriched);
+            return ResultList.Create(assets.Total, enriched);
         }
 
         private async Task<IResultList<IAssetEntity>> QueryByQueryAsync(QueryContext context, Q query)
@@ -108,9 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private static IResultList<IAssetEntity> Sort(IResultList<IAssetEntity> assets, IReadOnlyList<Guid> ids)
         {
-            var sorted = ids.Select(id => assets.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
-
-            return ResultList.Create(assets.Total, sorted);
+            return assets.SortSet(x => x.Id, ids);
         }
 
         private Query ParseQuery(QueryContext context, string query)

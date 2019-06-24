@@ -5,9 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 
@@ -15,6 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentEnricher : IContentEnricher
     {
+        private const string DefaultColor = StatusColors.Draft;
         private readonly IContentWorkflow contentWorkflow;
 
         public ContentEnricher(IContentWorkflow contentWorkflow)
@@ -22,33 +26,65 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentWorkflow = contentWorkflow;
         }
 
-        public async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents)
+        public async Task<IContentEntityEnriched> EnrichAsync(IContentEntity content)
         {
-            var results = new List<ContentEntity>();
+            Guard.NotNull(content, nameof(content));
+
+            var enriched = await EnrichAsync(Enumerable.Repeat(content, 1));
+
+            return enriched[0];
+        }
+
+        public async Task<IReadOnlyList<IContentEntityEnriched>> EnrichAsync(IEnumerable<IContentEntity> contents)
+        {
+            Guard.NotNull(contents, nameof(contents));
 
             using (Profiler.TraceMethod<ContentEnricher>())
             {
-                var cache = new Dictionary<Status, StatusInfo>();
+                var results = new List<ContentEntity>();
+
+                var cache = new Dictionary<(Guid, Status), StatusInfo>();
 
                 foreach (var content in contents)
                 {
                     var result = SimpleMapper.Map(content, new ContentEntity());
 
-                    if (!cache.TryGetValue(content.Status, out var info))
-                    {
-                        info = await contentWorkflow.GetInfoAsync(content.Status);
-
-                        cache[content.Status] = info;
-                    }
-
-                    result.StatusInfo = info;
-                    result.Nexts = await contentWorkflow.GetNextsAsync(content);
+                    await ResolveColorAsync(content, result, cache);
+                    await ResolveNextsAsync(content, result);
+                    await ResolveCanUpdateAsync(content, result);
 
                     results.Add(result);
                 }
+
+                return results;
+            }
+        }
+
+        private async Task ResolveCanUpdateAsync(IContentEntity content, ContentEntity result)
+        {
+            result.CanUpdate = await contentWorkflow.CanUpdateAsync(content);
+        }
+
+        private async Task ResolveNextsAsync(IContentEntity content, ContentEntity result)
+        {
+            result.Nexts = await contentWorkflow.GetNextsAsync(content);
+        }
+
+        private async Task ResolveColorAsync(IContentEntity content, ContentEntity result, Dictionary<(Guid, Status), StatusInfo> cache)
+        {
+            if (!cache.TryGetValue((content.SchemaId.Id, content.Status), out var info))
+            {
+                info = await contentWorkflow.GetInfoAsync(content.Status);
+
+                if (info == null)
+                {
+                    info = new StatusInfo(content.Status, DefaultColor);
+                }
+
+                cache[(content.SchemaId.Id, content.Status)] = info;
             }
 
-            return results;
+            result.StatusColor = info.Color;
         }
     }
 }

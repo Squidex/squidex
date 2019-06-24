@@ -66,33 +66,29 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         {
                             var existings = await assetQuery.QueryByHashAsync(createAsset.AppId.Id, createAsset.FileHash);
 
-                            AssetCreatedResult result = null;
-
                             foreach (var existing in existings)
                             {
                                 if (IsDuplicate(createAsset, existing))
                                 {
-                                    result = new AssetCreatedResult(existing, true);
-                                }
+                                    var result = new AssetCreatedResult(existing, true);
 
-                                break;
+                                    context.Complete(result);
+                                    return;
+                                }
                             }
 
-                            if (result == null)
+                            foreach (var tagGenerator in tagGenerators)
                             {
-                                foreach (var tagGenerator in tagGenerators)
-                                {
-                                    tagGenerator.GenerateTags(createAsset, createAsset.Tags);
-                                }
-
-                                var asset = (IEnrichedAssetEntity)await ExecuteAndAdjustTagsAsync(createAsset);
-
-                                result = new AssetCreatedResult(asset, false);
-
-                                await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), asset.FileVersion, null);
+                                tagGenerator.GenerateTags(createAsset, createAsset.Tags);
                             }
 
-                            context.Complete(result);
+                            await HandleCoreAsync(context, next);
+
+                            var asset = context.PlainResult as IAssetEntityEnriched;
+
+                            context.Complete(new AssetCreatedResult(asset, false));
+
+                            await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), asset.FileVersion, null);
                         }
                         finally
                         {
@@ -109,11 +105,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         try
                         {
-                            var result = (IEnrichedAssetEntity)await ExecuteAndAdjustTagsAsync(updateAsset);
+                            await HandleCoreAsync(context, next);
 
-                            context.Complete(result);
+                            var asset = context.PlainResult as IAssetEntity;
 
-                            await assetStore.CopyAsync(context.ContextId.ToString(), updateAsset.AssetId.ToString(), result.FileVersion, null);
+                            await assetStore.CopyAsync(context.ContextId.ToString(), updateAsset.AssetId.ToString(), asset.FileVersion, null);
                         }
                         finally
                         {
@@ -123,34 +119,23 @@ namespace Squidex.Domain.Apps.Entities.Assets
                         break;
                     }
 
-                case AssetCommand command:
-                    {
-                        var result = await ExecuteAndAdjustTagsAsync(command);
-
-                        context.Complete(result);
-
-                        break;
-                    }
-
                 default:
-                    await base.HandleAsync(context, next);
+                    await HandleCoreAsync(context, next);
 
                     break;
             }
         }
 
-        private async Task<object> ExecuteAndAdjustTagsAsync(AssetCommand command)
+        private async Task HandleCoreAsync(CommandContext context, Func<Task> next)
         {
-            var result = await ExecuteCommandAsync(command);
+            await HandleAsync(context, next);
 
-            if (result is IAssetEntity asset)
+            if (context.PlainResult is IAssetEntity asset && !(context.PlainResult is IAssetEntityEnriched))
             {
                 var enriched = await assetEnricher.EnrichAsync(asset);
 
-                return enriched;
+                context.Complete(enriched);
             }
-
-            return result;
         }
 
         private static bool IsDuplicate(CreateAsset createAsset, IAssetEntity asset)

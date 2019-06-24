@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -127,9 +126,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var context = Context();
             var contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).Ids);
-            var contentsList = ResultList.Create<IContentEntity>(contents.Count, contents);
 
-            var response = await ContentsDto.FromContentsAsync(contentsList, context, this, null, contentWorkflow);
+            var response = await ContentsDto.FromContentsAsync(contents, context, this, null, contentWorkflow);
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
@@ -201,7 +199,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = Context();
             var content = await contentQuery.FindContentAsync(context, name, id);
 
-            var response = await ContentDto.FromContentAsync(context, content, contentWorkflow, this);
+            var response = ContentDto.FromContent(context, content, this);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
@@ -237,7 +235,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var context = Context();
             var content = await contentQuery.FindContentAsync(context, name, id, version);
 
-            var response = await ContentDto.FromContentAsync(context, content, contentWorkflow, this);
+            var response = ContentDto.FromContent(context, content, this);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
@@ -447,8 +445,8 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<IContentEntity>();
-            var response = await ContentDto.FromContentAsync(null, result, contentWorkflow, this);
+            var result = context.Result<IContentEntityEnriched>();
+            var response = ContentDto.FromContent(null, result, this);
 
             return response;
         }

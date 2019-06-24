@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Xunit;
@@ -30,9 +29,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_check_is_valid_next()
         {
-            var entity = CreateContent(Status.Published);
+            var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanMoveToAsync(entity, Status.Draft);
+            var result = await sut.CanMoveToAsync(content, Status.Draft);
 
             Assert.True(result);
         }
@@ -40,9 +39,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_be_able_to_update_published()
         {
-            var entity = CreateContent(Status.Published);
+            var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanUpdateAsync(entity);
+            var result = await sut.CanUpdateAsync(content);
 
             Assert.True(result);
         }
@@ -50,9 +49,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_be_able_to_update_draft()
         {
-            var entity = CreateContent(Status.Published);
+            var content = new ContentEntity { Status = Status.Published };
 
-            var result = await sut.CanUpdateAsync(entity);
+            var result = await sut.CanUpdateAsync(content);
 
             Assert.True(result);
         }
@@ -60,9 +59,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_not_be_able_to_update_archived()
         {
-            var entity = CreateContent(Status.Archived);
+            var content = new ContentEntity { Status = Status.Archived };
 
-            var result = await sut.CanUpdateAsync(entity);
+            var result = await sut.CanUpdateAsync(content);
 
             Assert.False(result);
         }
@@ -70,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_get_next_statuses_for_draft()
         {
-            var content = CreateContent(Status.Draft);
+            var content = new ContentEntity { Status = Status.Draft };
 
             var expected = new[]
             {
@@ -86,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_get_next_statuses_for_archived()
         {
-            var content = CreateContent(Status.Archived);
+            var content = new ContentEntity { Status = Status.Archived };
 
             var expected = new[]
             {
@@ -101,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_get_next_statuses_for_published()
         {
-            var content = CreateContent(Status.Published);
+            var content = new ContentEntity { Status = Status.Published };
 
             var expected = new[]
             {
@@ -127,15 +126,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var result = await sut.GetAllAsync(null);
 
             result.Should().BeEquivalentTo(expected);
-        }
-
-        private IContentEntity CreateContent(Status status)
-        {
-            var content = A.Fake<IContentEntity>();
-
-            A.CallTo(() => content.Status).Returns(status);
-
-            return content;
         }
     }
 }

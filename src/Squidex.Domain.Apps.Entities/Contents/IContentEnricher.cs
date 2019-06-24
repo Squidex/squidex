@@ -12,6 +12,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentEnricher
     {
-        Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents);
+        Task<IContentEntityEnriched> EnrichAsync(IContentEntity content);
+
+        Task<IReadOnlyList<IContentEntityEnriched>> EnrichAsync(IEnumerable<IContentEntity> contents);
     }
 }

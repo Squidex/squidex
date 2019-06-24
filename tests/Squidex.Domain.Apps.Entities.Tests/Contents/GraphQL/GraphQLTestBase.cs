@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             sut = CreateSut();
         }
 
-        protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null, NamedContentData dataDraft = null)
+        protected static IContentEntityEnriched CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null, NamedContentData dataDraft = null)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -158,13 +158,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Data = data,
                 DataDraft = dataDraft,
                 Status = Status.Draft,
-                StatusInfo = new StatusInfo(Status.Draft, "red")
+                StatusColor = "red"
             };
 
             return content;
         }
 
-        protected static IEnrichedAssetEntity CreateAsset(Guid id)
+        protected static IAssetEntityEnriched CreateAsset(Guid id)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 

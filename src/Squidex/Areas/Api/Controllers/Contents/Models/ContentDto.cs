@@ -7,7 +7,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
@@ -85,11 +84,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static ValueTask<ContentDto> FromContentAsync(
-            QueryContext context,
-            IContentEntity content,
-            IContentWorkflow contentWorkflow,
-            ApiController controller)
+        public static ContentDto FromContent(QueryContext context, IContentEntityEnriched content, ApiController controller)
         {
             var response = SimpleMapper.Map(content, new ContentDto());
 
@@ -109,14 +104,10 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 response.ScheduleJob = SimpleMapper.Map(content.ScheduleJob, new ScheduleJobDto());
             }
 
-            return response.CreateLinksAsync(content, controller, content.AppId.Name, content.SchemaId.Name, contentWorkflow);
+            return response.CreateLinksAsync(content, controller, content.AppId.Name, content.SchemaId.Name);
         }
 
-        private async ValueTask<ContentDto> CreateLinksAsync(IContentEntity content,
-            ApiController controller,
-            string app,
-            string schema,
-            IContentWorkflow contentWorkflow)
+        private ContentDto CreateLinksAsync(IContentEntityEnriched content, ApiController controller, string app, string schema)
         {
             var values = new { app, name = schema, id = Id };
 
@@ -144,7 +135,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (controller.HasPermission(Permissions.AppContentsUpdate, app, schema))
             {
-                if (await contentWorkflow.CanUpdateAsync(content))
+                if (content.CanUpdate)
                 {
                     AddPutLink("update", controller.Url<ContentsController>(x => nameof(x.PutContent), values));
                 }
@@ -162,9 +153,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 AddDeleteLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
             }
 
-            var nextStatuses = await contentWorkflow.GetNextsAsync(content);
-
-            foreach (var next in nextStatuses)
+            foreach (var next in content.Nexts)
             {
                 if (controller.HasPermission(Helper.StatusPermission(app, schema, next.Status)))
                 {

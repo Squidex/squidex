@@ -34,10 +34,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class ContentQueryService : IContentQueryService
     {
         private static readonly Status[] StatusPublishedOnly = { Status.Published };
-        private readonly IContentRepository contentRepository;
-        private readonly IContentVersionLoader contentVersionLoader;
+        private static readonly IResultList<IContentEntityEnriched> EmptyContents = ResultList.CreateFrom<IContentEntityEnriched>(0);
         private readonly IAppProvider appProvider;
         private readonly IAssetUrlGenerator assetUrlGenerator;
+        private readonly IContentEnricher contentEnricher;
+        private readonly IContentRepository contentRepository;
+        private readonly IContentVersionLoader contentVersionLoader;
         private readonly IScriptEngine scriptEngine;
         private readonly ContentOptions options;
         private readonly EdmModelBuilder modelBuilder;
@@ -50,6 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public ContentQueryService(
             IAppProvider appProvider,
             IAssetUrlGenerator assetUrlGenerator,
+            IContentEnricher contentEnricher,
             IContentRepository contentRepository,
             IContentVersionLoader contentVersionLoader,
             IScriptEngine scriptEngine,
@@ -58,6 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(assetUrlGenerator, nameof(assetUrlGenerator));
+            Guard.NotNull(contentEnricher, nameof(contentEnricher));
             Guard.NotNull(contentRepository, nameof(contentRepository));
             Guard.NotNull(contentVersionLoader, nameof(contentVersionLoader));
             Guard.NotNull(modelBuilder, nameof(modelBuilder));
@@ -66,6 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             this.appProvider = appProvider;
             this.assetUrlGenerator = assetUrlGenerator;
+            this.contentEnricher = contentEnricher;
             this.contentRepository = contentRepository;
             this.contentVersionLoader = contentVersionLoader;
             this.modelBuilder = modelBuilder;
@@ -73,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.scriptEngine = scriptEngine;
         }
 
-        public async Task<IContentEntity> FindContentAsync(QueryContext context, string schemaIdOrName, Guid id, long version = -1)
+        public async Task<IContentEntityEnriched> FindContentAsync(QueryContext context, string schemaIdOrName, Guid id, long version = -1)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -83,25 +88,27 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var isVersioned = version > EtagVersion.Empty;
+                IContentEntity content;
 
-                var status = GetStatus(context);
-
-                var content =
-                    isVersioned ?
-                    await FindContentByVersionAsync(id, version) :
-                    await FindContentAsync(context, id, status, schema);
+                if (version > EtagVersion.Empty)
+                {
+                    content = await FindByVersionAsync(id, version);
+                }
+                else
+                {
+                    content = await FindCoreAsync(context, id, schema);
+                }
 
                 if (content == null || (content.Status != Status.Published && !context.IsFrontendClient) || content.SchemaId.Id != schema.Id)
                 {
                     throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
                 }
 
-                return Transform(context, schema, content);
+                return await TransformAsync(context, schema, content);
             }
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, string schemaIdOrName, Q query)
+        public async Task<IResultList<IContentEntityEnriched>> QueryAsync(QueryContext context, string schemaIdOrName, Q query)
         {
             Guard.NotNull(context, nameof(context));
 
@@ -111,95 +118,88 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var status = GetStatus(context);
-
                 IResultList<IContentEntity> contents;
 
-                if (query.Ids?.Count > 0)
+                if (query.Ids != null && query.Ids.Count > 0)
                 {
-                    contents = await QueryAsync(context, schema, query.Ids.ToHashSet(), status);
-                    contents = SortSet(contents, query.Ids);
+                    contents = await QueryByIdsAsync(context, query, schema);
                 }
                 else
                 {
-                    var parsedQuery = ParseQuery(context, query.ODataQuery, schema);
-
-                    contents = await QueryAsync(context, schema, parsedQuery, status);
+                    contents = await QueryByQueryAsync(context, query, schema);
                 }
 
-                return Transform(context, schema, contents);
+                return await TransformAsync(context, schema, contents);
             }
         }
 
-        public async Task<IReadOnlyList<IContentEntity>> QueryAsync(QueryContext context, IReadOnlyList<Guid> ids)
+        public async Task<IResultList<IContentEntityEnriched>> QueryAsync(QueryContext context, IReadOnlyList<Guid> ids)
         {
             Guard.NotNull(context, nameof(context));
 
             using (Profiler.TraceMethod<ContentQueryService>())
             {
-                var status = GetStatus(context);
-
-                List<IContentEntity> result;
-
-                if (ids?.Count > 0)
+                if (ids == null || ids.Count == 0)
                 {
-                    var contents = await QueryAsync(context, ids, status);
-
-                    var permissions = context.User.Permissions();
-
-                    contents = contents.Where(x => HasPermission(permissions, x.Schema)).ToList();
-
-                    result = contents.Select(x => Transform(context, x.Schema, x.Content)).ToList();
-                    result = SortList(result, ids).ToList();
-                }
-                else
-                {
-                    result = new List<IContentEntity>();
+                    return EmptyContents;
                 }
 
-                return result;
+                var results = new List<IContentEntityEnriched>();
+
+                var contents = await QueryCoreAsync(context, ids);
+
+                var permissions = context.User.Permissions();
+
+                foreach (var group in contents.GroupBy(x => x.Schema.Id))
+                {
+                    var schema = group.First().Schema;
+
+                    if (HasPermission(permissions, schema))
+                    {
+                        var enriched = await TransformCoreAsync(context, schema, group.Select(x => x.Content));
+
+                        results.AddRange(enriched);
+                    }
+                }
+
+                return ResultList.Create(results.Count, results.SortList(x => x.Id, ids));
             }
         }
 
-        private IResultList<IContentEntity> Transform(QueryContext context, ISchemaEntity schema, IResultList<IContentEntity> contents)
+        private async Task<IResultList<IContentEntityEnriched>> TransformAsync(QueryContext context, ISchemaEntity schema, IResultList<IContentEntity> contents)
         {
-            var transformed = TransformCore(context, schema, contents);
+            var transformed = await TransformCoreAsync(context, schema, contents);
 
             return ResultList.Create(contents.Total, transformed);
         }
 
-        private IContentEntity Transform(QueryContext context, ISchemaEntity schema, IContentEntity content)
+        private async Task<IContentEntityEnriched> TransformAsync(QueryContext context, ISchemaEntity schema, IContentEntity content)
         {
-            return TransformCore(context, schema, Enumerable.Repeat(content, 1)).FirstOrDefault();
+            var transformed = await TransformCoreAsync(context, schema, Enumerable.Repeat(content, 1));
+
+            return transformed[0];
         }
 
-        private static IResultList<IContentEntity> SortSet(IResultList<IContentEntity> contents, IReadOnlyList<Guid> ids)
-        {
-            return ResultList.Create(contents.Total, SortList(contents, ids));
-        }
-
-        private static IEnumerable<IContentEntity> SortList(IEnumerable<IContentEntity> contents, IReadOnlyList<Guid> ids)
-        {
-            return ids.Select(id => contents.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
-        }
-
-        private IEnumerable<IContentEntity> TransformCore(QueryContext context, ISchemaEntity schema, IEnumerable<IContentEntity> contents)
+        private async Task<IReadOnlyList<IContentEntityEnriched>> TransformCoreAsync(QueryContext context, ISchemaEntity schema, IEnumerable<IContentEntity> contents)
         {
             using (Profiler.TraceMethod<ContentQueryService>())
             {
+                var results = new List<IContentEntityEnriched>();
+
                 var converters = GenerateConverters(context).ToArray();
 
                 var scriptText = schema.SchemaDef.Scripts.Query;
+                var scripting = !string.IsNullOrWhiteSpace(scriptText);
 
-                var isScripting = !string.IsNullOrWhiteSpace(scriptText);
+                var enriched = await contentEnricher.EnrichAsync(contents);
 
-                foreach (var content in contents)
+                foreach (var content in enriched)
                 {
                     var result = SimpleMapper.Map(content, new ContentEntity());
 
                     if (result.Data != null)
                     {
-                        if (!context.IsFrontendClient && isScripting)
+                        if (!context.IsFrontendClient && scripting)
                         {
                             var ctx = new ScriptContext { User = context.User, Data = content.Data, ContentId = content.Id };
 
@@ -218,8 +218,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         result.DataDraft = null;
                     }
 
-                    yield return result;
+                    results.Add(result);
                 }
+
+                return results;
             }
         }
 
@@ -344,32 +346,46 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(QueryContext context, IReadOnlyList<Guid> ids, Status[] status)
+        private async Task<IResultList<IContentEntity>> QueryByQueryAsync(QueryContext context, Q query, ISchemaEntity schema)
         {
-            return contentRepository.QueryAsync(context.App, status, new HashSet<Guid>(ids), ShouldIncludeDraft(context));
+            var parsedQuery = ParseQuery(context, query.ODataQuery, schema);
+
+            return await QueryCoreAsync(context, schema, parsedQuery);
         }
 
-        private Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, ISchemaEntity schema, Query query, Status[] status)
+        private async Task<IResultList<IContentEntity>> QueryByIdsAsync(QueryContext context, Q query, ISchemaEntity schema)
         {
-            return contentRepository.QueryAsync(context.App, schema, status, context.IsFrontendClient, query, ShouldIncludeDraft(context));
+            var contents = await QueryCoreAsync(context, schema, query.Ids.ToHashSet());
+
+            return contents.SortSet(x => x.Id, query.Ids);
         }
 
-        private Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, ISchemaEntity schema, HashSet<Guid> ids, Status[] status)
+        private Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryCoreAsync(QueryContext context, IReadOnlyList<Guid> ids)
         {
-            return contentRepository.QueryAsync(context.App, schema, status, ids, ShouldIncludeDraft(context));
+            return contentRepository.QueryAsync(context.App, GetStatus(context), new HashSet<Guid>(ids), WithDraft(context));
         }
 
-        private Task<IContentEntity> FindContentAsync(QueryContext context, Guid id, Status[] status, ISchemaEntity schema)
+        private Task<IResultList<IContentEntity>> QueryCoreAsync(QueryContext context, ISchemaEntity schema, Query query)
         {
-            return contentRepository.FindContentAsync(context.App, schema, status, id, ShouldIncludeDraft(context));
+            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), context.IsFrontendClient, query, WithDraft(context));
         }
 
-        private Task<IContentEntity> FindContentByVersionAsync(Guid id, long version)
+        private Task<IResultList<IContentEntity>> QueryCoreAsync(QueryContext context, ISchemaEntity schema, HashSet<Guid> ids)
+        {
+            return contentRepository.QueryAsync(context.App, schema, GetStatus(context), ids, WithDraft(context));
+        }
+
+        private Task<IContentEntity> FindCoreAsync(QueryContext context, Guid id, ISchemaEntity schema)
+        {
+            return contentRepository.FindContentAsync(context.App, schema, GetStatus(context), id, WithDraft(context));
+        }
+
+        private Task<IContentEntity> FindByVersionAsync(Guid id, long version)
         {
             return contentVersionLoader.LoadAsync(id, version);
         }
 
-        private static bool ShouldIncludeDraft(QueryContext context)
+        private static bool WithDraft(QueryContext context)
         {
             return context.ApiStatus == StatusForApi.All || context.IsFrontendClient;
         }
