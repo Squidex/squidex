@@ -24,6 +24,7 @@
 <td class="cell-time" *ngIf="!isCompact" [sqxStopClick]="isDirty">
     <sqx-content-status 
         [status]="content.status"
+        [statusColor]="content.statusColor"
         [scheduledTo]="content.scheduleJob?.status"
         [scheduledAt]="content.scheduleJob?.dueTime"
         [isPending]="content.isPending">
@@ -55,8 +56,8 @@
             <i class="icon-dots"></i>
         </button>
         <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
-            <a class="dropdown-item" *ngFor="let status of content.statusUpdates" (click)="emitChangeStatus(status)">
-                Status to {{status}}
+            <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="emitChangeStatus(info.status)">
+                Change to <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
             </a>
             <a class="dropdown-item" (click)="emitClone(); dropdown.hide()" *ngIf="canClone">
                 Clone

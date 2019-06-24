@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public override async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            await HandleAsync(context, next);
+            await base.HandleAsync(context, next);
 
             if (context.PlainResult is IContentEntity content)
             {

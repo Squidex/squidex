@@ -251,7 +251,9 @@ module.exports = function (env) {
                 waitForLinting: isProduction
             })
         );
+    }
 
+    if (!isCoverage) {
         config.plugins.push(
             new plugins.NgToolsWebpack.AngularCompilerPlugin({
                 directTemplateLoading: true,

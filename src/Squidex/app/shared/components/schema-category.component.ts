@@ -74,7 +74,7 @@ export class SchemaCategoryComponent extends StatefulComponent<State> implements
             let filtered = this.schemaCategory.schemas;
 
             if (this.forContent) {
-                filtered = filtered.filter(x => x.canReadContents);
+                filtered = filtered.filter(x => x.canReadContents && x.isPublished);
             }
 
             let isOpen = false;

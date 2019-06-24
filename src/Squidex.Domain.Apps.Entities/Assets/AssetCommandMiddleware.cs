@@ -73,6 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                                     var result = new AssetCreatedResult(existing, true);
 
                                     context.Complete(result);
+                                    await next();
                                     return;
                                 }
                             }
@@ -128,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private async Task HandleCoreAsync(CommandContext context, Func<Task> next)
         {
-            await HandleAsync(context, next);
+            await base.HandleAsync(context, next);
 
             if (context.PlainResult is IAssetEntity asset && !(context.PlainResult is IAssetEntityEnriched))
             {

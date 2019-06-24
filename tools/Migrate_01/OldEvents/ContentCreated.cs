@@ -32,7 +32,7 @@ namespace Migrate_01.OldEvents
                 migrated.Status = Status.Draft;
             }
 
-            return this;
+            return migrated;
         }
     }
 }

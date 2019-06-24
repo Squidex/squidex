@@ -41,7 +41,7 @@ namespace Migrate_01.OldEvents
                 migrated.Change = StatusChange.Change;
             }
 
-            return this;
+            return migrated;
         }
     }
 }

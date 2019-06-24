@@ -72,19 +72,24 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task ResolveColorAsync(IContentEntity content, ContentEntity result, Dictionary<(Guid, Status), StatusInfo> cache)
         {
-            if (!cache.TryGetValue((content.SchemaId.Id, content.Status), out var info))
+            result.StatusColor = await GetColorAsync(content.SchemaId, content.Status, cache);
+        }
+
+        private async Task<string> GetColorAsync(NamedId<Guid> schemaId, Status status, Dictionary<(Guid, Status), StatusInfo> cache)
+        {
+            if (!cache.TryGetValue((schemaId.Id, status), out var info))
             {
-                info = await contentWorkflow.GetInfoAsync(content.Status);
+                info = await contentWorkflow.GetInfoAsync(status);
 
                 if (info == null)
                 {
-                    info = new StatusInfo(content.Status, DefaultColor);
+                    info = new StatusInfo(status, DefaultColor);
                 }
 
-                cache[(content.SchemaId.Id, content.Status)] = info;
+                cache[(schemaId.Id, status)] = info;
             }
 
-            result.StatusColor = info.Color;
+            return info.Color;
         }
     }
 }

@@ -36,6 +36,7 @@
                         [class.active]="dropdown.isOpen | async" #optionsButton>
                         <sqx-content-status
                             [status]="content.status"
+                            [statusColor]="content.statusColor"
                             [scheduledTo]="content.scheduleJob?.status"
                             [scheduledAt]="content.scheduleJob?.dueTime"
                             [isPending]="content.isPending"
@@ -56,8 +57,8 @@
                             </a>
 
                             <ng-container *ngIf="!schema.isSingleton">
-                                <a class="dropdown-item" *ngFor="let status of content.statusUpdates" (click)="changeStatus(status)">
-                                    Status to {{status}}
+                                <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="changeStatus(info.status)">
+                                    Change to <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
                                 </a>
 
                                 <div class="dropdown-divider"></div>
