@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -25,13 +26,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public Status Status { get; set; }
 
         /// <summary>
-        /// The user who schedule the content.
-        /// </summary>
-        public RefToken ScheduledBy { get; set; }
-
-        /// <summary>
         /// The target date and time when the content should be scheduled.
         /// </summary>
         public Instant DueTime { get; set; }
+
+        /// <summary>
+        /// The user who schedule the content.
+        /// </summary>
+        [Required]
+        public RefToken ScheduledBy { get; set; }
     }
 }

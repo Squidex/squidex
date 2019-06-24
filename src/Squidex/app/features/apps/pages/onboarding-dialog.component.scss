@@ -19,31 +19,33 @@ p {
     max-width: 489px;
 }
 
-::ng-deep .modal {
-    &-content,
-    &-dialog {
-        min-height: $size-height;
-        max-height: $size-height;
-        min-width: $size-width;
-        max-width: $size-width;
-    }
+:host ::ng-deep {
+    .modal {
+        &-content,
+        &-dialog {
+            min-height: $size-height;
+            max-height: $size-height;
+            min-width: $size-width;
+            max-width: $size-width;
+        }
 
-    &-content {
-        color: $color-dark-foreground;
-        background-color: $color-dark-onboarding;
-        background-image: url('./images/onboarding-background.png');
-        position: relative;
-    }
+        &-content {
+            color: $color-dark-foreground;
+            background-color: $color-dark-onboarding;
+            background-image: url('./images/onboarding-background.png');
+            position: relative;
+        }
 
-    &-body,
-    &-content {
-        overflow: hidden;
-    }
+        &-body,
+        &-content {
+            overflow: hidden;
+        }
 
-    &-close {
-        text-decoration: underline !important;
-        cursor: pointer;
-        color: $color-dark-foreground;
+        &-close {
+            text-decoration: underline !important;
+            cursor: pointer;
+            color: $color-dark-foreground;
+        }
     }
 }
 
