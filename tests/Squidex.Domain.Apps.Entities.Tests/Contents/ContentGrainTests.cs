@@ -127,11 +127,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
             result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Status.Draft, sut.Snapshot.Status);
-            Assert.Equal(StatusColors.Draft, sut.Snapshot.StatusColor);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft, StatusColor = StatusColors.Draft })
+                    CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft })
                 );
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<create-script>"))
@@ -150,21 +149,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Status.Published, sut.Snapshot.Status);
-            Assert.Equal(StatusColors.Published, sut.Snapshot.StatusColor);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentCreated
-                    {
-                        Data = data,
-                        Status = Status.Draft,
-                        StatusColor = StatusColors.Draft
-                    }),
-                    CreateContentEvent(new ContentStatusChanged
-                    {
-                        Status = Status.Published,
-                        StatusColor = StatusColors.Published
-                    })
+                    CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft }),
+                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published })
                 );
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<create-script>"))
@@ -326,12 +315,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentStatusChanged
-                    {
-                        Change = StatusChange.Published,
-                        Status = Status.Published,
-                        StatusColor = StatusColors.Published
-                    })
+                    CreateContentEvent(new ContentStatusChanged { Change = StatusChange.Published, Status = Status.Published })
                 );
 
             A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>"))
@@ -353,11 +337,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentStatusChanged
-                    {
-                        Status = Status.Archived,
-                        StatusColor = StatusColors.Archived
-                    })
+                    CreateContentEvent(new ContentStatusChanged { Status = Status.Archived })
                 );
 
             A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>"))
@@ -380,12 +360,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentStatusChanged
-                    {
-                        Change = StatusChange.Unpublished,
-                        Status = Status.Draft,
-                        StatusColor = StatusColors.Draft
-                    })
+                    CreateContentEvent(new ContentStatusChanged { Change = StatusChange.Unpublished, Status = Status.Draft })
                 );
 
             A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>"))
@@ -408,11 +383,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateContentEvent(new ContentStatusChanged
-                    {
-                        Status = Status.Draft,
-                        StatusColor = StatusColors.Draft
-                    })
+                    CreateContentEvent(new ContentStatusChanged { Status = Status.Draft })
                 );
 
             A.CallTo(() => scriptEngine.Execute(A<ScriptContext>.Ignored, "<change-script>"))

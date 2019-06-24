@@ -33,19 +33,6 @@ namespace Migrate_01.OldEvents
                 migrated.Status = Status.Draft;
             }
 
-            if (Status == Status.Archived)
-            {
-                migrated.StatusColor = StatusColors.Archived;
-            }
-            else if (Status == Status.Published)
-            {
-                migrated.StatusColor = StatusColors.Published;
-            }
-            else
-            {
-                migrated.StatusColor = StatusColors.Draft;
-            }
-
             return this;
         }
     }

@@ -38,8 +38,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Status Status { get; set; }
 
-        public string StatusColor { get; set; }
-
         public bool IsPending { get; set; }
     }
 }

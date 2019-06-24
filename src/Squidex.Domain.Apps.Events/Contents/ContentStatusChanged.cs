@@ -16,7 +16,5 @@ namespace Squidex.Domain.Apps.Events.Contents
         public StatusChange Change { get; set; }
 
         public Status Status { get; set; }
-
-        public string StatusColor { get; set; }
     }
 }

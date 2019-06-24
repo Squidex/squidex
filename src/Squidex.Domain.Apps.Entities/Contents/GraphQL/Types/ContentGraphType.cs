@@ -78,6 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Description = $"The the status of the {schemaName} content."
             });
 
+            /*
             AddField(new FieldType
             {
                 Name = "statusColor",
@@ -85,6 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                 Resolver = Resolve(x => x.StatusColor),
                 Description = $"The color status of the {schemaName} content."
             });
+            */
 
             AddField(new FieldType
             {

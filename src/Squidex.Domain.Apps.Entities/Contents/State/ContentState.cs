@@ -45,9 +45,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         [DataMember]
         public Status Status { get; set; }
 
-        [DataMember]
-        public string StatusColor { get; set; }
-
         protected void On(ContentCreated @event)
         {
             SimpleMapper.Map(@event, this);

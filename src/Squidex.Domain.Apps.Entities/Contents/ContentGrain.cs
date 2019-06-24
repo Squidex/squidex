@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         var statusInfo = await contentWorkflow.GetInitialStatusAsync(ctx.Schema);
 
-                        Create(c, statusInfo.Status, statusInfo.Color);
+                        Create(c, statusInfo.Status);
 
                         return Snapshot;
                     });
@@ -127,8 +127,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 }
                                 else
                                 {
-                                    var statusInfo = await contentWorkflow.GetInfoAsync(c.Status);
-
                                     StatusChange reason;
 
                                     if (c.Status == Status.Published)
@@ -146,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                                     await ctx.ExecuteScriptAsync(s => s.Change, reason, c, Snapshot.Data);
 
-                                    ChangeStatus(c, reason, statusInfo.Color);
+                                    ChangeStatus(c, reason);
                                 }
                             }
                         }
@@ -231,21 +229,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Snapshot;
         }
 
-        public void Create(CreateContent command, Status status, string color)
+        public void Create(CreateContent command, Status status)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentCreated
-            {
-                Status = status,
-                StatusColor = color
-            }));
+            RaiseEvent(SimpleMapper.Map(command, new ContentCreated { Status = status }));
 
             if (command.Publish)
             {
-                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged
-                {
-                    Status = Status.Published,
-                    StatusColor = StatusColors.Published
-                }));
+                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Status = Status.Published }));
             }
         }
 
@@ -284,9 +274,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = command.DueTime.Value }));
         }
 
-        public void ChangeStatus(ChangeContentStatus command, StatusChange change, string color)
+        public void ChangeStatus(ChangeContentStatus command, StatusChange change)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Change = change, StatusColor = color }));
+            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Change = change }));
         }
 
         private void RaiseEvent(SchemaEvent @event)

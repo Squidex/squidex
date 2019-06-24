@@ -17,7 +17,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 18;
+        private const int CurrentVersion = 17;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -113,12 +113,6 @@ namespace Migrate_01
             if (version < 17)
             {
                 yield return serviceProvider.GetService<RenameSlugField>();
-            }
-
-            // Version 18: Status colors introduced
-            if (version < 17)
-            {
-                yield return serviceProvider.GetService<CreateStatusColors>();
             }
 
             yield return serviceProvider.GetRequiredService<StartEventConsumers>();
