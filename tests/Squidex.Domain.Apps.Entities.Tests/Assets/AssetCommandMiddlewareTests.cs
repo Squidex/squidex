@@ -27,6 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class AssetCommandMiddlewareTests : HandlerTestBase<AssetState>
     {
         private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
+        private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator = A.Fake<IAssetThumbnailGenerator>();
         private readonly IAssetStore assetStore = A.Fake<MemoryAssetStore>();
         private readonly ITagService tagService = A.Fake<ITagService>();
@@ -52,19 +53,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
             asset.ActivateAsync(Id).Wait();
 
             A.CallTo(() => assetQuery.QueryByHashAsync(AppId, A<string>.Ignored))
-                .Returns(new List<IAssetEntity>());
-
-            A.CallTo(() => tagService.DenormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored))
-                .Returns(new Dictionary<string, string>
-                {
-                    ["1"] = "foundTag1",
-                    ["2"] = "foundTag2"
-                });
+                .Returns(new List<IEnrichedAssetEntity>());
 
             A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(Id, null))
                 .Returns(asset);
 
-            sut = new AssetCommandMiddleware(grainFactory, assetQuery, assetStore, assetThumbnailGenerator, new[] { tagGenerator }, tagService);
+            sut = new AssetCommandMiddleware(grainFactory,
+                assetEnricher,
+                assetQuery,
+                assetStore,
+                assetThumbnailGenerator, new[] { tagGenerator });
         }
 
         [Fact]
@@ -84,7 +82,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Assert.Contains("tag1", command.Tags);
             Assert.Contains("tag2", command.Tags);
 
-            Assert.Equal(new HashSet<string> { "tag1", "tag2" }, result.Tags);
 
             AssertAssetHasBeenUploaded(0, context.ContextId);
             AssertAssetImageChecked();
@@ -257,15 +254,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .MustHaveHappened();
         }
 
-        private void SetupSameHashAsset(string fileName, long fileSize, out IAssetEntity existing)
+        private void SetupSameHashAsset(string fileName, long fileSize, out IEnrichedAssetEntity existing)
         {
-            var temp = existing = A.Fake<IAssetEntity>();
+            var temp = existing = A.Fake<IEnrichedAssetEntity>();
 
             A.CallTo(() => temp.FileName).Returns(fileName);
             A.CallTo(() => temp.FileSize).Returns(fileSize);
 
             A.CallTo(() => assetQuery.QueryByHashAsync(A<Guid>.Ignored, A<string>.Ignored))
-                .Returns(new List<IAssetEntity> { existing });
+                .Returns(new List<IEnrichedAssetEntity> { existing });
         }
 
         private void SetupImageInfo()

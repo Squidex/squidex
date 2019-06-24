@@ -5,19 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Assets
+using Squidex.Domain.Apps.Core.Contents;
+
+namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class AssetCreatedResult
+    public interface IEnrichedContentEntity : IContentEntity
     {
-        public IEnrichedAssetEntity Asset { get; }
+        StatusInfo StatusInfo { get; }
 
-        public bool IsDuplicate { get; }
-
-        public AssetCreatedResult(IEnrichedAssetEntity asset, bool isDuplicate)
-        {
-            Asset = asset;
-
-            IsDuplicate = isDuplicate;
-        }
+        StatusInfo[] Nexts { get; }
     }
 }

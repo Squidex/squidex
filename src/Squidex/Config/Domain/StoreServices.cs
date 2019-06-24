@@ -67,9 +67,6 @@ namespace Squidex.Config.Domain
                     services.AddTransientAs(c => new RestructureContentCollection(c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName)))
                         .As<IMigration>();
 
-                    services.AddTransientAs(c => new CreateStatusColors(c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName)))
-                        .As<IMigration>();
-
                     services.AddSingletonAs<MongoMigrationStatus>()
                         .As<IMigrationStatus>();
 

@@ -158,17 +158,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 Data = data,
                 DataDraft = dataDraft,
                 Status = Status.Draft,
-                StatusColor = "red"
+                StatusInfo = new StatusInfo(Status.Draft, "red")
             };
 
             return content;
         }
 
-        protected static IAssetEntity CreateAsset(Guid id)
+        protected static IEnrichedAssetEntity CreateAsset(Guid id)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var asset = new FakeAssetEntity
+            var asset = new AssetEntity
             {
                 Id = id,
                 Version = 1,
@@ -185,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 IsImage = true,
                 PixelWidth = 800,
                 PixelHeight = 600,
-                Tags = new[] { "tag1", "tag2" }.ToHashSet()
+                TagNames = new[] { "tag1", "tag2" }.ToHashSet()
             };
 
             return asset;

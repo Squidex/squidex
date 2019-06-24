@@ -25,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class AssetQueryServiceTests
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
+        private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IAppEntity app = A.Fake<IAppEntity>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var options = Options.Create(new AssetOptions { DefaultPageSize = 30 });
 
-            sut = new AssetQueryService(tagService, assetRepository, options);
+            sut = new AssetQueryService(tagService, assetEnricher, assetRepository, options);
         }
 
         [Fact]
@@ -71,7 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetRepository.FindAssetAsync(id, false))
                 .Returns(CreateAsset(id, "id1", "id2", "id3"));
 
-            var result = await sut.FindAssetAsync(context, id);
+            var result = await sut.FindAssetAsync(id);
 
             Assert.Equal(HashSet.Of("name1", "name2", "name3"), result.Tags);
         }

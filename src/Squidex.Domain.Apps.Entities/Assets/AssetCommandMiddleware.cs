@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Orleans;
-using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
@@ -22,31 +21,31 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, IAssetGrain>
     {
         private readonly IAssetStore assetStore;
+        private readonly IAssetEnricher assetEnricher;
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IEnumerable<ITagGenerator<CreateAsset>> tagGenerators;
-        private readonly ITagService tagService;
 
         public AssetCommandMiddleware(
             IGrainFactory grainFactory,
+            IAssetEnricher assetEnricher,
             IAssetQueryService assetQuery,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
-            IEnumerable<ITagGenerator<CreateAsset>> tagGenerators,
-            ITagService tagService)
+            IEnumerable<ITagGenerator<CreateAsset>> tagGenerators)
             : base(grainFactory)
         {
+            Guard.NotNull(assetEnricher, nameof(assetEnricher));
             Guard.NotNull(assetStore, nameof(assetStore));
             Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
             Guard.NotNull(tagGenerators, nameof(tagGenerators));
-            Guard.NotNull(tagService, nameof(tagService));
 
             this.assetStore = assetStore;
+            this.assetEnricher = assetEnricher;
             this.assetQuery = assetQuery;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
             this.tagGenerators = tagGenerators;
-            this.tagService = tagService;
         }
 
         public override async Task HandleAsync(CommandContext context, Func<Task> next)
@@ -73,9 +72,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                             {
                                 if (IsDuplicate(createAsset, existing))
                                 {
-                                    var denormalizedTags = await tagService.DenormalizeTagsAsync(createAsset.AppId.Id, TagGroups.Assets, existing.Tags);
-
-                                    result = new AssetCreatedResult(existing, true, new HashSet<string>(denormalizedTags.Values));
+                                    result = new AssetCreatedResult(existing, true);
                                 }
 
                                 break;
@@ -88,9 +85,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
                                     tagGenerator.GenerateTags(createAsset, createAsset.Tags);
                                 }
 
-                                var asset = (IAssetEntity)await ExecuteCommandAsync(createAsset);
+                                var asset = (IEnrichedAssetEntity)await ExecuteAndAdjustTagsAsync(createAsset);
 
-                                result = new AssetCreatedResult(asset, false, createAsset.Tags);
+                                result = new AssetCreatedResult(asset, false);
 
                                 await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), asset.FileVersion, null);
                             }
@@ -112,11 +109,11 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         try
                         {
-                            var result = (AssetResult)await ExecuteAndAdjustTagsAsync(updateAsset);
+                            var result = (IEnrichedAssetEntity)await ExecuteAndAdjustTagsAsync(updateAsset);
 
                             context.Complete(result);
 
-                            await assetStore.CopyAsync(context.ContextId.ToString(), updateAsset.AssetId.ToString(), result.Asset.FileVersion, null);
+                            await assetStore.CopyAsync(context.ContextId.ToString(), updateAsset.AssetId.ToString(), result.FileVersion, null);
                         }
                         finally
                         {
@@ -148,9 +145,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (result is IAssetEntity asset)
             {
-                var denormalizedTags = await tagService.DenormalizeTagsAsync(asset.AppId.Id, TagGroups.Assets, asset.Tags);
+                var enriched = await assetEnricher.EnrichAsync(asset);
 
-                return new AssetResult(asset, new HashSet<string>(denormalizedTags.Values));
+                return enriched;
             }
 
             return result;
