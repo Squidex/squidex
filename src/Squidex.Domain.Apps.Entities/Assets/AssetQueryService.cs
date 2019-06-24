@@ -68,9 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var assets = await assetRepository.QueryByHashAsync(appId, hash);
 
-            var enriched = await assetEnricher.EnrichAsync(assets);
-
-            return enriched;
+            return await assetEnricher.EnrichAsync(assets);
         }
 
         public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(QueryContext context, Q query)
@@ -82,19 +80,30 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             if (query.Ids != null)
             {
-                assets = await assetRepository.QueryAsync(context.App.Id, new HashSet<Guid>(query.Ids));
-                assets = Sort(assets, query.Ids);
+                assets = await QueryByIdsAsync(context, query);
             }
             else
             {
-                var parsedQuery = ParseQuery(context, query.ODataQuery);
-
-                assets = await assetRepository.QueryAsync(context.App.Id, parsedQuery);
+                assets = await QueryByQueryAsync(context, query);
             }
 
             var enriched = await assetEnricher.EnrichAsync(assets);
 
             return ResultList.Create<IEnrichedAssetEntity>(assets.Total, enriched);
+        }
+
+        private async Task<IResultList<IAssetEntity>> QueryByQueryAsync(QueryContext context, Q query)
+        {
+            var parsedQuery = ParseQuery(context, query.ODataQuery);
+
+            return await assetRepository.QueryAsync(context.App.Id, parsedQuery);
+        }
+
+        private async Task<IResultList<IAssetEntity>> QueryByIdsAsync(QueryContext context, Q query)
+        {
+            var assets = await assetRepository.QueryAsync(context.App.Id, new HashSet<Guid>(query.Ids));
+
+            return Sort(assets, query.Ids);
         }
 
         private static IResultList<IAssetEntity> Sort(IResultList<IAssetEntity> assets, IReadOnlyList<Guid> ids)
