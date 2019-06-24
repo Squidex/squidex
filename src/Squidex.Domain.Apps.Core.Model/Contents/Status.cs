@@ -15,8 +15,6 @@ namespace Squidex.Domain.Apps.Core.Contents
         public static readonly Status Draft = new Status("Draft");
         public static readonly Status Published = new Status("Published");
 
-        public const string FallbackColor = "#8091a5";
-
         private readonly string name;
 
         public string Name
