@@ -39,7 +39,7 @@ describe("Login To Squidex", () => {
     browserPg.waitForAngularEnabledOnCurrentWindow().then(async () => {
       browserPg.switchToParentWindow();
       browser.sleep(1000);
-      await loginPg.skipTour();
+      loginPg.skipTour();
       browser.sleep(1000);
       await expect(browserPg.getCurrentURL()).toBe(
         config.params.expectedUrlAfterNavigation

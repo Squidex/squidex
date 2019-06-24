@@ -18,7 +18,7 @@ export class LoginPage extends BasePage {
   /**
    * signs in using specified username/password in login.json file.
    */
-  login(loginData: LoginData) {
+  public login(loginData: LoginData) {
     const usernameInput = element(by.id("userNameInput"));
     const passwordInput = element(by.id("passwordInput"));
     const submitButton = element(by.id("submitButton"));
@@ -26,16 +26,16 @@ export class LoginPage extends BasePage {
     passwordInput.sendKeys(loginData.password);
     submitButton.click();
   }
-  //navigating to Squidex base page
-  navigateTo() {
+  // navigating to Squidex base page
+  public navigateTo() {
     browser.get(config.params.baseUrl);
   }
 
-  closePopUp() {
+  public closePopUp() {
     element(by.xpath("//span[@class='ng-tns-c3-5']")).click();
   }
 
-  skipTour() {
+  public skipTour() {
     element(
       by.linkText('Skip Tour')
     ).click();

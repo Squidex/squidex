@@ -25,7 +25,7 @@ export let config: Config = {
   specs: ["../JSFiles/specs/login/*.spec.js"],
 
   onPrepare: () => {
-    var AllureReporter = require("jasmine-allure-reporter");
+    const AllureReporter = require("jasmine-allure-reporter");
     jasmine.getEnv().addReporter(
       new AllureReporter({
         allureReport: {
@@ -33,7 +33,7 @@ export let config: Config = {
         }
       })
     );
-    let addScreenShots = new (function() {
+    const addScreenShots = new (function() {
       this.specDone = function(result) {
         if (result.status === "failed") {
           browser
@@ -60,8 +60,8 @@ export let config: Config = {
       .maximize();
   },
   params: {
-    baseUrl: "http://localhost:5001",
-    expectedUrlAfterNavigation: "http://localhost:5001/app"
+    baseUrl: "https://localhost:5000",
+    expectedUrlAfterNavigation: "https://localhost:5000/app"
   },
   //protractor timeouts
   getPageTimeout: 50000,
