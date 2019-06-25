@@ -6,19 +6,11 @@
         vertical-align: middle;
     }
 
-    &-published {
-        color: $color-theme-green;
-    }
-
-    &-draft {
+    &.default {
         color: $color-text-decent;
     }
 
-    &-archived {
-        color: $color-theme-error;
-    }
-
-    &-pending {
+    &.pending {
         color: $color-dark-black;
     }
 

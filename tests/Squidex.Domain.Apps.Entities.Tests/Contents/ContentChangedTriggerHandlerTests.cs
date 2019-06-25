@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns(contentGrain);
 
             A.CallTo(() => contentGrain.GetStateAsync(12))
-                .Returns(A.Fake<IContentEntity>().AsJ());
+                .Returns(J.Of<IContentEntity>(new ContentEntity { SchemaId = SchemaMatch }));
 
             var result = await sut.CreateEnrichedEventAsync(envelope);
 

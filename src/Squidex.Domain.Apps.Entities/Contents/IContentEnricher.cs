@@ -5,21 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public interface IAssetQueryService
+    public interface IContentEnricher
     {
-        int DefaultPageSizeGraphQl { get; }
+        Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content);
 
-        Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Guid appId, string hash);
-
-        Task<IResultList<IEnrichedAssetEntity>> QueryAsync(QueryContext contex, Q query);
-
-        Task<IEnrichedAssetEntity> FindAssetAsync(Guid id);
+        Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents);
     }
 }

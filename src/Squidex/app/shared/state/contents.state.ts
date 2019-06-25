@@ -24,7 +24,7 @@ import { SchemaDto } from './../services/schemas.service';
 import { AppsState } from './apps.state';
 import { SchemasState } from './schemas.state';
 
-import { ContentDto, ContentsService } from './../services/contents.service';
+import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
 
 interface Snapshot {
     // The current comments.
@@ -40,7 +40,7 @@ interface Snapshot {
     isLoaded?: boolean;
 
     // The statuses.
-    statuses?: string[];
+    statuses?: StatusInfo[];
 
     // The selected content.
     selectedContent?: ContentDto | null;
@@ -348,10 +348,12 @@ export class ManualContentsState extends ContentsStateBase {
     }
 }
 
-function buildQueries(x: string[] | undefined): { name: string; filter: string; }[] {
-    return x ? x.map(s => buildQuery(s)) : [];
+export type ContentQuery =  { color: string; name: string; filter: string; };
+
+function buildQueries(statuses: StatusInfo[] | undefined): ContentQuery[] {
+    return statuses ? statuses.map(s => buildQuery(s)) : [];
 }
 
-function buildQuery(s: string) {
-    return ({ name: s, filter: `$filter=status eq '${s}'` });
+function buildQuery(s: StatusInfo) {
+    return ({ name: s.status, color: s.color, filter: `$filter=status eq '${s}'` });
 }

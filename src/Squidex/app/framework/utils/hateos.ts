@@ -13,7 +13,7 @@ export interface Resource {
 }
 
 export type ResourceLinks = { [rel: string]: ResourceLink };
-export type ResourceLink = { href: string; method: ResourceMethod; };
+export type ResourceLink = { href: string; method: ResourceMethod; metadata?: string; };
 
 export type Metadata = { [rel: string]: string };
 

@@ -5,16 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
+using AppPlanChangedV2 = Squidex.Domain.Apps.Events.Apps.AppPlanChanged;
 
 namespace Migrate_01.OldEvents
 {
     [TypeName("AppPlanChanged")]
-    public sealed class AppPlanChangedOld : AppEvent, IMigrated<IEvent>
+    [Obsolete]
+    public sealed class AppPlanChanged : AppEvent, IMigrated<IEvent>
     {
         public string PlanId { get; set; }
 
@@ -22,7 +25,7 @@ namespace Migrate_01.OldEvents
         {
             if (!string.IsNullOrWhiteSpace(PlanId))
             {
-                return SimpleMapper.Map(this, new AppPlanChanged());
+                return SimpleMapper.Map(this, new AppPlanChangedV2());
             }
             else
             {

@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
             return Items.ToSurrogateKeys();
         }
 
-        public static AssetsDto FromAssets(IResultList<IAssetEntity> assets, ApiController controller, string app)
+        public static AssetsDto FromAssets(IResultList<IEnrichedAssetEntity> assets, ApiController controller, string app)
         {
             var response = new AssetsDto
             {
