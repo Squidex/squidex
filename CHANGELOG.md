@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.0-beta1 - 2019-06-24
+
+This version contains many major breaking changes. Please read: https://docs.squidex.io/next/02-api-compatibility
+
+## Features 
+
+* **Contents**: Abstraction for content workflows.
+* **API**: Hateaos implementation
+* **API**: Full responseo of the resulting resource after PUT and POST.
+* **UI**: Show correct elements based o npermissions.
+
 ## v2.1.0 - 2019-06-22
 
 ## Features
