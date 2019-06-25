@@ -47,7 +47,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             return Items.ToSurrogateKeys();
         }
 
-        public static async Task<ContentsDto> FromContentsAsync(IResultList<IContentEntityEnriched> contents,
+        public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents,
             QueryContext context, ApiController controller, ISchemaEntity schema, IContentWorkflow contentWorkflow)
         {
             var result = new ContentsDto

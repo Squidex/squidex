@@ -532,7 +532,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     var input = (IEnumerable<IContentEntity>)x.Arguments[0];
 
-                    return Task.FromResult<IReadOnlyList<IContentEntityEnriched>>(input.Select(c => SimpleMapper.Map(c, new ContentEntity())).ToList());
+                    return Task.FromResult<IReadOnlyList<IEnrichedContentEntity>>(input.Select(c => SimpleMapper.Map(c, new ContentEntity())).ToList());
                 });
         }
 

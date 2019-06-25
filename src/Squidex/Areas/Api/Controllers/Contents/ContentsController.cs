@@ -445,7 +445,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<IContentEntityEnriched>();
+            var result = context.Result<IEnrichedContentEntity>();
             var response = ContentDto.FromContent(null, result, this);
 
             return response;

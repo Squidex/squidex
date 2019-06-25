@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.tagService = tagService;
         }
 
-        public async Task<IAssetEntityEnriched> EnrichAsync(IAssetEntity asset)
+        public async Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset)
         {
             Guard.NotNull(asset, nameof(asset));
 
@@ -35,13 +35,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return enriched[0];
         }
 
-        public async Task<IReadOnlyList<IAssetEntityEnriched>> EnrichAsync(IEnumerable<IAssetEntity> assets)
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> EnrichAsync(IEnumerable<IAssetEntity> assets)
         {
             Guard.NotNull(assets, nameof(assets));
 
             using (Profiler.TraceMethod<AssetEnricher>())
             {
-                var results = new List<IAssetEntityEnriched>();
+                var results = new List<IEnrichedAssetEntity>();
 
                 foreach (var group in assets.GroupBy(x => x.AppId.Id))
                 {

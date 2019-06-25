@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentWorkflow = contentWorkflow;
         }
 
-        public async Task<IContentEntityEnriched> EnrichAsync(IContentEntity content)
+        public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content)
         {
             Guard.NotNull(content, nameof(content));
 
@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return enriched[0];
         }
 
-        public async Task<IReadOnlyList<IContentEntityEnriched>> EnrichAsync(IEnumerable<IContentEntity> contents)
+        public async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents)
         {
             Guard.NotNull(contents, nameof(contents));
 

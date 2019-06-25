@@ -12,8 +12,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public interface IAssetEnricher
     {
-        Task<IAssetEntityEnriched> EnrichAsync(IAssetEntity asset);
+        Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset);
 
-        Task<IReadOnlyList<IAssetEntityEnriched>> EnrichAsync(IEnumerable<IAssetEntity> assets);
+        Task<IReadOnlyList<IEnrichedAssetEntity>> EnrichAsync(IEnumerable<IAssetEntity> assets);
     }
 }

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public interface IAssetEntityEnriched : IAssetEntity
+    public interface IEnrichedAssetEntity : IAssetEntity
     {
         HashSet<string> TagNames { get; }
     }

@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             await HandleCoreAsync(context, next);
 
-                            var asset = context.PlainResult as IAssetEntityEnriched;
+                            var asset = context.PlainResult as IEnrichedAssetEntity;
 
                             context.Complete(new AssetCreatedResult(asset, false));
 
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             await base.HandleAsync(context, next);
 
-            if (context.PlainResult is IAssetEntity asset && !(context.PlainResult is IAssetEntityEnriched))
+            if (context.PlainResult is IAssetEntity asset && !(context.PlainResult is IEnrichedAssetEntity))
             {
                 var enriched = await assetEnricher.EnrichAsync(asset);
 

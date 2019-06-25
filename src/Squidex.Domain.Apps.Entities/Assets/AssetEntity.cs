@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetEntity : IAssetEntityEnriched
+    public sealed class AssetEntity : IEnrichedAssetEntity
     {
         public NamedId<Guid> AppId { get; set; }
 

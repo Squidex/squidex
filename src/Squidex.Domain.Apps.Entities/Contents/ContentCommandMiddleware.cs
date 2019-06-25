@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             await base.HandleAsync(context, next);
 
-            if (context.PlainResult is IContentEntity content)
+            if (context.PlainResult is IContentEntity content && !(context.PlainResult is IEnrichedContentEntity))
             {
                 var enriched = await contentEnricher.EnrichAsync(content);
 

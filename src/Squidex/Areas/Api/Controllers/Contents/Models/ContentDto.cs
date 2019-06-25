@@ -84,7 +84,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static ContentDto FromContent(QueryContext context, IContentEntityEnriched content, ApiController controller)
+        public static ContentDto FromContent(QueryContext context, IEnrichedContentEntity content, ApiController controller)
         {
             var response = SimpleMapper.Map(content, new ContentDto());
 
@@ -107,7 +107,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             return response.CreateLinksAsync(content, controller, content.AppId.Name, content.SchemaId.Name);
         }
 
-        private ContentDto CreateLinksAsync(IContentEntityEnriched content, ApiController controller, string app, string schema)
+        private ContentDto CreateLinksAsync(IEnrichedContentEntity content, ApiController controller, string app, string schema)
         {
             var values = new { app, name = schema, id = Id };
 

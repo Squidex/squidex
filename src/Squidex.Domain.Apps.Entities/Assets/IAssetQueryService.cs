@@ -16,10 +16,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
     {
         int DefaultPageSizeGraphQl { get; }
 
-        Task<IReadOnlyList<IAssetEntityEnriched>> QueryByHashAsync(Guid appId, string hash);
+        Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Guid appId, string hash);
 
-        Task<IResultList<IAssetEntityEnriched>> QueryAsync(QueryContext contex, Q query);
+        Task<IResultList<IEnrichedAssetEntity>> QueryAsync(QueryContext contex, Q query);
 
-        Task<IAssetEntityEnriched> FindAssetAsync(Guid id);
+        Task<IEnrichedAssetEntity> FindAssetAsync(Guid id);
     }
 }

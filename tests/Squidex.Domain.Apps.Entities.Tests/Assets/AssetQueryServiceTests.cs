@@ -85,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .Returns(new List<IAssetEntity> { found });
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found)))
-                .Returns(new List<IAssetEntityEnriched> { enriched });
+                .Returns(new List<IEnrichedAssetEntity> { enriched });
 
             var result = await sut.QueryByHashAsync(appId.Id, "hash");
 
@@ -107,7 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .Returns(ResultList.CreateFrom(8, found1, found2));
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2)))
-                .Returns(new List<IAssetEntityEnriched> { enriched1, enriched2 });
+                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
 
             var result = await sut.QueryAsync(context, Q.Empty.WithIds(ids));
 
@@ -129,7 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .Returns(ResultList.CreateFrom(8, found1, found2));
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2)))
-                .Returns(new List<IAssetEntityEnriched> { enriched1, enriched2 });
+                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
 
             var result = await sut.QueryAsync(context, Q.Empty);
 

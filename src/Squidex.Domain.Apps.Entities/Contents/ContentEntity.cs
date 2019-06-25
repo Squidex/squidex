@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentEntity : IContentEntityEnriched
+    public sealed class ContentEntity : IEnrichedContentEntity
     {
         public Guid Id { get; set; }
 
