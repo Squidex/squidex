@@ -11,7 +11,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Squidex.Infrastructure.Security;
-using Squidex.Shared.Identity;
 
 namespace Squidex.ICIS.Handlers
 {
