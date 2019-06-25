@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Apps
         {
             Guard.NotNullOrEmpty(secret, nameof(secret));
             Guard.NotNullOrEmpty(role, nameof(role));
-            
+
             Role = role;
 
             Secret = secret;

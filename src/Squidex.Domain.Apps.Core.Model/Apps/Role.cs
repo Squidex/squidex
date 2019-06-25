@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using P = Squidex.Shared.Permissions;
 
 namespace Squidex.Domain.Apps.Core.Apps
