@@ -1,19 +1,18 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
 using System;
 using System.Collections.Generic;
 using NodaTime;
-using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents.TestData
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class FakeAssetEntity : IAssetEntity
+    public sealed class AssetEntity : IEnrichedAssetEntity
     {
         public NamedId<Guid> AppId { get; set; }
 
@@ -30,6 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.TestData
         public RefToken LastModifiedBy { get; set; }
 
         public HashSet<string> Tags { get; set; }
+
+        public HashSet<string> TagNames { get; set; }
 
         public long Version { get; set; }
 

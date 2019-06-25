@@ -17,11 +17,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         int DefaultPageSizeGraphQl { get; }
 
-        Task<IReadOnlyList<IContentEntity>> QueryAsync(QueryContext context, IReadOnlyList<Guid> ids);
+        Task<IResultList<IEnrichedContentEntity>> QueryAsync(QueryContext context, IReadOnlyList<Guid> ids);
 
-        Task<IResultList<IContentEntity>> QueryAsync(QueryContext context, string schemaIdOrName, Q query);
+        Task<IResultList<IEnrichedContentEntity>> QueryAsync(QueryContext context, string schemaIdOrName, Q query);
 
-        Task<IContentEntity> FindContentAsync(QueryContext context, string schemaIdOrName, Guid id, long version = EtagVersion.Any);
+        Task<IEnrichedContentEntity> FindContentAsync(QueryContext context, string schemaIdOrName, Guid id, long version = EtagVersion.Any);
 
         Task<ISchemaEntity> GetSchemaOrThrowAsync(QueryContext context, string schemaIdOrName);
     }

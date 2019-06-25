@@ -13,6 +13,16 @@ namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static IResultList<T> SortSet<T, TKey>(this IResultList<T> input, Func<T, TKey> idProvider, IReadOnlyList<TKey> ids) where T : class
+        {
+            return ResultList.Create(input.Total, SortList(input, idProvider, ids));
+        }
+
+        public static IEnumerable<T> SortList<T, TKey>(this IEnumerable<T> input, Func<T, TKey> idProvider, IReadOnlyList<TKey> ids) where T : class
+        {
+            return ids.Select(id => input.FirstOrDefault(x => Equals(idProvider(x), id))).Where(x => x != null);
+        }
+
         public static void AddRange<T>(this ICollection<T> target, IEnumerable<T> source)
         {
             foreach (var value in source)

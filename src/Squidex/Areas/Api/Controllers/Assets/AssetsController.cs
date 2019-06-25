@@ -133,9 +133,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAsset(string app, Guid id)
         {
-            var context = Context();
-
-            var asset = await assetQuery.FindAssetAsync(context, id);
+            var asset = await assetQuery.FindAssetAsync(id);
 
             if (asset == null)
             {
@@ -182,7 +180,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<AssetCreatedResult>();
-            var response = AssetDto.FromAsset(result.Asset, this, app, result.Tags, result.IsDuplicate);
+            var response = AssetDto.FromAsset(result.Asset, this, app, result.IsDuplicate);
 
             return CreatedAtAction(nameof(GetAsset), new { app, id = response.Id }, response);
         }
@@ -267,8 +265,8 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<AssetResult>();
-            var response = AssetDto.FromAsset(result.Asset, this, app, result.Tags);
+            var result = context.Result<IEnrichedAssetEntity>();
+            var response = AssetDto.FromAsset(result, this, app);
 
             return response;
         }

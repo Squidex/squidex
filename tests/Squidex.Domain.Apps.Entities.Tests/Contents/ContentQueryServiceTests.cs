@@ -25,6 +25,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
@@ -36,6 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class ContentQueryServiceTests
     {
+        private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly IContentVersionLoader contentVersionLoader = A.Fake<IContentVersionLoader>();
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
@@ -76,6 +78,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => schema.AppId).Returns(appId);
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
 
+            SetupEnricher();
+
             context = QueryContext.Create(app, user);
 
             var options = Options.Create(new ContentOptions { DefaultPageSize = 30 });
@@ -83,6 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             sut = new ContentQueryService(
                 appProvider,
                 urlGenerator,
+                contentEnricher,
                 contentRepository,
                 contentVersionLoader,
                 scriptEngine,
@@ -520,6 +525,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns((ISchemaEntity)null);
         }
 
+        private void SetupEnricher()
+        {
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>.Ignored))
+                .ReturnsLazily(x =>
+                {
+                    var input = (IEnumerable<IContentEntity>)x.Arguments[0];
+
+                    return Task.FromResult<IReadOnlyList<IEnrichedContentEntity>>(input.Select(c => SimpleMapper.Map(c, new ContentEntity())).ToList());
+                });
+        }
+
         private IContentEntity CreateContent(Guid id)
         {
             return CreateContent(id, Status.Published);
@@ -527,13 +543,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private IContentEntity CreateContent(Guid id, Status status)
         {
-            var content = A.Fake<IContentEntity>();
-
-            A.CallTo(() => content.Id).Returns(id);
-            A.CallTo(() => content.Data).Returns(contentData);
-            A.CallTo(() => content.DataDraft).Returns(contentData);
-            A.CallTo(() => content.Status).Returns(status);
-            A.CallTo(() => content.SchemaId).Returns(schemaId);
+            var content = new ContentEntity
+            {
+                Id = id,
+                Data = contentData,
+                DataDraft = contentData,
+                SchemaId = schemaId,
+                Status = status,
+            };
 
             return content;
         }

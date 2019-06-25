@@ -62,11 +62,13 @@ describe('ContentsService', () => {
                 contentResponse(12),
                 contentResponse(13)
             ],
-            statuses: ['Draft', 'Published']
+            statuses: [{
+                status: 'Draft', color: 'Gray'
+            }]
         });
 
         expect(contents!).toEqual(
-            new ContentsDto(['Draft', 'Published'], 10, [
+            new ContentsDto([{ status: 'Draft', color: 'Gray' }], 10, [
                 createContent(12),
                 createContent(13)
             ]));
@@ -351,6 +353,7 @@ describe('ContentsService', () => {
         return {
             id: `id${id}`,
             status: `Status${id}`,
+            statusColor: 'black',
             created: `${id % 1000 + 2000}-12-12T10:10:00`,
             createdBy: `creator-${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00`,
@@ -379,6 +382,7 @@ export function createContent(id: number, suffix = '') {
     return new ContentDto(links,
         `id${id}`,
         `Status${id}${suffix}`,
+        'black',
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
         new ScheduleDto('Draft', `Scheduler${id}`, DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`)),

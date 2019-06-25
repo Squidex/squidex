@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 if (fullTextIds?.Count == 0)
                 {
-                    return ResultList.Create<IContentEntity>(0);
+                    return ResultList.CreateFrom<IContentEntity>(0);
                 }
 
                 return await contents.QueryAsync(schema, query, fullTextIds, status, inDraft, includeDraft);

@@ -5,16 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.EventSourcing;
-
-namespace Squidex.Domain.Apps.Events.Contents
+namespace Squidex.Domain.Apps.Core.Contents
 {
-    [EventType(nameof(ContentCreated), 2)]
-    public sealed class ContentCreated : ContentEvent
+    public static class StatusColors
     {
-        public Status Status { get; set; }
-
-        public NamedContentData Data { get; set; }
+        public const string Archived = "#eb3142";
+        public const string Draft = "#8091a5";
+        public const string Published = "#4bb958";
     }
 }

@@ -5,16 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.EventSourcing;
-
-namespace Squidex.Domain.Apps.Events.Contents
+namespace Squidex.Domain.Apps.Core.Contents
 {
-    [EventType(nameof(ContentCreated), 2)]
-    public sealed class ContentCreated : ContentEvent
+    public sealed class StatusInfo
     {
-        public Status Status { get; set; }
+        public Status Status { get; }
 
-        public NamedContentData Data { get; set; }
+        public string Color { get; }
+
+        public StatusInfo(Status status, string color)
+        {
+            Status = status;
+
+            Color = color;
+        }
     }
 }

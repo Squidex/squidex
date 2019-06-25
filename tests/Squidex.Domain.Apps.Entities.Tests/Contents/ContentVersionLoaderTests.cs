@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public async Task Should_throw_exception_if_no_state_returned()
         {
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(new J<IContentEntity>(null));
+                .Returns(J.Of<IContentEntity>(null));
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.LoadAsync(id, 10));
         }
@@ -42,13 +42,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_exception_if_state_has_other_version()
         {
-            var entity = A.Fake<IContentEntity>();
-
-            A.CallTo(() => entity.Version)
-                .Returns(5);
+            var content = new ContentEntity { Version = 5 };
 
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of(entity));
+                .Returns(J.Of<IContentEntity>(content));
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.LoadAsync(id, 10));
         }
@@ -56,17 +53,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_return_content_from_state()
         {
-            var entity = A.Fake<IContentEntity>();
-
-            A.CallTo(() => entity.Version)
-                .Returns(10);
+            var content = new ContentEntity { Version = 10 };
 
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of(entity));
+                .Returns(J.Of<IContentEntity>(content));
 
             var result = await sut.LoadAsync(id, 10);
 
-            Assert.Same(entity, result);
+            Assert.Same(content, result);
         }
     }
 }

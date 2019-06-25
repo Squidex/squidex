@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             sut = CreateSut();
         }
 
-        protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null, NamedContentData dataDraft = null)
+        protected static IEnrichedContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null, NamedContentData dataDraft = null)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -157,17 +157,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
                 Data = data,
                 DataDraft = dataDraft,
-                Status = Status.Draft
+                Status = Status.Draft,
+                StatusColor = "red"
             };
 
             return content;
         }
 
-        protected static IAssetEntity CreateAsset(Guid id)
+        protected static IEnrichedAssetEntity CreateAsset(Guid id)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var asset = new FakeAssetEntity
+            var asset = new AssetEntity
             {
                 Id = id,
                 Version = 1,
@@ -184,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 IsImage = true,
                 PixelWidth = 800,
                 PixelHeight = 600,
-                Tags = new[] { "tag1", "tag2" }.ToHashSet()
+                TagNames = new[] { "tag1", "tag2" }.ToHashSet()
             };
 
             return asset;

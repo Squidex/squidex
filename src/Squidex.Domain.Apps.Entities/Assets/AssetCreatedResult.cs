@@ -5,17 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetCreatedResult : AssetResult
+    public sealed class AssetCreatedResult
     {
+        public IEnrichedAssetEntity Asset { get; }
+
         public bool IsDuplicate { get; }
 
-        public AssetCreatedResult(IAssetEntity asset, bool isDuplicate, HashSet<string> tags)
-            : base(asset, tags)
+        public AssetCreatedResult(IEnrichedAssetEntity asset, bool isDuplicate)
         {
+            Asset = asset;
+
             IsDuplicate = isDuplicate;
         }
     }

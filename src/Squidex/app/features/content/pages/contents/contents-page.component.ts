@@ -207,8 +207,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         const allActions = {};
 
         for (let content of this.contentsState.snapshot.contents.values) {
-            for (let status of content.statusUpdates) {
-                allActions[status] = true;
+            for (let info of content.statusUpdates) {
+                allActions[info.status] = info.color;
             }
         }
 

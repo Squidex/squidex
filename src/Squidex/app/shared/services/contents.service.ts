@@ -34,9 +34,11 @@ export class ScheduleDto {
     }
 }
 
+export type StatusInfo = { status: string; color: string; };
+
 export class ContentsDto extends ResultSet<ContentDto> {
     constructor(
-        public readonly statuses: string[],
+        public readonly statuses: StatusInfo[],
         total: number,
         items: ContentDto[],
         links?: ResourceLinks
@@ -56,7 +58,7 @@ export class ContentsDto extends ResultSet<ContentDto> {
 export class ContentDto {
     public readonly _links: ResourceLinks;
 
-    public readonly statusUpdates: string[];
+    public readonly statusUpdates: StatusInfo[];
 
     public readonly canDelete: boolean;
     public readonly canDraftDiscard: boolean;
@@ -67,6 +69,7 @@ export class ContentDto {
     constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly status: string,
+        public readonly statusColor: string,
         public readonly created: DateTime,
         public readonly createdBy: string,
         public readonly lastModified: DateTime,
@@ -85,7 +88,7 @@ export class ContentDto {
         this.canDraftPublish = hasAnyLink(links, 'draft/publish');
         this.canUpdate = hasAnyLink(links, 'update');
 
-        this.statusUpdates = Object.keys(links).filter(x => x.startsWith('status/')).map(x => x.substr(7));
+        this.statusUpdates = Object.keys(links).filter(x => x.startsWith('status/')).map(x => ({ status: x.substr(7), color: links[x].metadata! }));
     }
 }
 
@@ -133,7 +136,7 @@ export class ContentsService {
 
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
-        return this.http.get<{ total: number, items: [], statuses: string[] } & Resource>(url).pipe(
+        return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
                 map(({ total, items, statuses, _links }) => {
                     const contents = items.map(x => parseContent(x));
 
@@ -282,6 +285,7 @@ function parseContent(response: any) {
     return new ContentDto(response._links,
         response.id,
         response.status,
+        response.statusColor,
         DateTime.parseISO_UTC(response.created), response.createdBy,
         DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
         response.scheduleJob

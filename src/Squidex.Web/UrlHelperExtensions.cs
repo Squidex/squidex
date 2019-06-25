@@ -38,7 +38,7 @@ namespace Squidex.Web
 
         public static string Url<T>(this Controller controller, Func<T, string> action, object values = null) where T : Controller
         {
-            return controller.Url.Url<T>(action, values);
+            return controller.Url.Url(action, values);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// The possible statuses.
         /// </summary>
         [Required]
-        public Status[] Statuses { get; set; }
+        public StatusInfoDto[] Statuses { get; set; }
 
         public string ToEtag()
         {
@@ -47,20 +47,16 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
             return Items.ToSurrogateKeys();
         }
 
-        public static async Task<ContentsDto> FromContentsAsync(IResultList<IContentEntity> contents, QueryContext context,
-            ApiController controller,
-            ISchemaEntity schema,
-            IContentWorkflow contentWorkflow)
+        public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents,
+            QueryContext context, ApiController controller, ISchemaEntity schema, IContentWorkflow contentWorkflow)
         {
             var result = new ContentsDto
             {
                 Total = contents.Total,
-                Items = new ContentDto[contents.Count]
+                Items = contents.Select(x => ContentDto.FromContent(context, x, controller)).ToArray()
             };
 
-            await Task.WhenAll(
-                result.AssignContentsAsync(contentWorkflow, contents, context, controller),
-                result.AssignStatusesAsync(contentWorkflow, schema));
+            await result.AssignStatusesAsync(contentWorkflow, schema);
 
             return result.CreateLinks(controller, schema.AppId.Name, schema.SchemaDef.Name);
         }
@@ -69,15 +65,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         {
             var allStatuses = await contentWorkflow.GetAllAsync(schema);
 
-            Statuses = allStatuses.ToArray();
-        }
-
-        private async Task AssignContentsAsync(IContentWorkflow contentWorkflow, IResultList<IContentEntity> contents, QueryContext context, ApiController controller)
-        {
-            for (var i = 0; i < Items.Length; i++)
-            {
-                Items[i] = await ContentDto.FromContentAsync(context, contents[i], contentWorkflow, controller);
-            }
+            Statuses = allStatuses.Select(StatusInfoDto.FromStatusInfo).ToArray();
         }
 
         private ContentsDto CreateLinks(ApiController controller, string app, string schema)

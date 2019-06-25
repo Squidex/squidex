@@ -270,12 +270,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
 
         private IContentEntity CreateContent(Status status, bool isPending)
         {
-            var content = A.Fake<IContentEntity>();
-
-            A.CallTo(() => content.Status).Returns(status);
-            A.CallTo(() => content.IsPending).Returns(isPending);
-
-            return content;
+            return new ContentEntity { Status = status, IsPending = isPending };
         }
     }
 }
