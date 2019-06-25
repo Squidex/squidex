@@ -56,10 +56,10 @@ namespace Squidex.ICIS.Actions.Kafka
                 throw new Exception("Unable to find Commodity field.");
             }
 
-            var commentaryTypeMongoId = ((Collection<IJsonValue>)commentaryTypeData["iv"])[0].ToString();
-            var commodityMongoId = ((Collection<IJsonValue>)commodityData["iv"])[0].ToString();
+            var commentaryTypeDBId = ((Collection<IJsonValue>)commentaryTypeData["iv"])[0].ToString();
+            var commodityDBId = ((Collection<IJsonValue>)commodityData["iv"])[0].ToString();
 
-            var publishedEntities = GetPublishedEntities(string.Join(',', new[] { commodityMongoId, commentaryTypeMongoId }));
+            var publishedEntities = GetPublishedEntities(string.Join(',', new[] { commentaryTypeDBId, commodityDBId }));
 
             var commentaryType = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("commentary-type")).Item1;
             var commodity = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("commodity")).Item1;
