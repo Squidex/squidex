@@ -17,20 +17,18 @@ namespace Squidex.ICIS.Handlers
 {
     internal class AuthEventsHandler : JwtBearerEvents
     {
+        private const string GivenNameType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname";
+
         public override Task TokenValidated(TokenValidatedContext context)
         {
             if (context.SecurityToken is JwtSecurityToken accessToken)
             {
                 if (context.Principal.Identity is ClaimsIdentity identity)
                 {
-                    var nameClaim = identity.FindFirst(ClaimTypes.Name)?.Value;
-                    if (!string.IsNullOrWhiteSpace(nameClaim))
+                    var nameClaim = identity.FindFirst(ClaimTypes.GivenName)?.Value;
+                    if (string.IsNullOrWhiteSpace(nameClaim))
                     {
-                        identity.SetDisplayName(nameClaim);
-                    }
-                    else
-                    {
-                        identity.AddClaim(new Claim(OpenIdClaims.Name, accessToken.Payload[OpenIdClaims.ClientId].ToString()));
+                        identity.AddClaim(new Claim(GivenNameType, accessToken.Payload[OpenIdClaims.ClientId].ToString()));
                     }
 
                     if (!string.IsNullOrWhiteSpace(accessToken.Subject))
@@ -41,7 +39,6 @@ namespace Squidex.ICIS.Handlers
                     {
                         identity.AddClaim(new Claim(OpenIdClaims.Subject, accessToken.Payload[OpenIdClaims.ClientId].ToString()));
                     }
-
 
                     if (accessToken.Payload.Keys.Contains(OpenIdClaims.Email) && accessToken.Payload[OpenIdClaims.Email] != null)
                     {

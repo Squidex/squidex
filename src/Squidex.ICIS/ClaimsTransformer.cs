@@ -39,7 +39,7 @@ namespace Squidex.ICIS
 
             if (!_memoryCache.TryGetValue(key, out UserInfo cachedEntry))
             {
-                 var userInfo = claimsManager.CreateUserWithClaims(identity);
+                var userInfo = claimsManager.CreateUserWithClaims(identity);
                 _memoryCache.Set(key, userInfo);
                 CreateClaims(identity, userInfo);
             }
