@@ -177,6 +177,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 AddGetLink("schemas", controller.Url<SchemasController>(x => nameof(x.GetSchemas), values));
             }
 
+            if (controller.HasPermission(AllPermissions.AppWorkflowsRead, Name, permissions: permissions))
+            {
+                AddGetLink("workflows", controller.Url<AppWorkflowsController>(x => nameof(x.GetWorkflow), values));
+            }
+
             if (controller.HasPermission(AllPermissions.AppSchemasCreate, Name, permissions: permissions))
             {
                 AddPostLink("schemas/create", controller.Url<SchemasController>(x => nameof(x.PostSchema), values));
