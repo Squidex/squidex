@@ -7,6 +7,7 @@
 
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure.Dispatching;
@@ -41,6 +42,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         [DataMember]
         public LanguagesConfig LanguagesConfig { get; set; } = LanguagesConfig.English;
+
+        [DataMember]
+        public Workflows Workdlows { get; set; } = Workflows.Empty;
 
         [DataMember]
         public bool IsArchived { get; set; }

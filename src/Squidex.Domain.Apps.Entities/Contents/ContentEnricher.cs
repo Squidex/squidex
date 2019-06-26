@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -67,26 +68,26 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task ResolveNextsAsync(IContentEntity content, ContentEntity result)
         {
-            result.Nexts = await contentWorkflow.GetNextsAsync(content);
+            result.Nexts = await contentWorkflow.GetNextsAsync(content, ClaimsPrincipal.Current);
         }
 
         private async Task ResolveColorAsync(IContentEntity content, ContentEntity result, Dictionary<(Guid, Status), StatusInfo> cache)
         {
-            result.StatusColor = await GetColorAsync(content.SchemaId, content.Status, cache);
+            result.StatusColor = await GetColorAsync(content, cache);
         }
 
-        private async Task<string> GetColorAsync(NamedId<Guid> schemaId, Status status, Dictionary<(Guid, Status), StatusInfo> cache)
+        private async Task<string> GetColorAsync(IContentEntity content, Dictionary<(Guid, Status), StatusInfo> cache)
         {
-            if (!cache.TryGetValue((schemaId.Id, status), out var info))
+            if (!cache.TryGetValue((content.SchemaId.Id, content.Status), out var info))
             {
-                info = await contentWorkflow.GetInfoAsync(status);
+                info = await contentWorkflow.GetInfoAsync(content);
 
                 if (info == null)
                 {
-                    info = new StatusInfo(status, DefaultColor);
+                    info = new StatusInfo(content.Status, DefaultColor);
                 }
 
-                cache[(schemaId.Id, status)] = info;
+                cache[(content.SchemaId.Id, content.Status)] = info;
             }
 
             return info.Color;

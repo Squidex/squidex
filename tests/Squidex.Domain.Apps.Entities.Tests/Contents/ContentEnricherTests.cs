@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var source = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
 
-            A.CallTo(() => workflow.GetInfoAsync(Status.Published))
+            A.CallTo(() => workflow.GetInfoAsync(source))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
 
             var result = await sut.EnrichAsync(source);
@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var source = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
 
-            A.CallTo(() => workflow.GetInfoAsync(Status.Published))
+            A.CallTo(() => workflow.GetInfoAsync(source))
                 .Returns(Task.FromResult<StatusInfo>(null));
 
             var result = await sut.EnrichAsync(source);
@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var source1 = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
             var source2 = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
 
-            A.CallTo(() => workflow.GetInfoAsync(Status.Published))
+            A.CallTo(() => workflow.GetInfoAsync(source1))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
 
             var result = await sut.EnrichAsync(new[] { source1, source2 });
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Assert.Equal(StatusColors.Published, result[0].StatusColor);
             Assert.Equal(StatusColors.Published, result[1].StatusColor);
 
-            A.CallTo(() => workflow.GetInfoAsync(Status.Published))
+            A.CallTo(() => workflow.GetInfoAsync(A<IContentEntity>.Ignored))
                 .MustHaveHappenedOnceExactly();
         }
     }

@@ -448,7 +448,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var command = new ChangeContentStatus { Status = Status.Published, JobId = sut.Snapshot.ScheduleJob.Id };
 
-            A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>.Ignored, Status.Published))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(A<IContentEntity>.Ignored, Status.Published, User))
                 .Returns(false);
 
             var result = await sut.ExecuteAsync(CreateContentCommand(command));
