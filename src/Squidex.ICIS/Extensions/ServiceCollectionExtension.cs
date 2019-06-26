@@ -21,7 +21,7 @@ namespace Squidex.ICIS.Extensions
         public static void AddGenesisAuthentication(this IServiceCollection services, string authServer)
         {
             services.AddSingleton<IClaimsManager, ClaimsManager>();
-
+            
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -45,28 +45,10 @@ namespace Squidex.ICIS.Extensions
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsConfigured())
             {
-                services.AddSingleton(GetProducer(kafkaOptions));
-                ////services.AddSingleton(new KafkaProducer<CommentaryType>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
+                services.AddSingleton(new KafkaProducer<Commentary>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
+                services.AddSingleton(new KafkaProducer<CommentaryType>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
                 services.AddRuleAction<ICISKafkaAction, ICISKafkaActionHandler>();
             }
-        }
-
-        private static KafkaProducer<Commentary> GetProducer(ICISKafkaOptions kafkaOptions)
-        {
-            KafkaProducer<Commentary> producer = null;
-            while (producer == null)
-            {
-                try
-                {
-                    producer = new KafkaProducer<Commentary>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry);
-                }
-                catch (System.Exception ex)
-                {
-                    throw ex;
-                }
-            }
-
-            return producer;
         }
     }
 }
