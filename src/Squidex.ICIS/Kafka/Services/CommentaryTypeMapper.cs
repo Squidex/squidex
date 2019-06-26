@@ -19,6 +19,7 @@ namespace Squidex.ICIS.Actions.Kafka
         {
             var commentaryType = new CommentaryType();
             commentaryType.LastModified = contentEvent.LastModified.ToUnixTimeSeconds();
+            commentaryType.CreatedFor = contentEvent.Created.ToUnixTimeSeconds();
 
             if (!contentEvent.Data.TryGetValue("ID", out var idData))
             {
