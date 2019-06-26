@@ -27,12 +27,10 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                         StatusColors.Draft),
                 [Status.Archived] =
                     new WorkflowStep(
-                        new Dictionary<Status, WorkflowTransition>(),
-                        StatusColors.Archived, true),
+                        WorkflowStep.EmptyTransitions),
                 [Status.Published] =
                     new WorkflowStep(
-                        new Dictionary<Status, WorkflowTransition>(),
-                        StatusColors.Archived)
+                        WorkflowStep.EmptyTransitions)
             }, Status.Draft);
 
         [Fact]

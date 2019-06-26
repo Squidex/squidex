@@ -119,6 +119,16 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         return Snapshot;
                     });
 
+                case ConfigureWorkflow configureWorkflow:
+                    return UpdateReturn(configureWorkflow, c =>
+                    {
+                        GuardAppWorkflows.CanConfigure(c);
+
+                        ConfigureWorkflow(c);
+
+                        return Snapshot;
+                    });
+
                 case AddLanguage addLanguage:
                     return UpdateReturn(addLanguage, c =>
                     {
@@ -317,6 +327,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public void RevokeClient(RevokeClient command)
         {
             RaiseEvent(SimpleMapper.Map(command, new AppClientRevoked()));
+        }
+
+        public void ConfigureWorkflow(ConfigureWorkflow command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppWorkflowConfigured()));
         }
 
         public void AddLanguage(AddLanguage command)

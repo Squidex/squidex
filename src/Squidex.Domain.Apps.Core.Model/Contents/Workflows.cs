@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
@@ -32,6 +33,11 @@ namespace Squidex.Domain.Apps.Core.Contents
             Guard.NotNull(workflow, nameof(workflow));
 
             return new Workflows(With(Guid.Empty, workflow));
+        }
+
+        public Workflow GetFirst()
+        {
+            return Values.FirstOrDefault() ?? Workflow.Default;
         }
     }
 }

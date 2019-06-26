@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
@@ -257,6 +258,27 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
+        public async Task UpdateClient_should_create_events_and_update_state()
+        {
+            var command = new UpdateClient { Id = clientId, Name = clientNewName, Role = Role.Developer };
+
+            await ExecuteCreateAsync();
+            await ExecuteAttachClientAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal(clientNewName, sut.Snapshot.Clients[clientId].Name);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppClientRenamed { Id = clientId, Name = clientNewName }),
+                    CreateEvent(new AppClientUpdated { Id = clientId, Role = Role.Developer })
+                );
+        }
+
+        [Fact]
         public async Task RevokeClient_should_create_events_and_update_state()
         {
             var command = new RevokeClient { Id = clientId };
@@ -277,23 +299,21 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task UpdateClient_should_create_events_and_update_state()
+        public async Task ConfigureWorkflow_should_create_events_and_update_state()
         {
-            var command = new UpdateClient { Id = clientId, Name = clientNewName, Role = Role.Developer };
+            var command = new ConfigureWorkflow { Workflow = Workflow.Default };
 
             await ExecuteCreateAsync();
-            await ExecuteAttachClientAsync();
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.Equal(clientNewName, sut.Snapshot.Clients[clientId].Name);
+            Assert.NotEmpty(sut.Snapshot.Workflows);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppClientRenamed { Id = clientId, Name = clientNewName }),
-                    CreateEvent(new AppClientUpdated { Id = clientId, Role = Role.Developer })
+                    CreateEvent(new AppWorkflowConfigured { Workflow = Workflow.Default })
                 );
         }
 

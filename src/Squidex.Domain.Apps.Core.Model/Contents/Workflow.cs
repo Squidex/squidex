@@ -12,6 +12,8 @@ namespace Squidex.Domain.Apps.Core.Contents
 {
     public sealed class Workflow
     {
+        public static readonly IReadOnlyDictionary<Status, WorkflowStep> EmptySteps = new Dictionary<Status, WorkflowStep>();
+
         public static readonly Workflow Default = new Workflow(
             new Dictionary<Status, WorkflowStep>
             {
