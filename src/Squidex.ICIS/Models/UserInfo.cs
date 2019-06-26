@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -21,7 +20,6 @@ namespace Squidex.ICIS.Models
     public class UserInfo
     {
         private const string GroupType = "http://schemas.xmlsoap.org/claims/Group";
-        private const string GivenNameType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname";
         private readonly ClaimsIdentity identity;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly AppProvider _appProvider;
@@ -34,15 +32,14 @@ namespace Squidex.ICIS.Models
             _config = config;
             this.identity = identity;
             Email = GetValue(OpenIdClaims.Email);
-            UserId = GetValue(OpenIdClaims.Subject);
-            GivenName = GetValue(GivenNameType);
+            GivenName = GetValue(ClaimTypes.GivenName);
             Group = GetValues(GroupType);
             Permissions = SetPermissions(Email);
         }
 
         public string Email { get; }
 
-        public string UserId { get; }
+        public string UserId { get; set; }
 
         public string GivenName { get; }
 

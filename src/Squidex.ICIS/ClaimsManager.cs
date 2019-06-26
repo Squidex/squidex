@@ -44,29 +44,36 @@ namespace Squidex.ICIS
         public UserInfo CreateUserWithClaims(ClaimsIdentity identity)
         {
             var userInfo = new UserInfo(identity, userManager, appProvider, config);
-            CreateUser(userInfo);
+            userInfo.UserId = CreateUser(userInfo).Result.Id;
             return userInfo;
         }
 
-        private void CreateUser(UserInfo userInfo)
+        private async Task<IdentityUser> CreateUser(UserInfo userInfo)
         {
-            Task.Run(async () =>
+
+            var identityUser = new IdentityUser();
+
+            var userValues = userInfo.ToUserValues();
+            if (userManager.SupportsQueryableUsers && !DoesUserExists(userValues.Email))
             {
-                var userValues = userInfo.ToUserValues();
-                if (userManager.SupportsQueryableUsers && !DoesUserExists(userValues.Email))
+                try
                 {
-                    try
-                    {
-                        await userManager.CreateAsync(userFactory, userValues);
-                    }
-                    catch (Exception ex)
-                    {
-                        log.LogError(ex, w => w
-                            .WriteProperty("action", "createICISUser")
-                            .WriteProperty("status", "failed"));
-                    }
+                    identityUser = await userManager.CreateAsync(userFactory, userValues);
                 }
-            }).Wait();
+                catch (Exception ex)
+                {
+                    log.LogError(ex, w => w
+                        .WriteProperty("action", "createICISUser")
+                        .WriteProperty("status", "failed"));
+                }
+            }
+            else
+            {
+                identityUser = await userManager.FindByEmailAsync(userValues.Email);
+            }
+
+            return identityUser;
+
         }
 
         private bool DoesUserExists(string email)

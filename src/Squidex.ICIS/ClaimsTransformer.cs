@@ -35,7 +35,7 @@ namespace Squidex.ICIS
             var identity = principal.Identities.First();
 
             var key = identity.Claims.FirstOrDefault(claim =>
-                claim.Type.Equals(OpenIdClaims.Subject, StringComparison.OrdinalIgnoreCase))?.Value;
+                claim.Type.Equals(OpenIdClaims.Email, StringComparison.OrdinalIgnoreCase))?.Value;
 
             if (!_memoryCache.TryGetValue(key, out UserInfo cachedEntry))
             {
@@ -61,6 +61,10 @@ namespace Squidex.ICIS
             {
                 identity.AddClaim(squidexClaim);
             }
+
+            var subClaim = new Claim(OpenIdClaims.Subject, userInfo.UserId);
+            identity.AddClaim(subClaim);
+
         }
 
         private bool AreClaimsEqual(Claim identityClaim, Claim squidexClaim)

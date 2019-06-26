@@ -28,15 +28,6 @@ namespace Squidex.ICIS.Handlers
                         identity.AddClaim(new Claim(ClaimTypes.GivenName, accessToken.Payload[OpenIdClaims.ClientId].ToString()));
                     }
 
-                    if (!string.IsNullOrWhiteSpace(accessToken.Subject))
-                    {
-                        identity.AddClaim(new Claim(OpenIdClaims.Subject, accessToken.Subject));
-                    }
-                    else
-                    {
-                        identity.AddClaim(new Claim(OpenIdClaims.Subject, accessToken.Payload[OpenIdClaims.ClientId].ToString()));
-                    }
-
                     if (accessToken.Payload.Keys.Contains(OpenIdClaims.Email) && accessToken.Payload[OpenIdClaims.Email] != null)
                     {
                         var email = accessToken.Payload[OpenIdClaims.Email].ToString();
