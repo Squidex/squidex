@@ -16,8 +16,6 @@ namespace Squidex.ICIS.Handlers
 {
     internal class AuthEventsHandler : JwtBearerEvents
     {
-        private const string GivenNameType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname";
-
         public override Task TokenValidated(TokenValidatedContext context)
         {
             if (context.SecurityToken is JwtSecurityToken accessToken)
@@ -27,7 +25,7 @@ namespace Squidex.ICIS.Handlers
                     var nameClaim = identity.FindFirst(ClaimTypes.GivenName)?.Value;
                     if (string.IsNullOrWhiteSpace(nameClaim))
                     {
-                        identity.AddClaim(new Claim(GivenNameType, accessToken.Payload[OpenIdClaims.ClientId].ToString()));
+                        identity.AddClaim(new Claim(ClaimTypes.GivenName, accessToken.Payload[OpenIdClaims.ClientId].ToString()));
                     }
 
                     if (!string.IsNullOrWhiteSpace(accessToken.Subject))
