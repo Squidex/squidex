@@ -43,9 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id);
 
-            var transition = workflow.GetTransition(content.Status, next);
-
-            return transition != null && CanUse(transition, content, user);
+            return workflow.TryGetTransition(content.Status, next, out var transition) && CanUse(transition, content, user);
         }
 
         public async Task<bool> CanUpdateAsync(IContentEntity content)

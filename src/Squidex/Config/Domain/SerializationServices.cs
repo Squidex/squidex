@@ -46,7 +46,8 @@ namespace Squidex.Config.Domain
                 new RuleConverter(),
                 new SchemaConverter(),
                 new StatusConverter(),
-                new StringEnumConverter());
+                new StringEnumConverter(),
+                new WorkflowConverter());
 
             settings.NullValueHandling = NullValueHandling.Ignore;
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure;
 
@@ -54,29 +53,6 @@ namespace Squidex.Domain.Apps.Core.Contents
             Initial = initial;
         }
 
-        public static Workflow Create(IReadOnlyDictionary<Status, WorkflowStep> steps, Status initial)
-        {
-            Guard.NotNull(steps, nameof(steps));
-
-            foreach (var step in steps.Values)
-            {
-                foreach (var transition in step.Transitions)
-                {
-                    if (steps.ContainsKey(transition.Key))
-                    {
-                        throw new ArgumentException("Transitions ends to an unknown step.", nameof(initial));
-                    }
-                }
-            }
-
-            if (steps.ContainsKey(initial))
-            {
-                throw new ArgumentException("Initial step not known.", nameof(initial));
-            }
-
-            return new Workflow(steps, initial);
-        }
-
         public IEnumerable<(Status Status, WorkflowStep Step, WorkflowTransition Transition)> GetTransitions(Status status)
         {
             if (TryGetStep(status, out var step))
@@ -88,14 +64,16 @@ namespace Squidex.Domain.Apps.Core.Contents
             }
         }
 
-        public WorkflowTransition GetTransition(Status from, Status to)
+        public bool TryGetTransition(Status from, Status to, out WorkflowTransition transition)
         {
-            if (TryGetStep(from, out var step) && step.Transitions.TryGetValue(to, out var transition))
+            if (TryGetStep(from, out var step) && step.Transitions.TryGetValue(to, out transition))
             {
-                return transition;
+                return true;
             }
 
-            return null;
+            transition = null;
+
+            return false;
         }
 
         public bool TryGetStep(Status status, out WorkflowStep step)

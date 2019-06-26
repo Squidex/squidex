@@ -58,7 +58,8 @@ namespace Squidex.Domain.Apps.Core
                     new RuleConverter(),
                     new SchemaConverter(),
                     new StatusConverter(),
-                    new StringEnumConverter()),
+                    new StringEnumConverter(),
+                    new WorkflowConverter()),
 
                 TypeNameHandling = typeNameHandling
             };

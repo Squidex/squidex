@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         public LanguagesConfig LanguagesConfig { get; set; } = LanguagesConfig.English;
 
         [DataMember]
-        public Workflows Workdlows { get; set; } = Workflows.Empty;
+        public Workflows Workflows { get; set; } = Workflows.Empty;
 
         [DataMember]
         public bool IsArchived { get; set; }
