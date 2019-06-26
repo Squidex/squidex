@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 Workflow = new Workflow(
                     new Dictionary<Status, WorkflowStep>
                     {
-                        [Status.Published] = new WorkflowStep(WorkflowStep.EmptyTransitions)
+                        [Status.Published] = new WorkflowStep()
                     },
                     default)
             };
@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 Workflow = new Workflow(
                     new Dictionary<Status, WorkflowStep>
                     {
-                        [Status.Draft] = new WorkflowStep(WorkflowStep.EmptyTransitions)
+                        [Status.Draft] = new WorkflowStep()
                     },
                     Status.Draft)
             };
@@ -107,8 +107,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Draft] =
-                            new WorkflowStep(
-                                WorkflowStep.EmptyTransitions),
+                            new WorkflowStep(),
                         [Status.Published] =
                             new WorkflowStep(
                                 new Dictionary<Status, WorkflowTransition>

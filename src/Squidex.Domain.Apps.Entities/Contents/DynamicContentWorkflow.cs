@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var app = await appProvider.GetAppAsync(appId);
 
-            return app?.Workflows.Values?.FirstOrDefault() ?? Workflow.Default;
+            return app?.Workflows.GetFirst();
         }
 
         private static string GetColor(WorkflowStep step)

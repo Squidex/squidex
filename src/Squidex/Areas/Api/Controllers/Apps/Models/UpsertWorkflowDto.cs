@@ -34,9 +34,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                     x => new WorkflowStep(
                         x.Value?.Transitions.ToDictionary(
                             y => x.Key,
-                            y => new WorkflowTransition(y.Value.Expression, y.Value.Role)) ?? WorkflowStep.EmptyTransitions,
+                            y => new WorkflowTransition(y.Value.Expression, y.Value.Role)),
                         x.Value.Color,
-                        x.Value.NoUpdate)) ?? Workflow.EmptySteps,
+                        x.Value.NoUpdate)),
                 Initial);
 
             return new ConfigureWorkflow { Workflow = workflow };
