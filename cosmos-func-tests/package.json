@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "pretest": "npm-run-all -s lint compile dbstart appstart deploymentscriptsrun",
-    "lint":"./node_modules/.bin/tslint -c tslint.json ./pages/*.ts",
+    "lint": "./node_modules/.bin/tslint -c tslint.json ./pages/*.ts",
     "compile": "tsc",
-    "dbstart": "start node ./JSFiles/utils/Db.js",
-    "appstart": "start dotnet run --project ../../cosmos/src/Squidex",
+    "dbstart": "node ./JSFiles/utils/Db.js",
+    "appstart": "dotnet run --project ../../cosmos/src/Squidex",
     "deploymentscriptsrun": "wait-on https://localhost:5000/ && cd ../../cosmos/deploymentscripts && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./Deployment.ps1 -identityServiceBaseUrl 'http://identityservice.systest.tesla.cha.rbxd.ds' -apiBaseUrl 'https://localhost:5000/api' -tokenUser 'CMSDeployer' -tokenPassword 'p@55w0rd' -appName 'commentary'",
     "test": "protractor ../cosmos-func-tests/JSFiles/config.js",
     "posttest": "cd ./utils/ && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./TerminateTask.ps1 && rm -r ../database/*",
