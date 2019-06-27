@@ -8,10 +8,12 @@ $icon-size: 4.5rem;
     margin-left: -.5rem;
 }
 
-::ng-deep .editor {
-    height: 15rem !important;
-    margin-bottom: .5rem;
-    margin-top: 0;
+:host ::ng-deep {
+    .editor {
+        height: 15rem !important;
+        margin-bottom: .5rem;
+        margin-top: 0;
+    }
 }
 
 .name-group {

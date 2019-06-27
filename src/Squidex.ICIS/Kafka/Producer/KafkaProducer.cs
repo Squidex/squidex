@@ -11,39 +11,25 @@ using Avro.Specific;
 using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
-using Newtonsoft.Json;
 
-namespace Squidex.Extensions.Actions.Kafka
+namespace Squidex.ICIS.Actions.Kafka
 {
     public class KafkaProducer<T> : IKafkaProducer<T> where T : ISpecificRecord
     {
         private readonly CachedSchemaRegistryClient schemaRegistry;
-        private readonly string topicName;
         private readonly IProducer<string, T> producer;
 
-        public KafkaProducer(string topicName, string brokerUrl, string schemaRegistryUrl)
+        public KafkaProducer(ProducerConfig producerConfig, SchemaRegistryConfig schemaRegistryConfig)
         {
-            this.topicName = topicName;
-            schemaRegistry = new CachedSchemaRegistryClient(new SchemaRegistryConfig
-            {
-                SchemaRegistryUrl = schemaRegistryUrl,
-                SchemaRegistryRequestTimeoutMs = 5000,
-                SchemaRegistryMaxCachedSchemas = 10
-            });
+            schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
 
-            var config = new ProducerConfig
-            {
-                BootstrapServers = brokerUrl,
-                Partitioner = Partitioner.Murmur2Random,
-            };
-
-            producer = new ProducerBuilder<string, T>(config)
+            producer = new ProducerBuilder<string, T>(producerConfig)
                 .SetKeySerializer(new AvroSerializer<string>(schemaRegistry))
                 .SetValueSerializer(new AvroSerializer<T>(schemaRegistry))
                 .Build();
         }
 
-        public async Task<DeliveryResult<string, T>> Send(string key, T val)
+        public async Task<DeliveryResult<string, T>> Send(string topicName, string key, T val)
         {
             var message = new Message<string, T>
             {

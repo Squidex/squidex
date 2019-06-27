@@ -18,15 +18,7 @@ param(
 
     [Parameter(Mandatory=$true)]
     [string]
-    $appName,
-
-    [Parameter(Mandatory=$false)]
-    [string]
-    $broker,
-
-    [Parameter(Mandatory=$false)]
-    [string]
-    $schemaRegistry
+    $appName
 )
 
 add-type @"
@@ -50,9 +42,5 @@ $schemaResponse = .\2_CreateSchemas.ps1 -token $token -apiBaseUrl $apiBaseUrl -a
 Write-Host $schemaResponse
 .\3_CreateRoles.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
 .\4_CreateLanguages.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName 
-
-if ($broker -and $schemaRegistry) {
-    .\5_CreateRules.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName -broker $broker -schemaRegistry $schemaRegistry -schemaIds $schemaResponse
-}
-
+.\5_CreateRules.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName -schemaIds $schemaResponse
 .\6_CreateRefDataContent.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName

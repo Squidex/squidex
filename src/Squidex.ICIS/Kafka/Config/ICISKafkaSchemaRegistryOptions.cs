@@ -5,18 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-using Avro.Specific;
 using Confluent.Kafka;
 using Confluent.SchemaRegistry;
-using Confluent.SchemaRegistry.Serdes;
-using Newtonsoft.Json;
 
-namespace Squidex.Extensions.Actions.Kafka
+namespace Squidex.ICIS.Actions.Kafka
 {
-    public interface IKafkaProducer<T> : IDisposable where T : ISpecificRecord
+    public class ICISKafkaSchemaRegistryOptions : SchemaRegistryConfig
     {
-        Task<DeliveryResult<string, T>> Send(string key, T val);
+        public new string SchemaRegistryUrl { get; set; }
+        public new int SchemaRegistryRequestTimeoutMs { get; set; }
+        public new int SchemaRegistryMaxCachedSchemas { get; set; }
     }
 }

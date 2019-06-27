@@ -34,12 +34,12 @@ RUN dotnet restore && dotnet test -s ../../.runsettings --filter Category!=Depen
 COPY --from=builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
 
 # Publish
-RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64
+RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release
 
 #
 # Stage 2, Build runtime
 #
-FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-runtime-deps-alpine
+FROM nexus.cha.rbxd.ds:8000/dotnet/core/runtime:2.2.5-alpine3.9
 
 # Default AspNetCore directory
 WORKDIR /app
@@ -59,7 +59,6 @@ RUN update-ca-certificates
 
 EXPOSE 80
 EXPOSE 5000
-# EXPOSE 33333
-# EXPOSE 40000
+EXPOSE 11111
 
-ENTRYPOINT ["./Squidex"] 
+ENTRYPOINT ["dotnet","./Squidex.dll"] 

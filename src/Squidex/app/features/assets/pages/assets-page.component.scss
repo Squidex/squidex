@@ -6,7 +6,7 @@
     padding: 1rem;
 }
 
-::ng-deep {
+:host ::ng-deep {
     .search {
         .form-control {
             @include border-radius-right;
