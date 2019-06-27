@@ -5,10 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { Observable } from 'rxjs';
+
 import {
     compareStringsAsc,
     Model,
-    ResourceLinks
+    ResourceLinks,
+    Versioned
 } from '@app/framework';
 
 export class WorkflowDto extends Model<WorkflowDto> {
@@ -119,3 +122,7 @@ export type WorkflowTransitionValues = { expression?: string };
 export type WorkflowTransition = { from: string; to: string } & WorkflowTransitionValues;
 
 export type WorkflowTransitionView = { step: WorkflowStep } & WorkflowTransition;
+
+export class WorkflowsService {
+    public getWorkflow(app: string): Observable<Versioned<WorkflowDto>>
+}
