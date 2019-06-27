@@ -36,9 +36,9 @@ namespace Squidex.Domain.Apps.Core.Contents
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Archived] = new WorkflowTransition(),
-                            [Status.Published] = new WorkflowTransition()
+                            [Status.Draft] = new WorkflowTransition()
                         },
-                        StatusColors.Archived)
+                        StatusColors.Published)
             }, Status.Draft);
 
         public IReadOnlyDictionary<Status, WorkflowStep> Steps { get; }

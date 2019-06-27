@@ -79,7 +79,7 @@ export class ContributorsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
-            mapVersioned(({ body }) => {
+                mapVersioned(({ body }) => {
                     return parseContributors(body);
                 }),
                 tap(() => {
