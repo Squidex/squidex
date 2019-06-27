@@ -1,7 +1,10 @@
 <div class="step">
     <div class="row no-gutters step-header">
         <div class="col-auto">
-            <button class="btn btn-initial mr-1" (click)="makeInitial.emit()" [disabled]="step.name === workflow.initial || step.isLocked">
+            <button class="btn btn-initial mr-1" (click)="makeInitial.emit()"
+                [class.enabled]="step.name !== workflow.initial && step.isLocked"
+                [class.active]="step.name === workflow.initial"
+                [disabled]="step.name === workflow.initial || step.isLocked || disabled">
                 <i class="icon-arrow-right text-decent" *ngIf="!step.isLocked"></i>
             </button>
         </div>
@@ -10,14 +13,14 @@
                 [ngModelOptions]="onBlur"
                 [ngModel]="step.color"
                 (ngModelChange)="changeColor($event)"
-                [disabled]="step.isLocked">
+                [disabled]="step.isLocked || disabled">
             </sqx-color-picker>
         </div>
         <div class="col">
             <sqx-editable-title 
                 [name]="step.name"
                 (nameChanged)="changeName($event)"
-                [disabled]="step.isLocked">
+                [disabled]="step.isLocked || transitionAdd">
             </sqx-editable-title>
         </div>
         <div class="col">
@@ -26,7 +29,7 @@
             <small class="text-decent">(Cannot be removed)</small>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-text-danger" (click)="remove.emit()" *ngIf="!step.isLocked">
+            <button type="button" class="btn btn-text-danger" (click)="remove.emit()" *ngIf="!step.isLocked" [disabled]="disabled">
                 <i class="icon-bin2"></i>
             </button>
         </div>
@@ -35,12 +38,13 @@
     <div class="step-inner">
         <sqx-workflow-transition *ngFor="let transition of transitions; trackBy: trackByTransition" 
             [transition]="transition"
+            [disabled]="disabled"
             [roles]="roles"
             (remove)="transitionRemove.emit(transition)"
             (update)="changeTransition(transition, $event)">
         </sqx-workflow-transition>
             
-        <div class="row transition no-gutters" *ngIf="openSteps.length > 0">
+        <div class="row transition no-gutters" *ngIf="openSteps.length > 0 && !disabled">
             <div class="col-auto">
                 <i class="icon-corner-down-right text-decent"></i>
             </div>
@@ -60,6 +64,7 @@
 
         <div class="form-check">
             <input class="form-check-input" type="checkbox" id="preventUpdates_{{step.name}}"
+                [disabled]="disabled"
                 [ngModel]="step.noUpdate"
                 (ngModelChange)="changeNoUpdate($event)" />
 

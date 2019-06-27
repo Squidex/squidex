@@ -40,16 +40,16 @@
 
 .step {
     & {
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
     }
 
     &-inner {
-        padding-left: 2rem;
+        padding-left: 2.4rem;
     }
 
     &-header {
         &:hover {
-            .btn-initial {
+            .enabled {
                 visibility: visible;
             }
         }
@@ -68,6 +68,9 @@
 
     &:disabled {
         @include opacity(1);
+    }
+
+    &.active {
         visibility: visible;
     }
 }

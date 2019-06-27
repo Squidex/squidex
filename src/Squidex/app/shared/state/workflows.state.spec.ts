@@ -84,7 +84,7 @@ describe('WorkflowsState', () => {
 
             const request = oldWorkflow.workflow.serialize();
 
-            workflowsService.setup(x => x.putWorkflow(app, oldWorkflow, request, version))
+            workflowsService.setup(x => x.putWorkflow(app, oldWorkflow.workflow, request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
             workflowsState.save(oldWorkflow.workflow).subscribe();

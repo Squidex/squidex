@@ -8,6 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
+    AppsState,
     MathHelper,
     RolesState,
     WorkflowDto,
@@ -29,6 +30,7 @@ export class WorkflowsPageComponent implements OnInit {
     public workflow: WorkflowDto;
 
     constructor(
+        public readonly appsState: AppsState,
         public readonly rolesState: RolesState,
         public readonly workflowsState: WorkflowsState
     ) {

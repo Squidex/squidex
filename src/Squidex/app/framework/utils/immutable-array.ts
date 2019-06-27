@@ -197,7 +197,7 @@ export function compareStringsAsc(a: string, b: string) {
 }
 
 export function compareStringsDesc(a: string, b: string) {
-    return a.localeCompare(b, undefined, { sensitivity: 'base' });
+    return b.localeCompare(a, undefined, { sensitivity: 'base' });
 }
 
 export function compareNumbersAsc(a: number, b: number) {

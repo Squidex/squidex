@@ -27,8 +27,8 @@ export class WorkflowDto {
 
     public static DEFAULT =
         new WorkflowDto()
-            .setStep('Archived', { color: '#eb3142', noUpdate: true })
             .setStep('Draft', { color: '#8091a5' })
+            .setStep('Archived', { color: '#eb3142', noUpdate: true })
             .setStep('Published', { color: '#4bb958', isLocked: true })
             .setTransition('Archived', 'Draft')
             .setTransition('Draft', 'Archived')
