@@ -5,7 +5,123 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { WorkflowDto } from '@app/shared/internal';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { inject, TestBed } from '@angular/core/testing';
+
+import {
+    AnalyticsService,
+    ApiUrlConfig,
+    Resource,
+    ResourceLinks,
+    Version,
+    WorkflowDto,
+    WorkflowsDto,
+    WorkflowsPayload,
+    WorkflowStep,
+    WorkflowTransition,
+    WorkflowsService
+} from '@app/shared/internal';
+
+describe('WorkflowsService', () => {
+
+    const version = new Version('1');
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [
+                HttpClientTestingModule
+            ],
+            providers: [
+                WorkflowsService,
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+                { provide: AnalyticsService, useValue: new AnalyticsService() }
+            ]
+        });
+    });
+
+    afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
+        httpMock.verify();
+    }));
+
+    it('should make a get request to get app workflows',
+        inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+
+            let workflows: WorkflowsDto;
+
+            workflowsService.getWorkflows('my-app').subscribe(result => {
+                workflows = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush(workflowsResponse(1, 2, 3),
+                {
+                    headers: {
+                        etag: '2'
+                    }
+                });
+
+            expect(workflows!).toEqual({ payload: createWorkflows(1, 2, 3), version: new Version('2') });
+        }));
+
+    it('should make a post request to assign a workflow',
+        inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+
+            const dto = createWorkflow(1);
+
+            let workflows: WorkflowsDto;
+
+            workflowsService.postWorkflows('my-app', dto, version).subscribe(result => {
+                workflows = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
+
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+            req.flush(workflowsResponse(1, 2, 3), {
+                headers: {
+                    etag: '2'
+                }
+            });
+
+            expect(workflows!).toEqual({ payload: createWorkflows(1, 2, 3), version: new Version('2') });
+        }));
+
+    it('should make a delete request to remove a workflow',
+        inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+                const resource: Resource = {
+                    _links: {
+                        'delete': { method: 'DELETE', href: '/api/apps/my-app/workflows/123' }
+                    }
+                };
+
+                let workflows: WorkflowsDto;
+
+                workflowsService.deleteWorkflow('my-app', resource, version).subscribe(result => {
+                    workflows = result;
+                });
+
+                const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
+
+                expect(req.request.method).toEqual('DELETE');
+                expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+                req.flush(workflowsResponse(1, 2, 3),
+                    {
+                        headers: {
+                            etag: '2'
+                        }
+                    });
+
+                expect(workflows!).toEqual({ payload: createWorkflows(1, 2, 3), version: new Version('2') });
+        }));
+
+});
 
 describe('Workflow', () => {
     it('should create empty workflow', () => {
@@ -181,8 +297,69 @@ describe('Workflow', () => {
             name: 'Default'
         });
     });
+
 });
 
 function simplify(value: any) {
     return JSON.parse(JSON.stringify(value));
+}
+
+function workflowsResponse(...ids: number[]) {
+
+    return {
+        items: ids.map(id => createWorkflow(id)),
+        _links: {
+            create: { method: 'POST', href: '/workflows' }
+        },
+        canCreate: true
+    };
+
+
+/*return {
+        items: ids.map(id => ({
+            id: `id${id}`,
+            name: 'Published',
+            color: 'red',
+            isLocked: false,
+            noUpdate: false,
+            from: 'Draft',
+            to: 'Published',
+            expression: '1=1',
+            role: 'Editor',
+
+            _links: {
+                update: { method: 'PUT', href: `/workflows/id${id}` }
+            }
+        })),
+        _links: {
+            create: { method: 'POST', href: '/workflows' }
+        }
+    };*/
+}
+
+export function createWorkflows(...ids: number[]): WorkflowsPayload {
+    return {
+        items: ids.map(id => createWorkflow(id)),
+        _links: {
+            create: { method: 'POST', href: '/workflows' }
+        },
+
+        canCreate: true
+    };
+}
+
+export function createWorkflow(id: number) {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/workflows/id${id}` }
+    };
+
+    const step: WorkflowStep = { name: 'Published', color: 'red', isLocked: false, noUpdate: false };
+
+    const steps: WorkflowStep[] = [step];
+
+    const transition: WorkflowTransition = { from: 'Draft', to: 'Published', expression: '1=1', role: 'Editor'};
+
+    const transitions: WorkflowTransition[] = [transition];
+
+    return new WorkflowDto(links, 'test', steps, transitions);
 }

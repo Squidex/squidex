@@ -5,11 +5,32 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
 import {
+    AnalyticsService,
+    ApiUrlConfig,
     compareStringsAsc,
+    hasAnyLink,
+    HTTP,
+    mapVersioned,
+    pretifyError,
     Model,
-    ResourceLinks
+    Resource,
+    ResourceLinks,
+    Version,
+    Versioned
 } from '@app/framework';
+
+export type WorkflowsDto = Versioned<WorkflowsPayload>;
+export type WorkflowsPayload = {
+    readonly items: WorkflowDto[];
+
+    readonly canCreate: boolean;
+} & Resource;
 
 export class WorkflowDto extends Model<WorkflowDto> {
     public readonly _links: ResourceLinks;
@@ -141,3 +162,67 @@ export type WorkflowTransitionValues = { expression?: string; role?: string; };
 export type WorkflowTransition = { from: string; to: string } & WorkflowTransitionValues;
 
 export type WorkflowTransitionView = { step: WorkflowStep } & WorkflowTransition;
+
+@Injectable()
+export class WorkflowsService {
+    constructor(
+        private readonly http: HttpClient,
+        private readonly apiUrl: ApiUrlConfig,
+        private readonly analytics: AnalyticsService
+    ) {
+    }
+
+    public getWorkflows(appName: string): Observable<WorkflowsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflows`);
+
+        return HTTP.getVersioned(this.http, url).pipe(
+            mapVersioned(({ body }) => {
+                return parseWorkflow(body);
+            }),
+            pretifyError('Failed to load workflows. Please reload.'));
+    }
+
+    public postWorkflows(appName: string, dto: WorkflowDto, version: Version): Observable<WorkflowsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflows`);
+
+        return HTTP.postVersioned(this.http, url, dto, version).pipe(
+            mapVersioned(({ body }) => {
+                return parseWorkflow(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Workflow', 'Configured', appName);
+            }),
+            pretifyError('Failed to add Workflow. Please reload.'));
+    }
+
+    public deleteWorkflow(appName: string, resource: Resource, version: Version): Observable<WorkflowsDto> {
+        const link = resource._links['delete'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            mapVersioned(payload => {
+                const body = payload.body;
+
+                return parseWorkflow(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Workflow', 'Deleted', appName);
+            }),
+            pretifyError('Failed to delete Workflow. Please reload.'));
+    }
+}
+
+function parseWorkflow(response: any) {
+    const raw: any[] = response.items;
+
+    const items = raw.map(item =>
+        new WorkflowDto(item._links,
+            item._name,
+            item._steps,
+            item._transitions));
+
+    const { _links, _meta } = response;
+
+    return { items, _links, _meta, canCreate: hasAnyLink(_links, 'create') };
+}
