@@ -33,6 +33,13 @@ RUN dotnet restore && dotnet test -s ../../.runsettings --filter Category!=Depen
 
 COPY --from=builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
 
+# Run Functional Test Cases
+COPY cosmos-func-tests/package*.json /tmp/
+RUN cd /tmp && npm install --loglevel=error
+RUN cp -a /tmp/node_modules cosmos-func-tests/ \
+ && cd cosmos-func-tests \
+ && npm run test
+
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release
 
