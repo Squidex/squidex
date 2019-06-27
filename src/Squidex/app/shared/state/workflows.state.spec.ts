@@ -87,9 +87,11 @@ describe('WorkflowsState', () => {
             workflowsService.setup(x => x.putWorkflow(app, oldWorkflow, request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
-            workflowsState.save().subscribe();
+            workflowsState.save(oldWorkflow.workflow).subscribe();
 
             expectNewWorkflows(updated);
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
         function expectNewWorkflows(updated: WorkflowPayload) {

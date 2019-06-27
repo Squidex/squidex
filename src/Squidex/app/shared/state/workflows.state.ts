@@ -13,6 +13,7 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
+    shareMapSubscribed,
     shareSubscribed,
     State,
     Version
@@ -53,7 +54,7 @@ export class WorkflowsState extends State<Snapshot> {
         super({ version: Version.EMPTY });
     }
 
-    public load(isReload = false): Observable<any> {
+    public load(isReload = false): Observable<WorkflowDto> {
         if (!isReload) {
             this.resetState();
         }
@@ -66,15 +67,15 @@ export class WorkflowsState extends State<Snapshot> {
 
                 this.replaceWorkflow(payload, version);
             }),
-            shareSubscribed(this.dialogs));
+            shareMapSubscribed(this.dialogs, x => x.payload.workflow));
     }
 
-    public save(): Observable<any> {
-        const workflow = this.snapshot.workflow!;
-
+    public save(workflow: WorkflowDto): Observable<any> {
         return this.workflowsService.putWorkflow(this.appName, workflow, workflow.serialize(), this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceWorkflow(payload, version);
+
+                this.dialogs.notifyInfo('Workflow has been saved.');
             }),
             shareSubscribed(this.dialogs));
     }

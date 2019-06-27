@@ -25,6 +25,9 @@ export class WorkflowTransitionComponent {
     @Input()
     public roles: RoleDto[];
 
+    @Input()
+    public disabled: boolean;
+
     @Output()
     public update = new EventEmitter<WorkflowTransitionValues>();
 

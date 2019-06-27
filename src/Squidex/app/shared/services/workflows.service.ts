@@ -10,6 +10,7 @@ import { Observable, of } from 'rxjs';
 
 import {
     compareStringsAsc,
+    hasAnyLink,
     Resource,
     ResourceLinks,
     Version,
@@ -21,6 +22,8 @@ export type WorkflowPayload = { workflow: WorkflowDto; } & Resource;
 
 export class WorkflowDto {
     public readonly _links: ResourceLinks;
+
+    public readonly canUpdate: boolean;
 
     public static DEFAULT =
         new WorkflowDto()
@@ -43,6 +46,8 @@ export class WorkflowDto {
         this.transitions.sort((a, b) => compareStringsAsc(a.to, b.to));
 
         this._links = links;
+
+        this.canUpdate = hasAnyLink(links, 'update');
     }
 
     public getOpenSteps(step: WorkflowStep) {
