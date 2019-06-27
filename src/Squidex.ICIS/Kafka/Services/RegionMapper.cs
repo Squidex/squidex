@@ -18,8 +18,6 @@ namespace Squidex.ICIS.Actions.Kafka
         public ISpecificRecord ToAvro(EnrichedContentEvent contentEvent)
         {
             var region = new Region();
-            region.LastModified = contentEvent.LastModified.ToUnixTimeSeconds();
-            region.CreatedFor = contentEvent.Created.ToUnixTimeSeconds();
 
             if (!contentEvent.Data.TryGetValue("ID", out var idData))
             {

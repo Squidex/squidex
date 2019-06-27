@@ -13,28 +13,26 @@ using Squidex.ICIS.Actions.Kafka.Entities;
 
 namespace Squidex.ICIS.Actions.Kafka
 {
-    public class CommentaryTypeMapper : IKafkaMessageMapper
+    public class CommodityMapper : IKafkaMessageMapper
     {
         public ISpecificRecord ToAvro(EnrichedContentEvent contentEvent)
         {
-            var commentaryType = new Region();
-            commentaryType.LastModified = contentEvent.LastModified.ToUnixTimeSeconds();
-            commentaryType.CreatedFor = contentEvent.Created.ToUnixTimeSeconds();
+            var commodity = new Commodity();
 
             if (!contentEvent.Data.TryGetValue("ID", out var idData))
             {
                 throw new System.Exception("Unable to find Id field.");
             }
 
-            commentaryType.Id = idData["iv"].ToString();
+            commodity.Id = idData["iv"].ToString();
 
             if (!contentEvent.Data.TryGetValue("Name", out var nameData))
             {
                 throw new System.Exception("Unable to find Name field.");
             }
 
-            commentaryType.Name = nameData["iv"].ToString();
-            return commentaryType;
+            commodity.Name = nameData["iv"].ToString();
+            return commodity;
         }
     }
 }
