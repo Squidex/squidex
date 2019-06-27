@@ -47,4 +47,7 @@ $rulesPs = Get-Content './settings/kafkaRule.json' -Raw | ConvertFrom-Json
 CreateRule -rule $rulesPs -schemaId $schemaIds.CommentaryTypeSchemaId -schemaName "CommentaryType"
 $rulesPs = Get-Content './settings/kafkaRule.json' -Raw | ConvertFrom-Json
 CreateRule -rule $rulesPs -schemaId $schemaIds.CommentarySchemaId -schemaName "Commentary"
-
+$rulesPs = Get-Content './settings/kafkaRule.json' -Raw | ConvertFrom-Json
+CreateRule -rule $rulesPs -schemaId $schemaIds.CommoditySchemaId -schemaName "Commodity"
+$rulesPs = Get-Content './settings/kafkaRule.json' -Raw | ConvertFrom-Json
+CreateRule -rule $rulesPs -schemaId $schemaIds.RegionSchemaId -schemaName "Region"

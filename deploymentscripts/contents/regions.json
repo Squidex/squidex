@@ -1,0 +1,12 @@
+{
+    "regions": [
+        {
+            "ID": {
+                "iv": "http://iddn.icis.com/ref-data/location/1"
+            },
+            "Name": {
+                "iv": "Europe"
+            }
+        }
+    ]
+}

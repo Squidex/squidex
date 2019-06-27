@@ -1,0 +1,31 @@
+{
+    "fields": [
+      {
+        "name": "ID",
+        "partitioning": "invariant",
+        "properties": {
+          "label": "ID",
+          "isRequired": true,
+          "isListField": true,
+          "fieldType": "String",
+          "editor": "Input",
+              "isUnique": true
+        }
+      },
+      {
+        "name": "Name",
+        "partitioning": "invariant",
+        "properties": {
+          "label": "Name",
+          "isRequired": true,
+          "isListField": true,
+          "fieldType": "String",
+          "editor": "Input",
+              "isUnique": true
+        }
+      }
+    ],
+    "isPublished": true,
+    "name": "region",
+    "isSingleton": null
+  }

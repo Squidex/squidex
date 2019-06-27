@@ -44,9 +44,13 @@ function CreateSchemas {
     $commentaryType = GET-Content './schemas/ref-data/commentaryType.json'
     $commentaryTypeResponse = CreateSchema 'commentary-type'  $commentaryType
 
+    $regionSchema = GET-Content './schemas/ref-data/region.json'
+    $regionResponse = CreateSchema 'region'  $regionSchema
+
     $commentaryObj = GET-Content './schemas/commentary.json' -Raw | ConvertFrom-Json 
     $commentaryObj.fields[0].properties | Add-Member -Name "schemaId" -value $commoditySchemaResponse.id -MemberType NoteProperty
     $commentaryObj.fields[1].properties | Add-Member -Name "schemaId" -value $commentaryTypeResponse.id -MemberType NoteProperty
+    $commentaryObj.fields[2].properties | Add-Member -Name "schemaId" -value $regionResponse.id -MemberType NoteProperty
     
     $commentary = $commentaryObj | ConvertTo-Json -Depth 32
     $commentarySchemaResponse = CreateSchema 'commentary'  $commentary
@@ -54,6 +58,7 @@ function CreateSchemas {
     $response = @{
         CommoditySchemaId = $commoditySchemaResponse.id
         CommentaryTypeSchemaId = $commentaryTypeResponse.id
+        RegionSchemaId = $regionResponse.id
         CommentarySchemaId = $commentarySchemaResponse.id
     }
 
