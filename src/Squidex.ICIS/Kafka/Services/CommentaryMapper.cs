@@ -38,6 +38,7 @@ namespace Squidex.ICIS.Actions.Kafka
             var commentary = new Commentary();
             commentary.Id = contentEvent.Id.ToString();
             commentary.LastModified = contentEvent.LastModified.ToUnixTimeSeconds();
+            commentary.CreatedFor = contentEvent.Created.ToUnixTimeSeconds();
 
             if (!contentEvent.Data.TryGetValue("Body", out var bodyData))
             {
