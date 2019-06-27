@@ -44,6 +44,30 @@
     }
 
     &-inner {
-        padding-left: 1rem;
+        padding-left: 2rem;
+    }
+
+    &-header {
+        &:hover {
+            .btn-initial {
+                visibility: visible;
+            }
+        }
+    }
+}
+
+.btn-initial {
+    & {
+        visibility: hidden;
+        line-height: 1.6rem;
+        padding-left: 0;
+        padding-right: 0;
+        width: 2rem;
+        text-align: center;
+    }
+
+    &:disabled {
+        @include opacity(1);
+        visibility: visible;
     }
 }

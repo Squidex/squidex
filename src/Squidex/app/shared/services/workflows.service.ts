@@ -17,7 +17,8 @@ export class WorkflowDto extends Model<WorkflowDto> {
     constructor(links: ResourceLinks = {},
         public readonly name: string = 'Default',
         public readonly steps: WorkflowStep[] = [],
-        public readonly transitions: WorkflowTransition[] = []
+        public readonly transitions: WorkflowTransition[] = [],
+        public readonly initial?: string
     ) {
         super();
 
@@ -52,12 +53,28 @@ export class WorkflowDto extends Model<WorkflowDto> {
                 return this;
             }
 
-            values = { ...values, ...existing };
+            values = { ...existing,  ...values };
         }
 
         const steps = [...this.steps.filter(s => s !== found), { name, ...values }];
 
-        return this.with({ steps });
+        let initial = this.initial;
+
+        if (steps.length === 1) {
+            initial = steps[0].name;
+        }
+
+        return this.with({ steps, initial });
+    }
+
+    public setInitial(initial: string) {
+        const found = this.getStep(initial);
+
+        if (!found || initial === 'Published') {
+            return this;
+        }
+
+        return this.with({ initial });
     }
 
     public removeStep(name: string) {

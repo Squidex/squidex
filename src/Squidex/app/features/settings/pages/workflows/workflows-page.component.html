@@ -25,6 +25,7 @@
                 [workflow]="workflow"
                 [step]="step"
                 [roles]="roles"
+                (makeInitial)="setInitial(step)"
                 (rename)="renameStep(step, $event)"
                 (remove)="removeStep(step)"
                 (transitionAdd)="addTransiton(step, $event)"

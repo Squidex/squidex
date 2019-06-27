@@ -61,6 +61,10 @@ export class WorkflowsPageComponent implements OnInit {
         this.maxSteps++;
     }
 
+    public setInitial(step: WorkflowStep) {
+        this.workflow = this.workflow.setInitial(step.name);
+    }
+
     public addTransiton(from: WorkflowStep, to: WorkflowStep) {
         this.workflow = this.workflow.setTransition(from.name, to.name, {});
     }
