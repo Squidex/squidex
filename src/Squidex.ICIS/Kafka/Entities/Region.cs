@@ -10,20 +10,17 @@ using Avro.Specific;
 
 namespace Squidex.ICIS.Actions.Kafka.Entities
 {
-    public class Commentary : ISpecificRecord
+    // Please do not rename _SCHEMA variable. AvroSerializer class in Avro assembly looks for this particular property name.
+    public class Region : ISpecificRecord
     {
-        // Please do not rename _SCHEMA variable. AvroSerializer class in Avro assembly looks for this particular property name.
         public static readonly Schema _SCHEMA = Schema.Parse(@"
             {
                 ""type"": ""record"",
-                ""name"": ""Commentary"",
+                ""name"": ""Region"",
                 ""namespace"": ""Cosmos.Kafka.Entities"",
                 ""fields"": [
                     {""name"": ""id"", ""type"": ""string""},
-                    {""name"": ""commmentary_type_id"", ""type"": ""string""},
-                    {""name"": ""commodity_id"", ""type"": ""string""},,
-                    {""name"": ""region_id"", ""type"": ""string""},
-                    {""name"": ""body"", ""type"": [""string"", ""null""]},
+                    {""name"": ""name"", ""type"": ""string""},
                     {""name"": ""last_modified"", ""type"": ""long""},
                     {""name"": ""created_for"", ""type"": ""long""}
                 ]
@@ -32,10 +29,7 @@ namespace Squidex.ICIS.Actions.Kafka.Entities
         public virtual Schema Schema => _SCHEMA;
 
         public string Id { get; set; }
-        public string Body { get; set; }
-        public string CommentaryTypeId { get; set; }
-        public string CommodityId { get; set; }
-        public string RegionId { get; set; }
+        public string Name { get; set; }
         public long LastModified { get; set; }
         public long CreatedFor { get; set; }
 
@@ -46,16 +40,10 @@ namespace Squidex.ICIS.Actions.Kafka.Entities
                 case 0:
                     return Id;
                 case 1:
-                    return CommentaryTypeId;
+                    return Name;
                 case 2:
-                    return CommodityId;
-                case 3:
-                    return RegionId;
-                case 4:
-                    return Body;
-                case 5:
                     return LastModified;
-                case 6:
+                case 3:
                     return CreatedFor;
                 default:
                     throw new AvroRuntimeException("Bad index " + fieldPos + " in Get()");
@@ -70,21 +58,12 @@ namespace Squidex.ICIS.Actions.Kafka.Entities
                     Id = (string)fieldValue;
                     break;
                 case 1:
-                    CommentaryTypeId = (string)fieldValue;
+                    Name = (string)fieldValue;
                     break;
                 case 2:
-                    CommodityId = (string)fieldValue;
-                    break;
-                case 3:
-                    RegionId = (string)fieldValue;
-                    break;
-                case 4:
-                    Body = (string)fieldValue;
-                    break;
-                case 5:
                     LastModified = (long)fieldValue;
                     break;
-                case 6:
+                case 3:
                     CreatedFor = (long)fieldValue;
                     break;
                 default: throw new AvroRuntimeException("Bad index " + fieldPos + " in Put()");

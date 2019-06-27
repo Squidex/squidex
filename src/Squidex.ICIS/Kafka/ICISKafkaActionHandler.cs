@@ -28,6 +28,8 @@ namespace Squidex.ICIS.Actions.Kafka
         private const string DescriptionIgnore = "Ignore";
         private readonly KafkaProducer<Commentary> kafkaCommentaryProducer;
         private readonly KafkaProducer<CommentaryType> kafkaCommentaryTypeProducer;
+        private readonly KafkaProducer<Commodity> kafkaCommodityProducer;
+        private readonly KafkaProducer<Region> kafkaRegionProducer;
         private readonly IAppProvider appProvider;
         private readonly Dictionary<string, IAppEntity> commentaryAppDic = new Dictionary<string, IAppEntity>();
         private readonly IContentRepository contentRepository;
@@ -35,12 +37,16 @@ namespace Squidex.ICIS.Actions.Kafka
         public ICISKafkaActionHandler(RuleEventFormatter formatter, 
             KafkaProducer<Commentary> kafkaCommentaryProducer, 
             KafkaProducer<CommentaryType> kafkaCommentaryTypeProducer, 
+            KafkaProducer<Commodity> kafkaCommodityProducer,
+            KafkaProducer<Region> kafkaRegionProducer,
             IAppProvider appProvider, 
             IContentRepository contentRepository)
             : base(formatter)
         {
             this.kafkaCommentaryProducer = kafkaCommentaryProducer;
             this.kafkaCommentaryTypeProducer = kafkaCommentaryTypeProducer;
+            this.kafkaCommodityProducer = kafkaCommodityProducer;
+            this.kafkaRegionProducer = kafkaRegionProducer;
             this.appProvider = appProvider;
             this.contentRepository = contentRepository;
         }
@@ -86,6 +92,14 @@ namespace Squidex.ICIS.Actions.Kafka
                     case "commentary-type":
                         var commentaryTypeData = (CommentaryType)KafkaMessageFactory.GetKafkaMessage(job.Message.SchemaId.Name, job.Message, commentaryAppDic["commentary"], contentRepository);
                         await kafkaCommentaryTypeProducer.Send(job.TopicName, commentaryTypeData.Id, commentaryTypeData);
+                        break;
+                    case "commodity":
+                        var commodityData = (Commodity)KafkaMessageFactory.GetKafkaMessage(job.Message.SchemaId.Name, job.Message, commentaryAppDic["commentary"], contentRepository);
+                        await kafkaCommodityProducer.Send(job.TopicName, commodityData.Id, commodityData);
+                        break;
+                    case "region":
+                        var regionData = (Region)KafkaMessageFactory.GetKafkaMessage(job.Message.SchemaId.Name, job.Message, commentaryAppDic["commentary"], contentRepository);
+                        await kafkaRegionProducer.Send(job.TopicName, regionData.Id, regionData);
                         break;
                     default:
                         throw new Exception($"Schema {job.Message.SchemaId.Name} not configured for Kafka Integration.");
