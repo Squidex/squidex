@@ -19,7 +19,7 @@ import {
     ResultSet
 } from '@app/shared';
 
-export class UsersDto  extends ResultSet<UserDto> {
+export class UsersDto extends ResultSet<UserDto> {
     public get canCreate() {
         return hasAnyLink(this._links, 'create');
     }

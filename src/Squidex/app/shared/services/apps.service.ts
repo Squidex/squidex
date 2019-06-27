@@ -35,7 +35,7 @@ export class AppDto {
     public readonly canReadRoles: boolean;
     public readonly canReadRules: boolean;
     public readonly canReadSchemas: boolean;
-    public readonly canReadWorkflows: boolean = true;
+    public readonly canReadWorkflows: boolean;
     public readonly canUploadAssets: boolean;
 
     constructor(links: ResourceLinks,
@@ -63,6 +63,7 @@ export class AppDto {
         this.canReadRoles = hasAnyLink(links, 'roles');
         this.canReadRules = hasAnyLink(links, 'rules');
         this.canReadSchemas = hasAnyLink(links, 'schemas');
+        this.canReadWorkflows = hasAnyLink(links, 'workflows');
         this.canUploadAssets = hasAnyLink(links, 'assets/create');
     }
 }

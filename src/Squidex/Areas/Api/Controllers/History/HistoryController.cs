@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.History.Models;
@@ -48,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.History
         {
             var events = await historyService.QueryByChannelAsync(AppId, channel, 100);
 
-            var response = events.ToArray(HistoryEventDto.FromHistoryEvent);
+            var response = events.Select(HistoryEventDto.FromHistoryEvent).Where(x => x.Message != null).ToArray();
 
             return Ok(response);
         }

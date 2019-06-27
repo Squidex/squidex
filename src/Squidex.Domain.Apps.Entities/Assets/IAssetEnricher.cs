@@ -6,20 +6,14 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetResult
+    public interface IAssetEnricher
     {
-        public IAssetEntity Asset { get; }
+        Task<IEnrichedAssetEntity> EnrichAsync(IAssetEntity asset);
 
-        public HashSet<string> Tags { get; }
-
-        public AssetResult(IAssetEntity asset, HashSet<string> tags)
-        {
-            Asset = asset;
-
-            Tags = tags;
-        }
+        Task<IReadOnlyList<IEnrichedAssetEntity>> EnrichAsync(IEnumerable<IAssetEntity> assets);
     }
 }

@@ -43,7 +43,7 @@ module.exports = function (env) {
          *
          * See: https://webpack.js.org/configuration/devtool/
          */
-        devtool: isProduction ? false : (isTests ? 'inline-source-map' : 'source-map'),
+        devtool: isProduction ? false : 'inline-source-map',
 
         /**
          * Options affecting the resolving of modules.
@@ -93,11 +93,6 @@ module.exports = function (env) {
                     loader: 'ignore-loader'
                 }],
                 include: [/node_modules/]
-            }, {
-                test: /\.html$/,
-                use: [{
-                    loader: 'raw-loader'
-                }]
             }, {
                 test: /\.(woff|woff2|ttf|eot)(\?.*$|$)/,
                 use: [{
@@ -256,12 +251,15 @@ module.exports = function (env) {
                 waitForLinting: isProduction
             })
         );
+    }
 
+    if (!isCoverage) {
         config.plugins.push(
             new plugins.NgToolsWebpack.AngularCompilerPlugin({
+                directTemplateLoading: true,
                 entryModule: 'app/app.module#AppModule',
                 sourceMap: !isProduction,
-                skipSourceGeneration: !isAot,
+                skipCodeGeneration: !isAot,
                 tsConfigPath: './tsconfig.json'
             })
         );

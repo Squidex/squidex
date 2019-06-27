@@ -81,6 +81,12 @@ namespace Squidex.Shared
         public const string AppPatternsUpdate = "squidex.apps.{app}.patterns.update";
         public const string AppPatternsDelete = "squidex.apps.{app}.patterns.delete";
 
+        public const string AppWorkflows = "squidex.apps.{app}.workflows";
+        public const string AppWorkflowsRead = "squidex.apps.{app}.workflows.read";
+        public const string AppWorkflowsCreate = "squidex.apps.{app}.workflows.create";
+        public const string AppWorkflowsUpdate = "squidex.apps.{app}.workflows.update";
+        public const string AppWorkflowsDelete = "squidex.apps.{app}.workflows.delete";
+
         public const string AppBackups = "squidex.apps.{app}.backups";
         public const string AppBackupsRead = "squidex.apps.{app}.backups.read";
         public const string AppBackupsCreate = "squidex.apps.{app}.backups.create";

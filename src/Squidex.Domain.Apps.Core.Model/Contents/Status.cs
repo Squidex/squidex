@@ -5,11 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 using System;
+using System.ComponentModel;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
+    [TypeConverter(typeof(StatusConverter))]
     public struct Status : IEquatable<Status>
     {
         public static readonly Status Archived = new Status("Archived");
@@ -45,7 +46,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public override string ToString()
         {
-            return name;
+            return Name;
         }
 
         public static bool operator ==(Status lhs, Status rhs)

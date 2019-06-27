@@ -16,11 +16,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         public Guid Id { get; }
 
+        public Instant DueTime { get; }
+
         public Status Status { get; }
 
         public RefToken ScheduledBy { get; }
-
-        public Instant DueTime { get; }
 
         public ScheduleJob(Guid id, Status status, RefToken scheduledBy, Instant dueTime)
         {

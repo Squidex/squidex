@@ -32,7 +32,8 @@ import {
     RolesPageComponent,
     SettingsAreaComponent,
     WorkflowsPageComponent,
-    WorkflowStepComponent
+    WorkflowStepComponent,
+    WorkflowTransitionComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -204,6 +205,7 @@ const routes: Routes = [
         RolesPageComponent,
         SettingsAreaComponent,
         WorkflowsPageComponent,
+        WorkflowTransitionComponent,
         WorkflowStepComponent
     ]
 })

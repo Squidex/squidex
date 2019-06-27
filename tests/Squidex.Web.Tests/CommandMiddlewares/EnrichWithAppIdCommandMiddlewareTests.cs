@@ -32,12 +32,12 @@ namespace Squidex.Web.CommandMiddlewares
             A.CallTo(() => httpContextAccessor.HttpContext)
                 .Returns(httpContext);
 
-            var appEntity = A.Fake<IAppEntity>();
+            var app = A.Fake<IAppEntity>();
 
-            A.CallTo(() => appEntity.Id).Returns(appId.Id);
-            A.CallTo(() => appEntity.Name).Returns(appId.Name);
+            A.CallTo(() => app.Id).Returns(appId.Id);
+            A.CallTo(() => app.Name).Returns(appId.Name);
 
-            httpContext.Features.Set<IAppFeature>(new AppResolver.AppFeature(appEntity));
+            httpContext.Features.Set<IAppFeature>(new AppResolver.AppFeature(app));
 
             sut = new EnrichWithAppIdCommandMiddleware(httpContextAccessor);
         }

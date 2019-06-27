@@ -8,10 +8,13 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
+    MathHelper,
+    RolesState,
     WorkflowDto,
     WorkflowStep,
     WorkflowStepValues,
-    WorkflowTransition
+    WorkflowTransition,
+    WorkflowTransitionValues
 } from '@app/shared';
 
 @Component({
@@ -20,10 +23,28 @@ import {
     templateUrl: './workflows-page.component.html'
 })
 export class WorkflowsPageComponent implements OnInit {
+    private maxSteps = 1;
+
     public workflow: WorkflowDto;
 
+    constructor(
+        public readonly rolesState: RolesState
+    ) {
+    }
+
     public ngOnInit() {
-        this.workflow = new WorkflowDto().setStep('Published', { color: 'green', isLocked: true });
+        this.rolesState.load();
+
+        this.workflow =
+            new WorkflowDto()
+                .setStep('Archived', { color: '#eb3142', noUpdate: true })
+                .setStep('Draft', { color: '#8091a5' })
+                .setStep('Published', { color: '#4bb958', isLocked: true })
+                .setTransition('Archived', 'Draft')
+                .setTransition('Draft', 'Archived')
+                .setTransition('Draft', 'Published')
+                .setTransition('Published', 'Draft')
+                .setTransition('Published', 'Archived');
     }
 
     public reload() {
@@ -35,7 +56,13 @@ export class WorkflowsPageComponent implements OnInit {
     }
 
     public addStep() {
-        this.workflow = this.workflow.setStep(`Step${this.workflow.steps.length + 1}`, {});
+        this.workflow = this.workflow.setStep(`Step${this.maxSteps}`, { color: MathHelper.randomColor() });
+
+        this.maxSteps++;
+    }
+
+    public setInitial(step: WorkflowStep) {
+        this.workflow = this.workflow.setInitial(step.name);
     }
 
     public addTransiton(from: WorkflowStep, to: WorkflowStep) {
@@ -44,6 +71,10 @@ export class WorkflowsPageComponent implements OnInit {
 
     public removeTransition(from: WorkflowStep, transition: WorkflowTransition) {
         this.workflow = this.workflow.removeTransition(from.name, transition.to);
+    }
+
+    public updateTransition(update: { transition: WorkflowTransition, values: WorkflowTransitionValues }) {
+        this.workflow = this.workflow.setTransition(update.transition.from, update.transition.to, update.values);
     }
 
     public updateStep(step: WorkflowStep, values: WorkflowStepValues) {

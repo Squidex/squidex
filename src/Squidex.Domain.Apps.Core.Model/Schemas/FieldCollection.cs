@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Core.Schemas
     public sealed class FieldCollection<T> : Cloneable<FieldCollection<T>> where T : IField
     {
         public static readonly FieldCollection<T> Empty = new FieldCollection<T>();
-        
+
         private static readonly Dictionary<long, T> EmptyById = new Dictionary<long, T>();
         private static readonly Dictionary<string, T> EmptyByString = new Dictionary<string, T>();
 

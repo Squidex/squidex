@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
@@ -23,6 +24,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
     {
         private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
+        private readonly ClaimsPrincipal user = new ClaimsPrincipal();
         private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
 
         [Fact]
@@ -180,9 +182,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             SetupSingleton(false);
 
             var content = CreateContent(Status.Draft, false);
-            var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast };
+            var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast, User = user };
 
-            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status, user))
                 .Returns(true);
 
             await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command),
@@ -195,9 +197,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             SetupSingleton(false);
 
             var content = CreateContent(Status.Draft, false);
-            var command = new ChangeContentStatus { Status = Status.Published };
+            var command = new ChangeContentStatus { Status = Status.Published, User = user };
 
-            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status, user))
                 .Returns(false);
 
             await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command),
@@ -210,9 +212,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             SetupSingleton(false);
 
             var content = CreateContent(Status.Draft, false);
-            var command = new ChangeContentStatus { Status = Status.Published };
+            var command = new ChangeContentStatus { Status = Status.Published, User = user };
 
-            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status))
+            A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status, user))
                 .Returns(true);
 
             await GuardContent.CanChangeStatus(schema, content, contentWorkflow, command);
@@ -270,12 +272,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
 
         private IContentEntity CreateContent(Status status, bool isPending)
         {
-            var content = A.Fake<IContentEntity>();
-
-            A.CallTo(() => content.Status).Returns(status);
-            A.CallTo(() => content.IsPending).Returns(isPending);
-
-            return content;
+            return new ContentEntity { Status = status, IsPending = isPending };
         }
     }
 }

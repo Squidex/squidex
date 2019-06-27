@@ -83,9 +83,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             await ctx.ExecuteScriptAsync(s => s.Change, "Published", c, c.Data);
                         }
 
-                        var status = await contentWorkflow.GetInitialStatusAsync(ctx.Schema);
+                        var statusInfo = await contentWorkflow.GetInitialStatusAsync(ctx.Schema);
 
-                        Create(c, status);
+                        Create(c, statusInfo.Status);
 
                         return Snapshot;
                     });
