@@ -43,6 +43,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
+        public void CanConfigure_should_throw_exception_if_initial_step_is_published()
+        {
+            var command = new ConfigureWorkflow
+            {
+                Workflow = new Workflow(
+                    new Dictionary<Status, WorkflowStep>
+                    {
+                        [Status.Published] = new WorkflowStep()
+                    },
+                    Status.Published)
+            };
+
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanConfigure(command),
+                new ValidationError("Initial step cannot be published step.", "Workflow.Initial"));
+        }
+
+        [Fact]
         public void CanConfigure_should_throw_exception_if_workflow_does_not_have_published_state()
         {
             var command = new ConfigureWorkflow
@@ -67,9 +84,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 Workflow = new Workflow(
                     new Dictionary<Status, WorkflowStep>
                     {
-                        [Status.Published] = null
+                        [Status.Published] = null,
+                        [Status.Draft] = new WorkflowStep()
                     },
-                    Status.Published)
+                    Status.Draft)
             };
 
             ValidationAssert.Throws(() => GuardAppWorkflows.CanConfigure(command),
@@ -88,14 +106,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                             new WorkflowStep(
                                 new Dictionary<Status, WorkflowTransition>
                                 {
-                                    [Status.Draft] = new WorkflowTransition()
-                                })
+                                    [Status.Archived] = new WorkflowTransition()
+                                }),
+                        [Status.Draft] = new WorkflowStep()
                     },
-                    Status.Published)
+                    Status.Draft)
             };
 
             ValidationAssert.Throws(() => GuardAppWorkflows.CanConfigure(command),
-                new ValidationError("Transition has an invalid target.", "Workflow.Steps.Published.Transitions.Draft"));
+                new ValidationError("Transition has an invalid target.", "Workflow.Steps.Published.Transitions.Archived"));
         }
 
         [Fact]
@@ -115,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                                     [Status.Draft] = null
                                 })
                     },
-                    Status.Published)
+                    Status.Draft)
             };
 
             ValidationAssert.Throws(() => GuardAppWorkflows.CanConfigure(command),
