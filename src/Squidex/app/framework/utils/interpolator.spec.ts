@@ -58,7 +58,7 @@ describe('interpolate', () => {
     });
 
     it('should return undefined if it resolved to object', () => {
-        const result = interpolate('hello ${data}', { data: { } });
+        const result = interpolate('hello ${data}', { data: {} });
 
         expect(result).toEqual('hello undefined');
     });

@@ -93,7 +93,9 @@ import {
     UserPicturePipe,
     UserPictureRefPipe,
     UsersProviderService,
-    UsersService
+    UsersService,
+    WorkflowsService,
+    WorkflowsState
 } from './declarations';
 
 @NgModule({
@@ -224,6 +226,8 @@ export class SqxSharedModule {
                 UsagesService,
                 UsersProviderService,
                 UsersService,
+                WorkflowsService,
+                WorkflowsState,
                 {
                     provide: HTTP_INTERCEPTORS,
                     useClass: AuthInterceptor,

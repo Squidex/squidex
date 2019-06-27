@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { WorkflowDto } from '@app/shared/internal';
+import { WorkflowDto, WorkflowPayload } from '@app/shared/internal';
 
 describe('Workflow', () => {
     it('should create empty workflow', () => {
@@ -297,3 +297,21 @@ describe('Workflow', () => {
         });
     });
 });
+
+export function createWorkflow(name: string): WorkflowPayload {
+    return {
+        workflow: new WorkflowDto({
+            update: { method: 'PUT', href: '/api/workflows' }
+        },
+        `${name}1`,
+        [
+            { name: `${name}1`, color: `${name}1`, noUpdate: true, isLocked: true },
+            { name: `${name}2`, color: `${name}1`, noUpdate: true, isLocked: true }
+        ],
+        [
+            { from: `${name}1`, to: `${name}2`, expression: 'Expression1', role: 'Role1' },
+            { from: `${name}2`, to: `${name}1`, expression: 'Expression2', role: 'Role2' }
+        ]),
+        _links: {}
+    };
+}

@@ -35,13 +35,13 @@ export class CurrencyConfig {
 }
 
 export class AnalyticsIdConfig {
-    constructor(public value: string) { }
+    constructor(public value: string) {}
 }
 
 export class DecimalSeparatorConfig {
-    constructor(public readonly value: string) { }
+    constructor(public readonly value: string) {}
 }
 
 export class ProductionModeConfig {
-    constructor(public readonly isProductionMode: boolean) { }
+    constructor(public readonly isProductionMode: boolean) {}
 }
