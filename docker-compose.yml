@@ -8,10 +8,10 @@ services:
       - /etc/squidex/mongo/db:/data/db
     networks:
       - internal
-    restart: unless-stopped
+    restart: unless-stopped 
 
   squidex_squidex:
-    image: "nexus.cha.rbxd.ds:8000/vega-cms-app-dev:latest"
+    image: "nexus.cha.rbxd.ds:8000/cosmos:without-runtime"
     ports:
       - "5000:5000"
     environment:
@@ -28,6 +28,8 @@ services:
       - IDENTITY__MICROSOFTSECRET=${SQUIDEX_MICROSOFTSECRET}
       - LETSENCRYPT_HOST=${SQUIDEX_DOMAIN}
       - LETSENCRYPT_EMAIL=${SQUIDEX_ADMINEMAIL}
+      - KAFKA__PRODUCER__BOOTSTRAPSERVERS=kafka-0.cha.rbxd.ds:8080
+      - KAFKA__SCHEMAREGISTRY__SCHEMAREGISTRYURL=schema-registry.cha.rbxd.ds
     depends_on:
       - squidex_mongo
     volumes:
