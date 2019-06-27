@@ -41,17 +41,17 @@ namespace Squidex.ICIS
             {
                 var userInfo = claimsManager.CreateUserWithClaims(identity);
                 _memoryCache.Set(key, userInfo);
-                CreateClaims(identity, userInfo);
+                AddClaims(identity, userInfo);
             }
             else
             {
-                CreateClaims(identity, cachedEntry);
+                AddClaims(identity, cachedEntry);
             }
 
             return Task.FromResult(principal);
         }
 
-        private void CreateClaims(ClaimsIdentity identity, UserInfo userInfo)
+        private void AddClaims(ClaimsIdentity identity, UserInfo userInfo)
         {
             var squidexClaims = userInfo.ToUserValues().ToClaims();
             foreach (var squidexClaim in from squidexClaim in squidexClaims
