@@ -193,25 +193,11 @@ export class ImmutableArray<T> implements Iterable<T> {
 }
 
 export function compareStringsAsc(a: string, b: string) {
-    if (a < b) {
-        return -1;
-    }
-    if (a > b) {
-        return 1;
-    }
-
-    return 0;
+    return a.localeCompare(b, undefined, { sensitivity: 'base' });
 }
 
 export function compareStringsDesc(a: string, b: string) {
-    if (a < b) {
-        return 1;
-    }
-    if (a > b) {
-        return -1;
-    }
-
-    return 0;
+    return a.localeCompare(b, undefined, { sensitivity: 'base' });
 }
 
 export function compareNumbersAsc(a: number, b: number) {
