@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Squidex.ICIS.Actions.Kafka;
 using Squidex.ICIS.Actions.Kafka.Entities;
 using Squidex.ICIS.Handlers;
+using Squidex.ICIS.Interfaces;
 
 namespace Squidex.ICIS.Extensions
 {
@@ -19,7 +20,7 @@ namespace Squidex.ICIS.Extensions
     {
         public static void AddGenesisAuthentication(this IServiceCollection services, string authServer)
         {
-            services.AddSingleton<UserManager>();
+            services.AddSingleton<IUserManager, UserManager>();
             
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

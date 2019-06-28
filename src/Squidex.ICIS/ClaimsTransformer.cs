@@ -21,13 +21,13 @@ namespace Squidex.ICIS
 {
     public class ClaimsTransformer : IClaimsTransformation
     {
-        private readonly IClaimsManager claimsManager;
+        private readonly IUserManager userManager;
         private readonly MemoryCache _memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
 
 
-        public ClaimsTransformer(IClaimsManager claimsManager)
+        public ClaimsTransformer(IUserManager userManager)
         {
-            this.claimsManager = claimsManager;
+            this.userManager = userManager;
         }
 
         public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
@@ -40,7 +40,7 @@ namespace Squidex.ICIS
             var user = await _memoryCache.GetOrCreateAsync(key, entry =>
             {
                 entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(8);
-                return Task.FromResult(claimsManager.CreateUserWithClaims(identity));
+                return Task.FromResult(userManager.GetUserInfo(identity));
             });
 
             AddClaims(identity, user);

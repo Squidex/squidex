@@ -10,8 +10,8 @@ using Squidex.ICIS.Models;
 
 namespace Squidex.ICIS.Interfaces
 {
-    public interface IClaimsManager
+    public interface IUserManager
     {
-        UserInfo CreateUserWithClaims(ClaimsIdentity identity);
+        UserInfo GetUserInfo(ClaimsIdentity identity);
     }
 }
