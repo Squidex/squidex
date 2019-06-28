@@ -176,7 +176,16 @@ const routes: Routes = [
             },
             {
                 path: 'workflows',
-                component: WorkflowsPageComponent
+                component: WorkflowsPageComponent,
+                children: [
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/workflows'
+                        }
+                    }
+                ]
             }
         ]
     }
