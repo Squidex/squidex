@@ -30,7 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IAppEntity app = A.Fake<IAppEntity>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly QueryContext context;
+        private readonly Context context;
         private readonly AssetQueryService sut;
 
         public AssetQueryServiceTests()
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => app.Name).Returns(appId.Name);
             A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.English);
 
-            context = QueryContext.Create(app, user);
+            context = new Context(user, app);
 
             var options = Options.Create(new AssetOptions { DefaultPageSize = 30 });
 

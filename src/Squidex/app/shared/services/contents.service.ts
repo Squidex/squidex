@@ -137,45 +137,45 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?${fullQuery}`);
 
         return this.http.get<{ total: number, items: [], statuses: StatusInfo[] } & Resource>(url).pipe(
-                map(({ total, items, statuses, _links }) => {
-                    const contents = items.map(x => parseContent(x));
+            map(({ total, items, statuses, _links }) => {
+                const contents = items.map(x => parseContent(x));
 
-                    return new ContentsDto(statuses, total, contents, _links);
-                }),
-                pretifyError('Failed to load contents. Please reload.'));
+                return new ContentsDto(statuses, total, contents, _links);
+            }),
+            pretifyError('Failed to load contents. Please reload.'));
     }
 
     public getContent(appName: string, schemaName: string, id: string): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}`);
 
         return HTTP.getVersioned(this.http, url).pipe(
-                map(({ payload }) => {
-                    return parseContent(payload.body);
-                }),
-                pretifyError('Failed to load content. Please reload.'));
+            map(({ payload }) => {
+                return parseContent(payload.body);
+            }),
+            pretifyError('Failed to load content. Please reload.'));
     }
 
     public getVersionData(appName: string, schemaName: string, id: string, version: Version): Observable<Versioned<any>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/${id}/${version.value}`);
 
         return HTTP.getVersioned(this.http, url).pipe(
-                mapVersioned(({ body }) => {
-                    return body;
-                }),
-                pretifyError('Failed to load data. Please reload.'));
+            mapVersioned(({ body }) => {
+                return body;
+            }),
+            pretifyError('Failed to load data. Please reload.'));
     }
 
     public postContent(appName: string, schemaName: string, dto: any, publish: boolean): Observable<ContentDto> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}?publish=${publish}`);
 
         return HTTP.postVersioned(this.http, url, dto).pipe(
-                map(({ payload }) => {
-                    return parseContent(payload.body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Content', 'Created', appName);
-                }),
-                pretifyError('Failed to create content. Please reload.'));
+            map(({ payload }) => {
+                return parseContent(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Content', 'Created', appName);
+            }),
+            pretifyError('Failed to create content. Please reload.'));
     }
 
     public putContent(appName: string, resource: Resource, dto: any, version: Version): Observable<ContentDto> {
@@ -184,13 +184,13 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(
-                map(({ payload }) => {
-                    return parseContent(payload.body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Content', 'Updated', appName);
-                }),
-                pretifyError('Failed to update content. Please reload.'));
+            map(({ payload }) => {
+                return parseContent(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Content', 'Updated', appName);
+            }),
+            pretifyError('Failed to update content. Please reload.'));
     }
 
     public patchContent(appName: string, resource: Resource, dto: any, version: Version): Observable<ContentDto> {
@@ -199,13 +199,13 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
-                map(({ payload }) => {
-                    return parseContent(payload.body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Content', 'Updated', appName);
-                }),
-                pretifyError('Failed to update content. Please reload.'));
+            map(({ payload }) => {
+                return parseContent(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Content', 'Updated', appName);
+            }),
+            pretifyError('Failed to update content. Please reload.'));
     }
 
     public discardDraft(appName: string, resource: Resource, version: Version): Observable<ContentDto> {
@@ -214,13 +214,13 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
-                map(({ payload }) => {
-                    return parseContent(payload.body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Content', 'Discarded', appName);
-                }),
-                pretifyError('Failed to discard draft. Please reload.'));
+            map(({ payload }) => {
+                return parseContent(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Content', 'Discarded', appName);
+            }),
+            pretifyError('Failed to discard draft. Please reload.'));
     }
 
     public proposeDraft(appName: string, resource: Resource, dto: any, version: Version): Observable<ContentDto> {
@@ -229,13 +229,13 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(
-                map(({ payload }) => {
-                    return parseContent(payload.body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Content', 'Updated', appName);
-                }),
-                pretifyError('Failed to propose draft. Please reload.'));
+            map(({ payload }) => {
+                return parseContent(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Content', 'Updated', appName);
+            }),
+            pretifyError('Failed to propose draft. Please reload.'));
     }
 
     public publishDraft(appName: string, resource: Resource, dueTime: string | null, version: Version): Observable<ContentDto> {
@@ -244,13 +244,13 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, { status: 'Published', dueTime }).pipe(
-                map(({ payload }) => {
-                    return parseContent(payload.body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Content', 'Discarded', appName);
-                }),
-                pretifyError('Failed to publish draft. Please reload.'));
+            map(({ payload }) => {
+                return parseContent(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Content', 'Discarded', appName);
+            }),
+            pretifyError('Failed to publish draft. Please reload.'));
     }
 
     public putStatus(appName: string, resource: Resource, status: string, dueTime: string | null, version: Version): Observable<ContentDto> {
@@ -259,13 +259,13 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, { status, dueTime }).pipe(
-                map(({ payload }) => {
-                    return parseContent(payload.body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Content', 'Archived', appName);
-                }),
-                pretifyError(`Failed to ${status} content. Please reload.`));
+            map(({ payload }) => {
+                return parseContent(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Content', 'Archived', appName);
+            }),
+            pretifyError(`Failed to ${status} content. Please reload.`));
     }
 
     public deleteContent(appName: string, resource: Resource, version: Version): Observable<Versioned<any>> {
@@ -274,10 +274,10 @@ export class ContentsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
-                tap(() => {
-                    this.analytics.trackEvent('Content', 'Deleted', appName);
-                }),
-                pretifyError('Failed to delete content. Please reload.'));
+            tap(() => {
+                this.analytics.trackEvent('Content', 'Deleted', appName);
+            }),
+            pretifyError('Failed to delete content. Please reload.'));
     }
 }
 

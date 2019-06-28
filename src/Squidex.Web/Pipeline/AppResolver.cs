@@ -23,16 +23,6 @@ namespace Squidex.Web.Pipeline
     {
         private readonly IAppProvider appProvider;
 
-        public class AppFeature : IAppFeature
-        {
-            public IAppEntity App { get; }
-
-            public AppFeature(IAppEntity app)
-            {
-                App = app;
-            }
-        }
-
         public AppResolver(IAppProvider appProvider)
         {
             this.appProvider = appProvider;
@@ -76,15 +66,15 @@ namespace Squidex.Web.Pipeline
                     }
                 }
 
-                var set = user.Permissions();
+                var permissionSet = user.Permissions();
 
-                if (!set.Includes(Permissions.ForApp(Permissions.App, appName))&& !AllowAnonymous(context))
+                context.HttpContext.Context().App = app;
+
+                if (!permissionSet.Includes(Permissions.ForApp(Permissions.App, appName)) && !AllowAnonymous(context))
                 {
                     context.Result = new NotFoundResult();
                     return;
                 }
-
-                context.HttpContext.Features.Set<IAppFeature>(new AppFeature(app));
             }
 
             await next();

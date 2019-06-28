@@ -1017,14 +1017,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return A<Q>.That.Matches(x => x.Ids.Count == 1 && x.Ids[0] == contentId);
         }
 
-        private QueryContext MatchsAssetContext()
+        private Context MatchsAssetContext()
         {
-            return A<QueryContext>.That.Matches(x => x.App == app && x.User == user);
+            return A<Context>.That.Matches(x => x.App == app && x.User == user);
         }
 
-        private QueryContext MatchsContentContext()
+        private Context MatchsContentContext()
         {
-            return A<QueryContext>.That.Matches(x => x.App == app && x.User == user);
+            return A<Context>.That.Matches(x => x.App == app && x.User == user);
         }
     }
 }

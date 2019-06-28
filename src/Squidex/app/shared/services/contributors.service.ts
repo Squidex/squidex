@@ -50,7 +50,7 @@ export class ContributorDto {
     }
 }
 
-export interface AssignContributorDto  {
+export interface AssignContributorDto {
     readonly contributorId: string;
     readonly role: string;
     readonly invite?: boolean;
@@ -69,23 +69,23 @@ export class ContributorsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.getVersioned(this.http, url).pipe(
-                mapVersioned(({ body }) => {
-                    return parseContributors(body);
-                }),
-                pretifyError('Failed to load contributors. Please reload.'));
+            mapVersioned(({ body }) => {
+                return parseContributors(body);
+            }),
+            pretifyError('Failed to load contributors. Please reload.'));
     }
 
     public postContributor(appName: string, dto: AssignContributorDto, version: Version): Observable<ContributorsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
-                mapVersioned(({ body }) => {
-                    return parseContributors(body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Contributor', 'Configured', appName);
-                }),
-                pretifyError('Failed to add contributors. Please reload.'));
+            mapVersioned(({ body }) => {
+                return parseContributors(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Contributor', 'Configured', appName);
+            }),
+            pretifyError('Failed to add contributors. Please reload.'));
     }
 
     public deleteContributor(appName: string, resource: Resource, version: Version): Observable<ContributorsDto> {
@@ -94,15 +94,15 @@ export class ContributorsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
-                mapVersioned(payload => {
-                    const body = payload.body;
+            mapVersioned(payload => {
+                const body = payload.body;
 
-                    return parseContributors(body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Contributor', 'Deleted', appName);
-                }),
-                pretifyError('Failed to delete contributors. Please reload.'));
+                return parseContributors(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Contributor', 'Deleted', appName);
+            }),
+            pretifyError('Failed to delete contributors. Please reload.'));
     }
 }
 

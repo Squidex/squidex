@@ -86,7 +86,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            Assert.Same(app, httpContext.Features.Get<IAppFeature>()?.App);
+            Assert.Same(app, httpContext.Context().App);
             Assert.True(user.Claims.Count() > 2);
             Assert.True(isNextCalled);
         }
@@ -104,7 +104,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            Assert.Same(app, httpContext.Features.Get<IAppFeature>()?.App);
+            Assert.Same(app, httpContext.Context().App);
             Assert.True(user.Claims.Count() > 2);
             Assert.True(isNextCalled);
         }
@@ -124,7 +124,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            Assert.Same(app, httpContext.Features.Get<IAppFeature>()?.App);
+            Assert.Same(app, httpContext.Context().App);
             Assert.Equal(2, user.Claims.Count());
             Assert.True(isNextCalled);
         }

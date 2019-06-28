@@ -56,58 +56,58 @@ export class CommentsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}?version=${version.value}`);
 
         return this.http.get<any>(url).pipe(
-                map(body => {
-                    const comments = new CommentsDto(
-                        body.createdComments.map((item: any) => {
-                            return new CommentDto(
-                                item.id,
-                                DateTime.parseISO_UTC(item.time),
-                                item.text,
-                                item.user);
-                        }),
-                        body.updatedComments.map((item: any) => {
-                            return new CommentDto(
-                                item.id,
-                                DateTime.parseISO_UTC(item.time),
-                                item.text,
-                                item.user);
-                        }),
-                        body.deletedComments,
-                        new Version(body.version)
-                    );
+            map(body => {
+                const comments = new CommentsDto(
+                    body.createdComments.map((item: any) => {
+                        return new CommentDto(
+                            item.id,
+                            DateTime.parseISO_UTC(item.time),
+                            item.text,
+                            item.user);
+                    }),
+                    body.updatedComments.map((item: any) => {
+                        return new CommentDto(
+                            item.id,
+                            DateTime.parseISO_UTC(item.time),
+                            item.text,
+                            item.user);
+                    }),
+                    body.deletedComments,
+                    new Version(body.version)
+                );
 
-                    return comments;
-                }),
-                pretifyError('Failed to load comments.'));
+                return comments;
+            }),
+            pretifyError('Failed to load comments.'));
     }
 
     public postComment(appName: string, commentsId: string, dto: UpsertCommentDto): Observable<CommentDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}`);
 
         return this.http.post<any>(url, dto).pipe(
-                map(body => {
-                    const comment = new CommentDto(
-                        body.id,
-                        DateTime.parseISO_UTC(body.time),
-                        body.text,
-                        body.user);
+            map(body => {
+                const comment = new CommentDto(
+                    body.id,
+                    DateTime.parseISO_UTC(body.time),
+                    body.text,
+                    body.user);
 
-                    return comment;
-                }),
-                pretifyError('Failed to create comment.'));
+                return comment;
+            }),
+            pretifyError('Failed to create comment.'));
     }
 
     public putComment(appName: string, commentsId: string, commentId: string, dto: UpsertCommentDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}/${commentId}`);
 
         return this.http.put(url, dto).pipe(
-                pretifyError('Failed to update comment.'));
+            pretifyError('Failed to update comment.'));
     }
 
     public deleteComment(appName: string, commentsId: string, commentId: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/comments/${commentsId}/${commentId}`);
 
         return this.http.delete(url).pipe(
-                pretifyError('Failed to delete comment.'));
+            pretifyError('Failed to delete comment.'));
     }
 }

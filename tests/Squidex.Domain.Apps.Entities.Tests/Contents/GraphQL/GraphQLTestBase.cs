@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected readonly IJsonSerializer serializer = TestUtils.CreateSerializer(TypeNameHandling.None);
         protected readonly IDependencyResolver dependencyResolver;
         protected readonly IAppEntity app = A.Dummy<IAppEntity>();
-        protected readonly QueryContext context;
+        protected readonly Context context;
         protected readonly ClaimsPrincipal user = new ClaimsPrincipal();
         protected readonly IGraphQLService sut;
 
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => app.Name).Returns(appName);
             A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.Build(Language.DE, Language.GermanGermany));
 
-            context = QueryContext.Create(app, user);
+            context = new Context(user, app);
 
             A.CallTo(() => schema.Id).Returns(schemaId);
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);

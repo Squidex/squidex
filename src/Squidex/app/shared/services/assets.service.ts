@@ -138,12 +138,12 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
 
         return this.http.get<{ total: number, items: any[] } & Resource>(url).pipe(
-                map(({ total, items, _links }) => {
-                    const assets = items.map(item => parseAsset(item));
+            map(({ total, items, _links }) => {
+                const assets = items.map(item => parseAsset(item));
 
-                    return new AssetsDto(total, assets, _links);
-                }),
-                pretifyError('Failed to load assets. Please reload.'));
+                return new AssetsDto(total, assets, _links);
+            }),
+            pretifyError('Failed to load assets. Please reload.'));
     }
 
     public uploadFile(appName: string, file: File): Observable<number | AssetDto> {
@@ -152,45 +152,45 @@ export class AssetsService {
         const req = new HttpRequest('POST', url, getFormData(file), { reportProgress: true });
 
         return this.http.request(req).pipe(
-                filter(event =>
-                     event.type === HttpEventType.UploadProgress ||
-                     event.type === HttpEventType.Response),
-                map(event => {
-                    if (event.type === HttpEventType.UploadProgress) {
-                        const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
+            filter(event =>
+                event.type === HttpEventType.UploadProgress ||
+                event.type === HttpEventType.Response),
+            map(event => {
+                if (event.type === HttpEventType.UploadProgress) {
+                    const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
 
-                        return percentDone;
-                    } else if (Types.is(event, HttpResponse)) {
-                        return parseAsset(event.body);
-                    } else {
-                        throw 'Invalid';
-                    }
-                }),
-                catchError((error: any) => {
-                    if (Types.is(error, HttpErrorResponse) && error.status === 413) {
-                        return throwError(new ErrorDto(413, 'Asset is too big.'));
-                    } else {
-                        return throwError(error);
-                    }
-                }),
-                tap(value => {
-                    if (!Types.isNumber(value)) {
-                        this.analytics.trackEvent('Asset', 'Uploaded', appName);
-                    }
-                }),
-                pretifyError('Failed to upload asset. Please reload.'));
+                    return percentDone;
+                } else if (Types.is(event, HttpResponse)) {
+                    return parseAsset(event.body);
+                } else {
+                    throw 'Invalid';
+                }
+            }),
+            catchError((error: any) => {
+                if (Types.is(error, HttpErrorResponse) && error.status === 413) {
+                    return throwError(new ErrorDto(413, 'Asset is too big.'));
+                } else {
+                    return throwError(error);
+                }
+            }),
+            tap(value => {
+                if (!Types.isNumber(value)) {
+                    this.analytics.trackEvent('Asset', 'Uploaded', appName);
+                }
+            }),
+            pretifyError('Failed to upload asset. Please reload.'));
     }
 
     public getAsset(appName: string, id: string): Observable<AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/${id}`);
 
         return HTTP.getVersioned(this.http, url).pipe(
-                map(({ payload }) => {
-                    const body = payload.body;
+            map(({ payload }) => {
+                const body = payload.body;
 
-                    return parseAsset(body);
-                }),
-                pretifyError('Failed to load assets. Please reload.'));
+                return parseAsset(body);
+            }),
+            pretifyError('Failed to load assets. Please reload.'));
     }
 
     public replaceFile(appName: string, asset: Resource, file: File, version: Version): Observable<number | AssetDto> {
@@ -201,33 +201,33 @@ export class AssetsService {
         const req = new HttpRequest(link.method, url, getFormData(file), { headers: new HttpHeaders().set('If-Match', version.value), reportProgress: true });
 
         return this.http.request(req).pipe(
-                filter(event =>
-                    event.type === HttpEventType.UploadProgress ||
-                    event.type === HttpEventType.Response),
-                map(event => {
-                    if (event.type === HttpEventType.UploadProgress) {
-                        const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
+            filter(event =>
+                event.type === HttpEventType.UploadProgress ||
+                event.type === HttpEventType.Response),
+            map(event => {
+                if (event.type === HttpEventType.UploadProgress) {
+                    const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
 
-                        return percentDone;
-                    } else if (Types.is(event, HttpResponse)) {
-                        return parseAsset(event.body);
-                    } else {
-                        throw 'Invalid';
-                    }
-                }),
-                catchError(error => {
-                    if (Types.is(error, HttpErrorResponse) && error.status === 413) {
-                        return throwError(new ErrorDto(413, 'Asset is too big.'));
-                    } else {
-                        return throwError(error);
-                    }
-                }),
-                tap(value => {
-                    if (!Types.isNumber(value)) {
-                        this.analytics.trackEvent('Analytics', 'Replaced', appName);
-                    }
-                }),
-                pretifyError('Failed to replace asset. Please reload.'));
+                    return percentDone;
+                } else if (Types.is(event, HttpResponse)) {
+                    return parseAsset(event.body);
+                } else {
+                    throw 'Invalid';
+                }
+            }),
+            catchError(error => {
+                if (Types.is(error, HttpErrorResponse) && error.status === 413) {
+                    return throwError(new ErrorDto(413, 'Asset is too big.'));
+                } else {
+                    return throwError(error);
+                }
+            }),
+            tap(value => {
+                if (!Types.isNumber(value)) {
+                    this.analytics.trackEvent('Analytics', 'Replaced', appName);
+                }
+            }),
+            pretifyError('Failed to replace asset. Please reload.'));
     }
 
     public putAsset(appName: string, asset: Resource, dto: AnnotateAssetDto, version: Version): Observable<AssetDto> {
@@ -236,13 +236,13 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
-                map(({ payload }) => {
-                    return parseAsset(payload.body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Analytics', 'Updated', appName);
-                }),
-                pretifyError('Failed to update asset. Please reload.'));
+            map(({ payload }) => {
+                return parseAsset(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Analytics', 'Updated', appName);
+            }),
+            pretifyError('Failed to update asset. Please reload.'));
     }
 
     public deleteAsset(appName: string, asset: Resource, version: Version): Observable<Versioned<any>> {
@@ -251,10 +251,10 @@ export class AssetsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
-                tap(() => {
-                    this.analytics.trackEvent('Analytics', 'Deleted', appName);
-                }),
-                pretifyError('Failed to delete asset. Please reload.'));
+            tap(() => {
+                this.analytics.trackEvent('Analytics', 'Deleted', appName);
+            }),
+            pretifyError('Failed to delete asset. Please reload.'));
     }
 }
 
