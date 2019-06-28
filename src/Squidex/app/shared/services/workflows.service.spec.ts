@@ -11,6 +11,7 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
+    Resource,
     Version,
     Versioned,
     WorkflowDto,
@@ -48,7 +49,7 @@ describe('WorkflowsService', () => {
             workflow = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflow');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -66,15 +67,19 @@ describe('WorkflowsService', () => {
     it('should make a put request to assign a workflow',
         inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
 
-        const dto = createWorkflow('Draft');
+        const resource: Resource = {
+            _links: {
+                update: { method: 'PUT', href: '/api/apps/my-app/workflow' }
+            }
+        };
 
         let workflow: Versioned<WorkflowPayload>;
 
-        workflowsService.putWorkflow('my-app', dto, dto.workflow.serialize(), version).subscribe(result => {
+        workflowsService.putWorkflow('my-app', resource, {}, version).subscribe(result => {
             workflow = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflow');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);

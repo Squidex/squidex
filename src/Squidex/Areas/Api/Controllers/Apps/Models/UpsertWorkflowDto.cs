@@ -33,7 +33,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                     x => x.Key,
                     x => new WorkflowStep(
                         x.Value?.Transitions.ToDictionary(
-                            y => x.Key,
+                            y => y.Key,
                             y => new WorkflowTransition(y.Value.Expression, y.Value.Role)),
                         x.Value.Color,
                         x.Value.NoUpdate)),

@@ -237,7 +237,7 @@ export class WorkflowsService {
     }
 
     public getWorkflow(appName: string): Observable<Versioned<WorkflowPayload>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflows`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflow`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {
@@ -247,9 +247,11 @@ export class WorkflowsService {
     }
 
     public putWorkflow(appName: string, resource: Resource, dto: any, version: Version): Observable<Versioned<WorkflowPayload>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflows`);
+        const link = resource._links['update'];
 
-        return HTTP.putVersioned(this.http, url, resource, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             mapVersioned(({ body }) => {
                 return parseWorkflowPayload(body);
             }),
