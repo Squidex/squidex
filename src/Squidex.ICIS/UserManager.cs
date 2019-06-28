@@ -11,38 +11,35 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Users;
 using Squidex.ICIS.Extensions;
-using Squidex.ICIS.Interfaces;
 using Squidex.ICIS.Models;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.ICIS
 {
-    public sealed class ClaimsManager : IClaimsManager
+    public sealed class UserManager
     {
         public const string ClientId = "vega.cms";
 
         private readonly UserManager<IdentityUser> userManager;
-        private readonly AppProvider appProvider;
         private readonly IUserFactory userFactory;
         private readonly ISemanticLog log;
         private readonly IConfiguration config;
 
-        public ClaimsManager(IServiceProvider services)
+        public UserManager(IServiceProvider services)
         {
             userManager = services.GetRequiredService<UserManager<IdentityUser>>();
-            appProvider = services.GetRequiredService<AppProvider>();
             userFactory = services.GetRequiredService<IUserFactory>();
             config = services.GetRequiredService<IConfiguration>();
 
             log = services.GetRequiredService<ISemanticLog>();
         }
 
-        public UserInfo CreateUserWithClaims(ClaimsIdentity identity)
+        public UserInfo GetUserInfo(ClaimsIdentity identity)
         {
-            var userInfo = new UserInfo(identity, userManager, appProvider, config);
+            var userInfo = new UserInfo(identity, config);
+
             userInfo.UserId = CreateUser(userInfo).Result.Id;
             return userInfo;
         }
