@@ -20,7 +20,7 @@ param(
     [string]
     $appName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$false)]
     [bool]
     $createRules
 )
