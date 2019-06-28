@@ -17,7 +17,7 @@ namespace Squidex.Web
 
         [Required]
         [Display(Description = "The link method.")]
-        public string Method { get; set; } 
+        public string Method { get; set; }
 
         [Required]
         [Display(Description = "Additional data about the link.")]

@@ -35,4 +35,4 @@ const routes: Routes = [
         OnboardingDialogComponent
     ]
 })
-export class SqxFeatureAppsModule { }
+export class SqxFeatureAppsModule {}

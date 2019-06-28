@@ -62,12 +62,12 @@ export class EventConsumersService {
         const url = this.apiUrl.buildUrl('/api/event-consumers');
 
         return this.http.get<{ items: any[] } & Resource>(url).pipe(
-                map(({ items, _links }) => {
-                    const eventConsumers = items.map(item => parseEventConsumer(item));
+            map(({ items, _links }) => {
+                const eventConsumers = items.map(item => parseEventConsumer(item));
 
-                    return new EventConsumersDto(eventConsumers, _links);
-                }),
-                pretifyError('Failed to load event consumers. Please reload.'));
+                return new EventConsumersDto(eventConsumers, _links);
+            }),
+            pretifyError('Failed to load event consumers. Please reload.'));
     }
 
     public putStart(eventConsumer: Resource): Observable<EventConsumerDto> {
@@ -76,10 +76,10 @@ export class EventConsumersService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url).pipe(
-                map(body => {
-                    return parseEventConsumer(body);
-                }),
-                pretifyError('Failed to start event consumer. Please reload.'));
+            map(body => {
+                return parseEventConsumer(body);
+            }),
+            pretifyError('Failed to start event consumer. Please reload.'));
     }
 
     public putStop(eventConsumer: Resource): Observable<EventConsumerDto> {
@@ -88,10 +88,10 @@ export class EventConsumersService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url).pipe(
-                map(body => {
-                    return parseEventConsumer(body);
-                }),
-                pretifyError('Failed to stop event consumer. Please reload.'));
+            map(body => {
+                return parseEventConsumer(body);
+            }),
+            pretifyError('Failed to stop event consumer. Please reload.'));
     }
 
     public putReset(eventConsumer: Resource): Observable<EventConsumerDto> {
@@ -100,10 +100,10 @@ export class EventConsumersService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url).pipe(
-                map(body => {
-                    return parseEventConsumer(body);
-                }),
-                pretifyError('Failed to reset event consumer. Please reload.'));
+            map(body => {
+                return parseEventConsumer(body);
+            }),
+            pretifyError('Failed to reset event consumer. Please reload.'));
     }
 }
 

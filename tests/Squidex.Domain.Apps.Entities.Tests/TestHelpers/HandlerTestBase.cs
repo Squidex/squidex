@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using FakeItEasy;
 using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
@@ -26,7 +27,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         private readonly IPersistence<TState> persistence1 = A.Fake<IPersistence<TState>>();
         private readonly IPersistence persistence2 = A.Fake<IPersistence>();
 
-        protected RefToken User { get; } = new RefToken(RefTokenType.Subject, Guid.NewGuid().ToString());
+        protected RefToken Actor { get; } = new RefToken(RefTokenType.Subject, Guid.NewGuid().ToString());
 
         protected Guid AppId { get; } = Guid.NewGuid();
 
@@ -35,6 +36,8 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
         protected string AppName { get; } = "my-app";
 
         protected string SchemaName { get; } = "my-schema";
+
+        protected ClaimsPrincipal User { get; } = new ClaimsPrincipal();
 
         protected NamedId<Guid> AppNamedId
         {
@@ -87,7 +90,12 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
             if (command.Actor == null)
             {
-                command.Actor = User;
+                command.Actor = Actor;
+            }
+
+            if (command.User == null)
+            {
+                command.User = User;
             }
 
             if (command is IAppCommand appCommand && appCommand.AppId == null)
@@ -110,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected TEvent CreateEvent<TEvent>(TEvent @event) where TEvent : SquidexEvent
         {
-            @event.Actor = User;
+            @event.Actor = Actor;
 
             EnrichAppInfo(@event);
             EnrichSchemaInfo(@event);

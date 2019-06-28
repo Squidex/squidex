@@ -20,9 +20,10 @@ import { RootViewComponent } from './root-view.component';
     selector: '[sqxModalView]'
 })
 export class ModalViewDirective implements OnChanges, OnDestroy {
-    private subscription: Subscription | null = null;
+    private modalSubscription: Subscription | null = null;
     private documentClickListener: Function | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
+    private static clickCounter = 0;
 
     @Input('sqxModalView')
     public modalView: DialogModel | ModalModel | any;
@@ -43,6 +44,13 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         private readonly templateRef: TemplateRef<any>,
         private readonly viewContainer: ViewContainerRef
     ) {
+        if (ModalViewDirective.clickCounter === 0) {
+            this.renderer.listen('document', 'click', () => {
+                ModalViewDirective.clickCounter++;
+            });
+
+            ModalViewDirective.clickCounter = 1;
+        }
     }
 
     public ngOnDestroy() {
@@ -62,7 +70,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         this.unsubscribeToModal();
 
         if (Types.is(this.modalView, DialogModel) || Types.is(this.modalView, ModalModel)) {
-            this.subscription =
+            this.modalSubscription =
                 this.modalView.isOpen.subscribe(isOpen => {
                     this.update(isOpen);
                 });
@@ -76,6 +84,8 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             return;
         }
 
+        this.unsubscribeToClick();
+
         if (isOpen && !this.renderedView) {
             const container = this.getContainer();
 
@@ -85,9 +95,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
                 this.renderer.setStyle(this.renderedView.rootNodes[0], 'display', 'block');
             }
 
-            setTimeout(() => {
-                this.startListening();
-            }, 1000);
+            this.startListening(ModalViewDirective.clickCounter + 1);
 
             this.changeDetector.detectChanges();
         } else if (!isOpen && this.renderedView) {
@@ -98,8 +106,6 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
 
             this.renderedView = null;
 
-            this.unsubscribeToClick();
-
             this.changeDetector.detectChanges();
         }
     }
@@ -108,14 +114,14 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         return this.placeOnRoot ? this.rootView.viewContainer : this.viewContainer;
     }
 
-    private startListening() {
+    private startListening(clickCounter: number) {
         if (!this.closeAuto) {
             return;
         }
 
         this.documentClickListener =
             this.renderer.listen('document', 'click', (event: MouseEvent) => {
-                if (!event.target || this.renderedView === null) {
+                if (!event.target || this.renderedView === null || ModalViewDirective.clickCounter === clickCounter) {
                     return;
                 }
 
@@ -145,9 +151,9 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     }
 
     private unsubscribeToModal() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
+        if (this.modalSubscription) {
+            this.modalSubscription.unsubscribe();
+            this.modalSubscription = null;
         }
     }
 

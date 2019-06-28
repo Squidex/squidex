@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.ComponentModel;
 using Squidex.Domain.Apps.Core.Contents;
 using Xunit;
 
@@ -12,6 +13,24 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 {
     public class StatusTests
     {
+        private readonly TypeConverter typeConverter = TypeDescriptor.GetConverter(typeof(Status));
+
+        [Fact]
+        public void Should_convert_from_string()
+        {
+            var result = typeConverter.ConvertFromString("Draft");
+
+            Assert.Equal(Status.Draft, result);
+        }
+
+        [Fact]
+        public void Should_convert_to_string()
+        {
+            var result = typeConverter.ConvertToString(Status.Draft);
+
+            Assert.Equal("Draft", result);
+        }
+
         [Fact]
         public void Should_initialize_default()
         {

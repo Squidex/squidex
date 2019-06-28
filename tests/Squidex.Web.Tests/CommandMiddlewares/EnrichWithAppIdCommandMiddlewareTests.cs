@@ -8,63 +8,48 @@
 using System;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Microsoft.AspNetCore.Http;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Web.Pipeline;
 using Xunit;
 
 namespace Squidex.Web.CommandMiddlewares
 {
     public class EnrichWithAppIdCommandMiddlewareTests
     {
-        private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
+        private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly HttpContext httpContext = new DefaultHttpContext();
+        private readonly Context appContext = new Context();
         private readonly EnrichWithAppIdCommandMiddleware sut;
 
         public EnrichWithAppIdCommandMiddlewareTests()
         {
-            A.CallTo(() => httpContextAccessor.HttpContext)
-                .Returns(httpContext);
+            A.CallTo(() => contextProvider.Context)
+                .Returns(appContext);
 
-            var appEntity = A.Fake<IAppEntity>();
+            var app = A.Fake<IAppEntity>();
 
-            A.CallTo(() => appEntity.Id).Returns(appId.Id);
-            A.CallTo(() => appEntity.Name).Returns(appId.Name);
+            A.CallTo(() => app.Id).Returns(appId.Id);
+            A.CallTo(() => app.Name).Returns(appId.Name);
 
-            httpContext.Features.Set<IAppFeature>(new AppResolver.AppFeature(appEntity));
+            appContext.App = app;
 
-            sut = new EnrichWithAppIdCommandMiddleware(httpContextAccessor);
+            sut = new EnrichWithAppIdCommandMiddleware(contextProvider);
         }
 
         [Fact]
         public async Task Should_throw_exception_if_app_not_found()
         {
-            httpContext.Features.Set<IAppFeature>(new AppResolver.AppFeature(null));
+            appContext.App = null;
 
             var command = new CreateContent();
             var context = new CommandContext(command, commandBus);
 
             await Assert.ThrowsAsync<InvalidOperationException>(() => sut.HandleAsync(context));
-        }
-
-        [Fact]
-        public async Task Should_do_nothing_when_context_is_null()
-        {
-            A.CallTo(() => httpContextAccessor.HttpContext)
-                .Returns(null);
-
-            var command = new CreateContent();
-            var context = new CommandContext(command, commandBus);
-
-            await sut.HandleAsync(context);
-
-            Assert.Null(command.Actor);
         }
 
         [Fact]

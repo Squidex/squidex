@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -15,13 +16,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         Task<StatusInfo> GetInitialStatusAsync(ISchemaEntity schema);
 
-        Task<bool> CanMoveToAsync(IContentEntity content, Status next);
+        Task<bool> CanMoveToAsync(IContentEntity content, Status next, ClaimsPrincipal user);
 
         Task<bool> CanUpdateAsync(IContentEntity content);
 
-        Task<StatusInfo> GetInfoAsync(Status status);
+        Task<StatusInfo> GetInfoAsync(IContentEntity content);
 
-        Task<StatusInfo[]> GetNextsAsync(IContentEntity content);
+        Task<StatusInfo[]> GetNextsAsync(IContentEntity content, ClaimsPrincipal user);
 
         Task<StatusInfo[]> GetAllAsync(ISchemaEntity schema);
     }

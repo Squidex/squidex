@@ -6,14 +6,15 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentEnricher
     {
-        Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content);
+        Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, ClaimsPrincipal user);
 
-        Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents);
+        Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, ClaimsPrincipal user);
     }
 }

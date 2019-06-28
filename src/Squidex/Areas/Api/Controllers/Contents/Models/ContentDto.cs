@@ -84,11 +84,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static ContentDto FromContent(QueryContext context, IEnrichedContentEntity content, ApiController controller)
+        public static ContentDto FromContent(Context context, IEnrichedContentEntity content, ApiController controller)
         {
             var response = SimpleMapper.Map(content, new ContentDto());
 
-            if (context?.Flatten == true)
+            if (context.IsFlatten())
             {
                 response.Data = content.Data?.ToFlatten();
                 response.DataDraft = content.DataDraft?.ToFlatten();
@@ -153,11 +153,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 AddDeleteLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
             }
 
-            foreach (var next in content.Nexts)
+            if (content.Nexts != null)
             {
-                if (controller.HasPermission(Helper.StatusPermission(app, schema, next.Status)))
+                foreach (var next in content.Nexts)
                 {
-                    AddPutLink($"status/{next.Status}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
+                    if (controller.HasPermission(Helper.StatusPermission(app, schema, next.Status)))
+                    {
+                        AddPutLink($"status/{next.Status}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
+                    }
                 }
             }
 

@@ -115,34 +115,3 @@ export abstract class StatefulControlComponent<T, TValue> extends StatefulCompon
 
     public abstract writeValue(obj: any): void;
 }
-
-export abstract class ExternalControlComponent<TValue> extends StatefulComponent<any> implements ControlValueAccessor {
-    private fnChanged = (v: any) => { /* NOOP */ };
-    private fnTouched = () => { /* NOOP */ };
-
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {});
-
-        changeDetector.detach();
-    }
-
-    public registerOnChange(fn: any) {
-        this.fnChanged = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.fnTouched = fn;
-    }
-
-    protected callTouched() {
-        this.fnTouched();
-    }
-
-    protected callChange(value: TValue) {
-        this.fnChanged(value);
-    }
-
-    public abstract setDisabledState(isDisabled: boolean): void;
-
-    public abstract writeValue(obj: any): void;
-}

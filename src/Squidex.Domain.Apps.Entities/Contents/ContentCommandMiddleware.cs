@@ -30,12 +30,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             await base.HandleAsync(context, next);
 
-            if (context.PlainResult is IContentEntity content && !(context.PlainResult is IEnrichedContentEntity))
+            if (context.Command is SquidexCommand command && context.PlainResult is IContentEntity content && NotEnriched(context))
             {
-                var enriched = await contentEnricher.EnrichAsync(content);
+                var enriched = await contentEnricher.EnrichAsync(content, command.User);
 
                 context.Complete(enriched);
             }
+        }
+
+        private static bool NotEnriched(CommandContext context)
+        {
+            return !(context.PlainResult is IEnrichedContentEntity);
         }
     }
 }

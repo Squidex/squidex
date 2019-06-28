@@ -221,6 +221,10 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
             return;
         }
 
+        if (!this.inputElement.nativeElement) {
+            return;
+        }
+
         if (!canvas) {
             canvas = document.createElement('canvas');
         }
@@ -231,13 +235,13 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
             if (ctx) {
                 ctx.font = CACHED_FONT;
 
-                const text = this.inputElement.nativeElement.value;
-                const textKey = `${text}§${this.placeholder}§${ctx.font}`;
+                const textValue = this.inputElement.nativeElement.value;
+                const textKey = `${textValue}§${this.placeholder}§${ctx.font}`;
 
                 let width = CACHED_SIZES[textKey];
 
                 if (!width) {
-                    const widthText = ctx.measureText(text).width;
+                    const widthText = ctx.measureText(textValue).width;
                     const widthPlaceholder = ctx.measureText(this.placeholder).width;
 
                     width = Math.max(widthText, widthPlaceholder);

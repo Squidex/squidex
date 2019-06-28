@@ -5,11 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.EventSourcing;
+
+namespace Squidex.Domain.Apps.Events.Apps
 {
-    public enum StatusForApi
+    [EventType(nameof(AppWorkflowConfigured))]
+    public sealed class AppWorkflowConfigured : AppEvent
     {
-        PublishedOnly,
-        All,
+        public Workflow Workflow { get; set; }
     }
 }

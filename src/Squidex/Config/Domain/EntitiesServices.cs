@@ -120,7 +120,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<SchemaHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
 
-            services.AddSingletonAs<DefaultContentWorkflow>()
+            services.AddSingletonAs<DynamicContentWorkflow>()
                 .AsOptional<IContentWorkflow>();
 
             services.AddSingletonAs<RolePermissionsProvider>()

@@ -44,38 +44,38 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(`api/users?query=${query || ''}`);
 
         return this.http.get<any[]>(url).pipe(
-                map(body => {
-                    const users = body.map(item =>
-                        new UserDto(
-                            item.id,
-                            item.displayName));
+            map(body => {
+                const users = body.map(item =>
+                    new UserDto(
+                        item.id,
+                        item.displayName));
 
-                    return users;
-                }),
-                pretifyError('Failed to load users. Please reload.'));
+                return users;
+            }),
+            pretifyError('Failed to load users. Please reload.'));
     }
 
     public getUser(id: string): Observable<UserDto> {
         const url = this.apiUrl.buildUrl(`api/users/${id}`);
 
         return this.http.get<any>(url).pipe(
-                map(body => {
-                    const user = new UserDto(
-                        body.id,
-                        body.displayName);
+            map(body => {
+                const user = new UserDto(
+                    body.id,
+                    body.displayName);
 
-                    return user;
-                }),
-                pretifyError('Failed to load user. Please reload.'));
+                return user;
+            }),
+            pretifyError('Failed to load user. Please reload.'));
     }
 
     public getResources(): Observable<ResourcesDto> {
         const url = this.apiUrl.buildUrl(`api`);
 
         return this.http.get<{ _links: {} }>(url).pipe(
-                map(({ _links }) => {
-                    return new ResourcesDto(_links);
-                }),
-                pretifyError('Failed to load user. Please reload.'));
+            map(({ _links }) => {
+                return new ResourcesDto(_links);
+            }),
+            pretifyError('Failed to load user. Please reload.'));
     }
 }

@@ -41,7 +41,7 @@ export class UIService {
 
         return this.http.get<object>(url).pipe(
             catchError(() => {
-                return of({ });
+                return of({});
             }));
     }
 

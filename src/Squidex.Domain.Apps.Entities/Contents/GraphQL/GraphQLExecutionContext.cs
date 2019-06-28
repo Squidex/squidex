@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public ISemanticLog Log { get; }
 
-        public GraphQLExecutionContext(QueryContext context, IDependencyResolver resolver)
+        public GraphQLExecutionContext(Context context, IDependencyResolver resolver)
             : base(context,
                 resolver.Resolve<IAssetQueryService>(),
                 resolver.Resolve<IContentQueryService>())

@@ -54,6 +54,6 @@ describe('DisplayNamePipe', () => {
     it('should return empty string if also fallback not found', () => {
         const pipe = new DisplayNamePipe();
 
-        expect(pipe.transform({ })).toBe('');
+        expect(pipe.transform({})).toBe('');
     });
 });

@@ -30,7 +30,10 @@ import {
     PlansPageComponent,
     RoleComponent,
     RolesPageComponent,
-    SettingsAreaComponent
+    SettingsAreaComponent,
+    WorkflowsPageComponent,
+    WorkflowStepComponent,
+    WorkflowTransitionComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -170,6 +173,19 @@ const routes: Routes = [
                         }
                     }
                 ]
+            },
+            {
+                path: 'workflows',
+                component: WorkflowsPageComponent,
+                children: [
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/workflows'
+                        }
+                    }
+                ]
             }
         ]
     }
@@ -196,7 +212,10 @@ const routes: Routes = [
         PlansPageComponent,
         RoleComponent,
         RolesPageComponent,
-        SettingsAreaComponent
+        SettingsAreaComponent,
+        WorkflowsPageComponent,
+        WorkflowTransitionComponent,
+        WorkflowStepComponent
     ]
 })
-export class SqxFeatureSettingsModule { }
+export class SqxFeatureSettingsModule {}

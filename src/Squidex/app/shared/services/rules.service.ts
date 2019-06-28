@@ -41,7 +41,8 @@ export const ALL_TRIGGERS = {
         description: 'When a schema definition has been created, updated, published or deleted...',
         display: 'Schema changed',
         iconColor: '#3389ff',
-        iconCode: 'schemas'},
+        iconCode: 'schemas'
+    },
     'Usage': {
         description: 'When monthly API calls exceed a specified limit for one time a month...',
         display: 'Usage exceeded',

@@ -128,4 +128,4 @@ const routes: Routes = [
         SchemasPageComponent
     ]
 })
-export class SqxFeatureContentModule { }
+export class SqxFeatureContentModule {}

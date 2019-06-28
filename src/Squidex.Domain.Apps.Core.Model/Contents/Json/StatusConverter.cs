@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Newtonsoft.Json;
-using Squidex.Infrastructure.Json.Newtonsoft;
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Squidex.Infrastructure.Json.Newtonsoft;
 
 namespace Squidex.Domain.Apps.Core.Contents.Json
 {
