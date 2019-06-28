@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -54,7 +53,7 @@ namespace Squidex.ICIS
             var identityUser = new IdentityUser();
 
             var userValues = userInfo.ToUserValues();
-            if (userManager.SupportsQueryableUsers && !DoesUserExists(userValues.Email))
+            if (userManager.SupportsQueryableUsers && !(await DoesUserExist(userValues.Email)))
             {
                 try
                 {
@@ -76,23 +75,22 @@ namespace Squidex.ICIS
 
         }
 
-        private bool DoesUserExists(string email)
+        private async Task<bool> DoesUserExist(string email)
         {
             var result = false;
-            Task.Run(async () =>
+
+            try
             {
-                try
-                {
-                    var value = await userManager.FindByEmailAsync(email);
-                    result = value != null;
-                }
-                catch (Exception ex)
-                {
-                    log.LogError(ex, w => w
-                        .WriteProperty("action", "checkingICISUser")
-                        .WriteProperty("status", "failed"));
-                }
-            }).Wait();
+                var value = await userManager.FindByEmailAsync(email);
+                result = value != null;
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, w => w
+                    .WriteProperty("action", "checkingICISUser")
+                    .WriteProperty("status", "failed"));
+            }
+            
             return result;
         }
     }

@@ -30,25 +30,22 @@ namespace Squidex.ICIS
             this.claimsManager = claimsManager;
         }
 
-        public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+        public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
         {
             var identity = principal.Identities.First();
 
             var key = identity.Claims.FirstOrDefault(claim =>
                 claim.Type.Equals(OpenIdClaims.Email, StringComparison.OrdinalIgnoreCase))?.Value;
 
-            if (!_memoryCache.TryGetValue(key, out UserInfo cachedEntry))
+            var user = await _memoryCache.GetOrCreateAsync(key, entry =>
             {
-                var userInfo = claimsManager.CreateUserWithClaims(identity);
-                _memoryCache.Set(key, userInfo);
-                AddClaims(identity, userInfo);
-            }
-            else
-            {
-                AddClaims(identity, cachedEntry);
-            }
+                entry.AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(8);
+                return Task.FromResult(claimsManager.CreateUserWithClaims(identity));
+            });
 
-            return Task.FromResult(principal);
+            AddClaims(identity, user);
+
+            return principal;
         }
 
         private void AddClaims(ClaimsIdentity identity, UserInfo userInfo)
