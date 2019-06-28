@@ -25,8 +25,6 @@ import {
     templateUrl: './workflows-page.component.html'
 })
 export class WorkflowsPageComponent implements OnInit {
-    private maxSteps = 1;
-
     public workflow: WorkflowDto;
 
     constructor(
@@ -57,9 +55,16 @@ export class WorkflowsPageComponent implements OnInit {
     }
 
     public addStep() {
-        this.workflow = this.workflow.setStep(`Step${this.maxSteps}`, { color: MathHelper.randomColor() });
+        let index = this.workflow.steps.length;
 
-        this.maxSteps++;
+        for (let i = index; ;i++) {
+            const name = `Step${i}`;
+
+            if (!this.workflow.getStep(name)) {
+                this.workflow = this.workflow.setStep(name, { color: MathHelper.randomColor() });
+                return;
+            }
+        }
     }
 
     public setInitial(step: WorkflowStep) {
