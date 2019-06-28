@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, OnInit, Renderer2, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import {
@@ -19,12 +19,11 @@ import { RootViewComponent } from './root-view.component';
 @Directive({
     selector: '[sqxModalView]'
 })
-export class ModalViewDirective implements OnChanges, OnDestroy, OnInit {
+export class ModalViewDirective implements OnChanges, OnDestroy {
     private modalSubscription: Subscription | null = null;
-    private documentClickCounterListener: Function | null = null;
     private documentClickListener: Function | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
-    private clickCounter = 0;
+    private static clickCounter = 0;
 
     @Input('sqxModalView')
     public modalView: DialogModel | ModalModel | any;
@@ -45,23 +44,22 @@ export class ModalViewDirective implements OnChanges, OnDestroy, OnInit {
         private readonly templateRef: TemplateRef<any>,
         private readonly viewContainer: ViewContainerRef
     ) {
+        if (ModalViewDirective.clickCounter === 0) {
+            this.renderer.listen('document', 'click', () => {
+                ModalViewDirective.clickCounter++;
+            });
+
+            ModalViewDirective.clickCounter = 1;
+        }
     }
 
     public ngOnDestroy() {
         this.unsubscribeToModal();
         this.unsubscribeToClick();
-        this.unsubscribeToCounterClick();
 
         if (Types.is(this.modalView, DialogModel) || Types.is(this.modalView, ModalModel)) {
             this.modalView.hide();
         }
-    }
-
-    public ngOnInit() {
-        this.documentClickCounterListener =
-            this.renderer.listen('document', 'click', () => {
-                this.clickCounter++;
-            });
     }
 
     public ngOnChanges(changes: SimpleChanges) {
@@ -97,7 +95,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy, OnInit {
                 this.renderer.setStyle(this.renderedView.rootNodes[0], 'display', 'block');
             }
 
-            this.startListening(this.clickCounter + 1);
+            this.startListening(ModalViewDirective.clickCounter + 1);
 
             this.changeDetector.detectChanges();
         } else if (!isOpen && this.renderedView) {
@@ -123,7 +121,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy, OnInit {
 
         this.documentClickListener =
             this.renderer.listen('document', 'click', (event: MouseEvent) => {
-                if (!event.target || this.renderedView === null || this.clickCounter === clickCounter) {
+                if (!event.target || this.renderedView === null || ModalViewDirective.clickCounter === clickCounter) {
                     return;
                 }
 
@@ -163,13 +161,6 @@ export class ModalViewDirective implements OnChanges, OnDestroy, OnInit {
         if (this.documentClickListener) {
             this.documentClickListener();
             this.documentClickListener = null;
-        }
-    }
-
-    private unsubscribeToCounterClick() {
-        if (this.documentClickCounterListener) {
-            this.documentClickCounterListener();
-            this.documentClickCounterListener = null;
         }
     }
 }
