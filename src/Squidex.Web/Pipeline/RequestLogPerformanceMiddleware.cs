@@ -47,9 +47,9 @@ namespace Squidex.Web.Pipeline
             }
         }
 
-        private static void LogFilters(HttpContext context, IObjectWriter c)
+        private static void LogFilters(HttpContext httpContext, IObjectWriter c)
         {
-            var app = context.Features.Get<IAppFeature>()?.App;
+            var app = httpContext.Context().App;
 
             if (app != null)
             {
@@ -57,21 +57,21 @@ namespace Squidex.Web.Pipeline
                 c.WriteProperty("appName", app.Name);
             }
 
-            var userId = context.User.OpenIdSubject();
+            var userId = httpContext.User.OpenIdSubject();
 
             if (!string.IsNullOrWhiteSpace(userId))
             {
                 c.WriteProperty(nameof(userId), userId);
             }
 
-            var clientId = context.User.OpenIdClientId();
+            var clientId = httpContext.User.OpenIdClientId();
 
             if (!string.IsNullOrWhiteSpace(clientId))
             {
                 c.WriteProperty(nameof(clientId), clientId);
             }
 
-            var costs = context.Features.Get<IApiCostsFeature>()?.Weight ?? 0;
+            var costs = httpContext.Features.Get<IApiCostsFeature>()?.Weight ?? 0;
 
             c.WriteProperty(nameof(costs), costs);
         }

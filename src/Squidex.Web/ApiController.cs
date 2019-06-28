@@ -26,14 +26,14 @@ namespace Squidex.Web
         {
             get
             {
-                var appFeature = HttpContext.Features.Get<IAppFeature>();
+                var app = HttpContext.Context().App;
 
-                if (appFeature == null)
+                if (app == null)
                 {
                     throw new InvalidOperationException("Not in a app context.");
                 }
 
-                return appFeature.App;
+                return app;
             }
         }
 

@@ -21,10 +21,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private const string DefaultColor = StatusColors.Draft;
         private readonly IContentWorkflow contentWorkflow;
+        private readonly IContextProvider contextProvider;
 
-        public ContentEnricher(IContentWorkflow contentWorkflow)
+        public ContentEnricher(IContentWorkflow contentWorkflow, IContextProvider contextProvider)
         {
+            Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
+            Guard.NotNull(contextProvider, nameof(contextProvider));
+
             this.contentWorkflow = contentWorkflow;
+            this.contextProvider = contextProvider;
         }
 
         public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content)
@@ -51,14 +56,23 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     var result = SimpleMapper.Map(content, new ContentEntity());
 
                     await ResolveColorAsync(content, result, cache);
-                    await ResolveNextsAsync(content, result);
-                    await ResolveCanUpdateAsync(content, result);
+
+                    if (ShouldEnrichWithStatuses())
+                    {
+                        await ResolveNextsAsync(content, result);
+                        await ResolveCanUpdateAsync(content, result);
+                    }
 
                     results.Add(result);
                 }
 
                 return results;
             }
+        }
+
+        private bool ShouldEnrichWithStatuses()
+        {
+            return contextProvider.Context.IsFrontendClient || contextProvider.Context.IsResolveFlow();
         }
 
         private async Task ResolveCanUpdateAsync(IContentEntity content, ContentEntity result)
