@@ -74,23 +74,23 @@ export class AppLanguagesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
         return HTTP.getVersioned(this.http, url).pipe(
-                mapVersioned(({ body }) => {
-                    return parseLanguages(body);
-                }),
-                pretifyError('Failed to load languages. Please reload.'));
+            mapVersioned(({ body }) => {
+                return parseLanguages(body);
+            }),
+            pretifyError('Failed to load languages. Please reload.'));
     }
 
     public postLanguage(appName: string, dto: AddAppLanguageDto, version: Version): Observable<AppLanguagesDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
-                mapVersioned(({ body }) => {
-                    return parseLanguages(body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Language', 'Added', appName);
-                }),
-                pretifyError('Failed to add language. Please reload.'));
+            mapVersioned(({ body }) => {
+                return parseLanguages(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Language', 'Added', appName);
+            }),
+            pretifyError('Failed to add language. Please reload.'));
     }
 
     public putLanguage(appName: string, resource: Resource, dto: UpdateAppLanguageDto, version: Version): Observable<AppLanguagesDto> {
@@ -99,13 +99,13 @@ export class AppLanguagesService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
-                mapVersioned(({ body }) => {
-                    return parseLanguages(body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Language', 'Updated', appName);
-                }),
-                pretifyError('Failed to change language. Please reload.'));
+            mapVersioned(({ body }) => {
+                return parseLanguages(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Language', 'Updated', appName);
+            }),
+            pretifyError('Failed to change language. Please reload.'));
     }
 
     public deleteLanguage(appName: string, resource: Resource, version: Version): Observable<AppLanguagesDto> {
@@ -114,13 +114,13 @@ export class AppLanguagesService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
-                mapVersioned(({ body }) => {
-                    return parseLanguages(body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Language', 'Deleted', appName);
-                }),
-                pretifyError('Failed to add language. Please reload.'));
+            mapVersioned(({ body }) => {
+                return parseLanguages(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Language', 'Deleted', appName);
+            }),
+            pretifyError('Failed to add language. Please reload.'));
     }
 }
 
