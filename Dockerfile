@@ -38,6 +38,7 @@ COPY cosmos-func-tests/package*.json /tmp/
 RUN cd /tmp && npm install --loglevel=error
 RUN cp -a /tmp/node_modules cosmos-func-tests/ \
  && cd cosmos-func-tests \
+ && mkdir database \
  && npm run test
 
 # Publish
