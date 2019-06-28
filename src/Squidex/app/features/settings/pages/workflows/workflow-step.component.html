@@ -2,7 +2,7 @@
     <div class="row no-gutters step-header">
         <div class="col-auto">
             <button class="btn btn-initial mr-1" (click)="makeInitial.emit()"
-                [class.enabled]="step.name !== workflow.initial && step.isLocked"
+                [class.enabled]="step.name !== workflow.initial && !step.isLocked"
                 [class.active]="step.name === workflow.initial"
                 [disabled]="step.name === workflow.initial || step.isLocked || disabled">
                 <i class="icon-arrow-right text-decent" *ngIf="!step.isLocked"></i>
