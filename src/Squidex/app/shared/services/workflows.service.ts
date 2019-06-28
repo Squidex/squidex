@@ -7,7 +7,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import {
@@ -21,8 +21,7 @@ import {
     Resource,
     ResourceLinks,
     Version,
-    Versioned,
-    versioned
+    Versioned
 } from '@app/framework';
 
 export type WorkflowsDto = Versioned<WorkflowPayload>;
@@ -80,7 +79,7 @@ export class WorkflowDto {
                 return this;
             }
 
-            values = { ...existing,  ...values };
+            values = { ...existing, ...values };
         }
 
         const steps = [...this.steps.filter(s => s !== found), { name, ...values }];
@@ -217,7 +216,6 @@ export class WorkflowDto {
         }
 
         return result;
-
     }
 }
 
@@ -243,59 +241,52 @@ export class WorkflowsService {
 
         return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {
-                return parseWorkflow(body);
+                return parseWorkflowPayload(body);
             }),
             pretifyError('Failed to load workflows. Please reload.'));
     }
 
-    public postWorkflow(appName: string, dto: WorkflowPayload, version: Version): Observable<Versioned<WorkflowPayload>> {
+    public putWorkflow(appName: string, resource: Resource, dto: any, version: Version): Observable<Versioned<WorkflowPayload>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflows`);
 
-        return HTTP.postVersioned(this.http, url, dto, version).pipe(
+        return HTTP.putVersioned(this.http, url, resource, version).pipe(
             mapVersioned(({ body }) => {
-                return parseWorkflow(body);
+                return parseWorkflowPayload(body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Workflow', 'Configured', appName);
             }),
-            pretifyError('Failed to add Workflow. Please reload.'));
-    }
-
-    public deleteWorkflow(appName: string, resource: Resource, version: Version): Observable<Versioned<WorkflowPayload>> {
-        const link = resource._links['delete'];
-
-        const url = this.apiUrl.buildUrl(link.href);
-
-        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
-            mapVersioned(payload => {
-                const body = payload.body;
-
-                return parseWorkflow(body);
-            }),
-            tap(() => {
-                this.analytics.trackEvent('Workflow', 'Deleted', appName);
-            }),
-            pretifyError('Failed to delete Workflow. Please reload.'));
-    }
-
-    public getWorkflowz(appName: string): Observable<Versioned<WorkflowPayload>> {
-        return of(versioned(new Version('1'), { workflow: WorkflowDto.DEFAULT, _links: {} }));
-    }
-
-    public putWorkflow(appName: string, resource: Resource, dto: any, version: Version): Observable<Versioned<WorkflowPayload>> {
-        return of(versioned(new Version('1'), { workflow: WorkflowDto.DEFAULT, _links: {} }));
+            pretifyError('Failed to configure Workflow. Please reload.'));
     }
 }
 
-function parseWorkflow(response: any) {
-    const raw: any = response.item;
+function parseWorkflowPayload(response: any) {
+    const { workflow, _links } = response;
 
-    const workflow = new WorkflowDto(raw._links,
-            raw._initial,
-            raw._steps,
-            raw._transitions);
+    const result = parseWorkflow(workflow);
 
-    const { _links, _meta } = response;
+    return { workflow: result, _links };
+}
 
-    return { workflow, _links, _meta, canCreate: hasAnyLink(_links, 'create') };
+function parseWorkflow(workflow: any) {
+    const steps: WorkflowStep[] = [];
+    const transitions: WorkflowTransition[] = [];
+
+    for (let stepName in workflow.steps) {
+        if (workflow.steps.hasOwnProperty(stepName)) {
+            const step = workflow.steps[stepName];
+
+            steps.push({ name: stepName, color: step.color, noUpdate: step.noUpdate, isLocked: stepName === 'Published' });
+
+            for (let to in step.transitions) {
+                if (step.transitions.hasOwnProperty(to)) {
+                    const transition = step.transitions[to];
+
+                    transitions.push({ from: stepName, to, ...transition });
+                }
+            }
+        }
+    }
+
+    return new WorkflowDto(workflow._links, workflow.initial, steps, transitions);
 }
