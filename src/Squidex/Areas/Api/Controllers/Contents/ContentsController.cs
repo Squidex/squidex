@@ -62,7 +62,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLQuery query)
         {
-            var result = await graphQl.QueryAsync(Context(), query);
+            var result = await graphQl.QueryAsync(Context, query);
 
             if (result.HasError)
             {
@@ -93,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLQuery[] batch)
         {
-            var result = await graphQl.QueryAsync(Context(), batch);
+            var result = await graphQl.QueryAsync(Context, batch);
 
             if (result.HasError)
             {
@@ -124,10 +124,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetAllContents(string app, [FromQuery] string ids)
         {
-            var context = Context();
-            var contents = await contentQuery.QueryAsync(context, Q.Empty.WithIds(ids).Ids);
+            var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(ids).Ids);
 
-            var response = await ContentsDto.FromContentsAsync(contents, context, this, null, contentWorkflow);
+            var response = await ContentsDto.FromContentsAsync(contents, Context, this, null, contentWorkflow);
 
             if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
             {
@@ -159,12 +158,11 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null)
         {
-            var context = Context();
-            var contents = await contentQuery.QueryAsync(context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
+            var contents = await contentQuery.QueryAsync(Context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 
-            var schema = await contentQuery.GetSchemaOrThrowAsync(context, name);
+            var schema = await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
-            var response = await ContentsDto.FromContentsAsync(contents, context, this, schema, contentWorkflow);
+            var response = await ContentsDto.FromContentsAsync(contents, Context, this, schema, contentWorkflow);
 
             if (ShouldProvideSurrogateKeys(response))
             {
@@ -196,10 +194,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContent(string app, string name, Guid id)
         {
-            var context = Context();
-            var content = await contentQuery.FindContentAsync(context, name, id);
+            var content = await contentQuery.FindContentAsync(Context, name, id);
 
-            var response = ContentDto.FromContent(context, content, this);
+            var response = ContentDto.FromContent(Context, content, this);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
@@ -232,10 +229,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContentVersion(string app, string name, Guid id, int version)
         {
-            var context = Context();
-            var content = await contentQuery.FindContentAsync(context, name, id, version);
+            var content = await contentQuery.FindContentAsync(Context, name, id, version);
 
-            var response = ContentDto.FromContent(context, content, this);
+            var response = ContentDto.FromContent(Context, content, this);
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
@@ -269,7 +265,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
             if (publish && !this.HasPermission(Helper.StatusPermission(app, name, Status.Published)))
             {
@@ -306,7 +302,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PutContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned(), AsDraft = asDraft };
 
@@ -338,7 +334,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PatchContent(string app, string name, Guid id, [FromBody] NamedContentData request, [FromQuery] bool asDraft = false)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned(), AsDraft = asDraft };
 
@@ -369,7 +365,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> PutContentStatus(string app, string name, Guid id, ChangeStatusDto request)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
             if (!this.HasPermission(Helper.StatusPermission(app, name, Status.Published)))
             {
@@ -404,7 +400,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> DiscardDraft(string app, string name, Guid id)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
             var command = new DiscardChanges { ContentId = id };
 
@@ -432,7 +428,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContent(string app, string name, Guid id)
         {
-            await contentQuery.GetSchemaOrThrowAsync(Context(), name);
+            await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
             var command = new DeleteContent { ContentId = id };
 
@@ -449,15 +445,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
             var response = ContentDto.FromContent(null, result, this);
 
             return response;
-        }
-
-        private QueryContext Context()
-        {
-            return QueryContext.Create(App, User)
-                .WithAssetUrlsToResolve(Request.Headers["X-Resolve-Urls"])
-                .WithFlatten(Request.Headers.ContainsKey("X-Flatten"))
-                .WithLanguages(Request.Headers["X-Languages"])
-                .WithUnpublished(Request.Headers.ContainsKey("X-Unpublished"));
         }
 
         private bool ShouldProvideSurrogateKeys(ContentsDto response)

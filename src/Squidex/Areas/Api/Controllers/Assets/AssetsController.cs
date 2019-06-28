@@ -101,9 +101,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null)
         {
-            var context = Context();
-
-            var assets = await assetQuery.QueryAsync(context, Q.Empty.WithODataQuery(Request.QueryString.ToString()).WithIds(ids));
+            var assets = await assetQuery.QueryAsync(Context, Q.Empty.WithODataQuery(Request.QueryString.ToString()).WithIds(ids));
 
             var response = AssetsDto.FromAssets(assets, this, app);
 
@@ -303,11 +301,6 @@ namespace Squidex.Areas.Api.Controllers.Assets
             var assetFile = new AssetFile(formFile.FileName, formFile.ContentType, formFile.Length, formFile.OpenReadStream);
 
             return assetFile;
-        }
-
-        private QueryContext Context()
-        {
-            return QueryContext.Create(App, User);
         }
     }
 }

@@ -161,7 +161,7 @@ namespace Squidex.Web.Pipeline
 
         private void SetupApp()
         {
-            httpContext.Features.Set<IAppFeature>(new AppResolver.AppFeature(appEntity));
+            httpContext.Context().App = appEntity;
         }
     }
 }

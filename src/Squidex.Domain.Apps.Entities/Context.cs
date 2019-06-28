@@ -15,13 +15,16 @@ namespace Squidex.Domain.Apps.Entities
 {
     public sealed class Context
     {
+        public IDictionary<string, string> Headers { get; } = new Dictionary<string, string>();
+
         public IAppEntity App { get; set; }
 
         public ClaimsPrincipal User { get; set; }
 
-        public PermissionSet Permissions { get; set; }
-
-        public IDictionary<string, string> Headers { get; } = new Dictionary<string, string>();
+        public PermissionSet Permissions
+        {
+            get { return User?.Permissions() ?? PermissionSet.Empty; }
+        }
 
         public Context()
         {
@@ -30,11 +33,6 @@ namespace Squidex.Domain.Apps.Entities
         public Context(ClaimsPrincipal user, IAppEntity app)
         {
             User = user;
-
-            if (user != null)
-            {
-                Permissions = user.Permissions();
-            }
 
             App = app;
         }

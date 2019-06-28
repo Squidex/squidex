@@ -14,14 +14,24 @@ namespace Squidex.Web
     {
         public static Context Context(this HttpContext httpContext)
         {
-            var result = httpContext.Features.Get<Context>();
+            var context = httpContext.Features.Get<Context>();
 
-            if (result == null)
+            if (context == null)
             {
-                httpContext.Features.Set(new Context { User = httpContext.User });
+                context = new Context { User = httpContext.User };
+
+                foreach (var header in httpContext.Request.Headers)
+                {
+                    if (header.Key.StartsWith("X-", System.StringComparison.Ordinal))
+                    {
+                        context.Headers.Add(header.Key, header.Value.ToString());
+                    }
+                }
+
+                httpContext.Features.Set(context);
             }
 
-            return result;
+            return context;
         }
     }
 }

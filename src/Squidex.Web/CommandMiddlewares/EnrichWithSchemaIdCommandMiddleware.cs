@@ -63,6 +63,11 @@ namespace Squidex.Web.CommandMiddlewares
                 appId = appCommand.AppId;
             }
 
+            if (appId == null)
+            {
+                appId = actionContextAccessor.ActionContext.HttpContext.Context().App?.NamedId();
+            }
+
             if (appId != null)
             {
                 var routeValues = actionContextAccessor.ActionContext.RouteData.Values;

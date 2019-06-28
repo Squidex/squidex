@@ -38,7 +38,7 @@ namespace Squidex.Web
 
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), this);
             actionExecutingContext.HttpContext = httpContext;
-            actionExecutingContext.HttpContext.User = new ClaimsPrincipal(user);
+            actionExecutingContext.HttpContext.Context().User = new ClaimsPrincipal(user);
 
             next = () =>
             {

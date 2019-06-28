@@ -16,7 +16,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.UI
@@ -53,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.UI
                 MapKey = uiOptions.Map?.GoogleMaps?.Key
             };
 
-            var canCreateApps = !uiOptions.OnlyAdminsCanCreateApps || User.Permissions().Includes(CreateAppPermission);
+            var canCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.Permissions.Includes(CreateAppPermission);
 
             result.CanCreateApps = canCreateApps;
 

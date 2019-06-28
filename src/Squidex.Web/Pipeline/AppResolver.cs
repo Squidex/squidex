@@ -66,12 +66,11 @@ namespace Squidex.Web.Pipeline
                     }
                 }
 
-                var permissionset = user.Permissions();
+                var permissionSet = user.Permissions();
 
                 context.HttpContext.Context().App = app;
-                context.HttpContext.Context().Permissions = permissions;
 
-                if (!permissionset.Includes(Permissions.ForApp(Permissions.App, appName)) && !AllowAnonymous(context))
+                if (!permissionSet.Includes(Permissions.ForApp(Permissions.App, appName)) && !AllowAnonymous(context))
                 {
                     context.Result = new NotFoundResult();
                     return;
