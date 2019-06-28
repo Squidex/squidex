@@ -6,13 +6,12 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
     public sealed class WorkflowStep
     {
-        public static readonly Dictionary<Status, WorkflowTransition> EmptyTransitions = new Dictionary<Status, WorkflowTransition>();
+        private static readonly IReadOnlyDictionary<Status, WorkflowTransition> EmptyTransitions = new Dictionary<Status, WorkflowTransition>();
 
         public IReadOnlyDictionary<Status, WorkflowTransition> Transitions { get; }
 
@@ -20,11 +19,9 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public bool NoUpdate { get; }
 
-        public WorkflowStep(IReadOnlyDictionary<Status, WorkflowTransition> transitions, string color = null, bool noUpdate = false)
+        public WorkflowStep(IReadOnlyDictionary<Status, WorkflowTransition> transitions = null, string color = null, bool noUpdate = false)
         {
-            Guard.NotNull(transitions, nameof(transitions));
-
-            Transitions = transitions;
+            Transitions = transitions ?? EmptyTransitions;
 
             Color = color;
 

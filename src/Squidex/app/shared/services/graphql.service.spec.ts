@@ -32,7 +32,7 @@ describe('GraphQlService', () => {
 
         let graphQlResult: any = null;
 
-        graphQlService.query('my-app', { }).subscribe(result => {
+        graphQlService.query('my-app', {}).subscribe(result => {
             graphQlResult = result;
         });
 

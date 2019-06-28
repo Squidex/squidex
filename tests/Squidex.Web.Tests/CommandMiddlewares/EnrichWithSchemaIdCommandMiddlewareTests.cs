@@ -44,22 +44,22 @@ namespace Squidex.Web.CommandMiddlewares
             A.CallTo(() => actionContextAccessor.ActionContext)
                 .Returns(actionContext);
 
-            var appEntity = A.Fake<IAppEntity>();
+            var app = A.Fake<IAppEntity>();
 
-            A.CallTo(() => appEntity.Id).Returns(appId.Id);
-            A.CallTo(() => appEntity.Name).Returns(appId.Name);
+            A.CallTo(() => app.Id).Returns(appId.Id);
+            A.CallTo(() => app.Name).Returns(appId.Name);
 
-            httpContext.Features.Set<IAppFeature>(new AppResolver.AppFeature(appEntity));
+            httpContext.Features.Set<IAppFeature>(new AppResolver.AppFeature(app));
 
-            var schemaEntity = A.Fake<ISchemaEntity>();
+            var schema = A.Fake<ISchemaEntity>();
 
-            A.CallTo(() => schemaEntity.Id).Returns(schemaId.Id);
-            A.CallTo(() => schemaEntity.SchemaDef).Returns(new Schema(schemaId.Name));
+            A.CallTo(() => schema.Id).Returns(schemaId.Id);
+            A.CallTo(() => schema.SchemaDef).Returns(new Schema(schemaId.Name));
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Name))
-                .Returns(schemaEntity);
+                .Returns(schema);
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
-                .Returns(schemaEntity);
+                .Returns(schema);
 
             sut = new EnrichWithSchemaIdCommandMiddleware(appProvider, actionContextAccessor);
         }

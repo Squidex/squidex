@@ -26,12 +26,18 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                         },
                         StatusColors.Draft),
                 [Status.Archived] =
-                    new WorkflowStep(
-                        WorkflowStep.EmptyTransitions),
+                    new WorkflowStep(),
                 [Status.Published] =
-                    new WorkflowStep(
-                        WorkflowStep.EmptyTransitions)
+                    new WorkflowStep()
             }, Status.Draft);
+
+        [Fact]
+        public void Should_provide_default_workflow_if_none_found()
+        {
+            var result = Workflows.Empty.GetFirst();
+
+            Assert.Same(Workflow.Default, result);
+        }
 
         [Fact]
         public void Should_provide_initial_state()

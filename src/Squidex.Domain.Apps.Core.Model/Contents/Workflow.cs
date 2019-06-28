@@ -6,13 +6,12 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
     public sealed class Workflow
     {
-        public static readonly IReadOnlyDictionary<Status, WorkflowStep> EmptySteps = new Dictionary<Status, WorkflowStep>();
+        private static readonly IReadOnlyDictionary<Status, WorkflowStep> EmptySteps = new Dictionary<Status, WorkflowStep>();
 
         public static readonly Workflow Default = new Workflow(
             new Dictionary<Status, WorkflowStep>
@@ -37,9 +36,9 @@ namespace Squidex.Domain.Apps.Core.Contents
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Archived] = new WorkflowTransition(),
-                            [Status.Published] = new WorkflowTransition()
+                            [Status.Draft] = new WorkflowTransition()
                         },
-                        StatusColors.Archived)
+                        StatusColors.Published)
             }, Status.Draft);
 
         public IReadOnlyDictionary<Status, WorkflowStep> Steps { get; }
@@ -48,9 +47,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public Workflow(IReadOnlyDictionary<Status, WorkflowStep> steps, Status initial)
         {
-            Guard.NotNull(steps, nameof(steps));
-
-            Steps = steps;
+            Steps = steps ?? EmptySteps;
 
             Initial = initial;
         }

@@ -8,9 +8,11 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
+    AppsState,
     MathHelper,
     RolesState,
     WorkflowDto,
+    WorkflowsState,
     WorkflowStep,
     WorkflowStepValues,
     WorkflowTransition,
@@ -28,37 +30,40 @@ export class WorkflowsPageComponent implements OnInit {
     public workflow: WorkflowDto;
 
     constructor(
-        public readonly rolesState: RolesState
+        public readonly appsState: AppsState,
+        public readonly rolesState: RolesState,
+        public readonly workflowsState: WorkflowsState
     ) {
     }
 
     public ngOnInit() {
-        this.rolesState.load();
+        this.workflowsState.load()
+            .subscribe(workflow => {
+                this.workflow = workflow;
+            });
 
-        this.workflow =
-            new WorkflowDto()
-                .setStep('Archived', { color: '#eb3142', noUpdate: true })
-                .setStep('Draft', { color: '#8091a5' })
-                .setStep('Published', { color: '#4bb958', isLocked: true })
-                .setTransition('Archived', 'Draft')
-                .setTransition('Draft', 'Archived')
-                .setTransition('Draft', 'Published')
-                .setTransition('Published', 'Draft')
-                .setTransition('Published', 'Archived');
+        this.rolesState.load();
     }
 
     public reload() {
-        return;
+        this.workflowsState.load(true)
+            .subscribe(workflow => {
+                this.workflow = workflow;
+            });
     }
 
     public save() {
-        return;
+        this.workflowsState.save(this.workflow);
     }
 
     public addStep() {
         this.workflow = this.workflow.setStep(`Step${this.maxSteps}`, { color: MathHelper.randomColor() });
 
         this.maxSteps++;
+    }
+
+    public setInitial(step: WorkflowStep) {
+        this.workflow = this.workflow.setInitial(step.name);
     }
 
     public addTransiton(from: WorkflowStep, to: WorkflowStep) {

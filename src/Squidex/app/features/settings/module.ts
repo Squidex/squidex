@@ -209,4 +209,4 @@ const routes: Routes = [
         WorkflowStepComponent
     ]
 })
-export class SqxFeatureSettingsModule { }
+export class SqxFeatureSettingsModule {}

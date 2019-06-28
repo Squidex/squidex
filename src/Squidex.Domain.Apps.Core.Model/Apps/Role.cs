@@ -71,7 +71,8 @@ namespace Squidex.Domain.Apps.Core.Apps
             return new Role(Editor,
                 P.ForApp(P.AppAssets, app),
                 P.ForApp(P.AppCommon, app),
-                P.ForApp(P.AppContents, app));
+                P.ForApp(P.AppContents, app),
+                P.ForApp(P.AppWorkflowsRead, app));
         }
 
         public static Role CreateReader(string app)

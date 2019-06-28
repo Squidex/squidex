@@ -15,3 +15,10 @@
     line-height: 1.2rem;
     border: 1px solid transparent;
 }
+
+.form-control {
+    &:disabled,
+    &.disabled {
+        background: $panel-light-background;
+    }
+}

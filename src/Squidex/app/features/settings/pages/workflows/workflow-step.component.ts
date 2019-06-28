@@ -32,6 +32,12 @@ export class WorkflowStepComponent implements OnChanges {
     @Input()
     public roles: RoleDto[];
 
+    @Input()
+    public disabled: boolean;
+
+    @Output()
+    public makeInitial = new EventEmitter();
+
     @Output()
     public transitionAdd = new EventEmitter<WorkflowStep>();
 

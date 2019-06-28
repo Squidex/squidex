@@ -22,15 +22,5 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
 
             serialized.Should().BeEquivalentTo(workflow);
         }
-
-        [Fact]
-        public void Should_serialize_and_deserialize_workflows()
-        {
-            var workflow = Workflows.Empty.Set(Workflow.Default);
-
-            var serialized = workflow.SerializeAndDeserialize();
-
-            serialized.Should().BeEquivalentTo(workflow);
-        }
     }
 }

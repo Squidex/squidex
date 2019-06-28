@@ -40,10 +40,37 @@
 
 .step {
     & {
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
     }
 
     &-inner {
-        padding-left: 1rem;
+        padding-left: 2.4rem;
+    }
+
+    &-header {
+        &:hover {
+            .enabled {
+                visibility: visible;
+            }
+        }
+    }
+}
+
+.btn-initial {
+    & {
+        visibility: hidden;
+        line-height: 1.6rem;
+        padding-left: 0;
+        padding-right: 0;
+        width: 2rem;
+        text-align: center;
+    }
+
+    &:disabled {
+        @include opacity(1);
+    }
+
+    &.active {
+        visibility: visible;
     }
 }

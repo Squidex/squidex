@@ -39,4 +39,4 @@ const routes: Routes = [
         AssetsPageComponent
     ]
 })
-export class SqxFeatureAssetsModule { }
+export class SqxFeatureAssetsModule {}

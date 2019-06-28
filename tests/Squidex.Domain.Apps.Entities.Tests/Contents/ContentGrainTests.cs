@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IContentRepository contentRepository = A.Dummy<IContentRepository>();
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>(x => x.Wrapping(new DefaultContentWorkflow()));
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly IAppEntity app = A.Fake<IAppEntity>();
+        private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
         private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.DE);
 
         private readonly NamedContentData invalidData =
@@ -92,10 +92,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
                          new NumberFieldProperties { IsRequired = false })
                     .ConfigureScripts(scripts);
 
-            A.CallTo(() => app.LanguagesConfig).Returns(languagesConfig);
+            A.CallTo(() => appEntity.LanguagesConfig).Returns(languagesConfig);
 
-            A.CallTo(() => appProvider.GetAppAsync(AppName)).Returns(app);
-            A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppId, SchemaId)).Returns((app, schema));
+            A.CallTo(() => appProvider.GetAppAsync(AppName)).Returns(appEntity);
+            A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppId, SchemaId)).Returns((appEntity, schema));
 
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
 

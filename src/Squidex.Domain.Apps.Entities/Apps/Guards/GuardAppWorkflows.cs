@@ -32,6 +32,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     e(Not.Defined("Initial step"), $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
                 }
 
+                if (workflow.Initial == Status.Published)
+                {
+                    e("Initial step cannot be published step.", $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
+                }
+
                 var stepsPrefix = $"{nameof(command.Workflow)}.{nameof(workflow.Steps)}";
 
                 if (!workflow.Steps.ContainsKey(Status.Published))

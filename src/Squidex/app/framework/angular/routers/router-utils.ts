@@ -10,7 +10,7 @@ import { ActivatedRoute, ActivatedRouteSnapshot, Data, Params, RouterStateSnapsh
 export function allData(value: ActivatedRouteSnapshot | ActivatedRoute): Data {
     let snapshot: ActivatedRouteSnapshot | null = value['snapshot'] || value;
 
-    const result: { [key: string]: any } = { };
+    const result: { [key: string]: any } = {};
 
     while (snapshot) {
         for (let key in snapshot.data) {
@@ -27,7 +27,7 @@ export function allData(value: ActivatedRouteSnapshot | ActivatedRoute): Data {
 export function allParams(value: ActivatedRouteSnapshot | ActivatedRoute): Params {
     let snapshot: ActivatedRouteSnapshot | null = value['snapshot'] || value;
 
-    const result: { [key: string]: any } = { };
+    const result: { [key: string]: any } = {};
 
     while (snapshot) {
         for (let key in snapshot.params) {

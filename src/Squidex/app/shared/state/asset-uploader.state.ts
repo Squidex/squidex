@@ -43,7 +43,7 @@ interface Snapshot {
     uploads: UploadList;
 }
 
-export class UploadCanceled { }
+export class UploadCanceled {}
 
 type UploadList = ImmutableArray<Upload>;
 type UploadResult = AssetDto | number;
