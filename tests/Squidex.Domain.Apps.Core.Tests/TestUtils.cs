@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core
 
             var serializerSettings = new JsonSerializerSettings
             {
-                SerializationBinder = new ReadOnlyDictionaryBinder(new TypeNameSerializationBinder(typeNameRegistry)),
+                SerializationBinder = new TypeNameSerializationBinder(typeNameRegistry),
 
                 ContractResolver = new ConverterContractResolver(
                     new AppClientsConverter(),
