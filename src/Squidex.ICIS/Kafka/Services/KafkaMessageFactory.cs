@@ -28,6 +28,12 @@ namespace Squidex.ICIS.Actions.Kafka
                 case "commentary-type":
                     entity = new CommentaryTypeMapper().ToAvro(contentEvent);
                     break;
+                case "commodity":
+                    entity = new CommodityMapper().ToAvro(contentEvent);
+                    break;
+                case "region":
+                    entity = new RegionMapper().ToAvro(contentEvent);
+                    break;
                 default:
                     throw new Exception($"Schema {schemaName} not configured for Kafka Integration.");
             }

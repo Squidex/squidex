@@ -1,0 +1,29 @@
+{
+    "regions": [
+        {
+            "ID": {
+                "iv": "http://iddn.icis.com/ref-data/location/95"
+            },
+            "Name": {
+                "iv": "Americas"
+            }
+        },
+        {
+            "ID": {
+                "iv": "http://iddn.icis.com/ref-data/location/9"
+            },
+            "Name": {
+                "iv": "Asia"
+            }
+        },
+        {
+            "ID": {
+                "iv": "http://iddn.icis.com/ref-data/location/1"
+            },
+            "Name": {
+                "iv": "Europe"
+            }
+        }
+
+    ]
+}

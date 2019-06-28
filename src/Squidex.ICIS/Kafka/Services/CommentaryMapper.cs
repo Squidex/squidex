@@ -42,7 +42,7 @@ namespace Squidex.ICIS.Actions.Kafka
 
             if (!contentEvent.Data.TryGetValue("Body", out var bodyData))
             {
-                throw new System.Exception("Unable to find Body field.");
+                throw new Exception("Unable to find Body field.");
             }
 
             commentary.Body = bodyData["en"]?.ToString();
@@ -57,13 +57,20 @@ namespace Squidex.ICIS.Actions.Kafka
                 throw new Exception("Unable to find Commodity field.");
             }
 
+            if (!contentEvent.Data.TryGetValue("Region", out var regionData))
+            {
+                throw new Exception("Unable to find Region field.");
+            }
+
             var commentaryTypeDBId = ((Collection<IJsonValue>)commentaryTypeData["iv"])[0].ToString();
             var commodityDBId = ((Collection<IJsonValue>)commodityData["iv"])[0].ToString();
+            var regionDBId = ((Collection<IJsonValue>)regionData["iv"])[0].ToString();
 
-            var publishedEntities = GetPublishedEntities(string.Join(',', new[] { commentaryTypeDBId, commodityDBId }));
+            var publishedEntities = GetPublishedEntities(string.Join(',', new[] { commentaryTypeDBId, commodityDBId, regionDBId }));
 
             var commentaryType = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("commentary-type")).Item1;
             var commodity = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("commodity")).Item1;
+            var region = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("region")).Item1;
 
             if (!commentaryType.Data.TryGetValue("ID", out var commentaryTypeIdData))
             {
@@ -75,8 +82,14 @@ namespace Squidex.ICIS.Actions.Kafka
                 throw new Exception("Unable to find commodity Id field.");
             }
 
+            if (!region.Data.TryGetValue("ID", out var regionIdData))
+            {
+                throw new Exception("Unable to find commodity Id field.");
+            }
+
             commentary.CommentaryTypeId = commentaryTypeIdData["iv"].ToString();
             commentary.CommodityId = commodityIdData["iv"].ToString();
+            commentary.RegionId = regionIdData["iv"].ToString();
 
             return commentary;
         }

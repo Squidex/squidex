@@ -18,7 +18,11 @@ param(
 
     [Parameter(Mandatory=$true)]
     [string]
-    $appName
+    $appName,
+
+    [Parameter(Mandatory=$false)]
+    [bool]
+    $createRules
 )
 
 add-type @"
@@ -42,5 +46,11 @@ $schemaResponse = .\2_CreateSchemas.ps1 -token $token -apiBaseUrl $apiBaseUrl -a
 Write-Host $schemaResponse
 .\3_CreateRoles.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
 .\4_CreateLanguages.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName 
-.\5_CreateRules.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName -schemaIds $schemaResponse
+
+if($createRules)
+{
+    .\5_CreateRules.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName -schemaIds $schemaResponse
+}
+
+
 .\6_CreateRefDataContent.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
