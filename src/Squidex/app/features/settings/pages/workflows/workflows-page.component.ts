@@ -57,7 +57,7 @@ export class WorkflowsPageComponent implements OnInit {
     public addStep() {
         let index = this.workflow.steps.length;
 
-        for (let i = index; ;i++) {
+        for (let i = index; i < index + 100; i++) {
             const name = `Step${i}`;
 
             if (!this.workflow.getStep(name)) {

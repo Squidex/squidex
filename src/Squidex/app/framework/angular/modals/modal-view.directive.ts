@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnChanges, OnDestroy, Renderer2, SimpleChanges, TemplateRef, ViewContainerRef } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subscription, timer } from 'rxjs';
 
 import {
     DialogModel,
@@ -22,6 +22,7 @@ import { RootViewComponent } from './root-view.component';
 export class ModalViewDirective implements OnChanges, OnDestroy {
     private subscription: Subscription | null = null;
     private documentClickListener: Function | null = null;
+    private documentClickTimer: Subscription | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
 
     @Input('sqxModalView')
@@ -76,6 +77,8 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             return;
         }
 
+        this.unsubscribeToClick();
+
         if (isOpen && !this.renderedView) {
             const container = this.getContainer();
 
@@ -85,9 +88,9 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
                 this.renderer.setStyle(this.renderedView.rootNodes[0], 'display', 'block');
             }
 
-            setTimeout(() => {
+            this.documentClickTimer = timer(1000, 0).subscribe(() => {
                 this.startListening();
-            }, 1000);
+            });
 
             this.changeDetector.detectChanges();
         } else if (!isOpen && this.renderedView) {
@@ -97,8 +100,6 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             container.remove(containerIndex);
 
             this.renderedView = null;
-
-            this.unsubscribeToClick();
 
             this.changeDetector.detectChanges();
         }
@@ -112,6 +113,8 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         if (!this.closeAuto) {
             return;
         }
+
+        this.unsubscribeToClick();
 
         this.documentClickListener =
             this.renderer.listen('document', 'click', (event: MouseEvent) => {
@@ -155,6 +158,11 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         if (this.documentClickListener) {
             this.documentClickListener();
             this.documentClickListener = null;
+        }
+
+        if (this.documentClickTimer) {
+            this.documentClickTimer.unsubscribe();
+            this.documentClickTimer = null;
         }
     }
 }

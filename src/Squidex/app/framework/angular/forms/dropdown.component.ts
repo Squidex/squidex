@@ -118,6 +118,9 @@ export class DropdownComponent extends StatefulControlComponent<State, any[]> im
         if (value !== this.snapshot.selectedItem) {
             selectedIndex = selectedIndex;
 
+            this.callChange(value);
+            this.callTouched();
+
             this.next(s => ({ ...s, selectedIndex, selectedItem: value }));
         }
 
