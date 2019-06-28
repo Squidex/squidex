@@ -133,7 +133,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = response.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = response.ToEtag();
+            Response.Headers[HeaderNames.ETag] = $"{response.ToEtag()}_{App.Version}";
 
             return Ok(response);
         }
@@ -169,7 +169,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = response.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = response.ToEtag();
+            Response.Headers[HeaderNames.ETag] = $"{response.ToEtag()}_{App.Version}";
 
             return Ok(response);
         }
@@ -203,7 +203,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = content.Id.ToString();
             }
 
-            Response.Headers[HeaderNames.ETag] = content.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = $"{response.ToEtag()}_{App.Version}";
 
             return Ok(response);
         }
@@ -238,7 +238,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = content.Id.ToString();
             }
 
-            Response.Headers[HeaderNames.ETag] = content.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = $"{response.ToEtag()}_{App.Version}";
 
             return Ok(response.Data);
         }

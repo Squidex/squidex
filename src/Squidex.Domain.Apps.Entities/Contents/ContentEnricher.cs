@@ -32,18 +32,19 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contextProvider = contextProvider;
         }
 
-        public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content)
+        public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, ClaimsPrincipal user)
         {
             Guard.NotNull(content, nameof(content));
 
-            var enriched = await EnrichAsync(Enumerable.Repeat(content, 1));
+            var enriched = await EnrichAsync(Enumerable.Repeat(content, 1), user);
 
             return enriched[0];
         }
 
-        public async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents)
+        public async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, ClaimsPrincipal user)
         {
             Guard.NotNull(contents, nameof(contents));
+            Guard.NotNull(user, nameof(user));
 
             using (Profiler.TraceMethod<ContentEnricher>())
             {
@@ -59,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                     if (ShouldEnrichWithStatuses())
                     {
-                        await ResolveNextsAsync(content, result);
+                        await ResolveNextsAsync(content, result, user);
                         await ResolveCanUpdateAsync(content, result);
                     }
 
@@ -80,9 +81,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             result.CanUpdate = await contentWorkflow.CanUpdateAsync(content);
         }
 
-        private async Task ResolveNextsAsync(IContentEntity content, ContentEntity result)
+        private async Task ResolveNextsAsync(IContentEntity content, ContentEntity result, ClaimsPrincipal user)
         {
-            result.Nexts = await contentWorkflow.GetNextsAsync(content, ClaimsPrincipal.Current);
+            result.Nexts = await contentWorkflow.GetNextsAsync(content, user);
         }
 
         private async Task ResolveColorAsync(IContentEntity content, ContentEntity result, Dictionary<(Guid, Status), StatusInfo> cache)

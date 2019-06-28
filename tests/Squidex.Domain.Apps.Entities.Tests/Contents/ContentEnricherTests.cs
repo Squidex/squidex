@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
@@ -18,6 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
+        private readonly ClaimsPrincipal user = new ClaimsPrincipal();
         private readonly Context context = new Context();
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly ContentEnricher sut;
@@ -38,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentWorkflow.GetInfoAsync(source))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
 
-            var result = await sut.EnrichAsync(source);
+            var result = await sut.EnrichAsync(source, user);
 
             Assert.Equal(StatusColors.Published, result.StatusColor);
         }
@@ -51,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentWorkflow.GetInfoAsync(source))
                 .Returns(Task.FromResult<StatusInfo>(null));
 
-            var result = await sut.EnrichAsync(source);
+            var result = await sut.EnrichAsync(source, user);
 
             Assert.Equal(StatusColors.Draft, result.StatusColor);
         }
@@ -66,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentWorkflow.CanUpdateAsync(source))
                 .Returns(true);
 
-            var result = await sut.EnrichAsync(source);
+            var result = await sut.EnrichAsync(source, user);
 
             Assert.True(result.CanUpdate);
         }
@@ -78,7 +80,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var source = new ContentEntity { SchemaId = schemaId };
 
-            var result = await sut.EnrichAsync(source);
+            var result = await sut.EnrichAsync(source, user);
 
             Assert.False(result.CanUpdate);
 
@@ -95,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             A.CallTo(() => contentWorkflow.GetInfoAsync(source1))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
 
-            var result = await sut.EnrichAsync(new[] { source1, source2 });
+            var result = await sut.EnrichAsync(new[] { source1, source2 }, user);
 
             Assert.Equal(StatusColors.Published, result[0].StatusColor);
             Assert.Equal(StatusColors.Published, result[1].StatusColor);
