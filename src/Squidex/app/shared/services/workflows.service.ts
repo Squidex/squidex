@@ -7,7 +7,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import {
@@ -18,21 +18,17 @@ import {
     HTTP,
     mapVersioned,
     pretifyError,
-    Model,
     Resource,
     ResourceLinks,
     Version,
-    Versioned
+    Versioned,
+    versioned
 } from '@app/framework';
 
-export type WorkflowsDto = Versioned<WorkflowsPayload>;
-export type WorkflowsPayload = {
-    readonly items: WorkflowDto[];
+export type WorkflowsDto = Versioned<WorkflowPayload>;
+export type WorkflowPayload = { workflow: WorkflowDto; } & Resource;
 
-    readonly canCreate: boolean;
-} & Resource;
-
-export class WorkflowDto extends Model<WorkflowDto> {
+export class WorkflowDto {
     public readonly _links: ResourceLinks;
 
     public readonly canUpdate: boolean;
@@ -242,7 +238,7 @@ export class WorkflowsService {
     ) {
     }
 
-    public getWorkflows(appName: string): Observable<WorkflowsDto> {
+    public getWorkflow(appName: string): Observable<Versioned<WorkflowPayload>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflows`);
 
         return HTTP.getVersioned(this.http, url).pipe(
@@ -252,7 +248,7 @@ export class WorkflowsService {
             pretifyError('Failed to load workflows. Please reload.'));
     }
 
-    public postWorkflows(appName: string, dto: WorkflowDto, version: Version): Observable<WorkflowsDto> {
+    public postWorkflow(appName: string, dto: WorkflowPayload, version: Version): Observable<Versioned<WorkflowPayload>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflows`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
@@ -265,7 +261,7 @@ export class WorkflowsService {
             pretifyError('Failed to add Workflow. Please reload.'));
     }
 
-    public deleteWorkflow(appName: string, resource: Resource, version: Version): Observable<WorkflowsDto> {
+    public deleteWorkflow(appName: string, resource: Resource, version: Version): Observable<Versioned<WorkflowPayload>> {
         const link = resource._links['delete'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -281,30 +277,25 @@ export class WorkflowsService {
             }),
             pretifyError('Failed to delete Workflow. Please reload.'));
     }
-}
 
-function parseWorkflow(response: any) {
-    const raw: any[] = response.items;
-
-    const items = raw.map(item =>
-        new WorkflowDto(item._links,
-            item._name,
-            item._steps,
-            item._transitions));
-
-    const { _links, _meta } = response;
-
-    return { items, _links, _meta, canCreate: hasAnyLink(_links, 'create') };
-}
-export type WorkflowTransitionView = { step: WorkflowStep } & WorkflowTransition;
-
-@Injectable()
-export class WorkflowsService {
-    public getWorkflow(appName: string): Observable<Versioned<WorkflowPayload>> {
+    public getWorkflowz(appName: string): Observable<Versioned<WorkflowPayload>> {
         return of(versioned(new Version('1'), { workflow: WorkflowDto.DEFAULT, _links: {} }));
     }
 
     public putWorkflow(appName: string, resource: Resource, dto: any, version: Version): Observable<Versioned<WorkflowPayload>> {
         return of(versioned(new Version('1'), { workflow: WorkflowDto.DEFAULT, _links: {} }));
     }
+}
+
+function parseWorkflow(response: any) {
+    const raw: any = response.item;
+
+    const workflow = new WorkflowDto(raw._links,
+            raw._initial,
+            raw._steps,
+            raw._transitions);
+
+    const { _links, _meta } = response;
+
+    return { workflow, _links, _meta, canCreate: hasAnyLink(_links, 'create') };
 }
