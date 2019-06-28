@@ -20,7 +20,7 @@ import { RootViewComponent } from './root-view.component';
     selector: '[sqxModalView]'
 })
 export class ModalViewDirective implements OnChanges, OnDestroy, OnInit {
-    private subscription: Subscription | null = null;
+    private modalSubscription: Subscription | null = null;
     private documentClickCounterListener: Function | null = null;
     private documentClickListener: Function | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
@@ -72,7 +72,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy, OnInit {
         this.unsubscribeToModal();
 
         if (Types.is(this.modalView, DialogModel) || Types.is(this.modalView, ModalModel)) {
-            this.subscription =
+            this.modalSubscription =
                 this.modalView.isOpen.subscribe(isOpen => {
                     this.update(isOpen);
                 });
@@ -121,8 +121,6 @@ export class ModalViewDirective implements OnChanges, OnDestroy, OnInit {
             return;
         }
 
-        this.unsubscribeToClick();
-
         this.documentClickListener =
             this.renderer.listen('document', 'click', (event: MouseEvent) => {
                 if (!event.target || this.renderedView === null || this.clickCounter === clickCounter) {
@@ -155,9 +153,9 @@ export class ModalViewDirective implements OnChanges, OnDestroy, OnInit {
     }
 
     private unsubscribeToModal() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
+        if (this.modalSubscription) {
+            this.modalSubscription.unsubscribe();
+            this.modalSubscription = null;
         }
     }
 
