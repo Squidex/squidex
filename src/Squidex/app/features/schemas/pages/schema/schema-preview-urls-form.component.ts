@@ -43,10 +43,7 @@ export class SchemaPreviewUrlsFormComponent implements OnInit {
         this.isEditable = this.schema.canUpdateUrls;
 
         this.editForm.load(this.schema.previewUrls);
-
-        if (!this.isEditable) {
-            return;
-        }
+        this.editForm.setEnabled(this.isEditable);
     }
 
     public emitComplete() {

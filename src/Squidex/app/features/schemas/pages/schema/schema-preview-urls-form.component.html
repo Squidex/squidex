@@ -6,7 +6,7 @@
 
         <ng-container content>
             <sqx-form-hint>
-                Adding a preview url generates a link in the content editor, referring to your custom preview environment where the content item is used.
+                Adding a preview url generates a link in the content editor, referring to your custom preview or production environment where the content item is used.
             </sqx-form-hint>
 
             <sqx-form-hint>
@@ -14,6 +14,10 @@
             </sqx-form-hint>
 
             <div class="content">
+                <div class="mt-4" *ngIf="!isEditable && editForm.form.controls.length === 0">
+                    No preview urls configured.
+                </div>
+
                 <div class="form-group row no-gutters" *ngFor="let form of editForm.form.controls; let i = index">
                     <div class="col col-name pr-1">
                         <sqx-control-errors [for]="form.get('name')" fieldName="Name" [submitted]="editForm.submitted | async"></sqx-control-errors>

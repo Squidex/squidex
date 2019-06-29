@@ -64,8 +64,7 @@ export class CodeEditorComponent extends StatefulControlComponent<any, string> i
     }
 
     public ngAfterViewInit() {
-        this.valueChanged.pipe(
-                debounceTime(500))
+        this.valueChanged.pipe(debounceTime(500))
             .subscribe(() => {
                 this.changeValue();
             });
