@@ -52,7 +52,7 @@ export class ResourceOwner implements OnDestroy {
 
 export abstract class StatefulComponent<T = any> extends State<T> implements OnDestroy {
     private readonly subscriptions = new ResourceOwner();
-    private subscription: Subscription;
+    private readonly subscription: Subscription;
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
@@ -74,6 +74,10 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
 
     protected unsubscribeAll() {
         this.subscriptions.unsubscribeAll();
+    }
+
+    protected detach() {
+        this.changeDetector.detach();
     }
 
     protected detectChanges() {

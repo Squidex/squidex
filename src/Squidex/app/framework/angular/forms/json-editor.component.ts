@@ -87,6 +87,8 @@ export class JsonEditorComponent extends StatefulControlComponent<{}, string> im
             this.aceEditor.on('change', () => {
                 this.valueChanged.next();
             });
+
+            this.detach();
         });
     }
 
