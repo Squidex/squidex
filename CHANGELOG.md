@@ -1,8 +1,18 @@
 # Changelog
 
+## v2.2.0 - 2019-06-29
+
+### Features
+
+* **Login**: Redirect to authentication provider automatically if only one provider is active.
+
+### Bugfixes
+
+* **GraphQL**: Fix a bug in styles that prevented to autocomplete to show properly
+
 ## v2.1.0 - 2019-06-22
 
-## Features
+### Features
 
 * **Assets**: Parameter to prevent download in Browser.
 * **Assets**: FTP asset store.
@@ -19,7 +29,7 @@
 * **UI**: Dropdown field for references.
 * **Users**: Email notifications when contributors is added.
 
-## Bugfixes
+### Bugfixes
 
 * **Contents**: Fix for scheduled publishing.
 * **GraphQL**: Fix query parameters for assets.
@@ -30,11 +40,11 @@
 
 ## v2.0.5 - 2019-04-21
 
-## Features
+### Features
 
 * **UI**: Sort content by clicking on the table header.
 
-## Bugfixes
+### Bugfixes
 
 * **UI**: Fix publish button in content context menu.
 
