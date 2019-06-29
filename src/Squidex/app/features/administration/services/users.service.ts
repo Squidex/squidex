@@ -19,7 +19,7 @@ import {
     ResultSet
 } from '@app/shared';
 
-export class UsersDto  extends ResultSet<UserDto> {
+export class UsersDto extends ResultSet<UserDto> {
     public get canCreate() {
         return hasAnyLink(this._links, 'create');
     }
@@ -73,32 +73,32 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(`api/user-management?take=${take}&skip=${skip}&query=${query || ''}`);
 
         return this.http.get<{ total: number, items: any[] } & Resource>(url).pipe(
-                map(({ total, items, _links }) => {
-                    const users = items.map(item => parseUser(item));
+            map(({ total, items, _links }) => {
+                const users = items.map(item => parseUser(item));
 
-                    return new UsersDto(total, users, _links);
-                }),
-                pretifyError('Failed to load users. Please reload.'));
+                return new UsersDto(total, users, _links);
+            }),
+            pretifyError('Failed to load users. Please reload.'));
     }
 
     public getUser(id: string): Observable<UserDto> {
         const url = this.apiUrl.buildUrl(`api/user-management/${id}`);
 
         return this.http.get(url).pipe(
-                map(body => {
-                    return parseUser(body);
-                }),
-                pretifyError('Failed to load user. Please reload.'));
+            map(body => {
+                return parseUser(body);
+            }),
+            pretifyError('Failed to load user. Please reload.'));
     }
 
     public postUser(dto: CreateUserDto): Observable<UserDto> {
         const url = this.apiUrl.buildUrl('api/user-management');
 
         return this.http.post(url, dto).pipe(
-                map(body => {
-                    return parseUser(body);
-                }),
-                pretifyError('Failed to create user. Please reload.'));
+            map(body => {
+                return parseUser(body);
+            }),
+            pretifyError('Failed to create user. Please reload.'));
     }
 
     public putUser(user: Resource, dto: UpdateUserDto): Observable<UserDto> {
@@ -107,10 +107,10 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url, { body: dto }).pipe(
-                map(body => {
-                    return parseUser(body);
-                }),
-                pretifyError('Failed to update user. Please reload.'));
+            map(body => {
+                return parseUser(body);
+            }),
+            pretifyError('Failed to update user. Please reload.'));
     }
 
     public lockUser(user: Resource): Observable<UserDto> {
@@ -119,10 +119,10 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url).pipe(
-                map(body => {
-                    return parseUser(body);
-                }),
-                pretifyError('Failed to load users. Please retry.'));
+            map(body => {
+                return parseUser(body);
+            }),
+            pretifyError('Failed to load users. Please retry.'));
     }
 
     public unlockUser(user: Resource): Observable<UserDto> {
@@ -131,10 +131,10 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url).pipe(
-                map(body => {
-                    return parseUser(body);
-                }),
-                pretifyError('Failed to load users. Please retry.'));
+            map(body => {
+                return parseUser(body);
+            }),
+            pretifyError('Failed to load users. Please retry.'));
     }
 }
 

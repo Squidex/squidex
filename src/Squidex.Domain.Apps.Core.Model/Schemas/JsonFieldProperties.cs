@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-
 namespace Squidex.Domain.Apps.Core.Schemas
 {
     public sealed class JsonFieldProperties : FieldProperties

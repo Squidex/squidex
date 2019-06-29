@@ -21,6 +21,6 @@ export class HelpService {
         const url = `https://raw.githubusercontent.com/Squidex/squidex-docs/master/${helpPage}.md`;
 
         return this.http.get(url, { responseType: 'text' }).pipe(
-                catchError(() => of('')));
+            catchError(() => of('')));
     }
 }

@@ -1,0 +1,57 @@
+<sqx-title message="{app} | Workflows | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
+
+<sqx-panel desiredWidth="50rem" isBlank="true" [showSidebar]="true" [isLazyLoaded]="false">
+    <ng-container title>
+        Workflow
+    </ng-container>
+
+    <ng-container menu>
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh roles (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
+
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+
+        <ng-container *ngIf="workflow && workflow.canUpdate">
+            <button type="button" class="btn btn-primary" (click)="save()" title="Save (CTRL + S)">
+                Save
+            </button>
+    
+            <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
+        </ng-container>
+    </ng-container>
+
+    <ng-container content>
+        <ng-container *ngIf="workflow">
+            <ng-container *ngIf="rolesState.roles | async; let roles">
+                <sqx-workflow-step *ngFor="let step of workflow.steps; trackBy: trackByStep"
+                    [workflow]="workflow"
+                    [disabled]="!workflow.canUpdate"
+                    [roles]="roles"
+                    [step]="step"
+                    (makeInitial)="setInitial(step)"
+                    (rename)="renameStep(step, $event)"
+                    (remove)="removeStep(step)"
+                    (transitionAdd)="addTransiton(step, $event)"
+                    (transitionRemove)="removeTransition(step, $event)"
+                    (transitionUpdate)="updateTransition($event)"
+                    (update)="updateStep(step, $event)">
+                </sqx-workflow-step>
+            </ng-container>
+    
+            <button class="btn btn-success" (click)="addStep()" *ngIf="workflow.canUpdate">
+                Add Step
+            </button>
+        </ng-container>
+    </ng-container>
+
+    <ng-container sidebar>
+        <div class="panel-nav">
+            <a class="panel-link" routerLink="help" routerLinkActive="active" title="Help" titlePosition="left">
+                <i class="icon-help"></i>
+            </a>
+        </div>
+    </ng-container>
+</sqx-panel>
+
+<router-outlet></router-outlet>

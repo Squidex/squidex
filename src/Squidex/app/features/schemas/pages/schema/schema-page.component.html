@@ -25,10 +25,10 @@
             </button>
             <div class="dropdown-menu" *sqxModalView="editOptionsDropdown;closeAlways:true" [sqxModalTarget]="buttonOptions" @fade>
                 <a class="dropdown-item" (click)="configureScriptsDialog.show()">
-                    Edit Scripts
+                    Configure Scripts
                 </a>
                 <a class="dropdown-item" (click)="configurePreviewUrlsDialog.show()">
-                    Edit Preview Urls
+                    Configure Preview Urls
                 </a>
                 
                 <ng-container *ngIf="schemasState.canCreate">

@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using System;
+using System.ComponentModel;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
+    [TypeConverter(typeof(StatusConverter))]
     public struct Status : IEquatable<Status>
     {
         public static readonly Status Archived = new Status("Archived");

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -53,7 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Task.FromResult(result);
         }
 
-        public Task<bool> CanMoveToAsync(IContentEntity content, Status next)
+        public Task<bool> CanMoveToAsync(IContentEntity content, Status next, ClaimsPrincipal user)
         {
             var result = Flow.TryGetValue(content.Status, out var step) && step.Transitions.Any(x => x.Status == next);
 
@@ -67,14 +68,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return Task.FromResult(result);
         }
 
-        public Task<StatusInfo> GetInfoAsync(Status status)
+        public Task<StatusInfo> GetInfoAsync(IContentEntity content)
         {
-            var result = Flow[status].Info;
+            var result = Flow[content.Status].Info;
 
             return Task.FromResult(result);
         }
 
-        public Task<StatusInfo[]> GetNextsAsync(IContentEntity content)
+        public Task<StatusInfo[]> GetNextsAsync(IContentEntity content, ClaimsPrincipal user)
         {
             var result = Flow.TryGetValue(content.Status, out var step) ? step.Transitions : Array.Empty<StatusInfo>();
 

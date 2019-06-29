@@ -80,23 +80,23 @@ export class ClientsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
         return HTTP.getVersioned(this.http, url).pipe(
-                mapVersioned(({ body }) => {
-                    return parseClients(body);
-                }),
-                pretifyError('Failed to load clients. Please reload.'));
+            mapVersioned(({ body }) => {
+                return parseClients(body);
+            }),
+            pretifyError('Failed to load clients. Please reload.'));
     }
 
     public postClient(appName: string, dto: CreateClientDto, version: Version): Observable<ClientsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
-                mapVersioned(({ body }) => {
-                    return parseClients(body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Client', 'Created', appName);
-                }),
-                pretifyError('Failed to add client. Please reload.'));
+            mapVersioned(({ body }) => {
+                return parseClients(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Client', 'Created', appName);
+            }),
+            pretifyError('Failed to add client. Please reload.'));
     }
 
     public putClient(appName: string, resource: Resource, dto: UpdateClientDto, version: Version): Observable<ClientsDto> {
@@ -105,13 +105,13 @@ export class ClientsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
-                mapVersioned(({ body }) => {
-                    return parseClients(body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Client', 'Updated', appName);
-                }),
-                pretifyError('Failed to revoke client. Please reload.'));
+            mapVersioned(({ body }) => {
+                return parseClients(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Client', 'Updated', appName);
+            }),
+            pretifyError('Failed to revoke client. Please reload.'));
     }
 
     public deleteClient(appName: string, resource: Resource, version: Version): Observable<ClientsDto> {
@@ -120,13 +120,13 @@ export class ClientsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
-                mapVersioned(({ body }) => {
-                    return parseClients(body);
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Client', 'Deleted', appName);
-                }),
-                pretifyError('Failed to revoke client. Please reload.'));
+            mapVersioned(({ body }) => {
+                return parseClients(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Client', 'Deleted', appName);
+            }),
+            pretifyError('Failed to revoke client. Please reload.'));
     }
 
     public createToken(appName: string, client: ClientDto): Observable<AccessTokenDto> {
@@ -141,10 +141,10 @@ export class ClientsService {
         const url = this.apiUrl.buildUrl('identity-server/connect/token');
 
         return this.http.post(url, body, options).pipe(
-                map((response: any) => {
-                    return new AccessTokenDto(response.access_token, response.token_type);
-                }),
-                pretifyError('Failed to create token. Please retry.'));
+            map((response: any) => {
+                return new AccessTokenDto(response.access_token, response.token_type);
+            }),
+            pretifyError('Failed to create token. Please retry.'));
     }
 }
 

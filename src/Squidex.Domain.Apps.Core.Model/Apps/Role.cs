@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using P = Squidex.Shared.Permissions;
 
 namespace Squidex.Domain.Apps.Core.Apps
@@ -71,7 +71,8 @@ namespace Squidex.Domain.Apps.Core.Apps
             return new Role(Editor,
                 P.ForApp(P.AppAssets, app),
                 P.ForApp(P.AppCommon, app),
-                P.ForApp(P.AppContents, app));
+                P.ForApp(P.AppContents, app),
+                P.ForApp(P.AppWorkflowsRead, app));
         }
 
         public static Role CreateReader(string app)
@@ -90,6 +91,7 @@ namespace Squidex.Domain.Apps.Core.Apps
                 P.ForApp(P.AppCommon, app),
                 P.ForApp(P.AppContents, app),
                 P.ForApp(P.AppPatterns, app),
+                P.ForApp(P.AppWorkflows, app),
                 P.ForApp(P.AppRules, app),
                 P.ForApp(P.AppSchemas, app));
         }

@@ -21,9 +21,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly ConcurrentDictionary<Guid, IEnrichedAssetEntity> cachedAssets = new ConcurrentDictionary<Guid, IEnrichedAssetEntity>();
         private readonly IContentQueryService contentQuery;
         private readonly IAssetQueryService assetQuery;
-        private readonly QueryContext context;
+        private readonly Context context;
 
-        public QueryExecutionContext(QueryContext context, IAssetQueryService assetQuery, IContentQueryService contentQuery)
+        public QueryExecutionContext(Context context, IAssetQueryService assetQuery, IContentQueryService contentQuery)
         {
             Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(contentQuery, nameof(contentQuery));

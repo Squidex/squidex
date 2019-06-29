@@ -62,42 +62,42 @@ export class PlansService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plans`);
 
         return HTTP.getVersioned(this.http, url).pipe(
-                mapVersioned(({ body }) => {
-                    const items: any[] = body.plans;
+            mapVersioned(({ body }) => {
+                const items: any[] = body.plans;
 
-                    const { hasPortal, currentPlanId, planOwner } = body;
+                const { hasPortal, currentPlanId, planOwner } = body;
 
-                    const plans = {
-                        currentPlanId,
-                        planOwner,
-                        plans: items.map(item =>
-                            new PlanDto(
-                                item.id,
-                                item.name,
-                                item.costs,
-                                item.yearlyId,
-                                item.yearlyCosts,
-                                item.maxApiCalls,
-                                item.maxAssetSize,
-                                item.maxContributors)),
-                        hasPortal
-                    };
+                const plans = {
+                    currentPlanId,
+                    planOwner,
+                    plans: items.map(item =>
+                        new PlanDto(
+                            item.id,
+                            item.name,
+                            item.costs,
+                            item.yearlyId,
+                            item.yearlyCosts,
+                            item.maxApiCalls,
+                            item.maxAssetSize,
+                            item.maxContributors)),
+                    hasPortal
+                };
 
-                    return plans;
-                }),
-                pretifyError('Failed to load plans. Please reload.'));
+                return plans;
+            }),
+            pretifyError('Failed to load plans. Please reload.'));
     }
 
     public putPlan(appName: string, dto: ChangePlanDto, version: Version): Observable<Versioned<PlanChangedDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/plan`);
 
         return HTTP.putVersioned(this.http, url, dto, version).pipe(
-                mapVersioned(payload => {
-                    return <PlanChangedDto>payload.body;
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Plan', 'Changed', appName);
-                }),
-                pretifyError('Failed to change plan. Please reload.'));
+            mapVersioned(payload => {
+                return <PlanChangedDto>payload.body;
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Plan', 'Changed', appName);
+            }),
+            pretifyError('Failed to change plan. Please reload.'));
     }
 }

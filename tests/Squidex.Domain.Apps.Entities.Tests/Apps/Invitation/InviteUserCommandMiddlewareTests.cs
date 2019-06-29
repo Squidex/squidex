@@ -34,13 +34,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .Returns(true);
 
-            var result = A.Fake<IAppEntity>();
+            var app = A.Fake<IAppEntity>();
 
-            context.Complete(result);
+            context.Complete(app);
 
             await sut.HandleAsync(context);
 
-            Assert.Same(context.Result<InvitedResult>().App, result);
+            Assert.Same(context.Result<InvitedResult>().App, app);
 
             A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .MustHaveHappened();

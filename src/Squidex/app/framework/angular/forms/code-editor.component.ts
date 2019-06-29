@@ -11,8 +11,8 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 import {
-    ExternalControlComponent,
     ResourceLoaderService,
+    StatefulControlComponent,
     Types
 } from '@app/framework/internal';
 
@@ -29,7 +29,7 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CodeEditorComponent extends ExternalControlComponent<string> implements AfterViewInit {
+export class CodeEditorComponent extends StatefulControlComponent<any, any> implements AfterViewInit {
     private valueChanged = new Subject();
     private aceEditor: any;
     private value: string;
@@ -44,7 +44,7 @@ export class CodeEditorComponent extends ExternalControlComponent<string> implem
     constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
-        super(changeDetector);
+        super(changeDetector, {});
     }
 
     public writeValue(obj: any) {

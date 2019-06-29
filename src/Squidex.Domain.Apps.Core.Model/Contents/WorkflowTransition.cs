@@ -5,12 +5,19 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
-
-namespace Squidex.Web
+namespace Squidex.Domain.Apps.Core.Contents
 {
-    public interface IAppFeature
+    public sealed class WorkflowTransition
     {
-        IAppEntity App { get; }
+        public string Expression { get; }
+
+        public string Role { get; }
+
+        public WorkflowTransition(string expression = null, string role = null)
+        {
+            Expression = expression;
+
+            Role = role;
+        }
     }
 }

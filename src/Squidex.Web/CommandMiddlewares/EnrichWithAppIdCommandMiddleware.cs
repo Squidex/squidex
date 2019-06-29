@@ -7,7 +7,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
@@ -17,20 +16,15 @@ namespace Squidex.Web.CommandMiddlewares
 {
     public sealed class EnrichWithAppIdCommandMiddleware : ICommandMiddleware
     {
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IContextProvider contextProvider;
 
-        public EnrichWithAppIdCommandMiddleware(IHttpContextAccessor httpContextAccessor)
+        public EnrichWithAppIdCommandMiddleware(IContextProvider contextProvider)
         {
-            this.httpContextAccessor = httpContextAccessor;
+            this.contextProvider = contextProvider;
         }
 
         public Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (httpContextAccessor.HttpContext == null)
-            {
-                return next();
-            }
-
             if (context.Command is IAppCommand appCommand && appCommand.AppId == null)
             {
                 var appId = GetAppId();
@@ -50,14 +44,14 @@ namespace Squidex.Web.CommandMiddlewares
 
         private NamedId<Guid> GetAppId()
         {
-            var appFeature = httpContextAccessor.HttpContext.Features.Get<IAppFeature>();
+            var context = contextProvider.Context;
 
-            if (appFeature?.App == null)
+            if (context.App == null)
             {
                 throw new InvalidOperationException("Cannot resolve app.");
             }
 
-            return appFeature.App.NamedId();
+            return context.App.NamedId();
         }
     }
 }

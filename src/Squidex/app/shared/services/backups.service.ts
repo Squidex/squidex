@@ -85,51 +85,51 @@ export class BackupsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups`);
 
         return this.http.get<{ items: any[], _links: {} } & Resource>(url).pipe(
-                map(({ items, _links }) => {
-                    const backups = items.map(item => parseBackup(item));
+            map(({ items, _links }) => {
+                const backups = items.map(item => parseBackup(item));
 
-                    return new BackupsDto(backups, _links);
-                }),
-                pretifyError('Failed to load backups.'));
+                return new BackupsDto(backups, _links);
+            }),
+            pretifyError('Failed to load backups.'));
     }
 
     public getRestore(): Observable<RestoreDto | null> {
         const url = this.apiUrl.buildUrl(`api/apps/restore`);
 
         return this.http.get(url).pipe(
-                map(body => {
-                    const restore = parseRestore(body);
+            map(body => {
+                const restore = parseRestore(body);
 
-                    return restore;
-                }),
-                catchError(error => {
-                    if (Types.is(error, HttpErrorResponse) && error.status === 404) {
-                        return of(null);
-                    } else {
-                        return throwError(error);
-                    }
-                }),
-                pretifyError('Failed to load backups.'));
+                return restore;
+            }),
+            catchError(error => {
+                if (Types.is(error, HttpErrorResponse) && error.status === 404) {
+                    return of(null);
+                } else {
+                    return throwError(error);
+                }
+            }),
+            pretifyError('Failed to load backups.'));
     }
 
     public postBackup(appName: string): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/backups`);
 
         return this.http.post(url, {}).pipe(
-                tap(() => {
-                    this.analytics.trackEvent('Backup', 'Started', appName);
-                }),
-                pretifyError('Failed to start backup.'));
+            tap(() => {
+                this.analytics.trackEvent('Backup', 'Started', appName);
+            }),
+            pretifyError('Failed to start backup.'));
     }
 
     public postRestore(dto: StartRestoreDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/restore`);
 
         return this.http.post(url, dto).pipe(
-                tap(() => {
-                    this.analytics.trackEvent('Restore', 'Started');
-                }),
-                pretifyError('Failed to start restore.'));
+            tap(() => {
+                this.analytics.trackEvent('Restore', 'Started');
+            }),
+            pretifyError('Failed to start restore.'));
     }
 
     public deleteBackup(appName: string, resource: Resource): Observable<any> {
@@ -138,10 +138,10 @@ export class BackupsService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return this.http.request(link.method, url).pipe(
-                tap(() => {
-                    this.analytics.trackEvent('Backup', 'Deleted', appName);
-                }),
-                pretifyError('Failed to delete backup.'));
+            tap(() => {
+                this.analytics.trackEvent('Backup', 'Deleted', appName);
+            }),
+            pretifyError('Failed to delete backup.'));
     }
 }
 

@@ -48,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         }
 
         public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents,
-            QueryContext context, ApiController controller, ISchemaEntity schema, IContentWorkflow contentWorkflow)
+            Context context, ApiController controller, ISchemaEntity schema, IContentWorkflow contentWorkflow)
         {
             var result = new ContentsDto
             {

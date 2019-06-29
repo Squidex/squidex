@@ -7,34 +7,14 @@
 
 using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure.Security;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Web
 {
     public static class PermissionExtensions
     {
-        private sealed class PermissionFeature
-        {
-            public PermissionSet Permissions { get; }
-
-            public PermissionFeature(PermissionSet permissions)
-            {
-                Permissions = permissions;
-            }
-        }
-
         public static PermissionSet Permissions(this HttpContext httpContext)
         {
-            var feature = httpContext.Features.Get<PermissionFeature>();
-
-            if (feature == null)
-            {
-                feature = new PermissionFeature(httpContext.User.Permissions());
-
-                httpContext.Features.Set(feature);
-            }
-
-            return feature.Permissions;
+            return httpContext.Context().Permissions;
         }
 
         public static bool HasPermission(this HttpContext httpContext, Permission permission, PermissionSet permissions = null)

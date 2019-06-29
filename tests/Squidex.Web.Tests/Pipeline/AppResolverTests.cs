@@ -86,7 +86,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            Assert.Same(app, httpContext.Features.Get<IAppFeature>()?.App);
+            Assert.Same(app, httpContext.Context().App);
             Assert.True(user.Claims.Count() > 2);
             Assert.True(isNextCalled);
         }
@@ -104,7 +104,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            Assert.Same(app, httpContext.Features.Get<IAppFeature>()?.App);
+            Assert.Same(app, httpContext.Context().App);
             Assert.True(user.Claims.Count() > 2);
             Assert.True(isNextCalled);
         }
@@ -124,7 +124,7 @@ namespace Squidex.Web.Pipeline
 
             await sut.OnActionExecutionAsync(actionExecutingContext, next);
 
-            Assert.Same(app, httpContext.Features.Get<IAppFeature>()?.App);
+            Assert.Same(app, httpContext.Context().App);
             Assert.Equal(2, user.Claims.Count());
             Assert.True(isNextCalled);
         }
@@ -161,34 +161,34 @@ namespace Squidex.Web.Pipeline
 
         private static IAppEntity CreateApp(string name, string appUser = null, string appClient = null)
         {
-            var app = A.Fake<IAppEntity>();
+            var appEntity = A.Fake<IAppEntity>();
 
             if (appUser != null)
             {
-                A.CallTo(() => app.Contributors)
+                A.CallTo(() => appEntity.Contributors)
                     .Returns(AppContributors.Empty.Assign(appUser, Role.Owner));
             }
             else
             {
-                A.CallTo(() => app.Contributors)
+                A.CallTo(() => appEntity.Contributors)
                     .Returns(AppContributors.Empty);
             }
 
             if (appClient != null)
             {
-                A.CallTo(() => app.Clients)
+                A.CallTo(() => appEntity.Clients)
                     .Returns(AppClients.Empty.Add(appClient, "secret"));
             }
             else
             {
-                A.CallTo(() => app.Clients)
+                A.CallTo(() => appEntity.Clients)
                     .Returns(AppClients.Empty);
             }
 
-            A.CallTo(() => app.Roles)
+            A.CallTo(() => appEntity.Roles)
                 .Returns(Roles.CreateDefaults(name));
 
-            return app;
+            return appEntity;
         }
     }
 }
