@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.0.0-beta2 - 2019-06-29
+
+### Features
+
+* **Content**: Editor for custom workflows.
+
 ## v2.2.0 - 2019-06-29
 
 ### Features
@@ -9,6 +15,10 @@
 ### Bugfixes
 
 * **GraphQL**: Fix a bug in styles that prevented to autocomplete to show properly
+
+## v3.0.0-beta1 - 2019-06-24
+
+This version contains many major breaking changes. Please read: https://docs.squidex.io/next/02-api-compatibility
 
 ## v2.1.0 - 2019-06-22
 
