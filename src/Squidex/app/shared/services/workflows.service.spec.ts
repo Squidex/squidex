@@ -49,7 +49,7 @@ describe('WorkflowsService', () => {
             workflows = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflow');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -64,7 +64,7 @@ describe('WorkflowsService', () => {
         expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
     }));
 
-    it('should make a put request to create a workflow',
+    it('should make a post request to create a workflow',
         inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
 
         let workflows: WorkflowsDto;
@@ -73,7 +73,7 @@ describe('WorkflowsService', () => {
             workflows = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflow/123');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
 
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
@@ -92,7 +92,7 @@ describe('WorkflowsService', () => {
 
         const resource: Resource = {
             _links: {
-                update: { method: 'PUT', href: '/api/apps/my-app/workflow/123' }
+                update: { method: 'PUT', href: '/api/apps/my-app/workflows/123' }
             }
         };
 
@@ -102,7 +102,7 @@ describe('WorkflowsService', () => {
             workflows = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflow/123');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
@@ -121,7 +121,7 @@ describe('WorkflowsService', () => {
 
         const resource: Resource = {
             _links: {
-                delete: { method: 'DELETE', href: '/api/apps/my-app/workflow/123' }
+                delete: { method: 'DELETE', href: '/api/apps/my-app/workflows/123' }
             }
         };
 
@@ -131,9 +131,9 @@ describe('WorkflowsService', () => {
             workflows = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflow');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
 
-        expect(req.request.method).toEqual('PUT');
+        expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
         req.flush(workflowsResponse('1', '2'), {
@@ -156,32 +156,28 @@ describe('WorkflowsService', () => {
 
     function workflowResponse(name: string) {
         return {
-            workflow: {
-                steps: {
-                    [`${name}1`]: {
-                        transitions: {
-                            [`${name}2`]: {
-                                expression: 'Expression1', role: 'Role1'
-                            }
-                        },
-                        color: `${name}1`, noUpdate: true
+            name: `name_${name}`, id: `id_${name}`, initial: `${name}1`,
+            steps: {
+                [`${name}1`]: {
+                    transitions: {
+                        [`${name}2`]: {
+                            expression: 'Expression1', role: 'Role1'
+                        }
                     },
-                    [`${name}2`]: {
-                        transitions: {
-                            [`${name}1`]: {
-                                expression: 'Expression2', role: 'Role2'
-                            }
-                        },
-                        color: `${name}2`, noUpdate: true
-                    }
+                    color: `${name}1`, noUpdate: true
                 },
-                initial: `${name}1`,
-                _links: {
-                    update: { method: 'PUT', href: '/api/workflows' }
+                [`${name}2`]: {
+                    transitions: {
+                        [`${name}1`]: {
+                            expression: 'Expression2', role: 'Role2'
+                        }
+                    },
+                    color: `${name}2`, noUpdate: true
                 }
             },
-            _links: {},
-            canCreate: true
+            _links: {
+                update: { method: 'PUT', href: `/workflows/${name}` }
+            }
         };
     }
 });
@@ -198,9 +194,9 @@ export function createWorkflows(...names: string[]): WorkflowsPayload {
 
 export function createWorkflow(name: string): WorkflowDto {
     return new WorkflowDto({
-            update: { method: 'PUT', href: '/workflows' }
+            update: { method: 'PUT', href: `/workflows/${name}` }
         },
-        `${name}1`,
+        `id_${name}`, `name_${name}`, `${name}1`,
         [
             { name: `${name}1`, color: `${name}1`, noUpdate: true, isLocked: false },
             { name: `${name}2`, color: `${name}2`, noUpdate: true, isLocked: false }
@@ -213,17 +209,18 @@ export function createWorkflow(name: string): WorkflowDto {
 
 describe('Workflow', () => {
     it('should create empty workflow', () => {
-        const workflow = new WorkflowDto();
+        const workflow = new WorkflowDto({}, 'id');
 
         expect(workflow.initial);
     });
 
     it('should add step to workflow', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1', { color: '#00ff00' });
 
         expect(workflow.serialize()).toEqual({
+            name: null,
             steps: {
                 '1': { transitions: {}, color: '#00ff00' }
             },
@@ -233,11 +230,12 @@ describe('Workflow', () => {
 
     it('should override settings if step already exists', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1', { color: '#00ff00', noUpdate: true })
                 .setStep('1', { color: 'red' });
 
         expect(workflow.serialize()).toEqual({
+            name: null,
             steps: {
                 '1': { transitions: {}, color: 'red', noUpdate: true }
             },
@@ -247,7 +245,7 @@ describe('Workflow', () => {
 
     it('should return same workflow if step to update is locked', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1', { color: '#00ff00', isLocked: true });
 
         const updated = workflow.setStep('1', { color: 'red' });
@@ -257,7 +255,7 @@ describe('Workflow', () => {
 
     it('should sort steps case invariant', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('Z')
                 .setStep('a');
 
@@ -269,7 +267,7 @@ describe('Workflow', () => {
 
     it('should return same workflow if step to remove is locked', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1', { color: '#00ff00', isLocked: true });
 
         const updated = workflow.removeStep('1');
@@ -279,7 +277,7 @@ describe('Workflow', () => {
 
     it('should return same workflow if step to remove not found', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1');
 
         const updated = workflow.removeStep('3');
@@ -289,7 +287,7 @@ describe('Workflow', () => {
 
     it('should remove step', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1', { color: '#00ff00' })
                 .setStep('2', { color: '#ff0000' })
                 .setStep('3', { color: '#0000ff' })
@@ -299,6 +297,7 @@ describe('Workflow', () => {
                 .removeStep('1');
 
         expect(workflow.serialize()).toEqual({
+            name: null,
             steps: {
                 '2': {
                     transitions: {
@@ -314,13 +313,14 @@ describe('Workflow', () => {
 
     it('should make first non-locked step the initial step if initial removed', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1')
                 .setStep('2', { isLocked: true })
                 .setStep('3')
                 .removeStep('1');
 
         expect(workflow.serialize()).toEqual({
+            name: null,
             steps: {
                 '2': { transitions: {}, isLocked: true },
                 '3': { transitions: {} }
@@ -331,16 +331,16 @@ describe('Workflow', () => {
 
     it('should unset initial step if initial removed', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1')
                 .removeStep('1');
 
-        expect(workflow.serialize()).toEqual({ steps: {}, initial: undefined });
+        expect(workflow.serialize()).toEqual({ name: null, steps: {}, initial: null });
     });
 
     it('should rename step', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1', { color: '#00ff00' })
                 .setStep('2', { color: '#ff0000' })
                 .setStep('3', { color: '#0000ff' })
@@ -350,6 +350,7 @@ describe('Workflow', () => {
                 .renameStep('1', 'a');
 
         expect(workflow.serialize()).toEqual({
+            name: null,
             steps: {
                 'a': {
                     transitions: {
@@ -372,13 +373,14 @@ describe('Workflow', () => {
 
     it('should add transitions to workflow', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1')
                 .setStep('2')
                 .setTransition('1', '2', { expression: '1 === 2' })
                 .setTransition('2', '1', { expression: '2 === 1' });
 
         expect(workflow.serialize()).toEqual({
+            name: null,
             steps: {
                 '1': {
                     transitions: {
@@ -397,7 +399,7 @@ describe('Workflow', () => {
 
     it('should remove transition from workflow', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1')
                 .setStep('2')
                 .setTransition('1', '2', { expression: '1 === 2' })
@@ -405,6 +407,7 @@ describe('Workflow', () => {
                 .removeTransition('1', '2');
 
         expect(workflow.serialize()).toEqual({
+            name: null,
             steps: {
                 '1': { transitions: {}},
                 '2': {
@@ -419,13 +422,14 @@ describe('Workflow', () => {
 
     it('should override settings if transition already exists', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1')
                 .setStep('2')
                 .setTransition('2', '1', { expression: '2 === 1', role: 'Role' })
                 .setTransition('2', '1', { expression: '2 !== 1' });
 
         expect(workflow.serialize()).toEqual({
+            name: null,
             steps: {
                 '1': { transitions: {} },
                 '2': {
@@ -440,7 +444,7 @@ describe('Workflow', () => {
 
     it('should return same workflow if transition to update not found by from step', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1')
                 .setStep('2')
                 .setTransition('1', '2');
@@ -452,7 +456,7 @@ describe('Workflow', () => {
 
     it('should return same workflow if transition to update not found by to step', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1')
                 .setStep('2')
                 .setTransition('1', '2');
@@ -464,7 +468,7 @@ describe('Workflow', () => {
 
     it('should return same workflow if transition to remove not', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1')
                 .setStep('2')
                 .setTransition('1', '2');
@@ -476,7 +480,7 @@ describe('Workflow', () => {
 
     it('should return same workflow if step to make initial is locked', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1')
                 .setStep('2', { color: '#00ff00', isLocked: true });
 
@@ -487,18 +491,27 @@ describe('Workflow', () => {
 
     it('should set initial step', () => {
         const workflow =
-            new WorkflowDto()
+            new WorkflowDto({}, 'id')
                 .setStep('1')
                 .setStep('2')
                 .setInitial('2');
 
         expect(workflow.serialize()).toEqual({
+            name: null,
             steps: {
                 '1': { transitions: {} },
                 '2': { transitions: {} }
             },
             initial: '2'
         });
+    });
+
+    it('should rename workflow', () => {
+        const workflow =
+            new WorkflowDto({}, 'id')
+                .rename('name');
+
+        expect(workflow.serialize()).toEqual({ name: 'name', steps: {}, initial: null });
     });
 
 });

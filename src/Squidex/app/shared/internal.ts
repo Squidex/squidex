@@ -63,6 +63,7 @@ export * from './state/rules.state';
 export * from './state/schemas.forms';
 export * from './state/schemas.state';
 export * from './state/ui.state';
+export * from './state/workflows.forms';
 export * from './state/workflows.state';
 
 export * from './utils/messages';

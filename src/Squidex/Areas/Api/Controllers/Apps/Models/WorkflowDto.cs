@@ -24,6 +24,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public Guid Id { get; set; }
 
         /// <summary>
+        /// The name of the workflow.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// The workflow steps.
         /// </summary>
         [Required]
@@ -38,7 +43,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         {
             var result = new WorkflowDto
             {
-                Id = id,
                 Steps = workflow.Steps.ToDictionary(
                     x => x.Key,
                     x => SimpleMapper.Map(x.Value, new WorkflowStepDto
@@ -47,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                             y => y.Key,
                             y => new WorkflowTransitionDto { Expression = y.Value.Expression, Role = y.Value.Role })
                     })),
-                Initial = workflow.Initial
+                Id = id, Name = workflow.Name, Initial = workflow.Initial
             };
 
             return result.CreateLinks(controller, app, id);

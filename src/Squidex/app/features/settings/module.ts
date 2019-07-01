@@ -31,6 +31,7 @@ import {
     RoleComponent,
     RolesPageComponent,
     SettingsAreaComponent,
+    WorkflowComponent,
     WorkflowsPageComponent,
     WorkflowStepComponent,
     WorkflowTransitionComponent
@@ -213,6 +214,7 @@ const routes: Routes = [
         RoleComponent,
         RolesPageComponent,
         SettingsAreaComponent,
+        WorkflowComponent,
         WorkflowsPageComponent,
         WorkflowTransitionComponent,
         WorkflowStepComponent

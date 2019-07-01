@@ -6,17 +6,14 @@
  */
 
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 
 import {
+    AddWorkflowForm,
     AppsState,
-    MathHelper,
     RolesState,
     WorkflowDto,
-    WorkflowsState,
-    WorkflowStep,
-    WorkflowStepValues,
-    WorkflowTransition,
-    WorkflowTransitionValues
+    WorkflowsState
 } from '@app/shared';
 
 @Component({
@@ -25,78 +22,45 @@ import {
     templateUrl: './workflows-page.component.html'
 })
 export class WorkflowsPageComponent implements OnInit {
-    public workflow: WorkflowDto;
+    public addWorkflowForm = new AddWorkflowForm(this.formBuilder);
 
     constructor(
         public readonly appsState: AppsState,
         public readonly rolesState: RolesState,
-        public readonly workflowsState: WorkflowsState
+        public readonly workflowsState: WorkflowsState,
+        private readonly formBuilder: FormBuilder
     ) {
     }
 
     public ngOnInit() {
-        this.workflowsState.load()
-            .subscribe(workflow => {
-                this.workflow = workflow;
-            });
+        this.workflowsState.load();
 
         this.rolesState.load();
     }
 
     public reload() {
-        this.workflowsState.load(true)
-            .subscribe(workflow => {
-                this.workflow = workflow;
-            });
+        this.workflowsState.load(true);
     }
 
-    public save() {
-        this.workflowsState.save(this.workflow);
-    }
+    public addWorkflow() {
+        const value = this.addWorkflowForm.submit();
 
-    public addStep() {
-        let index = this.workflow.steps.length;
-
-        for (let i = index; i < index + 100; i++) {
-            const name = `Step${i}`;
-
-            if (!this.workflow.getStep(name)) {
-                this.workflow = this.workflow.setStep(name, { color: MathHelper.randomColor() });
-                return;
-            }
+        if (value) {
+            this.workflowsState.add(value.name)
+                .subscribe(() => {
+                    this.addWorkflowForm.submitCompleted();
+                }, error => {
+                    this.addWorkflowForm.submitFailed(error);
+                });
         }
     }
 
-    public setInitial(step: WorkflowStep) {
-        this.workflow = this.workflow.setInitial(step.name);
+    public cancelAddWorkflow() {
+        this.addWorkflowForm.submitCompleted();
     }
 
-    public addTransiton(from: WorkflowStep, to: WorkflowStep) {
-        this.workflow = this.workflow.setTransition(from.name, to.name, {});
-    }
-
-    public removeTransition(from: WorkflowStep, transition: WorkflowTransition) {
-        this.workflow = this.workflow.removeTransition(from.name, transition.to);
-    }
-
-    public updateTransition(update: { transition: WorkflowTransition, values: WorkflowTransitionValues }) {
-        this.workflow = this.workflow.setTransition(update.transition.from, update.transition.to, update.values);
-    }
-
-    public updateStep(step: WorkflowStep, values: WorkflowStepValues) {
-        this.workflow = this.workflow.setStep(step.name, values);
-    }
-
-    public renameStep(step: WorkflowStep, newName: string) {
-        this.workflow = this.workflow.renameStep(step.name, newName);
-    }
-
-    public removeStep(step: WorkflowStep) {
-        this.workflow = this.workflow.removeStep(step.name);
-    }
-
-    public trackByStep(index: number, step: WorkflowStep) {
-        return step.name;
+    public trackByWorkflow(index: number, workflow: WorkflowDto) {
+        return workflow.id;
     }
 }
 

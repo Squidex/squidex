@@ -16,6 +16,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
     public sealed class UpdateWorkflowDto
     {
         /// <summary>
+        /// The name of the workflow.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// The workflow steps.
         /// </summary>
         [Required]
@@ -37,7 +42,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                             y => new WorkflowTransition(y.Value.Expression, y.Value.Role)),
                         x.Value.Color,
                         x.Value.NoUpdate)),
-                Initial);
+                Initial, Name);
 
             return new UpdateWorkflow { Workflow = workflow };
         }

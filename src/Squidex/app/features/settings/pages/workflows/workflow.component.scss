@@ -1,0 +1,25 @@
+@import '_vars';
+@import '_mixins';
+
+.table-items-row-details {
+    &::before {
+        right: 4.55rem;
+    }
+}
+
+.col-form-label {
+    min-width: 4rem;
+    max-width: 4rem;
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 2rem;
+    margin-left: 2rem;
+    max-width: 60rem;
+}
+
+.btn-success {
+    margin-bottom: 1rem;
+    margin-left: 2rem;
+}
