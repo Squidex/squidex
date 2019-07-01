@@ -24,8 +24,6 @@ import {
     templateUrl: './user-page.component.html'
 })
 export class UserPageComponent extends ResourceOwner implements OnInit {
-    public canUpdate = false;
-
     public user?: { user: UserDto, isCurrentUser: boolean };
     public userForm = new UserForm(this.formBuilder);
 
