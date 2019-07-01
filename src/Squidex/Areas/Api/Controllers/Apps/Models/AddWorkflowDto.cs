@@ -6,27 +6,22 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Web;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class WorkflowResponseDto : Resource
+    public sealed class AddWorkflowDto
     {
         /// <summary>
-        /// The workflow.
+        /// The name of the workflow.
         /// </summary>
         [Required]
-        public WorkflowDto Workflow { get; set; }
+        public string Name { get; set; }
 
-        public static WorkflowResponseDto FromApp(IAppEntity app, ApiController controller)
+        public ICommand ToCommand()
         {
-            var result = new WorkflowResponseDto
-            {
-                Workflow = WorkflowDto.FromWorkflow(app.Workflows.GetFirst(), controller, app.Name)
-            };
-
-            return result;
+            return new AddWorkflow { Name = Name };
         }
     }
 }

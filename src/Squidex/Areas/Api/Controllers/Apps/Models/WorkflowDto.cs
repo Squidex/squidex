@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -18,6 +19,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
     public sealed class WorkflowDto : Resource
     {
         /// <summary>
+        /// The workflow id.
+        /// </summary>
+        public Guid Id { get; set; }
+
+        /// <summary>
         /// The workflow steps.
         /// </summary>
         [Required]
@@ -28,10 +34,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public Status Initial { get; set; }
 
-        public static WorkflowDto FromWorkflow(Workflow workflow, ApiController controller, string app)
+        public static WorkflowDto FromWorkflow(Guid id, Workflow workflow, ApiController controller, string app)
         {
             var result = new WorkflowDto
             {
+                Id = id,
                 Steps = workflow.Steps.ToDictionary(
                     x => x.Key,
                     x => SimpleMapper.Map(x.Value, new WorkflowStepDto
@@ -43,16 +50,21 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 Initial = workflow.Initial
             };
 
-            return result.CreateLinks(controller, app);
+            return result.CreateLinks(controller, app, id);
         }
 
-        private WorkflowDto CreateLinks(ApiController controller, string app)
+        private WorkflowDto CreateLinks(ApiController controller, string app, Guid id)
         {
-            var values = new { app };
+            var values = new { app, id };
 
             if (controller.HasPermission(Permissions.AppWorkflowsUpdate, app))
             {
                 AddPutLink("update", controller.Url<AppWorkflowsController>(x => nameof(x.PutWorkflow), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppWorkflowsDelete, app))
+            {
+                AddDeleteLink("delete", controller.Url<AppWorkflowsController>(x => nameof(x.DeleteWorkflow), values));
             }
 
             return this;

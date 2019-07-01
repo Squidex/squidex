@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class UpsertWorkflowDto
+    public sealed class UpdateWorkflowDto
     {
         /// <summary>
         /// The workflow steps.

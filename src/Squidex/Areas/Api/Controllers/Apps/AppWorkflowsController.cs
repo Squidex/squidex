@@ -5,11 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -36,13 +38,13 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// 404 => App not found.
         /// </returns>
         [HttpGet]
-        [Route("apps/{app}/workflow/")]
-        [ProducesResponseType(typeof(WorkflowResponseDto), 200)]
+        [Route("apps/{app}/workflows/")]
+        [ProducesResponseType(typeof(WorkflowsDto), 200)]
         [ApiPermission(Permissions.AppWorkflowsRead)]
         [ApiCosts(0)]
-        public IActionResult GetWorkflow(string app)
+        public IActionResult GetWorkflows(string app)
         {
-            var response = WorkflowResponseDto.FromApp(App, this);
+            var response = WorkflowsDto.FromApp(App, this);
 
             Response.Headers[HeaderNames.ETag] = App.Version.ToString();
 
@@ -50,21 +52,21 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Configure workflow of the app.
+        /// Create a workflow.
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="request">The new workflow.</param>
         /// <returns>
-        /// 200 => Workflow configured.
-        /// 400 => Workflow is not valid.
-        /// 404 => App not found.
+        /// 200 => Workflow updated.
+        /// 400 => Workflow request is not valid.
+        /// 404 => Workflow or app not found.
         /// </returns>
-        [HttpPut]
-        [Route("apps/{app}/workflow/")]
-        [ProducesResponseType(typeof(WorkflowResponseDto), 200)]
+        [HttpPost]
+        [Route("apps/{app}/workflows/")]
+        [ProducesResponseType(typeof(WorkflowsDto), 200)]
         [ApiPermission(Permissions.AppWorkflowsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutWorkflow(string app, [FromBody] UpsertWorkflowDto request)
+        public async Task<IActionResult> PostWorkflow(string app, [FromBody] AddWorkflowDto request)
         {
             var command = request.ToCommand();
 
@@ -73,12 +75,60 @@ namespace Squidex.Areas.Api.Controllers.Apps
             return Ok(response);
         }
 
-        private async Task<WorkflowResponseDto> InvokeCommandAsync(ICommand command)
+        /// <summary>
+        /// Update a workflow.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="request">The new workflow.</param>
+        /// <param name="id">The id of the workflow to update.</param>
+        /// <returns>
+        /// 200 => Workflow updated.
+        /// 400 => Workflow request is not valid.
+        /// 404 => Workflow or app not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/workflows/{id}")]
+        [ProducesResponseType(typeof(WorkflowsDto), 200)]
+        [ApiPermission(Permissions.AppWorkflowsUpdate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> PutWorkflow(string app, Guid id, [FromBody] UpdateWorkflowDto request)
+        {
+            var command = request.ToCommand();
+
+            var response = await InvokeCommandAsync(command);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Delete a workflow.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="id">The id of the workflow to update.</param>
+        /// <returns>
+        /// 200 => Workflow deleted.
+        /// 404 => Workflow or app not found.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/workflows/{id}")]
+        [ProducesResponseType(typeof(WorkflowsDto), 200)]
+        [ApiPermission(Permissions.AppWorkflowsUpdate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> DeleteWorkflow(string app, Guid id)
+        {
+            var command = new DeleteWorkflow { WorkflowId = id };
+
+            var response = await InvokeCommandAsync(command);
+
+            return Ok(response);
+        }
+
+        private async Task<WorkflowsDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<IAppEntity>();
-            var response = WorkflowResponseDto.FromApp(result, this);
+            var response = WorkflowsDto.FromApp(result, this);
 
             return response;
         }
