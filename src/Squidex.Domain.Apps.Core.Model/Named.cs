@@ -7,7 +7,7 @@
 
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Core.Apps
+namespace Squidex.Domain.Apps.Core
 {
     public abstract class Named
     {

@@ -59,7 +59,7 @@ export class WorkflowsState extends State<Snapshot> {
             this.resetState();
         }
 
-        return this.workflowsService.getWorkflow(this.appName).pipe(
+        return this.workflowsService.getWorkflows(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Workflow reloaded.');

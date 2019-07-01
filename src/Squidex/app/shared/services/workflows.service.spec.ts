@@ -13,9 +13,9 @@ import {
     ApiUrlConfig,
     Resource,
     Version,
-    Versioned,
     WorkflowDto,
-    WorkflowPayload,
+    WorkflowsDto,
+    WorkflowsPayload,
     WorkflowsService
 } from '@app/shared/internal';
 
@@ -43,10 +43,10 @@ describe('WorkflowsService', () => {
     it('should make a get request to get app workflows',
         inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
 
-        let workflow: Versioned<WorkflowPayload>;
+        let workflows: WorkflowsDto;
 
-        workflowsService.getWorkflow('my-app').subscribe(result => {
-            workflow = result;
+        workflowsService.getWorkflows('my-app').subscribe(result => {
+            workflows = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflow');
@@ -54,29 +54,81 @@ describe('WorkflowsService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush(workflowsResponse('Draft'),
+        req.flush(workflowsResponse('1', '2'),
             {
                 headers: {
                     etag: '2'
                 }
             });
 
-        expect(workflow!).toEqual({ payload: createWorkflow('Draft'), version: new Version('2') });
+        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
     }));
 
-    it('should make a put request to assign a workflow',
+    it('should make a put request to create a workflow',
+        inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+
+        let workflows: WorkflowsDto;
+
+        workflowsService.postWorkflow('my-app', { name: 'New' }, version).subscribe(result => {
+            workflows = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflow/123');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+        req.flush(workflowsResponse('1', '2'), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
+    }));
+
+    it('should make a put request to update a workflow',
         inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
 
         const resource: Resource = {
             _links: {
-                update: { method: 'PUT', href: '/api/apps/my-app/workflow' }
+                update: { method: 'PUT', href: '/api/apps/my-app/workflow/123' }
             }
         };
 
-        let workflow: Versioned<WorkflowPayload>;
+        let workflows: WorkflowsDto;
 
         workflowsService.putWorkflow('my-app', resource, {}, version).subscribe(result => {
-            workflow = result;
+            workflows = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflow/123');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+        req.flush(workflowsResponse('1', '2'), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
+    }));
+
+    it('should make a delete request to delete a workflow',
+        inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: '/api/apps/my-app/workflow/123' }
+            }
+        };
+
+        let workflows: WorkflowsDto;
+
+        workflowsService.deleteWorkflow('my-app', resource, version).subscribe(result => {
+            workflows = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflow');
@@ -84,16 +136,25 @@ describe('WorkflowsService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush(workflowsResponse('Draft'), {
+        req.flush(workflowsResponse('1', '2'), {
             headers: {
                 etag: '2'
             }
         });
 
-        expect(workflow!).toEqual({ payload: createWorkflow('Draft'), version: new Version('2') });
+        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new Version('2') });
     }));
 
-    function workflowsResponse(name: string) {
+    function workflowsResponse(...names: string[]) {
+        return {
+            items: names.map(name => workflowResponse(name)),
+            _links: {
+                create: { method: 'POST', href: '/workflows' }
+            }
+        };
+    }
+
+    function workflowResponse(name: string) {
         return {
             workflow: {
                 steps: {
@@ -125,10 +186,19 @@ describe('WorkflowsService', () => {
     }
 });
 
-export function createWorkflow(name: string): WorkflowPayload {
+export function createWorkflows(...names: string[]): WorkflowsPayload {
     return {
-        workflow: new WorkflowDto({
-            update: { method: 'PUT', href: '/api/workflows' }
+        items: names.map(name => createWorkflow(name)),
+        _links: {
+            create: { method: 'POST', href: '/workflows' }
+        },
+        canCreate: true
+    };
+}
+
+export function createWorkflow(name: string): WorkflowDto {
+    return new WorkflowDto({
+            update: { method: 'PUT', href: '/workflows' }
         },
         `${name}1`,
         [
@@ -138,9 +208,7 @@ export function createWorkflow(name: string): WorkflowPayload {
         [
             { from: `${name}1`, to: `${name}2`, expression: 'Expression1', role: 'Role1' },
             { from: `${name}2`, to: `${name}1`, expression: 'Expression2', role: 'Role2' }
-        ]),
-        _links: {}
-    };
+        ]);
 }
 
 describe('Workflow', () => {

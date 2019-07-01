@@ -28,11 +28,38 @@ namespace Squidex.Domain.Apps.Core.Contents
         }
 
         [Pure]
+        public Workflows Remove(Guid id)
+        {
+            return new Workflows(Without(id));
+        }
+
+        [Pure]
+        public Workflows Add(string name)
+        {
+            Guard.NotNullOrEmpty(name, nameof(name));
+
+            return new Workflows(With(Guid.NewGuid(), Workflow.CreateDefault(name)));
+        }
+
+        [Pure]
         public Workflows Set(Workflow workflow)
         {
             Guard.NotNull(workflow, nameof(workflow));
 
             return new Workflows(With(Guid.Empty, workflow));
+        }
+
+        [Pure]
+        public Workflows Update(Guid id, Workflow workflow)
+        {
+            Guard.NotNull(workflow, nameof(workflow));
+
+            if (!ContainsKey(id))
+            {
+                return this;
+            }
+
+            return new Workflows(With(id, workflow));
         }
 
         public Workflow GetFirst()

@@ -24,8 +24,12 @@ import {
     Versioned
 } from '@app/framework';
 
-export type WorkflowsDto = Versioned<WorkflowPayload>;
-export type WorkflowPayload = { workflow: WorkflowDto; } & Resource;
+export type WorkflowsDto = Versioned<WorkflowsPayload>;
+export type WorkflowsPayload = {
+    readonly items: WorkflowDto[];
+
+    readonly canCreate: boolean;
+} & Resource;
 
 export class WorkflowDto {
     public readonly _links: ResourceLinks;
@@ -227,6 +231,10 @@ export type WorkflowTransition = { from: string; to: string } & WorkflowTransiti
 
 export type WorkflowTransitionView = { step: WorkflowStep } & WorkflowTransition;
 
+export interface CreateWorkflowDto {
+    readonly name: string;
+}
+
 @Injectable()
 export class WorkflowsService {
     constructor(
@@ -236,38 +244,69 @@ export class WorkflowsService {
     ) {
     }
 
-    public getWorkflow(appName: string): Observable<Versioned<WorkflowPayload>> {
+    public getWorkflows(appName: string): Observable<WorkflowsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflow`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {
-                return parseWorkflowPayload(body);
+                return parseWorkflows(body);
             }),
             pretifyError('Failed to load workflows. Please reload.'));
     }
 
-    public putWorkflow(appName: string, resource: Resource, dto: any, version: Version): Observable<Versioned<WorkflowPayload>> {
+    public postWorkflow(appName: string, dto: CreateWorkflowDto, version: Version): Observable<WorkflowsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflow`);
+
+        return HTTP.postVersioned(this.http, url, dto, version).pipe(
+            mapVersioned(({ body }) => {
+                return parseWorkflows(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Workflow', 'Created', appName);
+            }),
+            pretifyError('Failed to create workflow. Please reload.'));
+    }
+
+    public putWorkflow(appName: string, resource: Resource, dto: any, version: Version): Observable<WorkflowsDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             mapVersioned(({ body }) => {
-                return parseWorkflowPayload(body);
+                return parseWorkflows(body);
             }),
             tap(() => {
-                this.analytics.trackEvent('Workflow', 'Configured', appName);
+                this.analytics.trackEvent('Workflow', 'Updated', appName);
             }),
-            pretifyError('Failed to configure Workflow. Please reload.'));
+            pretifyError('Failed to update Workflow. Please reload.'));
+    }
+
+    public deleteWorkflow(appName: string, resource: Resource, version: Version): Observable<WorkflowsDto> {
+        const link = resource._links['delete'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            mapVersioned(({ body }) => {
+                return parseWorkflows(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Workflow', 'Deleted', appName);
+            }),
+            pretifyError('Failed to delete Workflow. Please reload.'));
     }
 }
 
-function parseWorkflowPayload(response: any) {
-    const { workflow, _links } = response;
+function parseWorkflows(response: any) {
+    const raw: any[] = response.items;
 
-    const result = parseWorkflow(workflow);
+    const items = raw.map(item =>
+        parseWorkflow(item));
 
-    return { workflow: result, _links };
+    const { _links } = response;
+
+    return { items, _links, canCreate: hasAnyLink(_links, 'create') };
 }
 
 function parseWorkflow(workflow: any) {

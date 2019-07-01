@@ -47,7 +47,7 @@ describe('WorkflowsState', () => {
 
     describe('Loading', () => {
         it('should load workflow', () => {
-            workflowsService.setup(x => x.getWorkflow(app))
+            workflowsService.setup(x => x.getWorkflows(app))
                 .returns(() => of(versioned(version, oldWorkflow))).verifiable();
 
             workflowsState.load().subscribe();
@@ -60,7 +60,7 @@ describe('WorkflowsState', () => {
         });
 
         it('should show notification on load when reload is true', () => {
-            workflowsService.setup(x => x.getWorkflow(app))
+            workflowsService.setup(x => x.getWorkflows(app))
                 .returns(() => of(versioned(version, oldWorkflow))).verifiable();
 
             workflowsState.load(true).subscribe();
@@ -73,7 +73,7 @@ describe('WorkflowsState', () => {
 
     describe('Updates', () => {
         beforeEach(() => {
-            workflowsService.setup(x => x.getWorkflow(app))
+            workflowsService.setup(x => x.getWorkflows(app))
                 .returns(() => of(versioned(version, oldWorkflow))).verifiable();
 
             workflowsState.load().subscribe();
