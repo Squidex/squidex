@@ -36,7 +36,7 @@
             <div class="form-group row">
                 <label class="col-form-label" for="{{workflow.id}}_name">Name</label>
         
-                <div class="col-6">
+                <div class="col">
                     <input class="form-control" id="{{workflow.id}}_name"
                         [ngModelOptions]="onBlur"
                         [ngModel]="workflow.name"
@@ -44,6 +44,18 @@
         
                     <sqx-form-hint>
                         Optional name for the workflow.
+                    </sqx-form-hint>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-form-label" for="{{workflow.id}}_name">Schemas</label>
+        
+                <div class="col">
+                    <sqx-tag-editor [converter]="schemasSource" placeholder=", to add schema" [suggestedValues]="schemasSource.suggestions"></sqx-tag-editor>
+        
+                    <sqx-form-hint>
+                        Restrict this workflow to specific schemas or keep it empty for all schemas.
                     </sqx-form-hint>
                 </div>
             </div>

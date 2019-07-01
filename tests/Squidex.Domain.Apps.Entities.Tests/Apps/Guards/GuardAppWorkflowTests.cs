@@ -69,11 +69,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
+                    default,
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Published] = new WorkflowStep()
-                    },
-                    default),
+                    }),
                 WorkflowId = workflowId
             };
 
@@ -87,11 +87,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
+                    Status.Published,
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Published] = new WorkflowStep()
-                    },
-                    Status.Published),
+                    }),
                 WorkflowId = workflowId
             };
 
@@ -105,11 +105,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
+                    Status.Draft,
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Draft] = new WorkflowStep()
-                    },
-                    Status.Draft),
+                    }),
                 WorkflowId = workflowId
             };
 
@@ -123,12 +123,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
+                    Status.Draft,
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Published] = null,
                         [Status.Draft] = new WorkflowStep()
-                    },
-                    Status.Draft),
+                    }),
                 WorkflowId = workflowId
             };
 
@@ -142,6 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
+                    Status.Draft,
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Published] =
@@ -151,8 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                                     [Status.Archived] = new WorkflowTransition()
                                 }),
                         [Status.Draft] = new WorkflowStep()
-                    },
-                    Status.Draft),
+                    }),
                 WorkflowId = workflowId
             };
 
@@ -166,6 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
+                    Status.Draft,
                     new Dictionary<Status, WorkflowStep>
                     {
                         [Status.Draft] =
@@ -176,8 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                                 {
                                     [Status.Draft] = null
                                 })
-                    },
-                    Status.Draft),
+                    }),
                 WorkflowId = workflowId
             };
 

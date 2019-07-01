@@ -88,8 +88,6 @@ describe('WorkflowsState', () => {
             workflowsState.add('my-workflow' ).subscribe();
 
             expectNewWorkflows(updated);
-
-            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
         it('should update workflows when workflow updated', () => {
@@ -103,6 +101,8 @@ describe('WorkflowsState', () => {
             workflowsState.update(oldWorkflows.items[0]).subscribe();
 
             expectNewWorkflows(updated);
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
         it('should update workflows when workflow deleted', () => {

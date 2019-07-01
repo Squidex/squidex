@@ -14,14 +14,14 @@
     </ng-container>
 
     <ng-container content>
-        <ng-container *ngIf="workflowsState.workflows | async; let workflows">
+        <ng-container *ngIf="schemasSource && workflowsState.workflows | async; let workflows">
             <ng-container *ngIf="rolesState.roles | async; let roles">
                 <div class="table-items-row table-items-row-empty" *ngIf="workflows.length === 0">
                     No workflows created yet.
                 </div>
 
                 <sqx-workflow *ngFor="let workflow of workflows; trackBy: trackByWorkflow"
-                    [workflow]="workflow" [roles]="roles">
+                    [workflow]="workflow" [roles]="roles" [schemasSource]="schemasSource">
                 </sqx-workflow>
 
                 <div class="table-items-footer" *ngIf="workflowsState.canCreate | async">

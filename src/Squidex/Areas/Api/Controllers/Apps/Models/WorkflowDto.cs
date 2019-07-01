@@ -35,24 +35,27 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public Dictionary<Status, WorkflowStepDto> Steps { get; set; }
 
         /// <summary>
+        /// The schema ids.
+        /// </summary>
+        public IReadOnlyList<Guid> SchemaIds { get; set; }
+
+        /// <summary>
         /// The initial step.
         /// </summary>
         public Status Initial { get; set; }
 
         public static WorkflowDto FromWorkflow(Guid id, Workflow workflow, ApiController controller, string app)
         {
-            var result = new WorkflowDto
-            {
-                Steps = workflow.Steps.ToDictionary(
-                    x => x.Key,
-                    x => SimpleMapper.Map(x.Value, new WorkflowStepDto
-                    {
-                        Transitions = x.Value.Transitions.ToDictionary(
-                            y => y.Key,
-                            y => new WorkflowTransitionDto { Expression = y.Value.Expression, Role = y.Value.Role })
-                    })),
-                Id = id, Name = workflow.Name, Initial = workflow.Initial
-            };
+            var result = SimpleMapper.Map(workflow, new WorkflowDto { Id = id });
+
+            result.Steps = workflow.Steps.ToDictionary(
+                x => x.Key,
+                x => SimpleMapper.Map(x.Value, new WorkflowStepDto
+                {
+                    Transitions = x.Value.Transitions.ToDictionary(
+                        y => y.Key,
+                        y => new WorkflowTransitionDto { Expression = y.Value.Expression, Role = y.Value.Role })
+                }));
 
             return result.CreateLinks(controller, app, id);
         }

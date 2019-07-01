@@ -17,11 +17,11 @@ import {
     hasAnyLink,
     HTTP,
     mapVersioned,
+    Model,
     pretifyError,
     Resource,
     ResourceLinks,
     StringHelper,
-    Types,
     Version,
     Versioned
 } from '@app/framework';
@@ -33,7 +33,7 @@ export type WorkflowsPayload = {
     readonly canCreate: boolean;
 } & Resource;
 
-export class WorkflowDto {
+export class WorkflowDto extends Model<WorkflowDto> {
     public readonly _links: ResourceLinks;
 
     public readonly canUpdate: boolean;
@@ -57,12 +57,13 @@ export class WorkflowDto {
         public readonly id: string,
         public readonly name: string | null = null,
         public readonly initial: string | null = null,
+        public readonly schemaIds: string[] = [],
         public readonly steps: WorkflowStep[] = [],
-        private readonly transitions: WorkflowTransition[] = []
+        public readonly transitions: WorkflowTransition[] = []
     ) {
-        this.steps.sort((a, b) => compareStringsAsc(a.name, b.name));
+        super();
 
-        this.transitions.sort((a, b) => compareStringsAsc(a.to, b.to));
+        this.onCloned();
 
         this._links = links;
 
@@ -70,6 +71,12 @@ export class WorkflowDto {
         this.canDelete = hasAnyLink(links, 'delete');
 
         this.displayName = StringHelper.firstNonEmpty(name, 'Unnamed Workflow');
+    }
+
+    protected onCloned() {
+        this.steps.sort((a, b) => compareStringsAsc(a.name, b.name));
+
+        this.transitions.sort((a, b) => compareStringsAsc(a.to, b.to));
     }
 
     public getOpenSteps(step: WorkflowStep) {
@@ -105,7 +112,7 @@ export class WorkflowDto {
             initial = steps[0].name;
         }
 
-        return this.createNew({ initial, steps });
+        return this.with({ initial, steps });
     }
 
     public setInitial(initial: string) {
@@ -115,7 +122,7 @@ export class WorkflowDto {
             return this;
         }
 
-        return this.createNew({ initial });
+        return this.with({ initial });
     }
 
     public removeStep(name: string) {
@@ -138,11 +145,15 @@ export class WorkflowDto {
             initial = first ? first.name : null;
         }
 
-        return this.createNew({ initial, steps, transitions });
+        return this.with({ initial, steps, transitions });
+    }
+
+    public changeSchemaIds(schemaIds: string[]) {
+        return this.with({ schemaIds });
     }
 
     public rename(name: string) {
-        return this.createNew({ name });
+        return this.with({ name });
     }
 
     public renameStep(name: string, newName: string) {
@@ -178,7 +189,7 @@ export class WorkflowDto {
             initial = newName;
         }
 
-        return this.createNew({ initial, steps, transitions });
+        return this.with({ initial, steps, transitions });
     }
 
     public removeTransition(from: string, to: string) {
@@ -188,7 +199,7 @@ export class WorkflowDto {
             return this;
         }
 
-        return this.createNew({ transitions });
+        return this.with({ transitions });
     }
 
     public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
@@ -214,11 +225,11 @@ export class WorkflowDto {
 
         const transitions = [...this.transitions.filter(t => t !== found), { from, to, ...values }];
 
-        return this.createNew({ transitions });
+        return this.with({ transitions });
     }
 
     public serialize(): any {
-        const result = { steps: {}, initial: this.initial, name: this.name };
+        const result = { steps: {}, schemaIds: this.schemaIds, initial: this.initial, name: this.name };
 
         for (let step of this.steps) {
             const { name, ...values } = step;
@@ -235,14 +246,6 @@ export class WorkflowDto {
         }
 
         return result;
-    }
-
-    private createNew(values: { steps?: WorkflowStep[], transitions?: WorkflowTransition[], initial?: string | null, name?: string | null }) {
-        return new WorkflowDto(this._links, this.id,
-            Types.isUndefined(values.name) ? this.name : values.name,
-            Types.isUndefined(values.initial) ? this.initial : values.initial,
-            values.steps || this.steps,
-            values.transitions || this.transitions);
     }
 }
 
@@ -333,6 +336,8 @@ function parseWorkflows(response: any) {
 }
 
 function parseWorkflow(workflow: any) {
+    const { id, name, initial, schemaIds, _links } = workflow;
+
     const steps: WorkflowStep[] = [];
     const transitions: WorkflowTransition[] = [];
 
@@ -352,5 +357,5 @@ function parseWorkflow(workflow: any) {
         }
     }
 
-    return new WorkflowDto(workflow._links, workflow.id, workflow.name, workflow.initial, steps, transitions);
+    return new WorkflowDto(_links, id, name, initial, schemaIds, steps, transitions);
 }

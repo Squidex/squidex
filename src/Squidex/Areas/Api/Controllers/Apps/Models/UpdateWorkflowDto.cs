@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -27,6 +28,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public Dictionary<Status, WorkflowStepDto> Steps { get; set; }
 
         /// <summary>
+        /// The schema ids.
+        /// </summary>
+        public List<Guid> SchemaIds { get; set; }
+
+        /// <summary>
         /// The initial step.
         /// </summary>
         public Status Initial { get; set; }
@@ -34,6 +40,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public UpdateWorkflow ToCommand()
         {
             var workflow = new Workflow(
+                Initial,
                 Steps?.ToDictionary(
                     x => x.Key,
                     x => new WorkflowStep(
@@ -42,7 +49,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                             y => new WorkflowTransition(y.Value.Expression, y.Value.Role)),
                         x.Value.Color,
                         x.Value.NoUpdate)),
-                Initial, Name);
+                SchemaIds,
+                Name);
 
             return new UpdateWorkflow { Workflow = workflow };
         }

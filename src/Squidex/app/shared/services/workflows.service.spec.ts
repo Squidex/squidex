@@ -156,7 +156,10 @@ describe('WorkflowsService', () => {
 
     function workflowResponse(name: string) {
         return {
-            name: `name_${name}`, id: `id_${name}`, initial: `${name}1`,
+            id: `id_${name}`,
+            name: `name_${name}`,
+            initial: `${name}1`,
+            schemaIds: [`schema_${name}`],
             steps: {
                 [`${name}1`]: {
                     transitions: {
@@ -193,10 +196,14 @@ export function createWorkflows(...names: string[]): WorkflowsPayload {
 }
 
 export function createWorkflow(name: string): WorkflowDto {
-    return new WorkflowDto({
+    return new WorkflowDto(
+        {
             update: { method: 'PUT', href: `/workflows/${name}` }
         },
         `id_${name}`, `name_${name}`, `${name}1`,
+        [
+            `schema_${name}`
+        ],
         [
             { name: `${name}1`, color: `${name}1`, noUpdate: true, isLocked: false },
             { name: `${name}2`, color: `${name}2`, noUpdate: true, isLocked: false }
@@ -221,6 +228,7 @@ describe('Workflow', () => {
 
         expect(workflow.serialize()).toEqual({
             name: null,
+            schemaIds: [],
             steps: {
                 '1': { transitions: {}, color: '#00ff00' }
             },
@@ -236,6 +244,7 @@ describe('Workflow', () => {
 
         expect(workflow.serialize()).toEqual({
             name: null,
+            schemaIds: [],
             steps: {
                 '1': { transitions: {}, color: 'red', noUpdate: true }
             },
@@ -298,6 +307,7 @@ describe('Workflow', () => {
 
         expect(workflow.serialize()).toEqual({
             name: null,
+            schemaIds: [],
             steps: {
                 '2': {
                     transitions: {
@@ -321,6 +331,7 @@ describe('Workflow', () => {
 
         expect(workflow.serialize()).toEqual({
             name: null,
+            schemaIds: [],
             steps: {
                 '2': { transitions: {}, isLocked: true },
                 '3': { transitions: {} }
@@ -335,7 +346,7 @@ describe('Workflow', () => {
                 .setStep('1')
                 .removeStep('1');
 
-        expect(workflow.serialize()).toEqual({ name: null, steps: {}, initial: null });
+        expect(workflow.serialize()).toEqual({ name: null, schemaIds: [], steps: {}, initial: null });
     });
 
     it('should rename step', () => {
@@ -351,6 +362,7 @@ describe('Workflow', () => {
 
         expect(workflow.serialize()).toEqual({
             name: null,
+            schemaIds: [],
             steps: {
                 'a': {
                     transitions: {
@@ -381,6 +393,7 @@ describe('Workflow', () => {
 
         expect(workflow.serialize()).toEqual({
             name: null,
+            schemaIds: [],
             steps: {
                 '1': {
                     transitions: {
@@ -408,6 +421,7 @@ describe('Workflow', () => {
 
         expect(workflow.serialize()).toEqual({
             name: null,
+            schemaIds: [],
             steps: {
                 '1': { transitions: {}},
                 '2': {
@@ -430,6 +444,7 @@ describe('Workflow', () => {
 
         expect(workflow.serialize()).toEqual({
             name: null,
+            schemaIds: [],
             steps: {
                 '1': { transitions: {} },
                 '2': {
@@ -498,6 +513,7 @@ describe('Workflow', () => {
 
         expect(workflow.serialize()).toEqual({
             name: null,
+            schemaIds: [],
             steps: {
                 '1': { transitions: {} },
                 '2': { transitions: {} }
@@ -511,7 +527,14 @@ describe('Workflow', () => {
             new WorkflowDto({}, 'id')
                 .rename('name');
 
-        expect(workflow.serialize()).toEqual({ name: 'name', steps: {}, initial: null });
+        expect(workflow.serialize()).toEqual({ name: 'name', schemaIds: [], steps: {}, initial: null });
     });
 
+    it('should update schemaIds', () => {
+        const workflow =
+            new WorkflowDto({}, 'id')
+                .changeSchemaIds(['1', '2']);
+
+        expect(workflow.serialize()).toEqual({ name: null, schemaIds: ['1', '2'], steps: {}, initial: null });
+    });
 });

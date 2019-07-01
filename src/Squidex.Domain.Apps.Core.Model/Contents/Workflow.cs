@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Core.Contents
@@ -13,26 +14,41 @@ namespace Squidex.Domain.Apps.Core.Contents
     {
         private const string DefaultName = "Unnamed";
         private static readonly IReadOnlyDictionary<Status, WorkflowStep> EmptySteps = new Dictionary<Status, WorkflowStep>();
+        private static readonly IReadOnlyList<Guid> EmptySchemaIds = new List<Guid>();
 
         public static readonly Workflow Default = CreateDefault();
-        public static readonly Workflow Empty = new Workflow(EmptySteps, default);
+        public static readonly Workflow Empty = new Workflow(default, EmptySteps);
 
-        public IReadOnlyDictionary<Status, WorkflowStep> Steps { get; }
+        public IReadOnlyDictionary<Status, WorkflowStep> Steps { get; } = EmptySteps;
+
+        public IReadOnlyList<Guid> SchemaIds { get; } = EmptySchemaIds;
 
         public Status Initial { get; }
 
-        public Workflow(IReadOnlyDictionary<Status, WorkflowStep> steps, Status initial, string name = null)
+        public Workflow(
+            Status initial,
+            IReadOnlyDictionary<Status, WorkflowStep> steps,
+            IReadOnlyList<Guid> schemaIds = null,
+            string name = null)
             : base(name ?? DefaultName)
         {
-            Steps = steps ?? EmptySteps;
-
             Initial = initial;
+
+            if (steps != null)
+            {
+                Steps = steps;
+            }
+
+            if (schemaIds != null)
+            {
+                SchemaIds = schemaIds;
+            }
         }
 
         public static Workflow CreateDefault(string name = null)
         {
             return new Workflow(
-                new Dictionary<Status, WorkflowStep>
+                Status.Draft, new Dictionary<Status, WorkflowStep>
                 {
                     [Status.Archived] =
                         new WorkflowStep(
@@ -57,7 +73,7 @@ namespace Squidex.Domain.Apps.Core.Contents
                                 [Status.Draft] = new WorkflowTransition()
                             },
                             StatusColors.Published)
-                }, Status.Draft, name);
+                }, null, name);
         }
 
         public IEnumerable<(Status Status, WorkflowStep Step, WorkflowTransition Transition)> GetTransitions(Status status)

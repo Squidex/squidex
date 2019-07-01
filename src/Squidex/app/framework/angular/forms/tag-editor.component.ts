@@ -13,52 +13,103 @@ import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
 import { Keys, StatefulControlComponent, Types } from '@app/framework/internal';
 
-export interface Converter {
-    convert(input: string): any;
+export const CONVERSION_FAILED = {};
 
-    isValidInput(input: string): boolean;
-    isValidValue(value: any): boolean;
+export class TagValue<T = any> {
+    public readonly lowerCaseName: string;
+
+    constructor(
+        public readonly id: any,
+        public readonly name: string,
+        public readonly value: T
+    ) {
+        this.lowerCaseName = name.toLowerCase();
+    }
+
+    public toString() {
+        return this.name;
+    }
+}
+
+export interface Converter {
+    convertInput(input: string): TagValue | null;
+
+    convertValue(value: any): TagValue | null;
 }
 
 export class IntConverter implements Converter {
-    public isValidInput(input: string): boolean {
-        return !!parseInt(input, 10) || input === '0';
+    private static ZERO = new TagValue(0, '0', 0);
+
+    public convertInput(input: string): TagValue<number> | null {
+        if (input === '0') {
+            return IntConverter.ZERO;
+        }
+
+        const parsed = parseInt(input, 10);
+
+        if (parsed) {
+            return new TagValue(parsed, input, parsed);
+        }
+
+        return null;
     }
 
-    public isValidValue(value: any): boolean {
-        return Types.isNumber(value);
-    }
+    public convertValue(value: any): TagValue<number> | null {
+        if (Types.isNumber(value)) {
+            return new TagValue(value, `${value}`, value);
+        }
 
-    public convert(input: string): any {
-        return parseInt(input, 10) || 0;
+        return null;
     }
 }
 
 export class FloatConverter implements Converter {
-    public isValidInput(input: string): boolean {
-        return !!parseFloat(input) || input === '0';
+    private static ZERO = new TagValue(0, '0', 0);
+
+    public convertInput(input: string): TagValue<number> | null {
+        if (input === '0') {
+            return FloatConverter.ZERO;
+        }
+
+        const parsed = parseFloat(input);
+
+        if (parsed) {
+            return new TagValue(parsed, input, parsed);
+        }
+
+        return null;
     }
 
-    public isValidValue(value: any): boolean {
-        return Types.isNumber(value);
-    }
+    public convertValue(value: any): TagValue<number> | null {
+        if (Types.isNumber(value)) {
+            return new TagValue(value, `${value}`, value);
+        }
 
-    public convert(input: string): any {
-        return parseFloat(input) || 0;
+        return null;
     }
 }
 
 export class StringConverter implements Converter {
-    public isValidInput(input: string): boolean {
-        return input.trim().length > 0;
+    public convertInput(input: string): TagValue<string> | null {
+        if (input) {
+            const trimmed = input.trim();
+
+            if (trimmed.length > 0) {
+                return new TagValue(trimmed, trimmed, trimmed);
+            }
+        }
+
+        return null;
     }
 
-    public isValidValue(value: any): boolean {
-        return Types.isString(value);
-    }
+    public convertValue(value: any): TagValue<string> | null {
+        if (Types.isString(value)) {
+            const trimmed = value.trim();
 
-    public convert(input: string): any {
-        return input.trim();
+            return new TagValue(trimmed, trimmed, trimmed);
+        }
+
+        return null;
     }
 }
 
@@ -73,10 +124,10 @@ let CACHED_FONT: string;
 interface State {
     hasFocus: boolean;
 
-    suggestedItems: string[];
+    suggestedItems: TagValue[];
     suggestedIndex: number;
 
-    items: any[];
+    items: TagValue[];
 }
 
 @Component({
@@ -94,6 +145,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public inputElement: ElementRef<HTMLInputElement>;
 
     @Input()
+    public suggestedValues: TagValue[] = [];
+
+    @Input()
     public converter: Converter = new StringConverter();
 
     @Input()
@@ -106,9 +160,6 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public allowDuplicates = true;
 
     @Input()
-    public suggestions: string[] = [];
-
-    @Input()
     public singleLine = false;
 
     @Input()
@@ -119,6 +170,15 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
 
     @Input()
     public inputName = 'tag-editor';
+
+    @Input()
+    public set suggestions(value: string[]) {
+        if (value) {
+            this.suggestedValues = value.map(x => new TagValue(x, x, x));
+        } else {
+            this.suggestedValues = [];
+        }
+    }
 
     @Input()
     public set disabled(value: boolean) {
@@ -161,8 +221,8 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                     }),
                     distinctUntilChanged(),
                     map(query => {
-                        if (Types.isArray(this.suggestions) && query && query.length > 0) {
-                            return this.suggestions.filter(s => s.toLowerCase().indexOf(query) >= 0 && this.snapshot.items.indexOf(s) < 0);
+                        if (Types.isArray(this.suggestedValues) && query && query.length > 0) {
+                            return this.suggestedValues.filter(s => s.lowerCaseName.indexOf(query) >= 0 && !this.snapshot.items.find(x => x.id === s.id));
                         } else {
                             return [];
                         }
@@ -180,11 +240,23 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
         this.resetForm();
         this.resetSize();
 
-        if (this.converter && Types.isArrayOf(obj, v => this.converter.isValidValue(v))) {
-            this.next(s => ({ ...s, items: obj }));
-        } else {
-            this.next(s => ({ ...s, items: [] }));
+        const items: any[] = [];
+
+        if (this.converter && Types.isArray(obj)) {
+            for (let value of obj) {
+                if (Types.is(value, TagValue)) {
+                    items.push(value);
+                }
+
+                const converted = this.converter.convertValue(obj);
+
+                if (converted) {
+                    items.push(value);
+                }
+            }
         }
+
+        this.next(s => ({ ...s, items }));
     }
 
     public setDisabledState(isDisabled: boolean): void {
@@ -296,16 +368,22 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
         return true;
     }
 
-    public selectValue(value: string, noFocus?: boolean) {
+    public selectValue(value: TagValue | string, noFocus?: boolean) {
         if (!noFocus) {
             this.inputElement.nativeElement.focus();
         }
 
-        if (value && this.converter.isValidInput(value)) {
-            const converted = this.converter.convert(value);
+        let tagValue: TagValue | null;
 
-            if (this.allowDuplicates || this.snapshot.items.indexOf(converted) < 0) {
-                this.updateItems([...this.snapshot.items, converted]);
+        if (Types.isString(value)) {
+            tagValue = this.converter.convertInput(value);
+        } else {
+            tagValue = value;
+        }
+
+        if (tagValue) {
+            if (this.allowDuplicates || !this.snapshot.items.find(x => x.id === tagValue!.id)) {
+                this.updateItems([...this.snapshot.items, tagValue]);
             }
 
             this.resetForm();
@@ -363,7 +441,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public onCopy(event: ClipboardEvent) {
         if (!this.hasSelection()) {
             if (event.clipboardData) {
-                event.clipboardData.setData('text/plain', this.snapshot.items.filter(x => !!x).join(','));
+                event.clipboardData.setData('text/plain', this.snapshot.items.map(x => x.name).join(','));
             }
 
             event.preventDefault();
@@ -380,7 +458,7 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
                 const values = [...this.snapshot.items];
 
                 for (let part of value.split(',')) {
-                    const converted = this.converter.convert(part);
+                    const converted = this.converter.convertInput(part);
 
                     if (converted) {
                         values.push(converted);
@@ -401,13 +479,13 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
         return s && e && (e - s) > 0;
     }
 
-    private updateItems(items: any[]) {
+    private updateItems(items: TagValue[]) {
         this.next(s => ({ ...s, items }));
 
         if (items.length === 0 && this.undefinedWhenEmpty) {
             this.callChange(undefined);
         } else {
-            this.callChange(items);
+            this.callChange(items.map(x => x.value));
         }
 
         this.resetSize();

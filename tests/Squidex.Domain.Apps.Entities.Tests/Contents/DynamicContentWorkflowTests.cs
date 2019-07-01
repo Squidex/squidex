@@ -28,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly DynamicContentWorkflow sut;
 
         private readonly Workflow workflow = new Workflow(
+            Status.Draft,
             new Dictionary<Status, WorkflowStep>
             {
                 [Status.Archived] =
@@ -53,8 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             [Status.Draft] = new WorkflowTransition()
                         },
                         StatusColors.Published)
-            },
-            Status.Draft);
+            });
 
         public DynamicContentWorkflowTests()
         {

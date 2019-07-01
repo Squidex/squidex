@@ -11,31 +11,45 @@ import { FormBuilder } from '@angular/forms';
 import {
     AddWorkflowForm,
     AppsState,
+    ResourceOwner,
     RolesState,
+    SchemasState,
     WorkflowDto,
     WorkflowsState
 } from '@app/shared';
+
+import { SchemaTagConverter } from './schema-tag-converter';
 
 @Component({
     selector: 'sqx-workflows-page',
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html'
 })
-export class WorkflowsPageComponent implements OnInit {
+export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
     public addWorkflowForm = new AddWorkflowForm(this.formBuilder);
+
+    public schemasSource: SchemaTagConverter;
 
     constructor(
         public readonly appsState: AppsState,
         public readonly rolesState: RolesState,
+        public readonly schemasState: SchemasState,
         public readonly workflowsState: WorkflowsState,
         private readonly formBuilder: FormBuilder
     ) {
+        super();
     }
 
     public ngOnInit() {
-        this.workflowsState.load();
+        this.own(this.schemasState.changes.subscribe(s => {
+            if (s.isLoaded) {
+                this.schemasSource = new SchemaTagConverter(s.schemas.values);
+            }
+        }));
 
         this.rolesState.load();
+        this.schemasState.load();
+        this.workflowsState.load();
     }
 
     public reload() {

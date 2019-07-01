@@ -19,6 +19,8 @@ import {
     WorkflowTransitionValues
 } from '@app/shared';
 
+import { SchemaTagConverter } from './schema-tag-converter';
+
 @Component({
     selector: 'sqx-workflow',
     styleUrls: ['./workflow.component.scss'],
@@ -30,6 +32,9 @@ export class WorkflowComponent implements OnChanges {
 
     @Input()
     public roles: RoleDto[];
+
+    @Input()
+    public schemasSource: SchemaTagConverter;
 
     public error: ErrorDto | null;
 
