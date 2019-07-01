@@ -93,7 +93,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PutWorkflow(string app, Guid id, [FromBody] UpdateWorkflowDto request)
         {
-            var command = request.ToCommand();
+            var command = request.ToCommand(id);
 
             var response = await InvokeCommandAsync(command);
 

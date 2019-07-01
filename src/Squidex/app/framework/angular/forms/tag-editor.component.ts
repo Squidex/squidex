@@ -246,12 +246,12 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
             for (let value of obj) {
                 if (Types.is(value, TagValue)) {
                     items.push(value);
-                }
+                } else {
+                    const converted = this.converter.convertValue(value);
 
-                const converted = this.converter.convertValue(obj);
-
-                if (converted) {
-                    items.push(value);
+                    if (converted) {
+                        items.push(converted);
+                    }
                 }
             }
         }
@@ -289,11 +289,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     }
 
     public resetSize() {
-        if (!CACHED_FONT) {
-            return;
-        }
-
-        if (!this.inputElement.nativeElement) {
+        if (!CACHED_FONT ||
+            !this.inputElement ||
+            !this.inputElement.nativeElement) {
             return;
         }
 

@@ -90,6 +90,10 @@ export class WorkflowComponent implements OnChanges {
         this.workflow = this.workflow.rename(name);
     }
 
+    public changeSchemaIds(schemaIds: string[]) {
+        this.workflow = this.workflow.changeSchemaIds(schemaIds);
+    }
+
     public setInitial(step: WorkflowStep) {
         this.workflow = this.workflow.setInitial(step.name);
     }

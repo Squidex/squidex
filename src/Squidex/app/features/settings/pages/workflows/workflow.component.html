@@ -49,10 +49,15 @@
             </div>
 
             <div class="form-group row">
-                <label class="col-form-label" for="{{workflow.id}}_name">Schemas</label>
+                <label class="col-form-label" for="{{workflow.id}}_schemas">Schemas</label>
         
                 <div class="col">
-                    <sqx-tag-editor [converter]="schemasSource" placeholder=", to add schema" [suggestedValues]="schemasSource.suggestions"></sqx-tag-editor>
+                    <sqx-tag-editor placeholder=", to add schema"
+                        [converter]="schemasSource"
+                        [ngModel]="workflow.schemaIds"
+                        (ngModelChange)="changeSchemaIds($event)"
+                        [suggestedValues]="schemasSource.suggestions">
+                    </sqx-tag-editor>
         
                     <sqx-form-hint>
                         Restrict this workflow to specific schemas or keep it empty for all schemas.

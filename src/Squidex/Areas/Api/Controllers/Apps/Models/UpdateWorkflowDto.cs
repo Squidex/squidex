@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public Status Initial { get; set; }
 
-        public UpdateWorkflow ToCommand()
+        public UpdateWorkflow ToCommand(Guid id)
         {
             var workflow = new Workflow(
                 Initial,
@@ -52,7 +52,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 SchemaIds,
                 Name);
 
-            return new UpdateWorkflow { Workflow = workflow };
+            return new UpdateWorkflow { WorkflowId = id, Workflow = workflow };
         }
     }
 }
