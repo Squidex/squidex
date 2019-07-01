@@ -19,16 +19,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         [Fact]
         public void CanConfigure_should_throw_exception_if_workflow_is_not_defined()
         {
-            var command = new ConfigureWorkflow();
+            var command = new UpdateWorkflow();
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanConfigure(command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command),
                 new ValidationError("Workflow is required.", "Workflow"));
         }
 
         [Fact]
         public void CanConfigure_should_throw_exception_if_workflow_has_no_initial_step()
         {
-            var command = new ConfigureWorkflow
+            var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
                     new Dictionary<Status, WorkflowStep>
@@ -38,14 +38,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     default)
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanConfigure(command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command),
                 new ValidationError("Initial step is required.", "Workflow.Initial"));
         }
 
         [Fact]
         public void CanConfigure_should_throw_exception_if_initial_step_is_published()
         {
-            var command = new ConfigureWorkflow
+            var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
                     new Dictionary<Status, WorkflowStep>
@@ -55,14 +55,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     Status.Published)
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanConfigure(command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command),
                 new ValidationError("Initial step cannot be published step.", "Workflow.Initial"));
         }
 
         [Fact]
         public void CanConfigure_should_throw_exception_if_workflow_does_not_have_published_state()
         {
-            var command = new ConfigureWorkflow
+            var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
                     new Dictionary<Status, WorkflowStep>
@@ -72,14 +72,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     Status.Draft)
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanConfigure(command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command),
                 new ValidationError("Workflow must have a published step.", "Workflow.Steps"));
         }
 
         [Fact]
         public void CanConfigure_should_throw_exception_if_workflow_step_is_not_defined()
         {
-            var command = new ConfigureWorkflow
+            var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
                     new Dictionary<Status, WorkflowStep>
@@ -90,14 +90,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     Status.Draft)
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanConfigure(command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command),
                 new ValidationError("Step is required.", "Workflow.Steps.Published"));
         }
 
         [Fact]
         public void CanConfigure_should_throw_exception_if_workflow_transition_is_invalid()
         {
-            var command = new ConfigureWorkflow
+            var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
                     new Dictionary<Status, WorkflowStep>
@@ -113,14 +113,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     Status.Draft)
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanConfigure(command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command),
                 new ValidationError("Transition has an invalid target.", "Workflow.Steps.Published.Transitions.Archived"));
         }
 
         [Fact]
         public void CanConfigure_should_throw_exception_if_workflow_transition_is_not_defined()
         {
-            var command = new ConfigureWorkflow
+            var command = new UpdateWorkflow
             {
                 Workflow = new Workflow(
                     new Dictionary<Status, WorkflowStep>
@@ -137,16 +137,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     Status.Draft)
             };
 
-            ValidationAssert.Throws(() => GuardAppWorkflows.CanConfigure(command),
+            ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command),
                 new ValidationError("Transition is required.", "Workflow.Steps.Published.Transitions.Draft"));
         }
 
         [Fact]
         public void CanConfigure_should_not_throw_exception_if_workflow_is_valid()
         {
-            var command = new ConfigureWorkflow { Workflow = Workflow.Default };
+            var command = new UpdateWorkflow { Workflow = Workflow.Default };
 
-            GuardAppWorkflows.CanConfigure(command);
+            GuardAppWorkflows.CanUpdate(command);
         }
     }
 }

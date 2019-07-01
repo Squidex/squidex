@@ -26,7 +26,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public Status Initial { get; set; }
 
-        public ConfigureWorkflow ToCommand()
+        public UpdateWorkflow ToCommand()
         {
             var workflow = new Workflow(
                 Steps?.ToDictionary(
@@ -39,7 +39,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                         x.Value.NoUpdate)),
                 Initial);
 
-            return new ConfigureWorkflow { Workflow = workflow };
+            return new UpdateWorkflow { Workflow = workflow };
         }
     }
 }

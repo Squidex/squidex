@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
@@ -13,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppWorkflows
     {
-        public static void CanConfigure(ConfigureWorkflow command)
+        public static void CanUpdate(Workflows workflows, UpdateWorkflow command)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -71,6 +72,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     }
                 }
             });
+        }
+
+        internal static void CanAdd(AddWorkflow c)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal static void CanDelete(Workflows workflows, DeleteWorkflow c)
+        {
+            throw new NotImplementedException();
         }
     }
 }

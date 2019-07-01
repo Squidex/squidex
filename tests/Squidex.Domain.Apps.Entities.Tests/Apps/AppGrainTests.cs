@@ -301,7 +301,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task ConfigureWorkflow_should_create_events_and_update_state()
         {
-            var command = new ConfigureWorkflow { Workflow = Workflow.Default };
+            var command = new UpdateWorkflow { Workflow = Workflow.Default };
 
             await ExecuteCreateAsync();
 
