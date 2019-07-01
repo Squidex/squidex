@@ -14,11 +14,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppWorkflows
     {
+        public static void CanAdd(AddWorkflow command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            Validate.It(() => "Cannot add workflow.", e =>
+            {
+                if (string.IsNullOrWhiteSpace(command.Name))
+                {
+                    e(Not.Defined("Name"), nameof(command.Name));
+                }
+            });
+        }
+
         public static void CanUpdate(Workflows workflows, UpdateWorkflow command)
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot configure workflow.", e =>
+            GetWorkflowOrThrow(workflows, command.WorkflowId);
+
+            Validate.It(() => "Cannot update workflow.", e =>
             {
                 if (command.Workflow == null)
                 {
@@ -74,14 +89,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        internal static void CanAdd(AddWorkflow c)
+        public static void CanDelete(Workflows workflows, DeleteWorkflow command)
         {
-            throw new NotImplementedException();
+            Guard.NotNull(command, nameof(command));
+
+            GetWorkflowOrThrow(workflows, command.WorkflowId);
         }
 
-        internal static void CanDelete(Workflows workflows, DeleteWorkflow c)
+        private static Workflow GetWorkflowOrThrow(Workflows workflows, Guid id)
         {
-            throw new NotImplementedException();
+            if (!workflows.TryGetValue(id, out var workflow))
+            {
+                throw new DomainObjectNotFoundException(id.ToString(), "Workflows", typeof(IAppEntity));
+            }
+
+            return workflow;
         }
     }
 }

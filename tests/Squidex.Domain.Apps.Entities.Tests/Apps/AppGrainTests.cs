@@ -38,6 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly string planIdPaid = "premium";
         private readonly string planIdFree = "free";
         private readonly AppGrain sut;
+        private readonly Guid workflowId = Guid.NewGuid();
         private readonly Guid patternId1 = Guid.NewGuid();
         private readonly Guid patternId2 = Guid.NewGuid();
         private readonly Guid patternId3 = Guid.NewGuid();
@@ -299,9 +300,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
-        public async Task ConfigureWorkflow_should_create_events_and_update_state()
+        public async Task AddWorkflow_should_create_events_and_update_state()
         {
-            var command = new UpdateWorkflow { Workflow = Workflow.Default };
+            var command = new AddWorkflow { WorkflowId = workflowId, Name = "my-workflow" };
 
             await ExecuteCreateAsync();
 
@@ -313,7 +314,47 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppWorkflowConfigured { Workflow = Workflow.Default })
+                    CreateEvent(new AppWorkflowAdded { WorkflowId = workflowId, Name = "my-workflow" })
+                );
+        }
+
+        [Fact]
+        public async Task UpdateWorkflow_should_create_events_and_update_state()
+        {
+            var command = new UpdateWorkflow { WorkflowId = workflowId, Workflow = Workflow.Default };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddWorkflowAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.NotEmpty(sut.Snapshot.Workflows);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppWorkflowUpdated { WorkflowId = workflowId, Workflow = Workflow.Default })
+                );
+        }
+
+        [Fact]
+        public async Task DeleteWorkflow_should_create_events_and_update_state()
+        {
+            var command = new DeleteWorkflow { WorkflowId = workflowId };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddWorkflowAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Empty(sut.Snapshot.Workflows);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppWorkflowDeleted { WorkflowId = workflowId })
                 );
         }
 
@@ -538,6 +579,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private Task ExecuteAddLanguageAsync(Language language)
         {
             return sut.ExecuteAsync(CreateCommand(new AddLanguage { Language = language }));
+        }
+
+        private Task ExecuteAddWorkflowAsync()
+        {
+            return sut.ExecuteAsync(CreateCommand(new AddWorkflow { WorkflowId = workflowId, Name = "my-workflow" }));
         }
 
         private Task ExecuteChangePlanAsync()

@@ -34,11 +34,11 @@ namespace Squidex.Domain.Apps.Core.Contents
         }
 
         [Pure]
-        public Workflows Add(string name)
+        public Workflows Add(Guid workflowId, string name)
         {
             Guard.NotNullOrEmpty(name, nameof(name));
 
-            return new Workflows(With(Guid.NewGuid(), Workflow.CreateDefault(name)));
+            return new Workflows(With(workflowId, Workflow.CreateDefault(name)));
         }
 
         [Pure]
@@ -53,6 +53,11 @@ namespace Squidex.Domain.Apps.Core.Contents
         public Workflows Update(Guid id, Workflow workflow)
         {
             Guard.NotNull(workflow, nameof(workflow));
+
+            if (id == Guid.Empty)
+            {
+                return Set(workflow);
+            }
 
             if (!ContainsKey(id))
             {

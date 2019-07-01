@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Xunit;
 
@@ -38,18 +37,30 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_add_new_workflow_with_default_states()
         {
-            var workflows_1 = workflows_0.Add("1");
+            var id = Guid.NewGuid();
 
-            Assert.Equal(workflows_1.GetFirst().Steps.Keys, new[] { Status.Archived, Status.Draft, Status.Published });
+            var workflows_1 = workflows_0.Add(id, "1");
+
+            Assert.Equal(workflows_1[id].Steps.Keys, new[] { Status.Archived, Status.Draft, Status.Published });
         }
 
         [Fact]
         public void Should_update_workflow()
         {
-            var workflows_1 = workflows_0.Add("1");
-            var workflows_2 = workflows_1.Update(workflows_1.Keys.First(), Workflow.Empty);
+            var id = Guid.NewGuid();
+
+            var workflows_1 = workflows_0.Add(id, "1");
+            var workflows_2 = workflows_1.Update(id, Workflow.Empty);
 
             Assert.Empty(workflows_2.GetFirst().Steps.Keys);
+        }
+
+        [Fact]
+        public void Should_update_workflow_with_default_guid()
+        {
+            var workflows_1 = workflows_0.Update(Guid.Empty, Workflow.Empty);
+
+            Assert.NotEmpty(workflows_1);
         }
 
         [Fact]
@@ -63,8 +74,10 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         [Fact]
         public void Should_remove_workflow()
         {
-            var workflows_1 = workflows_0.Add("1");
-            var workflows_2 = workflows_1.Remove(workflows_1.Keys.First());
+            var id = Guid.NewGuid();
+
+            var workflows_1 = workflows_0.Add(id, "1");
+            var workflows_2 = workflows_1.Remove(id);
 
             Assert.Empty(workflows_2);
         }
