@@ -21,9 +21,7 @@ import { RootViewComponent } from './root-view.component';
 })
 export class ModalViewDirective implements OnChanges, OnDestroy {
     private modalSubscription: Subscription | null = null;
-    private documentClickListener: Function | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
-    private static clickCounter = 0;
 
     @Input('sqxModalView')
     public modalView: DialogModel | ModalModel | any;
@@ -44,13 +42,6 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         private readonly templateRef: TemplateRef<any>,
         private readonly viewContainer: ViewContainerRef
     ) {
-        if (ModalViewDirective.clickCounter === 0) {
-            this.renderer.listen('document', 'click', () => {
-                ModalViewDirective.clickCounter++;
-            });
-
-            ModalViewDirective.clickCounter = 1;
-        }
     }
 
     public ngOnDestroy() {
@@ -95,7 +86,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
                 this.renderer.setStyle(this.renderedView.rootNodes[0], 'display', 'block');
             }
 
-            this.startListening(ModalViewDirective.clickCounter + 1);
+            this.startListening();
 
             this.changeDetector.detectChanges();
         } else if (!isOpen && this.renderedView) {
@@ -114,40 +105,39 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         return this.placeOnRoot ? this.rootView.viewContainer : this.viewContainer;
     }
 
-    private startListening(clickCounter: number) {
-        if (!this.closeAuto) {
+    private startListening() {
+        if (this.closeAuto) {
+            document.addEventListener('click', this.documentClickListener, true);
+        }
+    }
+
+    private documentClickListener = (event: MouseEvent) => {
+        if (!event.target || this.renderedView === null) {
             return;
         }
 
-        this.documentClickListener =
-            this.renderer.listen('document', 'click', (event: MouseEvent) => {
-                if (!event.target || this.renderedView === null || ModalViewDirective.clickCounter === clickCounter) {
-                    return;
-                }
+        if (this.renderedView.rootNodes.length === 0) {
+            return;
+        }
 
-                if (this.renderedView.rootNodes.length === 0) {
-                    return;
-                }
+        if (this.closeAlways) {
+            this.modalView.hide();
+        } else {
+            try {
+                const rootNode = this.renderedView.rootNodes[0];
+                const rootBounds = rootNode.getBoundingClientRect();
 
-                if (this.closeAlways) {
-                    this.modalView.hide();
-                } else {
-                    try {
-                        const rootNode = this.renderedView.rootNodes[0];
-                        const rootBounds = rootNode.getBoundingClientRect();
+                if (rootBounds.width > 0 && rootBounds.height > 0) {
+                    const clickedInside = rootNode.contains(event.target);
 
-                        if (rootBounds.width > 0 && rootBounds.height > 0) {
-                            const clickedInside = rootNode.contains(event.target);
-
-                            if (!clickedInside && this.modalView) {
-                                this.modalView.hide();
-                            }
-                        }
-                    } catch (ex) {
-                        return;
+                    if (!clickedInside && this.modalView) {
+                        this.modalView.hide();
                     }
                 }
-            });
+            } catch (ex) {
+                return;
+            }
+        }
     }
 
     private unsubscribeToModal() {
@@ -158,9 +148,6 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     }
 
     private unsubscribeToClick() {
-        if (this.documentClickListener) {
-            this.documentClickListener();
-            this.documentClickListener = null;
-        }
+        document.removeEventListener('click', this.documentClickListener);
     }
 }

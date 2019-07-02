@@ -7,9 +7,20 @@
     }
 }
 
+.workflow {
+    &-name {
+        @include truncate;
+    }
+}
+
 .col-form-label {
     min-width: 4rem;
     max-width: 4rem;
+}
+
+.col-tags {
+    padding: .6rem 1rem;
+    padding-bottom: 0;
 }
 
 .form-group {

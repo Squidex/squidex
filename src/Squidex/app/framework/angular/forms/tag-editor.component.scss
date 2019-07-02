@@ -58,8 +58,21 @@ div {
         outline: none;
     }
 
+    &.disabled,
+    &:disabled {
+        background: transparent;
+    }
+
     &:hover {
         background: transparent;
+    }
+}
+
+.gray {
+    .item {
+        background: $color-border;
+        color: $color-text;
+        cursor: default;
     }
 }
 

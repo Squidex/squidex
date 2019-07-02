@@ -1,12 +1,21 @@
 <div class="table-items-row table-items-row-expandable workflow"> 
-    <div class="table-items-row-summary" (click)="toggleEditing()">        
+    <div class="table-items-row-summary">        
         <div class="row no-gutters">
-            <div class="col">
-                {{workflow.displayName}}
+            <div class="col col-name">
+                <span class="workflow-name">{{workflow.displayName}}</span>
+            </div>
+            <div class="col col-tags">
+                <sqx-tag-editor [converter]="schemasSource" [ngModel]="workflow.schemaIds"
+                 placeholder=""
+                    styleGray="true"
+                    styleBlank="true"
+                    singleLine="true"
+                    disabled="true">
+                </sqx-tag-editor>
             </div>
             <div class="col-options">
                 <div class="float-right">
-                    <button type="button" class="btn btn-secondary table-items-edit-button mr-1" [class.active]="isEditing" (click)="toggleEditing()" sqxStopClick>
+                    <button type="button" class="btn btn-secondary table-items-edit-button mr-1" [class.active]="isEditing" (click)="toggleEditing()">
                         <i class="icon-settings"></i>
                     </button>
 
@@ -14,8 +23,7 @@
                         [disabled]="!workflow.canDelete"
                         (sqxConfirmClick)="remove()"
                         confirmTitle="Remove workflow" 
-                        confirmText="Do you really want to remove the workflow?"
-                        sqxStopClick>
+                        confirmText="Do you really want to remove the workflow?">
                         <i class="icon-bin2"></i>
                     </button>
                 </div>
