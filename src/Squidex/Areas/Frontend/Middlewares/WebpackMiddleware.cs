@@ -37,7 +37,7 @@ namespace Squidex.Areas.Frontend.Middlewares
                     {
                         var html = await result.Content.ReadAsStringAsync();
 
-                        html = AdjustBase(html, context.Request.PathBase);
+                        html = html.AdjustHtml(context);
 
                         await context.Response.WriteHtmlAsync(html);
                     }
@@ -58,7 +58,7 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                     var html = Encoding.UTF8.GetString(responseBuffer.ToArray());
 
-                    html = AdjustBase(html, context.Request.PathBase);
+                    html = html.AdjustHtml(context);
 
                     context.Response.ContentLength = Encoding.UTF8.GetByteCount(html);
                     context.Response.Body = responseBody;
@@ -69,18 +69,6 @@ namespace Squidex.Areas.Frontend.Middlewares
             else
             {
                 await next(context);
-            }
-        }
-
-        private static string AdjustBase(string html, PathString baseUrl)
-        {
-            if (baseUrl.HasValue)
-            {
-                return html.Replace("<base href=\"/\">", $"<base href=\"{baseUrl}/\">");
-            }
-            else
-            {
-                return html;
             }
         }
     }
