@@ -43,7 +43,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
-            return workflow.TryGetTransition(content.Status, next, out var transition) && CanUse(transition, content, user);
+            return workflow.TryGetTransition(content.Status, next, out var transition) && CanUse(transition, content.DataDraft, user);
+        }
+
+        public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user)
+        {
+            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+            return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && CanUse(transition, data, user);
         }
 
         public async Task<bool> CanUpdateAsync(IContentEntity content)
@@ -87,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             foreach (var (to, step, transition) in workflow.GetTransitions(content.Status))
             {
-                if (CanUse(transition, content, user))
+                if (CanUse(transition, content.DataDraft, user))
                 {
                     result.Add(new StatusInfo(to, GetColor(step)));
                 }
@@ -96,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result.ToArray();
         }
 
-        private bool CanUse(WorkflowTransition transition, IContentEntity content, ClaimsPrincipal user)
+        private bool CanUse(WorkflowTransition transition, NamedContentData data, ClaimsPrincipal user)
         {
             if (!string.IsNullOrWhiteSpace(transition.Role))
             {
@@ -108,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!string.IsNullOrWhiteSpace(transition.Expression))
             {
-                return scriptEngine.Evaluate("data", content.DataDraft, transition.Expression);
+                return scriptEngine.Evaluate("data", data, transition.Expression);
             }
 
             return true;

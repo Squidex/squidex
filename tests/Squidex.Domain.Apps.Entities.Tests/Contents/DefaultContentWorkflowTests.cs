@@ -17,6 +17,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly DefaultContentWorkflow sut = new DefaultContentWorkflow();
 
         [Fact]
+        public async Task Should_always_allow_publish_on_create()
+        {
+            var result = await sut.CanPublishOnCreateAsync(null, null, null);
+
+            Assert.True(result);
+        }
+
+        [Fact]
         public async Task Should_draft_as_initial_status()
         {
             var expected = new StatusInfo(Status.Draft, StatusColors.Draft);

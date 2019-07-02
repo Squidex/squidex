@@ -16,7 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
 {
     public static class GuardContent
     {
-        public static void CanCreate(ISchemaEntity schema, CreateContent command)
+        public static async Task CanCreate(ISchemaEntity schema, IContentWorkflow contentWorkflow, CreateContent command)
         {
             Guard.NotNull(command, nameof(command));
 
@@ -28,6 +28,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guards
             if (schema.SchemaDef.IsSingleton && command.ContentId != schema.Id)
             {
                 throw new DomainException("Singleton content cannot be created.");
+            }
+
+            if (command.Publish && !await contentWorkflow.CanPublishOnCreateAsync(schema, command.Data, command.User))
+            {
+                throw new DomainException("Content workflow prevents publishing.");
             }
         }
 

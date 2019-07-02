@@ -105,6 +105,36 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
+        public async Task Should_allow_publish_on_create()
+        {
+            var content = CreateContent(Status.Draft, 2);
+
+            var result = await sut.CanPublishOnCreateAsync(CreateSchema(), content.DataDraft, User("Editor"));
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public async Task Should_not_allow_publish_on_create_if_data_is_invalid()
+        {
+            var content = CreateContent(Status.Draft, 4);
+
+            var result = await sut.CanPublishOnCreateAsync(CreateSchema(), content.DataDraft, User("Editor"));
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task Should_not_allow_publish_on_create_if_role_not_allowed()
+        {
+            var content = CreateContent(Status.Draft, 2);
+
+            var result = await sut.CanPublishOnCreateAsync(CreateSchema(), content.DataDraft, User("Developer"));
+
+            Assert.False(result);
+        }
+
+        [Fact]
         public async Task Should_check_is_valid_next()
         {
             var content = CreateContent(Status.Draft, 2);
@@ -125,7 +155,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
-        public async Task Should_not_allow_transition_if_expression_does_not_evauate_to_true()
+        public async Task Should_not_allow_transition_if_data_not_valid()
         {
             var content = CreateContent(Status.Draft, 4);
 
