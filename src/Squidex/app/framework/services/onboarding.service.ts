@@ -25,7 +25,7 @@ export class OnboardingService {
     constructor(uiOptions: UIOptions,
         private readonly localStore: LocalStoreService
     ) {
-        this.disabled = uiOptions.get('hideOnboardingTooltips');
+        this.disabled = uiOptions.get('hideOnboarding');
     }
 
     public disableAll() {
