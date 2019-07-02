@@ -355,5 +355,5 @@ function buildQueries(statuses: StatusInfo[] | undefined): ContentQuery[] {
 }
 
 function buildQuery(s: StatusInfo) {
-    return ({ name: s.status, color: s.color, filter: `$filter=status eq '${s}'` });
+    return ({ name: s.status, color: s.color, filter: `$filter=status eq '${s.status}'` });
 }
