@@ -30,7 +30,7 @@ export class UsersProviderService {
             const request =
                 this.usersService.getUser(id).pipe(
                     catchError(error => {
-                        return of(new UserDto('Unknown', 'Unknown'));
+                        return of(new UserDto('Unknown', 'Unknown', 'Unknown'));
                     }),
                     publishLast());
 
@@ -41,8 +41,8 @@ export class UsersProviderService {
 
         return result.pipe(
             map(dto => {
-                if (me && this.authService.user && dto.id === this.authService.user.id) {
-                    dto = new UserDto(dto.id, me);
+                if (me && this.authService.user && dto.email === this.authService.user.email) {
+                    dto = new UserDto(dto.id, me, dto.email);
                 }
                 return dto;
             }),
