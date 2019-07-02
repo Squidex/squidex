@@ -194,7 +194,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.AddResponse("204", $"{schemaName} content status changed.", contentSchema);
                 operation.AddResponse("400", "Content data valid.");
 
-                AddSecurity(operation, Permissions.AppContentsMove);
+                AddSecurity(operation, Permissions.AppContentsUpdate);
             });
         }
 

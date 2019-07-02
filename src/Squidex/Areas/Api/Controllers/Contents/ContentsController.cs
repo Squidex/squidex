@@ -267,11 +267,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
-            if (publish && !this.HasPermission(Helper.StatusPermission(app, name, Status.Published)))
-            {
-                return new ForbidResult();
-            }
-
             var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
 
             var response = await InvokeCommandAsync(app, name, command);
@@ -366,11 +361,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
         public async Task<IActionResult> PutContentStatus(string app, string name, Guid id, ChangeStatusDto request)
         {
             await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
-            if (!this.HasPermission(Helper.StatusPermission(app, name, Status.Published)))
-            {
-                return new ForbidResult();
-            }
 
             var command = request.ToCommand(id);
 
