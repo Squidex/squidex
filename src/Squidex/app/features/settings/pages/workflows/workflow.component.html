@@ -1,12 +1,12 @@
 <div class="table-items-row table-items-row-expandable workflow"> 
-    <div class="table-items-row-summary">        
+    <div class="table-items-row-summary" (click)="toggleEditing()">        
         <div class="row no-gutters">
             <div class="col">
                 {{workflow.displayName}}
             </div>
             <div class="col-options">
                 <div class="float-right">
-                    <button type="button" class="btn btn-secondary table-items-edit-button mr-1" [class.active]="isEditing" (click)="toggleEditing()">
+                    <button type="button" class="btn btn-secondary table-items-edit-button mr-1" [class.active]="isEditing" (click)="toggleEditing()" sqxStopClick>
                         <i class="icon-settings"></i>
                     </button>
 
@@ -14,7 +14,8 @@
                         [disabled]="!workflow.canDelete"
                         (sqxConfirmClick)="remove()"
                         confirmTitle="Remove workflow" 
-                        confirmText="Do you really want to remove the workflow?">
+                        confirmText="Do you really want to remove the workflow?"
+                        sqxStopClick>
                         <i class="icon-bin2"></i>
                     </button>
                 </div>

@@ -123,6 +123,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<DynamicContentWorkflow>()
                 .AsOptional<IContentWorkflow>();
 
+            services.AddSingletonAs<DefaultWorkflowsValidator>()
+                .AsOptional<IWorkflowsValidator>();
+
             services.AddSingletonAs<RolePermissionsProvider>()
                 .AsSelf();
 

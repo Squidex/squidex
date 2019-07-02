@@ -30,6 +30,8 @@ export type WorkflowsDto = Versioned<WorkflowsPayload>;
 export type WorkflowsPayload = {
     readonly items: WorkflowDto[];
 
+    readonly errors: string[];
+
     readonly canCreate: boolean;
 } & Resource;
 
@@ -330,9 +332,9 @@ function parseWorkflows(response: any) {
     const items = raw.map(item =>
         parseWorkflow(item));
 
-    const { _links } = response;
+    const { errors, _links } = response;
 
-    return { items, _links, canCreate: hasAnyLink(_links, 'create') };
+    return { errors, items, _links, canCreate: hasAnyLink(_links, 'create') };
 }
 
 function parseWorkflow(workflow: any) {

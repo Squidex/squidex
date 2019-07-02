@@ -13,9 +13,9 @@ namespace Squidex.Domain.Apps.Core.Contents
     public sealed class Workflow : Named
     {
         private const string DefaultName = "Unnamed";
-        private static readonly IReadOnlyDictionary<Status, WorkflowStep> EmptySteps = new Dictionary<Status, WorkflowStep>();
-        private static readonly IReadOnlyList<Guid> EmptySchemaIds = new List<Guid>();
 
+        public static readonly IReadOnlyDictionary<Status, WorkflowStep> EmptySteps = new Dictionary<Status, WorkflowStep>();
+        public static readonly IReadOnlyList<Guid> EmptySchemaIds = new List<Guid>();
         public static readonly Workflow Default = CreateDefault();
         public static readonly Workflow Empty = new Workflow(default, EmptySteps);
 

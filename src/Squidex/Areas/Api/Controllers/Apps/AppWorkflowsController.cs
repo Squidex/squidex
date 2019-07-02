@@ -12,6 +12,7 @@ using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -24,9 +25,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppWorkflowsController : ApiController
     {
-        public AppWorkflowsController(ICommandBus commandBus)
+        private readonly IWorkflowsValidator workflowsValidator;
+
+        public AppWorkflowsController(ICommandBus commandBus, IWorkflowsValidator workflowsValidator)
             : base(commandBus)
         {
+            this.workflowsValidator = workflowsValidator;
         }
 
         /// <summary>
@@ -42,9 +46,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(WorkflowsDto), 200)]
         [ApiPermission(Permissions.AppWorkflowsRead)]
         [ApiCosts(0)]
-        public IActionResult GetWorkflows(string app)
+        public async Task<IActionResult> GetWorkflows(string app)
         {
-            var response = WorkflowsDto.FromApp(App, this);
+            var response = await WorkflowsDto.FromAppAsync(workflowsValidator, App, this);
 
             Response.Headers[HeaderNames.ETag] = App.Version.ToString();
 
@@ -128,7 +132,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<IAppEntity>();
-            var response = WorkflowsDto.FromApp(result, this);
+            var response = await WorkflowsDto.FromAppAsync(workflowsValidator, result, this);
 
             return response;
         }
