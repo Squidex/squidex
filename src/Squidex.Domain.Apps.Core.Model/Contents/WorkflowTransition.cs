@@ -9,6 +9,8 @@ namespace Squidex.Domain.Apps.Core.Contents
 {
     public sealed class WorkflowTransition
     {
+        public static readonly WorkflowTransition Default = new WorkflowTransition();
+
         public string Expression { get; }
 
         public string Role { get; }
