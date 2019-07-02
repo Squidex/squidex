@@ -20,7 +20,7 @@ namespace Squidex.ICIS.Actions.Kafka.Entities
                 ""namespace"": ""Cosmos.Kafka.Entities"",
                 ""fields"": [
                     {""name"": ""id"", ""type"": ""string""},
-                    {""name"": ""commmentary_type_id"", ""type"": ""string""},
+                    {""name"": ""commentary_type_id"", ""type"": ""string""},
                     {""name"": ""commodity_id"", ""type"": ""string""},
                     {""name"": ""region_id"", ""type"": ""string""},
                     {""name"": ""body"", ""type"": [""string"", ""null""]},
