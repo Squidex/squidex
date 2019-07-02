@@ -122,12 +122,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
 
             if (IsPending)
             {
-                if (controller.HasPermission(Permissions.AppContentsDiscard, app, schema))
+                if (controller.HasPermission(Permissions.AppContentsDraftDiscard, app, schema))
                 {
                     AddPutLink("draft/discard", controller.Url<ContentsController>(x => nameof(x.DiscardDraft), values));
                 }
 
-                if (controller.HasPermission(Helper.StatusPermission(app, schema, Status.Published)))
+                if (controller.HasPermission(Permissions.AppContentsDraftPublish, app, schema))
                 {
                     AddPutLink("draft/publish", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values));
                 }
@@ -146,22 +146,19 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 }
 
                 AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
+
+                if (content.Nexts != null)
+                {
+                    foreach (var next in content.Nexts)
+                    {
+                        AddPutLink($"status/{next.Status}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
+                    }
+                }
             }
 
             if (controller.HasPermission(Permissions.AppContentsDelete, app, schema))
             {
                 AddDeleteLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
-            }
-
-            if (content.Nexts != null)
-            {
-                foreach (var next in content.Nexts)
-                {
-                    if (controller.HasPermission(Helper.StatusPermission(app, schema, next.Status)))
-                    {
-                        AddPutLink($"status/{next.Status}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
-                    }
-                }
             }
 
             return this;

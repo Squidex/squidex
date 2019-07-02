@@ -51,6 +51,14 @@ namespace Squidex.Domain.Apps.Core.Contents
         }
 
         [Pure]
+        public Workflows Set(Guid id, Workflow workflow)
+        {
+            Guard.NotNull(workflow, nameof(workflow));
+
+            return new Workflows(With(id, workflow));
+        }
+
+        [Pure]
         public Workflows Update(Guid id, Workflow workflow)
         {
             Guard.NotNull(workflow, nameof(workflow));
