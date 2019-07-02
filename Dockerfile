@@ -15,7 +15,7 @@ COPY src/Squidex src/Squidex
 # Build Frontend
 RUN cp -a /tmp/node_modules src/Squidex/ \
  && cd src/Squidex \
-# && npm run test:coverage \
+ && npm run test:coverage \
  && npm run build
  
 # Test Backend
