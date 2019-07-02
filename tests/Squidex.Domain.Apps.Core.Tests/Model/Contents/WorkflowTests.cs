@@ -78,9 +78,19 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
         }
 
         [Fact]
+        public void Should_provide_transition_to_initial_if_step_not_found()
+        {
+            var found = workflow.TryGetTransition(new Status("Other"), Status.Draft, out var transition);
+
+            Assert.True(found);
+            Assert.Null(transition.Expression);
+            Assert.Null(transition.Role);
+        }
+
+        [Fact]
         public void Should_not_provide_transition_from_unknown_step()
         {
-            var found = workflow.TryGetTransition(default, Status.Archived, out var transition);
+            var found = workflow.TryGetTransition(new Status("Other"), Status.Archived, out var transition);
 
             Assert.False(found);
             Assert.Null(transition);
@@ -107,14 +117,29 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
             Assert.Equal(Status.Archived, status1);
             Assert.Equal("ToArchivedExpr", transition1.Expression);
             Assert.Equal("ToArchivedRole", transition1.Role);
-            Assert.Same(workflow.Steps[Status.Archived], step1);
+            Assert.Same(workflow.Steps[status1], step1);
 
             var (status2, step2, transition2) = transitions[1];
 
             Assert.Equal(Status.Published, status2);
             Assert.Equal("ToPublishedExpr", transition2.Expression);
             Assert.Equal("ToPublishedRole", transition2.Role);
-            Assert.Same(workflow.Steps[Status.Published], step2);
+            Assert.Same(workflow.Steps[status2], step2);
+        }
+
+        [Fact]
+        public void Should_provide_transitions_to_initial_step_if_status_not_found()
+        {
+            var transitions = workflow.GetTransitions(new Status("Other")).ToArray();
+
+            Assert.Single(transitions);
+
+            var (status1, step1, transition1) = transitions[0];
+
+            Assert.Equal(Status.Draft, status1);
+            Assert.Null(transition1.Expression);
+            Assert.Null(transition1.Role);
+            Assert.Same(workflow.Steps[status1], step1);
         }
     }
 }

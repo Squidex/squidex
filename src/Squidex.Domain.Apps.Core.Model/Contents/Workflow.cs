@@ -85,16 +85,29 @@ namespace Squidex.Domain.Apps.Core.Contents
                     yield return (transition.Key, Steps[transition.Key], transition.Value);
                 }
             }
+            else if (TryGetStep(Initial, out var initial))
+            {
+                yield return (Initial, initial, WorkflowTransition.Default);
+            }
         }
 
         public bool TryGetTransition(Status from, Status to, out WorkflowTransition transition)
         {
-            if (TryGetStep(from, out var step) && step.Transitions.TryGetValue(to, out transition))
+            transition = null;
+
+            if (TryGetStep(from, out var step))
             {
+                if (step.Transitions.TryGetValue(to, out transition))
+                {
+                    return true;
+                }
+            }
+            else if (to == Initial)
+            {
+                transition = WorkflowTransition.Default;
+
                 return true;
             }
-
-            transition = null;
 
             return false;
         }
