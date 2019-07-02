@@ -39,6 +39,7 @@ RUN cd /tmp && npm install --loglevel=error
 RUN cp -a /tmp/node_modules cosmos-func-tests/ \
  && cd cosmos-func-tests \
  && mkdir database \
+ && chmod +x setup-app.sh \
  && npm run test
 
 # Publish
