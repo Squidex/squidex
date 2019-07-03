@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         var ctx = await CreateContext(c.AppId.Id, c.SchemaId.Id, Guid.Empty, () => "Failed to create content.");
 
-                        GuardContent.CanCreate(ctx.Schema, c);
+                        await GuardContent.CanCreate(ctx.Schema, contentWorkflow, c);
 
                         await ctx.ExecuteScriptAndTransformAsync(s => s.Create, "Create", c, c.Data);
                         await ctx.EnrichAsync(c.Data);
@@ -190,9 +190,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<object> UpdateAsync(ContentDataCommand c, Func<NamedContentData, NamedContentData> newDataFunc, bool partial)
+        private async Task<object> UpdateAsync(ContentUpdateCommand command, Func<NamedContentData, NamedContentData> newDataFunc, bool partial)
         {
-            var isProposal = c.AsDraft && Snapshot.Status == Status.Published;
+            var isProposal = command.AsDraft && Snapshot.Status == Status.Published;
 
             var currentData =
                 isProposal ?
@@ -207,22 +207,22 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 if (partial)
                 {
-                    await ctx.ValidatePartialAsync(c.Data);
+                    await ctx.ValidatePartialAsync(command.Data);
                 }
                 else
                 {
-                    await ctx.ValidateAsync(c.Data);
+                    await ctx.ValidateAsync(command.Data);
                 }
 
-                newData = await ctx.ExecuteScriptAndTransformAsync(s => s.Update, "Update", c, newData, Snapshot.Data);
+                newData = await ctx.ExecuteScriptAndTransformAsync(s => s.Update, "Update", command, newData, Snapshot.Data);
 
                 if (isProposal)
                 {
-                    ProposeUpdate(c, newData);
+                    ProposeUpdate(command, newData);
                 }
                 else
                 {
-                    Update(c, newData);
+                    Update(command, newData);
                 }
             }
 

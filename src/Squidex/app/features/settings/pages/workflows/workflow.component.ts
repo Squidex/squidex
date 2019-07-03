@@ -36,7 +36,7 @@ export class WorkflowComponent implements OnChanges {
     @Input()
     public schemasSource: SchemaTagConverter;
 
-    public error: ErrorDto | null;
+    public error: string | null;
 
     public onBlur = { updateOn: 'blur' };
 
@@ -68,8 +68,8 @@ export class WorkflowComponent implements OnChanges {
         this.workflowsState.update(this.workflow)
             .subscribe(() => {
                 this.error = null;
-            }, error => {
-                this.error = error;
+            }, (error: ErrorDto) => {
+                this.error = error.displayMessage;
             });
     }
 

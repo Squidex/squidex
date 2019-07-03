@@ -34,6 +34,9 @@ interface Snapshot {
     // The app version.
     version: Version;
 
+    // The errors.
+    errors: string[];
+
     // Indicates if the workflows are loaded.
     isLoaded?: boolean;
 
@@ -46,6 +49,9 @@ export class WorkflowsState extends State<Snapshot> {
     public workflows =
         this.project(x => x.workflows);
 
+    public errors =
+        this.project(x => x.errors);
+
     public isLoaded =
         this.project(x => !!x.isLoaded);
 
@@ -57,7 +63,7 @@ export class WorkflowsState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ workflows: ImmutableArray.empty(), version: Version.EMPTY });
+        super({ errors: [], workflows: ImmutableArray.empty(), version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -103,12 +109,12 @@ export class WorkflowsState extends State<Snapshot> {
     }
 
     private replaceWorkflows(payload: WorkflowsPayload, version: Version) {
-        const { canCreate, items } = payload;
+        const { canCreate, errors, items } = payload;
 
         const workflows = ImmutableArray.of(items);
 
         this.next(s => {
-            return { ...s, workflows, isLoaded: true, version, canCreate };
+            return { ...s, workflows, errors, isLoaded: true, version, canCreate };
         });
     }
 

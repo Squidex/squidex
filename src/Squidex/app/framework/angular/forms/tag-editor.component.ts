@@ -163,7 +163,10 @@ export class TagEditorComponent extends StatefulControlComponent<State, any[]> i
     public singleLine = false;
 
     @Input()
-    public class: string;
+    public styleBlank = false;
+
+    @Input()
+    public styleGray = false;
 
     @Input()
     public placeholder = ', to add tag';

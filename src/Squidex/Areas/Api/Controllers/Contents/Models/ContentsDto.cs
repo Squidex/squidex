@@ -70,10 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 {
                     AddPostLink("create", controller.Url<ContentsController>(x => nameof(x.PostContent), values));
 
-                    if (controller.HasPermission(Helper.StatusPermission(app, schema, Status.Published)))
-                    {
-                        AddPostLink("create/publish", controller.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
-                    }
+                    AddPostLink("create/publish", controller.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
                 }
             }
 

@@ -147,6 +147,10 @@ describe('WorkflowsService', () => {
 
     function workflowsResponse(...names: string[]) {
         return {
+            errors: [
+                'Error1',
+                'Error2'
+            ],
             items: names.map(name => workflowResponse(name)),
             _links: {
                 create: { method: 'POST', href: '/workflows' }
@@ -187,6 +191,10 @@ describe('WorkflowsService', () => {
 
 export function createWorkflows(...names: string[]): WorkflowsPayload {
     return {
+        errors: [
+            'Error1',
+            'Error2'
+        ],
         items: names.map(name => createWorkflow(name)),
         _links: {
             create: { method: 'POST', href: '/workflows' }

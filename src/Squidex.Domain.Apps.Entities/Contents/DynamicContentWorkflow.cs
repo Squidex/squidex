@@ -34,21 +34,28 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task<StatusInfo[]> GetAllAsync(ISchemaEntity schema)
         {
-            var workflow = await GetWorkflowAsync(schema.AppId.Id);
+            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
             return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
         }
 
         public async Task<bool> CanMoveToAsync(IContentEntity content, Status next, ClaimsPrincipal user)
         {
-            var workflow = await GetWorkflowAsync(content.AppId.Id);
+            var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
-            return workflow.TryGetTransition(content.Status, next, out var transition) && CanUse(transition, content, user);
+            return workflow.TryGetTransition(content.Status, next, out var transition) && CanUse(transition, content.DataDraft, user);
+        }
+
+        public async Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user)
+        {
+            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+
+            return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && CanUse(transition, data, user);
         }
 
         public async Task<bool> CanUpdateAsync(IContentEntity content)
         {
-            var workflow = await GetWorkflowAsync(content.AppId.Id);
+            var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
             if (workflow.TryGetStep(content.Status, out var step))
             {
@@ -60,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task<StatusInfo> GetInfoAsync(IContentEntity content)
         {
-            var workflow = await GetWorkflowAsync(content.AppId.Id);
+            var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
             if (workflow.TryGetStep(content.Status, out var step))
             {
@@ -72,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public async Task<StatusInfo> GetInitialStatusAsync(ISchemaEntity schema)
         {
-            var workflow = await GetWorkflowAsync(schema.AppId.Id);
+            var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
             var (status, step) = workflow.GetInitialStep();
 
@@ -83,11 +90,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var result = new List<StatusInfo>();
 
-            var workflow = await GetWorkflowAsync(content.AppId.Id);
+            var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
 
             foreach (var (to, step, transition) in workflow.GetTransitions(content.Status))
             {
-                if (CanUse(transition, content, user))
+                if (CanUse(transition, content.DataDraft, user))
                 {
                     result.Add(new StatusInfo(to, GetColor(step)));
                 }
@@ -96,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return result.ToArray();
         }
 
-        private bool CanUse(WorkflowTransition transition, IContentEntity content, ClaimsPrincipal user)
+        private bool CanUse(WorkflowTransition transition, NamedContentData data, ClaimsPrincipal user)
         {
             if (!string.IsNullOrWhiteSpace(transition.Role))
             {
@@ -108,17 +115,34 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!string.IsNullOrWhiteSpace(transition.Expression))
             {
-                return scriptEngine.Evaluate("data", content.DataDraft, transition.Expression);
+                return scriptEngine.Evaluate("data", data, transition.Expression);
             }
 
             return true;
         }
 
-        private async Task<Workflow> GetWorkflowAsync(Guid appId)
+        private async Task<Workflow> GetWorkflowAsync(Guid appId, Guid schemaId)
         {
+            Workflow result = null;
+
             var app = await appProvider.GetAppAsync(appId);
 
-            return app?.Workflows.GetFirst();
+            if (app != null)
+            {
+                result = app.Workflows.Values.FirstOrDefault(x => x.SchemaIds.Contains(schemaId));
+
+                if (result == null)
+                {
+                    result = app.Workflows.Values.FirstOrDefault(x => x.SchemaIds.Count == 0);
+                }
+            }
+
+            if (result == null)
+            {
+                result = Workflow.Default;
+            }
+
+            return result;
         }
 
         private static string GetColor(WorkflowStep step)

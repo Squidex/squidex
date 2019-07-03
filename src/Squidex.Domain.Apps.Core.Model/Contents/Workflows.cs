@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 
@@ -47,6 +48,14 @@ namespace Squidex.Domain.Apps.Core.Contents
             Guard.NotNull(workflow, nameof(workflow));
 
             return new Workflows(With(Guid.Empty, workflow));
+        }
+
+        [Pure]
+        public Workflows Set(Guid id, Workflow workflow)
+        {
+            Guard.NotNull(workflow, nameof(workflow));
+
+            return new Workflows(With(id, workflow));
         }
 
         [Pure]

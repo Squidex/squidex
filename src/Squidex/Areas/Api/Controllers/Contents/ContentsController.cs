@@ -274,11 +274,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
-            if (publish && !this.HasPermission(Helper.StatusPermission(app, name, Status.Published)))
-            {
-                return new ForbidResult();
-            }
-
             var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
 
             var response = await InvokeCommandAsync(app, name, command);
@@ -374,11 +369,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
-            if (!this.HasPermission(Helper.StatusPermission(app, name, Status.Published)))
-            {
-                return new ForbidResult();
-            }
-
             var command = request.ToCommand(id);
 
             var response = await InvokeCommandAsync(app, name, command);
@@ -403,7 +393,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/discard/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsDiscard)]
+        [ApiPermission(Permissions.AppContentsDraftDiscard)]
         [ApiCosts(1)]
         public async Task<IActionResult> DiscardDraft(string app, string name, Guid id)
         {

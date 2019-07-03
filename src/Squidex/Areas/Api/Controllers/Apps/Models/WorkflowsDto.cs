@@ -7,7 +7,9 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -21,12 +23,22 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [Required]
         public WorkflowDto[] Items { get; set; }
 
-        public static WorkflowsDto FromApp(IAppEntity app, ApiController controller)
+        /// <summary>
+        /// The errros that should be fixed.
+        /// </summary>
+        [Required]
+        public string[] Errors { get; set; }
+
+        public static async Task<WorkflowsDto> FromAppAsync(IWorkflowsValidator workflowsValidator, IAppEntity app, ApiController controller)
         {
             var result = new WorkflowsDto
             {
-                Items = app.Workflows.Select(x => WorkflowDto.FromWorkflow(x.Key, x.Value, controller, app.Name)).ToArray()
+                Items = app.Workflows.Select(x => WorkflowDto.FromWorkflow(x.Key, x.Value, controller, app.Name)).ToArray(),
             };
+
+            var errors = await workflowsValidator.ValidateAsync(app.Id, app.Workflows);
+
+            result.Errors = errors.ToArray();
 
             return result.CreateLinks(controller, app.Name);
         }

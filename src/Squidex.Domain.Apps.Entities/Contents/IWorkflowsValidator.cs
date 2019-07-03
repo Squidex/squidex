@@ -5,19 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.Security;
-using Squidex.Shared;
 
-namespace Squidex.Areas.Api.Controllers.Contents
+namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public static class Helper
+    public interface IWorkflowsValidator
     {
-        public static Permission StatusPermission(string app, string schema, Status status)
-        {
-            var id = Permissions.AppContentsStatus.Replace("{status}", status.Name);
-
-            return Permissions.ForApp(id, app, schema);
-        }
+        Task<IReadOnlyList<string>> ValidateAsync(Guid appId, Workflows workflows);
     }
 }
