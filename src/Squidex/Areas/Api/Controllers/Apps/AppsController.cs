@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -64,7 +65,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var response = Deferred.Response(() =>
             {
-                return apps.ToArray(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this));
+                return apps.Select(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
