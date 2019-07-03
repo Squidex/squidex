@@ -119,12 +119,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             {
                 var find = Collection.Find(x => ids.Contains(x.Id)).SortByDescending(x => x.LastModified);
 
-                var assetItems = find.ToListAsync();
-                var assetCount = find.CountDocumentsAsync();
+                var assetItems = await find.ToListAsync();
 
-                await Task.WhenAll(assetItems, assetCount);
-
-                return ResultList.Create(assetCount.Result, assetItems.Result.OfType<IAssetEntity>());
+                return ResultList.Create(assetItems.Count, assetItems.OfType<IAssetEntity>());
             }
         }
 

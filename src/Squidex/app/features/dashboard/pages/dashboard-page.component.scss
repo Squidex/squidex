@@ -19,10 +19,12 @@
     }
 }
 
-::ng-deep canvas {
-    height: 12rem !important;
-    margin-top: -1rem;
-    margin-bottom: 0;
+:host ::ng-deep {
+    canvas {
+        height: 12rem !important;
+        margin-top: -1rem;
+        margin-bottom: 0;
+    }
 }
 
 .subtext {

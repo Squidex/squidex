@@ -12,9 +12,9 @@ param(
     $appName
 )
 
-function CreateContent ($schemaName, $content) {
+function CreateContent ($schemaName, $content, $publish) {
 
-    $createContentUrl = "$apiBaseUrl/content/$appName/$schemaName" + "?publish=true"
+    $createContentUrl = "$apiBaseUrl/content/$appName/$schemaName" + "?publish=$publish"
     $headers = @{
         "Authorization" = "Bearer $token"
         "Content-Type" = "application/json"
@@ -42,7 +42,7 @@ $commoditiesArray = $commoditiesPs.commodities
 
 foreach($commodity in $commoditiesArray)
 {
-    CreateContent -schemaName 'commodity' -content $commodity
+    CreateContent -schemaName 'commodity' -content $commodity 'false'
 }
 
 # Create Commentary-Types Ref-Data
@@ -52,5 +52,15 @@ $commentaryTypesArray = $commentaryTypesPs.commentaryTypes
 
 foreach($commentaryType in $commentaryTypesArray)
 {
-    CreateContent -schemaName 'commentary-type' -content $commentaryType
+    CreateContent -schemaName 'commentary-type' -content $commentaryType -publish 'false'
+}
+
+# Create Regions Ref-Data
+Write-Host "Create Ref-Data - Regions"
+$regionsPs = Get-Content './contents/regions.json' | ConvertFrom-Json
+$regionsArray = $regionsPs.regions
+
+foreach($region in $regionsArray)
+{
+    CreateContent -schemaName 'region' -content $region -publish 'false'
 }

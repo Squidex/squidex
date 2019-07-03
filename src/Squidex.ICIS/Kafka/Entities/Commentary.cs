@@ -20,10 +20,12 @@ namespace Squidex.ICIS.Actions.Kafka.Entities
                 ""namespace"": ""Cosmos.Kafka.Entities"",
                 ""fields"": [
                     {""name"": ""id"", ""type"": ""string""},
-                    {""name"": ""commmentaryTypeId"", ""type"": ""string""},
-                    {""name"": ""commodityId"", ""type"": ""string""},
+                    {""name"": ""commentary_type_id"", ""type"": ""string""},
+                    {""name"": ""commodity_id"", ""type"": ""string""},
+                    {""name"": ""region_id"", ""type"": ""string""},
                     {""name"": ""body"", ""type"": [""string"", ""null""]},
-                    {""name"": ""lastModified"", ""type"": ""long""}
+                    {""name"": ""last_modified"", ""type"": ""long""},
+                    {""name"": ""created_for"", ""type"": ""long""}
                 ]
             }");
 
@@ -33,7 +35,9 @@ namespace Squidex.ICIS.Actions.Kafka.Entities
         public string Body { get; set; }
         public string CommentaryTypeId { get; set; }
         public string CommodityId { get; set; }
+        public string RegionId { get; set; }
         public long LastModified { get; set; }
+        public long CreatedFor { get; set; }
 
         public virtual object Get(int fieldPos)
         {
@@ -46,9 +50,13 @@ namespace Squidex.ICIS.Actions.Kafka.Entities
                 case 2:
                     return CommodityId;
                 case 3:
-                    return Body;
+                    return RegionId;
                 case 4:
+                    return Body;
+                case 5:
                     return LastModified;
+                case 6:
+                    return CreatedFor;
                 default:
                     throw new AvroRuntimeException("Bad index " + fieldPos + " in Get()");
             }
@@ -68,10 +76,16 @@ namespace Squidex.ICIS.Actions.Kafka.Entities
                     CommodityId = (string)fieldValue;
                     break;
                 case 3:
-                    Body = (string)fieldValue;
+                    RegionId = (string)fieldValue;
                     break;
                 case 4:
+                    Body = (string)fieldValue;
+                    break;
+                case 5:
                     LastModified = (long)fieldValue;
+                    break;
+                case 6:
+                    CreatedFor = (long)fieldValue;
                     break;
                 default: throw new AvroRuntimeException("Bad index " + fieldPos + " in Put()");
             }

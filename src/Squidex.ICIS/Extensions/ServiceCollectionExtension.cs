@@ -47,6 +47,8 @@ namespace Squidex.ICIS.Extensions
             {
                 services.AddSingleton(new KafkaProducer<Commentary>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
                 services.AddSingleton(new KafkaProducer<CommentaryType>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
+                services.AddSingleton(new KafkaProducer<Commodity>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
+                services.AddSingleton(new KafkaProducer<Region>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
                 services.AddRuleAction<ICISKafkaAction, ICISKafkaActionHandler>();
             }
         }

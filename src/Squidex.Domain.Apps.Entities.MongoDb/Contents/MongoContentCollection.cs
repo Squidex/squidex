@@ -137,17 +137,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             var find = Collection.Find(FilterFactory.IdsBySchema(schema.Id, ids, status));
 
-            var contentItems = find.WithoutDraft(includeDraft).ToListAsync();
-            var contentCount = find.CountDocumentsAsync();
+            var contentItems = await find.WithoutDraft(includeDraft).ToListAsync();
 
-            await Task.WhenAll(contentItems, contentCount);
-
-            foreach (var entity in contentItems.Result)
+            foreach (var entity in contentItems)
             {
                 entity.ParseData(schema.SchemaDef, serializer);
             }
 
-            return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
+            return ResultList.Create<IContentEntity>(contentItems.Count, contentItems);
         }
 
         public async Task<IContentEntity> FindContentAsync(ISchemaEntity schema, Guid id, Status[] status, bool includeDraft)

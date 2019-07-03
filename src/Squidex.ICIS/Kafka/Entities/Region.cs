@@ -11,12 +11,12 @@ using Avro.Specific;
 namespace Squidex.ICIS.Actions.Kafka.Entities
 {
     // Please do not rename _SCHEMA variable. AvroSerializer class in Avro assembly looks for this particular property name.
-    public class CommentaryType : ISpecificRecord
+    public class Region : ISpecificRecord
     {
         public static readonly Schema _SCHEMA = Schema.Parse(@"
             {
                 ""type"": ""record"",
-                ""name"": ""CommentaryType"",
+                ""name"": ""Region"",
                 ""namespace"": ""Cosmos.Kafka.Entities"",
                 ""fields"": [
                     {""name"": ""id"", ""type"": ""string""},

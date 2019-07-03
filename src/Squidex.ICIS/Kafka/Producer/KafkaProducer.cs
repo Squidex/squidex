@@ -24,7 +24,7 @@ namespace Squidex.ICIS.Actions.Kafka
             schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
 
             producer = new ProducerBuilder<string, T>(producerConfig)
-                .SetKeySerializer(new AvroSerializer<string>(schemaRegistry))
+                .SetKeySerializer(Serializers.Utf8)
                 .SetValueSerializer(new AvroSerializer<T>(schemaRegistry))
                 .Build();
         }
