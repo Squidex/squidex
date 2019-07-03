@@ -4,7 +4,7 @@
   "description": "Automation framework for Cosmos",
   "main": "index.js",
   "scripts": {
-    "pretest": "npm-run-all -s lint compile setupapp webdriver-update",
+    "pretest": "npm-run-all -s lint compile setupapp webdriverupdate",
     "lint": "./node_modules/.bin/tslint -c tslint.json ./pages/*.ts",
     "compile": "tsc",
     "setupapp": "screen -dmS appstart ./setup-app.sh",
@@ -14,7 +14,7 @@
     "test": "protractor ./JSFiles/config.js",
     "posttest": "cd ./utils/ && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./TerminateTask.ps1 && rm -r ./database/*",
     "protractor": "./node_modules/protractor/built/cli.js",
-    "webdriver-update": "./node_modules/.bin/webdriver-manager update"
+    "webdriverupdate": "npm run webdriver-update"
   },
   "author": "Pavani",
   "license": "ISC",
