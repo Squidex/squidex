@@ -4,7 +4,7 @@
   "description": "Automation framework for Cosmos",
   "main": "index.js",
   "scripts": {
-    "pretest": "npm-run-all -s lint compile setupapp deploymentscriptsrun",
+    "pretest": "npm-run-all -s lint compile setupapp",
     "lint": "./node_modules/.bin/tslint -c tslint.json ./pages/*.ts",
     "compile": "tsc",
     "setupapp": "screen -dmS appstart ./setup-app.sh",
