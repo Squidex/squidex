@@ -14,7 +14,7 @@
     "test": "protractor ./JSFiles/config.js",
     "posttest": "cd ./utils/ && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./TerminateTask.ps1 && rm -r ./database/*",
     "protractor": "./node_modules/protractor/built/cli.js",
-    "webdriver-update": "./node_modules/.bin/webdriver-manager update && ./node_modules/protractor/bin/webdriver-manager update && ./node_modules/.bin/webdriver-manager start"
+    "webdriver-update": "./node_modules/.bin/webdriver-manager update && ./node_modules/protractor/bin/webdriver-manager update && nohup ./node_modules/.bin/webdriver-manager start &"
   },
   "author": "Pavani",
   "license": "ISC",
