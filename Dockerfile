@@ -23,8 +23,25 @@ FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder_ba
 
 WORKDIR /src
 
+# Install Screen
 RUN apt-get update \
  && apt-get install screen
+
+# Install OpenJDK-8
+RUN apt-get update && \
+    apt-get install -y openjdk-8-jdk && \
+    apt-get install -y ant && \
+    apt-get clean;
+
+# Fix certificate issues
+RUN apt-get update && \
+    apt-get install ca-certificates-java && \
+    apt-get clean && \
+    update-ca-certificates -f;
+
+# Setup JAVA_HOME -- useful for docker commandline
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+RUN export JAVA_HOME
 
 COPY src/**/*.csproj /tmp/
 COPY tests/**/*.csproj /tmp/
