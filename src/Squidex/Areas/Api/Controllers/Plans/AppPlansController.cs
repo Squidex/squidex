@@ -51,9 +51,12 @@ namespace Squidex.Areas.Api.Controllers.Plans
         {
             var hasPortal = appPlansBillingManager.HasPortal;
 
-            var response = AppPlansDto.FromApp(App, appPlansProvider, hasPortal);
+            var response = Deferred.Response(() =>
+            {
+                return AppPlansDto.FromApp(App, appPlansProvider, hasPortal);
+            });
 
-            Response.Headers[HeaderNames.ETag] = App.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = App.ToEtag();
 
             return Ok(response);
         }

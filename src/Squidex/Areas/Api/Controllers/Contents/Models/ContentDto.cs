@@ -19,7 +19,7 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public sealed class ContentDto : Resource, IGenerateETag
+    public sealed class ContentDto : Resource
     {
         /// <summary>
         /// The if of the content item.

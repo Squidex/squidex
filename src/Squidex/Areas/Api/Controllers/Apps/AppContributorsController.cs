@@ -48,9 +48,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetContributors(string app)
         {
-            var response = ContributorsDto.FromApp(App, appPlansProvider, this, false);
+            var response = Deferred.Response(() =>
+            {
+                return ContributorsDto.FromApp(App, appPlansProvider, this, false);
+            });
 
-            Response.Headers[HeaderNames.ETag] = App.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = App.ToEtag();
 
             return Ok(response);
         }
@@ -73,18 +76,8 @@ namespace Squidex.Areas.Api.Controllers.Apps
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto request)
         {
             var command = request.ToCommand();
-            var context = await CommandBus.PublishAsync(command);
 
-            var response = (ContributorsDto)null;
-
-            if (context.PlainResult is IAppEntity newApp)
-            {
-                response = ContributorsDto.FromApp(newApp, appPlansProvider, this, false);
-            }
-            else if (context.PlainResult is InvitedResult invited)
-            {
-                response = ContributorsDto.FromApp(invited.App, appPlansProvider, this, true);
-            }
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(GetContributors), new { app }, response);
         }
@@ -117,10 +110,14 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<IAppEntity>();
-            var response = ContributorsDto.FromApp(result, appPlansProvider, this, false);
-
-            return response;
+            if (context.PlainResult is InvitedResult invited)
+            {
+                return ContributorsDto.FromApp(invited.App, appPlansProvider, this, true);
+            }
+            else
+            {
+                return ContributorsDto.FromApp(context.Result<IAppEntity>(), appPlansProvider, this, false);
+            }
         }
     }
 }

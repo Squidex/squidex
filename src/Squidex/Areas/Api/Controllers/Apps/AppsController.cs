@@ -62,9 +62,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var apps = await appProvider.GetUserApps(userOrClientId, userPermissions);
 
-            var response = apps.ToArray(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this));
+            var response = Deferred.Response(() =>
+            {
+                return apps.ToArray(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this));
+            });
 
-            Response.Headers[HeaderNames.ETag] = response.ToManyEtag();
+            Response.Headers[HeaderNames.ETag] = apps.ToEtag();
 
             return Ok(response);
         }

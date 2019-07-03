@@ -5,14 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
-namespace Squidex.Web
+namespace Squidex.Web.Pipeline
 {
-    public interface IGenerateETag
+    public sealed class ETagOptions
     {
-        Guid Id { get; }
-
-        long Version { get; }
+        public bool Strong { get; set; }
     }
 }

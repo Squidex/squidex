@@ -18,7 +18,7 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public sealed class AssetDto : Resource, IGenerateETag
+    public sealed class AssetDto : Resource
     {
         /// <summary>
         /// The id of the asset.

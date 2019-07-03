@@ -44,9 +44,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetWorkflows(string app)
         {
-            var response = WorkflowsDto.FromApp(App, this);
+            var response = Deferred.Response(() =>
+            {
+                return WorkflowsDto.FromApp(App, this);
+            });
 
-            Response.Headers[HeaderNames.ETag] = App.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = App.ToEtag();
 
             return Ok(response);
         }

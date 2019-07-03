@@ -103,14 +103,17 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var assets = await assetQuery.QueryAsync(Context, Q.Empty.WithODataQuery(Request.QueryString.ToString()).WithIds(ids));
 
-            var response = AssetsDto.FromAssets(assets, this, app);
-
-            if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
+            var response = Deferred.Response(() =>
             {
-                Response.Headers["Surrogate-Key"] = response.ToSurrogateKeys();
+                return AssetsDto.FromAssets(assets, this, app);
+            });
+
+            if (controllerOptions.Value.EnableSurrogateKeys && assets.Count <= controllerOptions.Value.MaxItemsForSurrogateKeys)
+            {
+                Response.Headers["Surrogate-Key"] = assets.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = response.ToEtag();
+            Response.Headers[HeaderNames.ETag] = assets.ToEtag();
 
             return Ok(response);
         }
@@ -138,14 +141,17 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return NotFound();
             }
 
-            var response = AssetDto.FromAsset(asset, this, app);
+            var response = Deferred.Response(() =>
+            {
+                return AssetDto.FromAsset(asset, this, app);
+            });
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
-                Response.Headers["Surrogate-Key"] = asset.Id.ToString();
+                Response.Headers["Surrogate-Key"] = asset.ToSurrogateKey();
             }
 
-            Response.Headers[HeaderNames.ETag] = asset.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = asset.ToEtag();
 
             return Ok(response);
         }
@@ -175,10 +181,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
 
             var command = new CreateAsset { File = assetFile };
 
-            var context = await CommandBus.PublishAsync(command);
-
-            var result = context.Result<AssetCreatedResult>();
-            var response = AssetDto.FromAsset(result.Asset, this, app, result.IsDuplicate);
+            var response = await InvokeCommandAsync(app, command);
 
             return CreatedAtAction(nameof(GetAsset), new { app, id = response.Id }, response);
         }
@@ -263,10 +266,14 @@ namespace Squidex.Areas.Api.Controllers.Assets
         {
             var context = await CommandBus.PublishAsync(command);
 
-            var result = context.Result<IEnrichedAssetEntity>();
-            var response = AssetDto.FromAsset(result, this, app);
-
-            return response;
+            if (context.PlainResult is AssetCreatedResult created)
+            {
+                return AssetDto.FromAsset(created.Asset, this, app, created.IsDuplicate);
+            }
+            else
+            {
+                return AssetDto.FromAsset(context.Result<IEnrichedAssetEntity>(), this, app);
+            }
         }
 
         private async Task<AssetFile> CheckAssetFileAsync(IReadOnlyList<IFormFile> file)

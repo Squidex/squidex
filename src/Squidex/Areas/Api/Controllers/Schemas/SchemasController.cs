@@ -50,9 +50,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         {
             var schemas = await appProvider.GetSchemasAsync(AppId);
 
-            var response = SchemasDto.FromSchemas(schemas, this, app);
+            var response = Deferred.Response(() =>
+            {
+                return SchemasDto.FromSchemas(schemas, this, app);
+            });
 
-            Response.Headers[HeaderNames.ETag] = response.ToEtag();
+            Response.Headers[HeaderNames.ETag] = schemas.ToEtag();
 
             return Ok(response);
         }
@@ -89,9 +92,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas
                 return NotFound();
             }
 
-            var response = SchemaDetailsDto.FromSchemaWithDetails(schema, this, app);
+            var response = Deferred.Response(() =>
+            {
+                return SchemaDetailsDto.FromSchemaWithDetails(schema, this, app);
+            });
 
-            Response.Headers[HeaderNames.ETag] = schema.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = schema.ToEtag();
 
             return Ok(response);
         }

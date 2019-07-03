@@ -58,9 +58,12 @@ namespace Squidex.Areas.Api.Controllers.Rules
         [ApiCosts(0)]
         public IActionResult GetActions()
         {
-            var etag = string.Join(";", ruleRegistry.Actions.Select(x => x.Key)).Sha256Base64();
+            var etag = string.Concat(ruleRegistry.Actions.Select(x => x.Key)).Sha256Base64();
 
-            var response = ruleRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDefinition(x.Value));
+            var response = Deferred.Response(() =>
+            {
+                return ruleRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDefinition(x.Value));
+            });
 
             Response.Headers[HeaderNames.ETag] = etag;
 
@@ -84,9 +87,12 @@ namespace Squidex.Areas.Api.Controllers.Rules
         {
             var rules = await appProvider.GetRulesAsync(AppId);
 
-            var response = RulesDto.FromRules(rules, this, app);
+            var response = Deferred.Response(() =>
+            {
+                return RulesDto.FromRules(rules, this, app);
+            });
 
-            Response.Headers[HeaderNames.ETag] = response.GenerateEtag();
+            Response.Headers[HeaderNames.ETag] = rules.ToEtag();
 
             return Ok(response);
         }

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 
-namespace Squidex.Web
+namespace Squidex.Web.Pipeline
 {
     public sealed class ETagFilter : IAsyncActionFilter
     {

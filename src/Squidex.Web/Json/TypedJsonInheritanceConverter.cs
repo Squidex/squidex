@@ -16,16 +16,15 @@ using Squidex.Infrastructure;
 
 #pragma warning disable RECS0108 // Warns about static fields in generic types
 
-namespace Squidex.Web
+namespace Squidex.Web.Json
 {
-    public class MyJsonInheritanceConverter<T> : JsonInheritanceConverter
+    public class TypedJsonInheritanceConverter<T> : JsonInheritanceConverter
     {
-        private static readonly Dictionary<string, Type> DefaultMapping = new Dictionary<string, Type>();
-        private readonly IReadOnlyDictionary<string, Type> maping;
-
-        static MyJsonInheritanceConverter()
+        private static readonly Lazy<Dictionary<string, Type>> DefaultMapping = new Lazy<Dictionary<string, Type>>(() =>
         {
             var baseName = typeof(T).Name;
+
+            var result = new Dictionary<string, Type>();
 
             void AddType(Type type)
             {
@@ -36,7 +35,7 @@ namespace Squidex.Web
                     discriminator = discriminator.Substring(0, discriminator.Length - baseName.Length);
                 }
 
-                DefaultMapping[discriminator] = type;
+                result[discriminator] = type;
             }
 
             foreach (var attribute in typeof(T).GetCustomAttributes<KnownTypeAttribute>())
@@ -66,17 +65,23 @@ namespace Squidex.Web
                     }
                 }
             }
-        }
 
-        public MyJsonInheritanceConverter(string discriminator)
-            : this(discriminator, DefaultMapping)
+            return result;
+        });
+
+        private readonly IReadOnlyDictionary<string, Type> maping;
+
+        public TypedJsonInheritanceConverter(string discriminator)
+            : this(discriminator, DefaultMapping.Value)
         {
         }
 
-        public MyJsonInheritanceConverter(string discriminator, IReadOnlyDictionary<string, Type> mapping)
+        public TypedJsonInheritanceConverter(string discriminator, IReadOnlyDictionary<string, Type> mapping)
             : base(typeof(T), discriminator)
         {
-            maping = mapping ?? DefaultMapping;
+            Guard.NotNull(maping, nameof(maping));
+
+            maping = mapping;
         }
 
         protected override Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)

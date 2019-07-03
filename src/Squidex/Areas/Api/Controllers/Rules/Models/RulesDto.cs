@@ -22,11 +22,6 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [Required]
         public RuleDto[] Items { get; set; }
 
-        public string GenerateEtag()
-        {
-            return Items.ToManyEtag(0);
-        }
-
         public static RulesDto FromRules(IEnumerable<IRuleEntity> items, ApiController controller, string app)
         {
             var result = new RulesDto

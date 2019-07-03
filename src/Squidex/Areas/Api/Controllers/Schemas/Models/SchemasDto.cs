@@ -21,11 +21,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public SchemaDto[] Items { get; set; }
 
-        public string ToEtag()
-        {
-            return Items.ToManyEtag();
-        }
-
         public static SchemasDto FromSchemas(IList<ISchemaEntity> schemas, ApiController controller, string app)
         {
             var result = new SchemasDto

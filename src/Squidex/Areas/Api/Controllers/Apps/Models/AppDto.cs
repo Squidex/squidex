@@ -25,7 +25,7 @@ using AllPermissions = Squidex.Shared.Permissions;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class AppDto : Resource, IGenerateETag
+    public sealed class AppDto : Resource
     {
         /// <summary>
         /// The name of the app.

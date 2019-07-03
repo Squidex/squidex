@@ -51,6 +51,7 @@ namespace Squidex.Config.Web
             services.AddMvc(options =>
             {
                 options.Filters.Add<ETagFilter>();
+                options.Filters.Add<DeferredActionFilter>();
                 options.Filters.Add<AppResolver>();
                 options.Filters.Add<MeasureResultFilter>();
             })

@@ -46,9 +46,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetClients(string app)
         {
-            var response = ClientsDto.FromApp(App, this);
+            var response = Deferred.Response(() =>
+            {
+                return ClientsDto.FromApp(App, this);
+            });
 
-            Response.Headers[HeaderNames.ETag] = App.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = App.ToEtag();
 
             return Ok(response);
         }

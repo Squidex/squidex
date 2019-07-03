@@ -55,9 +55,13 @@ namespace Squidex.Areas.Api.Controllers.Comments
         public async Task<IActionResult> GetComments(string app, Guid commentsId, [FromQuery] long version = EtagVersion.Any)
         {
             var result = await grainFactory.GetGrain<ICommentGrain>(commentsId).GetCommentsAsync(version);
-            var response = CommentsDto.FromResult(result);
 
-            Response.Headers[HeaderNames.ETag] = response.Version.ToString();
+            var response = Deferred.Response(() =>
+            {
+                return CommentsDto.FromResult(result);
+            });
+
+            Response.Headers[HeaderNames.ETag] = result.Version.ToString();
 
             return Ok(response);
         }
