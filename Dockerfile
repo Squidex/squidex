@@ -23,7 +23,8 @@ FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder_ba
 
 WORKDIR /src
 
-RUN apt-get install screen
+RUN apt-get update \
+ && apt-get install screen
 
 COPY src/**/*.csproj /tmp/
 COPY tests/**/*.csproj /tmp/
