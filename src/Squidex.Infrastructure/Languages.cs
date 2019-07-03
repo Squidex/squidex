@@ -319,6 +319,7 @@ namespace Squidex.Infrastructure
         public static readonly Language EnglishMalaysia = AddLanguage("en-MY", "English (Malaysia)");
         public static readonly Language EnglishNamibia = AddLanguage("en-NA", "English (Namibia)");
         public static readonly Language EnglishNorfolkIsland = AddLanguage("en-NF", "English (Norfolk Island)");
+        public static readonly Language EnglishNorway = AddLanguage("en-NO", "English (Norway)");
         public static readonly Language EnglishNigeria = AddLanguage("en-NG", "English (Nigeria)");
         public static readonly Language EnglishNetherlands = AddLanguage("en-NL", "English (Netherlands)");
         public static readonly Language EnglishNauru = AddLanguage("en-NR", "English (Nauru)");
