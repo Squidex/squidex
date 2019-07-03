@@ -4,15 +4,15 @@
   "description": "Automation framework for Cosmos",
   "main": "index.js",
   "scripts": {
-    "pretest": "npm-run-all -s lint compile setupapp",
+    "pretest": "npm-run-all -s lint compile setupapp webdriver-update",
     "lint": "./node_modules/.bin/tslint -c tslint.json ./pages/*.ts",
     "compile": "tsc",
     "setupapp": "screen -dmS appstart ./setup-app.sh",
     "dbstart": "nohup node ./JSFiles/utils/Db.js &>/dev/null &",
     "appstart": "nohup dotnet run --project ../src/Squidex &>/dev/null &",
     "deploymentscriptsrun": "wait-on https://localhost:5000/ && cd ../deploymentscripts && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./Deployment.ps1 -identityServiceBaseUrl 'http://identityservice.systest.tesla.cha.rbxd.ds' -apiBaseUrl 'https://localhost:5000/api' -tokenUser 'CMSDeployer' -tokenPassword 'p@55w0rd' -appName 'commentary'",
-    "test": "protractor ../cosmos-func-tests/JSFiles/config.js",
-    "posttest": "cd ./utils/ && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./TerminateTask.ps1 && rm -r ../database/*",
+    "test": "protractor ./JSFiles/config.js",
+    "posttest": "cd ./utils/ && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./TerminateTask.ps1 && rm -r ./database/*",
     "protractor": "./node_modules/protractor/built/cli.js",
     "webdriver-update": "./node_modules/.bin/webdriver-manager update"
   },
