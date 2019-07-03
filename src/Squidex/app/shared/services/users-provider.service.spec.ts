@@ -28,7 +28,7 @@ describe('UsersProviderService', () => {
     });
 
     it('should return users service when user not cached', () => {
-        const user = new UserDto('123', 'User1');
+        const user = new UserDto('123', 'User1', 'email');
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => of(user)).verifiable(Times.once());
@@ -45,7 +45,7 @@ describe('UsersProviderService', () => {
     });
 
     it('should return provide user from cache', () => {
-        const user = new UserDto('123', 'User1');
+        const user = new UserDto('123', 'User1', 'email');
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => of(user)).verifiable(Times.once());
@@ -64,10 +64,13 @@ describe('UsersProviderService', () => {
     });
 
     it('should return me when user is current user', () => {
-        const user = new UserDto('123', 'User1');
+        const user = new UserDto('123', 'User1', 'email');
 
         authService.setup(x => x.user)
-            .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
+            .returns(() => new Profile(<any>{
+                access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJlbWFpbCI6ImVtYWlsIiwiZ2l2ZW5fbmFtZSI6InRlc3QifQ.2MSPW3IvMx9GvGs4_yVbwEpnMzG_VpmUXPk34c3prnQ',
+                profile: { sub: '123' }
+            }));
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => of(user)).verifiable(Times.once());
@@ -78,14 +81,17 @@ describe('UsersProviderService', () => {
             resultingUser = result;
         }).unsubscribe();
 
-        expect(resultingUser!).toEqual(new UserDto('123', 'Me'));
+        expect(resultingUser!).toEqual(new UserDto('123', 'Me', 'email'));
 
         usersService.verifyAll();
     });
 
     it('should return invalid user when not found', () => {
         authService.setup(x => x.user)
-            .returns(() => new Profile(<any>{ profile: { sub: '123'}}));
+            .returns(() => new Profile(<any>{
+                access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJlbWFpbCI6ImVtYWlsIiwiZ2l2ZW5fbmFtZSI6InRlc3QifQ.2MSPW3IvMx9GvGs4_yVbwEpnMzG_VpmUXPk34c3prnQ',
+                profile: { sub: '123' }
+            }));
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => throwError('NOT FOUND')).verifiable(Times.once());
@@ -96,7 +102,7 @@ describe('UsersProviderService', () => {
             resultingUser = result;
         }).unsubscribe();
 
-        expect(resultingUser!).toEqual(new UserDto('Unknown', 'Unknown'));
+        expect(resultingUser!).toEqual(new UserDto('Unknown', 'Unknown', 'Unknown'));
 
         usersService.verifyAll();
     });

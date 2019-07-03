@@ -30,7 +30,7 @@ export class Profile {
     }
 
     public get email(): string {
-        return this.user.profile['email'];
+        return this.getEmail();
     }
 
     public get displayName(): string {
@@ -86,6 +86,10 @@ export class Profile {
 
     private getUserName(): string {
         return this.decodedToken['given_name'];
+    }
+
+    private getEmail(): string {
+        return this.decodedToken['email'];
     }
 
     private parseJwt(token: string): any {

@@ -11,7 +11,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Squidex.Infrastructure.Security;
-using Squidex.Shared.Identity;
 
 namespace Squidex.ICIS.Handlers
 {
@@ -23,25 +22,11 @@ namespace Squidex.ICIS.Handlers
             {
                 if (context.Principal.Identity is ClaimsIdentity identity)
                 {
-                    var nameClaim = identity.FindFirst(ClaimTypes.Name)?.Value;
-                    if (!string.IsNullOrWhiteSpace(nameClaim))
+                    var nameClaim = identity.FindFirst(ClaimTypes.GivenName)?.Value;
+                    if (string.IsNullOrWhiteSpace(nameClaim))
                     {
-                        identity.SetDisplayName(nameClaim);
+                        identity.AddClaim(new Claim(ClaimTypes.GivenName, accessToken.Payload[OpenIdClaims.ClientId].ToString()));
                     }
-                    else
-                    {
-                        identity.AddClaim(new Claim(OpenIdClaims.Name, accessToken.Payload[OpenIdClaims.ClientId].ToString()));
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(accessToken.Subject))
-                    {
-                        identity.AddClaim(new Claim(OpenIdClaims.Subject, accessToken.Subject));
-                    }
-                    else
-                    {
-                        identity.AddClaim(new Claim(OpenIdClaims.Subject, accessToken.Payload[OpenIdClaims.ClientId].ToString()));
-                    }
-
 
                     if (accessToken.Payload.Keys.Contains(OpenIdClaims.Email) && accessToken.Payload[OpenIdClaims.Email] != null)
                     {

@@ -20,7 +20,7 @@ namespace Squidex.ICIS.Extensions
     {
         public static void AddGenesisAuthentication(this IServiceCollection services, string authServer)
         {
-            services.AddSingleton<IClaimsManager, ClaimsManager>();
+            services.AddSingleton<IUserManager, UserManager>();
             
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
