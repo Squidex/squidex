@@ -14,7 +14,7 @@
     "test": "protractor ./JSFiles/config.js",
     "posttest": "cd ./utils/ && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./TerminateTask.ps1 && rm -r ./database/*",
     "protractor": "./node_modules/protractor/built/cli.js",
-    "webdriver-update": "./node_modules/.bin/webdriver-manager update"
+    "webdriver-update": "./node_modules/.bin/webdriver-manager update --standalone"
   },
   "author": "Pavani",
   "license": "ISC",
