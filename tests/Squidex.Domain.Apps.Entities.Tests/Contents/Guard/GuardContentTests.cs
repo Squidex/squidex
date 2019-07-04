@@ -97,7 +97,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Draft, false);
             var command = new UpdateContent();
 
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanUpdate(content, contentWorkflow, command),
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanUpdate(content, contentWorkflow, command, false),
                 new ValidationError("Data is required.", "Data"));
         }
 
@@ -109,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Draft, false);
             var command = new UpdateContent { Data = new NamedContentData() };
 
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanUpdate(content, contentWorkflow, command));
+            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanUpdate(content, contentWorkflow, command, false));
         }
 
         [Fact]
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Draft, false);
             var command = new UpdateContent { Data = new NamedContentData() };
 
-            await GuardContent.CanUpdate(content, contentWorkflow, command);
+            await GuardContent.CanUpdate(content, contentWorkflow, command, false);
         }
 
         [Fact]
@@ -131,7 +131,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Draft, false);
             var command = new PatchContent();
 
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanPatch(content, contentWorkflow, command),
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanPatch(content, contentWorkflow, command, false),
                 new ValidationError("Data is required.", "Data"));
         }
 
@@ -143,7 +143,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Draft, false);
             var command = new PatchContent { Data = new NamedContentData() };
 
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanPatch(content, contentWorkflow, command));
+            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanPatch(content, contentWorkflow, command, false));
         }
 
         [Fact]
@@ -154,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Draft, false);
             var command = new PatchContent { Data = new NamedContentData() };
 
-            await GuardContent.CanPatch(content, contentWorkflow, command);
+            await GuardContent.CanPatch(content, contentWorkflow, command, false);
         }
 
         [Fact]
@@ -163,7 +163,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Published, false);
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command),
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command, true),
                 new ValidationError("Content has no changes to publish.", "Status"));
         }
 
@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Published, false);
             var command = new ChangeContentStatus { Status = Status.Draft };
 
-            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command));
+            await Assert.ThrowsAsync<DomainException>(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command, false));
         }
 
         [Fact]
@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             var content = CreateContent(Status.Published, true);
             var command = new ChangeContentStatus { Status = Status.Published };
 
-            await GuardContent.CanChangeStatus(schema, content, contentWorkflow, command);
+            await GuardContent.CanChangeStatus(schema, content, contentWorkflow, command, true);
         }
 
         [Fact]
@@ -198,7 +198,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status, user))
                 .Returns(true);
 
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command),
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command, false),
                 new ValidationError("Due time must be in the future.", "DueTime"));
         }
 
@@ -211,7 +211,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status, user))
                 .Returns(false);
 
-            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command),
+            await ValidationAssert.ThrowsAsync(() => GuardContent.CanChangeStatus(schema, content, contentWorkflow, command, false),
                 new ValidationError("Cannot change status from Draft to Published.", "Status"));
         }
 
@@ -224,7 +224,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
             A.CallTo(() => contentWorkflow.CanMoveToAsync(content, command.Status, user))
                 .Returns(true);
 
-            await GuardContent.CanChangeStatus(schema, content, contentWorkflow, command);
+            await GuardContent.CanChangeStatus(schema, content, contentWorkflow, command, false);
         }
 
         [Fact]

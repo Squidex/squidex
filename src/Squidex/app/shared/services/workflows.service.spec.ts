@@ -260,16 +260,6 @@ describe('Workflow', () => {
         });
     });
 
-    it('should return same workflow if step to update is locked', () => {
-        const workflow =
-            new WorkflowDto({}, 'id')
-                .setStep('1', { color: '#00ff00', isLocked: true });
-
-        const updated = workflow.setStep('1', { color: 'red' });
-
-        expect(updated).toBe(workflow);
-    });
-
     it('should sort steps case invariant', () => {
         const workflow =
             new WorkflowDto({}, 'id')

@@ -43,17 +43,6 @@ export class WorkflowDto extends Model<WorkflowDto> {
 
     public readonly displayName: string;
 
-    public static DEFAULT =
-        new WorkflowDto({}, 'id', 'name')
-            .setStep('Draft', { color: '#8091a5' })
-            .setStep('Archived', { color: '#eb3142', noUpdate: true })
-            .setStep('Published', { color: '#4bb958', isLocked: true })
-            .setTransition('Archived', 'Draft')
-            .setTransition('Draft', 'Archived')
-            .setTransition('Draft', 'Published')
-            .setTransition('Published', 'Draft')
-            .setTransition('Published', 'Archived');
-
     constructor(
         links: ResourceLinks = {},
         public readonly id: string,
@@ -94,27 +83,29 @@ export class WorkflowDto extends Model<WorkflowDto> {
     }
 
     public setStep(name: string, values: Partial<WorkflowStepValues> = {}) {
-        const found = this.getStep(name);
+        const old = this.getStep(name);
 
-        if (found) {
-            const { name: _, ...existing } = found;
-
-            if (found.isLocked) {
-                return this;
-            }
-
-            values = { ...existing, ...values };
-        }
-
-        const steps = [...this.steps.filter(s => s !== found), { name, ...values }];
-
-        let initial = this.initial;
+        const step = { ...old, name, ...values };
+        const steps = [...this.steps.filter(s => s !== old), step];
 
         if (steps.length === 1) {
-            initial = steps[0].name;
+            return this.with({ initial: name, steps });
+        } else {
+            return this.with({ steps });
+        }
+    }
+
+    public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
+        if (!this.getStep(from) || !this.getStep(to)) {
+            return this;
         }
 
-        return this.with({ initial, steps });
+        const old = this.transitions.find(x => x.from === from && x.to === to);
+
+        const transition = { ...old, from, to, ...values };
+        const transitions = [...this.transitions.filter(t => t !== old), transition];
+
+        return this.with({ transitions });
     }
 
     public setInitial(initial: string) {
@@ -134,20 +125,15 @@ export class WorkflowDto extends Model<WorkflowDto> {
             return this;
         }
 
-        const transitions =
-            steps.length !== this.steps.length ?
-                this.transitions.filter(t => t.from !== name && t.to !== name) :
-                this.transitions;
+        const transitions = this.transitions.filter(t => t.from !== name && t.to !== name);
 
-        let initial = this.initial;
-
-        if (initial === name) {
+        if (this.initial === name) {
             const first = steps.find(x => !x.isLocked);
 
-            initial = first ? first.name : null;
+            return this.with({ initial: first ? first.name : null, steps, transitions });
+        } else {
+            return this.with({ steps, transitions });
         }
-
-        return this.with({ initial, steps, transitions });
     }
 
     public changeSchemaIds(schemaIds: string[]) {
@@ -185,13 +171,11 @@ export class WorkflowDto extends Model<WorkflowDto> {
             return transition;
         });
 
-        let initial = this.initial;
-
-        if (initial === name) {
-            initial = newName;
+        if (this.initial === name) {
+            return this.with({ initial: newName, steps, transitions });
+        } else {
+            return this.with({ steps, transitions });
         }
-
-        return this.with({ initial, steps, transitions });
     }
 
     public removeTransition(from: string, to: string) {
@@ -200,32 +184,6 @@ export class WorkflowDto extends Model<WorkflowDto> {
         if (transitions.length === this.transitions.length) {
             return this;
         }
-
-        return this.with({ transitions });
-    }
-
-    public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
-        const stepFrom = this.getStep(from);
-
-        if (!stepFrom) {
-            return this;
-        }
-
-        const stepTo = this.getStep(to);
-
-        if (!stepTo) {
-            return this;
-        }
-
-        const found = this.transitions.find(x => x.from === from && x.to === to);
-
-        if (found) {
-            const { from: _, to: __, ...existing } = found;
-
-            values = { ...existing, ...values };
-        }
-
-        const transitions = [...this.transitions.filter(t => t !== found), { from, to, ...values }];
 
         return this.with({ transitions });
     }

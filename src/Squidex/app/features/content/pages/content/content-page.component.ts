@@ -149,7 +149,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                             this.contentForm.submitFailed(error);
                         });
                 } else {
-                    if (this.content && !this.content.canUpdate) {
+                    if (this.content && !this.content.canUpdateAny) {
                         return;
                     }
 
@@ -183,7 +183,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     private loadContent(data: any) {
         this.contentForm.loadContent(data);
-        this.contentForm.setEnabled(!this.content || this.content.canUpdate);
+        this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
     }
 
     public discardChanges() {

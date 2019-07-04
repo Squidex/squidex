@@ -93,17 +93,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case UpdateContent updateContent:
                     return UpdateReturnAsync(updateContent, async c =>
                     {
-                        await GuardContent.CanUpdate(Snapshot, contentWorkflow, c);
+                        var isProposal = c.AsDraft && Snapshot.Status == Status.Published;
 
-                        return await UpdateAsync(c, x => c.Data, false);
+                        await GuardContent.CanUpdate(Snapshot, contentWorkflow, c, isProposal);
+
+                        return await UpdateAsync(c, x => c.Data, false, isProposal);
                     });
 
                 case PatchContent patchContent:
                     return UpdateReturnAsync(patchContent, async c =>
                     {
-                        await GuardContent.CanPatch(Snapshot, contentWorkflow, c);
+                        var isProposal = c.AsDraft && Snapshot.Status == Status.Published;
 
-                        return await UpdateAsync(c, c.Data.MergeInto, true);
+                        await GuardContent.CanPatch(Snapshot, contentWorkflow, c, isProposal);
+
+                        return await UpdateAsync(c, c.Data.MergeInto, true, isProposal);
                     });
 
                 case ChangeContentStatus changeContentStatus:
@@ -111,9 +115,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         try
                         {
+                            var isChangeConfirm = Snapshot.IsPending && Snapshot.Status == Status.Published && c.Status == Status.Published;
+
                             var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, Snapshot.Id, () => "Failed to change content.");
 
-                            await GuardContent.CanChangeStatus(ctx.Schema, Snapshot, contentWorkflow, c);
+                            await GuardContent.CanChangeStatus(ctx.Schema, Snapshot, contentWorkflow, c, isChangeConfirm);
 
                             if (c.DueTime.HasValue)
                             {
@@ -121,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             }
                             else
                             {
-                                if (Snapshot.IsPending && Snapshot.Status == Status.Published && c.Status == Status.Published)
+                                if (isChangeConfirm)
                                 {
                                     ConfirmChanges(c);
                                 }
@@ -190,10 +196,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<object> UpdateAsync(ContentUpdateCommand command, Func<NamedContentData, NamedContentData> newDataFunc, bool partial)
+        private async Task<object> UpdateAsync(ContentUpdateCommand command, Func<NamedContentData, NamedContentData> newDataFunc, bool partial, bool isProposal)
         {
-            var isProposal = command.AsDraft && Snapshot.Status == Status.Published;
-
             var currentData =
                 isProposal ?
                 Snapshot.DataDraft :

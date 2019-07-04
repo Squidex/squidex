@@ -13,7 +13,7 @@
                 [ngModelOptions]="onBlur"
                 [ngModel]="step.color"
                 (ngModelChange)="changeColor($event)"
-                [disabled]="step.isLocked || disabled">
+                [disabled]="disabled">
             </sqx-color-picker>
         </div>
         <div class="col">

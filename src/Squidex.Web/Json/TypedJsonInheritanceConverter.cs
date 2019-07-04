@@ -79,9 +79,7 @@ namespace Squidex.Web.Json
         public TypedJsonInheritanceConverter(string discriminator, IReadOnlyDictionary<string, Type> mapping)
             : base(typeof(T), discriminator)
         {
-            Guard.NotNull(maping, nameof(maping));
-
-            maping = mapping;
+            maping = mapping ?? DefaultMapping.Value;
         }
 
         protected override Type GetDiscriminatorType(JObject jObject, Type objectType, string discriminatorValue)

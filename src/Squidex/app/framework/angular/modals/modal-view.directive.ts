@@ -121,7 +121,11 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         }
 
         if (this.closeAlways) {
-            this.modalView.hide();
+            const modal = this.modalView;
+
+            setTimeout(() => {
+                modal.hide();
+            }, 100);
         } else {
             try {
                 const rootNode = this.renderedView.rootNodes[0];

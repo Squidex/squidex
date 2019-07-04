@@ -15,9 +15,9 @@ namespace Squidex.Web.Pipeline
     {
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            await next();
+            var resultContext = await next();
 
-            if (context.Result is ObjectResult objectResult && objectResult.Value is Deferred deferred)
+            if (resultContext.Result is ObjectResult objectResult && objectResult.Value is Deferred deferred)
             {
                 objectResult.Value = await deferred.Value;
             }
