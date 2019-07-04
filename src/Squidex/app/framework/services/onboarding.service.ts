@@ -12,15 +12,20 @@ import { Injectable } from '@angular/core';
 
 import { LocalStoreService } from './local-store.service';
 
-export const OnboardingServiceFactory = (localStore: LocalStoreService) => {
-    return new OnboardingService(localStore);
+import { UIOptions } from './../configurations';
+
+export const OnboardingServiceFactory = (uiOptions: UIOptions, localStore: LocalStoreService) => {
+    return new OnboardingService(uiOptions, localStore);
 };
 
 @Injectable()
 export class OnboardingService {
-    constructor(
+    private readonly disabled: boolean;
+
+    constructor(uiOptions: UIOptions,
         private readonly localStore: LocalStoreService
     ) {
+        this.disabled = uiOptions.get('hideOnboarding');
     }
 
     public disableAll() {
@@ -32,7 +37,7 @@ export class OnboardingService {
     }
 
     public shouldShow(key: string) {
-        return this.shouldShowKey(key) && this.shouldShowKey('all');
+        return !this.disabled && this.shouldShowKey(key) && this.shouldShowKey('all');
     }
 
     private shouldShowKey(key: string) {

@@ -45,6 +45,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
         private readonly renderer: Renderer2
     ) {
         super(changeDetector, {});
+
     }
 
     public ngOnDestroy() {

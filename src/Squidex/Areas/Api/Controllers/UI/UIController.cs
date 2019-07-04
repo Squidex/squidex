@@ -48,13 +48,8 @@ namespace Squidex.Areas.Api.Controllers.UI
         {
             var result = new UISettingsDto
             {
-                MapType = uiOptions.Map?.Type ?? "OSM",
-                MapKey = uiOptions.Map?.GoogleMaps?.Key
+                CanCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.Permissions.Includes(CreateAppPermission)
             };
-
-            var canCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.Permissions.Includes(CreateAppPermission);
-
-            result.CanCreateApps = canCreateApps;
 
             return Ok(result);
         }

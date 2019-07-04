@@ -10,14 +10,19 @@ import { CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
 
+import { UIOptions } from '@app/framework';
+
 import { AuthService } from './../services/auth.service';
 
 @Injectable()
 export class MustBeAuthenticatedGuard implements CanActivate {
-    constructor(
+    private readonly redirect: boolean;
+
+    constructor(uiOptions: UIOptions,
         private readonly authService: AuthService,
         private readonly router: Router
     ) {
+        this.redirect = uiOptions.get('redirectToLogin');
     }
 
     public canActivate(): Observable<boolean> {
@@ -25,7 +30,11 @@ export class MustBeAuthenticatedGuard implements CanActivate {
             take(1),
             tap(user => {
                 if (!user) {
-                    this.router.navigate(['']);
+                    if (this.redirect) {
+                        this.authService.loginRedirect();
+                    } else {
+                        this.router.navigate(['']);
+                    }
                 }
             }),
             map(user => !!user));
