@@ -18,9 +18,26 @@ namespace Squidex.Areas.Api.Controllers.Ping
     [ApiExplorerSettings(GroupName = nameof(Ping))]
     public sealed class PingController : ApiController
     {
-        public PingController(ICommandBus commandBus)
+        private readonly ExposedValues exposedValues;
+
+        public PingController(ICommandBus commandBus, ExposedValues exposedValues)
             : base(commandBus)
         {
+            this.exposedValues = exposedValues;
+        }
+
+        /// <summary>
+        /// Get general info status of the API.
+        /// </summary>
+        /// <returns>
+        /// 200 => Infos returned.
+        /// </returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(ExposedValues), 200)]
+        [Route("info/")]
+        public IActionResult Info()
+        {
+            return Ok(exposedValues);
         }
 
         /// <summary>

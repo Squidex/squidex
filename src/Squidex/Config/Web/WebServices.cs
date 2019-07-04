@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Pipeline.Plugins;
@@ -21,6 +22,9 @@ namespace Squidex.Config.Web
     {
         public static void AddMyMvcWithPlugins(this IServiceCollection services, IConfiguration config)
         {
+            services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config))
+                .AsSelf();
+
             services.AddSingletonAs<FileCallbackResultExecutor>()
                 .AsSelf();
 
