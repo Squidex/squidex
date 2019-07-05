@@ -62,7 +62,7 @@ export class LanguageComponent implements OnChanges {
         const value = this.editForm.submit();
 
         if (value) {
-            const request = { ...value, fallbackLanguages: this.fallbackLanguages.map(x => x.iso2Code).values };
+            const request = { ...value, fallback: this.fallbackLanguages.map(x => x.iso2Code).values };
 
             this.languagesState.update(this.language, request)
                 .subscribe(() => {

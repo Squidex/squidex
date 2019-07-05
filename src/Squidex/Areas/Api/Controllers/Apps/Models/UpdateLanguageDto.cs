@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Linq;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -30,7 +31,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public UpdateLanguage ToCommand(Language language)
         {
-            return SimpleMapper.Map(this, new UpdateLanguage { Language = language });
+            return SimpleMapper.Map(this, new UpdateLanguage { Language = language, Fallback = Fallback?.ToList() });
         }
     }
 }
