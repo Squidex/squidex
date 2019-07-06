@@ -10,15 +10,15 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    BackupDto,
     BackupsDto,
     BackupsService,
     BackupsState,
-    DateTime,
     DialogService
 } from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
+
+import { createBackup } from './../services/backups.service.spec';
 
 describe('BackupsState', () => {
     const {
@@ -26,8 +26,8 @@ describe('BackupsState', () => {
         appsState
     } = TestValues;
 
-    const backup1 = new BackupDto({}, 'id1', DateTime.now(), null, 1, 1, 'Started');
-    const backup2 = new BackupDto({}, 'id2', DateTime.now(), null, 2, 2, 'Started');
+    const backup1 = createBackup(12);
+    const backup2 = createBackup(13);
 
     let dialogs: IMock<DialogService>;
     let backupsService: IMock<BackupsService>;
