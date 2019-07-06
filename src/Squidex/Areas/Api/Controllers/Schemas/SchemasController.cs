@@ -114,7 +114,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 201)]
         [ApiPermission(Permissions.AppSchemasCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostSchema(string app, [FromBody] CreateSchemaDto request)

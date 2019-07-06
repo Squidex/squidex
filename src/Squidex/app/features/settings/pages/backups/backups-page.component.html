@@ -72,7 +72,7 @@
                         <div *ngIf="backup.stopped && !backup.isFailed">
                             Download:
 
-                            <a href="{{backup | sqxBackupDownloadUrl}}" sqxExternalLink="noicon">
+                            <a href="{{apiUrl.buildUrl(backup.downloadUrl)}}" sqxExternalLink="noicon">
                                 Ready <i class="icon-external-link"></i>
                             </a>
                         </div>

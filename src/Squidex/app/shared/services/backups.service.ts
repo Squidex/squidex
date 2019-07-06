@@ -41,6 +41,8 @@ export class BackupDto {
 
     public readonly canDelete: boolean;
 
+    public readonly downloadUrl: string;
+
     constructor(
         links: ResourceLinks,
         public readonly id: string,
@@ -53,6 +55,8 @@ export class BackupDto {
         this._links = links;
 
         this.canDelete = hasAnyLink(links, 'delete');
+
+        this.downloadUrl = links['download'].href;
     }
 }
 

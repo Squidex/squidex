@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [HttpPost]
         [Route("apps/restore/")]
         [ApiPermission(Permissions.AdminRestore)]
-        public async Task<IActionResult> PostRestore([FromBody] RestoreRequest request)
+        public async Task<IActionResult> PostRestore([FromBody] RestoreRequestDto request)
         {
             var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
 
