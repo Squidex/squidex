@@ -82,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private async Task RestoreTagsAsync(Guid appId, BackupReader reader)
         {
-            var tags = await reader.ReadJsonAttachmentAsync<TagSet>(TagsFile);
+            var tags = await reader.ReadJsonAttachmentAsync<TagsExport>(TagsFile);
 
             await tagService.RebuildTagsAsync(appId, TagGroups.Assets, tags);
         }

@@ -77,9 +77,11 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ApiCosts(1)]
         public async Task<IActionResult> GetTags(string app)
         {
-            var response = await tagService.GetTagsAsync(AppId, TagGroups.Assets);
+            var tags = await tagService.GetTagsAsync(AppId, TagGroups.Assets);
 
-            return Ok(response);
+            Response.Headers[HeaderNames.ETag] = tags.Version.ToString();
+
+            return Ok(tags);
         }
 
         /// <summary>

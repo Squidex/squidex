@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map, shareReplay, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -65,6 +65,8 @@ type LanguageResultList = ImmutableArray<SnapshotLanguage>;
 
 @Injectable()
 export class LanguagesState extends State<Snapshot> {
+    private cachedLanguage$: Observable<LanguageDto[]>;
+
     public languages =
         this.project(x => x.languages);
 
@@ -96,9 +98,7 @@ export class LanguagesState extends State<Snapshot> {
             this.resetState();
         }
 
-        return forkJoin(
-                this.languagesService.getLanguages(),
-                this.appLanguagesService.getLanguages(this.appName)).pipe(
+        return forkJoin(this.getAllLanguages(), this.getAppLanguages()).pipe(
             map(args => {
                 return { allLanguages: args[0], languages: args[1] };
             }),
@@ -164,6 +164,20 @@ export class LanguagesState extends State<Snapshot> {
 
     private get version() {
         return this.snapshot.version;
+    }
+
+    private getAppLanguages() {
+        return this.appLanguagesService.getLanguages(this.appName);
+    }
+
+    private getAllLanguages() {
+        if (!this.cachedLanguage$) {
+            this.cachedLanguage$ =
+                this.languagesService.getLanguages().pipe(
+                    shareReplay(1));
+        }
+
+        return this.cachedLanguage$;
     }
 
     private createLanguage(language: AppLanguageDto, languages: AppLanguagesList): SnapshotLanguage {
