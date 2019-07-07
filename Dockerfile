@@ -24,24 +24,24 @@ FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder_ba
 WORKDIR /src
 
 # Install Screen
-RUN apt-get update \
- && apt-get install screen
+#RUN apt-get update \
+ #&& apt-get install screen
 
 # Install OpenJDK-8
-RUN apt-get update && \
-    apt-get install -y openjdk-8-jdk && \
-    apt-get install -y ant && \
-    apt-get clean;
+# RUN apt-get update && \
+#     apt-get install -y openjdk-8-jdk && \
+#     apt-get install -y ant && \
+#     apt-get clean;
 
 # Fix certificate issues
-RUN apt-get update && \
-    apt-get install ca-certificates-java && \
-    apt-get clean && \
-    update-ca-certificates -f;
+# RUN apt-get update && \
+#     apt-get install ca-certificates-java && \
+#     apt-get clean && \
+#     update-ca-certificates -f;
 
 # Setup JAVA_HOME -- useful for docker commandline
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
-RUN export JAVA_HOME
+# ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+# RUN export JAVA_HOME
 
 COPY src/**/*.csproj /tmp/
 COPY tests/**/*.csproj /tmp/
@@ -54,13 +54,13 @@ RUN dotnet restore && dotnet test -s ../../.runsettings --filter Category!=Depen
 COPY --from=builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
 
 # Run Functional Test Cases
-COPY cosmos-func-tests/package*.json /tmp/
-RUN cd /tmp && npm install --loglevel=error
-RUN cp -a /tmp/node_modules cosmos-func-tests/ \
- && cd cosmos-func-tests \
- && mkdir database \
- && chmod +x setup-app.sh \
- && npm run test
+# COPY cosmos-func-tests/package*.json /tmp/
+# RUN cd /tmp && npm install --loglevel=error
+# RUN cp -a /tmp/node_modules cosmos-func-tests/ \
+#  && cd cosmos-func-tests \
+#  && mkdir database \
+#  && chmod +x setup-app.sh \
+#  && npm run test
 
 # Publish
 RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release
