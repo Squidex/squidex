@@ -127,6 +127,7 @@
 
   <ItemGroup>
     <Content Remove="Assets\**" />
+    <Content Remove="appsettings.Development.json" />
     <Content Remove="package-lock.json" />
     <Content Remove="package.json" />
     <Content Remove="tsconfig.json" />
