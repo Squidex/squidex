@@ -9,9 +9,9 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Infrastructure.Json;
+using Squidex.Web;
 
 namespace Squidex.Areas.Frontend.Middlewares
 {
@@ -45,6 +45,13 @@ namespace Squidex.Areas.Frontend.Middlewares
 
             if (uiOptions != null)
             {
+                var values = httpContext.RequestServices.GetService<ExposedValues>();
+
+                if (values != null)
+                {
+                    uiOptions.More["info"] = values.ToString();
+                }
+
                 var jsonSerializer = httpContext.RequestServices.GetRequiredService<IJsonSerializer>();
                 var jsonOptions = jsonSerializer.Serialize(uiOptions, false);
 

@@ -95,6 +95,8 @@ namespace Squidex
                 config.GetSection("usage"));
             services.Configure<RebuildOptions>(
                 config.GetSection("rebuild"));
+            services.Configure<ExposedConfiguration>(
+                config.GetSection("exposedConfiguration"));
 
             services.Configure<MyContentsControllerOptions>(
                 config.GetSection("contentsController"));

@@ -90,3 +90,10 @@
         display: none;
     }
 }
+
+.info {
+    color: $color-border-dark;
+    padding: 2rem;
+    padding-left: $size-sidebar-width + .25rem;
+    font-size: .8rem;
+}

@@ -35,6 +35,8 @@ export class AppsPageComponent implements OnInit {
     public newsFeatures: FeatureDto[];
     public newsDialog = new DialogModel();
 
+    public info: string;
+
     constructor(
         public readonly appsState: AppsState,
         public readonly authState: AuthService,
@@ -44,6 +46,9 @@ export class AppsPageComponent implements OnInit {
         private readonly onboardingService: OnboardingService,
         private readonly uiOptions: UIOptions
     ) {
+        if (uiOptions.get('showInfo')) {
+            this.info = uiOptions.get('more.info');
+        }
     }
 
     public ngOnInit() {
