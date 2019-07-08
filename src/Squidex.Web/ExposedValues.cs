@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Squidex.Infrastructure;
@@ -18,7 +19,7 @@ namespace Squidex.Web
         {
         }
 
-        public ExposedValues(ExposedConfiguration configured, IConfiguration configuration)
+        public ExposedValues(ExposedConfiguration configured, IConfiguration configuration, Assembly assembly = null)
         {
             Guard.NotNull(configured, nameof(configured));
             Guard.NotNull(configuration, nameof(configuration));
@@ -30,6 +31,14 @@ namespace Squidex.Web
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     this[kvp.Key] = value;
+                }
+            }
+
+            if (assembly != null)
+            {
+                if (!ContainsKey("version"))
+                {
+                    this["version"] = assembly.GetName().Version.ToString();
                 }
             }
         }

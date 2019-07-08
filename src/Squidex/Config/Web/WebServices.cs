@@ -22,7 +22,7 @@ namespace Squidex.Config.Web
     {
         public static void AddMyMvcWithPlugins(this IServiceCollection services, IConfiguration config)
         {
-            services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config))
+            services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config, typeof(WebServices).Assembly))
                 .AsSelf();
 
             services.AddSingletonAs<FileCallbackResultExecutor>()

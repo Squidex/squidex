@@ -36,6 +36,16 @@ namespace Squidex.Web
         }
 
         [Fact]
+        public void Should_use_version_from_assembly()
+        {
+            var source = new ExposedConfiguration();
+
+            var values = new ExposedValues(source, A.Fake<IConfiguration>(), typeof(ExposedValuesTests).Assembly);
+
+            Assert.Equal("1.0.0.0", values["version"]);
+        }
+
+        [Fact]
         public void Should_format_empty_values()
         {
             var values = new ExposedValues();
