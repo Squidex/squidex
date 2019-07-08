@@ -226,7 +226,7 @@ describe('Workflow', () => {
     it('should create empty workflow', () => {
         const workflow = new WorkflowDto({}, 'id');
 
-        expect(workflow.initial).not.toBeDefined();
+        expect(workflow.initial).toBeNull();
     });
 
     it('should add step to workflow', () => {
