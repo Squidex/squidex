@@ -10,15 +10,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.ICIS.Actions.Kafka;
 using Squidex.ICIS.Actions.Kafka.Entities;
 using Squidex.ICIS.Handlers;
 using Squidex.ICIS.Interfaces;
 using Squidex.ICIS.Kafka.Consumer;
-using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Log;
 
 namespace Squidex.ICIS.Extensions
 {
@@ -76,13 +72,6 @@ namespace Squidex.ICIS.Extensions
                     var option = section.Get<CommodityConsumerOptions>();
 
                     services.AddSingleton<IHostedService>(c => ActivatorUtilities.CreateInstance<CommodityConsumer>(c, option));
-
-                    //services.AddSingleton<IHostedService>(c => new CommodityConsumer(option,
-                    //    c.GetRequiredService<IKafkaConsumer<Commodity>>(),
-                    //    c.GetRequiredService<ICommandBus>(),
-                    //    c.GetRequiredService<IAppProvider>(),
-                    //    c.GetRequiredService<IContentQueryService>(),
-                    //    c.GetRequiredService<ISemanticLog>()));
                 }
             }
         }
