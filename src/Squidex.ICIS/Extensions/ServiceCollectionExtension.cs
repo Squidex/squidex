@@ -44,9 +44,6 @@ namespace Squidex.ICIS.Extensions
 
         public static void AddKafkaRuleExtention(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<ICISKafkaOptions>(
-                config.GetSection("kafka"));
-
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsProducerConfigured())
             {

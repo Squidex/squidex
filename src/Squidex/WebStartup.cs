@@ -30,6 +30,7 @@ using Squidex.Config.Startup;
 using Squidex.Config.Web;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.ICIS.Actions.Kafka;
 using Squidex.ICIS.Extensions;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
@@ -62,6 +63,9 @@ namespace Squidex
             services.AddMyAssetServices(config);
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
             services.AddGenesisAuthentication(identityOptions.ICISAuthServer);
+
+            services.Configure<ICISKafkaOptions>(
+                config.GetSection("kafka"));
             services.AddKafkaRuleExtention(config);
             services.AddKafkaConsumers(config);
 
