@@ -61,8 +61,8 @@ namespace Squidex.ICIS.Extensions
             if (kafkaOptions.IsConsumerConfigured())
             {
                 services.AddSingleton(new KafkaConsumer<Commodity>(kafkaOptions.Consumer, kafkaOptions.SchemaRegistry, "Commodity"));
+                services.AddSingleton(new KafkaConsumer<Region>(kafkaOptions.Consumer, kafkaOptions.SchemaRegistry, "Region"));
             }
-
         }
     }
 }
