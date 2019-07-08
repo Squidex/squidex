@@ -45,15 +45,16 @@ namespace Squidex.ICIS.Extensions
 
         public static void AddKafkaRuleExtention(this IServiceCollection services, IConfiguration config)
         {
+            services.Configure<ICISKafkaOptions>(
+                config.GetSection("kafka"));
+
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsProducerConfigured())
             {
-                services.AddSingleton(c => new KafkaProducer<Commentary>(kafkaOptions.Producer,
-                    kafkaOptions.SchemaRegistry));
-                services.AddSingleton(c =>
-                    new KafkaProducer<CommentaryType>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
-                services.AddSingleton(c => new KafkaProducer<Commodity>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
-                services.AddSingleton(c => new KafkaProducer<Region>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
+                services.AddSingleton<KafkaProducer<Commentary>>();
+                services.AddSingleton<KafkaProducer<CommentaryType>>();
+                services.AddSingleton<KafkaProducer<Commodity>>();
+                services.AddSingleton<KafkaProducer<Region>>();
                 services.AddRuleAction<ICISKafkaAction, ICISKafkaActionHandler>();
             }
         }
