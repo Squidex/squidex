@@ -8,11 +8,14 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Squidex.ICIS.Actions.Kafka;
 using Squidex.ICIS.Actions.Kafka.Entities;
 using Squidex.ICIS.Handlers;
 using Squidex.ICIS.Interfaces;
+using Squidex.ICIS.Kafka.Consumer;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.ICIS.Extensions
 {
@@ -45,12 +48,12 @@ namespace Squidex.ICIS.Extensions
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsProducerConfigured())
             {
-                services.AddSingleton(new KafkaProducer<Commentary>(kafkaOptions.Producer,
+                services.AddSingleton(c => new KafkaProducer<Commentary>(kafkaOptions.Producer,
                     kafkaOptions.SchemaRegistry));
-                services.AddSingleton(
+                services.AddSingleton(c =>
                     new KafkaProducer<CommentaryType>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
-                services.AddSingleton(new KafkaProducer<Commodity>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
-                services.AddSingleton(new KafkaProducer<Region>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
+                services.AddSingleton(c => new KafkaProducer<Commodity>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
+                services.AddSingleton(c => new KafkaProducer<Region>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
                 services.AddRuleAction<ICISKafkaAction, ICISKafkaActionHandler>();
             }
         }
@@ -60,9 +63,10 @@ namespace Squidex.ICIS.Extensions
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsConsumerConfigured())
             {
-                services.AddSingleton(new KafkaConsumer<Commodity>(kafkaOptions.Consumer, kafkaOptions.SchemaRegistry, "Commodity"));
+                services.AddSingleton(c => new KafkaConsumer<Commodity>(kafkaOptions.Consumer, kafkaOptions.SchemaRegistry, "Commodity",
+                    c.GetRequiredService<ISemanticLog>()));
+                services.AddSingleton<IHostedService, CommodityConsumer>();
             }
-
         }
     }
 }
