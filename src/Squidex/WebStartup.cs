@@ -63,6 +63,7 @@ namespace Squidex
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
             services.AddGenesisAuthentication(identityOptions.ICISAuthServer);
             services.AddKafkaRuleExtention(config);
+            services.AddKafkaConsumers(config);
 
             IdentityModelEventSource.ShowPII = true;
 

@@ -5,15 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-using Avro.Specific;
-using Confluent.Kafka;
-using Confluent.SchemaRegistry;
-using Confluent.SchemaRegistry.Serdes;
-
 namespace Squidex.ICIS.Actions.Kafka
 {
+    using System.Threading.Tasks;
+    using Avro.Specific;
+    using Confluent.Kafka;
+    using Confluent.SchemaRegistry;
+    using Confluent.SchemaRegistry.Serdes;
+
     public class KafkaProducer<T> : IKafkaProducer<T> where T : ISpecificRecord
     {
         private readonly CachedSchemaRegistryClient schemaRegistry;

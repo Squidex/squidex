@@ -7,13 +7,10 @@
 
 namespace Squidex.ICIS.Actions.Kafka
 {
-    using System;
-    using System.Threading.Tasks;
-    using Avro.Specific;
     using Confluent.Kafka;
 
-    public interface IKafkaProducer<T> : IDisposable where T : ISpecificRecord
+    public class ICISKafkaConsumerOptions : ConsumerConfig
     {
-        Task<DeliveryResult<string, T>> Send(string topicName, string key, T val);
+        public new string BootstrapServers { get; set; }
     }
 }

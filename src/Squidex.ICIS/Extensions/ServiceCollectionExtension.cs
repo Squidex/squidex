@@ -21,7 +21,7 @@ namespace Squidex.ICIS.Extensions
         public static void AddGenesisAuthentication(this IServiceCollection services, string authServer)
         {
             services.AddSingleton<IUserManager, UserManager>();
-            
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -43,14 +43,26 @@ namespace Squidex.ICIS.Extensions
         public static void AddKafkaRuleExtention(this IServiceCollection services, IConfiguration config)
         {
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
-            if (kafkaOptions.IsConfigured())
+            if (kafkaOptions.IsProducerConfigured())
             {
-                services.AddSingleton(new KafkaProducer<Commentary>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
-                services.AddSingleton(new KafkaProducer<CommentaryType>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
+                services.AddSingleton(new KafkaProducer<Commentary>(kafkaOptions.Producer,
+                    kafkaOptions.SchemaRegistry));
+                services.AddSingleton(
+                    new KafkaProducer<CommentaryType>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
                 services.AddSingleton(new KafkaProducer<Commodity>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
                 services.AddSingleton(new KafkaProducer<Region>(kafkaOptions.Producer, kafkaOptions.SchemaRegistry));
                 services.AddRuleAction<ICISKafkaAction, ICISKafkaActionHandler>();
             }
+        }
+
+        public static void AddKafkaConsumers(this IServiceCollection services, IConfiguration config)
+        {
+            var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
+            if (kafkaOptions.IsConsumerConfigured())
+            {
+                services.AddSingleton(new KafkaConsumer<Commodity>(kafkaOptions.Consumer, kafkaOptions.SchemaRegistry, "Commodity"));
+            }
+
         }
     }
 }
