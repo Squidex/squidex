@@ -1,6 +1,6 @@
 FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as builder
 
-ARG SQUIDEX__VERSION=3.0.0
+ARG SQUIDEX__VERSION=1.0.0
 
 WORKDIR /src
 
