@@ -7,6 +7,7 @@ using Squidex.ICIS.Actions.Kafka;
 using Squidex.ICIS.Actions.Kafka.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,24 +20,28 @@ namespace Squidex.ICIS.Kafka.Consumer
     public sealed class CommodityConsumer : IHostedService
     {
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CommodityConsumerOptions options;
         private readonly IKafkaConsumer<Commodity> consumer;
         private readonly ICommandBus commandBus;
         private readonly IAppProvider appProvider;
         private readonly IContentQueryService contentQuery;
+        private readonly ISemanticLog log;
         private readonly Dictionary<string, Guid> contentIds = new Dictionary<string, Guid>();
         private Task consumerTask;
 
-        public CommodityConsumer(IKafkaConsumer<Commodity> consumer, ICommandBus commandBus, IAppProvider appProvider, IContentQueryService contentQuery)
+        public CommodityConsumer(CommodityConsumerOptions options, IKafkaConsumer<Commodity> consumer, ICommandBus commandBus, IAppProvider appProvider, IContentQueryService contentQuery, ISemanticLog log)
         {
+            this.options = options;
             this.consumer = consumer;
             this.commandBus = commandBus;
             this.appProvider = appProvider;
             this.contentQuery = contentQuery;
+            this.log = log;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            var app = await appProvider.GetAppAsync("default"); // TODO;
+            var app = await appProvider.GetAppAsync(options.AppName); // TODO;
             var actor = new RefToken(RefTokenType.Client, "client"); // TODO;
             var user = new ClaimsPrincipal(new ClaimsIdentity());
             var schemaId = NamedId.Of(Guid.NewGuid(), "my-schema"); // TODO;

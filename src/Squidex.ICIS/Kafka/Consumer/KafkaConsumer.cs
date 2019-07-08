@@ -2,42 +2,37 @@
 namespace Squidex.ICIS.Actions.Kafka
 {
     using System.Threading;
+    using System.Reflection;
     using Avro.Specific;
     using Confluent.Kafka;
     using Confluent.SchemaRegistry;
     using Confluent.Kafka.SyncOverAsync;
     using Confluent.SchemaRegistry.Serdes;
-    using Squidex.Infrastructure.Log;
+    using Microsoft.Extensions.Logging;
+    using Squidex.ICIS.Kafka;
+    using Squidex.ICIS.Kafka.Entities;
+    using Microsoft.Extensions.Options;
 
     public class KafkaConsumer<T> : IKafkaConsumer<T> where T : ISpecificRecord
     {
         private readonly CachedSchemaRegistryClient schemaRegistry;
         private readonly IConsumer<string, T> consumer;
-        private readonly ISemanticLog log;
 
-        public KafkaConsumer(ConsumerConfig consumerConfig, SchemaRegistryConfig schemaRegistryConfig, string topicName, ISemanticLog log)
+        public KafkaConsumer(IOptions<ICISKafkaOptions> options, ILogger<KafkaConsumer<T>> log)
         {
-            schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
+            schemaRegistry = new CachedSchemaRegistryClient(options.Value.SchemaRegistry);
 
-            consumer = new ConsumerBuilder<string, T>(consumerConfig)
+            var topicName = typeof(T).GetCustomAttribute<TopicNameAttribute>().Name;
+
+            consumer = new ConsumerBuilder<string, T>(options.Value.Consumer)
                 .SetKeyDeserializer(Deserializers.Utf8)
                 .SetValueDeserializer(new AvroDeserializer<T>(schemaRegistry).AsSyncOverAsync())
-                .SetLogHandler((consumer, message) =>
-                {
-                    // TODO
-                })
-                .SetErrorHandler((consumer, message) =>
-                {
-                    // TODO
-                })
-                .SetStatisticsHandler((consumer, message) =>
-                {
-                    // TODO
-                })
+                .SetLogHandler(LogFactory<T>.ConsumerLog(log))
+                .SetErrorHandler(LogFactory<T>.ConsumerError(log))
+                .SetStatisticsHandler(LogFactory<T>.ConsumerStats(log))
                 .Build();
 
             consumer.Subscribe(topicName);
-            this.log = log;
         }
 
         public ConsumeResult<string, T> Consume(CancellationToken cancellationToken)

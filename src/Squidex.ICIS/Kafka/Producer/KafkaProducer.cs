@@ -12,19 +12,25 @@ namespace Squidex.ICIS.Actions.Kafka
     using Confluent.Kafka;
     using Confluent.SchemaRegistry;
     using Confluent.SchemaRegistry.Serdes;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using Squidex.ICIS.Kafka;
 
     public class KafkaProducer<T> : IKafkaProducer<T> where T : ISpecificRecord
     {
         private readonly CachedSchemaRegistryClient schemaRegistry;
         private readonly IProducer<string, T> producer;
 
-        public KafkaProducer(ProducerConfig producerConfig, SchemaRegistryConfig schemaRegistryConfig)
+        public KafkaProducer(IOptions<ICISKafkaOptions> options, ILogger<KafkaProducer<T>> log)
         {
-            schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
+            schemaRegistry = new CachedSchemaRegistryClient(options.Value.SchemaRegistry);
 
-            producer = new ProducerBuilder<string, T>(producerConfig)
+            producer = new ProducerBuilder<string, T>(options.Value.Producer)
                 .SetKeySerializer(Serializers.Utf8)
                 .SetValueSerializer(new AvroSerializer<T>(schemaRegistry))
+                .SetLogHandler(LogFactory<T>.ProducerLog(log))
+                .SetErrorHandler(LogFactory<T>.ProducerError(log))
+                .SetStatisticsHandler(LogFactory<T>.ProducerStats(log))
                 .Build();
         }
 
