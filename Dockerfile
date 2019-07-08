@@ -55,6 +55,9 @@ RUN apk update \
 # Copy from build stage
 COPY --from=builder /out/alpine .
 
+ARG SQUIDEX__VERSION
+ENV SQUIDEX__VERSION ${SQUIDEX__VERSION:-dev}
+
 EXPOSE 80
 EXPOSE 11111
 
