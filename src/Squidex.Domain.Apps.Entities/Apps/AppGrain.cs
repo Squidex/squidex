@@ -119,12 +119,32 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         return Snapshot;
                     });
 
-                case ConfigureWorkflow configureWorkflow:
-                    return UpdateReturn(configureWorkflow, c =>
+                case AddWorkflow addWorkflow:
+                    return UpdateReturn(addWorkflow, c =>
                     {
-                        GuardAppWorkflows.CanConfigure(c);
+                        GuardAppWorkflows.CanAdd(c);
 
-                        ConfigureWorkflow(c);
+                        AddWorkflow(c);
+
+                        return Snapshot;
+                    });
+
+                case UpdateWorkflow updateWorkflow:
+                    return UpdateReturn(updateWorkflow, c =>
+                    {
+                        GuardAppWorkflows.CanUpdate(Snapshot.Workflows, c);
+
+                        UpdateWorkflow(c);
+
+                        return Snapshot;
+                    });
+
+                case DeleteWorkflow deleteWorkflow:
+                    return UpdateReturn(deleteWorkflow, c =>
+                    {
+                        GuardAppWorkflows.CanDelete(Snapshot.Workflows, c);
+
+                        DeleteWorkflow(c);
 
                         return Snapshot;
                     });
@@ -329,9 +349,19 @@ namespace Squidex.Domain.Apps.Entities.Apps
             RaiseEvent(SimpleMapper.Map(command, new AppClientRevoked()));
         }
 
-        public void ConfigureWorkflow(ConfigureWorkflow command)
+        public void AddWorkflow(AddWorkflow command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppWorkflowConfigured()));
+            RaiseEvent(SimpleMapper.Map(command, new AppWorkflowAdded()));
+        }
+
+        public void UpdateWorkflow(UpdateWorkflow command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppWorkflowUpdated()));
+        }
+
+        public void DeleteWorkflow(DeleteWorkflow command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppWorkflowDeleted()));
         }
 
         public void AddLanguage(AddLanguage command)

@@ -70,7 +70,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var patterns_1 = patterns_0.Remove(id);
 
-            Assert.NotSame(patterns_0, patterns_1);
+            Assert.NotEmpty(patterns_1);
         }
     }
 }

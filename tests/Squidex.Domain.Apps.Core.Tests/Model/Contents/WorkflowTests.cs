@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
     public class WorkflowTests
     {
         private readonly Workflow workflow = new Workflow(
-            new Dictionary<Status, WorkflowStep>
+            Status.Draft, new Dictionary<Status, WorkflowStep>
             {
                 [Status.Draft] =
                     new WorkflowStep(
@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Core.Model.Contents
                     new WorkflowStep(),
                 [Status.Published] =
                     new WorkflowStep()
-            }, Status.Draft);
+            });
 
         [Fact]
         public void Should_provide_default_workflow_if_none_found()

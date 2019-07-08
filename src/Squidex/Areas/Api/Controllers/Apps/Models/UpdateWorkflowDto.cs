@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,8 +14,13 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class UpsertWorkflowDto
+    public sealed class UpdateWorkflowDto
     {
+        /// <summary>
+        /// The name of the workflow.
+        /// </summary>
+        public string Name { get; set; }
+
         /// <summary>
         /// The workflow steps.
         /// </summary>
@@ -22,13 +28,19 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public Dictionary<Status, WorkflowStepDto> Steps { get; set; }
 
         /// <summary>
+        /// The schema ids.
+        /// </summary>
+        public List<Guid> SchemaIds { get; set; }
+
+        /// <summary>
         /// The initial step.
         /// </summary>
         public Status Initial { get; set; }
 
-        public ConfigureWorkflow ToCommand()
+        public UpdateWorkflow ToCommand(Guid id)
         {
             var workflow = new Workflow(
+                Initial,
                 Steps?.ToDictionary(
                     x => x.Key,
                     x => new WorkflowStep(
@@ -37,9 +49,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                             y => new WorkflowTransition(y.Value.Expression, y.Value.Role)),
                         x.Value.Color,
                         x.Value.NoUpdate)),
-                Initial);
+                SchemaIds,
+                Name);
 
-            return new ConfigureWorkflow { Workflow = workflow };
+            return new UpdateWorkflow { WorkflowId = id, Workflow = workflow };
         }
     }
 }

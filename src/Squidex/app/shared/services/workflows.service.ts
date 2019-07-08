@@ -17,44 +17,57 @@ import {
     hasAnyLink,
     HTTP,
     mapVersioned,
+    Model,
     pretifyError,
     Resource,
     ResourceLinks,
+    StringHelper,
     Version,
     Versioned
 } from '@app/framework';
 
-export type WorkflowsDto = Versioned<WorkflowPayload>;
-export type WorkflowPayload = { workflow: WorkflowDto; } & Resource;
+export type WorkflowsDto = Versioned<WorkflowsPayload>;
+export type WorkflowsPayload = {
+    readonly items: WorkflowDto[];
 
-export class WorkflowDto {
+    readonly errors: string[];
+
+    readonly canCreate: boolean;
+} & Resource;
+
+export class WorkflowDto extends Model<WorkflowDto> {
     public readonly _links: ResourceLinks;
 
     public readonly canUpdate: boolean;
+    public readonly canDelete: boolean;
 
-    public static DEFAULT =
-        new WorkflowDto()
-            .setStep('Draft', { color: '#8091a5' })
-            .setStep('Archived', { color: '#eb3142', noUpdate: true })
-            .setStep('Published', { color: '#4bb958', isLocked: true })
-            .setTransition('Archived', 'Draft')
-            .setTransition('Draft', 'Archived')
-            .setTransition('Draft', 'Published')
-            .setTransition('Published', 'Draft')
-            .setTransition('Published', 'Archived');
+    public readonly displayName: string;
 
-    constructor(links: ResourceLinks = {},
-        public readonly initial?: string,
+    constructor(
+        links: ResourceLinks = {},
+        public readonly id: string,
+        public readonly name: string | null = null,
+        public readonly initial: string | null = null,
+        public readonly schemaIds: string[] = [],
         public readonly steps: WorkflowStep[] = [],
-        private readonly transitions: WorkflowTransition[] = []
+        public readonly transitions: WorkflowTransition[] = []
     ) {
-        this.steps.sort((a, b) => compareStringsAsc(a.name, b.name));
+        super();
 
-        this.transitions.sort((a, b) => compareStringsAsc(a.to, b.to));
+        this.onCloned();
 
         this._links = links;
 
         this.canUpdate = hasAnyLink(links, 'update');
+        this.canDelete = hasAnyLink(links, 'delete');
+
+        this.displayName = StringHelper.firstNonEmpty(name, 'Unnamed Workflow');
+    }
+
+    protected onCloned() {
+        this.steps.sort((a, b) => compareStringsAsc(a.name, b.name));
+
+        this.transitions.sort((a, b) => compareStringsAsc(a.to, b.to));
     }
 
     public getOpenSteps(step: WorkflowStep) {
@@ -70,27 +83,29 @@ export class WorkflowDto {
     }
 
     public setStep(name: string, values: Partial<WorkflowStepValues> = {}) {
-        const found = this.getStep(name);
+        const old = this.getStep(name);
 
-        if (found) {
-            const { name: _, ...existing } = found;
-
-            if (found.isLocked) {
-                return this;
-            }
-
-            values = { ...existing, ...values };
-        }
-
-        const steps = [...this.steps.filter(s => s !== found), { name, ...values }];
-
-        let initial = this.initial;
+        const step = { ...old, name, ...values };
+        const steps = [...this.steps.filter(s => s !== old), step];
 
         if (steps.length === 1) {
-            initial = steps[0].name;
+            return this.with({ initial: name, steps });
+        } else {
+            return this.with({ steps });
+        }
+    }
+
+    public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
+        if (!this.getStep(from) || !this.getStep(to)) {
+            return this;
         }
 
-        return new WorkflowDto(this._links, initial, steps, this.transitions);
+        const old = this.transitions.find(x => x.from === from && x.to === to);
+
+        const transition = { ...old, from, to, ...values };
+        const transitions = [...this.transitions.filter(t => t !== old), transition];
+
+        return this.with({ transitions });
     }
 
     public setInitial(initial: string) {
@@ -100,7 +115,7 @@ export class WorkflowDto {
             return this;
         }
 
-        return new WorkflowDto(this._links, initial, this.steps, this.transitions);
+        return this.with({ initial });
     }
 
     public removeStep(name: string) {
@@ -110,20 +125,23 @@ export class WorkflowDto {
             return this;
         }
 
-        const transitions =
-            steps.length !== this.steps.length ?
-                this.transitions.filter(t => t.from !== name && t.to !== name) :
-                this.transitions;
+        const transitions = this.transitions.filter(t => t.from !== name && t.to !== name);
 
-        let initial = this.initial;
-
-        if (initial === name) {
+        if (this.initial === name) {
             const first = steps.find(x => !x.isLocked);
 
-            initial = first ? first.name : undefined;
+            return this.with({ initial: first ? first.name : null, steps, transitions });
+        } else {
+            return this.with({ steps, transitions });
         }
+    }
 
-        return new WorkflowDto(this._links, initial, steps, transitions);
+    public changeSchemaIds(schemaIds: string[]) {
+        return this.with({ schemaIds });
+    }
+
+    public rename(name: string) {
+        return this.with({ name });
     }
 
     public renameStep(name: string, newName: string) {
@@ -153,13 +171,11 @@ export class WorkflowDto {
             return transition;
         });
 
-        let initial = this.initial;
-
-        if (initial === name) {
-            initial = newName;
+        if (this.initial === name) {
+            return this.with({ initial: newName, steps, transitions });
+        } else {
+            return this.with({ steps, transitions });
         }
-
-        return new WorkflowDto(this._links, initial, steps, transitions);
     }
 
     public removeTransition(from: string, to: string) {
@@ -169,37 +185,11 @@ export class WorkflowDto {
             return this;
         }
 
-        return new WorkflowDto(this._links, this.initial, this.steps, transitions);
-    }
-
-    public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
-        const stepFrom = this.getStep(from);
-
-        if (!stepFrom) {
-            return this;
-        }
-
-        const stepTo = this.getStep(to);
-
-        if (!stepTo) {
-            return this;
-        }
-
-        const found = this.transitions.find(x => x.from === from && x.to === to);
-
-        if (found) {
-            const { from: _, to: __, ...existing } = found;
-
-            values = { ...existing, ...values };
-        }
-
-        const transitions = [...this.transitions.filter(t => t !== found), { from, to, ...values }];
-
-        return new WorkflowDto(this._links, this.initial, this.steps, transitions);
+        return this.with({ transitions });
     }
 
     public serialize(): any {
-        const result = { steps: {}, initial: this.initial };
+        const result = { steps: {}, schemaIds: this.schemaIds, initial: this.initial, name: this.name };
 
         for (let step of this.steps) {
             const { name, ...values } = step;
@@ -227,6 +217,10 @@ export type WorkflowTransition = { from: string; to: string } & WorkflowTransiti
 
 export type WorkflowTransitionView = { step: WorkflowStep } & WorkflowTransition;
 
+export interface CreateWorkflowDto {
+    readonly name: string;
+}
+
 @Injectable()
 export class WorkflowsService {
     constructor(
@@ -236,41 +230,74 @@ export class WorkflowsService {
     ) {
     }
 
-    public getWorkflow(appName: string): Observable<Versioned<WorkflowPayload>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflow`);
+    public getWorkflows(appName: string): Observable<WorkflowsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflows`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {
-                return parseWorkflowPayload(body);
+                return parseWorkflows(body);
             }),
             pretifyError('Failed to load workflows. Please reload.'));
     }
 
-    public putWorkflow(appName: string, resource: Resource, dto: any, version: Version): Observable<Versioned<WorkflowPayload>> {
+    public postWorkflow(appName: string, dto: CreateWorkflowDto, version: Version): Observable<WorkflowsDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflows`);
+
+        return HTTP.postVersioned(this.http, url, dto, version).pipe(
+            mapVersioned(({ body }) => {
+                return parseWorkflows(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Workflow', 'Created', appName);
+            }),
+            pretifyError('Failed to create workflow. Please reload.'));
+    }
+
+    public putWorkflow(appName: string, resource: Resource, dto: any, version: Version): Observable<WorkflowsDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
             mapVersioned(({ body }) => {
-                return parseWorkflowPayload(body);
+                return parseWorkflows(body);
             }),
             tap(() => {
-                this.analytics.trackEvent('Workflow', 'Configured', appName);
+                this.analytics.trackEvent('Workflow', 'Updated', appName);
             }),
-            pretifyError('Failed to configure Workflow. Please reload.'));
+            pretifyError('Failed to update Workflow. Please reload.'));
+    }
+
+    public deleteWorkflow(appName: string, resource: Resource, version: Version): Observable<WorkflowsDto> {
+        const link = resource._links['delete'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            mapVersioned(({ body }) => {
+                return parseWorkflows(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Workflow', 'Deleted', appName);
+            }),
+            pretifyError('Failed to delete Workflow. Please reload.'));
     }
 }
 
-function parseWorkflowPayload(response: any) {
-    const { workflow, _links } = response;
+function parseWorkflows(response: any) {
+    const raw: any[] = response.items;
 
-    const result = parseWorkflow(workflow);
+    const items = raw.map(item =>
+        parseWorkflow(item));
 
-    return { workflow: result, _links };
+    const { errors, _links } = response;
+
+    return { errors, items, _links, canCreate: hasAnyLink(_links, 'create') };
 }
 
 function parseWorkflow(workflow: any) {
+    const { id, name, initial, schemaIds, _links } = workflow;
+
     const steps: WorkflowStep[] = [];
     const transitions: WorkflowTransition[] = [];
 
@@ -290,5 +317,5 @@ function parseWorkflow(workflow: any) {
         }
     }
 
-    return new WorkflowDto(workflow._links, workflow.initial, steps, transitions);
+    return new WorkflowDto(_links, id, name, initial, schemaIds, steps, transitions);
 }

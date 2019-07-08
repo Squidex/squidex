@@ -17,7 +17,7 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public class SchemaDto : Resource, IGenerateETag
+    public class SchemaDto : Resource
     {
         /// <summary>
         /// The id of the schema.

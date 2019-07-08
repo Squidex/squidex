@@ -47,9 +47,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetPatterns(string app)
         {
-            var response = PatternsDto.FromApp(App, this);
+            var response = Deferred.Response(() =>
+            {
+                return PatternsDto.FromApp(App, this);
+            });
 
-            Response.Headers[HeaderNames.ETag] = App.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = App.ToEtag();
 
             return Ok(response);
         }

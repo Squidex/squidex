@@ -27,16 +27,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         [Required]
         public AssetDto[] Items { get; set; }
 
-        public string ToEtag()
-        {
-            return Items.ToManyEtag(Total);
-        }
-
-        public string ToSurrogateKeys()
-        {
-            return Items.ToSurrogateKeys();
-        }
-
         public static AssetsDto FromAssets(IResultList<IEnrichedAssetEntity> assets, ApiController controller, string app)
         {
             var response = new AssetsDto

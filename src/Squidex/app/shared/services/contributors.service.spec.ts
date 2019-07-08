@@ -119,7 +119,7 @@ describe('ContributorsService', () => {
 
     function contributorsResponse(...ids: number[]) {
         return {
-            items:  ids.map(id => ({
+            items: ids.map(id => ({
                 contributorId: `id${id}`, role: id % 2 === 0 ? 'Owner' : 'Developer',
                 _links: {
                     update: { method: 'PUT', href: `/contributors/id${id}` }

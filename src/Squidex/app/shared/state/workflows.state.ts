@@ -13,7 +13,7 @@ import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
-    shareMapSubscribed,
+    ImmutableArray,
     shareSubscribed,
     State,
     Version
@@ -23,68 +23,98 @@ import { AppsState } from './apps.state';
 
 import {
     WorkflowDto,
-    WorkflowPayload,
+    WorkflowsPayload,
     WorkflowsService
 } from './../services/workflows.service';
 
 interface Snapshot {
     // The current workflow.
-    workflow?: WorkflowDto;
+    workflows: ImmutableArray<WorkflowDto>;
 
     // The app version.
     version: Version;
 
+    // The errors.
+    errors: string[];
+
     // Indicates if the workflows are loaded.
     isLoaded?: boolean;
+
+    // Indicates if the user can create new workflow.
+    canCreate?: boolean;
 }
 
 @Injectable()
 export class WorkflowsState extends State<Snapshot> {
-    public workflow =
-        this.project(x => x.workflow);
+    public workflows =
+        this.project(x => x.workflows);
+
+    public errors =
+        this.project(x => x.errors);
 
     public isLoaded =
         this.project(x => !!x.isLoaded);
+
+    public canCreate =
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly workflowsService: WorkflowsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ version: Version.EMPTY });
+        super({ errors: [], workflows: ImmutableArray.empty(), version: Version.EMPTY });
     }
 
-    public load(isReload = false): Observable<WorkflowDto> {
+    public load(isReload = false): Observable<any> {
         if (!isReload) {
             this.resetState();
         }
 
-        return this.workflowsService.getWorkflow(this.appName).pipe(
+        return this.workflowsService.getWorkflows(this.appName).pipe(
             tap(({ version, payload }) => {
                 if (isReload) {
-                    this.dialogs.notifyInfo('Workflow reloaded.');
+                    this.dialogs.notifyInfo('Workflows reloaded.');
                 }
 
-                this.replaceWorkflow(payload, version);
-            }),
-            shareMapSubscribed(this.dialogs, x => x.payload.workflow));
-    }
-
-    public save(workflow: WorkflowDto): Observable<any> {
-        return this.workflowsService.putWorkflow(this.appName, workflow, workflow.serialize(), this.version).pipe(
-            tap(({ version, payload }) => {
-                this.replaceWorkflow(payload, version);
-
-                this.dialogs.notifyInfo('Workflow has been saved.');
+                this.replaceWorkflows(payload, version);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    private replaceWorkflow(payload: WorkflowPayload, version: Version) {
-        const { workflow } = payload;
+    public add(name: string): Observable<any> {
+        return this.workflowsService.postWorkflow(this.appName, { name }, this.version).pipe(
+            tap(({ version, payload }) => {
+                this.replaceWorkflows(payload, version);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public update(workflow: WorkflowDto): Observable<any> {
+        return this.workflowsService.putWorkflow(this.appName, workflow, workflow.serialize(), this.version).pipe(
+            tap(({ version, payload }) => {
+                this.dialogs.notifyInfo('Workflow has been saved.');
+
+                this.replaceWorkflows(payload, version);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public delete(workflow: WorkflowDto): Observable<any> {
+        return this.workflowsService.deleteWorkflow(this.appName, workflow, this.version).pipe(
+            tap(({ version, payload }) => {
+                this.replaceWorkflows(payload, version);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    private replaceWorkflows(payload: WorkflowsPayload, version: Version) {
+        const { canCreate, errors, items } = payload;
+
+        const workflows = ImmutableArray.of(items);
 
         this.next(s => {
-            return { ...s, workflow, isLoaded: true, version };
+            return { ...s, workflows, errors, isLoaded: true, version, canCreate };
         });
     }
 

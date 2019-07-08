@@ -5,51 +5,75 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 
 namespace Squidex.Domain.Apps.Core.Contents
 {
-    public sealed class Workflow
+    public sealed class Workflow : Named
     {
-        private static readonly IReadOnlyDictionary<Status, WorkflowStep> EmptySteps = new Dictionary<Status, WorkflowStep>();
+        private const string DefaultName = "Unnamed";
 
-        public static readonly Workflow Default = new Workflow(
-            new Dictionary<Status, WorkflowStep>
-            {
-                [Status.Archived] =
-                    new WorkflowStep(
-                        new Dictionary<Status, WorkflowTransition>
-                        {
-                            [Status.Draft] = new WorkflowTransition()
-                        },
-                        StatusColors.Archived, true),
-                [Status.Draft] =
-                    new WorkflowStep(
-                        new Dictionary<Status, WorkflowTransition>
-                        {
-                            [Status.Archived] = new WorkflowTransition(),
-                            [Status.Published] = new WorkflowTransition()
-                        },
-                        StatusColors.Draft),
-                [Status.Published] =
-                    new WorkflowStep(
-                        new Dictionary<Status, WorkflowTransition>
-                        {
-                            [Status.Archived] = new WorkflowTransition(),
-                            [Status.Draft] = new WorkflowTransition()
-                        },
-                        StatusColors.Published)
-            }, Status.Draft);
+        public static readonly IReadOnlyDictionary<Status, WorkflowStep> EmptySteps = new Dictionary<Status, WorkflowStep>();
+        public static readonly IReadOnlyList<Guid> EmptySchemaIds = new List<Guid>();
+        public static readonly Workflow Default = CreateDefault();
+        public static readonly Workflow Empty = new Workflow(default, EmptySteps);
 
-        public IReadOnlyDictionary<Status, WorkflowStep> Steps { get; }
+        public IReadOnlyDictionary<Status, WorkflowStep> Steps { get; } = EmptySteps;
+
+        public IReadOnlyList<Guid> SchemaIds { get; } = EmptySchemaIds;
 
         public Status Initial { get; }
 
-        public Workflow(IReadOnlyDictionary<Status, WorkflowStep> steps, Status initial)
+        public Workflow(
+            Status initial,
+            IReadOnlyDictionary<Status, WorkflowStep> steps,
+            IReadOnlyList<Guid> schemaIds = null,
+            string name = null)
+            : base(name ?? DefaultName)
         {
-            Steps = steps ?? EmptySteps;
-
             Initial = initial;
+
+            if (steps != null)
+            {
+                Steps = steps;
+            }
+
+            if (schemaIds != null)
+            {
+                SchemaIds = schemaIds;
+            }
+        }
+
+        public static Workflow CreateDefault(string name = null)
+        {
+            return new Workflow(
+                Status.Draft, new Dictionary<Status, WorkflowStep>
+                {
+                    [Status.Archived] =
+                        new WorkflowStep(
+                            new Dictionary<Status, WorkflowTransition>
+                            {
+                                [Status.Draft] = new WorkflowTransition()
+                            },
+                            StatusColors.Archived, true),
+                    [Status.Draft] =
+                        new WorkflowStep(
+                            new Dictionary<Status, WorkflowTransition>
+                            {
+                                [Status.Archived] = new WorkflowTransition(),
+                                [Status.Published] = new WorkflowTransition()
+                            },
+                            StatusColors.Draft),
+                    [Status.Published] =
+                        new WorkflowStep(
+                            new Dictionary<Status, WorkflowTransition>
+                            {
+                                [Status.Archived] = new WorkflowTransition(),
+                                [Status.Draft] = new WorkflowTransition()
+                            },
+                            StatusColors.Published)
+                }, null, name);
         }
 
         public IEnumerable<(Status Status, WorkflowStep Step, WorkflowTransition Transition)> GetTransitions(Status status)

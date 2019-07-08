@@ -1,23 +1,23 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+using System;
 
-namespace Squidex.Domain.Apps.Core.Apps
+namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public abstract class Named
+    public sealed class AddWorkflow : AppCommand
     {
-        public string Name { get; }
+        public Guid WorkflowId { get; set; }
 
-        protected Named(string name)
+        public string Name { get; set; }
+
+        public AddWorkflow()
         {
-            Guard.NotNullOrEmpty(name, nameof(name));
-
-            Name = name;
+            WorkflowId = Guid.NewGuid();
         }
     }
 }

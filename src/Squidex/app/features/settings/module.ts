@@ -16,7 +16,6 @@ import {
 } from '@app/shared';
 
 import {
-    BackupDownloadUrlPipe,
     BackupDurationPipe,
     BackupsPageComponent,
     ClientComponent,
@@ -31,6 +30,7 @@ import {
     RoleComponent,
     RolesPageComponent,
     SettingsAreaComponent,
+    WorkflowComponent,
     WorkflowsPageComponent,
     WorkflowStepComponent,
     WorkflowTransitionComponent
@@ -198,7 +198,6 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
-        BackupDownloadUrlPipe,
         BackupDurationPipe,
         BackupsPageComponent,
         ClientComponent,
@@ -213,6 +212,7 @@ const routes: Routes = [
         RoleComponent,
         RolesPageComponent,
         SettingsAreaComponent,
+        WorkflowComponent,
         WorkflowsPageComponent,
         WorkflowTransitionComponent,
         WorkflowStepComponent

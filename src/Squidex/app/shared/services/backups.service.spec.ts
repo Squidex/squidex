@@ -16,6 +16,7 @@ import {
     BackupsService,
     DateTime,
     Resource,
+    ResourceLinks,
     RestoreDto
 } from '@app/shared/internal';
 
@@ -52,30 +53,16 @@ describe('BackupsService', () => {
         expect(req.request.headers.get('If-Match')).toBeNull();
 
         req.flush({
-            items: [{
-                id: '1',
-                started: '2017-02-03',
-                stopped: '2017-02-04',
-                handledEvents: 13,
-                handledAssets: 17,
-                status: 'Failed',
-                _links: {}
-            },
-            {
-                id: '2',
-                started: '2018-02-03',
-                stopped: null,
-                handledEvents: 23,
-                handledAssets: 27,
-                status: 'Completed',
-                _links: {}
-            }]
+            items: [
+                backupResponse(12),
+                backupResponse(13)
+            ]
         });
 
         expect(backups!).toEqual(
             new BackupsDto([
-                new BackupDto({}, '1', DateTime.parseISO_UTC('2017-02-03'), DateTime.parseISO_UTC('2017-02-04'), 13, 17, 'Failed'),
-                new BackupDto({}, '2', DateTime.parseISO_UTC('2018-02-03'), null, 23, 27, 'Completed')
+                createBackup(12),
+                createBackup(13)
             ]));
     }));
 
@@ -203,4 +190,32 @@ describe('BackupsService', () => {
 
         req.flush({});
     }));
+
+    function backupResponse(id: number) {
+        return {
+            id: `id${id}`,
+            started: `${id % 1000 + 2000}-12-12T10:10:00`,
+            stopped: id % 2 === 0 ? `${id % 1000 + 2000}-11-11T10:10:00` : null,
+            handledEvents: id * 17,
+            handledAssets: id * 23,
+            status: id % 2 === 0 ? 'Status' : 'Failed',
+            _links: {
+                download: { method: 'GET', href: '/api/backups/1' }
+            }
+        };
+    }
 });
+
+export function createBackup(id: number) {
+    const links: ResourceLinks = {
+        download: { method: 'GET', href: '/api/backups/1' }
+    };
+
+    return new BackupDto(links,
+        `id${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`),
+        id % 2 === 0 ? DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`) : null,
+        id * 17,
+        id * 23,
+        id % 2 === 0 ? 'Status' : 'Failed');
+}

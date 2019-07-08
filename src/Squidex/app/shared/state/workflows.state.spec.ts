@@ -11,12 +11,12 @@ import { IMock, It, Mock, Times } from 'typemoq';
 import {
     DialogService,
     versioned,
-    WorkflowPayload,
+    WorkflowsPayload,
     WorkflowsService,
     WorkflowsState
 } from '@app/shared/internal';
 
-import { createWorkflow } from '../services/workflows.service.spec';
+import { createWorkflows } from '../services/workflows.service.spec';
 
 import { TestValues } from './_test-helpers';
 
@@ -28,7 +28,7 @@ describe('WorkflowsState', () => {
         version
     } = TestValues;
 
-    const oldWorkflow = createWorkflow('test');
+    const oldWorkflows = createWorkflows('1', '2');
 
     let dialogs: IMock<DialogService>;
     let workflowsService: IMock<WorkflowsService>;
@@ -47,12 +47,12 @@ describe('WorkflowsState', () => {
 
     describe('Loading', () => {
         it('should load workflow', () => {
-            workflowsService.setup(x => x.getWorkflow(app))
-                .returns(() => of(versioned(version, oldWorkflow))).verifiable();
+            workflowsService.setup(x => x.getWorkflows(app))
+                .returns(() => of(versioned(version, oldWorkflows))).verifiable();
 
             workflowsState.load().subscribe();
 
-            expect(workflowsState.snapshot.workflow).toEqual(oldWorkflow.workflow);
+            expect(workflowsState.snapshot.workflows.values).toEqual(oldWorkflows.items);
             expect(workflowsState.snapshot.isLoaded).toBeTruthy();
             expect(workflowsState.snapshot.version).toEqual(version);
 
@@ -60,8 +60,8 @@ describe('WorkflowsState', () => {
         });
 
         it('should show notification on load when reload is true', () => {
-            workflowsService.setup(x => x.getWorkflow(app))
-                .returns(() => of(versioned(version, oldWorkflow))).verifiable();
+            workflowsService.setup(x => x.getWorkflows(app))
+                .returns(() => of(versioned(version, oldWorkflows))).verifiable();
 
             workflowsState.load(true).subscribe();
 
@@ -73,29 +73,51 @@ describe('WorkflowsState', () => {
 
     describe('Updates', () => {
         beforeEach(() => {
-            workflowsService.setup(x => x.getWorkflow(app))
-                .returns(() => of(versioned(version, oldWorkflow))).verifiable();
+            workflowsService.setup(x => x.getWorkflows(app))
+                .returns(() => of(versioned(version, oldWorkflows))).verifiable();
 
             workflowsState.load().subscribe();
         });
 
-        it('should update workflows when saved', () => {
-            const updated = createWorkflow('updated');
+        it('should update workflows when workflow added', () => {
+            const updated = createWorkflows('1', '2', '3');
 
-            const request = oldWorkflow.workflow.serialize();
-
-            workflowsService.setup(x => x.putWorkflow(app, oldWorkflow.workflow, request, version))
+            workflowsService.setup(x => x.postWorkflow(app, { name: 'my-workflow' }, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
-            workflowsState.save(oldWorkflow.workflow).subscribe();
+            workflowsState.add('my-workflow' ).subscribe();
+
+            expectNewWorkflows(updated);
+        });
+
+        it('should update workflows when workflow updated', () => {
+            const updated = createWorkflows('1', '2', '3');
+
+            const request = oldWorkflows.items[0].serialize();
+
+            workflowsService.setup(x => x.putWorkflow(app, oldWorkflows.items[0], request, version))
+                .returns(() => of(versioned(newVersion, updated))).verifiable();
+
+            workflowsState.update(oldWorkflows.items[0]).subscribe();
 
             expectNewWorkflows(updated);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
-        function expectNewWorkflows(updated: WorkflowPayload) {
-            expect(workflowsState.snapshot.workflow).toEqual(updated.workflow);
+        it('should update workflows when workflow deleted', () => {
+            const updated = createWorkflows('1', '2', '3');
+
+            workflowsService.setup(x => x.deleteWorkflow(app, oldWorkflows.items[0], version))
+                .returns(() => of(versioned(newVersion, updated))).verifiable();
+
+            workflowsState.delete(oldWorkflows.items[0]).subscribe();
+
+            expectNewWorkflows(updated);
+        });
+
+        function expectNewWorkflows(updated: WorkflowsPayload) {
+            expect(workflowsState.snapshot.workflows.values).toEqual(updated.items);
             expect(workflowsState.snapshot.version).toEqual(newVersion);
         }
     });

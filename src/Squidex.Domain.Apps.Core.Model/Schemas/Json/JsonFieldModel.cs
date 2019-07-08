@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
             if (Properties is ArrayFieldProperties arrayProperties)
             {
-                var nested = Children?.ToArray(n => n.ToNestedField()) ?? Array.Empty<NestedField>();
+                var nested = Children?.Map(n => n.ToNestedField()) ?? Array.Empty<NestedField>();
 
                 return new ArrayField(Id, Name, partitioning, nested, arrayProperties, this);
             }

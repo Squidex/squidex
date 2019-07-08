@@ -45,9 +45,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetLanguages(string app)
         {
-            var response = AppLanguagesDto.FromApp(App, this);
+            var response = Deferred.Response(() =>
+            {
+                return AppLanguagesDto.FromApp(App, this);
+            });
 
-            Response.Headers[HeaderNames.ETag] = App.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = App.ToEtag();
 
             return Ok(response);
         }

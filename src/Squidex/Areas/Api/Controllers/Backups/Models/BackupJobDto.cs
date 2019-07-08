@@ -62,6 +62,8 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
                 AddDeleteLink("delete", controller.Url<BackupsController>(x => nameof(x.DeleteBackup), values));
             }
 
+            AddGetLink("download", controller.Url<BackupContentController>(x => nameof(x.GetBackupContent), values));
+
             return this;
         }
     }

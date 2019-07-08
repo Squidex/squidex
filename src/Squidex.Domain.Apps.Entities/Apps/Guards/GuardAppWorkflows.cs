@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
@@ -13,11 +14,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
     public static class GuardAppWorkflows
     {
-        public static void CanConfigure(ConfigureWorkflow command)
+        public static void CanAdd(AddWorkflow command)
         {
             Guard.NotNull(command, nameof(command));
 
-            Validate.It(() => "Cannot configure workflow.", e =>
+            Validate.It(() => "Cannot add workflow.", e =>
+            {
+                if (string.IsNullOrWhiteSpace(command.Name))
+                {
+                    e(Not.Defined("Name"), nameof(command.Name));
+                }
+            });
+        }
+
+        public static void CanUpdate(Workflows workflows, UpdateWorkflow command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            GetWorkflowOrThrow(workflows, command.WorkflowId);
+
+            Validate.It(() => "Cannot update workflow.", e =>
             {
                 if (command.Workflow == null)
                 {
@@ -71,6 +87,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     }
                 }
             });
+        }
+
+        public static void CanDelete(Workflows workflows, DeleteWorkflow command)
+        {
+            Guard.NotNull(command, nameof(command));
+
+            GetWorkflowOrThrow(workflows, command.WorkflowId);
+        }
+
+        private static Workflow GetWorkflowOrThrow(Workflows workflows, Guid id)
+        {
+            if (!workflows.TryGetValue(id, out var workflow))
+            {
+                throw new DomainObjectNotFoundException(id.ToString(), "Workflows", typeof(IAppEntity));
+            }
+
+            return workflow;
         }
     }
 }

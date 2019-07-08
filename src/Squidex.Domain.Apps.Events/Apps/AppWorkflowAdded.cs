@@ -6,13 +6,15 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Web
+namespace Squidex.Domain.Apps.Events.Apps
 {
-    public interface IGenerateETag
+    [EventType(nameof(AppWorkflowAdded))]
+    public sealed class AppWorkflowAdded : AppEvent
     {
-        Guid Id { get; }
+        public Guid WorkflowId { get; set; }
 
-        long Version { get; }
+        public string Name { get; set; }
     }
 }

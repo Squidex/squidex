@@ -37,16 +37,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         [Required]
         public StatusInfoDto[] Statuses { get; set; }
 
-        public string ToEtag()
-        {
-            return Items.ToManyEtag(Total);
-        }
-
-        public string ToSurrogateKeys()
-        {
-            return Items.ToSurrogateKeys();
-        }
-
         public static async Task<ContentsDto> FromContentsAsync(IResultList<IEnrichedContentEntity> contents,
             Context context, ApiController controller, ISchemaEntity schema, IContentWorkflow contentWorkflow)
         {
@@ -80,10 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 {
                     AddPostLink("create", controller.Url<ContentsController>(x => nameof(x.PostContent), values));
 
-                    if (controller.HasPermission(Helper.StatusPermission(app, schema, Status.Published)))
-                    {
-                        AddPostLink("create/publish", controller.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
-                    }
+                    AddPostLink("create/publish", controller.Url<ContentsController>(x => nameof(x.PostContent), values) + "?publish=true");
                 }
             }
 

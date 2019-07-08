@@ -65,6 +65,7 @@ export class ContentDto {
     public readonly canDraftPropose: boolean;
     public readonly canDraftPublish: boolean;
     public readonly canUpdate: boolean;
+    public readonly canUpdateAny: boolean;
 
     constructor(links: ResourceLinks,
         public readonly id: string,
@@ -87,6 +88,7 @@ export class ContentDto {
         this.canDraftPropose = hasAnyLink(links, 'draft/propose');
         this.canDraftPublish = hasAnyLink(links, 'draft/publish');
         this.canUpdate = hasAnyLink(links, 'update');
+        this.canUpdateAny = this.canUpdate || this.canDraftPropose;
 
         this.statusUpdates = Object.keys(links).filter(x => x.startsWith('status/')).map(x => ({ status: x.substr(7), color: links[x].metadata! }));
     }

@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models
 {
-    public sealed class RestoreRequest
+    public sealed class RestoreRequestDto
     {
         /// <summary>
         /// The name of the app.

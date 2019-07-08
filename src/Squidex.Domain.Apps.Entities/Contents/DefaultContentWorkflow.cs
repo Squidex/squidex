@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -52,6 +53,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var result = InfoDraft;
 
             return Task.FromResult(result);
+        }
+
+        public Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user)
+        {
+            return TaskHelper.True;
         }
 
         public Task<bool> CanMoveToAsync(IContentEntity content, Status next, ClaimsPrincipal user)

@@ -1,0 +1,96 @@
+<div class="table-items-row table-items-row-expandable workflow"> 
+    <div class="table-items-row-summary">        
+        <div class="row no-gutters">
+            <div class="col col-name">
+                <span class="workflow-name">{{workflow.displayName}}</span>
+            </div>
+            <div class="col col-tags">
+                <sqx-tag-editor [converter]="schemasSource" [ngModel]="workflow.schemaIds"
+                 placeholder=""
+                    styleGray="true"
+                    styleBlank="true"
+                    singleLine="true"
+                    disabled="true">
+                </sqx-tag-editor>
+            </div>
+            <div class="col-options">
+                <div class="float-right">
+                    <button type="button" class="btn btn-secondary table-items-edit-button mr-1" [class.active]="isEditing" (click)="toggleEditing()">
+                        <i class="icon-settings"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-text-danger"
+                        [disabled]="!workflow.canDelete"
+                        (sqxConfirmClick)="remove()"
+                        confirmTitle="Remove workflow" 
+                        confirmText="Do you really want to remove the workflow?">
+                        <i class="icon-bin2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-items-row-details" *ngIf="isEditing">
+        <div class="table-items-row-details-tabs clearfix">
+            <div class="float-right">
+                <button type="reset" class="btn btn-text" (click)="toggleEditing()">Cancel</button>
+                <button type="submit" class="btn btn-primary" *ngIf="isEditable" (click)="save()">Save</button>
+            </div>
+        </div>
+
+        <div class="table-items-row-details-tab">
+            <sqx-form-error [error]="error"></sqx-form-error>
+
+            <div class="form-group row">
+                <label class="col-form-label" for="{{workflow.id}}_name">Name</label>
+        
+                <div class="col">
+                    <input class="form-control" id="{{workflow.id}}_name"
+                        [ngModelOptions]="onBlur"
+                        [ngModel]="workflow.name"
+                        (ngModelChange)="rename($event)" />
+        
+                    <sqx-form-hint>
+                        Optional name for the workflow.
+                    </sqx-form-hint>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-form-label" for="{{workflow.id}}_schemas">Schemas</label>
+        
+                <div class="col">
+                    <sqx-tag-editor placeholder=", to add schema"
+                        [converter]="schemasSource"
+                        [ngModel]="workflow.schemaIds"
+                        (ngModelChange)="changeSchemaIds($event)"
+                        [suggestedValues]="schemasSource.suggestions">
+                    </sqx-tag-editor>
+        
+                    <sqx-form-hint>
+                        Restrict this workflow to specific schemas or keep it empty for all schemas.
+                    </sqx-form-hint>
+                </div>
+            </div>
+
+            <sqx-workflow-step *ngFor="let step of workflow.steps; trackBy: trackByStep"
+                [workflow]="workflow"
+                [disabled]="!workflow.canUpdate"
+                [roles]="roles"
+                [step]="step"
+                (makeInitial)="setInitial(step)"
+                (rename)="renameStep(step, $event)"
+                (remove)="removeStep(step)"
+                (transitionAdd)="addTransiton(step, $event)"
+                (transitionRemove)="removeTransition(step, $event)"
+                (transitionUpdate)="updateTransition($event)"
+                (update)="updateStep(step, $event)">
+            </sqx-workflow-step>
+
+            <button class="btn btn-success" (click)="addStep()" *ngIf="workflow.canUpdate">
+                Add Step
+            </button>
+        </div>
+    </div>
+</div>

@@ -5,19 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure.Security;
-using Squidex.Shared;
 
-namespace Squidex.Areas.Api.Controllers.Contents
+namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
-    public static class Helper
+    public sealed class UpdateWorkflow : AppCommand
     {
-        public static Permission StatusPermission(string app, string schema, Status status)
-        {
-            var id = Permissions.AppContentsStatus.Replace("{status}", status.Name);
+        public Guid WorkflowId { get; set; }
 
-            return Permissions.ForApp(id, app, schema);
-        }
+        public Workflow Workflow { get; set; }
     }
 }

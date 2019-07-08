@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Web
 {

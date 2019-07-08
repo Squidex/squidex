@@ -5,11 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Squidex.Domain.Apps.Core.Contents;
 
-namespace Squidex.Domain.Apps.Core.Tags
+namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class TagSet : Dictionary<string, Tag>
+    public interface IWorkflowsValidator
     {
+        Task<IReadOnlyList<string>> ValidateAsync(Guid appId, Workflows workflows);
     }
 }

@@ -35,6 +35,7 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
 using Squidex.Web;
+using Squidex.Web.Pipeline;
 
 namespace Squidex
 {

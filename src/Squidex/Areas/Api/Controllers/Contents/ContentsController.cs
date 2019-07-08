@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -126,14 +127,17 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var contents = await contentQuery.QueryAsync(Context, Q.Empty.WithIds(ids).Ids);
 
-            var response = await ContentsDto.FromContentsAsync(contents, Context, this, null, contentWorkflow);
-
-            if (controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys)
+            var response = Deferred.AsyncResponse(() =>
             {
-                Response.Headers["Surrogate-Key"] = response.ToSurrogateKeys();
+                return ContentsDto.FromContentsAsync(contents, Context, this, null, contentWorkflow);
+            });
+
+            if (ShouldProvideSurrogateKeys(contents))
+            {
+                Response.Headers["Surrogate-Key"] = contents.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = $"{response.ToEtag()}_{App.Version}";
+            Response.Headers[HeaderNames.ETag] = contents.ToEtag(App);
 
             return Ok(response);
         }
@@ -160,16 +164,19 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             var contents = await contentQuery.QueryAsync(Context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 
-            var schema = await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
-            var response = await ContentsDto.FromContentsAsync(contents, Context, this, schema, contentWorkflow);
-
-            if (ShouldProvideSurrogateKeys(response))
+            var response = Deferred.AsyncResponse(async () =>
             {
-                Response.Headers["Surrogate-Key"] = response.ToSurrogateKeys();
+                var schema = await contentQuery.GetSchemaOrThrowAsync(Context, name);
+
+                return await ContentsDto.FromContentsAsync(contents, Context, this, schema, contentWorkflow);
+            });
+
+            if (ShouldProvideSurrogateKeys(contents))
+            {
+                Response.Headers["Surrogate-Key"] = contents.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = $"{response.ToEtag()}_{App.Version}";
+            Response.Headers[HeaderNames.ETag] = contents.ToEtag(App);
 
             return Ok(response);
         }
@@ -200,10 +207,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
-                Response.Headers["Surrogate-Key"] = content.Id.ToString();
+                Response.Headers["Surrogate-Key"] = content.ToSurrogateKey();
             }
 
-            Response.Headers[HeaderNames.ETag] = $"{response.ToEtag()}_{App.Version}";
+            Response.Headers[HeaderNames.ETag] = content.ToEtag(App);
 
             return Ok(response);
         }
@@ -235,10 +242,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             if (controllerOptions.Value.EnableSurrogateKeys)
             {
-                Response.Headers["Surrogate-Key"] = content.Id.ToString();
+                Response.Headers["Surrogate-Key"] = content.ToSurrogateKey();
             }
 
-            Response.Headers[HeaderNames.ETag] = $"{response.ToEtag()}_{App.Version}";
+            Response.Headers[HeaderNames.ETag] = content.ToEtag(App);
 
             return Ok(response.Data);
         }
@@ -266,11 +273,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
         {
             await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
-            if (publish && !this.HasPermission(Helper.StatusPermission(app, name, Status.Published)))
-            {
-                return new ForbidResult();
-            }
 
             var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
 
@@ -367,11 +369,6 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
-            if (!this.HasPermission(Helper.StatusPermission(app, name, Status.Published)))
-            {
-                return new ForbidResult();
-            }
-
             var command = request.ToCommand(id);
 
             var response = await InvokeCommandAsync(app, name, command);
@@ -396,7 +393,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [HttpPut]
         [Route("content/{app}/{name}/{id}/discard/")]
         [ProducesResponseType(typeof(ContentsDto), 200)]
-        [ApiPermission(Permissions.AppContentsDiscard)]
+        [ApiPermission(Permissions.AppContentsDraftDiscard)]
         [ApiCosts(1)]
         public async Task<IActionResult> DiscardDraft(string app, string name, Guid id)
         {
@@ -447,9 +444,9 @@ namespace Squidex.Areas.Api.Controllers.Contents
             return response;
         }
 
-        private bool ShouldProvideSurrogateKeys(ContentsDto response)
+        private bool ShouldProvideSurrogateKeys(IReadOnlyList<IContentEntity> response)
         {
-            return controllerOptions.Value.EnableSurrogateKeys && response.Items.Length <= controllerOptions.Value.MaxItemsForSurrogateKeys;
+            return controllerOptions.Value.EnableSurrogateKeys && response.Count <= controllerOptions.Value.MaxItemsForSurrogateKeys;
         }
     }
 }

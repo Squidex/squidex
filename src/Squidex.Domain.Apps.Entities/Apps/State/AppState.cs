@@ -96,9 +96,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
             Clients = Clients.Revoke(@event.Id);
         }
 
-        protected void On(AppWorkflowConfigured @event)
+        protected void On(AppWorkflowAdded @event)
         {
-            Workflows = Workflows.Set(@event.Workflow);
+            Workflows = Workflows.Add(@event.WorkflowId, @event.Name);
+        }
+
+        protected void On(AppWorkflowUpdated @event)
+        {
+            Workflows = Workflows.Update(@event.WorkflowId, @event.Workflow);
+        }
+
+        protected void On(AppWorkflowDeleted @event)
+        {
+            Workflows = Workflows.Remove(@event.WorkflowId);
         }
 
         protected void On(AppPatternAdded @event)

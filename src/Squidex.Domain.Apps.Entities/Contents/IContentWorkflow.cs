@@ -16,6 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         Task<StatusInfo> GetInitialStatusAsync(ISchemaEntity schema);
 
+        Task<bool> CanPublishOnCreateAsync(ISchemaEntity schema, NamedContentData data, ClaimsPrincipal user);
+
         Task<bool> CanMoveToAsync(IContentEntity content, Status next, ClaimsPrincipal user);
 
         Task<bool> CanUpdateAsync(IContentEntity content);

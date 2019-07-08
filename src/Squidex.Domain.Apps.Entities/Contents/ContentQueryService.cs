@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
@@ -23,9 +22,7 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Security;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 
 #pragma warning disable RECS0147
 

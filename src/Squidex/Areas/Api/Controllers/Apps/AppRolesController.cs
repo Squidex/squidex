@@ -47,9 +47,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetRoles(string app)
         {
-            var response = RolesDto.FromApp(App, this);
+            var response = Deferred.Response(() =>
+            {
+                return RolesDto.FromApp(App, this);
+            });
 
-            Response.Headers[HeaderNames.ETag] = App.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = App.ToEtag();
 
             return Ok(response);
         }
@@ -67,11 +70,14 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(string[]), 200)]
         [ApiPermission(Permissions.AppRolesRead)]
         [ApiCosts(0)]
-        public async Task<IActionResult> GetPermissions(string app)
+        public IActionResult GetPermissions(string app)
         {
-            var response = await permissionsProvider.GetPermissionsAsync(App);
+            var response = Deferred.AsyncResponse(() =>
+            {
+                return permissionsProvider.GetPermissionsAsync(App);
+            });
 
-            Response.Headers[HeaderNames.ETag] = string.Join(";", response).Sha256Base64();
+            Response.Headers[HeaderNames.ETag] = string.Concat(response).Sha256Base64();
 
             return Ok(response);
         }
