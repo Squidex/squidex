@@ -5,12 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.ICIS.Actions.Kafka
-{
-    using Confluent.Kafka;
+using Confluent.Kafka;
 
+namespace Squidex.ICIS.Kafka.Config
+{
     public class ICISKafkaConsumerOptions : ConsumerConfig
     {
-        public new string BootstrapServers { get; set; }
     }
 }

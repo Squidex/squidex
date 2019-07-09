@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.ICIS.Actions.Kafka
+namespace Squidex.ICIS.Kafka.Config
 {
     public class ICISKafkaOptions
     {

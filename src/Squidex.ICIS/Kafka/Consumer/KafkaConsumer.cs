@@ -1,31 +1,48 @@
-﻿using Squidex.ICIS.Kafka.Consumer;
+﻿using System;
+using System.Threading;
+using Confluent.Kafka;
+using Confluent.Kafka.SyncOverAsync;
+using Confluent.SchemaRegistry;
+using Confluent.SchemaRegistry.Serdes;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Squidex.ICIS.Kafka.Config;
+using Squidex.ICIS.Utilities;
 
-namespace Squidex.ICIS.Actions.Kafka
+namespace Squidex.ICIS.Kafka.Consumer
 {
-    using System.Threading;
-    using System.Reflection;
-    using Avro.Specific;
-    using Confluent.Kafka;
-    using Confluent.SchemaRegistry;
-    using Confluent.Kafka.SyncOverAsync;
-    using Confluent.SchemaRegistry.Serdes;
-    using Microsoft.Extensions.Logging;
-    using Squidex.ICIS.Kafka.Entities;
-    using Microsoft.Extensions.Options;
-    using Utilities;
-
     public class KafkaConsumer<T> : IKafkaConsumer<T>
     {
         private readonly CachedSchemaRegistryClient schemaRegistry;
         private readonly IConsumer<string, T> consumer;
 
-        public KafkaConsumer(IOptions<ICISKafkaOptions> options, IOptions<CommodityConsumerOptions> commodityConsumerOptions, ILogger<KafkaConsumer<T>> log)
+        public KafkaConsumer(IOptions<ICISKafkaOptions> options, ConsumerOptions commodityConsumerOptions, ILogger<KafkaConsumer<T>> log)
         {
             schemaRegistry = new CachedSchemaRegistryClient(options.Value.SchemaRegistry);
 
-            var topicName = commodityConsumerOptions.Value.SchemaName;
+            var topicName = commodityConsumerOptions.SchemaName;
 
-            consumer = new ConsumerBuilder<string, T>(options.Value.Consumer)
+            if (commodityConsumerOptions.TopicName != null)
+            {
+                topicName = commodityConsumerOptions.TopicName;
+            }
+
+            var config = new ConsumerConfig(options.Value.Consumer)
+            {
+                AutoOffsetReset = AutoOffsetReset.Earliest
+            };
+
+            if (string.IsNullOrWhiteSpace(config.GroupId))
+            {
+                config.GroupId = $"cosmos-{Guid.NewGuid()}";
+            }
+
+            if (!string.IsNullOrWhiteSpace(commodityConsumerOptions.GroupId))
+            {
+                config.GroupId = commodityConsumerOptions.GroupId;
+            }
+
+            consumer = new ConsumerBuilder<string, T>(config)
                 .SetKeyDeserializer(Deserializers.Utf8)
                 .SetValueDeserializer(new AvroDeserializer<T>(schemaRegistry).AsSyncOverAsync())
                 .SetLogHandler(LogFactory<T>.ConsumerLog(log))

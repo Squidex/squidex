@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using Avro.Specific;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.ICIS.Actions.Kafka.Entities;
+using Squidex.ICIS.Kafka.Entities;
 
-namespace Squidex.ICIS.Actions.Kafka
+namespace Squidex.ICIS.Kafka.Services
 {
     public class RegionMapper : IKafkaMessageMapper
     {

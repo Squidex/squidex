@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using Avro.Specific;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -17,10 +16,10 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.ICIS.Actions.Kafka.Entities;
+using Squidex.ICIS.Kafka.Entities;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.ICIS.Actions.Kafka
+namespace Squidex.ICIS.Kafka.Services
 {
     public class CommentaryMapper : IKafkaMessageMapper
     {

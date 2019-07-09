@@ -7,13 +7,11 @@
 
 using System;
 using Avro.Specific;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 
-namespace Squidex.ICIS.Actions.Kafka
+namespace Squidex.ICIS.Kafka.Services
 {
     public static class KafkaMessageFactory
     {

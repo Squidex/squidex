@@ -11,11 +11,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Squidex.ICIS.Actions.Kafka;
-using Squidex.ICIS.Actions.Kafka.Entities;
 using Squidex.ICIS.Handlers;
 using Squidex.ICIS.Interfaces;
+using Squidex.ICIS.Kafka;
+using Squidex.ICIS.Kafka.Config;
 using Squidex.ICIS.Kafka.Consumer;
+using Squidex.ICIS.Kafka.Entities;
+using Squidex.ICIS.Kafka.Producer;
 
 namespace Squidex.ICIS.Extensions
 {
@@ -61,14 +63,18 @@ namespace Squidex.ICIS.Extensions
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsConsumerConfigured())
             {
-                var sections = config.GetSection("kafka:commodityConsumers").GetChildren();
+                var sections = config.GetSection("kafka:consumers").GetChildren();
 
                 foreach (var section in sections)
                 { 
-                    var option = section.Get<CommodityConsumerOptions>();
+                    var option = section.Get<ConsumerOptions>();
 
-                    services.AddSingleton<IKafkaConsumer<GenericRecord>>(c => ActivatorUtilities.CreateInstance<KafkaConsumer<GenericRecord>>(c, option));
-                    services.AddSingleton<IHostedService>(c => ActivatorUtilities.CreateInstance<CommodityConsumer>(c, option));
+                    services.AddSingleton<IHostedService>(c =>
+                    {
+                        IKafkaConsumer<GenericRecord> consumer = ActivatorUtilities.CreateInstance<KafkaConsumer<GenericRecord>>(c, option);
+
+                        return ActivatorUtilities.CreateInstance<ConsumerService>(c, option, consumer);
+                    });
                 }
             }
         }
