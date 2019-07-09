@@ -5,7 +5,7 @@
     using System.Threading;
     using Avro.Specific;
 
-    public interface IKafkaConsumer<T> : IDisposable where T : ISpecificRecord
+    public interface IKafkaConsumer<T> : IDisposable
     {
         ConsumeResult<string, T> Consume(CancellationToken cancellationToken);
     }

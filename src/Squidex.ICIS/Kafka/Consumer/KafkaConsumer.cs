@@ -1,4 +1,6 @@
-﻿namespace Squidex.ICIS.Actions.Kafka
+﻿using Squidex.ICIS.Kafka.Consumer;
+
+namespace Squidex.ICIS.Actions.Kafka
 {
     using System.Threading;
     using System.Reflection;
@@ -12,16 +14,16 @@
     using Microsoft.Extensions.Options;
     using Utilities;
 
-    public class KafkaConsumer<T> : IKafkaConsumer<T> where T : ISpecificRecord
+    public class KafkaConsumer<T> : IKafkaConsumer<T>
     {
         private readonly CachedSchemaRegistryClient schemaRegistry;
         private readonly IConsumer<string, T> consumer;
 
-        public KafkaConsumer(IOptions<ICISKafkaOptions> options, ILogger<KafkaConsumer<T>> log)
+        public KafkaConsumer(IOptions<ICISKafkaOptions> options, IOptions<CommodityConsumerOptions> commodityConsumerOptions, ILogger<KafkaConsumer<T>> log)
         {
             schemaRegistry = new CachedSchemaRegistryClient(options.Value.SchemaRegistry);
 
-            var topicName = typeof(T).GetCustomAttribute<TopicNameAttribute>().Name;
+            var topicName = commodityConsumerOptions.Value.SchemaName;
 
             consumer = new ConsumerBuilder<string, T>(options.Value.Consumer)
                 .SetKeyDeserializer(Deserializers.Utf8)

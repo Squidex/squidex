@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using Avro.Generic;
 using Microsoft.Extensions.Hosting;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
@@ -21,7 +22,7 @@ namespace Squidex.ICIS.Kafka.Consumer
     {
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly CommodityConsumerOptions options;
-        private readonly IKafkaConsumer<Commodity> consumer;
+        private readonly IKafkaConsumer<GenericRecord> consumer;
         private readonly ICommandBus commandBus;
         private readonly IAppProvider appProvider;
         private readonly IContentQueryService contentQuery;
@@ -29,7 +30,7 @@ namespace Squidex.ICIS.Kafka.Consumer
         private readonly Dictionary<string, Guid> contentIds = new Dictionary<string, Guid>();
         private Task consumerTask;
 
-        public CommodityConsumer(CommodityConsumerOptions options, IKafkaConsumer<Commodity> consumer, ICommandBus commandBus, IAppProvider appProvider, IContentQueryService contentQuery, ISemanticLog log)
+        public CommodityConsumer(CommodityConsumerOptions options, IKafkaConsumer<GenericRecord> consumer, ICommandBus commandBus, IAppProvider appProvider, IContentQueryService contentQuery, ISemanticLog log)
         {
             this.options = options;
             this.consumer = consumer;
@@ -54,17 +55,20 @@ namespace Squidex.ICIS.Kafka.Consumer
                 {
                     try
                     {
-                        var commodity = consumer.Consume(cts.Token).Value;
+                        var contentConsumed = consumer.Consume(cts.Token);
 
-                        if (!contentIds.TryGetValue(commodity.Id, out var contentId))
+                        var contentConsumedId = contentConsumed.Message.Key;
+                        var contentConsumedFields = contentConsumed.Value.Schema.Fields;
+
+                        if (!contentIds.TryGetValue(contentConsumedId, out var contentId))
                         {
-                            var contents = await contentQuery.QueryAsync(queryContext, schemaId.Name, Q.Empty.WithODataQuery($"data/id/iv eq '{commodity.Id}'"));
+                            var contents = await contentQuery.QueryAsync(queryContext, schemaId.Name, Q.Empty.WithODataQuery($"data/id/iv eq '{contentConsumedId}'"));
                             var contentFound = contents.FirstOrDefault();
 
                             if (contentFound != null)
                             {
                                 contentId = contentFound.Id;
-                                contentIds[commodity.Id] = contentFound.Id;
+                                contentIds[contentConsumedId] = contentFound.Id;
                             }
                         }
 
@@ -78,10 +82,10 @@ namespace Squidex.ICIS.Kafka.Consumer
                                 Data = new NamedContentData()
                                     .AddField("id",
                                         new ContentFieldData()
-                                            .AddValue(commodity.Id))
+                                            .AddValue(contentConsumedId))
                                     .AddField("name",
                                         new ContentFieldData()
-                                            .AddValue(commodity.Name))
+                                            .AddValue(contentConsumedFields[1]))
                             });
                         }
                         else
@@ -96,15 +100,15 @@ namespace Squidex.ICIS.Kafka.Consumer
                                 Data = new NamedContentData()
                                     .AddField("id",
                                         new ContentFieldData()
-                                            .AddValue(commodity.Id))
+                                            .AddValue(contentConsumedId))
                                     .AddField("name",
                                         new ContentFieldData()
-                                            .AddValue(commodity.Name))
+                                            .AddValue(contentConsumedFields[1]))
                             });
 
                             var content = context.Result<IContentEntity>();
 
-                            contentIds[commodity.Id] = content.Id;
+                            contentIds[contentConsumedId] = content.Id;
                         }
                     }
                     catch (OperationCanceledException)

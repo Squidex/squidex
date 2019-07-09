@@ -5,6 +5,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Avro.Generic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,14 +61,13 @@ namespace Squidex.ICIS.Extensions
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsConsumerConfigured())
             {
-                services.AddSingleton<IKafkaConsumer<Commodity>, KafkaConsumer<Commodity>>();
-
                 var sections = config.GetSection("kafka:commodityConsumers").GetChildren();
 
                 foreach (var section in sections)
-                {
+                { 
                     var option = section.Get<CommodityConsumerOptions>();
 
+                    services.AddSingleton<IKafkaConsumer<GenericRecord>>(c => ActivatorUtilities.CreateInstance<KafkaConsumer<GenericRecord>>(c, option));
                     services.AddSingleton<IHostedService>(c => ActivatorUtilities.CreateInstance<CommodityConsumer>(c, option));
                 }
             }
