@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Security;
+using Squidex.Shared;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities
@@ -39,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public bool IsFrontendClient
         {
-            get { return User != null && User.IsInClient("squidex-frontend"); }
+            get { return User != null && User.IsInClient(DefaultClients.Frontend); }
         }
     }
 }
