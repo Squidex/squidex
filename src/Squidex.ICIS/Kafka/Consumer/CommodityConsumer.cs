@@ -1,4 +1,10 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -8,12 +14,6 @@ using Squidex.ICIS.Actions.Kafka.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Squidex.ICIS.Kafka.Consumer
 {
@@ -41,10 +41,10 @@ namespace Squidex.ICIS.Kafka.Consumer
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            var app = await appProvider.GetAppAsync(options.AppName); // TODO;
-            var actor = new RefToken(RefTokenType.Client, "client"); // TODO;
+            var app = await appProvider.GetAppAsync(options.AppName);
+            var actor = new RefToken(RefTokenType.Client, options.ClientName);
             var user = new ClaimsPrincipal(new ClaimsIdentity());
-            var schemaId = NamedId.Of(Guid.NewGuid(), "my-schema"); // TODO;
+            var schemaId = NamedId.Of(Guid.NewGuid(), options.SchemaName);
 
             var queryContext = QueryContext.Create(app, user, actor.Identifier);
 
@@ -109,10 +109,13 @@ namespace Squidex.ICIS.Kafka.Consumer
                     }
                     catch (OperationCanceledException)
                     {
-                        // Noop
+                        throw;
                     }
                     catch (Exception ex)
-                    { // TODO;
+                    {
+                        log.LogError(ex, w => w
+                            .WriteProperty("action", "createContentConsumedByKafka")
+                            .WriteProperty("status", "Failed"));
                     }
                 }
             });
