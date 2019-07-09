@@ -1,4 +1,6 @@
 ﻿
+using Squidex.ICIS.Utilities;
+
 namespace Squidex.ICIS.Actions.Kafka
 {
     using System.Threading;

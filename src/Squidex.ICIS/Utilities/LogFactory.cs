@@ -1,8 +1,8 @@
-﻿using Confluent.Kafka;
+﻿using System;
+using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
-using System;
 
-namespace Squidex.ICIS.Kafka
+namespace Squidex.ICIS.Utilities
 {
     public static class LogFactory<TMessage>
     {

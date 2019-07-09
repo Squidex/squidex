@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.ICIS.Utilities;
+
 namespace Squidex.ICIS.Actions.Kafka
 {
     using System.Threading.Tasks;
