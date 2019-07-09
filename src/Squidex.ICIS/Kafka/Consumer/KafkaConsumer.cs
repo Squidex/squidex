@@ -1,7 +1,4 @@
-﻿
-using Squidex.ICIS.Utilities;
-
-namespace Squidex.ICIS.Actions.Kafka
+﻿namespace Squidex.ICIS.Actions.Kafka
 {
     using System.Threading;
     using System.Reflection;
@@ -11,9 +8,9 @@ namespace Squidex.ICIS.Actions.Kafka
     using Confluent.Kafka.SyncOverAsync;
     using Confluent.SchemaRegistry.Serdes;
     using Microsoft.Extensions.Logging;
-    using Squidex.ICIS.Kafka;
     using Squidex.ICIS.Kafka.Entities;
     using Microsoft.Extensions.Options;
+    using Utilities;
 
     public class KafkaConsumer<T> : IKafkaConsumer<T> where T : ISpecificRecord
     {
