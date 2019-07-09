@@ -1,4 +1,18 @@
 {
+  "name": "squidex",
+  "version": "1.0.0",
+  "description": "Squidex Headless CMS",
+  "license": "MIT",
+  "repository": "https://github.com/SebastianStehle/Squidex",
+  "scripts": {
+    "copy": "cpx node_modules/oidc-client/dist/oidc-client.min.js wwwroot/scripts/",
+    "start": "npm run copy && webpack-dev-server --config app-config/webpack.run.dev.js --inline --port 3000 --hot",
+    "test": "karma start",
+    "test:coverage": "karma start karma.coverage.conf.js",
+    "test:clean": "rimraf _test-output",
+    "tslint": "tslint -c tslint.json -p tsconfig.json app/**/*.ts",
+    "build": "npm run copy && webpack --config app-config/webpack.run.prod.js",
+    "build:clean": "rimraf wwwroot/build"
     },
   "dependencies": {
     "@angular/animations": "7.2.14",
