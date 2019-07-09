@@ -45,16 +45,16 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(`api/users?query=${query || ''}`);
 
         return this.http.get<any[]>(url).pipe(
-			map(body => {
-				const users = body.map(item =>
-					new UserDto(
-						item.id,
-						item.displayName,
-						item.email));
+            map(body => {
+                const users = body.map(item =>
+                    new UserDto(
+                        item.id,
+                        item.displayName,
+                        item.email));
 
-				return users;
-			}),
-			pretifyError('Failed to load users. Please reload.'));
+                return users;
+            }),
+            pretifyError('Failed to load users. Please reload.'));
     }
 
     public getUser(id: string): Observable<UserDto> {
@@ -62,10 +62,10 @@ export class UsersService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-				const user = new UserDto(
-					body.id,
-					body.displayName,
-					body.email);
+                const user = new UserDto(
+                    body.id,
+                    body.displayName,
+                    body.email);
 
                 return user;
             }),
