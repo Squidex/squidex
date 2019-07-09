@@ -93,6 +93,11 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
             return value;
         }
 
+        public IJsonValue Visit(IField<UIFieldProperties> field)
+        {
+            return value;
+        }
+
         public IJsonValue Visit(IArrayField field)
         {
             return value;

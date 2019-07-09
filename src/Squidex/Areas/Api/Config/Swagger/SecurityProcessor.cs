@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Options;
 using NSwag;
 using NSwag.SwaggerGeneration.Processors.Security;
@@ -17,7 +18,7 @@ namespace Squidex.Areas.Api.Config.Swagger
     public class SecurityProcessor : SecurityDefinitionAppender
     {
         public SecurityProcessor(IOptions<UrlsOptions> urlOptions)
-            : base(Constants.SecurityDefinition, CreateOAuthSchema(urlOptions.Value))
+            : base(Constants.SecurityDefinition, Enumerable.Empty<string>(), CreateOAuthSchema(urlOptions.Value))
         {
         }
 

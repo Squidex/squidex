@@ -136,7 +136,7 @@ namespace Squidex.Areas.Api.Controllers.Users
         [HttpGet]
         [Route("users/{id}/picture/")]
         [ProducesResponseType(typeof(FileResult), 200)]
-        [ResponseCache(Duration = 3600)]
+        [ResponseCache(Duration = 300)]
         public async Task<IActionResult> GetUserPicture(string id)
         {
             try

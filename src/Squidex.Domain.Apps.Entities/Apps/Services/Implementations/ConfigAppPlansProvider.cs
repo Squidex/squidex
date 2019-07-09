@@ -64,6 +64,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Services.Implementations
             return GetPlanCore(planId);
         }
 
+        public IAppLimitsPlan GetFreePlan()
+        {
+            return GetPlanCore(plansList.FirstOrDefault(x => string.IsNullOrWhiteSpace(x.Costs))?.Id);
+        }
+
         public IAppLimitsPlan GetPlanUpgradeForApp(IAppEntity app)
         {
             Guard.NotNull(app, nameof(app));

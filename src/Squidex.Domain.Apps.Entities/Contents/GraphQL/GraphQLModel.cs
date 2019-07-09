@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -136,9 +135,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return partitionResolver(key);
         }
 
-        public (IGraphType ResolveType, ValueResolver Resolver) GetGraphType(ISchemaEntity schema, IField field)
+        public (IGraphType ResolveType, ValueResolver Resolver) GetGraphType(ISchemaEntity schema, IField field, string fieldName)
         {
-            return field.Accept(new QueryGraphTypeVisitor(schema, GetContentType, this, assetListType));
+            return field.Accept(new QueryGraphTypeVisitor(schema, GetContentType, this, assetListType, fieldName));
         }
 
         public IGraphType GetAssetType()
@@ -176,15 +175,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             Guard.NotNull(context, nameof(context));
 
-            var inputs = query.Variables?.ToInputs();
-
-            var result = await new DocumentExecuter().ExecuteAsync(options =>
+            var result = await new DocumentExecuter().ExecuteAsync(execution =>
             {
-                options.OperationName = query.OperationName;
-                options.UserContext = context;
-                options.Schema = graphQLSchema;
-                options.Inputs = inputs;
-                options.Query = query.Query;
+                context.Setup(execution);
+
+                execution.Schema = graphQLSchema;
+                execution.Inputs = query.Variables?.ToInputs();
+                execution.Query = query.Query;
             }).ConfigureAwait(false);
 
             return (result.Data, result.Errors?.Select(x => (object)new { x.Message, x.Locations }).ToArray());

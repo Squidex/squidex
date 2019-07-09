@@ -21,19 +21,22 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
         public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (context.IsOptional || (value != null && !(value is string)))
+            if (context.IsOptional)
             {
                 return TaskHelper.Done;
             }
 
-            var valueAsString = (string)value;
-
-            if (valueAsString == null || (validateEmptyStrings && string.IsNullOrWhiteSpace(valueAsString)))
+            if (value.IsNullOrUndefined() || IsEmptyString(value))
             {
                 addError(context.Path, "Field is required.");
             }
 
             return TaskHelper.Done;
+        }
+
+        private bool IsEmptyString(object value)
+        {
+            return value is string typed && validateEmptyStrings && string.IsNullOrWhiteSpace(typed);
         }
     }
 }

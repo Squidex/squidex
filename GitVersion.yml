@@ -1,0 +1,12 @@
+mode: Mainline
+branches:
+  master:
+    tag: ''
+  release:
+    tag: ''
+  hotfix:
+    tag: ''
+  feature:
+    tag: ''
+ignore:
+  sha: []

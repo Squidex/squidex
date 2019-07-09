@@ -30,6 +30,9 @@ export class ArrayEditorComponent extends StatefulComponent<State> {
     public form: EditContentForm;
 
     @Input()
+    public formContext: any;
+
+    @Input()
     public field: RootFieldDto;
 
     @Input()

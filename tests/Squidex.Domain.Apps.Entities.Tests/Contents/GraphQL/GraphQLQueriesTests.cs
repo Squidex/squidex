@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             const string query = @"
                 query {
-                  queryAssets(search: ""my-query"", take: 30, skip: 5) {
+                  queryAssets(filter: ""my-query"", top: 30, skip: 5) {
                     id
                     version
                     created
@@ -57,13 +57,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     isImage
                     pixelWidth
                     pixelHeight
+                    tags
                     slug
                   }
                 }";
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$take=30&$skip=5&$search=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.Create(0, asset));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
@@ -93,6 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             isImage = true,
                             pixelWidth = 800,
                             pixelHeight = 600,
+                            tags = new string[] { "tag1", "tag2" },
                             slug = "myfile.png"
                         }
                     }
@@ -107,7 +109,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             const string query = @"
                 query {
-                  queryAssetsWithTotal(search: ""my-query"", take: 30, skip: 5) {
+                  queryAssetsWithTotal(filter: ""my-query"", top: 30, skip: 5) {
                     total
                     items {
                       id
@@ -127,6 +129,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                       isImage
                       pixelWidth
                       pixelHeight
+                      tags
                       slug
                     }   
                   }
@@ -134,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var asset = CreateAsset(Guid.NewGuid());
 
-            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$take=30&$skip=5&$search=my-query")))
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.That.Matches(x => x.ODataQuery == "?$top=30&$skip=5&$filter=my-query")))
                 .Returns(ResultList.Create(10, asset));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
@@ -167,6 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 isImage = true,
                                 pixelWidth = 800,
                                 pixelHeight = 600,
+                                tags = new string[] { "tag1", "tag2" },
                                 slug = "myfile.png"
                             }
                         }
@@ -183,9 +187,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var assetId = Guid.NewGuid();
             var asset = CreateAsset(assetId);
 
-            var query = $@"
-                query {{
-                  findAsset(id: ""{assetId}"") {{
+            var query = @"
+                query {
+                  findAsset(id: ""<ID>"") {
                     id
                     version
                     created
@@ -203,12 +207,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     isImage
                     pixelWidth
                     pixelHeight
+                    tags
                     slug
-                  }}
-                }}";
+                  }
+                }".Replace("<ID>", assetId.ToString());
 
-            A.CallTo(() => assetQuery.FindAssetAsync(MatchsAssetContext(), assetId))
-                .Returns(asset);
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchId(assetId)))
+                .Returns(ResultList.Create(1, asset));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
@@ -235,6 +240,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         isImage = true,
                         pixelWidth = 800,
                         pixelHeight = 600,
+                        tags = new string[] { "tag1", "tag2" },
                         slug = "myfile.png"
                     }
                 }
@@ -366,12 +372,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                     {
                                         new
                                         {
-                                            nestedNumber = 1,
+                                            nestedNumber = 10,
                                             nestedBoolean = true
                                         },
                                         new
                                         {
-                                            nestedNumber = 2,
+                                            nestedNumber = 20,
                                             nestedBoolean = false
                                         }
                                     }
@@ -513,14 +519,85 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         }
 
         [Fact]
+        public async Task Should_return_single_content_with_duplicate_names()
+        {
+            var contentId = Guid.NewGuid();
+            var content = CreateContent(contentId, Guid.Empty, Guid.Empty);
+
+            var query = @"
+                query {
+                  findMySchemaContent(id: ""<ID>"") {
+                    data {
+                      myNumber {
+                        iv
+                      }
+                      myNumber2 {
+                        iv
+                      }
+                      myArray {
+                        iv {
+                          nestedNumber
+                          nestedNumber2
+                        }
+                      }
+                    }
+                  }
+                }".Replace("<ID>", contentId.ToString());
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.ToString(), MatchId(contentId)))
+                .Returns(ResultList.Create(1, content));
+
+            var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
+
+            var expected = new
+            {
+                data = new
+                {
+                    findMySchemaContent = new
+                    {
+                        data = new
+                        {
+                            myNumber = new
+                            {
+                                iv = 1
+                            },
+                            myNumber2 = new
+                            {
+                                iv = 2
+                            },
+                            myArray = new
+                            {
+                                iv = new[]
+                                {
+                                    new
+                                    {
+                                        nestedNumber = 10,
+                                        nestedNumber2 = 11,
+                                    },
+                                    new
+                                    {
+                                        nestedNumber = 20,
+                                        nestedNumber2 = 21,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            AssertResult(expected, result);
+        }
+
+        [Fact]
         public async Task Should_return_single_content_when_finding_content()
         {
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, Guid.Empty, Guid.Empty);
 
-            var query = $@"
-                query {{
-                  findMySchemaContent(id: ""{contentId}"") {{
+            var query = @"
+                query {
+                  findMySchemaContent(id: ""<ID>"") {
                     id
                     version
                     created
@@ -529,37 +606,37 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     lastModifiedBy
                     status
                     url
-                    data {{
-                      myString {{
+                    data {
+                      myString {
                         de
-                      }}
-                      myNumber {{
+                      }
+                      myNumber {
                         iv
-                      }}
-                      myBoolean {{
+                      }
+                      myBoolean {
                         iv
-                      }}
-                      myDatetime {{
+                      }
+                      myDatetime {
                         iv
-                      }}
-                      myJson {{
+                      }
+                      myJson {
                         iv
-                      }}
-                      myGeolocation {{
+                      }
+                      myGeolocation {
                         iv
-                      }}
-                      myTags {{
+                      }
+                      myTags {
                         iv
-                      }}
-                      myLocalized {{
+                      }
+                      myLocalized {
                         de_DE
-                      }}
-                    }}
-                  }}
-                }}";
+                      }
+                    }
+                  }
+                }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.FindContentAsync(MatchsContentContext(), schemaId.ToString(), contentId, EtagVersion.Any))
-                .Returns(content);
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.ToString(), MatchId(contentId)))
+                .Returns(ResultList.Create(1, content));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
@@ -639,25 +716,25 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, contentRefId, Guid.Empty);
 
-            var query = $@"
-                query {{
-                  findMySchemaContent(id: ""{contentId}"") {{
+            var query = @"
+                query {
+                  findMySchemaContent(id: ""<ID>"") {
                     id
-                    data {{
-                      myReferences {{
-                        iv {{
+                    data {
+                      myReferences {
+                        iv {
                           id
-                        }}
-                      }}
-                    }}
-                  }}
-                }}";
-
-            A.CallTo(() => contentQuery.FindContentAsync(MatchsContentContext(), schemaId.ToString(), contentId, EtagVersion.Any))
-                .Returns(content);
+                        }
+                      }
+                    }
+                  }
+                }".Replace("<ID>", contentId.ToString());
 
             A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.ToString(), A<Q>.Ignored))
                 .Returns(ResultList.Create(0, contentRef));
+
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.ToString(), MatchId(contentId)))
+                .Returns(ResultList.Create(1, content));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
@@ -697,22 +774,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, Guid.Empty, assetRefId);
 
-            var query = $@"
-                query {{
-                  findMySchemaContent(id: ""{contentId}"") {{
+            var query = @"
+                query {
+                  findMySchemaContent(id: ""<ID>"") {
                     id
-                    data {{
-                      myAssets {{
-                        iv {{
+                    data {
+                      myAssets {
+                        iv {
                           id
-                        }}
-                      }}
-                    }}
-                  }}
-                }}";
+                        }
+                      }
+                    }
+                  }
+                }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.FindContentAsync(MatchsContentContext(), schemaId.ToString(), contentId, EtagVersion.Any))
-                .Returns(content);
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.ToString(), MatchId(contentId)))
+                .Returns(ResultList.Create(1, content));
 
             A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), A<Q>.Ignored))
                 .Returns(ResultList.Create(0, assetRef));
@@ -754,23 +831,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var asset1 = CreateAsset(assetId1);
             var asset2 = CreateAsset(assetId2);
 
-            var query1 = $@"
-                query {{
-                  findAsset(id: ""{assetId1}"") {{
+            var query1 = @"
+                query {
+                  findAsset(id: ""<ID>"") {
                     id
-                  }}
-                }}";
-            var query2 = $@"
-                query {{
-                  findAsset(id: ""{assetId2}"") {{
+                  }
+                }".Replace("<ID>", assetId1.ToString());
+            var query2 = @"
+                query {
+                  findAsset(id: ""<ID>"") {
                     id
-                  }}
-                }}";
+                  }
+                }".Replace("<ID>", assetId2.ToString());
 
-            A.CallTo(() => assetQuery.FindAssetAsync(MatchsAssetContext(), assetId1))
-                .Returns(asset1);
-            A.CallTo(() => assetQuery.FindAssetAsync(MatchsAssetContext(), assetId2))
-                .Returns(asset2);
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchId(assetId1)))
+                .Returns(ResultList.Create(0, asset1));
+
+            A.CallTo(() => assetQuery.QueryAsync(MatchsAssetContext(), MatchId(assetId2)))
+                .Returns(ResultList.Create(0, asset2));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query1 }, new GraphQLQuery { Query = query2 });
 
@@ -807,9 +885,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, Guid.Empty, Guid.Empty, new NamedContentData());
 
-            var query = $@"
-                query {{
-                  findMySchemaContent(id: ""{contentId}"") {{
+            var query = @"
+                query {
+                  findMySchemaContent(id: ""<ID>"") {
                     id
                     version
                     created
@@ -817,16 +895,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     lastModified
                     lastModifiedBy
                     url
-                    data {{
-                      myInvalid {{
+                    data {
+                      myInvalid {
                         iv
-                      }}
-                    }}
-                  }}
-                }}";
+                      }
+                    }
+                  }
+                }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.FindContentAsync(MatchsContentContext(), schemaId.ToString(), contentId, EtagVersion.Any))
-                .Returns(content);
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.ToString(), MatchId(contentId)))
+                .Returns(ResultList.Create(1, content));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
@@ -849,22 +927,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, Guid.Empty, Guid.Empty, null, dataDraft);
 
-            var query = $@"
-                query {{
-                  findMySchemaContent(id: ""{contentId}"") {{
-                    dataDraft {{
-                      myString {{
+            var query = @"
+                query {
+                  findMySchemaContent(id: ""<ID>"") {
+                    dataDraft {
+                      myString {
                         de
-                      }}
-                      myNumber {{
+                      }
+                      myNumber {
                         iv
-                      }}
-                    }}
-                  }}
-                }}";
+                      }
+                    }
+                  }
+                }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.FindContentAsync(MatchsContentContext(), schemaId.ToString(), contentId, EtagVersion.Any))
-                .Returns(content);
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.ToString(), MatchId(contentId)))
+                .Returns(ResultList.Create(1, content));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
@@ -898,19 +976,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             var contentId = Guid.NewGuid();
             var content = CreateContent(contentId, Guid.Empty, Guid.Empty, null);
 
-            var query = $@"
-                query {{
-                  findMySchemaContent(id: ""{contentId}"") {{
-                    dataDraft {{
-                      myString {{
+            var query = @"
+                query {
+                  findMySchemaContent(id: ""<ID>"") {
+                    dataDraft {
+                      myString {
                         de
-                      }}
-                    }}
-                  }}
-                }}";
+                      }
+                    }
+                  }
+                }".Replace("<ID>", contentId.ToString());
 
-            A.CallTo(() => contentQuery.FindContentAsync(MatchsContentContext(), schemaId.ToString(), contentId, EtagVersion.Any))
-                .Returns(content);
+            A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), schemaId.ToString(), MatchId(contentId)))
+                .Returns(ResultList.Create(1, content));
 
             var result = await sut.QueryAsync(context, new GraphQLQuery { Query = query });
 
@@ -926,6 +1004,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             };
 
             AssertResult(expected, result);
+        }
+
+        private static Q MatchId(Guid contentId)
+        {
+            return A<Q>.That.Matches(x => x.Ids.Count == 1 && x.Ids[0] == contentId);
         }
 
         private QueryContext MatchsAssetContext()

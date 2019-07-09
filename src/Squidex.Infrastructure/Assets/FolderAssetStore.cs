@@ -82,7 +82,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNull(stream, nameof(stream));
 
             var file = GetFile(fileName);
 
@@ -101,7 +101,7 @@ namespace Squidex.Infrastructure.Assets
 
         public async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNull(stream, nameof(stream));
 
             var file = GetFile(fileName);
 
@@ -120,8 +120,6 @@ namespace Squidex.Infrastructure.Assets
 
         public Task DeleteAsync(string fileName)
         {
-            Guard.NotNullOrEmpty(fileName, nameof(fileName));
-
             var file = GetFile(fileName);
 
             file.Delete();

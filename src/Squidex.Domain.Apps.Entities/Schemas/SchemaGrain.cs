@@ -321,7 +321,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             {
                 if (id.HasValue && Snapshot.SchemaDef.FieldsById.TryGetValue(id.Value, out var field))
                 {
-                    return NamedId.Of(field.Id, field.Name);
+                    return field.NamedId();
                 }
 
                 return null;
@@ -333,13 +333,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                 {
                     if (Snapshot.SchemaDef.FieldsById.TryGetValue(pc.ParentFieldId.Value, out var field))
                     {
-                        pe.ParentFieldId = NamedId.Of(field.Id, field.Name);
+                        pe.ParentFieldId = field.NamedId();
 
                         if (command is FieldCommand fc && @event is FieldEvent fe)
                         {
                             if (field is IArrayField arrayField && arrayField.FieldsById.TryGetValue(fc.FieldId, out var nestedField))
                             {
-                                fe.FieldId = NamedId.Of(nestedField.Id, nestedField.Name);
+                                fe.FieldId = nestedField.NamedId();
                             }
                         }
                     }
@@ -357,7 +357,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
         {
             if (@event.SchemaId == null)
             {
-                @event.SchemaId = NamedId.Of(Snapshot.Id, Snapshot.SchemaDef.Name);
+                @event.SchemaId = Snapshot.NamedId();
             }
 
             if (@event.AppId == null)

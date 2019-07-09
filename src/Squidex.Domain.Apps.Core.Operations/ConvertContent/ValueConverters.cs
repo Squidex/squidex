@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static ValueConverter ExcludeHidden()
         {
-            return (value, field) => field.IsHidden ? Value.Unset : value;
+            return (value, field) => !field.IsForApi() ? Value.Unset : value;
         }
 
         public static ValueConverter ExcludeChangedTypes()

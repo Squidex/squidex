@@ -1,19 +1,20 @@
 <div>
     <div class="form-inline">
-        <div class="form-group date-group">
-            <input type="text" class="form-control" [formControl]="dateControl" (blur)="callTouched()" #dateInput />
-        </div>
-        <div class="form-group time-group" *ngIf="showTime">
-            <input type="text" class="form-control" [formControl]="timeControl" (blur)="callTouched()" />
+        <div class="form-group mr-1">
+            <div class="input-group">
+                <input type="text" class="form-control" [formControl]="dateControl" placeholder="Date" (blur)="callTouched()" #dateInput />
+                <input type="text" class="form-control" [formControl]="timeControl" placeholder="Time" (blur)="callTouched()" *ngIf="showTime" />
+            </div>
+
+            <button type="button" class="btn btn-text-secondary btn-sm btn-clear" [class.hidden]="!hasValue" [disabled]="snapshot.isDisabled" (click)="reset()" *ngIf="!hideClear">
+                <i class="icon-close"></i>
+            </button>
         </div>
         <div class="form-group" *ngIf="showTime">
-            <button type="button" class="btn btn-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()">Now</button>
+            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="Use Now (UTC)">Now</button>
         </div>
         <div class="form-group" *ngIf="!showTime">
-            <button type="button" class="btn btn-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()">Today</button>
-        </div>
-        <div class="form-group" [class.hidden]="!hasValue" *ngIf="!hideClear">
-            <button type="button" class="btn btn-text clear" [disabled]="snapshot.isDisabled" (click)="reset()">Clear</button>
+            <button type="button" class="btn btn-text-secondary" [disabled]="snapshot.isDisabled" (click)="writeNow()" title="Use Today (UTC)">Today</button>
         </div>
     </div>
 </div>

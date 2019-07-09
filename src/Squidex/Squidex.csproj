@@ -67,21 +67,21 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.4" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.5.4" />
-    <PackageReference Include="Microsoft.Orleans.Client" Version="2.3.0" />
-    <PackageReference Include="Microsoft.Orleans.Core" Version="2.3.0" />
-    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.3.0" />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.3.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.8.0" />
-    <PackageReference Include="NJsonSchema" Version="9.13.29" />
-    <PackageReference Include="NSwag.AspNetCore" Version="12.1.0" />
+    <PackageReference Include="Microsoft.Orleans.Client" Version="2.3.2" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="2.3.2" />
+    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.3.2" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.3.2" />
+    <PackageReference Include="MongoDB.Driver" Version="2.8.1" />
+    <PackageReference Include="NJsonSchema" Version="9.14.1" />
+    <PackageReference Include="NSwag.AspNetCore" Version="12.3.1" />
     <PackageReference Include="OpenCover" Version="4.7.922" PrivateAssets="all" />
-    <PackageReference Include="Orleans.Providers.MongoDB" Version="2.3.1" />
+    <PackageReference Include="Orleans.Providers.MongoDB" Version="2.4.0" />
     <PackageReference Include="Orleans.WebHostCompatibilityLayer" Version="2.3.1" />
     <PackageReference Include="OrleansDashboard" Version="2.3.1" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="ReportGenerator" Version="4.1.2" PrivateAssets="all" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="2.9.0" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
+    <PackageReference Include="ReportGenerator" Version="4.1.6" PrivateAssets="all" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="2.10.0" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>

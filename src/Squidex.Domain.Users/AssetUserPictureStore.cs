@@ -25,7 +25,7 @@ namespace Squidex.Domain.Users
 
         public Task UploadAsync(string userId, Stream stream)
         {
-            return assetStore.UploadAsync(userId, 0, "picture", stream);
+            return assetStore.UploadAsync(userId, 0, "picture", stream, true);
         }
 
         public async Task<Stream> DownloadAsync(string userId)

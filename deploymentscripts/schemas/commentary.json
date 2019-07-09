@@ -29,6 +29,20 @@
           }
        },
        {
+         "name":"Region",
+         "partitioning":"invariant",
+         "properties":{
+            "label":"Region",
+            "isRequired":true,
+            "isListField":true,
+            "fieldType":"References",
+            "editor":"List",
+            "isUnique":true,
+            "minItems":1,
+            "maxItems":1
+         }
+       },
+       {
           "name":"Body",
           "partitioning":"language",
           "properties":{

@@ -25,6 +25,11 @@ namespace Squidex.Domain.Apps.Entities
             return Clone(c => c.ODataQuery = odataQuery);
         }
 
+        public Q WithIds(params Guid[] ids)
+        {
+            return Clone(c => c.Ids = ids.ToList());
+        }
+
         public Q WithIds(IEnumerable<Guid> ids)
         {
             return Clone(c => c.Ids = ids.ToList());

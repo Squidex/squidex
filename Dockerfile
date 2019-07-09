@@ -1,7 +1,7 @@
 #
 # Stage 1, Prebuild
 #
-FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as builder
+FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder
 
 WORKDIR /src
 
@@ -10,29 +10,65 @@ COPY src/Squidex/package*.json /tmp/
 # Install Node packages 
 RUN cd /tmp && npm install --loglevel=error
 
-COPY . .
+COPY src/Squidex src/Squidex
 
 # Build Frontend
 RUN cp -a /tmp/node_modules src/Squidex/ \
  && cd src/Squidex \
-# && npm run test:coverage \
+ && npm run test:coverage \
  && npm run build
  
 # Test Backend
-RUN dotnet restore \
- && dotnet test --filter Category!=Dependencies tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj \ 
- && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj \ 
- && dotnet test tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj \
- && dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj \
- && dotnet test tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj
+FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder_backend
+
+WORKDIR /src
+
+# Install Screen
+#RUN apt-get update \
+ #&& apt-get install screen
+
+# Install OpenJDK-8
+# RUN apt-get update && \
+#     apt-get install -y openjdk-8-jdk && \
+#     apt-get install -y ant && \
+#     apt-get clean;
+
+# Fix certificate issues
+# RUN apt-get update && \
+#     apt-get install ca-certificates-java && \
+#     apt-get clean && \
+#     update-ca-certificates -f;
+
+# Setup JAVA_HOME -- useful for docker commandline
+# ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+# RUN export JAVA_HOME
+
+COPY src/**/*.csproj /tmp/
+COPY tests/**/*.csproj /tmp/
+RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p; true; done; popd'
+
+COPY . .
+
+RUN dotnet restore && dotnet test -s ../../.runsettings --filter Category!=Dependencies
+
+COPY --from=builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
+
+# Run Functional Test Cases
+# COPY cosmos-func-tests/package*.json /tmp/
+# RUN cd /tmp && npm install --loglevel=error
+# RUN cp -a /tmp/node_modules cosmos-func-tests/ \
+#  && cd cosmos-func-tests \
+#  && mkdir database \
+#  && chmod +x setup-app.sh \
+#  && npm run test
 
 # Publish
-RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64
+RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release
 
 #
 # Stage 2, Build runtime
 #
-FROM microsoft/dotnet:2.2-runtime-deps-alpine
+FROM nexus.cha.rbxd.ds:8000/dotnet/core/runtime:2.2.5-alpine3.9
 
 # Default AspNetCore directory
 WORKDIR /app
@@ -45,14 +81,13 @@ RUN apk update \
  && ln -s /usr/lib/libuv.so.1 /usr/lib/libuv.so
 
 # Copy from build stage
-COPY --from=builder /out/alpine .
+COPY --from=builder_backend /out/alpine .
 COPY src/Squidex/cha-ca.cer /usr/local/share/ca-certificates/cha-ca.cer
 
 RUN update-ca-certificates
 
 EXPOSE 80
 EXPOSE 5000
-# EXPOSE 33333
-# EXPOSE 40000
+EXPOSE 11111
 
-ENTRYPOINT ["./Squidex"]
+ENTRYPOINT ["dotnet","./Squidex.dll"] 

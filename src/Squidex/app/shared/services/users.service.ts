@@ -15,7 +15,8 @@ import { ApiUrlConfig, pretifyError } from '@app/framework';
 export class UserDto {
     constructor(
         public readonly id: string,
-        public readonly displayName: string
+        public readonly displayName: string,
+        public readonly email: string
     ) {
     }
 }
@@ -36,7 +37,8 @@ export class UsersService {
                     const users = body.map(item =>
                         new UserDto(
                             item.id,
-                            item.displayName));
+                            item.displayName,
+                            item.email));
 
                     return users;
                 }),
@@ -50,7 +52,8 @@ export class UsersService {
                 map(body => {
                     const user = new UserDto(
                         body.id,
-                        body.displayName);
+                        body.displayName,
+                        body.email);
 
                     return user;
                 }),

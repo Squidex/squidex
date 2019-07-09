@@ -26,7 +26,7 @@ namespace Squidex.Areas.IdentityServer.Config
         {
              app.UseIdentityServer();
 
-            return app;
+             return app;
         }
 
         public static IServiceProvider UseMyAdmin(this IServiceProvider services)

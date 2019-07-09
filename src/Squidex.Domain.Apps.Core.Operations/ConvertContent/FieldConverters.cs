@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static FieldConverter ExcludeHidden()
         {
-            return (data, field) => field.IsHidden ? null : data;
+            return (data, field) => !field.IsForApi() ? null : data;
         }
 
         public static FieldConverter ExcludeChangedTypes()

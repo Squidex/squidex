@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Contents;
@@ -26,18 +25,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
             Name = $"{schemaType}DataDto";
 
-            foreach (var field in schema.SchemaDef.Fields.Where(x => !x.IsHidden))
+            foreach (var (field, fieldName, typeName) in schema.SchemaDef.Fields.SafeFields())
             {
-                var fieldInfo = model.GetGraphType(schema, field);
+                var (resolvedType, valueResolver) = model.GetGraphType(schema, field, fieldName);
 
-                if (fieldInfo.ResolveType != null)
+                if (valueResolver != null)
                 {
-                    var fieldType = field.TypeName();
-                    var fieldName = field.DisplayName();
+                    var displayName = field.DisplayName();
 
                     var fieldGraphType = new ObjectGraphType
                     {
-                        Name = $"{schemaType}Data{fieldType}Dto"
+                        Name = $"{schemaType}Data{typeName}Dto"
                     };
 
                     var partition = model.ResolvePartition(field.Partitioning);
@@ -46,45 +44,51 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
                     {
                         var key = partitionItem.Key;
 
-                        var resolver = new FuncFieldResolver<object>(c =>
-                        {
-                            if (((ContentFieldData)c.Source).TryGetValue(key, out var value))
-                            {
-                                return fieldInfo.Resolver(value, c);
-                            }
-                            else
-                            {
-                                return null;
-                            }
-                        });
-
                         fieldGraphType.AddField(new FieldType
                         {
                             Name = key.EscapePartition(),
-                            Resolver = resolver,
-                            ResolvedType = fieldInfo.ResolveType,
+                            Resolver = PartitionResolver(valueResolver, key),
+                            ResolvedType = resolvedType,
                             Description = field.RawProperties.Hints
                         });
                     }
 
-                    fieldGraphType.Description = $"The structure of the {fieldName} field of the {schemaName} content type.";
-
-                    var fieldResolver = new FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, IJsonValue>>(c =>
-                    {
-                        return c.Source.GetOrDefault(field.Name);
-                    });
+                    fieldGraphType.Description = $"The structure of the {displayName} field of the {schemaName} content type.";
 
                     AddField(new FieldType
                     {
-                        Name = field.Name.ToCamelCase(),
-                        Resolver = fieldResolver,
+                        Name = fieldName,
+                        Resolver = FieldResolver(field),
                         ResolvedType = fieldGraphType,
-                        Description = $"The {fieldName} field."
+                        Description = $"The {displayName} field."
                     });
                 }
             }
 
             Description = $"The structure of the {schemaName} content type.";
+        }
+
+        private static FuncFieldResolver<object> PartitionResolver(ValueResolver valueResolver, string key)
+        {
+            return new FuncFieldResolver<object>(c =>
+            {
+                if (((ContentFieldData)c.Source).TryGetValue(key, out var value))
+                {
+                    return valueResolver(value, c);
+                }
+                else
+                {
+                    return null;
+                }
+            });
+        }
+
+        private static FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, IJsonValue>> FieldResolver(RootField field)
+        {
+            return new FuncFieldResolver<NamedContentData, IReadOnlyDictionary<string, IJsonValue>>(c =>
+            {
+                return c.Source.GetOrDefault(field.Name);
+            });
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
     {
         public Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
-            if (value == null && !context.IsOptional)
+            if (value.IsNullOrUndefined() && !context.IsOptional)
             {
                 addError(context.Path, "Field is required.");
             }

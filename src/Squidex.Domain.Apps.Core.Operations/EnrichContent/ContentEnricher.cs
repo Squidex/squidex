@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Core.EnrichContent
 
             var defaultValue = DefaultValueFactory.CreateDefaultValue(field, SystemClock.Instance.GetCurrentInstant());
 
-            if (field.RawProperties.IsRequired || defaultValue.Type == JsonValueType.Null)
+            if (field.RawProperties.IsRequired || defaultValue == null || defaultValue.Type == JsonValueType.Null)
             {
                 return;
             }

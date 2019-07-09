@@ -7,15 +7,12 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { fadeAnimation } from './../animations';
-
 @Component({
     selector: 'sqx-form-error',
-    styleUrls: ['./form-error.component.scss'],
-    templateUrl: './form-error.component.html',
-    animations: [
-        fadeAnimation
-    ],
+    template: `
+        <ng-container *ngIf="error">
+            <div class="form-alert form-alert-error" [innerHTML]="error"></div>
+        </ng-container>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FormErrorComponent {

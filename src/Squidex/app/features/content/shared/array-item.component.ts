@@ -40,6 +40,9 @@ export class ArrayItemComponent implements OnChanges {
     public form: EditContentForm;
 
     @Input()
+    public formContext: any;
+
+    @Input()
     public field: RootFieldDto;
 
     @Input()
@@ -50,6 +53,9 @@ export class ArrayItemComponent implements OnChanges {
 
     @Input()
     public isLast = false;
+
+    @Input()
+    public isDisabled = false;
 
     @Input()
     public index: number;
@@ -73,7 +79,7 @@ export class ArrayItemComponent implements OnChanges {
         }
 
         if (changes['itemForm'] || changes['field']) {
-            this.fieldControls = this.field.nested.map(field => ({ field, control: this.itemForm.get(field.name)! })).filter(x => !!x.control);
+            this.fieldControls = this.field.nested.map(field => ({ field, control: this.itemForm.get(field.name)! })).filter(x => !x.field.properties.isContentField || !!x.control);
         }
     }
 

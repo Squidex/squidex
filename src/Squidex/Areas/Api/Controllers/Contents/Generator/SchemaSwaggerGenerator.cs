@@ -40,7 +40,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             SchemaQueryDescription = NSwagHelper.LoadDocs("schemaquery");
         }
 
-        public SchemaSwaggerGenerator(SwaggerDocument document, string appName, string appPath, Schema schema, Func<string, JsonSchema4, JsonSchema4> schemaResolver, PartitionResolver partitionResolver)
+        public SchemaSwaggerGenerator(
+            SwaggerDocument document,
+            string appName,
+            string appPath,
+            Schema schema,
+            SchemaResolver schemaResolver,
+            PartitionResolver partitionResolver)
         {
             this.document = document;
 
@@ -271,6 +277,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private void AddSecurity(SwaggerOperation operation, string permission)
         {
+            if (operation.Security == null)
+            {
+                operation.Security = new List<SwaggerSecurityRequirement>();
+            }
+
             operation.Security.Add(new SwaggerSecurityRequirement
             {
                 [Constants.SecurityDefinition] = new[] { Permissions.ForApp(permission, appName, schemaPath).Id }

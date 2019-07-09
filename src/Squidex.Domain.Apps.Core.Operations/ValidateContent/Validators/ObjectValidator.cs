@@ -12,21 +12,25 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class ObjectValidator<TValue> : IValidator
     {
+        private static readonly IReadOnlyDictionary<string, TValue> DefaultValue = new Dictionary<string, TValue>();
         private readonly IDictionary<string, (bool IsOptional, IValidator Validator)> schema;
         private readonly bool isPartial;
         private readonly string fieldType;
-        private readonly TValue fieldDefault;
 
-        public ObjectValidator(IDictionary<string, (bool IsOptional, IValidator Validator)> schema, bool isPartial, string fieldType, TValue fieldDefault)
+        public ObjectValidator(IDictionary<string, (bool IsOptional, IValidator Validator)> schema, bool isPartial, string fieldType)
         {
             this.schema = schema;
-            this.fieldDefault = fieldDefault;
             this.fieldType = fieldType;
             this.isPartial = isPartial;
         }
 
         public async Task ValidateAsync(object value, ValidationContext context, AddError addError)
         {
+            if (value.IsNullOrUndefined())
+            {
+                value = DefaultValue;
+            }
+
             if (value is IReadOnlyDictionary<string, TValue> values)
             {
                 foreach (var fieldData in values)
@@ -45,17 +49,22 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
                 {
                     var name = field.Key;
 
-                    if (!values.TryGetValue(name, out var fieldValue))
+                    var (isOptional, validator) = field.Value;
+
+                    var fieldValue = Undefined.Value;
+
+                    if (!values.TryGetValue(name, out var temp))
                     {
                         if (isPartial)
                         {
                             continue;
                         }
-
-                        fieldValue = fieldDefault;
+                    }
+                    else
+                    {
+                        fieldValue = temp;
                     }
 
-                    var (isOptional, validator) = field.Value;
                     var fieldContext = context.Nested(name).Optional(isOptional);
 
                     tasks.Add(validator.ValidateAsync(fieldValue, fieldContext, addError));

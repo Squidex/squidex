@@ -43,6 +43,7 @@ namespace Squidex.Infrastructure.Assets
         public virtual async Task DownloadAsync(string fileName, Stream stream, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNull(stream, nameof(stream));
 
             if (!streams.TryGetValue(fileName, out var sourceStream))
             {
@@ -65,6 +66,7 @@ namespace Squidex.Infrastructure.Assets
         public virtual async Task UploadAsync(string fileName, Stream stream, bool overwrite = false, CancellationToken ct = default)
         {
             Guard.NotNullOrEmpty(fileName, nameof(fileName));
+            Guard.NotNull(stream, nameof(stream));
 
             var memoryStream = new MemoryStream();
 

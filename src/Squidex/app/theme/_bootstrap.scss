@@ -81,6 +81,26 @@
     border: 0;
 }
 
+.alert-hint {
+    @include border-radius(0);
+    background: lighten($color-theme-blue, 35%);
+    border: 1px solid $color-border;
+    font-size: 90%;
+    font-weight: normal;
+    color: $color-text;
+
+    .alert-link {
+        color: $color-text !important;
+    }
+
+    i {
+        color: $color-theme-blue;
+        font-size: 1.2rem;
+        font-weight: normal;
+        vertical-align: text-bottom;
+    }
+}
+
 a {
     &:disabled,
     &.disabled {
@@ -174,6 +194,20 @@ a {
                 color: $color-dark-foreground;
             }
         }
+    }
+}
+
+.dropdown-divider {
+    &:first-child {
+        display: none;
+    }
+
+    &:last-child {
+        display: none;
+    }
+
+    & + .dropdown-divider {
+        display: none;
     }
 }
 
@@ -435,15 +469,6 @@ a {
 // Restyle modal dialogs.
 //
 .modal {
-    &-content,
-    &-header {
-        border: 0;
-    }
-
-    &-backdrop {
-        @include opacity(.5);
-    }
-
     &-header,
     &-footer {
         @include flex-shrink(0);
@@ -457,8 +482,7 @@ a {
         & {
             @include border-radius-top(.25rem);
             background: $color-modal-header-background;
-            font-size: 1rem;
-            font-weight: normal;
+            border: 0;
             color: $color-modal-header-foreground;
         }
 
@@ -469,11 +493,7 @@ a {
 
         .close {
             & {
-                @include opacity(1);
-                @include text-shadow-none;
                 color: $color-modal-header-foreground;
-                font-size: 1.6rem;
-                font-weight: 400;
             }
 
             &:hover {

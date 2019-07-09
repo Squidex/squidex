@@ -78,6 +78,11 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             throw new InvalidCastException("Invalid json type, expected string.");
         }
 
+        public object Visit(IField<UIFieldProperties> field)
+        {
+            return value;
+        }
+
         public object Visit(IField<DateTimeFieldProperties> field)
         {
             if (value.Type == JsonValueType.String)

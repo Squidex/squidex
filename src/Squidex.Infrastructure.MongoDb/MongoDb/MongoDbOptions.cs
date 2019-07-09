@@ -9,6 +9,21 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public sealed class MongoDbOptions
     {
-        public bool IsCosmosDb { get; set; }
+        public MongoDbEngine Engine { get; set; } = MongoDbEngine.MongoDb;
+
+        public bool IsCosmosDb
+        {
+            get { return Engine == MongoDbEngine.CosmosDb; }
+        }
+
+        public bool IsDocumentDb
+        {
+            get { return Engine == MongoDbEngine.DocumentDb; }
+        }
+
+        public bool IsMongoDb
+        {
+            get { return Engine == MongoDbEngine.MongoDb; }
+        }
     }
 }

@@ -1,7 +1,7 @@
 @import '_mixins';
 @import '_vars';
 
-:host /deep/ {
+:host ::ng-deep {
     .color-picker {
         & {
             border-color: $color-border;
