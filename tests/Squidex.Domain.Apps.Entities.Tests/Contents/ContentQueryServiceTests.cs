@@ -465,7 +465,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             if (isFrontend)
             {
-                identity.AddClaim(new Claim(OpenIdClaims.ClientId, "squidex-frontend"));
+                identity.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
             }
 
             if (allowSchema)
