@@ -19,7 +19,8 @@ import {
 export class UserDto {
     constructor(
         public readonly id: string,
-        public readonly displayName: string
+        public readonly displayName: string,
+        public readonly email: string
     ) {
     }
 }
@@ -44,15 +45,16 @@ export class UsersService {
         const url = this.apiUrl.buildUrl(`api/users?query=${query || ''}`);
 
         return this.http.get<any[]>(url).pipe(
-            map(body => {
-                const users = body.map(item =>
-                    new UserDto(
-                        item.id,
-                        item.displayName));
+			map(body => {
+				const users = body.map(item =>
+					new UserDto(
+						item.id,
+						item.displayName,
+						item.email));
 
-                return users;
-            }),
-            pretifyError('Failed to load users. Please reload.'));
+				return users;
+			}),
+			pretifyError('Failed to load users. Please reload.'));
     }
 
     public getUser(id: string): Observable<UserDto> {
@@ -60,16 +62,17 @@ export class UsersService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                const user = new UserDto(
-                    body.id,
-                    body.displayName);
+				const user = new UserDto(
+					body.id,
+					body.displayName,
+					body.email);
 
                 return user;
             }),
             pretifyError('Failed to load user. Please reload.'));
     }
 
-    public getResources(): Observable<ResourcesDto> {
+   public getResources(): Observable<ResourcesDto> {
         const url = this.apiUrl.buildUrl(`api`);
 
         return this.http.get<{ _links: {} }>(url).pipe(

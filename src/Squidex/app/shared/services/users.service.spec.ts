@@ -49,18 +49,20 @@ describe('UsersService', () => {
         req.flush([
             {
                 id: '123',
-                displayName: 'User1'
+                displayName: 'User1',
+                email: 'email'
             },
             {
                 id: '456',
-                displayName: 'User2'
+                displayName: 'User2',
+                email: 'email'
             }
         ]);
 
         expect(users!).toEqual(
             [
-                new UserDto('123', 'User1'),
-                new UserDto('456', 'User2')
+                new UserDto('123', 'User1', 'email'),
+                new UserDto('456', 'User2', 'email')
             ]);
     }));
 
@@ -81,18 +83,20 @@ describe('UsersService', () => {
         req.flush([
             {
                 id: '123',
-                displayName: 'User1'
+                displayName: 'User1',
+                email: 'email'
             },
             {
                 id: '456',
-                displayName: 'User2'
+                displayName: 'User2',
+                email: 'email'
             }
         ]);
 
         expect(users!).toEqual(
             [
-                new UserDto('123', 'User1'),
-                new UserDto('456', 'User2')
+                new UserDto('123', 'User1', 'email'),
+                new UserDto('456', 'User2', 'email')
             ]);
     }));
 
@@ -110,9 +114,9 @@ describe('UsersService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({ id: '123', displayName: 'User1' });
+        req.flush({ id: '123', displayName: 'User1', email: 'email' });
 
-        expect(user!).toEqual(new UserDto('123', 'User1'));
+            expect(user!).toEqual(new UserDto('123', 'User1', 'email'));
     }));
 
     it('should make get request to get resources',

@@ -18,6 +18,9 @@
     <None Update="dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
+    <None Update="localhost.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +33,7 @@
     <ProjectReference Include="..\Squidex.Domain.Apps.Events\Squidex.Domain.Apps.Events.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users.MongoDb\Squidex.Domain.Users.MongoDb.csproj" />
+    <ProjectReference Include="..\Squidex.ICIS\Squidex.ICIS.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.Azure\Squidex.Infrastructure.Azure.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.GetEventStore\Squidex.Infrastructure.GetEventStore.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure.GoogleCloud\Squidex.Infrastructure.GoogleCloud.csproj" />

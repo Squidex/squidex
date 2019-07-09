@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="1.0.1.1" />
+    <PackageReference Include="Confluent.Kafka.Avro" Version="0.11.6" />
+    <PackageReference Include="Confluent.SchemaRegistry" Version="1.0.1.1" />
+    <PackageReference Include="Confluent.SchemaRegistry.Serdes" Version="1.0.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj" />
+    <ProjectReference Include="..\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
+    <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

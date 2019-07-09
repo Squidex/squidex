@@ -1,0 +1,14 @@
+{
+    "trigger":{
+       "schemas":[
+            {
+                "condition":"event.type == 'Published' || (event.type == 'Updated' && event.status == 'Published')"
+            }
+        ],
+       "handleAll":false,
+       "triggerType":"ContentChanged"
+    },
+    "action":{
+       "actionType":"ICISKafka"
+    }
+ }

@@ -16,19 +16,25 @@ import {
     WebStorageStateStore
 } from 'oidc-client';
 
-import { ApiUrlConfig, Types } from '@app/framework';
+import {
+    ApiUrlConfig,
+    Permission,
+    Types
+} from '@app/framework';
 
 export class Profile {
+    public readonly permissions: Permission[];
+
     public get id(): string {
         return this.user.profile['sub'];
     }
 
     public get email(): string {
-        return this.user.profile['email'];
+        return this.getEmail();
     }
 
     public get displayName(): string {
-        return this.user.profile['urn:squidex:name'];
+        return this.getUserName();
     }
 
     public get pictureUrl(): string {
@@ -47,9 +53,49 @@ export class Profile {
         return `subject:${this.id}`;
     }
 
+    private decodedToken: any;
+
     constructor(
         public readonly user: User
     ) {
+        this.parseJwt(this.user.access_token);
+        const permissions = this.getPermission();
+
+        if (Types.isArrayOfString(permissions)) {
+            this.permissions = permissions.map(x => new Permission(x));
+        } else if (Types.isString(permissions)) {
+            this.permissions = [new Permission(permissions)];
+        } else {
+            this.permissions = [];
+        }
+
+    }
+
+    private getPermission(): string[] {
+        const group = this.decodedToken['group'];
+
+        const adminUserGroup = ['ICIS_Darwin', 'ICIS_AppSupport', 'RBI-QHS-SECURITY-ICIS-APPLICATIONS-SUPPORT'];
+        const adminPermissions = ['squidex.*', 'squidex.admin.*', 'squidex.apps.commentary.*'];
+
+        if (Types.isArrayOfString(group) && group.some(item => adminUserGroup.includes(item))) {
+            return adminPermissions;
+        } else {
+            return this.user.profile['urn:squidex:permissions'];
+        }
+    }
+
+    private getUserName(): string {
+        return this.decodedToken['given_name'];
+    }
+
+    private getEmail(): string {
+        return this.decodedToken['email'];
+    }
+
+    private parseJwt(token: string): any {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        this.decodedToken = JSON.parse(window.atob(base64));
     }
 }
 
@@ -75,14 +121,14 @@ export class AuthService {
         Log.logger = console;
 
         this.userManager = new UserManager({
-            client_id: 'squidex-frontend',
-            scope: 'squidex-api openid profile email squidex-profile role permissions',
+            client_id: 'vega.cms',
+            scope: 'openid all',
             response_type: 'id_token token',
-            redirect_uri: apiUrl.buildUrl('login;'),
+            redirect_uri: apiUrl.buildUrl('login'),
             post_logout_redirect_uri: apiUrl.buildUrl('logout'),
             silent_redirect_uri: apiUrl.buildUrl('client-callback-silent'),
             popup_redirect_uri: apiUrl.buildUrl('client-callback-popup'),
-            authority: apiUrl.buildUrl('identity-server/'),
+            authority: 'https://identityservice.systest.tesla.cha.rbxd.ds/',
             userStore: new WebStorageStateStore({ store: window.localStorage || window.sessionStorage }),
             automaticSilentRenew: true
         });
@@ -103,7 +149,7 @@ export class AuthService {
     }
 
     public logoutRedirect() {
-        this.userManager.signoutRedirect();
+       this.userManager.signoutRedirect();
     }
 
     public loginRedirect() {

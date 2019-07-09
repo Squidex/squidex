@@ -1,0 +1,41 @@
+version: '2.1'
+services:
+  squidex_mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - /etc/squidex/mongo/db:/data/db
+    networks:
+      - internal
+    restart: unless-stopped
+
+  squidex_squidex:
+    image: "nexus.cha.rbxd.ds:8000/vega-cms-app-dev:latest"
+    ports:
+      - "5000:5000"
+    environment:
+      - URLS__BASEURL=${SQUIDEX_PROTOCOL}://${SQUIDEX_DOMAIN}/
+      - URLS__ENFORCEHTTPS=${SQUIDEX_FORCE_HTTPS}
+      - EVENTSTORE__CONSUME=true
+      - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://squidex_mongo
+      - STORE__MONGODB__CONFIGURATION=mongodb://squidex_mongo
+      - IDENTITY__ADMINEMAIL=${SQUIDEX_ADMINEMAIL}
+      - IDENTITY__ADMINPASSWORD=${SQUIDEX_ADMINPASSWORD}
+      - IDENTITY__GOOGLECLIENT=${SQUIDEX_GOOGLECLIENT}
+      - IDENTITY__GOOGLESECRET=${SQUIDEX_GOOGLESECRET}
+      - IDENTITY__MICROSOFTCLIENT=${SQUIDEX_MICROSOFTCLIENT}
+      - IDENTITY__MICROSOFTSECRET=${SQUIDEX_MICROSOFTSECRET}
+      - LETSENCRYPT_HOST=${SQUIDEX_DOMAIN}
+      - LETSENCRYPT_EMAIL=${SQUIDEX_ADMINEMAIL}
+    depends_on:
+      - squidex_mongo
+    volumes:
+      - /etc/squidex/assets:/app/Assets
+    networks:
+      - internal
+    restart: unless-stopped
+    
+networks:
+  internal:
+    driver: bridge

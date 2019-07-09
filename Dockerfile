@@ -1,27 +1,16 @@
 #
 # Stage 1, Prebuild
 #
-FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as builder
-
-ARG SQUIDEX__VERSION=1.0.0
+FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder
 
 WORKDIR /src
 
-# Copy Node project files.
 COPY src/Squidex/package*.json /tmp/
 
 # Install Node packages 
 RUN cd /tmp && npm install --loglevel=error
 
-# Copy nuget project files.
-COPY /**/**/*.csproj /tmp/
-# Copy nuget.config for package sources.
-COPY NuGet.Config /tmp/
-
-# Install nuget packages
-RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p --verbosity quiet; true; done; popd'
-
-COPY . .
+COPY src/Squidex src/Squidex
 
 # Build Frontend
 RUN cp -a /tmp/node_modules src/Squidex/ \
@@ -30,19 +19,27 @@ RUN cp -a /tmp/node_modules src/Squidex/ \
  && npm run build
  
 # Test Backend
-RUN dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj --filter Category!=Dependencies \ 
- && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj \ 
- && dotnet test tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj \
- && dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj \
- && dotnet test tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj
+FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder_backend
+
+WORKDIR /src
+
+COPY src/**/*.csproj /tmp/
+COPY tests/**/*.csproj /tmp/
+RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p; true; done; popd'
+
+COPY . .
+
+RUN dotnet restore && dotnet test -s ../../.runsettings --filter Category!=Dependencies
+
+COPY --from=builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
 
 # Publish
-RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64 -p:version=$SQUIDEX__VERSION
+RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release
 
 #
 # Stage 2, Build runtime
 #
-FROM microsoft/dotnet:2.2-runtime-deps-alpine
+FROM nexus.cha.rbxd.ds:8000/dotnet/core/runtime:2.2.5-alpine3.9
 
 # Default AspNetCore directory
 WORKDIR /app
@@ -55,9 +52,13 @@ RUN apk update \
  && ln -s /usr/lib/libuv.so.1 /usr/lib/libuv.so
 
 # Copy from build stage
-COPY --from=builder /out/alpine .
+COPY --from=builder_backend /out/alpine .
+COPY src/Squidex/cha-ca.cer /usr/local/share/ca-certificates/cha-ca.cer
+
+RUN update-ca-certificates
 
 EXPOSE 80
+EXPOSE 5000
 EXPOSE 11111
 
-ENTRYPOINT ["./Squidex"]
+ENTRYPOINT ["dotnet","./Squidex.dll"] 

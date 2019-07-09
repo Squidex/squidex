@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.IO;
+using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -21,8 +22,9 @@ namespace Squidex
             BuildWebHost(args).Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            new WebHostBuilder()
+        public static IWebHost BuildWebHost(string[] args)
+        {
+            return new WebHostBuilder()
                 .UseKestrel(k => { k.AddServerHeader = false; })
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIIS()
@@ -44,6 +46,14 @@ namespace Squidex
 
                     builder.AddCommandLine(args);
                 })
+                .ConfigureKestrel((hostContext, options) =>
+                {
+                    options.Listen(
+                        IPAddress.Any,
+                        hostContext.Configuration.GetValue<int>("hostings:devPort"),
+                        listenOptions => listenOptions.UseHttps("localhost.pfx", "password"));
+                })
                 .Build();
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace Squidex.Web
 
         public static readonly string ProfileScope = "squidex-profile";
 
-        public static readonly string FrontendClient = "squidex-frontend";
+        public static readonly string FrontendClient = "vega.cms";
 
         public static readonly string InternalClientId = "squidex-internal";
 
