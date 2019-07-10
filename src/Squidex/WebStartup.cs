@@ -62,9 +62,6 @@ namespace Squidex
             services.AddOptions();
 
             services.AddMyAssetServices(config);
-            var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
-            services.AddGenesisAuthentication(identityOptions.ICISAuthServer);
-            services.AddKafkaRuleExtention(config);
 
             IdentityModelEventSource.ShowPII = true;
 
@@ -125,6 +122,10 @@ namespace Squidex
             services.AddHostedService<MigratorHost>();
             services.AddHostedService<MigrationRebuilderHost>();
             services.AddHostedService<BackgroundHost>();
+
+            var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
+            services.AddGenesisAuthentication(identityOptions.ICISAuthServer);
+            services.AddKafkaRuleExtention(config);
 
             return services.BuildServiceProvider();
         }
