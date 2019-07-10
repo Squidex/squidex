@@ -13,13 +13,10 @@ namespace Squidex.ICIS.Kafka.Consumer
 {
     public class KafkaConsumer<T> : IKafkaConsumer<T>
     {
-        private readonly CachedSchemaRegistryClient schemaRegistry;
         private readonly IConsumer<string, T> consumer;
 
-        public KafkaConsumer(IOptions<ICISKafkaOptions> options, ConsumerOptions consumerOptions, ILogger<KafkaConsumer<T>> log)
+        public KafkaConsumer(IOptions<ICISKafkaOptions> options, ConsumerOptions consumerOptions, ISchemaRegistryClient schemaRegistry, ILogger<KafkaConsumer<T>> log)
         {
-            schemaRegistry = new CachedSchemaRegistryClient(options.Value.SchemaRegistry);
-
             var topicName = consumerOptions.SchemaName;
 
             if (consumerOptions.TopicName != null)
@@ -60,7 +57,6 @@ namespace Squidex.ICIS.Kafka.Consumer
 
         public void Dispose()
         {
-            schemaRegistry.Dispose();
             consumer.Dispose();
         }
     }

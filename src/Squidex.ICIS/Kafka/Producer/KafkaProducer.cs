@@ -19,13 +19,10 @@ namespace Squidex.ICIS.Kafka.Producer
 {
     public class KafkaProducer<T> : IKafkaProducer<T> where T : ISpecificRecord
     {
-        private readonly CachedSchemaRegistryClient schemaRegistry;
         private readonly IProducer<string, T> producer;
 
-        public KafkaProducer(IOptions<ICISKafkaOptions> options, ILogger<KafkaProducer<T>> log)
+        public KafkaProducer(IOptions<ICISKafkaOptions> options, ISchemaRegistryClient schemaRegistry, ILogger<KafkaProducer<T>> log)
         {
-            schemaRegistry = new CachedSchemaRegistryClient(options.Value.SchemaRegistry);
-
             producer = new ProducerBuilder<string, T>(options.Value.Producer)
                 .SetKeySerializer(Serializers.Utf8)
                 .SetValueSerializer(new AvroSerializer<T>(schemaRegistry))
@@ -48,7 +45,6 @@ namespace Squidex.ICIS.Kafka.Producer
 
         public void Dispose()
         {
-            schemaRegistry?.Dispose();
             producer?.Dispose();
         }
     }

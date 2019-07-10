@@ -6,9 +6,11 @@
 // ==========================================================================
 
 using Avro.Generic;
+using Confluent.SchemaRegistry;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Squidex.ICIS.Handlers;
@@ -23,6 +25,14 @@ namespace Squidex.ICIS.Extensions
 {
     public static class ServiceCollectionExtension
     {
+        public static void AddIcisServices(this IServiceCollection services, IConfiguration config)
+        {
+            // Create MyIdentityOptionExtension and call GenesisAuth from here
+            services.Configure<ICISKafkaOptions>(config.GetSection("kafka"));
+            services.AddKafkaRuleExtention(config);
+            services.AddKafkaConsumers(config);
+        }
+
         public static void AddGenesisAuthentication(this IServiceCollection services, string authServer)
         {
             services.AddSingleton<IUserManager, UserManager>();
@@ -50,6 +60,8 @@ namespace Squidex.ICIS.Extensions
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsProducerConfigured())
             {
+                services.TryAddSingleton<ISchemaRegistryClient>(c => new CachedSchemaRegistryClient(kafkaOptions.SchemaRegistry));
+
                 services.AddSingleton<KafkaProducer<Commentary>>();
                 services.AddSingleton<KafkaProducer<CommentaryType>>();
                 services.AddSingleton<KafkaProducer<Commodity>>();
@@ -63,6 +75,8 @@ namespace Squidex.ICIS.Extensions
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsConsumerConfigured())
             {
+                services.TryAddSingleton<ISchemaRegistryClient>(c => new CachedSchemaRegistryClient(kafkaOptions.SchemaRegistry));
+
                 var consumerServices = config.GetSection("kafka:consumers").GetChildren();
 
                 foreach (var service in consumerServices)

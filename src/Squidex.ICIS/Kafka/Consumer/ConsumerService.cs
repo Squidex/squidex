@@ -32,10 +32,10 @@ namespace Squidex.ICIS.Kafka.Consumer
         private readonly IContentQueryService contentQuery;
         private readonly ISemanticLog log;
         private readonly Dictionary<string, Guid> contentIds = new Dictionary<string, Guid>();
+        private readonly RefToken actor;
+        private readonly ClaimsPrincipal user = CreateUser();
         private IAppEntity app;
         private NamedId<Guid> schemaId;
-        private RefToken actor;
-        private ClaimsPrincipal user;
         private Task consumerTask;
 
         public ConsumerService(ConsumerOptions options, IKafkaConsumer<GenericRecord> consumer, ICommandBus commandBus, IAppProvider appProvider, IContentQueryService contentQuery, ISemanticLog log)
@@ -46,17 +46,12 @@ namespace Squidex.ICIS.Kafka.Consumer
             this.appProvider = appProvider;
             this.contentQuery = contentQuery;
             this.log = log;
+
+            actor = new RefToken(RefTokenType.Client, options.ClientName);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            // TODO: Make field variables.
-            actor = new RefToken(RefTokenType.Client, options.ClientName);
-
-            var identity = new ClaimsIdentity();
-            identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
-            user = new ClaimsPrincipal(identity);
-
             consumerTask = new Task(async () =>
             {
                 while (!cts.IsCancellationRequested)
@@ -104,25 +99,30 @@ namespace Squidex.ICIS.Kafka.Consumer
 
                                 var schemaField = new UpsertSchemaField
                                 {
-                                    Name = field.Name,
-
+                                    Name = MapName(field.Name)
                                 };
 
                                 switch (type)
                                 {
                                     case Avro.Schema.Type.Boolean:
                                         schemaField.Properties = new BooleanFieldProperties
-                                            {IsListField = contentConsumedFields.Count <= 3};
+                                        {
+                                            IsListField = contentConsumedFields.Count <= 3
+                                        };
                                         break;
                                     case Avro.Schema.Type.String:
                                         schemaField.Properties = new StringFieldProperties
-                                            { IsListField = contentConsumedFields.Count <= 3}; 
+                                        {
+                                            IsListField = contentConsumedFields.Count <= 3
+                                        };
                                         break;
                                     case Avro.Schema.Type.Int:
                                     case Avro.Schema.Type.Float:
                                     case Avro.Schema.Type.Double:
                                         schemaField.Properties = new NumberFieldProperties
-                                        { IsListField = contentConsumedFields.Count <= 3 };
+                                        {
+                                            IsListField = contentConsumedFields.Count <= 3
+                                        };
                                         break;
                                     default:
                                         throw new NotSupportedException();
@@ -140,7 +140,7 @@ namespace Squidex.ICIS.Kafka.Consumer
                         {
                             var queryContext = QueryContext.Create(app, user, actor.Identifier);
 
-                            var contents = await contentQuery.QueryAsync(queryContext, options.SchemaName, Q.Empty.WithODataQuery($"$filter=data/id/iv eq '{contentConsumedId}'"));
+                            var contents = await contentQuery.QueryAsync(queryContext, options.SchemaName, Q.Empty.WithODataQuery($"$filter=data/ID/iv eq '{contentConsumedId}'"));
                             var contentFound = contents.FirstOrDefault();
 
                             if (contentFound != null)
@@ -165,7 +165,7 @@ namespace Squidex.ICIS.Kafka.Consumer
                         {
                             foreach (var field in contentConsumedFields)
                             {
-                                data.AddField(field.Name,
+                                data.AddField(MapName(field.Name),
                                     new ContentFieldData()
                                         .AddValue(contentConsumed.Value[field.Name]));
 
@@ -217,11 +217,35 @@ namespace Squidex.ICIS.Kafka.Consumer
             return Task.CompletedTask;
         }
 
+        private static string MapName(string name)
+        {
+            if (string.Equals(name, "id", StringComparison.OrdinalIgnoreCase))
+            {
+                name = "ID";
+            }
+            else
+            {
+                // name => Name, first_name => FirstName
+                name = name.ToPascalCase();
+            }
+
+            return name;
+        }
+
         public Task StopAsync(CancellationToken cancellationToken)
         {
             cts.Cancel();
 
             return consumerTask;
+        }
+
+        private static ClaimsPrincipal CreateUser()
+        {
+            var identity = new ClaimsIdentity();
+
+            identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
+
+            return new ClaimsPrincipal(identity);
         }
     }
 }
