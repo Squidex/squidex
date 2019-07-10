@@ -39,7 +39,7 @@ namespace Squidex.ICIS.Kafka.Services
             commentary.LastModified = contentEvent.LastModified.ToUnixTimeSeconds();
             commentary.CreatedFor = contentEvent.Created.ToUnixTimeSeconds();
 
-            if (!contentEvent.Data.TryGetValue("Body", out var bodyData))
+            if (!contentEvent.Data.TryGetValue("body", out var bodyData))
             {
                 throw new Exception("Unable to find Body field.");
             }
