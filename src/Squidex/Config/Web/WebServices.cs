@@ -50,7 +50,7 @@ namespace Squidex.Config.Web
                 .As<IContextProvider>();
 
             services.AddSingletonAs<ApiPermissionUnifier>()
-                .As<IClaimsTransformation>();
+                .AsOptional<IClaimsTransformation>();
 
             services.AddMvc(options =>
             {
