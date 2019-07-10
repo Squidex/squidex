@@ -11,6 +11,7 @@ import { FormBuilder } from '@angular/forms';
 import {
     createProperties,
     DialogModel,
+    DialogService,
     EditFieldForm,
     fadeAnimation,
     ImmutableArray,
@@ -53,6 +54,7 @@ export class FieldComponent implements OnChanges {
     public addFieldDialog = new DialogModel();
 
     constructor(
+        private readonly dialogs: DialogService,
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
     ) {
@@ -115,6 +117,8 @@ export class FieldComponent implements OnChanges {
             this.schemasState.updateField(this.schema, this.field, { properties })
                 .subscribe(() => {
                     this.editForm.submitCompleted();
+
+                    this.dialogs.notifyInfo('Field saved successfully.');
                 }, error => {
                     this.editForm.submitFailed(error);
                 });

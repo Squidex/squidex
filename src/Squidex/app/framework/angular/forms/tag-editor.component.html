@@ -3,7 +3,7 @@
     [class.focus]="snapshot.hasFocus" 
     [class.disabled]="addInput.disabled">
     <span class="item" *ngFor="let item of snapshot.items; let i = index" [class.disabled]="addInput.disabled">
-        {{item}} <i class="icon-close" *ngIf="!addInput.disabled" (click)="remove(i)"></i>
+        {{item}} <i class="icon-close" (click)="remove(i)"></i>
     </span>
 
     <input type="text" class="blank" #input
