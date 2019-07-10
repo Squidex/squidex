@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
+using Squidex.ICIS;
 using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
 using Squidex.Web;
@@ -50,6 +51,9 @@ namespace Squidex.Config.Web
                 .As<IContextProvider>();
 
             services.AddSingletonAs<ApiPermissionUnifier>()
+                .As<IClaimsTransformation>();
+
+            services.AddSingletonAs<ClaimsTransformer>()
                 .As<IClaimsTransformation>();
 
             services.AddMvc(options =>
