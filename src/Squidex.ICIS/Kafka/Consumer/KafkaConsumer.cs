@@ -16,15 +16,15 @@ namespace Squidex.ICIS.Kafka.Consumer
         private readonly CachedSchemaRegistryClient schemaRegistry;
         private readonly IConsumer<string, T> consumer;
 
-        public KafkaConsumer(IOptions<ICISKafkaOptions> options, ConsumerOptions commodityConsumerOptions, ILogger<KafkaConsumer<T>> log)
+        public KafkaConsumer(IOptions<ICISKafkaOptions> options, ConsumerOptions consumerOptions, ILogger<KafkaConsumer<T>> log)
         {
             schemaRegistry = new CachedSchemaRegistryClient(options.Value.SchemaRegistry);
 
-            var topicName = commodityConsumerOptions.SchemaName;
+            var topicName = consumerOptions.SchemaName;
 
-            if (commodityConsumerOptions.TopicName != null)
+            if (consumerOptions.TopicName != null)
             {
-                topicName = commodityConsumerOptions.TopicName;
+                topicName = consumerOptions.TopicName;
             }
 
             var config = new ConsumerConfig(options.Value.Consumer)
@@ -37,9 +37,9 @@ namespace Squidex.ICIS.Kafka.Consumer
                 config.GroupId = $"cosmos-{Guid.NewGuid()}";
             }
 
-            if (!string.IsNullOrWhiteSpace(commodityConsumerOptions.GroupId))
+            if (!string.IsNullOrWhiteSpace(consumerOptions.GroupId))
             {
-                config.GroupId = commodityConsumerOptions.GroupId;
+                config.GroupId = consumerOptions.GroupId;
             }
 
             consumer = new ConsumerBuilder<string, T>(config)

@@ -63,11 +63,11 @@ namespace Squidex.ICIS.Extensions
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsConsumerConfigured())
             {
-                var sections = config.GetSection("kafka:consumers").GetChildren();
+                var consumerServices = config.GetSection("kafka:consumers").GetChildren();
 
-                foreach (var section in sections)
+                foreach (var service in consumerServices)
                 { 
-                    var option = section.Get<ConsumerOptions>();
+                    var option = service.Get<ConsumerOptions>();
 
                     services.AddSingleton<IHostedService>(c =>
                     {

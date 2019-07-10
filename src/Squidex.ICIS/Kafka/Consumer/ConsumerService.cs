@@ -32,8 +32,10 @@ namespace Squidex.ICIS.Kafka.Consumer
         private readonly IContentQueryService contentQuery;
         private readonly ISemanticLog log;
         private readonly Dictionary<string, Guid> contentIds = new Dictionary<string, Guid>();
-        private IAppEntity app; // 
+        private IAppEntity app;
         private NamedId<Guid> schemaId;
+        private RefToken actor;
+        private ClaimsPrincipal user;
         private Task consumerTask;
 
         public ConsumerService(ConsumerOptions options, IKafkaConsumer<GenericRecord> consumer, ICommandBus commandBus, IAppProvider appProvider, IContentQueryService contentQuery, ISemanticLog log)
@@ -49,12 +51,11 @@ namespace Squidex.ICIS.Kafka.Consumer
         public Task StartAsync(CancellationToken cancellationToken)
         {
             // TODO: Make field variables.
-            var actor = new RefToken(RefTokenType.Client, options.ClientName);
+            actor = new RefToken(RefTokenType.Client, options.ClientName);
 
-            var usedIdentity = new ClaimsIdentity();
-            var user = new ClaimsPrincipal(usedIdentity);
-
-            usedIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
+            var identity = new ClaimsIdentity();
+            identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
+            user = new ClaimsPrincipal(identity);
 
             consumerTask = new Task(async () =>
             {
@@ -110,15 +111,18 @@ namespace Squidex.ICIS.Kafka.Consumer
                                 switch (type)
                                 {
                                     case Avro.Schema.Type.Boolean:
-                                        schemaField.Properties = new BooleanFieldProperties { IsListField = contentConsumedFields.Count <= 3 }
+                                        schemaField.Properties = new BooleanFieldProperties
+                                            {IsListField = contentConsumedFields.Count <= 3};
                                         break;
                                     case Avro.Schema.Type.String:
-                                        schemaField.Properties = new StringFieldProperties(); // TODO ^
+                                        schemaField.Properties = new StringFieldProperties
+                                            { IsListField = contentConsumedFields.Count <= 3}; 
                                         break;
                                     case Avro.Schema.Type.Int:
                                     case Avro.Schema.Type.Float:
                                     case Avro.Schema.Type.Double:
-                                        schemaField.Properties = new NumberFieldProperties(); // TODO ^
+                                        schemaField.Properties = new NumberFieldProperties
+                                        { IsListField = contentConsumedFields.Count <= 3 };
                                         break;
                                     default:
                                         throw new NotSupportedException();
