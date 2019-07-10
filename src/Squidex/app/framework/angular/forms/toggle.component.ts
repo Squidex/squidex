@@ -28,6 +28,10 @@ export class ToggleComponent extends StatefulControlComponent<State, boolean | n
     @Input()
     public threeStates = false;
 
+    public set disabled(value: boolean) {
+        this.setDisabledState(value);
+    }
+
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, {
             isChecked: null

@@ -44,9 +44,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             Assert.True(result.Contains("*"));
             Assert.True(result.Contains("clients.read"));
-            Assert.True(result.Contains("schemas.*.read"));
-            Assert.True(result.Contains("schemas.schema1.read"));
-            Assert.True(result.Contains("schemas.schema2.read"));
+            Assert.True(result.Contains("schemas.*.update"));
+            Assert.True(result.Contains("schemas.schema1.update"));
+            Assert.True(result.Contains("schemas.schema2.update"));
         }
 
         private static ISchemaEntity CreateSchema(string name)

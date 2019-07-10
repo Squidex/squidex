@@ -40,19 +40,19 @@ export class NewsService {
         const url = this.apiUrl.buildUrl(`api/news/features?version=${version}`);
 
         return this.http.get<any>(url).pipe(
-                map(body => {
-                    const items: any[] = body.features;
+            map(body => {
+                const items: any[] = body.features;
 
-                    const features = new FeaturesDto(
-                        items.map(item =>
-                            new FeatureDto(
-                                item.name,
-                                item.text)
-                        ),
-                        body.version);
+                const features = new FeaturesDto(
+                    items.map(item =>
+                        new FeatureDto(
+                            item.name,
+                            item.text)
+                    ),
+                    body.version);
 
-                    return features;
-                }),
-                pretifyError('Failed to load features. Please reload.'));
+                return features;
+            }),
+            pretifyError('Failed to load features. Please reload.'));
     }
 }

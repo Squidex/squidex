@@ -26,7 +26,7 @@
                 </sqx-client>
             </ng-container>
 
-            <div class="table-items-footer">
+            <div class="table-items-footer" *ngIf="clientsState.canCreate | async">
                 <form [formGroup]="addClientForm.form" (ngSubmit)="attachClient()">
                     <div class="row no-gutters">
                         <div class="col">

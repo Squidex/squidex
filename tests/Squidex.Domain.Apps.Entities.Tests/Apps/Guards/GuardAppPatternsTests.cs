@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public void CanAdd_should_not_throw_exception_if_success()
+        public void CanAdd_should_not_throw_exception_if_command_is_valid()
         {
             var command = new AddPattern { PatternId = patternId, Name = "any", Pattern = ".*" };
 
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public void CanDelete_should_not_throw_exception_if_success()
+        public void CanDelete_should_not_throw_exception_if_command_is_valid()
         {
             var patterns_1 = patterns_0.Add(patternId, "any", ".*", "Message");
 

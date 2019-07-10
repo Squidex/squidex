@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(EntityCreatedResult.Create(Id, 0));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(AppId, sut.Snapshot.AppId.Id);
 
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(EntityCreatedResult.Create(Id, 0));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             var @event = (SchemaCreated)LastEvents.Single().Payload;
 
@@ -125,7 +125,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.Properties, sut.Snapshot.SchemaDef.Properties);
 
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -167,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(sut.Snapshot.SchemaDef.IsPublished);
 
@@ -187,7 +187,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(sut.Snapshot.SchemaDef.IsPublished);
 
@@ -206,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.Name, sut.Snapshot.SchemaDef.Category);
 
@@ -231,7 +231,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.PreviewUrls, sut.Snapshot.SchemaDef.PreviewUrls);
 
@@ -271,7 +271,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(3));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -291,7 +291,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(4));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -308,7 +308,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(EntityCreatedResult.Create(1, 1));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.Properties, GetField(1).RawProperties);
 
@@ -328,10 +328,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(EntityCreatedResult.Create(2, 2));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.NotEqual(command.Properties, GetField(1).RawProperties);
-            Assert.Equal(command.Properties, GetNestedField(1, 2).RawProperties);
+            Assert.Same(command.Properties, GetNestedField(1, 2).RawProperties);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -349,7 +348,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(command.Properties, GetField(1).RawProperties);
 
@@ -370,10 +369,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(3));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.NotEqual(command.Properties, GetField(1).RawProperties);
-            Assert.Equal(command.Properties, GetNestedField(1, 2).RawProperties);
+            Assert.Same(command.Properties, GetNestedField(1, 2).RawProperties);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -391,7 +389,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(GetField(1).IsDisabled);
 
@@ -412,9 +410,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(3));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.False(GetField(1).IsLocked);
             Assert.True(GetNestedField(1, 2).IsLocked);
 
             LastEvents
@@ -433,7 +430,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(GetField(1).IsHidden);
 
@@ -454,9 +451,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(3));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.False(GetField(1).IsHidden);
             Assert.True(GetNestedField(1, 2).IsHidden);
 
             LastEvents
@@ -476,7 +472,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(3));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(GetField(1).IsHidden);
 
@@ -498,9 +494,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(4));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.False(GetField(1).IsHidden);
             Assert.False(GetNestedField(1, 2).IsHidden);
 
             LastEvents
@@ -519,7 +514,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(GetField(1).IsDisabled);
 
@@ -540,9 +535,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(3));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.False(GetField(1).IsDisabled);
             Assert.True(GetNestedField(1, 2).IsDisabled);
 
             LastEvents
@@ -562,7 +556,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(3));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(GetField(1).IsDisabled);
 
@@ -584,9 +578,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(4));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.False(GetField(1).IsDisabled);
             Assert.False(GetNestedField(1, 2).IsDisabled);
 
             LastEvents
@@ -605,7 +598,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(2));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Null(GetField(1));
 
@@ -626,9 +619,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(3));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.NotNull(GetField(1));
             Assert.Null(GetNestedField(1, 2));
 
             LastEvents
@@ -661,7 +653,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(4));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.NotNull(GetField(1));
             Assert.Equal(command.Category, sut.Snapshot.SchemaDef.Category);

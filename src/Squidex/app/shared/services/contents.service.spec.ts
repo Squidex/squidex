@@ -15,6 +15,8 @@ import {
     ContentsDto,
     ContentsService,
     DateTime,
+    Resource,
+    ResourceLinks,
     ScheduleDto,
     Version,
     Versioned
@@ -45,11 +47,11 @@ describe('ContentsService', () => {
 
         let contents: ContentsDto;
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, undefined, 'Archived').subscribe(result => {
+        contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, undefined, ['Draft', 'Published']).subscribe(result => {
             contents = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&status=Archived');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&status=Draft&status=Published');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -57,56 +59,19 @@ describe('ContentsService', () => {
         req.flush({
             total: 10,
             items: [
-                {
-                    id: 'id1',
-                    status: 'Published',
-                    created: '2016-12-12T10:10',
-                    createdBy: 'Created1',
-                    lastModified: '2017-12-12T10:10',
-                    lastModifiedBy: 'LastModifiedBy1',
-                    scheduleJob: {
-                        status: 'Draft',
-                        scheduledBy: 'Scheduler1',
-                        dueTime: '2018-12-12T10:10'
-                    },
-                    isPending: true,
-                    version: 11,
-                    data: {},
-                    dataDraft: {}
-                },
-                {
-                    id: 'id2',
-                    status: 'Published',
-                    created: '2016-10-12T10:10',
-                    createdBy: 'Created2',
-                    lastModified: '2017-10-12T10:10',
-                    lastModifiedBy: 'LastModifiedBy2',
-                    version: 22,
-                    data: {},
-                    dataDraft: {}
-                }
-            ]
+                contentResponse(12),
+                contentResponse(13)
+            ],
+            statuses: [{
+                status: 'Draft', color: 'Gray'
+            }]
         });
 
         expect(contents!).toEqual(
-            new ContentsDto(10, [
-                new ContentDto('id1', 'Published',
-                    DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
-                    DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
-                    new ScheduleDto('Draft', 'Scheduler1', DateTime.parseISO_UTC('2018-12-12T10:10')),
-                    true,
-                    {},
-                    {},
-                    new Version('11')),
-                new ContentDto('id2', 'Published',
-                    DateTime.parseISO_UTC('2016-10-12T10:10'), 'Created2',
-                    DateTime.parseISO_UTC('2017-10-12T10:10'), 'LastModifiedBy2',
-                    null,
-                    false,
-                    {},
-                    {},
-                    new Version('22'))
-        ]));
+            new ContentsDto([{ status: 'Draft', color: 'Gray' }], 10, [
+                createContent(12),
+                createContent(13)
+            ]));
     }));
 
     it('should append query to get request as search',
@@ -114,7 +79,7 @@ describe('ContentsService', () => {
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, 'my-query').subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$search="my-query"&$top=17&$skip=13&status=PublishedDraft');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$search="my-query"&$top=17&$skip=13');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -127,7 +92,7 @@ describe('ContentsService', () => {
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, ['id1', 'id2']).subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&ids=id1,id2&status=PublishedDraft');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&ids=id1,id2');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -140,7 +105,7 @@ describe('ContentsService', () => {
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, '$filter=my-filter').subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$filter=my-filter&$top=17&$skip=13&status=PublishedDraft');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$filter=my-filter&$top=17&$skip=13');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -162,36 +127,9 @@ describe('ContentsService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({
-            id: 'id1',
-            status: 'Published',
-            created: '2016-12-12T10:10',
-            createdBy: 'Created1',
-            lastModified: '2017-12-12T10:10',
-            lastModifiedBy: 'LastModifiedBy1',
-            scheduleJob: {
-                status: 'Draft',
-                scheduledBy: 'Scheduler1',
-                dueTime: '2018-12-12T10:10'
-            },
-            isPending: true,
-            data: {},
-            dataDraft: {}
-        }, {
-            headers: {
-                etag: '2'
-            }
-        });
+        req.flush(contentResponse(12));
 
-        expect(content!).toEqual(
-            new ContentDto('id1', 'Published',
-                DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
-                DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
-                new ScheduleDto('Draft', 'Scheduler1', DateTime.parseISO_UTC('2018-12-12T10:10')),
-                true,
-                {},
-                {},
-                new Version('2')));
+        expect(content!).toEqual(createContent(12));
     }));
 
     it('should make post request to create content',
@@ -210,30 +148,9 @@ describe('ContentsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({
-            id: 'id1',
-            status: 'Published',
-            created: '2016-12-12T10:10',
-            createdBy: 'Created1',
-            lastModified: '2017-12-12T10:10',
-            lastModifiedBy: 'LastModifiedBy1',
-            isPending: false,
-            data: {}
-        }, {
-            headers: {
-                etag: '2'
-            }
-        });
+        req.flush(contentResponse(12));
 
-        expect(content!).toEqual(
-            new ContentDto('id1', 'Published',
-                DateTime.parseISO_UTC('2016-12-12T10:10'), 'Created1',
-                DateTime.parseISO_UTC('2017-12-12T10:10'), 'LastModifiedBy1',
-                null,
-                false,
-                null,
-                {},
-                new Version('2')));
+        expect(content!).toEqual(createContent(12));
     }));
 
     it('should make get request to get versioned content data',
@@ -262,14 +179,26 @@ describe('ContentsService', () => {
 
         const dto = {};
 
-        contentsService.putContent('my-app', 'my-schema', 'content1', dto, true, version).subscribe();
+        const resource: Resource = {
+            _links: {
+                update: { method: 'PUT', href: '/api/content/my-app/my-schema/content1?asDraft=true' }
+            }
+        };
+
+        let content: ContentDto;
+
+        contentsService.putContent('my-app', resource, dto, version).subscribe(result => {
+            content = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1?asDraft=true');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush({});
+        req.flush(contentResponse(12));
+
+        expect(content!).toEqual(createContent(12));
     }));
 
     it('should make patch request to update content',
@@ -277,61 +206,140 @@ describe('ContentsService', () => {
 
         const dto = {};
 
-        contentsService.patchContent('my-app', 'my-schema', 'content1', dto, version).subscribe();
+        const resource: Resource = {
+            _links: {
+                patch: { method: 'PATCH', href: '/api/content/my-app/my-schema/content1' }
+            }
+        };
+
+        let content: ContentDto;
+
+        contentsService.patchContent('my-app', resource, dto, version).subscribe(result => {
+            content = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1');
 
         expect(req.request.method).toEqual('PATCH');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush({});
+        req.flush(contentResponse(12));
+
+        expect(content!).toEqual(createContent(12));
     }));
 
-    it('should make put request to discard changes',
+    it('should make put request to discard draft',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        contentsService.discardChanges('my-app', 'my-schema', 'content1', version).subscribe();
+        const resource: Resource = {
+            _links: {
+                ['draft/discard']: { method: 'PUT', href: '/api/content/my-app/my-schema/content1/discard' }
+            }
+        };
+
+        let content: ContentDto;
+
+        contentsService.discardDraft('my-app', resource, version).subscribe(result => {
+            content = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/discard');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-        req.flush({});
+        req.flush(contentResponse(12));
+
+        expect(content!).toEqual(createContent(12));
+    }));
+
+    it('should make put request to propose draft',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const dto = {};
+
+        const resource: Resource = {
+            _links: {
+                ['draft/propose']: { method: 'PUT', href: '/api/content/my-app/my-schema/content1/status' }
+            }
+        };
+
+        let content: ContentDto;
+
+        contentsService.proposeDraft('my-app', resource, dto, version).subscribe(result => {
+            content = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/status');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(contentResponse(12));
+
+        expect(content!).toEqual(createContent(12));
+    }));
+
+    it('should make put request to publish draft',
+        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                ['draft/publish']: { method: 'PUT', href: '/api/content/my-app/my-schema/content1/status' }
+            }
+        };
+
+        let content: ContentDto;
+
+        contentsService.publishDraft('my-app', resource, null, version).subscribe(result => {
+            content = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/status');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(contentResponse(12));
+
+        expect(content!).toEqual(createContent(12));
     }));
 
     it('should make put request to change content status',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        contentsService.changeContentStatus('my-app', 'my-schema', 'content1', 'publish', null, version).subscribe();
+        const resource: Resource = {
+            _links: {
+                ['status/published']: { method: 'PUT', href: '/api/content/my-app/my-schema/content1/status' }
+            }
+        };
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/publish');
+        let content: ContentDto;
 
-        expect(req.request.method).toEqual('PUT');
-        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        contentsService.putStatus('my-app', resource, 'published', '2016-12-12T10:10:00', version).subscribe(result => {
+            content = result;
+        });
 
-        req.flush({});
-    }));
-
-    it('should make put request with due time when status change is scheduled',
-        inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-
-        const dueTime = '2016-12-12T10:10:00';
-
-        contentsService.changeContentStatus('my-app', 'my-schema', 'content1', 'publish', dueTime, version).subscribe();
-
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/publish?dueTime=2016-12-12T10:10:00');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/status');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({});
+        req.flush(contentResponse(12));
+
+        expect(content!).toEqual(createContent(12));
     }));
 
     it('should make delete request to delete content',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        contentsService.deleteContent('my-app', 'my-schema', 'content1', version).subscribe();
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: '/api/content/my-app/my-schema/content1' }
+            }
+        };
+
+        contentsService.deleteContent('my-app', resource, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1');
 
@@ -340,4 +348,46 @@ describe('ContentsService', () => {
 
         req.flush({});
     }));
+
+    function contentResponse(id: number) {
+        return {
+            id: `id${id}`,
+            status: `Status${id}`,
+            statusColor: 'black',
+            created: `${id % 1000 + 2000}-12-12T10:10:00`,
+            createdBy: `creator-${id}`,
+            lastModified: `${id % 1000 + 2000}-11-11T10:10:00`,
+            lastModifiedBy: `modifier-${id}`,
+            scheduleJob: {
+                status: 'Draft',
+                scheduledBy: `Scheduler${id}`,
+                dueTime: `${id % 1000 + 2000}-11-11T10:10:00`
+            },
+            isPending: true,
+            data: {},
+            dataDraft: {},
+            version: `${id}`,
+            _links: {
+                update: { method: 'PUT', href: `/contents/id${id}` }
+            }
+        };
+    }
 });
+
+export function createContent(id: number, suffix = '') {
+    const links: ResourceLinks = {
+        update:  { method: 'PUT', href: `/contents/id${id}` }
+    };
+
+    return new ContentDto(links,
+        `id${id}`,
+        `Status${id}${suffix}`,
+        'black',
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
+        new ScheduleDto('Draft', `Scheduler${id}`, DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`)),
+        true,
+        {},
+        {},
+        new Version(`${id}`));
+}

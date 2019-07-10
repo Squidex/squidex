@@ -12,7 +12,8 @@ import {
     AuthService,
     fadeAnimation,
     ModalModel,
-    StatefulComponent
+    StatefulComponent,
+    UIState
 } from '@app/shared';
 
 interface State {
@@ -35,6 +36,7 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     public modalMenu = new ModalModel();
 
     constructor(changeDetector: ChangeDetectorRef, apiUrl: ApiUrlConfig,
+        public readonly uiState: UIState,
         private readonly authService: AuthService
     ) {
         super(changeDetector, {

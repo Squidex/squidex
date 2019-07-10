@@ -36,6 +36,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly string typeContentDeleted;
         private readonly MongoContentCollection contents;
 
+        static MongoContentRepository()
+        {
+            StatusSerializer.Register();
+        }
+
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer, TypeNameRegistry typeNameRegistry)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
@@ -64,7 +69,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(status, nameof(status));
             Guard.NotNull(query, nameof(query));
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByQuery"))
@@ -73,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
                 if (fullTextIds?.Count == 0)
                 {
-                    return ResultList.Create<IContentEntity>(0);
+                    return ResultList.CreateFrom<IContentEntity>(0);
                 }
 
                 return await contents.QueryAsync(schema, query, fullTextIds, status, inDraft, includeDraft);
@@ -83,9 +87,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<IResultList<IContentEntity>> QueryAsync(IAppEntity app, ISchemaEntity schema, Status[] status, HashSet<Guid> ids, bool includeDraft = true)
         {
             Guard.NotNull(app, nameof(app));
-            Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(status, nameof(status));
             Guard.NotNull(ids, nameof(ids));
+            Guard.NotNull(schema, nameof(schema));
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIds"))
             {
@@ -96,7 +99,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public async Task<List<(IContentEntity Content, ISchemaEntity Schema)>> QueryAsync(IAppEntity app, Status[] status, HashSet<Guid> ids, bool includeDraft = true)
         {
             Guard.NotNull(app, nameof(app));
-            Guard.NotNull(status, nameof(status));
             Guard.NotNull(ids, nameof(ids));
 
             using (Profiler.TraceMethod<MongoContentRepository>("QueryAsyncByIdsWithoutSchema"))
@@ -109,7 +111,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             Guard.NotNull(app, nameof(app));
             Guard.NotNull(schema, nameof(schema));
-            Guard.NotNull(status, nameof(status));
 
             using (Profiler.TraceMethod<MongoContentRepository>())
             {

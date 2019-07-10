@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -25,34 +26,26 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class AssetQueryServiceTests
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
+        private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
         private readonly IAppEntity app = A.Fake<IAppEntity>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly ClaimsIdentity identity = new ClaimsIdentity();
-        private readonly QueryContext context;
+        private readonly Context context;
         private readonly AssetQueryService sut;
 
         public AssetQueryServiceTests()
         {
-            var user = new ClaimsPrincipal(identity);
+            var user = new ClaimsPrincipal(new ClaimsIdentity());
 
             A.CallTo(() => app.Id).Returns(appId.Id);
             A.CallTo(() => app.Name).Returns(appId.Name);
             A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.English);
 
-            context = QueryContext.Create(app, user);
-
-            A.CallTo(() => tagService.DenormalizeTagsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.IsSameSequenceAs("id1", "id2", "id3")))
-                .Returns(new Dictionary<string, string>
-                {
-                    ["id1"] = "name1",
-                    ["id2"] = "name2",
-                    ["id3"] = "name3"
-                });
+            context = new Context(user, app);
 
             var options = Options.Create(new AssetOptions { DefaultPageSize = 30 });
 
-            sut = new AssetQueryService(tagService, assetRepository, options);
+            sut = new AssetQueryService(tagService, assetEnricher, assetRepository, options);
         }
 
         [Fact]
@@ -64,68 +57,85 @@ namespace Squidex.Domain.Apps.Entities.Assets
         }
 
         [Fact]
-        public async Task Should_find_asset_by_id_and_resolve_tags()
+        public async Task Should_find_asset_by_id_and_enrich_it()
         {
-            var id = Guid.NewGuid();
+            var found = new AssetEntity { Id = Guid.NewGuid() };
 
-            A.CallTo(() => assetRepository.FindAssetAsync(id, false))
-                .Returns(CreateAsset(id, "id1", "id2", "id3"));
+            var enriched = new AssetEntity();
 
-            var result = await sut.FindAssetAsync(context, id);
+            A.CallTo(() => assetRepository.FindAssetAsync(found.Id, false))
+                .Returns(found);
 
-            Assert.Equal(HashSet.Of("name1", "name2", "name3"), result.Tags);
+            A.CallTo(() => assetEnricher.EnrichAsync(found))
+                .Returns(enriched);
+
+            var result = await sut.FindAssetAsync(found.Id);
+
+            Assert.Same(enriched, result);
         }
 
         [Fact]
-        public async Task Should_find_asset_by_hash_and_resolve_tags()
+        public async Task Should_find_assets_by_hash_and_and_enrich_it()
         {
-            var id = Guid.NewGuid();
+            var found = new AssetEntity { Id = Guid.NewGuid() };
+
+            var enriched = new AssetEntity();
 
             A.CallTo(() => assetRepository.QueryByHashAsync(appId.Id, "hash"))
-                .Returns(new List<IAssetEntity> { CreateAsset(id, "id1", "id2", "id3") });
+                .Returns(new List<IAssetEntity> { found });
+
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found)))
+                .Returns(new List<IEnrichedAssetEntity> { enriched });
 
             var result = await sut.QueryByHashAsync(appId.Id, "hash");
 
-            Assert.Equal(HashSet.Of("name1", "name2", "name3"), result[0].Tags);
+            Assert.Same(enriched, result.Single());
         }
 
         [Fact]
         public async Task Should_load_assets_from_ids_and_resolve_tags()
         {
-            var id1 = Guid.NewGuid();
-            var id2 = Guid.NewGuid();
+            var found1 = new AssetEntity { Id = Guid.NewGuid() };
+            var found2 = new AssetEntity { Id = Guid.NewGuid() };
 
-            var ids = HashSet.Of(id1, id2);
+            var enriched1 = new AssetEntity();
+            var enriched2 = new AssetEntity();
+
+            var ids = HashSet.Of(found1.Id, found2.Id);
 
             A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<HashSet<Guid>>.That.IsSameSequenceAs(ids)))
-                .Returns(ResultList.Create(8,
-                    CreateAsset(id1, "id1", "id2", "id3"),
-                    CreateAsset(id2)));
+                .Returns(ResultList.CreateFrom(8, found1, found2));
+
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2)))
+                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
 
             var result = await sut.QueryAsync(context, Q.Empty.WithIds(ids));
 
             Assert.Equal(8, result.Total);
-            Assert.Equal(2, result.Count);
 
-            Assert.Equal(HashSet.Of("name1", "name2", "name3"), result[0].Tags);
-            Assert.Empty(result[1].Tags);
+            Assert.Equal(new[] { enriched1, enriched2 }, result.ToArray());
         }
 
         [Fact]
         public async Task Should_load_assets_with_query_and_resolve_tags()
         {
+            var found1 = new AssetEntity { Id = Guid.NewGuid() };
+            var found2 = new AssetEntity { Id = Guid.NewGuid() };
+
+            var enriched1 = new AssetEntity();
+            var enriched2 = new AssetEntity();
+
             A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.Ignored))
-                .Returns(ResultList.Create(8,
-                    CreateAsset(Guid.NewGuid(), "id1", "id2"),
-                    CreateAsset(Guid.NewGuid(), "id2", "id3")));
+                .Returns(ResultList.CreateFrom(8, found1, found2));
+
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2)))
+                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
 
             var result = await sut.QueryAsync(context, Q.Empty);
 
             Assert.Equal(8, result.Total);
-            Assert.Equal(2, result.Count);
 
-            Assert.Equal(HashSet.Of("name1", "name2"), result[0].Tags);
-            Assert.Equal(HashSet.Of("name2", "name3"), result[1].Tags);
+            Assert.Equal(new[] { enriched1, enriched2 }, result.ToArray());
         }
 
         [Fact]
@@ -170,16 +180,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending")))
                 .MustHaveHappened();
-        }
-
-        private static IAssetEntity CreateAsset(Guid id, params string[] tags)
-        {
-            var asset = A.Fake<IAssetEntity>();
-
-            A.CallTo(() => asset.Id).Returns(id);
-            A.CallTo(() => asset.Tags).Returns(HashSet.Of(tags));
-
-            return asset;
         }
     }
 }

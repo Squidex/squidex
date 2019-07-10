@@ -8,7 +8,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { AppsState, SchemasState } from '@app/shared';
+import {
+    AppsState,
+    SchemaCategory,
+    SchemasState
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -28,8 +32,8 @@ export class SchemasPageComponent implements OnInit {
         this.schemasState.load();
     }
 
-    public trackByCategory(index: number, category: string) {
-        return category;
+    public trackByCategory(index: number, category: SchemaCategory) {
+        return category.name;
     }
 }
 

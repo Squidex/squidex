@@ -15,7 +15,7 @@ namespace Squidex.Web
         [Required]
         [Display(Description = "Id of the created entity.")]
         public string Id { get; set; }
-        
+
         [Display(Description = "The new version of the entity.")]
         public long Version { get; set; }
 

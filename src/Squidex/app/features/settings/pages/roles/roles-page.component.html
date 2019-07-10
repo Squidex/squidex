@@ -17,7 +17,7 @@
         <ng-container *ngIf="(rolesState.isLoaded | async) && (rolesState.roles | async); let roles">
             <sqx-role *ngFor="let role of roles" [role]="role" [allPermissions]="allPermissions"></sqx-role>
 
-            <div class="table-items-footer">
+            <div class="table-items-footer" *ngIf="rolesState.canCreate | async">
                 <form [formGroup]="addRoleForm.form" (ngSubmit)="addRole()">
                     <div class="row no-gutters">
                         <div class="col">

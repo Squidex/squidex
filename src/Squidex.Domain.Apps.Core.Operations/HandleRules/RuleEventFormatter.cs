@@ -47,6 +47,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             AddPattern("APP_ID", AppId);
             AddPattern("APP_NAME", AppName);
             AddPattern("CONTENT_ACTION", ContentAction);
+            AddPattern("CONTENT_STATUS", ContentStatus);
             AddPattern("CONTENT_URL", ContentUrl);
             AddPattern("SCHEMA_ID", SchemaId);
             AddPattern("SCHEMA_NAME", SchemaName);
@@ -207,6 +208,16 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             if (@event is EnrichedContentEvent contentEvent)
             {
                 return contentEvent.Type.ToString();
+            }
+
+            return Fallback;
+        }
+
+        private static string ContentStatus(EnrichedEvent @event)
+        {
+            if (@event is EnrichedContentEvent contentEvent)
+            {
+                return contentEvent.Status.ToString();
             }
 
             return Fallback;

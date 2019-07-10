@@ -1,0 +1,76 @@
+<div class="step">
+    <div class="row no-gutters step-header">
+        <div class="col-auto">
+            <button class="btn btn-initial mr-1" (click)="makeInitial.emit()"
+                [class.enabled]="step.name !== workflow.initial && !step.isLocked"
+                [class.active]="step.name === workflow.initial"
+                [disabled]="step.name === workflow.initial || step.isLocked || disabled">
+                <i class="icon-arrow-right text-decent" *ngIf="!step.isLocked"></i>
+            </button>
+        </div>
+        <div class="col-auto color pr-2">
+            <sqx-color-picker mode="Circle"
+                [ngModelOptions]="onBlur"
+                [ngModel]="step.color"
+                (ngModelChange)="changeColor($event)"
+                [disabled]="disabled">
+            </sqx-color-picker>
+        </div>
+        <div class="col">
+            <sqx-editable-title 
+                [name]="step.name"
+                (nameChanged)="changeName($event)"
+                [disabled]="step.isLocked || disabled">
+            </sqx-editable-title>
+        </div>
+        <div class="col">
+        </div>
+        <div class="col-auto" *ngIf="step.isLocked">
+            <small class="text-decent">(Cannot be removed)</small>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-text-danger" (click)="remove.emit()" *ngIf="!step.isLocked && workflow.steps.length > 2" [disabled]="disabled">
+                <i class="icon-bin2"></i>
+            </button>
+        </div>
+    </div>
+        
+    <div class="step-inner">
+        <sqx-workflow-transition *ngFor="let transition of transitions; trackBy: trackByTransition" 
+            [transition]="transition"
+            [disabled]="disabled"
+            [roles]="roles"
+            (remove)="transitionRemove.emit(transition)"
+            (update)="changeTransition(transition, $event)">
+        </sqx-workflow-transition>
+            
+        <div class="row transition no-gutters" *ngIf="openSteps.length > 0 && !disabled">
+            <div class="col-auto">
+                <i class="icon-corner-down-right text-decent"></i>
+            </div>
+            <div class="col col-step">
+                <sqx-dropdown [items]="openSteps" [(ngModel)]="openStep">
+                    <ng-template let-target="$implicit">
+                        <div class="color-circle" [style.background]="target.color"></div> {{target.name}}
+                    </ng-template>
+                </sqx-dropdown>
+            </div>
+            <div class="col pl-2">
+                <button class="btn btn-outline-secondary" (click)="transitionAdd.emit(openStep)">
+                    <i class="icon-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="preventUpdates_{{step.name}}"
+                [disabled]="disabled"
+                [ngModel]="step.noUpdate"
+                (ngModelChange)="changeNoUpdate($event)" />
+
+            <label class="form-check-label" for="preventUpdates_{{step.name}}">
+                Prevent updates
+            </label>
+        </div> 
+    </div>
+</div>

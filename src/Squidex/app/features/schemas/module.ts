@@ -112,4 +112,4 @@ const routes: Routes = [
         TagsValidationComponent
     ]
 })
-export class SqxFeatureSchemasModule { }
+export class SqxFeatureSchemasModule {}

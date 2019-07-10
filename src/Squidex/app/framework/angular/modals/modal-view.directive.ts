@@ -20,8 +20,7 @@ import { RootViewComponent } from './root-view.component';
     selector: '[sqxModalView]'
 })
 export class ModalViewDirective implements OnChanges, OnDestroy {
-    private subscription: Subscription | null = null;
-    private documentClickListener: Function | null = null;
+    private modalSubscription: Subscription | null = null;
     private renderedView: EmbeddedViewRef<any> | null = null;
 
     @Input('sqxModalView')
@@ -62,7 +61,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
         this.unsubscribeToModal();
 
         if (Types.is(this.modalView, DialogModel) || Types.is(this.modalView, ModalModel)) {
-            this.subscription =
+            this.modalSubscription =
                 this.modalView.isOpen.subscribe(isOpen => {
                     this.update(isOpen);
                 });
@@ -76,6 +75,8 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
             return;
         }
 
+        this.unsubscribeToClick();
+
         if (isOpen && !this.renderedView) {
             const container = this.getContainer();
 
@@ -85,9 +86,7 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
                 this.renderer.setStyle(this.renderedView.rootNodes[0], 'display', 'block');
             }
 
-            setTimeout(() => {
-                this.startListening();
-            }, 1000);
+            this.startListening();
 
             this.changeDetector.detectChanges();
         } else if (!isOpen && this.renderedView) {
@@ -98,8 +97,6 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
 
             this.renderedView = null;
 
-            this.unsubscribeToClick();
-
             this.changeDetector.detectChanges();
         }
     }
@@ -109,52 +106,52 @@ export class ModalViewDirective implements OnChanges, OnDestroy {
     }
 
     private startListening() {
-        if (!this.closeAuto) {
+        if (this.closeAuto) {
+            document.addEventListener('click', this.documentClickListener, true);
+        }
+    }
+
+    private documentClickListener = (event: MouseEvent) => {
+        if (!event.target || this.renderedView === null) {
             return;
         }
 
-        this.documentClickListener =
-            this.renderer.listen('document', 'click', (event: MouseEvent) => {
-                if (!event.target || this.renderedView === null) {
-                    return;
-                }
+        if (this.renderedView.rootNodes.length === 0) {
+            return;
+        }
 
-                if (this.renderedView.rootNodes.length === 0) {
-                    return;
-                }
+        if (this.closeAlways) {
+            const modal = this.modalView;
 
-                if (this.closeAlways) {
-                    this.modalView.hide();
-                } else {
-                    try {
-                        const rootNode = this.renderedView.rootNodes[0];
-                        const rootBounds = rootNode.getBoundingClientRect();
+            setTimeout(() => {
+                modal.hide();
+            }, 100);
+        } else {
+            try {
+                const rootNode = this.renderedView.rootNodes[0];
+                const rootBounds = rootNode.getBoundingClientRect();
 
-                        if (rootBounds.width > 0 && rootBounds.height > 0) {
-                            const clickedInside = rootNode.contains(event.target);
+                if (rootBounds.width > 0 && rootBounds.height > 0) {
+                    const clickedInside = rootNode.contains(event.target);
 
-                            if (!clickedInside && this.modalView) {
-                                this.modalView.hide();
-                            }
-                        }
-                    } catch (ex) {
-                        return;
+                    if (!clickedInside && this.modalView) {
+                        this.modalView.hide();
                     }
                 }
-            });
+            } catch (ex) {
+                return;
+            }
+        }
     }
 
     private unsubscribeToModal() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = null;
+        if (this.modalSubscription) {
+            this.modalSubscription.unsubscribe();
+            this.modalSubscription = null;
         }
     }
 
     private unsubscribeToClick() {
-        if (this.documentClickListener) {
-            this.documentClickListener();
-            this.documentClickListener = null;
-        }
+        document.removeEventListener('click', this.documentClickListener);
     }
 }

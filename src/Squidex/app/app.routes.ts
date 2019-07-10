@@ -38,12 +38,12 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                loadChildren: './features/apps/module#SqxFeatureAppsModule',
+                loadChildren: () => import('./features/apps/module').then(m => m.SqxFeatureAppsModule),
                 canActivate: [UnsetAppGuard]
             },
             {
                 path: 'administration',
-                loadChildren: './features/administration/module#SqxFeatureAdministrationModule',
+                loadChildren: () => import('./features/administration/module').then(m => m.SqxFeatureAdministrationModule),
                 canActivate: [UnsetAppGuard]
             },
             {
@@ -53,31 +53,31 @@ export const routes: Routes = [
                 children: [
                     {
                         path: '',
-                        loadChildren: './features/dashboard/module#SqxFeatureDashboardModule'
+                        loadChildren: () => import('./features/dashboard/module').then(m => m.SqxFeatureDashboardModule)
                     },
                     {
                         path: 'content',
-                        loadChildren: './features/content/module#SqxFeatureContentModule'
+                        loadChildren: () => import('./features/content/module').then(m => m.SqxFeatureContentModule)
                     },
                     {
                         path: 'schemas',
-                        loadChildren: './features/schemas/module#SqxFeatureSchemasModule'
+                        loadChildren: () => import('./features/schemas/module').then(m => m.SqxFeatureSchemasModule)
                     },
                     {
                         path: 'assets',
-                        loadChildren: './features/assets/module#SqxFeatureAssetsModule'
+                        loadChildren: () => import('./features/assets/module').then(m => m.SqxFeatureAssetsModule)
                     },
                     {
                         path: 'rules',
-                        loadChildren: './features/rules/module#SqxFeatureRulesModule'
+                        loadChildren: () => import('./features/rules/module').then(m => m.SqxFeatureRulesModule)
                     },
                     {
                         path: 'settings',
-                        loadChildren: './features/settings/module#SqxFeatureSettingsModule'
+                        loadChildren: () => import('./features/settings/module').then(m => m.SqxFeatureSettingsModule)
                     },
                     {
                         path: 'api',
-                        loadChildren: './features/api/module#SqxFeatureApiModule'
+                        loadChildren: () => import('./features/api/module').then(m => m.SqxFeatureApiModule)
                     }
                 ]
             }

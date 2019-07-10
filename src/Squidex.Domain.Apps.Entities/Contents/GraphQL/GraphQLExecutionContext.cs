@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLExecutionContext : QueryExecutionContext
     {
-        private static readonly List<IAssetEntity> EmptyAssets = new List<IAssetEntity>();
+        private static readonly List<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
         private static readonly List<IContentEntity> EmptyContents = new List<IContentEntity>();
         private readonly IDataLoaderContextAccessor dataLoaderContextAccessor;
         private readonly IDependencyResolver resolver;
@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
         public ISemanticLog Log { get; }
 
-        public GraphQLExecutionContext(QueryContext context, IDependencyResolver resolver)
+        public GraphQLExecutionContext(Context context, IDependencyResolver resolver)
             : base(context,
                 resolver.Resolve<IAssetQueryService>(),
                 resolver.Resolve<IContentQueryService>())
@@ -53,7 +53,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             execution.UserContext = this;
         }
 
-        public override Task<IAssetEntity> FindAssetAsync(Guid id)
+        public override Task<IEnrichedAssetEntity> FindAssetAsync(Guid id)
         {
             var dataLoader = GetAssetsLoader();
 
@@ -67,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return dataLoader.LoadAsync(id);
         }
 
-        public async Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(IJsonValue value)
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value)
         {
             var ids = ParseIds(value);
 
@@ -95,9 +95,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return await dataLoader.LoadManyAsync(ids);
         }
 
-        private IDataLoader<Guid, IAssetEntity> GetAssetsLoader()
+        private IDataLoader<Guid, IEnrichedAssetEntity> GetAssetsLoader()
         {
-            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IAssetEntity>("Assets",
+            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IEnrichedAssetEntity>("Assets",
                 async batch =>
                 {
                     var result = await GetReferencedAssetsAsync(new List<Guid>(batch));

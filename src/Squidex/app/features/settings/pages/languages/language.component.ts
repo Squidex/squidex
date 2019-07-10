@@ -37,6 +37,7 @@ export class LanguageComponent implements OnChanges {
     public otherLanguage: AppLanguageDto;
 
     public isEditing = false;
+    public isEditable = false;
 
     public editForm = new EditLanguageForm(this.formBuilder);
 
@@ -47,7 +48,12 @@ export class LanguageComponent implements OnChanges {
     }
 
     public ngOnChanges() {
-        this.resetForm();
+        this.isEditable = this.language.canUpdate;
+
+        this.editForm.load(this.language);
+        this.editForm.setEnabled(this.isEditable);
+
+        this.otherLanguage = this.fallbackLanguagesNew.at(0);
     }
 
     public toggleEditing() {
@@ -59,6 +65,10 @@ export class LanguageComponent implements OnChanges {
     }
 
     public save() {
+        if (!this.isEditable) {
+            return;
+        }
+
         const value = this.editForm.submit();
 
         if (value) {
@@ -87,12 +97,6 @@ export class LanguageComponent implements OnChanges {
         this.fallbackLanguagesNew = this.fallbackLanguagesNew.remove(this.otherLanguage);
 
         this.otherLanguage = this.fallbackLanguagesNew.at(0);
-    }
-
-    private resetForm() {
-        this.otherLanguage = this.fallbackLanguagesNew.at(0);
-
-        this.editForm.load(this.language);
     }
 
     public trackByLanguage(index: number, language: AppLanguageDto) {

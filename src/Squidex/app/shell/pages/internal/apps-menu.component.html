@@ -29,7 +29,7 @@
                     <div class="dropdown-divider"></div>
     
                     <div class="dropdown-button">
-                        <button type="button" class="btn btn-block btn-success" (click)="createApp()">
+                        <button type="button" class="btn btn-block btn-success" (click)="addAppDialog.show()">
                             <i class="icon-plus"></i> Create New App
                         </button>
                     </div>
@@ -38,19 +38,17 @@
         </ng-container>
     </li>
 
-    <ng-container *ngIf="appsState.selectedApp | async; let selectedApp">
-        <ng-container *ngIf="selectedApp.planUpgrade && selectedApp.planName">
-            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.plans.change'">
-                <div class="btn-group app-upgrade">
-                    <button type="button" class="btn btn-primary btn-plan">
-                        You are on the <strong>{{selectedApp.planName}}</strong> plan.
-                    </button>
-                    <button type="button" class="btn btn-warning" [routerLink]="['/app', selectedApp.name, 'settings', 'plans']">
-                        Upgrade!
-                    </button>
-                </div>
-            </li>
-        </ng-container>
+    <ng-container *ngIf="appsState.selectedValidApp | async; let selectedApp">
+        <li class="nav-item" *ngIf="selectedApp.planUpgrade && selectedApp.planName">
+            <div class="btn-group app-upgrade">
+                <button type="button" class="btn btn-primary btn-plan">
+                    You are on the <strong>{{selectedApp.planName}}</strong> plan.
+                </button>
+                <button type="button" class="btn btn-warning" [routerLink]="['/app', selectedApp.name, 'settings', 'plans']">
+                    Upgrade!
+                </button>
+            </div>
+        </li>
     </ng-container>
 </ul>
 

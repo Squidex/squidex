@@ -7,12 +7,11 @@
 
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { map, shareReplay, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
-    mapVersioned,
     shareMapSubscribed,
     shareSubscribed,
     State,
@@ -21,6 +20,7 @@ import {
 
 import {
     AppLanguageDto,
+    AppLanguagesPayload,
     AppLanguagesService,
     UpdateAppLanguageDto
 } from './../services/app-languages.service';
@@ -40,9 +40,6 @@ interface SnapshotLanguage {
 }
 
 interface Snapshot {
-    // the configured languages as plan format.
-    plainLanguages: AppLanguagesList;
-
     // All supported languages.
     allLanguages: LanguageList;
 
@@ -57,6 +54,9 @@ interface Snapshot {
 
     // Indicates if the languages are loaded.
     isLoaded?: boolean;
+
+    // Inedicates if the user can add a language.
+    canCreate?: boolean;
 }
 
 type AppLanguagesList = ImmutableArray<AppLanguageDto>;
@@ -65,17 +65,19 @@ type LanguageResultList = ImmutableArray<SnapshotLanguage>;
 
 @Injectable()
 export class LanguagesState extends State<Snapshot> {
+    private cachedLanguage$: Observable<LanguageDto[]>;
+
     public languages =
-        this.changes.pipe(map(x => x.languages),
-            distinctUntilChanged());
+        this.project(x => x.languages);
 
     public newLanguages =
-        this.changes.pipe(map(x => x.allLanguagesNew),
-            distinctUntilChanged());
+        this.project(x => x.allLanguagesNew);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
+
+    public canCreate =
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly appLanguagesService: AppLanguagesService,
@@ -84,11 +86,10 @@ export class LanguagesState extends State<Snapshot> {
         private readonly languagesService: LanguagesService
     ) {
         super({
-            plainLanguages: ImmutableArray.empty(),
             allLanguages: ImmutableArray.empty(),
             allLanguagesNew: ImmutableArray.empty(),
             languages: ImmutableArray.empty(),
-            version: new Version('')
+            version: Version.EMPTY
         });
     }
 
@@ -97,9 +98,7 @@ export class LanguagesState extends State<Snapshot> {
             this.resetState();
         }
 
-        return forkJoin(
-                this.languagesService.getLanguages(),
-                this.appLanguagesService.getLanguages(this.appName)).pipe(
+        return forkJoin(this.getAllLanguages(), this.getAppLanguages()).pipe(
             map(args => {
                 return { allLanguages: args[0], languages: args[1] };
             }),
@@ -110,64 +109,47 @@ export class LanguagesState extends State<Snapshot> {
 
                 const sorted = ImmutableArray.of(allLanguages).sortByStringAsc(x => x.englishName);
 
-                this.replaceLanguages(ImmutableArray.of(languages.payload), languages.version, sorted);
+                this.replaceLanguages(languages.payload, languages.version, sorted);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public add(language: LanguageDto): Observable<AppLanguageDto> {
+    public add(language: LanguageDto): Observable<any> {
         return this.appLanguagesService.postLanguage(this.appName, { language: language.iso2Code }, this.version).pipe(
             tap(({ version, payload }) => {
-                const languages = this.snapshot.plainLanguages.push(payload).sortByStringAsc(x => x.englishName);
-
-                this.replaceLanguages(languages, version);
+                this.replaceLanguages(payload, version);
             }),
             shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
     public remove(language: AppLanguageDto): Observable<any> {
-        return this.appLanguagesService.deleteLanguage(this.appName, language.iso2Code, this.version).pipe(
-            tap(({ version }) => {
-                const languages = this.snapshot.plainLanguages.filter(x => x.iso2Code !== language.iso2Code);
-
-                this.replaceLanguages(languages, version);
+        return this.appLanguagesService.deleteLanguage(this.appName, language, this.version).pipe(
+            tap(({ version, payload }) => {
+                this.replaceLanguages(payload, version);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public update(language: AppLanguageDto, request: UpdateAppLanguageDto): Observable<AppLanguageDto> {
-        return this.appLanguagesService.putLanguage(this.appName, language.iso2Code, request, this.version).pipe(
-            mapVersioned(() => update(language, request)),
+    public update(language: AppLanguageDto, request: UpdateAppLanguageDto): Observable<any> {
+        return this.appLanguagesService.putLanguage(this.appName, language, request, this.version).pipe(
             tap(({ version, payload }) => {
-                const languages = this.snapshot.plainLanguages.map(x => {
-                    if (x.iso2Code === language.iso2Code) {
-                        return payload;
-                    } else if (x.isMaster && request.isMaster) {
-                        return update(x, { isMaster: false });
-                    } else {
-                        return x;
-                    }
-                });
-
-                this.replaceLanguages(languages, version);
+                this.replaceLanguages(payload, version);
             }),
             shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
-    private replaceLanguages(languages: AppLanguagesList, version: Version, allLanguages?: LanguageList) {
+    private replaceLanguages(payload: AppLanguagesPayload, version: Version, allLanguages?: LanguageList) {
         this.next(s => {
             allLanguages = allLanguages || s.allLanguages;
 
+            const { canCreate, items } = payload;
+
+            const languages = ImmutableArray.of(items);
+
             return {
                 ...s,
-                languages: languages.sort((a, b) => {
-                    if (a.isMaster === b.isMaster) {
-                        return a.englishName.localeCompare(b.englishName);
-                    } else {
-                        return (a.isMaster ? 0 : 1) - (b.isMaster ? 0 : 1);
-                    }
-                }).map(x => this.createLanguage(x, languages)),
-                plainLanguages: languages,
+                canCreate,
+                languages: languages.map(x => this.createLanguage(x, languages)),
                 allLanguages: allLanguages,
                 allLanguagesNew: allLanguages.filter(x => !languages.find(l => l.iso2Code === x.iso2Code)),
                 isLoaded: true,
@@ -184,6 +166,20 @@ export class LanguagesState extends State<Snapshot> {
         return this.snapshot.version;
     }
 
+    private getAppLanguages() {
+        return this.appLanguagesService.getLanguages(this.appName);
+    }
+
+    private getAllLanguages() {
+        if (!this.cachedLanguage$) {
+            this.cachedLanguage$ =
+                this.languagesService.getLanguages().pipe(
+                    shareReplay(1));
+        }
+
+        return this.cachedLanguage$;
+    }
+
     private createLanguage(language: AppLanguageDto, languages: AppLanguagesList): SnapshotLanguage {
         return {
             language,
@@ -191,7 +187,7 @@ export class LanguagesState extends State<Snapshot> {
                 ImmutableArray.of(
                     language.fallback
                         .map(l => languages.find(x => x.iso2Code === l)).filter(x => !!x)
-                        .map(x => <AppLanguageDto>x)),
+                        .map(l => l!)),
             fallbackLanguagesNew:
                 languages
                     .filter(l =>
@@ -201,6 +197,3 @@ export class LanguagesState extends State<Snapshot> {
         };
     }
 }
-
-const update = (language: AppLanguageDto, request: UpdateAppLanguageDto) =>
-    language.with(request);

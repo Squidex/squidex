@@ -18,14 +18,6 @@ $color-editor: #eceeef;
     }
 }
 
-.col-name {
-    &:hover {
-        .client-edit {
-            display: inline-block;
-        }
-    }
-}
-
 .client {
     &-info {
         margin: 0;
@@ -33,29 +25,6 @@ $color-editor: #eceeef;
 
     &-delete {
         vertical-align: top;
-    }
-
-    &-edit {
-        color: $color-border-dark;
-        display: none;
-        font-size: .9rem;
-        font-weight: normal;
-        padding: .6rem .25rem;
-        border: 0;
-        background: transparent;
-        vertical-align: baseline;
-    }
-
-    &-name {
-        padding: .375rem 0;
-        font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        font-size: 1.2rem;
-        font-weight: normal;
-        line-height: 1.5rem;
-        border-top: 1px solid transparent;
-        border-bottom: 1px solid transparent;
-        display: inline-block;
-        margin: 0;
     }
 }
 

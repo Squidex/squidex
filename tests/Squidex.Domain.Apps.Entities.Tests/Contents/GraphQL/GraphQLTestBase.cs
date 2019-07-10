@@ -45,7 +45,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected readonly IJsonSerializer serializer = TestUtils.CreateSerializer(TypeNameHandling.None);
         protected readonly IDependencyResolver dependencyResolver;
         protected readonly IAppEntity app = A.Dummy<IAppEntity>();
-        protected readonly QueryContext context;
+        protected readonly Context context;
         protected readonly ClaimsPrincipal user = new ClaimsPrincipal();
         protected readonly IGraphQLService sut;
 
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             A.CallTo(() => app.Name).Returns(appName);
             A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.Build(Language.DE, Language.GermanGermany));
 
-            context = QueryContext.Create(app, user);
+            context = new Context(user, app);
 
             A.CallTo(() => schema.Id).Returns(schemaId);
             A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             sut = CreateSut();
         }
 
-        protected static IContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null, NamedContentData dataDraft = null)
+        protected static IEnrichedContentEntity CreateContent(Guid id, Guid refId, Guid assetId, NamedContentData data = null, NamedContentData dataDraft = null)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
@@ -156,17 +156,19 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 LastModified = now,
                 LastModifiedBy = new RefToken(RefTokenType.Subject, "user2"),
                 Data = data,
-                DataDraft = dataDraft
+                DataDraft = dataDraft,
+                Status = Status.Draft,
+                StatusColor = "red"
             };
 
             return content;
         }
 
-        protected static IAssetEntity CreateAsset(Guid id)
+        protected static IEnrichedAssetEntity CreateAsset(Guid id)
         {
             var now = SystemClock.Instance.GetCurrentInstant();
 
-            var asset = new FakeAssetEntity
+            var asset = new AssetEntity
             {
                 Id = id,
                 Version = 1,
@@ -183,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 IsImage = true,
                 PixelWidth = 800,
                 PixelHeight = 600,
-                Tags = new[] { "tag1", "tag2" }.ToHashSet()
+                TagNames = new[] { "tag1", "tag2" }.ToHashSet()
             };
 
             return asset;

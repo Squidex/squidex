@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import {
@@ -32,7 +32,7 @@ import {
 
             <div class="float-right" *ngIf="showButtons">
                 <button [disabled]="field.isLocked" type="reset" class="btn btn-secondary" (click)="cancel.emit()">Cancel</button>
-                <button [disabled]="field.isLocked" type="submit" class="btn btn-primary ml-1">Save</button>
+                <button [disabled]="field.isLocked" type="submit" class="btn btn-primary ml-1" *ngIf="isEditable">Save</button>
             </div>
         </div>
 
@@ -49,9 +49,12 @@ import {
         </div>
     `
 })
-export class FieldFormComponent {
+export class FieldFormComponent implements AfterViewInit {
     @Input()
     public showButtons: boolean;
+
+    @Input()
+    public isEditable: boolean;
 
     @Input()
     public editForm: FormGroup;
@@ -69,6 +72,14 @@ export class FieldFormComponent {
     public cancel = new EventEmitter();
 
     public selectedTab = 0;
+
+    public ngAfterViewInit() {
+        if (!this.isEditable) {
+            this.editForm.disable();
+        } else {
+            this.editForm.enable();
+        }
+    }
 
     public selectTab(tab: number) {
         this.selectedTab = tab;

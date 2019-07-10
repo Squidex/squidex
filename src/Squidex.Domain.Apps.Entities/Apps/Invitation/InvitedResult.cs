@@ -5,12 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.Commands;
-
 namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 {
     public sealed class InvitedResult
     {
-        public EntityCreatedResult<string> Id { get; set; }
+        public IAppEntity App { get; set; }
     }
 }

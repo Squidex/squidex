@@ -23,7 +23,7 @@
                 [pattern]="pattern">
             </sqx-pattern>
             
-            <sqx-pattern></sqx-pattern>
+            <sqx-pattern *ngIf="patternsState.canCreate | async"></sqx-pattern>
         </ng-container>
     </ng-container>
 

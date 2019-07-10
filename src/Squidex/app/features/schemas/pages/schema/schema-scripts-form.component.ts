@@ -30,6 +30,8 @@ export class SchemaScriptsFormComponent implements OnInit {
 
     public editForm = new EditScriptsForm(this.formBuilder);
 
+    public isEditable = false;
+
     constructor(
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
@@ -37,7 +39,10 @@ export class SchemaScriptsFormComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.isEditable = this.schema.canUpdateScripts;
+
         this.editForm.load(this.schema.scripts);
+        this.editForm.setEnabled(this.isEditable);
     }
 
     public emitComplete() {
@@ -49,6 +54,10 @@ export class SchemaScriptsFormComponent implements OnInit {
     }
 
     public saveSchema() {
+        if (!this.isEditable) {
+            return;
+        }
+
         const value = this.editForm.submit();
 
         if (value) {

@@ -9,10 +9,12 @@ using System;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Backups.Models
 {
-    public sealed class BackupJobDto
+    public sealed class BackupJobDto : Resource
     {
         /// <summary>
         /// The id of the backup job.
@@ -44,9 +46,25 @@ namespace Squidex.Areas.Api.Controllers.Backups.Models
         /// </summary>
         public JobStatus Status { get; set; }
 
-        public static BackupJobDto FromBackup(IBackupJob backup)
+        public static BackupJobDto FromBackup(IBackupJob backup, ApiController controller, string app)
         {
-            return SimpleMapper.Map(backup, new BackupJobDto());
+            var result = SimpleMapper.Map(backup, new BackupJobDto());
+
+            return result.CreateLinks(controller, app);
+        }
+
+        private BackupJobDto CreateLinks(ApiController controller, string app)
+        {
+            var values = new { app, id = Id };
+
+            if (controller.HasPermission(Permissions.AppBackupsDelete, app))
+            {
+                AddDeleteLink("delete", controller.Url<BackupsController>(x => nameof(x.DeleteBackup), values));
+            }
+
+            AddGetLink("download", controller.Url<BackupContentController>(x => nameof(x.GetBackupContent), values));
+
+            return this;
         }
     }
 }

@@ -1,36 +1,34 @@
-<ng-container>
-    <div class="form-control {{class}}" #form (click)="input.focus()" 
-        [class.single-line]="singleLine"
-        [class.focus]="snapshot.hasFocus" 
-        [class.disabled]="addInput.disabled">
-        <span class="item" *ngFor="let item of snapshot.items; let i = index" [class.disabled]="addInput.disabled">
-            {{item}} <i class="icon-close" (click)="remove(i)"></i>
-        </span>
+<div class="form-control tags" [class.blank]="styleBlank" [class.gray]="styleGray" #form (click)="input.focus()" 
+    [class.single-line]="singleLine"
+    [class.focus]="snapshot.hasFocus" 
+    [class.disabled]="addInput.disabled">
+    <span class="item" *ngFor="let item of snapshot.items; let i = index" [class.disabled]="addInput.disabled">
+        {{item}} <i class="icon-close" (click)="remove(i)"></i>
+    </span>
 
-        <input type="text" class="blank" #input
-            (blur)="markTouched()"
-            (cut)="onCut($event)"
-            (copy)="onCopy($event)"
-            (paste)="onPaste($event)"
-            (focus)="focus()"
-            (keydown)="onKeyDown($event)"
-            [formControl]="addInput"
-            [attr.name]="inputName"
-            [attr.placeholder]="placeholder"
-            autocomplete="off" 
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false">
-    </div>
+    <input type="text" class="blank" #input
+        (blur)="markTouched()"
+        (cut)="onCut($event)"
+        (copy)="onCopy($event)"
+        (paste)="onPaste($event)"
+        (focus)="focus()"
+        (keydown)="onKeyDown($event)"
+        [formControl]="addInput"
+        [attr.name]="inputName"
+        [attr.placeholder]="placeholder"
+        autocomplete="off" 
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false">
+</div>
 
-    <div *ngIf="snapshot.suggestedItems.length > 0" [sqxModalTarget]="form" class="control-dropdown" #container position="bottom-left">
-        <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
-            [class.active]="i === snapshot.suggestedIndex"
-            [container]="container"
-            (mousedown)="selectValue(item)" 
-            (mouseover)="selectIndex(i)"
-            [sqxScrollActive]="i === snapshot.suggestedIndex">
-            <ng-container>{{item}}</ng-container>
-        </div>
+<div *ngIf="snapshot.suggestedItems.length > 0" [sqxModalTarget]="form" class="control-dropdown" #container position="bottom-left">
+    <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
+        [class.active]="i === snapshot.suggestedIndex"
+        [container]="container"
+        (mousedown)="selectValue(item)" 
+        (mouseover)="selectIndex(i)"
+        [sqxScrollActive]="i === snapshot.suggestedIndex">
+        <ng-container>{{item}}</ng-container>
     </div>
-</ng-container>
+</div>

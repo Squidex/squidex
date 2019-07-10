@@ -69,11 +69,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         case StatusChange.Unpublished:
                             result.Type = EnrichedContentEventType.Unpublished;
                             break;
-                        case StatusChange.Archived:
-                            result.Type = EnrichedContentEventType.Archived;
-                            break;
-                        case StatusChange.Restored:
-                            result.Type = EnrichedContentEventType.Restored;
+                        default:
+                            result.Type = EnrichedContentEventType.StatusChanged;
                             break;
                     }
 

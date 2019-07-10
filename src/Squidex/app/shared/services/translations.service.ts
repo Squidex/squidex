@@ -38,9 +38,9 @@ export class TranslationsService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/translations`);
 
         return this.http.post<any>(url, request).pipe(
-                map(body => {
-                    return new TranslationDto(body.result, body.text);
-                }),
-                pretifyError('Failed to translate text. Please reload.'));
+            map(body => {
+                return new TranslationDto(body.result, body.text);
+            }),
+            pretifyError('Failed to translate text. Please reload.'));
     }
 }
