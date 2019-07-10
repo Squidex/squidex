@@ -138,7 +138,7 @@ namespace Squidex.ICIS.Kafka.Consumer
 
                         if (!contentIds.TryGetValue(contentConsumedId, out var contentId))
                         {
-                            var queryContext = QueryContext.Create(app, user, actor.Identifier);
+                            var queryContext = QueryContext.Create(app, user, actor.Identifier).WithUnpublished(true);
 
                             var contents = await contentQuery.QueryAsync(queryContext, options.SchemaName, Q.Empty.WithODataQuery($"$filter=data/ID/iv eq '{contentConsumedId}'"));
                             var contentFound = contents.FirstOrDefault();

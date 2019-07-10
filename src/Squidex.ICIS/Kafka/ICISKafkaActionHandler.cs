@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -28,7 +28,7 @@ namespace Squidex.ICIS.Kafka
         private readonly KafkaProducer<Commodity> kafkaCommodityProducer;
         private readonly KafkaProducer<Region> kafkaRegionProducer;
         private readonly IAppProvider appProvider;
-        private readonly Dictionary<string, IAppEntity> commentaryAppDic = new Dictionary<string, IAppEntity>();
+        private readonly ConcurrentDictionary<string, IAppEntity> commentaryAppDic = new ConcurrentDictionary<string, IAppEntity>();
         private readonly IContentRepository contentRepository;
 
         public ICISKafkaActionHandler(RuleEventFormatter formatter, 
@@ -75,9 +75,9 @@ namespace Squidex.ICIS.Kafka
             {
                 if (!commentaryAppDic.ContainsKey("commentary"))
                 {
-                    var app = appProvider.GetAppAsync("commentary");
-                    app.Wait();
-                    commentaryAppDic.Add("commentary", app.Result);
+                    var app = await appProvider.GetAppAsync("commentary");
+
+                    commentaryAppDic["commentary"] = app;
                 }
 
                 switch (job.Message.SchemaId.Name)
