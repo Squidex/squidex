@@ -46,17 +46,17 @@ namespace Squidex.ICIS.Kafka.Services
 
             commentary.Body = bodyData["en"]?.ToString();
 
-            if (!contentEvent.Data.TryGetValue("CommentaryType", out var commentaryTypeData))
+            if (!contentEvent.Data.TryGetValue("commentarytype", out var commentaryTypeData))
             {
                 throw new Exception("Unable to find CommentaryType field.");
             }
 
-            if (!contentEvent.Data.TryGetValue("Commodity", out var commodityData))
+            if (!contentEvent.Data.TryGetValue("commodity", out var commodityData))
             {
                 throw new Exception("Unable to find Commodity field.");
             }
 
-            if (!contentEvent.Data.TryGetValue("Region", out var regionData))
+            if (!contentEvent.Data.TryGetValue("region", out var regionData))
             {
                 throw new Exception("Unable to find Region field.");
             }
@@ -71,17 +71,17 @@ namespace Squidex.ICIS.Kafka.Services
             var commodity = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("commodity")).Item1;
             var region = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("region")).Item1;
 
-            if (!commentaryType.Data.TryGetValue("ID", out var commentaryTypeIdData))
+            if (!commentaryType.Data.TryGetValue("id", out var commentaryTypeIdData))
             {
                 throw new Exception("Unable to find commentary-type Id field.");
             }
 
-            if (!commodity.Data.TryGetValue("ID", out var commodityIdData))
+            if (!commodity.Data.TryGetValue("id", out var commodityIdData))
             {
                 throw new Exception("Unable to find commodity Id field.");
             }
 
-            if (!region.Data.TryGetValue("ID", out var regionIdData))
+            if (!region.Data.TryGetValue("id", out var regionIdData))
             {
                 throw new Exception("Unable to find commodity Id field.");
             }

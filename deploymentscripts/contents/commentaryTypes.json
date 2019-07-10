@@ -1,10 +1,10 @@
 {
     "commentaryTypes": [
         {
-            "ID": {
+            "id": {
                 "iv": "1"
             },
-            "Name": {
+            "name": {
                 "iv": "Overview"
             }
         }

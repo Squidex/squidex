@@ -58,146 +58,15 @@ namespace Squidex.ICIS.Kafka.Consumer
                 {
                     try
                     {
-                        var contentConsumed = consumer.Consume(cts.Token);
+                        var consumed = consumer.Consume(cts.Token);
+                        var consumedId = consumed.Message.Key;
+                        var consumedFields = consumed.Value.Schema.Fields;
 
-                        var contentConsumedId = contentConsumed.Message.Key;
-                        var contentConsumedFields = contentConsumed.Value.Schema.Fields;
-
-                        // TODO: Extract to methods.
-                        if (app == null)
-                        {   
-                            app = await appProvider.GetAppAsync(options.AppName);
-                        }
-
-                        if (app == null)
-                        {
-                            throw new InvalidOperationException($"Cannot find app with name '{options.AppName}'");
-                        }
-
-                        if (schemaId == null)
-                        {
-                            var schema = await appProvider.GetSchemaAsync(app.Id, options.SchemaName);
-
-                            schemaId = schema?.NamedId();
-                        }
-
-                        if (schemaId == null)
-                        {
-                            var createSchema = new CreateSchema
-                            {
-                                AppId = EntityExtensions.NamedId(app),
-                                Actor = actor,
-                                User = user,
-                                Name = options.SchemaName,
-                                Fields = new List<UpsertSchemaField>(),
-                                IsPublished = true
-                            };
-
-                            foreach (var field in contentConsumedFields)
-                            {
-                                var type = field.Schema.Tag;
-
-                                var schemaField = new UpsertSchemaField
-                                {
-                                    Name = MapName(field.Name)
-                                };
-
-                                switch (type)
-                                {
-                                    case Avro.Schema.Type.Boolean:
-                                        schemaField.Properties = new BooleanFieldProperties
-                                        {
-                                            IsListField = contentConsumedFields.Count <= 3
-                                        };
-                                        break;
-                                    case Avro.Schema.Type.String:
-                                        schemaField.Properties = new StringFieldProperties
-                                        {
-                                            IsListField = contentConsumedFields.Count <= 3
-                                        };
-                                        break;
-                                    case Avro.Schema.Type.Int:
-                                    case Avro.Schema.Type.Float:
-                                    case Avro.Schema.Type.Double:
-                                        schemaField.Properties = new NumberFieldProperties
-                                        {
-                                            IsListField = contentConsumedFields.Count <= 3
-                                        };
-                                        break;
-                                    default:
-                                        throw new NotSupportedException();
-                                }
-
-                                createSchema.Fields.Add(schemaField);
-                            }
-
-                            await commandBus.PublishAsync(createSchema);
-
-                            schemaId = NamedId.Of(createSchema.SchemaId, options.SchemaName);
-                        }
-
-                        if (!contentIds.TryGetValue(contentConsumedId, out var contentId))
-                        {
-                            var queryContext = QueryContext.Create(app, user, actor.Identifier).WithUnpublished(true);
-
-                            var contents = await contentQuery.QueryAsync(queryContext, options.SchemaName, Q.Empty.WithODataQuery($"$filter=data/ID/iv eq '{contentConsumedId}'"));
-                            var contentFound = contents.FirstOrDefault();
-
-                            if (contentFound != null)
-                            {
-                                contentId = contentFound.Id;
-                                contentIds[contentConsumedId] = contentFound.Id;
-                            }
-                        }
-
-                        var data = new NamedContentData();
-
-                        if (options.Mapping?.Count > 0)
-                        {
-                            foreach (var mapping in options.Mapping)
-                            {
-                                data.AddField(mapping.Key,
-                                    new ContentFieldData()
-                                        .AddValue(contentConsumed.Value[mapping.Value]));
-                            }
-                        }
-                        else
-                        {
-                            foreach (var field in contentConsumedFields)
-                            {
-                                data.AddField(MapName(field.Name),
-                                    new ContentFieldData()
-                                        .AddValue(contentConsumed.Value[field.Name]));
-
-                            }
-                        }
-
-                        if (contentId != Guid.Empty)
-                        {
-                            await commandBus.PublishAsync(new UpdateContent
-                            {
-                                ContentId = contentId,
-                                Actor = actor,
-                                User = user,
-                                Data = data
-                            });
-                        }
-                        else
-                        {
-                            var command = new CreateContent
-                            {
-                                AppId = EntityExtensions.NamedId(app),
-                                SchemaId = schemaId,
-                                Actor = actor,
-                                User = user,
-                                Publish = true,
-                                Data = data
-                            };
-
-                            await commandBus.PublishAsync(command);
-
-                            contentIds[contentConsumedId] = command.ContentId;
-                        }
+                        await EnsureAppExistsAsync();
+                        await CheckOrCreateSchemaAsync(consumedFields);
+                        var contentId = await GetContentId(consumedId);
+                        var data = CreateContentData(consumed, consumedFields);
+                        await CreateOrUpdateContent(consumedId, contentId, data);
                     }
                     catch (OperationCanceledException)
                     {
@@ -217,19 +86,158 @@ namespace Squidex.ICIS.Kafka.Consumer
             return Task.CompletedTask;
         }
 
-        private static string MapName(string name)
+        private async Task CreateOrUpdateContent(string consumedId, Guid contentId, NamedContentData data)
         {
-            if (string.Equals(name, "id", StringComparison.OrdinalIgnoreCase))
+            if (contentId != Guid.Empty)
             {
-                name = "ID";
+                await commandBus.PublishAsync(new UpdateContent
+                {
+                    ContentId = contentId,
+                    Actor = actor,
+                    User = user,
+                    Data = data
+                });
             }
             else
             {
-                // name => Name, first_name => FirstName
-                name = name.ToPascalCase();
+                var command = new CreateContent
+                {
+                    AppId = EntityExtensions.NamedId(app),
+                    SchemaId = schemaId,
+                    Actor = actor,
+                    User = user,
+                    Publish = true,
+                    Data = data
+                };
+
+                await commandBus.PublishAsync(command);
+
+                contentIds[consumedId] = command.ContentId;
+            }
+        }
+
+        private NamedContentData CreateContentData(Confluent.Kafka.ConsumeResult<string, GenericRecord> consumed, List<Avro.Field> consumedFields)
+        {
+            var data = new NamedContentData();
+
+            if (options.Mapping?.Count > 0)
+            {
+                foreach (var mapping in options.Mapping)
+                {
+                    data.AddField(mapping.Key,
+                        new ContentFieldData()
+                            .AddValue(consumed.Value[mapping.Value]));
+                }
+            }
+            else
+            {
+                foreach (var field in consumedFields)
+                {
+                    data.AddField(field.Name,
+                        new ContentFieldData()
+                            .AddValue(consumed.Value[field.Name]));
+
+                }
             }
 
-            return name;
+            return data;
+        }
+
+        private async Task<Guid> GetContentId(string consumedId)
+        {
+            if (!contentIds.TryGetValue(consumedId, out var contentId))
+            {
+                var queryContext = QueryContext.Create(app, user, actor.Identifier).WithUnpublished(true);
+
+                var contents = await contentQuery.QueryAsync(queryContext, options.SchemaName, Q.Empty.WithODataQuery($"$filter=data/id/iv eq '{consumedId}'"));
+                var contentFound = contents.FirstOrDefault();
+
+                if (contentFound != null)
+                {
+                    contentId = contentFound.Id;
+                    contentIds[consumedId] = contentFound.Id;
+                }
+            }
+
+            return contentId;
+        }
+
+        private async Task EnsureAppExistsAsync()
+        {
+            if (app == null)
+            {
+                app = await appProvider.GetAppAsync(options.AppName);
+            }
+
+            if (app == null)
+            {
+                throw new InvalidOperationException($"Cannot find app with name '{options.AppName}'");
+            }
+        }
+
+        private async Task CheckOrCreateSchemaAsync(List<Avro.Field> fields)
+        {
+            if (schemaId == null)
+            {
+                var schema = await appProvider.GetSchemaAsync(app.Id, options.SchemaName);
+
+                schemaId = schema?.NamedId();
+            }
+
+            if (schemaId == null)
+            {
+                var createSchema = new CreateSchema
+                {
+                    AppId = EntityExtensions.NamedId(app),
+                    Actor = actor,
+                    User = user,
+                    Name = options.SchemaName,
+                    Fields = new List<UpsertSchemaField>(),
+                    IsPublished = true
+                };
+
+                foreach (var field in fields)
+                {
+                    var type = field.Schema.Tag;
+
+                    var schemaField = new UpsertSchemaField
+                    {
+                        Name = field.Name
+                    };
+
+                    switch (type)
+                    {
+                        case Avro.Schema.Type.Boolean:
+                            schemaField.Properties = new BooleanFieldProperties
+                            {
+                                IsListField = fields.Count <= 3
+                            };
+                            break;
+                        case Avro.Schema.Type.String:
+                            schemaField.Properties = new StringFieldProperties
+                            {
+                                IsListField = fields.Count <= 3
+                            };
+                            break;
+                        case Avro.Schema.Type.Int:
+                        case Avro.Schema.Type.Float:
+                        case Avro.Schema.Type.Double:
+                            schemaField.Properties = new NumberFieldProperties
+                            {
+                                IsListField = fields.Count <= 3
+                            };
+                            break;
+                        default:
+                            throw new NotSupportedException();
+                    }
+
+                    createSchema.Fields.Add(schemaField);
+                }
+
+                await commandBus.PublishAsync(createSchema);
+
+                schemaId = NamedId.Of(createSchema.SchemaId, options.SchemaName);
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

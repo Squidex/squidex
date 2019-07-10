@@ -17,14 +17,14 @@ namespace Squidex.ICIS.Kafka.Services
         {
             var region = new Region();
 
-            if (!contentEvent.Data.TryGetValue("ID", out var idData))
+            if (!contentEvent.Data.TryGetValue("id", out var idData))
             {
                 throw new System.Exception("Unable to find Id field.");
             }
 
             region.Id = idData["iv"].ToString();
 
-            if (!contentEvent.Data.TryGetValue("Name", out var nameData))
+            if (!contentEvent.Data.TryGetValue("name", out var nameData))
             {
                 throw new System.Exception("Unable to find Name field.");
             }
