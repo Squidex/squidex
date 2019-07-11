@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.0.0 - 2019-07-11
+
+This version contains many major breaking changes. Please read: https://docs.squidex.io/next/02-api-compatibility
+
+### Features
+
+* **Content**: Worklflow system
+* **API**: Hateoas
+* **API**: Info endpoint
+* **Configuration**: A lot of configuration settings to tweak some aspects of the UI.
+
 ## v3.0.0-beta2 - 2019-06-29
 
 ### Features
