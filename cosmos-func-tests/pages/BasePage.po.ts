@@ -8,7 +8,7 @@ import { browser, element, by, ExpectedConditions } from "protractor";
 export class BasePage {
   constructor() {}
 
-  loginButton() {
+ public loginButton() {
     return element(
       by.className("btn btn-success btn-lg login-button login-element")
     ).click();
