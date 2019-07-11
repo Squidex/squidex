@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Logging;
 using Migrate_01;
 using Squidex.Areas.Api;
 using Squidex.Areas.Api.Config.Swagger;
@@ -23,7 +22,6 @@ using Squidex.Areas.IdentityServer.Config;
 using Squidex.Areas.OrleansDashboard;
 using Squidex.Areas.Portal;
 using Squidex.Config;
-using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
 using Squidex.Config.Orleans;
 using Squidex.Config.Startup;
@@ -31,7 +29,6 @@ using Squidex.Config.Web;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.ICIS.Extensions;
-using Squidex.ICIS.Kafka.Config;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.Translations;
@@ -62,8 +59,6 @@ namespace Squidex
 
             services.AddMyAssetServices(config);
             services.AddIcisServices(config);
-
-            IdentityModelEventSource.ShowPII = true;
 
             services.AddMyMvcWithPlugins(config);
 

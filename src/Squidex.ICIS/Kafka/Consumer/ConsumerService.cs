@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
-using Avro.Generic;
+﻿using Avro.Generic;
 using Microsoft.Extensions.Hosting;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -19,6 +13,14 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
+using Avro;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.ICIS.Kafka.Consumer
 {
@@ -37,6 +39,7 @@ namespace Squidex.ICIS.Kafka.Consumer
         private IAppEntity app;
         private NamedId<Guid> schemaId;
         private Task consumerTask;
+        private ISchemaEntity schema;
 
         public ConsumerService(ConsumerOptions options, IKafkaConsumer<GenericRecord> consumer, ICommandBus commandBus, IAppProvider appProvider, IContentQueryService contentQuery, ISemanticLog log)
         {
@@ -90,11 +93,9 @@ namespace Squidex.ICIS.Kafka.Consumer
         {
             if (contentId != Guid.Empty)
             {
-                await commandBus.PublishAsync(new UpdateContent
+                await PublishAsync(new UpdateContent
                 {
                     ContentId = contentId,
-                    Actor = actor,
-                    User = user,
                     Data = data
                 });
             }
@@ -104,13 +105,11 @@ namespace Squidex.ICIS.Kafka.Consumer
                 {
                     AppId = EntityExtensions.NamedId(app),
                     SchemaId = schemaId,
-                    Actor = actor,
-                    User = user,
                     Publish = true,
                     Data = data
                 };
 
-                await commandBus.PublishAsync(command);
+                await PublishAsync(command);
 
                 contentIds[consumedId] = command.ContentId;
             }
@@ -179,9 +178,37 @@ namespace Squidex.ICIS.Kafka.Consumer
         {
             if (schemaId == null)
             {
-                var schema = await appProvider.GetSchemaAsync(app.Id, options.SchemaName);
-
+                schema = await appProvider.GetSchemaAsync(app.Id, options.SchemaName);
                 schemaId = schema?.NamedId();
+            }
+
+            if (schema != null && schemaId != null)
+            {
+                var isUpdated = false;
+
+                foreach (var field in fields)
+                {
+                    if (!schema.SchemaDef.FieldsByName.ContainsKey(field.Name))
+                    {
+                        var schemaField = MapField(field);
+                        schemaField.Properties.IsListField = fields.Count <= 3;
+
+                        await PublishAsync(new AddField
+                        {
+                            SchemaId = schemaId.Id,
+                            Name = schemaField.Name,
+                            Properties = schemaField.Properties,
+                            Partitioning = schemaField.Partitioning
+                        });
+
+                        isUpdated = true;
+                    }
+                }
+
+                if (isUpdated)
+                {
+                    schema = await appProvider.GetSchemaAsync(app.Id, options.SchemaName);
+                }
             }
 
             if (schemaId == null)
@@ -189,8 +216,6 @@ namespace Squidex.ICIS.Kafka.Consumer
                 var createSchema = new CreateSchema
                 {
                     AppId = EntityExtensions.NamedId(app),
-                    Actor = actor,
-                    User = user,
                     Name = options.SchemaName,
                     Fields = new List<UpsertSchemaField>(),
                     IsPublished = true
@@ -198,46 +223,53 @@ namespace Squidex.ICIS.Kafka.Consumer
 
                 foreach (var field in fields)
                 {
-                    var type = field.Schema.Tag;
-
-                    var schemaField = new UpsertSchemaField
-                    {
-                        Name = field.Name
-                    };
-
-                    switch (type)
-                    {
-                        case Avro.Schema.Type.Boolean:
-                            schemaField.Properties = new BooleanFieldProperties
-                            {
-                                IsListField = fields.Count <= 3
-                            };
-                            break;
-                        case Avro.Schema.Type.String:
-                            schemaField.Properties = new StringFieldProperties
-                            {
-                                IsListField = fields.Count <= 3
-                            };
-                            break;
-                        case Avro.Schema.Type.Int:
-                        case Avro.Schema.Type.Float:
-                        case Avro.Schema.Type.Double:
-                            schemaField.Properties = new NumberFieldProperties
-                            {
-                                IsListField = fields.Count <= 3
-                            };
-                            break;
-                        default:
-                            throw new NotSupportedException();
-                    }
-
+                    var schemaField = MapField(field);
+                    schemaField.Properties.IsListField = fields.Count <= 3;
                     createSchema.Fields.Add(schemaField);
                 }
 
-                await commandBus.PublishAsync(createSchema);
+                await PublishAsync(createSchema);
 
                 schemaId = NamedId.Of(createSchema.SchemaId, options.SchemaName);
             }
+
+        }
+
+        private static UpsertSchemaField MapField(Field field)
+        {
+            var type = field.Schema.Tag;
+
+            var schemaField = new UpsertSchemaField
+            {
+                Name = field.Name
+            };
+
+            switch (type)
+            {
+                case Avro.Schema.Type.Boolean:
+                    schemaField.Properties = new BooleanFieldProperties();
+                    break;
+                case Avro.Schema.Type.String:
+                    schemaField.Properties = new StringFieldProperties();
+                    break;
+                case Avro.Schema.Type.Int:
+                case Avro.Schema.Type.Float:
+                case Avro.Schema.Type.Double:
+                    schemaField.Properties = new NumberFieldProperties();
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            return schemaField;
+        }
+
+        private Task PublishAsync(SquidexCommand command)
+        {
+            command.Actor = actor;
+            command.User = user;
+
+            return commandBus.PublishAsync(command);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

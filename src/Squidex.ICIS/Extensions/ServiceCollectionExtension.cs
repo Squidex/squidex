@@ -5,6 +5,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using System.Diagnostics;
 using Avro.Generic;
 using Confluent.SchemaRegistry;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Squidex.ICIS.Handlers;
 using Squidex.ICIS.Interfaces;
@@ -27,6 +29,11 @@ namespace Squidex.ICIS.Extensions
     {
         public static void AddIcisServices(this IServiceCollection services, IConfiguration config)
         {
+            if (Debugger.IsAttached)
+            {
+                IdentityModelEventSource.ShowPII = true;
+            }
+
             var identityOptions = config.GetSection("identity").Get<MyIdentityOptionsExtension>();
             services.AddGenesisAuthentication(identityOptions.IcisAuthServer);
             services.Configure<ICISKafkaOptions>(config.GetSection("kafka"));

@@ -2,6 +2,6 @@
 {
     public class MyIdentityOptionsExtension
     {
-        public string IcisAuthServer;
+        public string IcisAuthServer { get; set; }
     }
 }
