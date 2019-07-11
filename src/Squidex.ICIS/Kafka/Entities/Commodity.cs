@@ -11,7 +11,6 @@ using Avro.Specific;
 namespace Squidex.ICIS.Kafka.Entities
 {
     // Please do not rename _SCHEMA variable. AvroSerializer class in Avro assembly looks for this particular property name.
-    [TopicName("Commodity")]
     public class Commodity : ISpecificRecord
     {
         public static readonly Schema _SCHEMA = Schema.Parse(@"

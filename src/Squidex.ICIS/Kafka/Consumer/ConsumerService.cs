@@ -20,7 +20,6 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Avro;
-using Squidex.Infrastructure.Json;
 
 namespace Squidex.ICIS.Kafka.Consumer
 {
