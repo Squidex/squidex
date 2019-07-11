@@ -27,9 +27,10 @@ namespace Squidex.ICIS.Extensions
     {
         public static void AddIcisServices(this IServiceCollection services, IConfiguration config)
         {
-            // Create MyIdentityOptionExtension and call GenesisAuth from here
+            var identityOptions = config.GetSection("identity").Get<MyIdentityOptionsExtension>();
+            services.AddGenesisAuthentication(identityOptions.IcisAuthServer);
             services.Configure<ICISKafkaOptions>(config.GetSection("kafka"));
-            services.AddKafkaRuleExtention(config);
+            services.AddKafkaRuleExtension(config);
             services.AddKafkaConsumers(config);
         }
 
@@ -55,7 +56,7 @@ namespace Squidex.ICIS.Extensions
                 .AddCookie();
         }
 
-        public static void AddKafkaRuleExtention(this IServiceCollection services, IConfiguration config)
+        public static void AddKafkaRuleExtension(this IServiceCollection services, IConfiguration config)
         {
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
             if (kafkaOptions.IsProducerConfigured())

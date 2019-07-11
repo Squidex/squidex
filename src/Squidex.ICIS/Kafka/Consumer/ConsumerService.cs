@@ -64,9 +64,9 @@ namespace Squidex.ICIS.Kafka.Consumer
 
                         await EnsureAppExistsAsync();
                         await CheckOrCreateSchemaAsync(consumedFields);
-                        var contentId = await GetContentId(consumedId);
+                        var contentId = await GetContentIdAsync(consumedId);
                         var data = CreateContentData(consumed, consumedFields);
-                        await CreateOrUpdateContent(consumedId, contentId, data);
+                        await CreateOrUpdateContentAsync(consumedId, contentId, data);
                     }
                     catch (OperationCanceledException)
                     {
@@ -86,7 +86,7 @@ namespace Squidex.ICIS.Kafka.Consumer
             return Task.CompletedTask;
         }
 
-        private async Task CreateOrUpdateContent(string consumedId, Guid contentId, NamedContentData data)
+        private async Task CreateOrUpdateContentAsync(string consumedId, Guid contentId, NamedContentData data)
         {
             if (contentId != Guid.Empty)
             {
@@ -143,7 +143,7 @@ namespace Squidex.ICIS.Kafka.Consumer
             return data;
         }
 
-        private async Task<Guid> GetContentId(string consumedId)
+        private async Task<Guid> GetContentIdAsync(string consumedId)
         {
             if (!contentIds.TryGetValue(consumedId, out var contentId))
             {

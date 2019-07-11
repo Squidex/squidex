@@ -61,8 +61,6 @@ namespace Squidex
             services.AddOptions();
 
             services.AddMyAssetServices(config);
-            var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
-            services.AddGenesisAuthentication(identityOptions.ICISAuthServer);
             services.AddIcisServices(config);
 
             IdentityModelEventSource.ShowPII = true;
