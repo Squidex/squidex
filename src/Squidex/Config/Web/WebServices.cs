@@ -8,9 +8,11 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
+using Squidex.ICIS;
 using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
 using Squidex.Web;
@@ -49,8 +51,7 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<ContextProvider>()
                 .As<IContextProvider>();
 
-            services.AddSingletonAs<ApiPermissionUnifier>()
-                .As<IClaimsTransformation>();
+            services.TryAddSingleton<IClaimsTransformation, ApiPermissionUnifier>();
 
             services.AddMvc(options =>
             {
