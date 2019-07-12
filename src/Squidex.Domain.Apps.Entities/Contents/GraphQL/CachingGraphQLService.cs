@@ -29,7 +29,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             this.resolver = resolver;
         }
 
-        public async Task<(bool HasError, object Response)> QueryAsync(QueryContext context, params GraphQLQuery[] queries)
+        public async Task<(bool HasError, object Response)> QueryAsync(Context context, params GraphQLQuery[] queries)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(queries, nameof(queries));
@@ -40,10 +40,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
             var result = await Task.WhenAll(queries.Select(q => QueryInternalAsync(model, ctx, q)));
 
-            return (result.Any(x => x.HasError), result.ToArray(x => x.Response));
+            return (result.Any(x => x.HasError), result.Map(x => x.Response));
         }
 
-        public async Task<(bool HasError, object Response)> QueryAsync(QueryContext context, GraphQLQuery query)
+        public async Task<(bool HasError, object Response)> QueryAsync(Context context, GraphQLQuery query)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(query, nameof(query));

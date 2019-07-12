@@ -24,9 +24,9 @@ import {
     templateUrl: './user-page.component.html'
 })
 export class UserPageComponent extends ResourceOwner implements OnInit {
-    public canUpdate = false;
+    public isEditable = true;
 
-    public user?: { user: UserDto, isCurrentUser: boolean };
+    public user?: UserDto;
     public userForm = new UserForm(this.formBuilder);
 
     constructor(
@@ -45,17 +45,24 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
                     this.user = selectedUser!;
 
                     if (selectedUser) {
-                        this.userForm.load(selectedUser.user);
+                        this.isEditable = this.user.canUpdate;
+
+                        this.userForm.load(selectedUser);
+                        this.userForm.setEnabled(this.isEditable);
                     }
                 }));
     }
 
     public save() {
+        if (!this.isEditable) {
+            return;
+        }
+
         const value = this.userForm.submit();
 
         if (value) {
             if (this.user) {
-                this.usersState.update(this.user.user, value)
+                this.usersState.update(this.user, value)
                     .subscribe(() => {
                         this.userForm.submitCompleted();
                     }, error => {

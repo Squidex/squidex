@@ -10,9 +10,11 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Contents
 {
-    [EventType(nameof(ContentCreated))]
+    [EventType(nameof(ContentCreated), 2)]
     public sealed class ContentCreated : ContentEvent
     {
+        public Status Status { get; set; }
+
         public NamedContentData Data { get; set; }
     }
 }

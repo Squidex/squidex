@@ -198,6 +198,17 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             var externalProviders = await signInManager.GetExternalProvidersAsync();
 
+            if (externalProviders.Count == 1 && !allowPasswordAuth)
+            {
+                var provider = externalProviders[0].AuthenticationScheme;
+
+                var properties =
+                    signInManager.ConfigureExternalAuthenticationProperties(provider,
+                        Url.Action(nameof(ExternalCallback), new { ReturnUrl = returnUrl }));
+
+                return Challenge(properties, provider);
+            }
+
             var vm = new LoginVM
             {
                 ExternalProviders = externalProviders,
@@ -242,7 +253,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             var isLoggedIn = result.Succeeded;
 
-            UserWithClaims user = null;
+            UserWithClaims user;
 
             if (isLoggedIn)
             {

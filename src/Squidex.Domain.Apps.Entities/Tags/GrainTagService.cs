@@ -45,17 +45,17 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return GetGrain(appId, group).DenormalizeTagsAsync(ids);
         }
 
-        public Task<Dictionary<string, int>> GetTagsAsync(Guid appId, string group)
+        public Task<TagsSet> GetTagsAsync(Guid appId, string group)
         {
             return GetGrain(appId, group).GetTagsAsync();
         }
 
-        public Task<TagSet> GetExportableTagsAsync(Guid appId, string group)
+        public Task<TagsExport> GetExportableTagsAsync(Guid appId, string group)
         {
             return GetGrain(appId, group).GetExportableTagsAsync();
         }
 
-        public Task RebuildTagsAsync(Guid appId, string group, TagSet tags)
+        public Task RebuildTagsAsync(Guid appId, string group, TagsExport tags)
         {
             return GetGrain(appId, group).RebuildAsync(tags);
         }

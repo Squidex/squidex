@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
-using System;
 using P = Squidex.Domain.Apps.Core.Partitioning;
 
 namespace Squidex.Domain.Apps.Core.Schemas.Json
@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
             if (Properties is ArrayFieldProperties arrayProperties)
             {
-                var nested = Children?.ToArray(n => n.ToNestedField()) ?? Array.Empty<NestedField>();
+                var nested = Children?.Map(n => n.ToNestedField()) ?? Array.Empty<NestedField>();
 
                 return new ArrayField(Id, Name, partitioning, nested, arrayProperties, this);
             }

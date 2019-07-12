@@ -66,4 +66,4 @@ const routes: Routes = [
         UsageTriggerComponent
     ]
 })
-export class SqxFeatureRulesModule { }
+export class SqxFeatureRulesModule {}

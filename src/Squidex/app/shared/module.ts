@@ -64,7 +64,6 @@ import {
     NewsService,
     PatternsService,
     PatternsState,
-    PermissionDirective,
     PlansService,
     PlansState,
     RichEditorComponent,
@@ -94,7 +93,9 @@ import {
     UserPicturePipe,
     UserPictureRefPipe,
     UsersProviderService,
-    UsersService
+    UsersService,
+    WorkflowsService,
+    WorkflowsState
 } from './declarations';
 
 @NgModule({
@@ -123,7 +124,6 @@ import {
         HistoryMessagePipe,
         LanguageSelectorComponent,
         MarkdownEditorComponent,
-        PermissionDirective,
         SchemaCategoryComponent,
         UserDtoPicture,
         UserIdPicturePipe,
@@ -155,7 +155,6 @@ import {
         HistoryMessagePipe,
         LanguageSelectorComponent,
         MarkdownEditorComponent,
-        PermissionDirective,
         RichEditorComponent,
         RouterModule,
         SchemaCategoryComponent,
@@ -227,6 +226,8 @@ export class SqxSharedModule {
                 UsagesService,
                 UsersProviderService,
                 UsersService,
+                WorkflowsService,
+                WorkflowsState,
                 {
                     provide: HTTP_INTERCEPTORS,
                     useClass: AuthInterceptor,

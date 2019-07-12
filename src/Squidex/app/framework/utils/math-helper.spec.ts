@@ -108,6 +108,54 @@ describe('MathHelper', () => {
         expect(color.a).toBe(0.5);
     });
 
+    it('should convert from hsv with red', () => {
+        const color = MathHelper.colorFromHsv(0, 1, 1);
+
+        expect(color.r).toBe(1);
+        expect(color.g).toBe(0);
+        expect(color.b).toBe(0);
+    });
+
+    it('should convert from hsv with yellow', () => {
+        const color = MathHelper.colorFromHsv(60, 1, 1);
+
+        expect(color.r).toBe(1);
+        expect(color.g).toBe(1);
+        expect(color.b).toBe(0);
+    });
+
+    it('should convert from hsv with blue', () => {
+        const color = MathHelper.colorFromHsv(120, 1, 1);
+
+        expect(color.r).toBe(0);
+        expect(color.g).toBe(1);
+        expect(color.b).toBe(0);
+    });
+
+    it('should convert from hsv with turkis', () => {
+        const color = MathHelper.colorFromHsv(180, 1, 1);
+
+        expect(color.r).toBe(0);
+        expect(color.g).toBe(1);
+        expect(color.b).toBe(1);
+    });
+
+    it('should convert from hsv with red', () => {
+        const color = MathHelper.colorFromHsv(240, 1, 1);
+
+        expect(color.r).toBe(0);
+        expect(color.g).toBe(0);
+        expect(color.b).toBe(1);
+    });
+
+    it('should convert from hsv with pink', () => {
+        const color = MathHelper.colorFromHsv(300, 1, 1);
+
+        expect(color.r).toBe(1);
+        expect(color.g).toBe(0);
+        expect(color.b).toBe(1);
+    });
+
     it('should convert to luminance', () => {
         expect(MathHelper.toLuminance(undefined!)).toBe(1);
 
@@ -115,5 +163,11 @@ describe('MathHelper', () => {
         expect(MathHelper.toLuminance({ r: 1, g: 1, b: 1, a: 1 })).toBe(1);
 
         expect(MathHelper.toLuminance({ r: 0.5, g: 0.5, b: 0.5, a: 1 })).toBe(0.5);
+    });
+
+    it('should generate random color', () => {
+        const color = MathHelper.randomColor();
+
+        expect(color[0]).toEqual('#');
     });
 });

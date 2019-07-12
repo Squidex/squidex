@@ -7,8 +7,8 @@
 
 import { MessageBus, MessageBusFactory } from './message-bus.service';
 
-class Event1 { }
-class Event2 { }
+class Event1 {}
+class Event2 {}
 
 describe('MessageBus', () => {
     it('should instantiate from factory', () => {

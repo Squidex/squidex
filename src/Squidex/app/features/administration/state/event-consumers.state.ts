@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -31,12 +31,10 @@ type EventConsumersList = ImmutableArray<EventConsumerDto>;
 @Injectable()
 export class EventConsumersState extends State<Snapshot> {
     public eventConsumers =
-        this.changes.pipe(map(x => x.eventConsumers),
-            distinctUntilChanged());
+        this.project(x => x.eventConsumers);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     constructor(
         private readonly dialogs: DialogService,
@@ -51,12 +49,12 @@ export class EventConsumersState extends State<Snapshot> {
         }
 
         return this.eventConsumersService.getEventConsumers().pipe(
-            tap(payload => {
+            tap(({ items }) => {
                 if (isReload && !silent) {
                     this.dialogs.notifyInfo('Event Consumers reloaded.');
                 }
 
-                const eventConsumers = ImmutableArray.of(payload);
+                const eventConsumers = ImmutableArray.of(items);
 
                 this.next(s => {
                     return { ...s, eventConsumers, isLoaded: true };
@@ -66,8 +64,7 @@ export class EventConsumersState extends State<Snapshot> {
     }
 
     public start(eventConsumer: EventConsumerDto): Observable<any> {
-        return this.eventConsumersService.putStart(eventConsumer.name).pipe(
-            map(() => setStopped(eventConsumer, false)),
+        return this.eventConsumersService.putStart(eventConsumer).pipe(
             tap(updated => {
                 this.replaceEventConsumer(updated);
             }),
@@ -75,8 +72,7 @@ export class EventConsumersState extends State<Snapshot> {
     }
 
     public stop(eventConsumer: EventConsumerDto): Observable<EventConsumerDto> {
-        return this.eventConsumersService.putStop(eventConsumer.name).pipe(
-            map(() => setStopped(eventConsumer, true)),
+        return this.eventConsumersService.putStop(eventConsumer).pipe(
             tap(updated => {
                 this.replaceEventConsumer(updated);
             }),
@@ -84,8 +80,7 @@ export class EventConsumersState extends State<Snapshot> {
     }
 
     public reset(eventConsumer: EventConsumerDto): Observable<EventConsumerDto> {
-        return this.eventConsumersService.putReset(eventConsumer.name).pipe(
-            map(() => reset(eventConsumer)),
+        return this.eventConsumersService.putReset(eventConsumer).pipe(
             tap(updated => {
                 this.replaceEventConsumer(updated);
             }),
@@ -100,9 +95,3 @@ export class EventConsumersState extends State<Snapshot> {
         });
     }
 }
-
-const setStopped = (eventConsumer: EventConsumerDto, isStopped: boolean) =>
-    eventConsumer.with({ isStopped });
-
-const reset = (eventConsumer: EventConsumerDto) =>
-    eventConsumer.with({ isResetting: true });

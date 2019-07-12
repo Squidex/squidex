@@ -11,6 +11,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Domain.Apps.Core.Apps.Json;
+using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -56,7 +57,9 @@ namespace Squidex.Domain.Apps.Core
                     new RolesConverter(),
                     new RuleConverter(),
                     new SchemaConverter(),
-                    new StringEnumConverter()),
+                    new StatusConverter(),
+                    new StringEnumConverter(),
+                    new WorkflowConverter()),
 
                 TypeNameHandling = typeNameHandling
             };

@@ -60,11 +60,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
             switch (command)
             {
                 case CreateApp createApp:
-                    return CreateAsync(createApp, c =>
+                    return CreateReturn(createApp, c =>
                     {
                         GuardApp.CanCreate(c);
 
                         Create(c);
+
+                        return Snapshot;
                     });
 
                 case AssignContributor assignContributor:
@@ -74,111 +76,167 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
                         AssignContributor(c, !Snapshot.Contributors.ContainsKey(assignContributor.ContributorId));
 
-                        return EntityCreatedResult.Create(c.ContributorId, Version);
+                        return Snapshot;
                     });
 
                 case RemoveContributor removeContributor:
-                    return UpdateAsync(removeContributor, c =>
+                    return UpdateReturn(removeContributor, c =>
                     {
                         GuardAppContributors.CanRemove(Snapshot.Contributors, c);
 
                         RemoveContributor(c);
+
+                        return Snapshot;
                     });
 
                 case AttachClient attachClient:
-                    return UpdateAsync(attachClient, c =>
+                    return UpdateReturn(attachClient, c =>
                     {
                         GuardAppClients.CanAttach(Snapshot.Clients, c);
 
                         AttachClient(c);
+
+                        return Snapshot;
                     });
 
                 case UpdateClient updateClient:
-                    return UpdateAsync(updateClient, c =>
+                    return UpdateReturn(updateClient, c =>
                     {
                         GuardAppClients.CanUpdate(Snapshot.Clients, c, Snapshot.Roles);
 
                         UpdateClient(c);
+
+                        return Snapshot;
                     });
 
                 case RevokeClient revokeClient:
-                    return UpdateAsync(revokeClient, c =>
+                    return UpdateReturn(revokeClient, c =>
                     {
                         GuardAppClients.CanRevoke(Snapshot.Clients, c);
 
                         RevokeClient(c);
+
+                        return Snapshot;
+                    });
+
+                case AddWorkflow addWorkflow:
+                    return UpdateReturn(addWorkflow, c =>
+                    {
+                        GuardAppWorkflows.CanAdd(c);
+
+                        AddWorkflow(c);
+
+                        return Snapshot;
+                    });
+
+                case UpdateWorkflow updateWorkflow:
+                    return UpdateReturn(updateWorkflow, c =>
+                    {
+                        GuardAppWorkflows.CanUpdate(Snapshot.Workflows, c);
+
+                        UpdateWorkflow(c);
+
+                        return Snapshot;
+                    });
+
+                case DeleteWorkflow deleteWorkflow:
+                    return UpdateReturn(deleteWorkflow, c =>
+                    {
+                        GuardAppWorkflows.CanDelete(Snapshot.Workflows, c);
+
+                        DeleteWorkflow(c);
+
+                        return Snapshot;
                     });
 
                 case AddLanguage addLanguage:
-                    return UpdateAsync(addLanguage, c =>
+                    return UpdateReturn(addLanguage, c =>
                     {
                         GuardAppLanguages.CanAdd(Snapshot.LanguagesConfig, c);
 
                         AddLanguage(c);
+
+                        return Snapshot;
                     });
 
                 case RemoveLanguage removeLanguage:
-                    return UpdateAsync(removeLanguage, c =>
+                    return UpdateReturn(removeLanguage, c =>
                     {
                         GuardAppLanguages.CanRemove(Snapshot.LanguagesConfig, c);
 
                         RemoveLanguage(c);
+
+                        return Snapshot;
                     });
 
                 case UpdateLanguage updateLanguage:
-                    return UpdateAsync(updateLanguage, c =>
+                    return UpdateReturn(updateLanguage, c =>
                     {
                         GuardAppLanguages.CanUpdate(Snapshot.LanguagesConfig, c);
 
                         UpdateLanguage(c);
+
+                        return Snapshot;
                     });
 
                 case AddRole addRole:
-                    return UpdateAsync(addRole, c =>
+                    return UpdateReturn(addRole, c =>
                     {
                         GuardAppRoles.CanAdd(Snapshot.Roles, c);
 
                         AddRole(c);
+
+                        return Snapshot;
                     });
 
                 case DeleteRole deleteRole:
-                    return UpdateAsync(deleteRole, c =>
+                    return UpdateReturn(deleteRole, c =>
                     {
                         GuardAppRoles.CanDelete(Snapshot.Roles, c, Snapshot.Contributors, Snapshot.Clients);
 
                         DeleteRole(c);
+
+                        return Snapshot;
                     });
 
                 case UpdateRole updateRole:
-                    return UpdateAsync(updateRole, c =>
+                    return UpdateReturn(updateRole, c =>
                     {
                         GuardAppRoles.CanUpdate(Snapshot.Roles, c);
 
                         UpdateRole(c);
+
+                        return Snapshot;
                     });
 
                 case AddPattern addPattern:
-                    return UpdateAsync(addPattern, c =>
+                    return UpdateReturn(addPattern, c =>
                     {
                         GuardAppPatterns.CanAdd(Snapshot.Patterns, c);
 
                         AddPattern(c);
+
+                        return Snapshot;
                     });
 
                 case DeletePattern deletePattern:
-                    return UpdateAsync(deletePattern, c =>
+                    return UpdateReturn(deletePattern, c =>
                     {
                         GuardAppPatterns.CanDelete(Snapshot.Patterns, c);
 
                         DeletePattern(c);
+
+                        return Snapshot;
                     });
 
                 case UpdatePattern updatePattern:
-                    return UpdateAsync(updatePattern, c =>
+                    return UpdateReturn(updatePattern, c =>
                     {
                         GuardAppPatterns.CanUpdate(Snapshot.Patterns, c);
 
                         UpdatePattern(c);
+
+                        return Snapshot;
                     });
 
                 case ChangePlan changePlan:
@@ -289,6 +347,21 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public void RevokeClient(RevokeClient command)
         {
             RaiseEvent(SimpleMapper.Map(command, new AppClientRevoked()));
+        }
+
+        public void AddWorkflow(AddWorkflow command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppWorkflowAdded()));
+        }
+
+        public void UpdateWorkflow(UpdateWorkflow command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppWorkflowUpdated()));
+        }
+
+        public void DeleteWorkflow(DeleteWorkflow command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppWorkflowDeleted()));
         }
 
         public void AddLanguage(AddLanguage command)

@@ -12,17 +12,39 @@
         <hr />
 
         <div class="sidebar-section">
-            <h3>Saved queries</h3>
+            <h3>Status Queries</h3>
 
-            <a class="sidebar-item" *ngFor="let query of schemaQueries.queries | async; trackBy: trackByQuery" (click)="search(query.filter)"
+            <a class="sidebar-item" *ngFor="let query of contentsState.statusQueries | async; trackBy: trackByQuery" (click)="search(query.filter)"
                 [class.active]="isSelectedQuery(query.filter)">
                 
-                {{query.name}}
-                
-                <a class="sidebar-item-remove float-right" (click)="schemaQueries.remove(query.name)">
-                    <i class="icon-close"></i>
-                </a>
+                <i class="icon-circle" [style.color]="query.color"></i> {{query.name}}
             </a>
+        </div>
+
+        <hr />
+
+        <div class="sidebar-section">
+            <h3>Saved queries</h3>
+
+            <ng-container *ngIf="schemaQueries.queries | async; let queries">
+                <ng-container *ngIf="queries.length > 0; else noQuery">
+                    <a class="sidebar-item" *ngFor="let query of queries; trackBy: trackByQuery" (click)="search(query.filter)"
+                        [class.active]="isSelectedQuery(query.filter)">
+                        
+                        {{query.name}}
+                        
+                        <a class="sidebar-item-remove float-right" (click)="schemaQueries.remove(query.name)">
+                            <i class="icon-close"></i>
+                        </a>
+                    </a>
+                </ng-container>
+
+                <ng-template #noQuery>
+                    <div class="sidebar-item text-muted">
+                        Search for contents and use <i class="icon-star-empty"></i> icon in search form to save query for all contributors.
+                    </div>
+                </ng-template>
+            </ng-container>
         </div>
     </ng-container>
 </sqx-panel>

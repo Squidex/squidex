@@ -32,6 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         private readonly string schemaName;
         private readonly string schemaType;
         private readonly string appPath;
+        private readonly JsonSchema4 statusSchema;
         private readonly string appName;
 
         static SchemaSwaggerGenerator()
@@ -46,12 +47,15 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             string appPath,
             Schema schema,
             SchemaResolver schemaResolver,
+            JsonSchema4 statusSchema,
             PartitionResolver partitionResolver)
         {
             this.document = document;
 
             this.appName = appName;
             this.appPath = appPath;
+
+            this.statusSchema = statusSchema;
 
             schemaPath = schema.Name;
             schemaName = schema.DisplayName();
@@ -72,15 +76,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
             var schemaOperations = new List<SwaggerPathItem>
             {
-                GenerateSchemaQueryOperation(),
-                GenerateSchemaCreateOperation(),
+                GenerateSchemaGetsOperation(),
                 GenerateSchemaGetOperation(),
+                GenerateSchemaCreateOperation(),
                 GenerateSchemaUpdateOperation(),
-                GenerateSchemaPatchOperation(),
-                GenerateSchemaPublishOperation(),
-                GenerateSchemaUnpublishOperation(),
-                GenerateSchemaArchiveOperation(),
-                GenerateSchemaRestoreOperation(),
+                GenerateSchemaUpdatePatchOperation(),
+                GenerateSchemaStatusOperation(),
+                GenerateSchemaDiscardOperation(),
                 GenerateSchemaDeleteOperation()
             };
 
@@ -90,11 +92,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             }
         }
 
-        private SwaggerPathItem GenerateSchemaQueryOperation()
+        private SwaggerPathItem GenerateSchemaGetsOperation()
         {
             return AddOperation(SwaggerOperationMethod.Get, null, $"{appPath}/{schemaPath}", operation =>
             {
                 operation.OperationId = $"Query{schemaType}Contents";
+
                 operation.Summary = $"Queries {schemaName} contents.";
 
                 operation.Description = SchemaQueryDescription;
@@ -103,7 +106,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.AddQueryParameter("$skip", JsonObjectType.Number, "Optional number of contents to skip.");
                 operation.AddQueryParameter("$filter", JsonObjectType.String, "Optional OData filter.");
                 operation.AddQueryParameter("$search", JsonObjectType.String, "Optional OData full text search.");
-                operation.AddQueryParameter("orderby", JsonObjectType.String, "Optional OData order definition.");
+                operation.AddQueryParameter("$orderby", JsonObjectType.String, "Optional OData order definition.");
+                operation.AddQueryParameter("$orderby", JsonObjectType.String, "Optional OData order definition.");
 
                 operation.AddResponse("200", $"{schemaName} content retrieved.", CreateContentsSchema(schemaName, contentSchema));
 
@@ -116,6 +120,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return AddOperation(SwaggerOperationMethod.Get, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
                 operation.OperationId = $"Get{schemaType}Content";
+
                 operation.Summary = $"Get a {schemaName} content.";
 
                 operation.AddResponse("200", $"{schemaName} content found.", contentSchema);
@@ -129,12 +134,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return AddOperation(SwaggerOperationMethod.Post, null, $"{appPath}/{schemaPath}", operation =>
             {
                 operation.OperationId = $"Create{schemaType}Content";
+
                 operation.Summary = $"Create a {schemaName} content.";
 
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
                 operation.AddQueryParameter("publish", JsonObjectType.Boolean, "Set to true to autopublish content.");
 
-                operation.AddResponse("201", $"{schemaName} content created.", contentSchema);
+                operation.AddResponse("200", $"{schemaName} content created.", contentSchema);
+                operation.AddResponse("400", "Content data valid.");
 
                 AddSecurity(operation, Permissions.AppContentsCreate);
             });
@@ -145,80 +152,64 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
                 operation.OperationId = $"Update{schemaType}Content";
+
                 operation.Summary = $"Update a {schemaName} content.";
 
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
-                operation.AddResponse("200", $"{schemaName} content updated.", dataSchema);
+                operation.AddResponse("200", $"{schemaName} content updated.", contentSchema);
+                operation.AddResponse("400", "Content data valid.");
 
                 AddSecurity(operation, Permissions.AppContentsUpdate);
             });
         }
 
-        private SwaggerPathItem GenerateSchemaPatchOperation()
+        private SwaggerPathItem GenerateSchemaUpdatePatchOperation()
         {
             return AddOperation(SwaggerOperationMethod.Patch, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
                 operation.OperationId = $"Path{schemaType}Content";
+
                 operation.Summary = $"Patch a {schemaName} content.";
 
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
-                operation.AddResponse("200", $"{schemaName} content patched.", dataSchema);
+                operation.AddResponse("200", $"{schemaName} content patched.", contentSchema);
+                operation.AddResponse("400", "Status change not valid.");
 
                 AddSecurity(operation, Permissions.AppContentsUpdate);
             });
         }
 
-        private SwaggerPathItem GenerateSchemaPublishOperation()
+        private SwaggerPathItem GenerateSchemaStatusOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/publish", operation =>
+            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/status", operation =>
             {
-                operation.OperationId = $"Publish{schemaType}Content";
-                operation.Summary = $"Publish a {schemaName} content.";
+                operation.OperationId = $"Change{schemaType}ContentStatus";
 
-                operation.AddResponse("204", $"{schemaName} content published.");
+                operation.Summary = $"Change status of {schemaName} content.";
 
-                AddSecurity(operation, Permissions.AppContentsPublish);
+                operation.AddBodyParameter("request", statusSchema, "The request to change content status.");
+
+                operation.AddResponse("204", $"{schemaName} content status changed.", contentSchema);
+                operation.AddResponse("400", "Content data valid.");
+
+                AddSecurity(operation, Permissions.AppContentsUpdate);
             });
         }
 
-        private SwaggerPathItem GenerateSchemaUnpublishOperation()
+        private SwaggerPathItem GenerateSchemaDiscardOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/unpublish", operation =>
+            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/discard", operation =>
             {
-                operation.OperationId = $"Unpublish{schemaType}Content";
-                operation.Summary = $"Unpublish a {schemaName} content.";
+                operation.OperationId = $"Discard{schemaType}Content";
 
-                operation.AddResponse("204", $"{schemaName} content unpublished.");
+                operation.Summary = $"Discard changes of {schemaName} content.";
 
-                AddSecurity(operation, Permissions.AppContentsUnpublish);
-            });
-        }
+                operation.AddResponse("400", "No pending draft.");
+                operation.AddResponse("200", $"{schemaName} content status changed.", contentSchema);
 
-        private SwaggerPathItem GenerateSchemaArchiveOperation()
-        {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/archive", operation =>
-            {
-                operation.OperationId = $"Archive{schemaType}Content";
-                operation.Summary = $"Archive a {schemaName} content.";
-
-                operation.AddResponse("204", $"{schemaName} content restored.");
-
-                AddSecurity(operation, Permissions.AppContentsRead);
-            });
-        }
-
-        private SwaggerPathItem GenerateSchemaRestoreOperation()
-        {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/restore", operation =>
-            {
-                operation.OperationId = $"Restore{schemaType}Content";
-                operation.Summary = $"Restore a {schemaName} content.";
-
-                operation.AddResponse("204", $"{schemaName} content restored.");
-
-                AddSecurity(operation, Permissions.AppContentsRestore);
+                AddSecurity(operation, Permissions.AppContentsDraftDiscard);
             });
         }
 
@@ -227,6 +218,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return AddOperation(SwaggerOperationMethod.Delete, schemaName, $"{appPath}/{schemaPath}/{{id}}/", operation =>
             {
                 operation.OperationId = $"Delete{schemaType}Content";
+
                 operation.Summary = $"Delete a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content deleted.");

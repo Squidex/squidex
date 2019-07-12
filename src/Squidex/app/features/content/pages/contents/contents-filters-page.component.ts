@@ -24,7 +24,7 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
     public schemaQueries: Queries;
 
     constructor(
-        private readonly contentsState: ContentsState,
+        public readonly contentsState: ContentsState,
         private readonly schemasState: SchemasState,
         private readonly uiState: UIState
     ) {

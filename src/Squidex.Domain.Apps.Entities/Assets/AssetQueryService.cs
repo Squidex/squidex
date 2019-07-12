@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
@@ -21,9 +20,10 @@ using Squidex.Infrastructure.Queries.OData;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public class AssetQueryService : IAssetQueryService
+    public sealed class AssetQueryService : IAssetQueryService
     {
         private readonly ITagService tagService;
+        private readonly IAssetEnricher assetEnricher;
         private readonly IAssetRepository assetRepository;
         private readonly AssetOptions options;
 
@@ -32,79 +32,85 @@ namespace Squidex.Domain.Apps.Entities.Assets
             get { return options.DefaultPageSizeGraphQl; }
         }
 
-        public AssetQueryService(ITagService tagService, IAssetRepository assetRepository, IOptions<AssetOptions> options)
+        public AssetQueryService(
+            ITagService tagService,
+            IAssetEnricher assetEnricher,
+            IAssetRepository assetRepository,
+            IOptions<AssetOptions> options)
         {
             Guard.NotNull(tagService, nameof(tagService));
-            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(assetEnricher, nameof(assetEnricher));
             Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(options, nameof(options));
 
+            this.tagService = tagService;
+            this.assetEnricher = assetEnricher;
             this.assetRepository = assetRepository;
             this.options = options.Value;
-            this.tagService = tagService;
         }
 
-        public Task<IAssetEntity> FindAssetAsync(QueryContext context, Guid id)
-        {
-            Guard.NotNull(context, nameof(context));
-
-            return FindAssetAsync(context.App.Id, id);
-        }
-
-        public async Task<IAssetEntity> FindAssetAsync(Guid appId, Guid id)
+        public async Task<IEnrichedAssetEntity> FindAssetAsync( Guid id)
         {
             var asset = await assetRepository.FindAssetAsync(id);
 
             if (asset != null)
             {
-                await DenormalizeTagsAsync(appId, Enumerable.Repeat(asset, 1));
+                return await assetEnricher.EnrichAsync(asset);
             }
 
-            return asset;
+            return null;
         }
 
-        public async Task<IList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash)
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Guid appId, string hash)
         {
             Guard.NotNull(hash, nameof(hash));
 
             var assets = await assetRepository.QueryByHashAsync(appId, hash);
 
-            await DenormalizeTagsAsync(appId, assets);
-
-            return assets;
+            return await assetEnricher.EnrichAsync(assets);
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(QueryContext context, Q query)
+        public async Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, Q query)
         {
             Guard.NotNull(context, nameof(context));
             Guard.NotNull(query, nameof(query));
 
             IResultList<IAssetEntity> assets;
 
-            if (query.Ids != null)
+            if (query.Ids != null && query.Ids.Count > 0)
             {
-                assets = await assetRepository.QueryAsync(context.App.Id, new HashSet<Guid>(query.Ids));
-                assets = Sort(assets, query.Ids);
+                assets = await QueryByIdsAsync(context, query);
             }
             else
             {
-                var parsedQuery = ParseQuery(context, query.ODataQuery);
-
-                assets = await assetRepository.QueryAsync(context.App.Id, parsedQuery);
+                assets = await QueryByQueryAsync(context, query);
             }
 
-            await DenormalizeTagsAsync(context.App.Id, assets);
+            var enriched = await assetEnricher.EnrichAsync(assets);
 
-            return assets;
+            return ResultList.Create(assets.Total, enriched);
+        }
+
+        private async Task<IResultList<IAssetEntity>> QueryByQueryAsync(Context context, Q query)
+        {
+            var parsedQuery = ParseQuery(context, query.ODataQuery);
+
+            return await assetRepository.QueryAsync(context.App.Id, parsedQuery);
+        }
+
+        private async Task<IResultList<IAssetEntity>> QueryByIdsAsync(Context context, Q query)
+        {
+            var assets = await assetRepository.QueryAsync(context.App.Id, new HashSet<Guid>(query.Ids));
+
+            return Sort(assets, query.Ids);
         }
 
         private static IResultList<IAssetEntity> Sort(IResultList<IAssetEntity> assets, IReadOnlyList<Guid> ids)
         {
-            var sorted = ids.Select(id => assets.FirstOrDefault(x => x.Id == id)).Where(x => x != null);
-
-            return ResultList.Create(assets.Total, sorted);
+            return assets.SortSet(x => x.Id, ids);
         }
 
-        private Query ParseQuery(QueryContext context, string query)
+        private Query ParseQuery(Context context, string query)
         {
             try
             {
@@ -138,35 +144,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
             catch (ODataException ex)
             {
                 throw new ValidationException($"Failed to parse query: {ex.Message}", ex);
-            }
-        }
-
-        private async Task DenormalizeTagsAsync(Guid appId, IEnumerable<IAssetEntity> assets)
-        {
-            var tags = new HashSet<string>(assets.Where(x => x.Tags != null).SelectMany(x => x.Tags).Distinct());
-
-            var tagsById = await tagService.DenormalizeTagsAsync(appId, TagGroups.Assets, tags);
-
-            foreach (var asset in assets)
-            {
-                if (asset.Tags?.Count > 0)
-                {
-                    var tagNames = asset.Tags.ToList();
-
-                    asset.Tags.Clear();
-
-                    foreach (var id in tagNames)
-                    {
-                        if (tagsById.TryGetValue(id, out var name))
-                        {
-                            asset.Tags.Add(name);
-                        }
-                    }
-                }
-                else
-                {
-                    asset.Tags?.Clear();
-                }
             }
         }
     }

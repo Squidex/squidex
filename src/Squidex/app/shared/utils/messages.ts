@@ -5,4 +5,4 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export class HistoryChannelUpdated { }
+export class HistoryChannelUpdated {}

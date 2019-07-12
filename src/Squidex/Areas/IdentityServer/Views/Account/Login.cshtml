@@ -88,14 +88,3 @@ else
         Already registered? <a asp-controller="Account" asp-action="Login" asp-route-returnurl="@Model.ReturnUrl">Click here to login</a>
     </p>
 }
-
-@if (!Model.HasPasswordAuth && Model.ExternalProviders.Count == 1)
-{
-    <script>
-        var redirectButtons = document.getElementsByClassName("redirect-button");
-
-        if (redirectButtons.length === 1) {
-            redirectButtons[0].click();
-        }
-    </script>
-}

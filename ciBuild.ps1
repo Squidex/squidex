@@ -20,6 +20,7 @@ try{
     docker build . -t $semanticDockerTag --pull `
         --build-arg http_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
         --build-arg https_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
+		--build-arg SQUIDEX__VERSION=$env:Version
 
     Write-Host "Pushing docker image $semanticDockerTag"
     docker push $semanticDockerTag

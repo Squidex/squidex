@@ -11,9 +11,7 @@ import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 import {
     AppLanguageDto,
     AppsState,
-    CONTENT_STATUSES,
     ContentDto,
-    ContentQueryStatus,
     ContentsState,
     FilterState,
     ImmutableArray,
@@ -43,11 +41,9 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public selectedItems:  { [id: string]: boolean; } = {};
     public selectionCount = 0;
+    public selectionCanDelete = false;
 
-    public canUnpublish = false;
-    public canPublish = false;
-
-    public statuses = CONTENT_STATUSES;
+    public nextStatuses: string[] = [];
 
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
@@ -56,7 +52,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public isAllSelected = false;
 
-    @ViewChild('dueTimeSelector')
+    @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(
@@ -118,36 +114,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.deleteMany([content]);
     }
 
-    public publish(content: ContentDto) {
-        this.changeContentItems([content], 'Publish');
+    public changeStatus(content: ContentDto, status: string) {
+        this.changeContentItems([content], status);
     }
 
-    public publishSelected() {
-        this.changeContentItems(this.selectItems(c => c.status !== 'Published'), 'Publish');
-    }
-
-    public unpublish(content: ContentDto) {
-        this.changeContentItems([content], 'Unpublish');
-    }
-
-    public unpublishSelected() {
-        this.changeContentItems(this.selectItems(c => c.status === 'Published'), 'Unpublish');
-    }
-
-    public archive(content: ContentDto) {
-        this.changeContentItems([content], 'Archive');
-    }
-
-    public archiveSelected() {
-        this.changeContentItems(this.selectItems(), 'Archive');
-    }
-
-    public restore(content: ContentDto) {
-        this.changeContentItems([content], 'Restore');
-    }
-
-    public restoreSelected() {
-        this.changeContentItems(this.selectItems(), 'Restore');
+    public changeSelectedStatus(status: string) {
+        this.changeContentItems(this.selectItems(c => c.status !== status), status);
     }
 
     public clone(content: ContentDto) {
@@ -166,10 +138,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 switchMap(d => this.contentsState.changeManyStatus(contents, action, d)),
                 onErrorResumeNext())
             .subscribe();
-    }
-
-    public filterStatus(status: ContentQueryStatus) {
-        this.contentsState.filterStatus(status);
     }
 
     public goPrev() {
@@ -234,25 +202,35 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.isAllSelected = this.contentsState.snapshot.contents.length > 0;
 
         this.selectionCount = 0;
+        this.selectionCanDelete = true;
 
-        this.canPublish = true;
-        this.canUnpublish = true;
+        const allActions = {};
+
+        for (let content of this.contentsState.snapshot.contents.values) {
+            for (let info of content.statusUpdates) {
+                allActions[info.status] = info.color;
+            }
+        }
 
         for (let content of this.contentsState.snapshot.contents.values) {
             if (this.selectedItems[content.id]) {
                 this.selectionCount++;
 
-                if (content.status !== 'Published') {
-                    this.canUnpublish = false;
+                for (let action in allActions) {
+                    if (!content.statusUpdates) {
+                        delete allActions[action];
+                    }
                 }
 
-                if (content.status === 'Published') {
-                    this.canPublish = false;
+                if (!content.canDelete) {
+                    this.selectionCanDelete = false;
                 }
             } else {
                 this.isAllSelected = false;
             }
         }
+
+        this.nextStatuses = Object.keys(allActions);
     }
 }
 

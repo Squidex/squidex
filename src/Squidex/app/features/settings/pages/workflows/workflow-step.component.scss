@@ -1,0 +1,76 @@
+@import '_vars';
+@import '_mixins';
+
+:host ::ng-deep {
+    .color {
+        line-height: 2.8rem;
+    }
+
+    .color-circle {
+        @include circle(12px);
+        border: 1px solid $color-border-dark;
+        background: $color-border;
+        display: inline-block;
+    }
+
+    .col-label {
+        padding: 0 .5rem;
+    }
+
+    .col-step {
+        min-width: 10rem;
+        max-width: 10rem;
+        padding-left: .5rem;
+    }
+
+    .transition {
+        & {
+            margin-top: .25rem;
+            margin-bottom: .5rem;
+            line-height: 2.2rem;
+        }
+
+        &-to {
+            padding: .5rem .75rem;
+            padding-right: 0;
+            line-height: 1.2rem;
+        }
+    }
+}
+
+.step {
+    & {
+        margin-bottom: 1.5rem;
+    }
+
+    &-inner {
+        padding-left: 2.4rem;
+    }
+
+    &-header {
+        &:hover {
+            .enabled {
+                visibility: visible;
+            }
+        }
+    }
+}
+
+.btn-initial {
+    & {
+        visibility: hidden;
+        line-height: 1.6rem;
+        padding-left: 0;
+        padding-right: 0;
+        width: 2rem;
+        text-align: center;
+    }
+
+    &:disabled {
+        @include opacity(1);
+    }
+
+    &.active {
+        visibility: visible;
+    }
+}

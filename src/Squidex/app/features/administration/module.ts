@@ -87,4 +87,4 @@ const routes: Routes = [
         UsersState
     ]
 })
-export class SqxFeatureAdministrationModule { }
+export class SqxFeatureAdministrationModule {}

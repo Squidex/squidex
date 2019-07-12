@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Invitation;
 using Squidex.Domain.Apps.Entities.Apps.Services;
@@ -47,9 +48,12 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetContributors(string app)
         {
-            var response = ContributorsDto.FromApp(App, appPlansProvider);
+            var response = Deferred.Response(() =>
+            {
+                return ContributorsDto.FromApp(App, appPlansProvider, this, false);
+            });
 
-            Response.Headers[HeaderNames.ETag] = App.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = App.ToEtag();
 
             return Ok(response);
         }
@@ -60,33 +64,22 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="request">Contributor object that needs to be added to the app.</param>
         /// <returns>
-        /// 200 => User assigned to app.
+        /// 201 => User assigned to app.
         /// 400 => User is already assigned to the app or not found.
         /// 404 => App not found.
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/contributors/")]
-        [ProducesResponseType(typeof(ContributorAssignedDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(ContributorsDto), 200)]
         [ApiPermission(Permissions.AppContributorsAssign)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto request)
         {
             var command = request.ToCommand();
-            var context = await CommandBus.PublishAsync(command);
 
-            var response = (ContributorAssignedDto)null;
+            var response = await InvokeCommandAsync(command);
 
-            if (context.PlainResult is EntityCreatedResult<string> idOrValue)
-            {
-                response = ContributorAssignedDto.FromId(idOrValue.IdOrValue, false);
-            }
-            else if (context.PlainResult is InvitedResult invited)
-            {
-                response = ContributorAssignedDto.FromId(invited.Id.IdOrValue, true);
-            }
-
-            return Ok(response);
+            return CreatedAtAction(nameof(GetContributors), new { app }, response);
         }
 
         /// <summary>
@@ -95,20 +88,36 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// <param name="app">The name of the app.</param>
         /// <param name="id">The id of the contributor.</param>
         /// <returns>
-        /// 204 => User removed from app.
+        /// 200 => User removed from app.
         /// 400 => User is not assigned to the app.
         /// 404 => Contributor or app not found.
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/contributors/{id}/")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
+        [ProducesResponseType(typeof(ContributorsDto), 200)]
         [ApiPermission(Permissions.AppContributorsRevoke)]
         [ApiCosts(1)]
         public async Task<IActionResult> DeleteContributor(string app, string id)
         {
-            await CommandBus.PublishAsync(new RemoveContributor { ContributorId = id });
+            var command = new RemoveContributor { ContributorId = id };
 
-            return NoContent();
+            var response = await InvokeCommandAsync(command);
+
+            return Ok(response);
+        }
+
+        private async Task<ContributorsDto> InvokeCommandAsync(ICommand command)
+        {
+            var context = await CommandBus.PublishAsync(command);
+
+            if (context.PlainResult is InvitedResult invited)
+            {
+                return ContributorsDto.FromApp(invited.App, appPlansProvider, this, true);
+            }
+            else
+            {
+                return ContributorsDto.FromApp(context.Result<IAppEntity>(), appPlansProvider, this, false);
+            }
         }
     }
 }

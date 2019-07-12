@@ -20,7 +20,7 @@
             </div>
             <div class="col col-options">
                 <div class="float-right">
-                    <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="editing" (click)="toggleEditing()">
+                    <button type="button" class="btn btn-secondary table-items-edit-button" [class.active]="isEditing" (click)="toggleEditing()">
                         <i class="icon-settings"></i>
                     </button>
 
@@ -30,21 +30,21 @@
                         </button>
                         <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
                             <ng-container *ngIf="field.properties.isContentField">
-                                <a class="dropdown-item" (click)="enableField()" *ngIf="field.isDisabled">
+                                <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
                                     Enable in UI
                                 </a>
-                                <a class="dropdown-item" (click)="disableField()" *ngIf="!field.isDisabled">
+                                <a class="dropdown-item" (click)="disableField()" *ngIf="field.canDisable">
                                     Disable in UI
                                 </a>
-                                <a class="dropdown-item" (click)="hideField()" *ngIf="!field.isHidden && !field.isLocked">
+                                <a class="dropdown-item" (click)="hideField()" *ngIf="field.canHide">
                                     Hide in API
                                 </a>
-                                <a class="dropdown-item" (click)="showField()" *ngIf="field.isHidden && !field.isLocked">
+                                <a class="dropdown-item" (click)="showField()" *ngIf="field.canShow">
                                     Show in API
                                 </a>
                             </ng-container>                
                             
-                            <ng-container *ngIf="!field.isLocked">
+                            <ng-container *ngIf="field.canLock">
                                 <div class="dropdown-divider"></div>
                         
                                 <a class="dropdown-item" 
@@ -53,10 +53,13 @@
                                     confirmText="Do you really want to lock the field? Locked fields cannot be deleted or changed anymore.">
                                     Lock and prevent changes
                                 </a>
-                            
+                            </ng-container>
+
+                            <ng-container>
                                 <div class="dropdown-divider"></div>
 
                                 <a class="dropdown-item dropdown-item-delete"
+                                    [class.disabled]="!field.canDelete"
                                     (sqxConfirmClick)="deleteField()"
                                     confirmTitle="Delete field" 
                                     confirmText="Do you really want to delete the field?">
@@ -70,7 +73,7 @@
         </div>
     </div>
 
-    <div class="table-items-row-details" *ngIf="editing">
+    <div class="table-items-row-details" *ngIf="isEditing">
         <form [formGroup]="editForm.form" (ngSubmit)="save()">
             <sqx-field-form
                 (cancel)="toggleEditing()"
@@ -78,6 +81,7 @@
                 [patterns]="patterns"
                 [editForm]="editForm.form"
                 [editFormSubmitted]="editForm.submitted | async"
+                [isEditable]="isEditable"
                 [field]="field">
             </sqx-field-form>
         </form> 
@@ -87,7 +91,10 @@
         <ng-container *ngIf="field['nested']; let nested">
             <span class="nested-field-line-v"></span>
 
-            <div [sqxSortModel]="nested" (sqxSort)="sortFields($event)">
+            <div
+                [sqxSortDisabled]="!isEditable"
+                [sqxSortModel]="nested"
+                (sqxSort)="sortFields($event)">
                 <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByField.bind(this)">
                     <span class="nested-field-line-h"></span>
     
@@ -95,7 +102,7 @@
                 </div>
             </div>
             
-            <div class="nested-field nested-field-add">
+            <div class="nested-field nested-field-add" *ngIf="isEditable">
                 <span class="nested-field-line-h"></span>
 
                 <button type="button" class="btn btn-success btn-sm" (click)="addFieldDialog.show()">

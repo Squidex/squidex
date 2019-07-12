@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                         await Index(GetUserId(createApp)).AddAppAsync(createApp.AppId);
                         break;
                     case AssignContributor assignContributor:
-                        await Index(GetUserId(context)).AddAppAsync(assignContributor.AppId);
+                        await Index(GetUserId(assignContributor)).AddAppAsync(assignContributor.AppId);
                         break;
                     case RemoveContributor removeContributor:
                         await Index(GetUserId(removeContributor)).RemoveAppAsync(removeContributor.AppId);
@@ -57,19 +57,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             await next();
         }
 
-        private static string GetUserId(RemoveContributor removeContributor)
-        {
-            return removeContributor.ContributorId;
-        }
-
         private static string GetUserId(CreateApp createApp)
         {
             return createApp.Actor.Identifier;
         }
 
-        private static string GetUserId(CommandContext context)
+        private static string GetUserId(AssignContributor assignContributor)
         {
-            return context.Result<EntityCreatedResult<string>>().IdOrValue;
+            return assignContributor.ContributorId;
+        }
+
+        private static string GetUserId(RemoveContributor removeContributor)
+        {
+            return removeContributor.ContributorId;
         }
 
         private IAppsByUserIndex Index(string id)

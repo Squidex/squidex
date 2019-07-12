@@ -55,7 +55,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                         if (oldName != null)
                         {
                             context.Document.Definitions.Remove(oldName);
-                            context.Document.Definitions.Add(action.Key, derivedSchema);
+                            context.Document.Definitions.Add($"{action.Key}RuleActionDto", derivedSchema);
                         }
                     }
 

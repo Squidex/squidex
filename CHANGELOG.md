@@ -1,19 +1,28 @@
 # Changelog
 
-## v3.0-beta1 - 2019-06-24
+## v3.0.0-beta2 - 2019-06-29
+
+### Features
+
+* **Content**: Editor for custom workflows.
+
+## v2.2.0 - 2019-06-29
+
+### Features
+
+* **Login**: Redirect to authentication provider automatically if only one provider is active.
+
+### Bugfixes
+
+* **GraphQL**: Fix a bug in styles that prevented to autocomplete to show properly
+
+## v3.0.0-beta1 - 2019-06-24
 
 This version contains many major breaking changes. Please read: https://docs.squidex.io/next/02-api-compatibility
 
-## Features 
-
-* **Contents**: Abstraction for content workflows.
-* **API**: Hateaos implementation
-* **API**: Full responseo of the resulting resource after PUT and POST.
-* **UI**: Show correct elements based o npermissions.
-
 ## v2.1.0 - 2019-06-22
 
-## Features
+### Features
 
 * **Assets**: Parameter to prevent download in Browser.
 * **Assets**: FTP asset store.
@@ -30,7 +39,7 @@ This version contains many major breaking changes. Please read: https://docs.squ
 * **UI**: Dropdown field for references.
 * **Users**: Email notifications when contributors is added.
 
-## Bugfixes
+### Bugfixes
 
 * **Contents**: Fix for scheduled publishing.
 * **GraphQL**: Fix query parameters for assets.
@@ -41,11 +50,11 @@ This version contains many major breaking changes. Please read: https://docs.squ
 
 ## v2.0.5 - 2019-04-21
 
-## Features
+### Features
 
 * **UI**: Sort content by clicking on the table header.
 
-## Bugfixes
+### Bugfixes
 
 * **UI**: Fix publish button in content context menu.
 

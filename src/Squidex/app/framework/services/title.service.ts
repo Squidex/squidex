@@ -22,7 +22,7 @@ export const TitleServiceFactory = (titles: TitlesConfig) => {
 
 @Injectable()
 export class TitleService {
-    constructor(private readonly titles: TitlesConfig) { }
+    constructor(private readonly titles: TitlesConfig) {}
 
     public setTitle(key: string, parameters?: { [key: string]: string }) {
         let title = this.titles.value[key] || key;

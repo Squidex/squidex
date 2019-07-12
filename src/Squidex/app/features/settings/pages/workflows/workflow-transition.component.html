@@ -1,0 +1,40 @@
+<div class="row transition no-gutters">
+    <div class="col-auto">
+        <i class="icon-corner-down-right text-decent"></i>
+    </div>
+    <div class="col col-step">
+        <div class="transition-to">
+            <div class="color-circle" [style.background]="transition.step.color"></div> {{transition.to}}
+        </div>
+    </div>
+    <div class="col-auto col-label">
+        <span class="text-decent">when</span>
+    </div>
+    <div class="col">
+        <input class="form-control" [class.dashed]="!transition.expression" spellcheck="false"
+            [disabled]="disabled"
+            [ngModelOptions]="onBlur"
+            [ngModel]="transition.expression"
+            (ngModelChange)="changeExpression($event)"
+            placeholder="Add Expression" /> 
+    </div>
+    <div class="col-auto col-label">
+        <span class="text-decent">for</span>
+    </div>
+    <div class="col">
+        <select class="form-control" [class.dashed]="!transition.role || transition.role === ''"
+            [disabled]="disabled"
+            [ngModel]="transition.role"
+            (ngModelChange)="changeRole($event)">
+            <option></option>
+            <option *ngFor="let role of roles; trackBy: trackByRole" [ngValue]="role.name">{{role.name}}</option>
+        </select>
+
+        <span class="select-placeholder" *ngIf="!transition.role || transition.role === ''">Add Role</span>
+    </div>
+    <div class="col-auto pl-2">
+        <button type="button" class="btn btn-text-danger" (click)="remove.emit()" [disabled]="disabled">
+            <i class="icon-bin2"></i>
+        </button>
+    </div>
+</div>

@@ -8,7 +8,10 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
+using Squidex.Domain.Apps.Entities;
 using Squidex.ICIS;
 using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
@@ -21,6 +24,9 @@ namespace Squidex.Config.Web
     {
         public static void AddMyMvcWithPlugins(this IServiceCollection services, IConfiguration config)
         {
+            services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config, typeof(WebServices).Assembly))
+                .AsSelf();
+
             services.AddSingletonAs<FileCallbackResultExecutor>()
                 .AsSelf();
 
@@ -42,12 +48,15 @@ namespace Squidex.Config.Web
             services.AddSingletonAs<RequestLogPerformanceMiddleware>()
                 .AsSelf();
 
-            services.AddSingletonAs<ClaimsTransformer>()
-                .As<IClaimsTransformation>();
+            services.AddSingletonAs<ContextProvider>()
+                .As<IContextProvider>();
+
+            services.TryAddSingleton<IClaimsTransformation, ApiPermissionUnifier>();
 
             services.AddMvc(options =>
             {
                 options.Filters.Add<ETagFilter>();
+                options.Filters.Add<DeferredActionFilter>();
                 options.Filters.Add<AppResolver>();
                 options.Filters.Add<MeasureResultFilter>();
             })

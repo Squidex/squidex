@@ -5,6 +5,7 @@
 //  All rights reserved.
 // ==========================================================================
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,8 @@ namespace Squidex.ICIS.Extensions
     {
         public static void AddGenesisAuthentication(this IServiceCollection services, string authServer)
         {
+            services.AddSingleton<IClaimsTransformation, ClaimsTransformer>();
+
             services.AddSingleton<IUserManager, UserManager>();
             
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

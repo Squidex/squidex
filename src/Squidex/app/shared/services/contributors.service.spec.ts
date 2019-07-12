@@ -11,10 +11,12 @@ import { inject, TestBed } from '@angular/core/testing';
 import {
     AnalyticsService,
     ApiUrlConfig,
-    ContributorAssignedDto,
     ContributorDto,
     ContributorsDto,
+    ContributorsPayload,
     ContributorsService,
+    Resource,
+    ResourceLinks,
     Version
 } from '@app/shared/internal';
 
@@ -52,34 +54,13 @@ describe('ContributorsService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({
-            contributors: [
-                {
-                    contributorId: '123',
-                    role: 'Owner'
-                },
-                {
-                    contributorId: '456',
-                    role: 'Owner'
-                }
-            ],
-            maxContributors: 100
-        }, {
+        req.flush(contributorsResponse(1, 2, 3), {
             headers: {
                 etag: '2'
             }
         });
 
-        expect(contributors!).toEqual({
-            payload: {
-                contributors: [
-                    new ContributorDto('123', 'Owner'),
-                    new ContributorDto('456', 'Owner')
-                ],
-                maxContributors: 100
-            },
-            version: new Version('2')
-        });
+        expect(contributors!).toEqual({ payload: createContributors(1, 2, 3), version: new Version('2') });
     }));
 
     it('should make post request to assign contributor',
@@ -87,10 +68,10 @@ describe('ContributorsService', () => {
 
         const dto = { contributorId: '123', role: 'Owner' };
 
-        let contributorAssignedDto: ContributorAssignedDto;
+        let contributors: ContributorsDto;
 
         contributorsService.postContributor('my-app', dto, version).subscribe(result => {
-            contributorAssignedDto = result.payload;
+            contributors = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors');
@@ -98,21 +79,81 @@ describe('ContributorsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({ contributorId: '123', isCreated: true });
+        req.flush(contributorsResponse(1, 2, 3), {
+            headers: {
+                etag: '2'
+            }
+        });
 
-        expect(contributorAssignedDto!.contributorId).toEqual('123');
+        expect(contributors!).toEqual({ payload: createContributors(1, 2, 3), version: new Version('2') });
     }));
 
     it('should make delete request to remove contributor',
         inject([ContributorsService, HttpTestingController], (contributorsService: ContributorsService, httpMock: HttpTestingController) => {
 
-        contributorsService.deleteContributor('my-app', '123', version).subscribe();
+        const resource: Resource = {
+            _links: {
+                'delete': { method: 'DELETE', href: '/api/apps/my-app/contributors/123' }
+            }
+        };
+
+        let contributors: ContributorsDto;
+
+        contributorsService.deleteContributor('my-app', resource, version).subscribe(result => {
+            contributors = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/contributors/123');
 
         expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({});
+        req.flush(contributorsResponse(1, 2, 3), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(contributors!).toEqual({ payload: createContributors(1, 2, 3), version: new Version('2') });
     }));
+
+    function contributorsResponse(...ids: number[]) {
+        return {
+            items: ids.map(id => ({
+                contributorId: `id${id}`, role: id % 2 === 0 ? 'Owner' : 'Developer',
+                _links: {
+                    update: { method: 'PUT', href: `/contributors/id${id}` }
+                }
+            })),
+            maxContributors: ids.length * 13,
+            _links: {
+                create: { method: 'POST', href: '/contributors' }
+            },
+            _meta: {
+                isInvited: 'true'
+            }
+        };
+    }
 });
+
+export function createContributors(...ids: number[]): ContributorsPayload {
+    return {
+        items: ids.map(id => createContributor(id)),
+        maxContributors: ids.length * 13,
+        _links: {
+            create: { method: 'POST', href: '/contributors' }
+        },
+        _meta: {
+            isInvited: 'true'
+        },
+        canCreate: true
+    };
+}
+
+export function createContributor(id: number) {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/contributors/id${id}` }
+    };
+
+    return new ContributorDto(links, `id${id}`, id % 2 === 0 ? 'Owner' : 'Developer');
+}

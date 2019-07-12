@@ -16,7 +16,7 @@ namespace Squidex.Infrastructure
         private static readonly Regex CultureRegex = new Regex("^([a-z]{2})(\\-[a-z]{2})?$", RegexOptions.IgnoreCase);
         private static readonly Dictionary<string, Language> AllLanguagesField = new Dictionary<string, Language>(StringComparer.OrdinalIgnoreCase);
 
-        private static Language AddLanguage(string iso2Code, string englishName)
+        internal static Language AddLanguage(string iso2Code, string englishName)
         {
             return AllLanguagesField.GetOrAdd(iso2Code, englishName, (c, n) => new Language(c, n));
         }

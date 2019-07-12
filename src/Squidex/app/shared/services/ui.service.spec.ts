@@ -40,7 +40,7 @@ describe('UIService', () => {
             settings = result;
         });
 
-        const response: UISettingsDto = { mapType: 'OSM', mapKey: '', canCreateApps: true };
+        const response: UISettingsDto = { canCreateApps: true };
 
         const req = httpMock.expectOne('http://service/p/api/ui/settings');
 

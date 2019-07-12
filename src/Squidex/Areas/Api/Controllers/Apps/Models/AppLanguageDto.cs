@@ -5,18 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
-    public sealed class AppLanguageDto
+    public sealed class AppLanguageDto : Resource
     {
         /// <summary>
         /// The iso code of the language.
@@ -46,25 +46,37 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public bool IsOptional { get; set; }
 
-        public static AppLanguageDto FromCommand(AddLanguage command)
+        public static AppLanguageDto FromLanguage(LanguageConfig language, IAppEntity app, ApiController controller)
         {
-            return SimpleMapper.Map(command.Language, new AppLanguageDto { Fallback = Array.Empty<Language>() });
-        }
-
-        public static AppLanguageDto[] FromApp(IAppEntity app)
-        {
-            return app.LanguagesConfig.OfType<LanguageConfig>().Select(x => FromLanguage(x, app)).OrderByDescending(x => x.IsMaster).ThenBy(x => x.Iso2Code).ToArray();
-        }
-
-        private static AppLanguageDto FromLanguage(LanguageConfig x, IAppEntity app)
-        {
-            return SimpleMapper.Map(x.Language,
+            var result = SimpleMapper.Map(language.Language,
                 new AppLanguageDto
                 {
-                    IsMaster = x == app.LanguagesConfig.Master,
-                    IsOptional = x.IsOptional,
-                    Fallback = x.LanguageFallbacks.ToArray()
+                    IsMaster = language == app.LanguagesConfig.Master,
+                    IsOptional = language.IsOptional,
+                    Fallback = language.LanguageFallbacks.ToArray()
                 });
+
+            return result.CreateLinks(controller, app);
+        }
+
+        private AppLanguageDto CreateLinks(ApiController controller, IAppEntity app)
+        {
+            var values = new { app = app.Name, language = Iso2Code };
+
+            if (!IsMaster)
+            {
+                if (controller.HasPermission(Permissions.AppLanguagesUpdate, app.Name))
+                {
+                    AddPutLink("update", controller.Url<AppLanguagesController>(x => nameof(x.PutLanguage), values));
+                }
+
+                if (controller.HasPermission(Permissions.AppLanguagesDelete, app.Name) && app.LanguagesConfig.Count > 1)
+                {
+                    AddDeleteLink("delete", controller.Url<AppLanguagesController>(x => nameof(x.DeleteLanguage), values));
+                }
+            }
+
+            return this;
         }
     }
 }

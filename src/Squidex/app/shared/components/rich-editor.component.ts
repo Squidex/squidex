@@ -46,7 +46,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
     private value: string;
     private isDisabled = false;
 
-    @ViewChild('editor')
+    @ViewChild('editor', { static: false })
     public editor: ElementRef;
 
     @Output()
@@ -78,6 +78,10 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
     }
 
     private showSelector = () => {
+        if (this.isDisabled) {
+            return;
+        }
+
         this.assetsDialog.show();
     }
 
@@ -98,7 +102,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
                 this.assetUploader.uploadFile(file)
                     .subscribe(asset => {
                         if (Types.is(asset, AssetDto)) {
-                            success(asset.url);
+                            success(asset.contentUrl);
                         }
                     }, error => {
                         if (!Types.is(error, UploadCanceled)) {
@@ -186,7 +190,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
         let content = '';
 
         for (let asset of assets) {
-            content += `<img src="${asset.url}" alt="${asset.fileName}" />`;
+            content += `<img src="${asset.contentUrl}" alt="${asset.fileName}" />`;
         }
 
         if (content.length > 0) {
@@ -216,7 +220,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                    replaceText(`<img src="${asset.url}" alt="${asset.fileName}" />`);
+                    replaceText(`<img src="${asset.contentUrl}" alt="${asset.fileName}" />`);
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {

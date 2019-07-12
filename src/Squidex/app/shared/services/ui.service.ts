@@ -13,9 +13,6 @@ import { catchError } from 'rxjs/operators';
 import { ApiUrlConfig } from '@app/framework';
 
 export interface UISettingsDto {
-    readonly mapType: string;
-    readonly mapKey?: string;
-
     readonly canCreateApps: boolean;
 }
 
@@ -41,7 +38,7 @@ export class UIService {
 
         return this.http.get<object>(url).pipe(
             catchError(() => {
-                return of({ });
+                return of({});
             }));
     }
 

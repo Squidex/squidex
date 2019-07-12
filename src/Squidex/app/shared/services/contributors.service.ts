@@ -13,34 +13,44 @@ import { tap } from 'rxjs/operators';
 import {
     AnalyticsService,
     ApiUrlConfig,
+    hasAnyLink,
     HTTP,
     mapVersioned,
-    Model,
     pretifyError,
+    Resource,
+    ResourceLinks,
     Version,
     Versioned
 } from '@app/framework';
 
-export type ContributorsDto = Versioned<{
-    readonly contributors: ContributorDto[],
-    readonly maxContributors: number
-}>;
+export type ContributorsDto = Versioned<ContributorsPayload>;
+export type ContributorsPayload = {
+    readonly items: ContributorDto[];
 
-export class ContributorDto extends Model<AssignContributorDto> {
+    readonly maxContributors: number;
+
+    readonly canCreate: boolean;
+} & Resource;
+
+export class ContributorDto {
+    public readonly _links: ResourceLinks;
+
+    public readonly canUpdate: boolean;
+    public readonly canRevoke: boolean;
+
     constructor(
+        links: ResourceLinks,
         public readonly contributorId: string,
         public readonly role: string
     ) {
-        super();
+        this._links = links;
+
+        this.canUpdate = hasAnyLink(links, 'update');
+        this.canRevoke = hasAnyLink(links, 'delete');
     }
 }
 
-export interface ContributorAssignedDto {
-    readonly contributorId: string;
-    readonly isCreated?: boolean;
-}
-
-export interface AssignContributorDto  {
+export interface AssignContributorDto {
     readonly contributorId: string;
     readonly role: string;
     readonly invite?: boolean;
@@ -58,43 +68,53 @@ export class ContributorsService {
     public getContributors(appName: string): Observable<ContributorsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
-                mapVersioned(payload => {
-                    const body = payload.body;
-
-                    const items: any[] = body.contributors;
-
-                    const contributors =
-                        items.map(item =>
-                            new ContributorDto(
-                                item.contributorId,
-                                item.role));
-
-                    return { contributors, maxContributors: body.maxContributors };
-                }),
-                pretifyError('Failed to load contributors. Please reload.'));
+        return HTTP.getVersioned(this.http, url).pipe(
+            mapVersioned(({ body }) => {
+                return parseContributors(body);
+            }),
+            pretifyError('Failed to load contributors. Please reload.'));
     }
 
-    public postContributor(appName: string, dto: AssignContributorDto, version: Version): Observable<Versioned<ContributorAssignedDto>> {
+    public postContributor(appName: string, dto: AssignContributorDto, version: Version): Observable<ContributorsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors`);
 
         return HTTP.postVersioned(this.http, url, dto, version).pipe(
-                mapVersioned(payload => {
-                    return <ContributorAssignedDto>payload.body;
-                }),
-                tap(() => {
-                    this.analytics.trackEvent('Contributor', 'Configured', appName);
-                }),
-                pretifyError('Failed to add contributors. Please reload.'));
+            mapVersioned(({ body }) => {
+                return parseContributors(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Contributor', 'Configured', appName);
+            }),
+            pretifyError('Failed to add contributors. Please reload.'));
     }
 
-    public deleteContributor(appName: string, contributorId: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/contributors/${contributorId}`);
+    public deleteContributor(appName: string, resource: Resource, version: Version): Observable<ContributorsDto> {
+        const link = resource._links['delete'];
 
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
-                tap(() => {
-                    this.analytics.trackEvent('Contributor', 'Deleted', appName);
-                }),
-                pretifyError('Failed to delete contributors. Please reload.'));
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            mapVersioned(payload => {
+                const body = payload.body;
+
+                return parseContributors(body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('Contributor', 'Deleted', appName);
+            }),
+            pretifyError('Failed to delete contributors. Please reload.'));
     }
+}
+
+function parseContributors(response: any) {
+    const raw: any[] = response.items;
+
+    const items = raw.map(item =>
+        new ContributorDto(item._links,
+            item.contributorId,
+            item.role));
+
+    const { maxContributors, _links, _meta } = response;
+
+    return { items, maxContributors, _links, _meta, canCreate: hasAnyLink(_links, 'create') };
 }

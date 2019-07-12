@@ -12,7 +12,7 @@ import {
     ResourceLoaderService,
     StatefulControlComponent,
     Types,
-    UIState,
+    UIOptions,
     ValidatorsEx
 } from '@app/shared/internal';
 
@@ -28,10 +28,6 @@ interface Geolocation {
     longitude: number;
 }
 
-interface State {
-    isGoogleMaps: boolean;
-}
-
 @Component({
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
@@ -39,7 +35,8 @@ interface State {
     providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GeolocationEditorComponent extends StatefulControlComponent<State, Geolocation> implements AfterViewInit {
+export class GeolocationEditorComponent extends StatefulControlComponent<any, Geolocation> implements AfterViewInit {
+    private readonly isGoogleMaps: boolean;
     private marker: any;
     private map: any;
     private value: Geolocation | null = null;
@@ -64,20 +61,20 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
             ]
         });
 
-    @ViewChild('editor')
+    @ViewChild('editor', { static: false })
     public editor: ElementRef<HTMLElement>;
 
-    @ViewChild('searchBox')
+    @ViewChild('searchBox', { static: false })
     public searchBoxInput: ElementRef<HTMLInputElement>;
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
-        private readonly uiState: UIState
+        private readonly uiOptions: UIOptions
     ) {
-        super(changeDetector, {
-            isGoogleMaps: false
-        });
+        super(changeDetector, {});
+
+        this.isGoogleMaps = uiOptions.get('map.type');
     }
 
     public writeValue(obj: any) {
@@ -154,18 +151,11 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     }
 
     public ngAfterViewInit() {
-        this.uiState.settings
-            .subscribe(settings => {
-                const isGoogleMaps = settings.mapType === 'GoogleMaps';
-
-                this.next(s => ({ ...s, isGoogleMaps }));
-
-                if (!this.snapshot.isGoogleMaps) {
-                    this.ngAfterViewInitOSM();
-                } else {
-                    this.ngAfterViewInitGoogle(settings.mapKey);
-                }
-            });
+        if (!this.isGoogleMaps) {
+            this.ngAfterViewInitOSM();
+        } else {
+            this.ngAfterViewInitGoogle(this.uiOptions.get('map.googleMaps.key'));
+        }
     }
 
     private ngAfterViewInitOSM() {
@@ -224,11 +214,11 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
                         }
                     });
 
-                this.map.addListener('bounds_changed', (event: any) => {
+                this.map.addListener('bounds_changed', () => {
                     searchBox.setBounds(this.map.getBounds());
                 });
 
-                searchBox.addListener('places_changed', (event: any) => {
+                searchBox.addListener('places_changed', () => {
                     let places = searchBox.getPlaces();
 
                     if (places.length === 1) {

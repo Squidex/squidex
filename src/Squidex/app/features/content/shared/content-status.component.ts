@@ -20,6 +20,9 @@ export class ContentStatusComponent {
     public status: string;
 
     @Input()
+    public statusColor: string;
+
+    @Input()
     public scheduledTo?: string;
 
     @Input()

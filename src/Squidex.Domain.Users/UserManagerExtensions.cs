@@ -115,7 +115,7 @@ namespace Squidex.Domain.Users
             return result;
         }
 
-        public static async Task<IdentityUser> CreateAsync(this UserManager<IdentityUser> userManager, IUserFactory factory, UserValues values)
+        public static async Task<UserWithClaims> CreateAsync(this UserManager<IdentityUser> userManager, IUserFactory factory, UserValues values)
         {
             var user = factory.Create(values.Email);
 
@@ -142,10 +142,10 @@ namespace Squidex.Domain.Users
                 throw;
             }
 
-            return user;
+            return await userManager.ResolveUserAsync(user);
         }
 
-        public static async Task UpdateAsync(this UserManager<IdentityUser> userManager, string id, UserValues values)
+        public static async Task<UserWithClaims> UpdateAsync(this UserManager<IdentityUser> userManager, string id, UserValues values)
         {
             var user = await userManager.FindByIdAsync(id);
 
@@ -155,6 +155,8 @@ namespace Squidex.Domain.Users
             }
 
             await UpdateAsync(userManager, user, values);
+
+            return await userManager.ResolveUserAsync(user);
         }
 
         public static async Task<IdentityResult> UpdateSafeAsync(this UserManager<IdentityUser> userManager, IdentityUser user, UserValues values)
@@ -193,7 +195,7 @@ namespace Squidex.Domain.Users
             }
         }
 
-        public static async Task LockAsync(this UserManager<IdentityUser> userManager, string id)
+        public static async Task<UserWithClaims> LockAsync(this UserManager<IdentityUser> userManager, string id)
         {
             var user = await userManager.FindByIdAsync(id);
 
@@ -203,9 +205,11 @@ namespace Squidex.Domain.Users
             }
 
             await DoChecked(() => userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100)), "Cannot lock user.");
+
+            return await userManager.ResolveUserAsync(user);
         }
 
-        public static async Task UnlockAsync(this UserManager<IdentityUser> userManager, string id)
+        public static async Task<UserWithClaims> UnlockAsync(this UserManager<IdentityUser> userManager, string id)
         {
             var user = await userManager.FindByIdAsync(id);
 
@@ -215,6 +219,8 @@ namespace Squidex.Domain.Users
             }
 
             await DoChecked(() => userManager.SetLockoutEndDateAsync(user, null), "Cannot unlock user.");
+
+            return await userManager.ResolveUserAsync(user);
         }
 
         private static async Task DoChecked(Func<Task<IdentityResult>> action, string message)

@@ -10,6 +10,7 @@ import { timer } from 'rxjs';
 import { onErrorResumeNext, switchMap } from 'rxjs/operators';
 
 import {
+    ApiUrlConfig,
     AppsState,
     BackupDto,
     BackupsState,
@@ -23,6 +24,7 @@ import {
 })
 export class BackupsPageComponent extends ResourceOwner implements OnInit {
     constructor(
+        public readonly apiUrl: ApiUrlConfig,
         public readonly appsState: AppsState,
         public readonly backupsState: BackupsState
     ) {

@@ -1,6 +1,11 @@
 @import '_vars';
 @import '_mixins';
 
+// Graphiql hints
+::ng-deep {
+    @import '~graphiql/dist/show-hint';
+}
+
 :host ::ng-deep {
     @import '~graphiql/graphiql';
 

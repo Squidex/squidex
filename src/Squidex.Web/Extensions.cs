@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Security.Claims;
 using Squidex.Infrastructure.Security;
 
@@ -39,6 +40,13 @@ namespace Squidex.Web
             }
 
             return (null, null);
+        }
+
+        public static bool IsUser(this ApiController controller, string userId)
+        {
+            var subject = controller.User.OpenIdSubject();
+
+            return string.Equals(subject, userId, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

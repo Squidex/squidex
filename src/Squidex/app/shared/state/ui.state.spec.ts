@@ -8,7 +8,13 @@
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import { UIService, UIState } from '@app/shared/internal';
+import {
+    ResourceLinks,
+    ResourcesDto,
+    UIService,
+    UIState,
+    UsersService
+} from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
 
@@ -30,6 +36,13 @@ describe('UIState', () => {
         canCreateApps: true
     };
 
+    const resources: ResourceLinks = {
+        ['admin/events']: { method: 'GET', href: '/api/events' },
+        ['admin/restore']: { method: 'GET', href: '/api/restore' },
+        ['admin/users']: { method: 'GET', href: '/api/users' }
+    };
+
+    let usersService: IMock<UsersService>;
     let uiService: IMock<UIService>;
     let uiState: UIState;
 
@@ -48,7 +61,12 @@ describe('UIState', () => {
         uiService.setup(x => x.deleteSetting(app, It.isAnyString()))
             .returns(() => of({}));
 
-        uiState = new UIState(appsState.object, uiService.object);
+        usersService = Mock.ofType<UsersService>();
+
+        usersService.setup(x => x.getResources())
+            .returns(() => of(new ResourcesDto(resources)));
+
+        uiState = new UIState(appsState.object, uiService.object, usersService.object);
     });
 
     it('should load settings', () => {
@@ -58,6 +76,10 @@ describe('UIState', () => {
             mapSize: 1024,
             canCreateApps: true
         });
+
+        expect(uiState.snapshot.canReadEvents).toBeTruthy();
+        expect(uiState.snapshot.canReadUsers).toBeTruthy();
+        expect(uiState.snapshot.canRestore).toBeTruthy();
     });
 
     it('should add value to snapshot when set', () => {

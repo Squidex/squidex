@@ -41,16 +41,7 @@ export class ContentItemComponent implements OnChanges {
     public delete = new EventEmitter();
 
     @Output()
-    public archive = new EventEmitter();
-
-    @Output()
-    public restore = new EventEmitter();
-
-    @Output()
-    public publish = new EventEmitter();
-
-    @Output()
-    public unpublish = new EventEmitter();
+    public statusChange = new EventEmitter<string>();
 
     @Output()
     public selectedChange = new EventEmitter();
@@ -68,6 +59,9 @@ export class ContentItemComponent implements OnChanges {
     public schema: SchemaDetailsDto;
 
     @Input()
+    public canClone: boolean;
+
+    @Input()
     public isReadOnly = false;
 
     @Input()
@@ -80,13 +74,14 @@ export class ContentItemComponent implements OnChanges {
     public content: ContentDto;
 
     public patchForm: PatchContentForm;
+    public patchAllowed = false;
 
     public dropdown = new ModalModel();
 
     public values: any[] = [];
 
     public get isDirty() {
-        return this.patchForm.form.dirty;
+        return this.patchForm && this.patchForm.form.dirty;
     }
 
     constructor(
@@ -96,8 +91,14 @@ export class ContentItemComponent implements OnChanges {
     }
 
     public ngOnChanges(changes: SimpleChanges) {
+        if (changes['content']) {
+            this.patchAllowed = !this.isReadOnly && this.content.canUpdate;
+        }
+
         if (changes['schema'] || changes['language']) {
-            this.patchForm = new PatchContentForm(this.schema, this.language);
+            if (this.patchAllowed) {
+                this.patchForm = new PatchContentForm(this.schema, this.language);
+            }
         }
 
         if (changes['content'] || changes['language']) {
@@ -106,6 +107,10 @@ export class ContentItemComponent implements OnChanges {
     }
 
     public save() {
+        if (!this.content.canUpdate) {
+            return;
+        }
+
         const value = this.patchForm.submit();
 
         if (value) {
@@ -132,20 +137,8 @@ export class ContentItemComponent implements OnChanges {
         this.delete.emit();
     }
 
-    public emitPublish() {
-        this.publish.emit();
-    }
-
-    public emitUnpublish() {
-        this.unpublish.emit();
-    }
-
-    public emitArchive() {
-        this.archive.emit();
-    }
-
-    public emitRestore() {
-        this.unpublish.emit();
+    public emitChangeStatus(status: string) {
+        this.statusChange.emit(status);
     }
 
     public emitClone() {

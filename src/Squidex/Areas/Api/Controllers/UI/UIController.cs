@@ -16,7 +16,6 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.UI
@@ -27,9 +26,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         private readonly MyUIOptions uiOptions;
         private readonly IGrainFactory grainFactory;
 
-        public UIController(ICommandBus commandBus,
-            IOptions<MyUIOptions> uiOptions,
-            IGrainFactory grainFactory)
+        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IGrainFactory grainFactory)
             : base(commandBus)
         {
             this.uiOptions = uiOptions.Value;
@@ -51,13 +48,8 @@ namespace Squidex.Areas.Api.Controllers.UI
         {
             var result = new UISettingsDto
             {
-                MapType = uiOptions.Map?.Type ?? "OSM",
-                MapKey = uiOptions.Map?.GoogleMaps?.Key
+                CanCreateApps = !uiOptions.OnlyAdminsCanCreateApps || Context.Permissions.Includes(CreateAppPermission)
             };
-
-            var canCreateApps = !uiOptions.OnlyAdminsCanCreateApps || User.Permissions().Includes(CreateAppPermission);
-
-            result.CanCreateApps = canCreateApps;
 
             return Ok(result);
         }

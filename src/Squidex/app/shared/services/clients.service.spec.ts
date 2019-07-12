@@ -14,7 +14,10 @@ import {
     ApiUrlConfig,
     ClientDto,
     ClientsDto,
+    ClientsPayload,
     ClientsService,
+    Resource,
+    ResourceLinks,
     Version
 } from '@app/shared/internal';
 
@@ -52,32 +55,13 @@ describe('ClientsService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush([
-            {
-                id: 'client1',
-                name: 'Client 1',
-                secret: 'secret1',
-                role: 'Editor'
-            },
-            {
-                id: 'client2',
-                name: 'Client 2',
-                secret: 'secret2',
-                role: 'Developer'
-            }
-        ], {
+        req.flush(clientsResponse(1, 2), {
             headers: {
                 etag: '2'
             }
         });
 
-        expect(clients!).toEqual({
-            payload: [
-                new ClientDto('client1', 'Client 1', 'secret1', 'Editor'),
-                new ClientDto('client2', 'Client 2', 'secret2', 'Developer')
-            ],
-            version: new Version('2')
-        });
+        expect(clients!).toEqual({ payload: createClients(1, 2), version: new Version('2') });
     }));
 
     it('should make post request to create client',
@@ -85,10 +69,10 @@ describe('ClientsService', () => {
 
         const dto = { id: 'client1' };
 
-        let client: ClientDto;
+        let clients: ClientsDto;
 
         clientsService.postClient('my-app', dto, version).subscribe(result => {
-            client = result.payload;
+            clients = result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients');
@@ -96,9 +80,13 @@ describe('ClientsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({ id: 'client1', name: 'Client 1', secret: 'secret1', role: 'Developer' });
+        req.flush(clientsResponse(1, 2), {
+            headers: {
+                etag: '2'
+            }
+        });
 
-        expect(client!).toEqual(new ClientDto('client1', 'Client 1', 'secret1', 'Developer'));
+        expect(clients!).toEqual({ payload: createClients(1, 2), version: new Version('2') });
     }));
 
     it('should make put request to rename client',
@@ -106,27 +94,59 @@ describe('ClientsService', () => {
 
         const dto = { name: 'New Name' };
 
-        clientsService.putClient('my-app', 'client1', dto, version).subscribe();
+        const resource: Resource = {
+            _links: {
+                'update': { method: 'PUT', href: '/api/apps/my-app/clients/client1' }
+            }
+        };
+
+        let clients: ClientsDto;
+
+        clientsService.putClient('my-app', resource, dto, version).subscribe(result => {
+            clients = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients/client1');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({});
+        req.flush(clientsResponse(1, 2), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(clients!).toEqual({ payload: createClients(1, 2), version: new Version('2') });
     }));
 
     it('should make delete request to remove client',
         inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
 
-        clientsService.deleteClient('my-app', 'client1', version).subscribe();
+        const resource: Resource = {
+            _links: {
+                'delete': { method: 'DELETE', href: '/api/apps/my-app/clients/client1' }
+            }
+        };
+
+        let clients: ClientsDto;
+
+        clientsService.deleteClient('my-app', resource, version).subscribe(result => {
+            clients = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients/client1');
 
         expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({});
+        req.flush(clientsResponse(1, 2), {
+            headers: {
+                etag: '2'
+            }
+        });
+
+        expect(clients!).toEqual({ payload: createClients(1, 2), version: new Version('2') });
     }));
 
     it('should make form request to create token',
@@ -134,11 +154,11 @@ describe('ClientsService', () => {
 
         let accessTokenDto: AccessTokenDto;
 
-        clientsService.createToken('my-app', new ClientDto('myClientId', 'myClient', 'mySecret', 'Editor')).subscribe(result => {
+        clientsService.createToken('my-app', createClient(13)).subscribe(result => {
             accessTokenDto = result;
         });
 
-        const body = 'grant_type=client_credentials&scope=squidex-api&client_id=my-app:myClientId&client_secret=mySecret';
+        const body = 'grant_type=client_credentials&scope=squidex-api&client_id=my-app:id13&client_secret=secret13';
 
         const req = httpMock.expectOne('http://service/p/identity-server/connect/token');
 
@@ -149,4 +169,39 @@ describe('ClientsService', () => {
 
         expect(accessTokenDto!).toEqual(new AccessTokenDto('token1', 'type1'));
     }));
+
+    function clientsResponse(...ids: number[]) {
+        return {
+            items:  ids.map(id => ({
+                id: `id${id}`,
+                name: `Client ${id}`,
+                role: `Role${id}`,
+                secret: `secret${id}`,
+                _links: {
+                    update: { method: 'PUT', href: `/clients/id${id}` }
+                }
+            })),
+            _links: {
+                create: { method: 'POST', href: '/clients' }
+            }
+        };
+    }
 });
+
+export function createClients(...ids: number[]): ClientsPayload {
+    return {
+        items: ids.map(id => createClient(id)),
+        _links: {
+            create: { method: 'POST', href: '/clients' }
+        },
+        canCreate: true
+    };
+}
+
+export function createClient(id: number) {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/clients/id${id}` }
+    };
+
+    return new ClientDto(links, `id${id}`,  `Client ${id}`, `secret${id}`, `Role${id}`);
+}

@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
+using Squidex.Infrastructure;
 using NamedIdStatic = Squidex.Infrastructure.NamedId;
 
 namespace Squidex.Domain.Apps.Core.Schemas

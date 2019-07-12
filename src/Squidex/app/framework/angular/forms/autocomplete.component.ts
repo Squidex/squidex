@@ -10,16 +10,11 @@ import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
 
-import { StatefulControlComponent } from '@app/framework/internal';
+import { Keys, StatefulControlComponent } from '@app/framework/internal';
 
 export interface AutocompleteSource {
     find(query: string): Observable<any[]>;
 }
-
-const KEY_ENTER = 13;
-const KEY_ESCAPE = 27;
-const KEY_UP = 38;
-const KEY_DOWN = 40;
 
 const NO_EMIT = { emitEvent: false };
 
@@ -52,10 +47,10 @@ export class AutocompleteComponent extends StatefulControlComponent<State, any[]
     @Input()
     public placeholder = '';
 
-    @ContentChild(TemplateRef)
+    @ContentChild(TemplateRef, { static: false })
     public itemTemplate: TemplateRef<any>;
 
-    @ViewChild('input')
+    @ViewChild('input', { static: false })
     public inputControl: ElementRef<HTMLInputElement>;
 
     public queryInput = new FormControl();
@@ -95,17 +90,17 @@ export class AutocompleteComponent extends StatefulControlComponent<State, any[]
 
     public onKeyDown(event: KeyboardEvent) {
         switch (event.keyCode) {
-            case KEY_UP:
+            case Keys.UP:
                 this.up();
                 return false;
-            case KEY_DOWN:
+            case Keys.DOWN:
                 this.down();
                 return false;
-            case KEY_ESCAPE:
+            case Keys.ESCAPE:
                 this.resetForm();
                 this.reset();
                 return false;
-            case KEY_ENTER:
+            case Keys.ENTER:
                 if (this.snapshot.suggestedItems.length > 0 && this.selectItem()) {
                     return false;
                 }

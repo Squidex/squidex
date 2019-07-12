@@ -29,6 +29,7 @@ namespace Squidex.Config.Domain
         {
             this.jsonNetSerializer = jsonNetSerializer;
             this.jsonSerializer = jsonSerializer;
+
             this.ruleRegistry = ruleRegistry;
         }
 

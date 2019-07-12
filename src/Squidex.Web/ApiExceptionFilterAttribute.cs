@@ -93,7 +93,7 @@ namespace Squidex.Web
 
         private static string[] ToDetails(ValidationException ex)
         {
-            return ex.Errors?.ToArray(e =>
+            return ex.Errors?.Select(e =>
             {
                 if (e.PropertyNames?.Any() == true)
                 {
@@ -103,7 +103,7 @@ namespace Squidex.Web
                 {
                     return e.Message;
                 }
-            });
+            }).ToArray();
         }
     }
 }

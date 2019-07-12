@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { ExternalControlComponent, Types } from '@app/framework/internal';
+import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IFrameEditorComponent), multi: true
@@ -21,12 +21,12 @@ export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IFrameEditorComponent extends ExternalControlComponent<any> implements OnChanges, OnInit {
+export class IFrameEditorComponent extends StatefulControlComponent<any, any> implements OnChanges, OnInit {
     private value: any;
     private isDisabled = false;
     private isInitialized = false;
 
-    @ViewChild('iframe')
+    @ViewChild('iframe', { static: false })
     public iframe: ElementRef<HTMLIFrameElement>;
 
     @Input()
@@ -41,7 +41,7 @@ export class IFrameEditorComponent extends ExternalControlComponent<any> impleme
     constructor(changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2
     ) {
-        super(changeDetector);
+        super(changeDetector, {});
     }
 
     public ngOnChanges(changes: SimpleChanges) {

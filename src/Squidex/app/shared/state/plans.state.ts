@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -52,24 +52,19 @@ interface Snapshot {
 @Injectable()
 export class PlansState extends State<Snapshot> {
     public plans =
-        this.changes.pipe(map(x => x.plans),
-            distinctUntilChanged());
+        this.project(x => x.plans);
 
     public isOwner =
-        this.changes.pipe(map(x => !!x.isOwner),
-            distinctUntilChanged());
+        this.project(x => !!x.isOwner);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     public isDisabled =
-        this.changes.pipe(map(x => !x.isOwner),
-            distinctUntilChanged());
+        this.project(x => !x.isOwner);
 
     public hasPortal =
-        this.changes.pipe(map(x => x.hasPortal),
-            distinctUntilChanged());
+        this.project(x => x.hasPortal);
 
     public window = window;
 
@@ -79,7 +74,7 @@ export class PlansState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly plansService: PlansService
     ) {
-        super({ plans: ImmutableArray.empty(), version: new Version('') });
+        super({ plans: ImmutableArray.empty(), version: Version.EMPTY });
     }
 
     public load(isReload = false, overridePlanId?: string): Observable<any> {

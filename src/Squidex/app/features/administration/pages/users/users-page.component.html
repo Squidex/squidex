@@ -12,15 +12,18 @@
 
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
         <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
-        <sqx-shortcut keys="ctrl+shift+n" (trigger)="buttonNew.click()"></sqx-shortcut>
 
         <form class="form-inline mr-1" (ngSubmit)="search()">
             <input class="form-control" #inputFind [formControl]="usersFilter" placeholder="Search for user" />
         </form>
 
-        <button type="button" class="btn btn-success" #buttonNew routerLink="new" title="New User (CTRL + N)">
-            <i class="icon-plus"></i> New
-        </button>
+        <ng-container *ngIf="usersState.canCreate | async">
+            <sqx-shortcut keys="ctrl+shift+n" (trigger)="buttonNew.click()"></sqx-shortcut>
+
+            <button type="button" class="btn btn-success" #buttonNew routerLink="new" title="New User (CTRL + N)">
+                <i class="icon-plus"></i> New
+            </button>
+        </ng-container>
     </ng-container>
 
     <ng-container content>
@@ -48,32 +51,24 @@
         <div class="grid-content">
             <div sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed" *ngIf="usersState.users | async; let users">
-                    <tbody *ngFor="let userInfo of users; trackBy: trackByUser">
-                        <tr [routerLink]="userInfo.user.id" routerLinkActive="active">
+                    <tbody *ngFor="let user of users; trackBy: trackByUser">
+                        <tr [routerLink]="user.id" routerLinkActive="active">
                             <td class="cell-user">
-                                <img class="user-picture" title="{{userInfo.user.name}}" [attr.src]="userInfo.user | sqxUserDtoPicture" />
+                                <img class="user-picture" title="{{user.name}}" [attr.src]="user | sqxUserDtoPicture" />
                             </td>
                             <td class="cell-auto">
-                                <span class="user-name table-cell">{{userInfo.user.displayName}}</span>
+                                <span class="user-name table-cell">{{user.displayName}}</span>
                             </td>
                             <td class="cell-auto">
-                                <span class="user-email table-cell">{{userInfo.user.email}}</span>
+                                <span class="user-email table-cell">{{user.email}}</span>
                             </td>
                             <td class="cell-actions">
-                                <ng-container *ngIf="!userInfo.isCurrentUser; else self">
-                                    <button type="button" class="btn btn-text" (click)="lock(userInfo.user)" sqxStopClick *ngIf="!userInfo.user.isLocked" title="Lock User">
-                                        <i class="icon icon-unlocked"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-text" (click)="unlock(userInfo.user)" sqxStopClick *ngIf="userInfo.user.isLocked" title="Unlock User">
-                                        <i class="icon icon-lock"></i>
-                                    </button>
-                                </ng-container>
-                                
-                                <ng-template #self>
-                                    <button class="btn btn-text invisible">
-                                        &nbsp;
-                                    </button>
-                                </ng-template>
+                                <button type="button" class="btn btn-text" (click)="lock(user)" sqxStopClick *ngIf="user.canLock" title="Lock User">
+                                    <i class="icon icon-unlocked"></i>
+                                </button>
+                                <button type="button" class="btn btn-text" (click)="unlock(user)" sqxStopClick *ngIf="user.canUnlock" title="Unlock User">
+                                    <i class="icon icon-lock"></i>
+                                </button>
                             </td>
                         </tr>
                         <tr class="spacer"></tr>
