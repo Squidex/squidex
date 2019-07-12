@@ -23,6 +23,8 @@ RUN cp -a /tmp/node_modules src/Squidex/ \
 # Test Backend
 FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder_backend
 
+ARG SQUIDEX__VERSION=1.0.0
+
 WORKDIR /src
 
 # Install Screen
