@@ -18,12 +18,11 @@ import {
 
 import {
     ApiUrlConfig,
-    Permission,
     Types
 } from '@app/framework';
 
 export class Profile {
-    public readonly permissions: Permission[];
+    public readonly permissions: string[];
 
     public get id(): string {
         return this.user.profile['sub'];
@@ -62,9 +61,9 @@ export class Profile {
         const permissions = this.getPermission();
 
         if (Types.isArrayOfString(permissions)) {
-            this.permissions = permissions.map(x => new Permission(x));
+            this.permissions = permissions;
         } else if (Types.isString(permissions)) {
-            this.permissions = [new Permission(permissions)];
+            this.permissions = [permissions];
         } else {
             this.permissions = [];
         }

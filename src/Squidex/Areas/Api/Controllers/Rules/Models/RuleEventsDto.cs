@@ -9,10 +9,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
-    public sealed class RuleEventsDto
+    public sealed class RuleEventsDto : Resource
     {
         /// <summary>
         /// The rule events.
@@ -25,9 +26,22 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         /// </summary>
         public long Total { get; set; }
 
-        public static RuleEventsDto FromRuleEvents(IReadOnlyList<IRuleEventEntity> items, long total)
+        public static RuleEventsDto FromRuleEvents(IReadOnlyList<IRuleEventEntity> items, long total, ApiController controller, string app)
         {
-            return new RuleEventsDto { Total = total, Items = items.Select(RuleEventDto.FromRuleEvent).ToArray() };
+            var result = new RuleEventsDto
+            {
+                Total = total,
+                Items = items.Select(x => RuleEventDto.FromRuleEvent(x, controller, app)).ToArray()
+            };
+
+            return result.CreateLinks(controller, app);
+        }
+
+        private RuleEventsDto CreateLinks(ApiController controller, string app)
+        {
+            AddSelfLink(controller.Url<RulesController>(x => nameof(x.GetEvents), new { app }));
+
+            return this;
         }
     }
 }

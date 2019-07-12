@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 .Returns(assetGrain);
 
             A.CallTo(() => assetGrain.GetStateAsync(12))
-                .Returns(A.Fake<IAssetEntity>().AsJ());
+                .Returns(J.Of<IAssetEntity>(new AssetEntity()));
 
             var result = await sut.CreateEnrichedEventAsync(envelope);
 

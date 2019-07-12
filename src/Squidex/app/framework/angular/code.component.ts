@@ -13,4 +13,4 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
     templateUrl: './code.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CodeComponent { }
+export class CodeComponent {}

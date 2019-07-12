@@ -50,7 +50,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [Fact]
         public async Task Should_rebuild_tags()
         {
-            var tags = new TagSet
+            var tags = new TagsExport
             {
                 ["id1"] = new Tag { Name = "name1", Count = 1 },
                 ["id2"] = new Tag { Name = "name2", Count = 2 },

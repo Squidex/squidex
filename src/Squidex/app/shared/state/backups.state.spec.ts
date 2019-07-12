@@ -10,14 +10,15 @@ import { onErrorResumeNext } from 'rxjs/operators';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
-    BackupDto,
+    BackupsDto,
     BackupsService,
     BackupsState,
-    DateTime,
     DialogService
 } from '@app/shared/internal';
 
 import { TestValues } from './_test-helpers';
+
+import { createBackup } from './../services/backups.service.spec';
 
 describe('BackupsState', () => {
     const {
@@ -25,10 +26,8 @@ describe('BackupsState', () => {
         appsState
     } = TestValues;
 
-    const oldBackups = [
-        new BackupDto('id1', DateTime.now(), null, 1, 1, 'Started'),
-        new BackupDto('id2', DateTime.now(), null, 2, 2, 'Started')
-    ];
+    const backup1 = createBackup(12);
+    const backup2 = createBackup(13);
 
     let dialogs: IMock<DialogService>;
     let backupsService: IMock<BackupsService>;
@@ -48,11 +47,11 @@ describe('BackupsState', () => {
     describe('Loading', () => {
         it('should load backups', () => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => of(oldBackups)).verifiable();
+                .returns(() => of(new BackupsDto([backup1, backup2]))).verifiable();
 
             backupsState.load().subscribe();
 
-            expect(backupsState.snapshot.backups.values).toEqual(oldBackups);
+            expect(backupsState.snapshot.backups.values).toEqual([backup1, backup2]);
             expect(backupsState.snapshot.isLoaded).toBeTruthy();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
@@ -60,7 +59,7 @@ describe('BackupsState', () => {
 
         it('should show notification on load when reload is true', () => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => of(oldBackups)).verifiable();
+                .returns(() => of(new BackupsDto([backup1, backup2]))).verifiable();
 
             backupsState.load(true, false).subscribe();
 
@@ -95,7 +94,7 @@ describe('BackupsState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             backupsService.setup(x => x.getBackups(app))
-                .returns(() => of(oldBackups)).verifiable();
+                .returns(() => of(new BackupsDto([backup1, backup2]))).verifiable();
 
             backupsState.load().subscribe();
         });
@@ -112,10 +111,10 @@ describe('BackupsState', () => {
         });
 
         it('should not remove backup from snapshot', () => {
-            backupsService.setup(x => x.deleteBackup(app, oldBackups[0].id))
+            backupsService.setup(x => x.deleteBackup(app, backup1))
                 .returns(() => of({})).verifiable();
 
-            backupsState.delete(oldBackups[0]).subscribe();
+            backupsState.delete(backup1).subscribe();
 
             expect(backupsState.snapshot.backups.length).toBe(2);
 

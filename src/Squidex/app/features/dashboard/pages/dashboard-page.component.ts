@@ -6,10 +6,9 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { filter, map, switchMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 import {
-    AppDto,
     AppsState,
     AuthService,
     DateTime,
@@ -52,7 +51,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
 
     public isPerformanceStacked = false;
 
-    public app = this.appsState.selectedApp.pipe(filter(x => !!x), map(x => <AppDto>x));
+    public app = this.appsState.selectedValidApp;
 
     public chartOptions = {
         responsive: true,

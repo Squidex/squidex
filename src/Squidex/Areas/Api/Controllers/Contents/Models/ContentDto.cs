@@ -12,15 +12,14 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Models
 {
-    public sealed class ContentDto : IGenerateETag
+    public sealed class ContentDto : Resource
     {
         /// <summary>
         /// The if of the content item.
@@ -71,39 +70,25 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public Instant LastModified { get; set; }
 
         /// <summary>
-        /// The the status of the content.
+        /// The status of the content.
         /// </summary>
         public Status Status { get; set; }
+
+        /// <summary>
+        /// The color of the status.
+        /// </summary>
+        public string StatusColor { get; set; }
 
         /// <summary>
         /// The version of the content.
         /// </summary>
         public long Version { get; set; }
 
-        public static ContentDto FromCommand(CreateContent command, EntityCreatedResult<NamedContentData> result)
-        {
-            var now = SystemClock.Instance.GetCurrentInstant();
-
-            var response = new ContentDto
-            {
-                Id = command.ContentId,
-                Data = result.IdOrValue,
-                Version = result.Version,
-                Created = now,
-                CreatedBy = command.Actor,
-                LastModified = now,
-                LastModifiedBy = command.Actor,
-                Status = command.Publish ? Status.Published : Status.Draft
-            };
-
-            return response;
-        }
-
-        public static ContentDto FromContent(IContentEntity content, QueryContext context)
+        public static ContentDto FromContent(Context context, IEnrichedContentEntity content, ApiController controller)
         {
             var response = SimpleMapper.Map(content, new ContentDto());
 
-            if (context.Flatten)
+            if (context.IsFlatten())
             {
                 response.Data = content.Data?.ToFlatten();
                 response.DataDraft = content.DataDraft?.ToFlatten();
@@ -119,7 +104,64 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
                 response.ScheduleJob = SimpleMapper.Map(content.ScheduleJob, new ScheduleJobDto());
             }
 
-            return response;
+            return response.CreateLinksAsync(content, controller, content.AppId.Name, content.SchemaId.Name);
+        }
+
+        private ContentDto CreateLinksAsync(IEnrichedContentEntity content, ApiController controller, string app, string schema)
+        {
+            var values = new { app, name = schema, id = Id };
+
+            AddSelfLink(controller.Url<ContentsController>(x => nameof(x.GetContent), values));
+
+            if (Version > 0)
+            {
+                var versioned = new { app, name = schema, id = Id, version = Version - 1 };
+
+                AddGetLink("prev", controller.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
+            }
+
+            if (IsPending)
+            {
+                if (controller.HasPermission(Permissions.AppContentsDraftDiscard, app, schema))
+                {
+                    AddPutLink("draft/discard", controller.Url<ContentsController>(x => nameof(x.DiscardDraft), values));
+                }
+
+                if (controller.HasPermission(Permissions.AppContentsDraftPublish, app, schema))
+                {
+                    AddPutLink("draft/publish", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values));
+                }
+            }
+
+            if (controller.HasPermission(Permissions.AppContentsUpdate, app, schema))
+            {
+                if (content.CanUpdate)
+                {
+                    AddPutLink("update", controller.Url<ContentsController>(x => nameof(x.PutContent), values));
+                }
+
+                if (Status == Status.Published)
+                {
+                    AddPutLink("draft/propose", controller.Url((ContentsController x) => nameof(x.PutContent), values) + "?asDraft=true");
+                }
+
+                AddPatchLink("patch", controller.Url<ContentsController>(x => nameof(x.PatchContent), values));
+
+                if (content.Nexts != null)
+                {
+                    foreach (var next in content.Nexts)
+                    {
+                        AddPutLink($"status/{next.Status}", controller.Url<ContentsController>(x => nameof(x.PutContentStatus), values), next.Color);
+                    }
+                }
+            }
+
+            if (controller.HasPermission(Permissions.AppContentsDelete, app, schema))
+            {
+                AddDeleteLink("delete", controller.Url<ContentsController>(x => nameof(x.DeleteContent), values));
+            }
+
+            return this;
         }
     }
 }

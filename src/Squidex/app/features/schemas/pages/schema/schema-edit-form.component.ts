@@ -28,6 +28,8 @@ export class SchemaEditFormComponent implements OnInit {
 
     public editForm = new EditSchemaForm(this.formBuilder);
 
+    public isEditable = false;
+
     constructor(
         private readonly formBuilder: FormBuilder,
         private readonly schemasState: SchemasState
@@ -35,7 +37,10 @@ export class SchemaEditFormComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.isEditable = this.schema.canUpdate;
+
         this.editForm.load(this.schema.properties);
+        this.editForm.setEnabled(this.isEditable);
     }
 
     public emitComplete() {
@@ -43,6 +48,10 @@ export class SchemaEditFormComponent implements OnInit {
     }
 
     public saveSchema() {
+        if (!this.isEditable) {
+            return;
+        }
+
         const value = this.editForm.submit();
 
         if (value) {

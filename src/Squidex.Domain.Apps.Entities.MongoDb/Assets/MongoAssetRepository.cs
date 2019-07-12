@@ -137,7 +137,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             }
         }
 
-        public async Task<IList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash)
+        public async Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {

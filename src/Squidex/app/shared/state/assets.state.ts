@@ -7,9 +7,10 @@
 
 import { Injectable } from '@angular/core';
 import { combineLatest, Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
+    compareStringsAsc,
     DialogService,
     ImmutableArray,
     Pager,
@@ -38,37 +39,36 @@ interface Snapshot {
 
     // Indicates if the assets are loaded.
     isLoaded?: boolean;
+
+    // Indicates if the user can create assets.
+    canCreate?: boolean;
 }
 
 @Injectable()
 export class AssetsState extends State<Snapshot> {
     public tags =
-        this.changes.pipe(map(x => x.tags),
-            distinctUntilChanged(), map(x => sort(x)));
+        this.project2(x => x.tags, x => sort(x));
 
     public tagsNames =
-        this.tags.pipe(
-            distinctUntilChanged(), map(x => x.map(t => t.name)));
+        this.project2(x => x.tags, x => Object.keys(x));
 
     public selectedTagNames =
-        this.changes.pipe(
-            distinctUntilChanged(), map(x => Object.keys(x.tagsSelected)));
+        this.project2(x => x.tagsSelected, x => Object.keys(x));
 
     public assets =
-        this.changes.pipe(map(x => x.assets),
-            distinctUntilChanged());
+        this.project(x => x.assets);
 
     public assetsQuery =
-        this.changes.pipe(map(x => x.assetsQuery),
-            distinctUntilChanged());
+        this.project(x => x.assetsQuery);
 
     public assetsPager =
-        this.changes.pipe(map(x => x.assetsPager),
-            distinctUntilChanged());
+        this.project(x => x.assetsPager);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
+
+    public canCreate =
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly appsState: AppsState,
@@ -95,7 +95,7 @@ export class AssetsState extends State<Snapshot> {
                 Object.keys(this.snapshot.tagsSelected)),
             this.assetsService.getTags(this.appName)
         ).pipe(
-            tap(([ { items, total }, tags ]) => {
+            tap(([ { items, total, canCreate }, tags ]) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('Assets reloaded.');
                 }
@@ -104,7 +104,7 @@ export class AssetsState extends State<Snapshot> {
                     const assets = ImmutableArray.of(items);
                     const assetsPager = s.assetsPager.setCount(total);
 
-                    return { ...s, assets, assetsPager, isLoaded: true, tags };
+                    return { ...s, assets, assetsPager, isLoaded: true, tags, canCreate };
                 });
             }),
             shareSubscribed(this.dialogs));
@@ -124,7 +124,7 @@ export class AssetsState extends State<Snapshot> {
     }
 
     public delete(asset: AssetDto): Observable<any> {
-        return this.assetsService.deleteAsset(this.appName, asset.id, asset.version).pipe(
+        return this.assetsService.deleteAsset(this.appName, asset, asset.version).pipe(
             tap(() => {
                 return this.next(s => {
                     const assets = s.assets.filter(x => x.id !== asset.id);
@@ -251,17 +251,7 @@ function removeTags(previous: AssetDto, tags: { [x: string]: number; }, tagsSele
 }
 
 function sort(tags: { [name: string]: number }) {
-    return Object.keys(tags).sort((a, b) => {
-        if (a < b) {
-            return -1;
-        }
-        if (a > b) {
-            return 1;
-        }
-        return 0;
-    }).map(key => {
-        return { name: key, count: tags[key] };
-    });
+    return Object.keys(tags).sort(compareStringsAsc).map(name => ({ name, count: tags[name] }));
 }
 
 @Injectable()

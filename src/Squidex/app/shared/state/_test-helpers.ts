@@ -31,6 +31,9 @@ appsState.setup(x => x.appName)
 appsState.setup(x => x.selectedApp)
     .returns(() => of(<any>{ name: app }));
 
+appsState.setup(x => x.selectedValidApp)
+    .returns(() => of(<any>{ name: app }));
+
 const authService = Mock.ofType<AuthService>();
 
 authService.setup(x => x.user)

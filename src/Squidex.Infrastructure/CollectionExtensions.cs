@@ -13,6 +13,24 @@ namespace Squidex.Infrastructure
 {
     public static class CollectionExtensions
     {
+        public static IResultList<T> SortSet<T, TKey>(this IResultList<T> input, Func<T, TKey> idProvider, IReadOnlyList<TKey> ids) where T : class
+        {
+            return ResultList.Create(input.Total, SortList(input, idProvider, ids));
+        }
+
+        public static IEnumerable<T> SortList<T, TKey>(this IEnumerable<T> input, Func<T, TKey> idProvider, IReadOnlyList<TKey> ids) where T : class
+        {
+            return ids.Select(id => input.FirstOrDefault(x => Equals(idProvider(x), id))).Where(x => x != null);
+        }
+
+        public static void AddRange<T>(this ICollection<T> target, IEnumerable<T> source)
+        {
+            foreach (var value in source)
+            {
+                target.Add(value);
+            }
+        }
+
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable)
         {
             var random = new Random();
@@ -35,27 +53,13 @@ namespace Squidex.Infrastructure
             return source.Concat(Enumerable.Repeat(value, 1));
         }
 
-        public static TResult[] ToArray<TResult, T>(this T[] value, Func<T, TResult> convert)
+        public static TResult[] Map<TResult, T>(this T[] value, Func<T, TResult> convert)
         {
             var result = new TResult[value.Length];
 
             for (var i = 0; i < value.Length; i++)
             {
                 result[i] = convert(value[i]);
-            }
-
-            return result;
-        }
-
-        public static TResult[] ToArray<TResult, T>(this IReadOnlyCollection<T> value, Func<T, TResult> convert)
-        {
-            var result = new TResult[value.Count];
-            var i = 0;
-
-            foreach (var v in value)
-            {
-                result[i] = convert(v);
-                i++;
             }
 
             return result;

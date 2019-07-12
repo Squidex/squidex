@@ -53,14 +53,17 @@ namespace Squidex.Domain.Apps.Entities.History
 
             message = new Lazy<string>(() =>
             {
-                var result = texts[item.Message];
-
-                foreach (var kvp in item.Parameters)
+                if (texts.TryGetValue(item.Message, out var result))
                 {
-                    result = result.Replace("[" + kvp.Key + "]", kvp.Value);
+                    foreach (var kvp in item.Parameters)
+                    {
+                        result = result.Replace("[" + kvp.Key + "]", kvp.Value);
+                    }
+
+                    return result;
                 }
 
-                return result;
+                return null;
             });
         }
     }

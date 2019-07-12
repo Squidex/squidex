@@ -19,15 +19,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public AppHistoryEventsCreator(TypeNameRegistry typeNameRegistry)
             : base(typeNameRegistry)
         {
-            AddEventMessage("AppContributorAssignedEvent",
-                "assigned {user:[Contributor]} as {[Role]}");
-
-            AddEventMessage("AppClientUpdatedEvent",
-                "updated client {[Id]}");
-
-            AddEventMessage("AppPlanChanged",
-                "changed plan to {[Plan]}");
-
             AddEventMessage<AppContributorAssigned>(
                 "assigned {user:[Contributor]} as {[Role]}");
 

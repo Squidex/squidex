@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 
             if (command.ParentFieldId.HasValue)
             {
-                arrayField = GuardHelper.GetArrayFieldOrThrow(schema, command.ParentFieldId.Value);
+                arrayField = GuardHelper.GetArrayFieldOrThrow(schema, command.ParentFieldId.Value, false);
             }
 
             Validate.It(() => "Cannot reorder schema fields.", error =>

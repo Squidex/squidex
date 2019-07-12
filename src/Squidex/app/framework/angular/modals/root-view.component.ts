@@ -14,6 +14,6 @@ import { ChangeDetectionStrategy, Component, ViewChild, ViewContainerRef } from 
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RootViewComponent {
-    @ViewChild('element', { read: ViewContainerRef })
+    @ViewChild('element', { read: ViewContainerRef, static: false })
     public viewContainer: ViewContainerRef;
 }

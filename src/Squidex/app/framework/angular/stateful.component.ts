@@ -52,7 +52,7 @@ export class ResourceOwner implements OnDestroy {
 
 export abstract class StatefulComponent<T = any> extends State<T> implements OnDestroy {
     private readonly subscriptions = new ResourceOwner();
-    private subscription: Subscription;
+    private readonly subscription: Subscription;
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
@@ -74,6 +74,10 @@ export abstract class StatefulComponent<T = any> extends State<T> implements OnD
 
     protected unsubscribeAll() {
         this.subscriptions.unsubscribeAll();
+    }
+
+    protected detach() {
+        this.changeDetector.detach();
     }
 
     protected detectChanges() {
@@ -112,37 +116,6 @@ export abstract class StatefulControlComponent<T, TValue> extends StatefulCompon
     public setDisabledState(isDisabled: boolean): void {
         this.next(s => ({ ...s, isDisabled }));
     }
-
-    public abstract writeValue(obj: any): void;
-}
-
-export abstract class ExternalControlComponent<TValue> extends StatefulComponent<any> implements ControlValueAccessor {
-    private fnChanged = (v: any) => { /* NOOP */ };
-    private fnTouched = () => { /* NOOP */ };
-
-    constructor(changeDetector: ChangeDetectorRef) {
-        super(changeDetector, {});
-
-        changeDetector.detach();
-    }
-
-    public registerOnChange(fn: any) {
-        this.fnChanged = fn;
-    }
-
-    public registerOnTouched(fn: any) {
-        this.fnTouched = fn;
-    }
-
-    protected callTouched() {
-        this.fnTouched();
-    }
-
-    protected callChange(value: TValue) {
-        this.fnChanged(value);
-    }
-
-    public abstract setDisabledState(isDisabled: boolean): void;
 
     public abstract writeValue(obj: any): void;
 }

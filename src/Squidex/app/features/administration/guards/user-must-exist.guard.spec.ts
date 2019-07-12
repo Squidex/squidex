@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
 
-import { SnapshotUser, UsersState } from '@app/features/administration/internal';
+import { UserDto, UsersState } from '@app/features/administration/internal';
 
 import { UserMustExistGuard } from './user-must-exist.guard';
 
@@ -32,7 +32,7 @@ describe('UserMustExistGuard', () => {
 
     it('should load user and return true when found', () => {
         usersState.setup(x => x.select('123'))
-            .returns(() => of(<SnapshotUser>{}));
+            .returns(() => of(<UserDto>{}));
 
         let result: boolean;
 

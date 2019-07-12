@@ -52,8 +52,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         public async Task Should_add_app_to_index_on_assign_of_contributor()
         {
             var context =
-                new CommandContext(new AssignContributor { AppId = appId }, commandBus)
-                    .Complete(EntityCreatedResult.Create(userId, 1));
+                new CommandContext(new AssignContributor { AppId = appId, ContributorId = userId }, commandBus)
+                    .Complete();
 
             await sut.HandleAsync(context);
 

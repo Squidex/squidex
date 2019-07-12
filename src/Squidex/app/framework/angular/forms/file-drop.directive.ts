@@ -19,7 +19,7 @@ const ImageTypes = [
 ];
 
 @Directive({
-    selector: '[sqxFileDrop]'
+    selector: '[sqxDropFile]'
 })
 export class FileDropDirective {
     private dragCounter = 0;
@@ -33,7 +33,10 @@ export class FileDropDirective {
     @Input()
     public noDrop: boolean;
 
-    @Output('sqxFileDrop')
+    @Input('sqxDropDisabled')
+    public disabled = false;
+
+    @Output('sqxDropFile')
     public drop = new EventEmitter<File[]>();
 
     constructor(
@@ -60,7 +63,7 @@ export class FileDropDirective {
             }
         }
 
-        if (result.length > 0) {
+        if (result.length > 0 && !this.disabled) {
             this.drop.emit(result);
         }
 
@@ -127,7 +130,7 @@ export class FileDropDirective {
     private dragStart() {
         this.dragCounter++;
 
-        if (this.dragCounter === 1) {
+        if (this.dragCounter === 1 && !this.disabled) {
             this.renderer.addClass(this.element.nativeElement, 'drag');
         }
     }
@@ -135,7 +138,7 @@ export class FileDropDirective {
     private dragEnd(number?: number ) {
         this.dragCounter = number || this.dragCounter - 1;
 
-        if (this.dragCounter === 0) {
+        if (this.dragCounter === 0 && !this.disabled) {
             this.renderer.removeClass(this.element.nativeElement, 'drag');
         }
     }

@@ -55,7 +55,7 @@ namespace Squidex.ICIS
             {
                 try
                 {
-                    identityUser = await userManager.CreateAsync(userFactory, userValues);
+                    identityUser = (await userManager.CreateAsync(userFactory, userValues))?.Identity;
                 }
                 catch (Exception ex)
                 {

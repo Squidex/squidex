@@ -370,9 +370,9 @@ describe('StringField', () => {
 });
 
 function createSchema(properties: SchemaPropertiesDto, index = 1, fields: RootFieldDto[]) {
-    return new SchemaDetailsDto('id' + index, 'schema' + index, '', properties, false, true, null!, null!, null!, null!, null!, fields);
+    return new SchemaDetailsDto({}, 'id' + index, 'schema' + index, '', properties, false, true, null!, null!, null!, null!, null!, fields);
 }
 
 function createField(properties: FieldPropertiesDto, index = 1, partitioning = 'languages') {
-    return new RootFieldDto(index, 'field' + index, properties, partitioning);
+    return new RootFieldDto({}, index, 'field' + index, properties, partitioning);
 }

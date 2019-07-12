@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -23,26 +23,15 @@ import {
 import {
     AssignContributorDto,
     ContributorDto,
+    ContributorsPayload,
     ContributorsService
 } from './../services/contributors.service';
 
-import { AuthService } from './../services/auth.service';
 import { AppsState } from './apps.state';
-
-interface SnapshotContributor {
-    // The contributor.
-    contributor: ContributorDto;
-
-    // Indicates if the contributor is the ucrrent user.
-    isCurrentUser: boolean;
-}
 
 interface Snapshot {
     // All loaded contributors.
     contributors: ContributorsList;
-
-    // Indicates if the maximum number of contributors are reached.
-    isMaxReached?: boolean;
 
     // Indicates if the contributors are loaded.
     isLoaded?: boolean;
@@ -52,35 +41,33 @@ interface Snapshot {
 
     // The app version.
     version: Version;
+
+    // Indicates if the user can add a contributor.
+    canCreate?: boolean;
 }
 
-type ContributorsList = ImmutableArray<SnapshotContributor>;
+type ContributorsList = ImmutableArray<ContributorDto>;
 
 @Injectable()
 export class ContributorsState extends State<Snapshot> {
     public contributors =
-        this.changes.pipe(map(x => x.contributors),
-            distinctUntilChanged());
-
-    public isMaxReached =
-        this.changes.pipe(map(x => x.isMaxReached),
-            distinctUntilChanged());
+        this.project(x => x.contributors);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
 
     public maxContributors =
-        this.changes.pipe(map(x => x.maxContributors),
-            distinctUntilChanged());
+        this.project(x => x.maxContributors);
+
+    public canCreate =
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly contributorsService: ContributorsService,
         private readonly appsState: AppsState,
-        private readonly authState: AuthService,
         private readonly dialogs: DialogService
     ) {
-        super({ contributors: ImmutableArray.empty(), version: new Version(''), maxContributors: -1 });
+        super({ contributors: ImmutableArray.empty(), version: Version.EMPTY, maxContributors: -1 });
     }
 
     public load(isReload = false): Observable<any> {
@@ -94,19 +81,15 @@ export class ContributorsState extends State<Snapshot> {
                     this.dialogs.notifyInfo('Contributors reloaded.');
                 }
 
-                const contributors = ImmutableArray.of(payload.contributors.map(x => this.createContributor(x)));
-
-                this.replaceContributors(contributors, version, payload.maxContributors);
+                this.replaceContributors(version, payload);
             }),
             shareSubscribed(this.dialogs));
     }
 
     public revoke(contributor: ContributorDto): Observable<any> {
-        return this.contributorsService.deleteContributor(this.appName, contributor.contributorId, this.version).pipe(
-            tap(({ version }) => {
-                const contributors = this.snapshot.contributors.filter(x => x.contributor.contributorId !== contributor.contributorId);
-
-                this.replaceContributors(contributors, version);
+        return this.contributorsService.deleteContributor(this.appName, contributor, this.version).pipe(
+            tap(({ version, payload }) => {
+                this.replaceContributors(version, payload);
             }),
             shareSubscribed(this.dialogs));
     }
@@ -121,32 +104,18 @@ export class ContributorsState extends State<Snapshot> {
                 }
             }),
             tap(({ version, payload }) => {
-                const contributors = this.updateContributors(payload.contributorId, request.role);
-
-                this.replaceContributors(contributors, version);
+                this.replaceContributors(version, payload);
             }),
-            shareMapSubscribed(this.dialogs, x => x.payload.isCreated));
+            shareMapSubscribed(this.dialogs, x => x.payload._meta && x.payload._meta['isInvited'] === '1'));
     }
 
-    private updateContributors(id: string, role: string) {
-        const contributor = new ContributorDto(id, role);
-        const contributors = this.snapshot.contributors;
-
-        if (contributors.find(x => x.contributor.contributorId === id)) {
-            return contributors.map(x => x.contributor.contributorId === id ? this.createContributor(contributor) : x);
-        } else {
-            return contributors.push(this.createContributor(contributor));
-        }
-    }
-
-    private replaceContributors(contributors: ImmutableArray<SnapshotContributor>, version: Version, maxContributors?: number) {
+    private replaceContributors(version: Version, payload: ContributorsPayload) {
         this.next(s => {
-            maxContributors = maxContributors || s.maxContributors;
+            const { canCreate, items, maxContributors } = payload;
 
-            const isLoaded = true;
-            const isMaxReached = maxContributors > 0 && maxContributors <= contributors.length;
+            const contributors = ImmutableArray.of(items);
 
-            return { ...s, contributors, maxContributors, isLoaded, isMaxReached, version };
+            return { ...s, contributors, maxContributors, isLoaded: true, version, canCreate };
         });
     }
 
@@ -154,15 +123,7 @@ export class ContributorsState extends State<Snapshot> {
         return this.appsState.appName;
     }
 
-    private get userId() {
-        return this.authState.user!.id;
-    }
-
     private get version() {
         return this.snapshot.version;
-    }
-
-    private createContributor(contributor: ContributorDto): SnapshotContributor {
-        return { contributor, isCurrentUser: contributor.contributorId === this.userId };
     }
 }

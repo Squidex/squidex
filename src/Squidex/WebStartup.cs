@@ -31,12 +31,14 @@ using Squidex.Config.Web;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.ICIS.Extensions;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.Translations;
 using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
 using Squidex.Web;
+using Squidex.Web.Pipeline;
 
 namespace Squidex
 {
@@ -60,9 +62,6 @@ namespace Squidex
             services.AddOptions();
 
             services.AddMyAssetServices(config);
-            var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
-            services.AddGenesisAuthentication(identityOptions.ICISAuthServer);
-            services.AddKafkaRuleExtention(config);
 
             IdentityModelEventSource.ShowPII = true;
 
@@ -88,6 +87,8 @@ namespace Squidex
                 config.GetSection("assets"));
             services.Configure<DeepLTranslatorOptions>(
                 config.GetSection("translations:deepL"));
+            services.Configure<LanguagesOptions>(
+                config.GetSection("languages"));
             services.Configure<ReadonlyOptions>(
                 config.GetSection("mode"));
             services.Configure<RobotsTxtOptions>(
@@ -102,6 +103,8 @@ namespace Squidex
                 config.GetSection("usage"));
             services.Configure<RebuildOptions>(
                 config.GetSection("rebuild"));
+            services.Configure<ExposedConfiguration>(
+                config.GetSection("exposedConfiguration"));
 
             services.Configure<MyContentsControllerOptions>(
                 config.GetSection("contentsController"));
@@ -119,6 +122,10 @@ namespace Squidex
             services.AddHostedService<MigratorHost>();
             services.AddHostedService<MigrationRebuilderHost>();
             services.AddHostedService<BackgroundHost>();
+
+            var identityOptions = config.GetSection("identity").Get<MyIdentityOptions>();
+            services.AddGenesisAuthentication(identityOptions.ICISAuthServer);
+            services.AddKafkaRuleExtention(config);
 
             return services.BuildServiceProvider();
         }

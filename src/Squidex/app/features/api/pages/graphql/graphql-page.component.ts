@@ -22,7 +22,7 @@ import { AppsState, GraphQlService } from '@app/shared';
     templateUrl: './graphql-page.component.html'
 })
 export class GraphQLPageComponent implements AfterViewInit {
-    @ViewChild('graphiQLContainer')
+    @ViewChild('graphiQLContainer', { static: false })
     public graphiQLContainer: ElementRef;
 
     constructor(

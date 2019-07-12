@@ -35,9 +35,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
                     await next();
 
-                    if (assignContributor.IsCreated && context.PlainResult is EntityCreatedResult<string> id)
+                    if (assignContributor.IsCreated && context.PlainResult is IAppEntity app)
                     {
-                        context.Complete(new InvitedResult { Id = id });
+                        context.Complete(new InvitedResult { App = app });
                     }
 
                     return;

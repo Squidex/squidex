@@ -6,7 +6,7 @@
 
         <ng-container content>
             <sqx-form-hint>
-                Adding a preview url generates a link in the content editor, referring to your custom preview environment where the content item is used.
+                Adding a preview url generates a link in the content editor, referring to your custom preview or production environment where the content item is used.
             </sqx-form-hint>
 
             <sqx-form-hint>
@@ -14,6 +14,10 @@
             </sqx-form-hint>
 
             <div class="content">
+                <div class="mt-4" *ngIf="!isEditable && editForm.form.controls.length === 0">
+                    No preview urls configured.
+                </div>
+
                 <div class="form-group row no-gutters" *ngFor="let form of editForm.form.controls; let i = index">
                     <div class="col col-name pr-1">
                         <sqx-control-errors [for]="form.get('name')" fieldName="Name" [submitted]="editForm.submitted | async"></sqx-control-errors>
@@ -29,6 +33,7 @@
 
                     <div class="col-auto col-options">
                         <button type="button" class="btn btn-text-danger"
+                            [disabled]="!isEditable"
                             (sqxConfirmClick)="editForm.remove(i)"
                             confirmTitle="Remove url" 
                             confirmText="Do you really want to remove this url?">
@@ -37,7 +42,7 @@
                     </div>
                 </div>
 
-                <div class="form-group row no-gutters" [formGroup]="addForm.form">
+                <div class="form-group row no-gutters" [formGroup]="addForm.form" *ngIf="isEditable">
                     <div class="col col-name pr-1">
                         <sqx-control-errors for="name" [submitted]="addForm.submitted | async"></sqx-control-errors>
 
@@ -65,7 +70,7 @@
 
         <ng-container footer>
             <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()" [disabled]="editForm.submitted | async">Cancel</button>
-            <button type="submit" class="float-right btn btn-primary">Save</button>
+            <button type="submit" class="float-right btn btn-primary" *ngIf="isEditable">Save</button>
         </ng-container>
     </sqx-modal-dialog>
 </form>

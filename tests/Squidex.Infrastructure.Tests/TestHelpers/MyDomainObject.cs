@@ -26,13 +26,13 @@ namespace Squidex.Infrastructure.TestHelpers
             switch (command)
             {
                 case CreateAuto createAuto:
-                    return CreateAsync(createAuto, c =>
+                    return Create(createAuto, c =>
                     {
                         RaiseEvent(new ValueChanged { Value = c.Value });
                     });
 
                 case CreateCustom createCustom:
-                    return CreateReturnAsync(createCustom, c =>
+                    return CreateReturn(createCustom, c =>
                     {
                         RaiseEvent(new ValueChanged { Value = c.Value });
 
@@ -40,13 +40,13 @@ namespace Squidex.Infrastructure.TestHelpers
                     });
 
                 case UpdateAuto updateAuto:
-                    return UpdateAsync(updateAuto, c =>
+                    return Update(updateAuto, c =>
                     {
                         RaiseEvent(new ValueChanged { Value = c.Value });
                     });
 
                 case UpdateCustom updateCustom:
-                    return UpdateAsync(updateCustom, c =>
+                    return UpdateReturn(updateCustom, c =>
                     {
                         RaiseEvent(new ValueChanged { Value = c.Value });
 

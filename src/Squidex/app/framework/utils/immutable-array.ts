@@ -78,63 +78,19 @@ export class ImmutableArray<T> implements Iterable<T> {
     }
 
     public sortByStringAsc(filter: (a: T) => string): ImmutableArray<T> {
-        return this.sort((a, b) => {
-            const av = filter(a);
-            const bv = filter(b);
-
-            if (av < bv) {
-                return -1;
-            }
-            if (av > bv) {
-                return 1;
-            }
-            return 0;
-        });
+        return this.sort((a, b) => compareStringsAsc(filter(a), filter(b)));
     }
 
     public sortByStringDesc(filter: (a: T) => string): ImmutableArray<T> {
-        return this.sort((a, b) => {
-            const av = filter(a);
-            const bv = filter(b);
-
-            if (av < bv) {
-                return 1;
-            }
-            if (av > bv) {
-                return -1;
-            }
-            return 0;
-        });
+        return this.sort((a, b) => compareStringsDesc(filter(a), filter(b)));
     }
 
     public sortByNumberAsc(filter: (a: T) => number): ImmutableArray<T> {
-        return this.sort((a, b) => {
-            const av = filter(a);
-            const bv = filter(b);
-
-            if (av < bv) {
-                return -1;
-            }
-            if (av > bv) {
-                return 1;
-            }
-            return 0;
-        });
+        return this.sort((a, b) => compareNumbersAsc(filter(a), filter(b)));
     }
 
     public sortByNumberDesc(filter: (a: T) => number): ImmutableArray<T> {
-        return this.sort((a, b) => {
-            const av = filter(a);
-            const bv = filter(b);
-
-            if (av < bv) {
-                return 1;
-            }
-            if (av > bv) {
-                return -1;
-            }
-            return 0;
-        });
+        return this.sort((a, b) => compareNumbersDesc(filter(a), filter(b)));
     }
 
     public pushFront(...items: T[]): ImmutableArray<T> {
@@ -234,4 +190,34 @@ export class ImmutableArray<T> implements Iterable<T> {
     public removeBy(field: string, value: T) {
         return this.removeAll(x => x[field] === value[field]);
     }
+}
+
+export function compareStringsAsc(a: string, b: string) {
+    return a.localeCompare(b, undefined, { sensitivity: 'base' });
+}
+
+export function compareStringsDesc(a: string, b: string) {
+    return b.localeCompare(a, undefined, { sensitivity: 'base' });
+}
+
+export function compareNumbersAsc(a: number, b: number) {
+    if (a < b) {
+        return -1;
+    }
+    if (a > b) {
+        return 1;
+    }
+
+    return 0;
+}
+
+export function compareNumbersDesc(a: number, b: number) {
+    if (a < b) {
+        return 1;
+    }
+    if (a > b) {
+        return -1;
+    }
+
+    return 0;
 }

@@ -13,6 +13,8 @@ export * from './angular/forms/confirm-click.directive';
 export * from './angular/forms/control-errors.component';
 export * from './angular/forms/copy.directive';
 export * from './angular/forms/date-time-editor.component';
+export * from './angular/forms/dropdown.component';
+export * from './angular/forms/editable-title.component';
 export * from './angular/forms/file-drop.directive';
 export * from './angular/forms/focus-on-init.directive';
 export * from './angular/forms/form-alert.component';

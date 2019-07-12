@@ -55,6 +55,12 @@ export class PanelContainerDirective implements AfterViewInit {
 
         const panels = this.panels;
 
+        for (let panel of panels) {
+            if (!panel.isViewInit) {
+                return;
+            }
+        }
+
         let currentSize = 0;
         let panelsWidthSpread = 0;
 

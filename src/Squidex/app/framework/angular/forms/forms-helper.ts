@@ -5,9 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
- import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
- import { Observable } from 'rxjs';
- import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
+import { AbstractControl, FormArray, FormGroup } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
 
 import { Types } from './../../utils/types';
 

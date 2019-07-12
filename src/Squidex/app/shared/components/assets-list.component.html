@@ -1,4 +1,4 @@
-<div class="file-drop" (sqxFileDrop)="addFiles($event)" *ngIf="!isDisabled">
+<div class="file-drop" (sqxDropFile)="addFiles($event)" *ngIf="!isDisabled && (state.canCreate | async)">
     <h3 class="file-drop-header">Drop files here to upload</h3>
 
     <div class="file-drop-or">or</div>

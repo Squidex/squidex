@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         {
             ScheduleJob = null;
 
-            Status = @event.Status;
+            SimpleMapper.Map(@event, this);
 
             if (@event.Status == Status.Published)
             {

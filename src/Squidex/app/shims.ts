@@ -5,20 +5,93 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import 'core-js/es6/array';
-import 'core-js/es6/date';
-import 'core-js/es6/function';
-import 'core-js/es6/map';
-import 'core-js/es6/math';
-import 'core-js/es6/number';
-import 'core-js/es6/object';
-import 'core-js/es6/parse-float';
-import 'core-js/es6/parse-int';
-import 'core-js/es6/reflect';
-import 'core-js/es6/regexp';
-import 'core-js/es6/set';
-import 'core-js/es6/string';
-import 'core-js/es6/symbol';
+import 'reflect-metadata';
 
-import 'core-js/es7/reflect';
+// ES2015 symbol capabilities
+import 'core-js/modules/es.symbol';
+
+// ES2015 function capabilities
+import 'core-js/modules/es.function.bind';
+import 'core-js/modules/es.function.has-instance';
+import 'core-js/modules/es.function.name';
+
+// ES2015 object capabilities
+import 'core-js/modules/es.object.assign';
+import 'core-js/modules/es.object.create';
+import 'core-js/modules/es.object.define-properties';
+import 'core-js/modules/es.object.define-property';
+import 'core-js/modules/es.object.freeze';
+import 'core-js/modules/es.object.get-own-property-descriptor';
+import 'core-js/modules/es.object.get-own-property-names';
+import 'core-js/modules/es.object.get-prototype-of';
+import 'core-js/modules/es.object.is';
+import 'core-js/modules/es.object.is-extensible';
+import 'core-js/modules/es.object.is-frozen';
+import 'core-js/modules/es.object.is-sealed';
+import 'core-js/modules/es.object.keys';
+import 'core-js/modules/es.object.prevent-extensions';
+import 'core-js/modules/es.object.seal';
+import 'core-js/modules/es.object.set-prototype-of';
+import 'core-js/modules/es.object.to-string';
+
+// ES2015 array capabilities
+import 'core-js/modules/es.array.copy-within';
+import 'core-js/modules/es.array.every';
+import 'core-js/modules/es.array.fill';
+import 'core-js/modules/es.array.filter';
+import 'core-js/modules/es.array.find';
+import 'core-js/modules/es.array.find-index';
+import 'core-js/modules/es.array.for-each';
+import 'core-js/modules/es.array.from';
+import 'core-js/modules/es.array.index-of';
+import 'core-js/modules/es.array.is-array';
+import 'core-js/modules/es.array.iterator';
+import 'core-js/modules/es.array.join';
+import 'core-js/modules/es.array.last-index-of';
+import 'core-js/modules/es.array.map';
+import 'core-js/modules/es.array.of';
+import 'core-js/modules/es.array.reduce';
+import 'core-js/modules/es.array.reduce-right';
+import 'core-js/modules/es.array.slice';
+import 'core-js/modules/es.array.some';
+import 'core-js/modules/es.array.sort';
+
+// ES2015 string capabilities
+import 'core-js/modules/es.string.anchor';
+import 'core-js/modules/es.string.big';
+import 'core-js/modules/es.string.blink';
+import 'core-js/modules/es.string.bold';
+import 'core-js/modules/es.string.code-point-at';
+import 'core-js/modules/es.string.ends-with';
+import 'core-js/modules/es.string.fixed';
+import 'core-js/modules/es.string.fontcolor';
+import 'core-js/modules/es.string.fontsize';
+import 'core-js/modules/es.string.from-code-point';
+import 'core-js/modules/es.string.includes';
+import 'core-js/modules/es.string.italics';
+import 'core-js/modules/es.string.iterator';
+import 'core-js/modules/es.string.link';
+import 'core-js/modules/es.string.raw';
+import 'core-js/modules/es.string.repeat';
+import 'core-js/modules/es.string.small';
+import 'core-js/modules/es.string.starts-with';
+import 'core-js/modules/es.string.strike';
+import 'core-js/modules/es.string.sub';
+import 'core-js/modules/es.string.sup';
+import 'core-js/modules/es.string.trim';
+
+import 'core-js/modules/es.parse-float';
+import 'core-js/modules/es.parse-int';
+
+import 'core-js/es/date';
+import 'core-js/es/math';
+import 'core-js/es/number';
+import 'core-js/es/regexp';
+
+import 'core-js/modules/es.map';
+import 'core-js/modules/es.promise';
+import 'core-js/modules/es.set';
+import 'core-js/modules/es.weak-map';
+import 'core-js/modules/web.dom-collections.iterator';
+
 import 'zone.js/dist/zone';

@@ -106,12 +106,12 @@
             
             <ng-container *ngIf="mode !== 'Wizard' && step === 2">
                 <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
-                <button type="submit" class="float-right btn btn-primary" (click)="saveTrigger()">Save</button>
+                <button type="submit" class="float-right btn btn-primary" (click)="saveTrigger()" *ngIf="isEditable">Save</button>
             </ng-container>
 
             <ng-container *ngIf="step === 4">
                 <button type="reset" class="float-left btn btn-secondary" (click)="emitComplete()">Cancel</button>
-                <button type="submit" class="float-right btn btn-primary" (click)="saveAction()">Save</button>
+                <button type="submit" class="float-right btn btn-primary" (click)="saveAction()" *ngIf="isEditable">Save</button>
             </ng-container>
         </div>
     </ng-container>

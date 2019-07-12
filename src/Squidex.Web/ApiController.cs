@@ -8,6 +8,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -26,15 +27,20 @@ namespace Squidex.Web
         {
             get
             {
-                var appFeature = HttpContext.Features.Get<IAppFeature>();
+                var app = HttpContext.Context().App;
 
-                if (appFeature == null)
+                if (app == null)
                 {
                     throw new InvalidOperationException("Not in a app context.");
                 }
 
-                return appFeature.App;
+                return app;
             }
+        }
+
+        protected Context Context
+        {
+            get { return HttpContext.Context(); }
         }
 
         protected Guid AppId

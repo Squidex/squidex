@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using NodaTime;
 using Squidex.Infrastructure;
-using System;
 
 namespace Squidex.Domain.Apps.Core.Comments
 {

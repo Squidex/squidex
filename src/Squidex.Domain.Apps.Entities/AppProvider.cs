@@ -65,6 +65,17 @@ namespace Squidex.Domain.Apps.Entities
             });
         }
 
+        public Task<IAppEntity> GetAppAsync(Guid appId)
+        {
+            return localCache.GetOrCreateAsync($"GetAppAsync({appId})", async () =>
+            {
+                using (Profiler.TraceMethod<AppProvider>())
+                {
+                    return await GetAppByIdAsync(appId);
+                }
+            });
+        }
+
         public Task<IAppEntity> GetAppAsync(string appName)
         {
             return localCache.GetOrCreateAsync($"GetAppAsync({appName})", async () =>
@@ -78,14 +89,7 @@ namespace Squidex.Domain.Apps.Entities
                         return null;
                     }
 
-                    var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
-
-                    if (!IsExisting(app))
-                    {
-                        return null;
-                    }
-
-                    return app.Value;
+                    return await GetAppByIdAsync(appId);
                 }
             });
         }
@@ -182,6 +186,18 @@ namespace Squidex.Domain.Apps.Entities
                     return apps.Where(a => IsFound(a.Value)).Select(a => a.Value).ToList();
                 }
             });
+        }
+
+        private async Task<IAppEntity> GetAppByIdAsync(Guid appId)
+        {
+            var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
+
+            if (!IsExisting(app))
+            {
+                return null;
+            }
+
+            return app.Value;
         }
 
         private async Task<List<Guid>> GetAppIdsByUserAsync(string userId)

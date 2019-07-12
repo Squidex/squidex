@@ -21,27 +21,30 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetCommandMiddleware : GrainCommandMiddleware<AssetCommand, IAssetGrain>
     {
         private readonly IAssetStore assetStore;
+        private readonly IAssetEnricher assetEnricher;
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IEnumerable<ITagGenerator<CreateAsset>> tagGenerators;
 
         public AssetCommandMiddleware(
             IGrainFactory grainFactory,
+            IAssetEnricher assetEnricher,
             IAssetQueryService assetQuery,
             IAssetStore assetStore,
             IAssetThumbnailGenerator assetThumbnailGenerator,
             IEnumerable<ITagGenerator<CreateAsset>> tagGenerators)
             : base(grainFactory)
         {
+            Guard.NotNull(assetEnricher, nameof(assetEnricher));
             Guard.NotNull(assetStore, nameof(assetStore));
             Guard.NotNull(assetQuery, nameof(assetQuery));
             Guard.NotNull(assetThumbnailGenerator, nameof(assetThumbnailGenerator));
             Guard.NotNull(tagGenerators, nameof(tagGenerators));
 
             this.assetStore = assetStore;
+            this.assetEnricher = assetEnricher;
             this.assetQuery = assetQuery;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
-
             this.tagGenerators = tagGenerators;
         }
 
@@ -56,53 +59,37 @@ namespace Squidex.Domain.Apps.Entities.Assets
                             createAsset.Tags = new HashSet<string>();
                         }
 
-                        createAsset.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(createAsset.File.OpenRead());
-
-                        createAsset.FileHash = await UploadAsync(context, createAsset.File);
+                        await EnrichWithImageInfosAsync(createAsset);
+                        await EnrichWithHashAndUploadAsync(createAsset, context);
 
                         try
                         {
                             var existings = await assetQuery.QueryByHashAsync(createAsset.AppId.Id, createAsset.FileHash);
 
-                            AssetCreatedResult result = null;
-
                             foreach (var existing in existings)
                             {
                                 if (IsDuplicate(createAsset, existing))
                                 {
-                                    result = new AssetCreatedResult(
-                                        existing.Id,
-                                        existing.Tags,
-                                        existing.Version,
-                                        existing.FileVersion,
-                                        existing.FileHash,
-                                        true);
-                                }
+                                    var result = new AssetCreatedResult(existing, true);
 
-                                break;
+                                    context.Complete(result);
+                                    await next();
+                                    return;
+                                }
                             }
 
-                            if (result == null)
+                            foreach (var tagGenerator in tagGenerators)
                             {
-                                foreach (var tagGenerator in tagGenerators)
-                                {
-                                    tagGenerator.GenerateTags(createAsset, createAsset.Tags);
-                                }
-
-                                var commandResult = (AssetSavedResult)await ExecuteCommandAsync(createAsset);
-
-                                result = new AssetCreatedResult(
-                                    createAsset.AssetId,
-                                    createAsset.Tags,
-                                    commandResult.Version,
-                                    commandResult.FileVersion,
-                                    commandResult.FileHash,
-                                    false);
-
-                                await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), result.FileVersion, null);
+                                tagGenerator.GenerateTags(createAsset, createAsset.Tags);
                             }
 
-                            context.Complete(result);
+                            await HandleCoreAsync(context, next);
+
+                            var asset = context.PlainResult as IEnrichedAssetEntity;
+
+                            context.Complete(new AssetCreatedResult(asset, false));
+
+                            await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), asset.FileVersion, null);
                         }
                         finally
                         {
@@ -114,16 +101,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 case UpdateAsset updateAsset:
                     {
-                        updateAsset.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(updateAsset.File.OpenRead());
+                        await EnrichWithImageInfosAsync(updateAsset);
+                        await EnrichWithHashAndUploadAsync(updateAsset, context);
 
-                        updateAsset.FileHash = await UploadAsync(context, updateAsset.File);
                         try
                         {
-                            var result = (AssetSavedResult)await ExecuteCommandAsync(updateAsset);
+                            await HandleCoreAsync(context, next);
 
-                            context.Complete(result);
+                            var asset = context.PlainResult as IAssetEntity;
 
-                            await assetStore.CopyAsync(context.ContextId.ToString(), updateAsset.AssetId.ToString(), result.FileVersion, null);
+                            await assetStore.CopyAsync(context.ContextId.ToString(), updateAsset.AssetId.ToString(), asset.FileVersion, null);
                         }
                         finally
                         {
@@ -134,8 +121,21 @@ namespace Squidex.Domain.Apps.Entities.Assets
                     }
 
                 default:
-                    await base.HandleAsync(context, next);
+                    await HandleCoreAsync(context, next);
+
                     break;
+            }
+        }
+
+        private async Task HandleCoreAsync(CommandContext context, Func<Task> next)
+        {
+            await base.HandleAsync(context, next);
+
+            if (context.PlainResult is IAssetEntity asset && !(context.PlainResult is IEnrichedAssetEntity))
+            {
+                var enriched = await assetEnricher.EnrichAsync(asset);
+
+                context.Complete(enriched);
             }
         }
 
@@ -144,18 +144,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return asset != null && asset.FileName == createAsset.File.FileName && asset.FileSize == createAsset.File.FileSize;
         }
 
-        private async Task<string> UploadAsync(CommandContext context, AssetFile file)
+        private async Task EnrichWithImageInfosAsync(UploadAssetCommand command)
         {
-            string hash;
+            command.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
+        }
 
-            using (var hashStream = new HasherStream(file.OpenRead(), HashAlgorithmName.SHA256))
+        private async Task EnrichWithHashAndUploadAsync(UploadAssetCommand command, CommandContext context)
+        {
+            using (var hashStream = new HasherStream(command.File.OpenRead(), HashAlgorithmName.SHA256))
             {
                 await assetStore.UploadAsync(context.ContextId.ToString(), hashStream);
 
-                hash = $"{hashStream.GetHashStringAndReset()}{file.FileName}{file.FileSize}".Sha256Base64();
+                command.FileHash = $"{hashStream.GetHashStringAndReset()}{command.File.FileName}{command.File.FileSize}".Sha256Base64();
             }
-
-            return hash;
         }
     }
 }

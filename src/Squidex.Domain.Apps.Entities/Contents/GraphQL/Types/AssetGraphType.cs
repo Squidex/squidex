@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class AssetGraphType : ObjectGraphType<IAssetEntity>
+    public sealed class AssetGraphType : ObjectGraphType<IEnrichedAssetEntity>
     {
         public AssetGraphType(IGraphModel model)
         {
@@ -167,8 +167,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             {
                 Name = "tags",
                 ResolvedType = null,
-                Resolver = Resolve(x => x.Tags),
-                Description = "The height of the image in pixels if the asset is an image.",
+                Resolver = Resolve(x => x.TagNames),
+                Description = "The asset tags.",
                 Type = AllTypes.NonNullTagsType
             });
 
@@ -186,9 +186,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             Description = "An asset";
         }
 
-        private static IFieldResolver Resolve(Func<IAssetEntity, object> action)
+        private static IFieldResolver Resolve(Func<IEnrichedAssetEntity, object> action)
         {
-            return new FuncFieldResolver<IAssetEntity, object>(c => action(c.Source));
+            return new FuncFieldResolver<IEnrichedAssetEntity, object>(c => action(c.Source));
         }
     }
 }

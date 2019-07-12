@@ -17,38 +17,38 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 {
     public class JintScriptEngineTests
     {
-        private readonly JintScriptEngine scriptEngine = new JintScriptEngine { Timeout = TimeSpan.FromSeconds(1) };
+        private readonly JintScriptEngine sut = new JintScriptEngine { Timeout = TimeSpan.FromSeconds(1) };
 
         [Fact]
         public void Should_throw_validation_exception_when_calling_reject()
         {
-            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "reject()"));
-            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "reject('Not valid')"));
+            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), "reject()"));
+            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), "reject('Not valid')"));
         }
 
         [Fact]
         public void Should_throw_security_exception_when_calling_reject()
         {
-            Assert.Throws<DomainForbiddenException>(() => scriptEngine.Execute(new ScriptContext(), "disallow()"));
-            Assert.Throws<DomainForbiddenException>(() => scriptEngine.Execute(new ScriptContext(), "disallow('Not allowed')"));
+            Assert.Throws<DomainForbiddenException>(() => sut.Execute(new ScriptContext(), "disallow()"));
+            Assert.Throws<DomainForbiddenException>(() => sut.Execute(new ScriptContext(), "disallow('Not allowed')"));
         }
 
         [Fact]
         public void Should_catch_script_syntax_errors()
         {
-            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "x => x"));
+            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), "x => x"));
         }
 
         [Fact]
         public void Should_catch_script_runtime_errors()
         {
-            Assert.Throws<ValidationException>(() => scriptEngine.Execute(new ScriptContext(), "throw 'Error';"));
+            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), "throw 'Error';"));
         }
 
         [Fact]
         public void Should_catch_script_runtime_errors_on_execute_and_transform()
         {
-            Assert.Throws<ValidationException>(() => scriptEngine.ExecuteAndTransform(new ScriptContext(), "throw 'Error';"));
+            Assert.Throws<ValidationException>(() => sut.ExecuteAndTransform(new ScriptContext(), "throw 'Error';"));
         }
 
         [Fact]
@@ -57,7 +57,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var content = new NamedContentData();
             var context = new ScriptContext { Data = content };
 
-            var result = scriptEngine.Transform(context, "x => x");
+            var result = sut.Transform(context, "x => x");
 
             Assert.Same(content, result);
         }
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var content = new NamedContentData();
             var context = new ScriptContext { Data = content };
 
-            Assert.Throws<ValidationException>(() => scriptEngine.ExecuteAndTransform(context, "x => x"));
+            Assert.Throws<ValidationException>(() => sut.ExecuteAndTransform(context, "x => x"));
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var content = new NamedContentData();
             var context = new ScriptContext { Data = content };
 
-            var result = scriptEngine.ExecuteAndTransform(context, "var x = 0;");
+            var result = sut.ExecuteAndTransform(context, "var x = 0;");
 
             Assert.Same(content, result);
         }
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content, Operation = "MyOperation" };
 
-            var result = scriptEngine.ExecuteAndTransform(context, @"
+            var result = sut.ExecuteAndTransform(context, @"
                 var data = ctx.data;
 
                 data.operation = { iv: ctx.operation };
@@ -127,7 +127,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content };
 
-            var result = scriptEngine.Transform(context, @"
+            var result = sut.Transform(context, @"
                 var data = ctx.data;
 
                 delete data.number0;
@@ -160,7 +160,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content };
 
-            var result = scriptEngine.Transform(context, @"
+            var result = sut.Transform(context, @"
                 var data = ctx.data;
 
                 data.slug = { iv: slugify(data.title.iv) };
@@ -190,7 +190,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content };
 
-            var result = scriptEngine.Transform(context, @"
+            var result = sut.Transform(context, @"
                 var data = ctx.data;
 
                 data.slug = { iv: slugify(data.title.iv, true) };
@@ -222,7 +222,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content };
 
-            var result = scriptEngine.ExecuteAndTransform(context, @"
+            var result = sut.ExecuteAndTransform(context, @"
                 var data = ctx.data;
 
                 delete data.number0;
@@ -263,12 +263,44 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
 
             var context = new ScriptContext { Data = content, OldData = oldContent, User = userPrincipal };
 
-            var result = scriptEngine.ExecuteAndTransform(context, @"
+            var result = sut.ExecuteAndTransform(context, @"
                 ctx.data.number0.iv = ctx.data.number0.iv + ctx.oldData.number0.iv * parseInt(ctx.user.id, 10);
 
                 replace(ctx.data);");
 
             Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void Should_evaluate_to_true_when_expression_match()
+        {
+            var result = sut.Evaluate("value", new { i = 2 }, "value.i == 2");
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void Should_evaluate_to_true_when_status_match()
+        {
+            var result = sut.Evaluate("value", new { status = Status.Published }, "value.status == 'Published'");
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void Should_evaluate_to_false_when_expression_match()
+        {
+            var result = sut.Evaluate("value", new { i = 2 }, "value.i == 3");
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void Should_evaluate_to_false_when_script_is_invalid()
+        {
+            var result = sut.Evaluate("value", new { i = 2 }, "function()");
+
+            Assert.False(result);
         }
     }
 }

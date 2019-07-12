@@ -8,9 +8,13 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 
-import { ApiUrlConfig } from '@app/framework';
+import { ApiUrlConfig, Resource, ResourceLinks } from '@app/framework';
 
-import { EventConsumerDto, EventConsumersService } from './event-consumers.service';
+import {
+    EventConsumerDto,
+    EventConsumersDto,
+    EventConsumersService
+} from './event-consumers.service';
 
 describe('EventConsumersService', () => {
     beforeEach(() => {
@@ -32,7 +36,7 @@ describe('EventConsumersService', () => {
     it('should make get request to get event consumers',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
 
-        let eventConsumers: EventConsumerDto[];
+        let eventConsumers: EventConsumersDto;
 
         eventConsumersService.getEventConsumers().subscribe(result => {
             eventConsumers = result;
@@ -43,66 +47,118 @@ describe('EventConsumersService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush([
-            {
-                name: 'event-consumer1',
-                position: '13',
-                isStopped: true,
-                isResetting: true,
-                error: 'an error 1'
-            },
-            {
-                name: 'event-consumer2',
-                position: '29',
-                isStopped: true,
-                isResetting: true,
-                error: 'an error 2'
-            }
-        ]);
+        req.flush({
+            items: [
+                eventConsumerResponse(12),
+                eventConsumerResponse(13)
+            ]
+        });
 
         expect(eventConsumers!).toEqual(
-            [
-                new EventConsumerDto('event-consumer1', true, true, 'an error 1', '13'),
-                new EventConsumerDto('event-consumer2', true, true, 'an error 2', '29')
-            ]);
+            new EventConsumersDto([
+                createEventConsumer(12),
+                createEventConsumer(13)
+            ]));
     }));
 
     it('should make put request to start event consumer',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
 
-        eventConsumersService.putStart('event-consumer1').subscribe();
+        const resource: Resource = {
+            _links: {
+                start: { method: 'PUT', href: 'api/event-consumers/event-consumer123/start' }
+            }
+        };
 
-        const req = httpMock.expectOne('http://service/p/api/event-consumers/event-consumer1/start');
+        let eventConsumer: EventConsumerDto;
+
+        eventConsumersService.putStart(resource).subscribe(response => {
+            eventConsumer = response;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/event-consumers/event-consumer123/start');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({});
+        req.flush(eventConsumerResponse(123));
+
+        expect(eventConsumer!).toEqual(createEventConsumer(123));
     }));
 
     it('should make put request to stop event consumer',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
 
-        eventConsumersService.putStop('event-consumer1').subscribe();
+        const resource: Resource = {
+            _links: {
+                stop: { method: 'PUT', href: 'api/event-consumers/event-consumer123/stop' }
+            }
+        };
 
-        const req = httpMock.expectOne('http://service/p/api/event-consumers/event-consumer1/stop');
+        let eventConsumer: EventConsumerDto;
+
+        eventConsumersService.putStop(resource).subscribe(response => {
+            eventConsumer = response;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/event-consumers/event-consumer123/stop');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({});
+        req.flush(eventConsumerResponse(12));
+
+        expect(eventConsumer!).toEqual(createEventConsumer(12));
     }));
 
     it('should make put request to reset event consumer',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
 
-        eventConsumersService.putReset('event-consumer1').subscribe();
+        const resource: Resource = {
+            _links: {
+                reset: { method: 'PUT', href: 'api/event-consumers/event-consumer123/reset' }
+            }
+        };
 
-        const req = httpMock.expectOne('http://service/p/api/event-consumers/event-consumer1/reset');
+        let eventConsumer: EventConsumerDto;
+
+        eventConsumersService.putReset(resource).subscribe(response => {
+            eventConsumer = response;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/event-consumers/event-consumer123/reset');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({});
+        req.flush(eventConsumerResponse(12));
+
+        expect(eventConsumer!).toEqual(createEventConsumer(12));
     }));
+
+    function eventConsumerResponse(id: number) {
+        return {
+            name: `event-consumer${id}`,
+            position: `position-${id}`,
+            isStopped: true,
+            isResetting: true,
+            error: `failure-${id}`,
+            _links: {
+                reset: { method: 'PUT', href: `/event-consumers/${id}/reset` }
+            }
+        };
+    }
 });
+
+export function createEventConsumer(id: number, suffix = '') {
+    const links: ResourceLinks = {
+        reset: { method: 'PUT', href: `/event-consumers/${id}/reset` }
+    };
+
+    return new EventConsumerDto(links,
+        `event-consumer${id}`,
+        true,
+        true,
+        `failure-${id}${suffix}`,
+        `position-${id}${suffix}`);
+}

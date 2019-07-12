@@ -10,7 +10,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
-import { ExternalControlComponent, ResourceLoaderService } from '@app/framework/internal';
+import { ResourceLoaderService, StatefulControlComponent } from '@app/framework/internal';
 
 declare var ace: any;
 
@@ -25,22 +25,20 @@ export const SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_JSON_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class JsonEditorComponent extends ExternalControlComponent<string> implements AfterViewInit {
+export class JsonEditorComponent extends StatefulControlComponent<{}, string> implements AfterViewInit {
     private valueChanged = new Subject();
     private aceEditor: any;
     private value: any;
     private valueString: string;
     private isDisabled = false;
 
-    @ViewChild('editor')
+    @ViewChild('editor', { static: false })
     public editor: ElementRef<HTMLDivElement>;
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
-        super(changeDetector);
-
-        changeDetector.detach();
+        super(changeDetector, {});
     }
 
     public writeValue(obj: any) {
@@ -89,6 +87,8 @@ export class JsonEditorComponent extends ExternalControlComponent<string> implem
             this.aceEditor.on('change', () => {
                 this.valueChanged.next();
             });
+
+            this.detach();
         });
     }
 

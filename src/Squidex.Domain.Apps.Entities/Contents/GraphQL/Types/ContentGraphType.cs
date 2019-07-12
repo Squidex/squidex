@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 {
-    public sealed class ContentGraphType : ObjectGraphType<IContentEntity>
+    public sealed class ContentGraphType : ObjectGraphType<IEnrichedContentEntity>
     {
         public void Initialize(IGraphModel model, ISchemaEntity schema, IComplexGraphType contentDataType)
         {
@@ -73,9 +73,17 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             AddField(new FieldType
             {
                 Name = "status",
-                ResolvedType = AllTypes.NonNullStatusType,
-                Resolver = Resolve(x => x.Status),
+                ResolvedType = AllTypes.NonNullString,
+                Resolver = Resolve(x => x.Status.Name.ToUpperInvariant()),
                 Description = $"The the status of the {schemaName} content."
+            });
+
+            AddField(new FieldType
+            {
+                Name = "statusColor",
+                ResolvedType = AllTypes.NonNullString,
+                Resolver = Resolve(x => x.StatusColor),
+                Description = $"The color status of the {schemaName} content."
             });
 
             AddField(new FieldType
@@ -108,9 +116,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
             Description = $"The structure of a {schemaName} content type.";
         }
 
-        private static IFieldResolver Resolve(Func<IContentEntity, object> action)
+        private static IFieldResolver Resolve(Func<IEnrichedContentEntity, object> action)
         {
-            return new FuncFieldResolver<IContentEntity, object>(c => action(c.Source));
+            return new FuncFieldResolver<IEnrichedContentEntity, object>(c => action(c.Source));
         }
     }
 }
