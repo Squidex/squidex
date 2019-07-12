@@ -41,10 +41,11 @@ interface Snapshot {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GeolocationEditorComponent extends StatefulControlComponent<Snapshot, Geolocation> implements AfterViewInit {
-    private readonly isGoogleMaps: boolean;
     private marker: any;
     private map: any;
     private value: Geolocation | null = null;
+
+    public readonly isGoogleMaps: boolean;
 
     public get hasValue() {
         return !!this.value;
