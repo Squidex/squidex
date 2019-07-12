@@ -2,7 +2,7 @@
     <form [class.hidden]="snapshot.isMapHidden">
         <div class="editor" #editor></div>
 
-        <input [class.hidden]="!snapshot.isGoogleMaps" class="form-control search-control" type="text" [disabled]="snapshot.isDisabled" placeholder="Search Google Maps" #searchBox />
+        <input [class.hidden]="!isGoogleMaps" class="form-control search-control" type="text" [disabled]="snapshot.isDisabled" placeholder="Search Google Maps" #searchBox />
     </form>
 
     <div class="row mt-2">
