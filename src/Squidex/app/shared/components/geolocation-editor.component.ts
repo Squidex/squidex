@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
+    LocalStoreService,
     ResourceLoaderService,
     StatefulControlComponent,
     Types,
@@ -28,6 +29,10 @@ interface Geolocation {
     longitude: number;
 }
 
+interface Snapshot {
+    isMapHidden?: boolean;
+}
+
 @Component({
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
@@ -35,7 +40,7 @@ interface Geolocation {
     providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GeolocationEditorComponent extends StatefulControlComponent<undefined, Geolocation> implements AfterViewInit {
+export class GeolocationEditorComponent extends StatefulControlComponent<Snapshot, Geolocation> implements AfterViewInit {
     private readonly isGoogleMaps: boolean;
     private marker: any;
     private map: any;
@@ -61,6 +66,9 @@ export class GeolocationEditorComponent extends StatefulControlComponent<undefin
             ]
         });
 
+    @Input()
+    public isCompact: boolean;
+
     @ViewChild('editor', { static: false })
     public editor: ElementRef<HTMLElement>;
 
@@ -68,13 +76,20 @@ export class GeolocationEditorComponent extends StatefulControlComponent<undefin
     public searchBoxInput: ElementRef<HTMLInputElement>;
 
     constructor(changeDetector: ChangeDetectorRef,
+        private readonly localStore: LocalStoreService,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
         private readonly uiOptions: UIOptions
     ) {
-        super(changeDetector, undefined);
+        super(changeDetector, { isMapHidden: localStore.getBoolean('hideMap') });
 
         this.isGoogleMaps = uiOptions.get('map.type') !== 'OSM';
+    }
+
+    public hideMap(isMapHidden: boolean) {
+        this.next({ isMapHidden });
+
+        this.localStore.setBoolean('hideMap', isMapHidden);
     }
 
     public writeValue(obj: any) {
