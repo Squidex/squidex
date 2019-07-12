@@ -28,45 +28,48 @@
                         <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" [class.active]="dropdown.isOpen | async" #optionsButton>
                             <i class="icon-dots"></i>
                         </button>
-                        <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
-                            <ng-container *ngIf="field.properties.isContentField">
-                                <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
-                                    Enable in UI
-                                </a>
-                                <a class="dropdown-item" (click)="disableField()" *ngIf="field.canDisable">
-                                    Disable in UI
-                                </a>
-                                <a class="dropdown-item" (click)="hideField()" *ngIf="field.canHide">
-                                    Hide in API
-                                </a>
-                                <a class="dropdown-item" (click)="showField()" *ngIf="field.canShow">
-                                    Show in API
-                                </a>
-                            </ng-container>                
+
+                        <sqx-modal [model]="dropdown" [target]="optionsButton" closeAlways="true">
+                            <div class="dropdown-menu" @fade>
+                                <ng-container *ngIf="field.properties.isContentField">
+                                    <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
+                                        Enable in UI
+                                    </a>
+                                    <a class="dropdown-item" (click)="disableField()" *ngIf="field.canDisable">
+                                        Disable in UI
+                                    </a>
+                                    <a class="dropdown-item" (click)="hideField()" *ngIf="field.canHide">
+                                        Hide in API
+                                    </a>
+                                    <a class="dropdown-item" (click)="showField()" *ngIf="field.canShow">
+                                        Show in API
+                                    </a>
+                                </ng-container>                
+                                
+                                <ng-container *ngIf="field.canLock">
+                                    <div class="dropdown-divider"></div>
                             
-                            <ng-container *ngIf="field.canLock">
-                                <div class="dropdown-divider"></div>
-                        
-                                <a class="dropdown-item" 
-                                    (sqxConfirmClick)="lockField()"
-                                    confirmTitle="Lock field" 
-                                    confirmText="Do you really want to lock the field? Locked fields cannot be deleted or changed anymore.">
-                                    Lock and prevent changes
-                                </a>
-                            </ng-container>
-
-                            <ng-container>
-                                <div class="dropdown-divider"></div>
-
-                                <a class="dropdown-item dropdown-item-delete"
-                                    [class.disabled]="!field.canDelete"
-                                    (sqxConfirmClick)="deleteField()"
-                                    confirmTitle="Delete field" 
-                                    confirmText="Do you really want to delete the field?">
-                                    Delete
-                                </a>
-                            </ng-container>
-                        </div>
+                                    <a class="dropdown-item" 
+                                        (sqxConfirmClick)="lockField()"
+                                        confirmTitle="Lock field" 
+                                        confirmText="Do you really want to lock the field? Locked fields cannot be deleted or changed anymore.">
+                                        Lock and prevent changes
+                                    </a>
+                                </ng-container>
+    
+                                <ng-container>
+                                    <div class="dropdown-divider"></div>
+    
+                                    <a class="dropdown-item dropdown-item-delete"
+                                        [class.disabled]="!field.canDelete"
+                                        (sqxConfirmClick)="deleteField()"
+                                        confirmTitle="Delete field" 
+                                        confirmText="Do you really want to delete the field?">
+                                        Delete
+                                    </a>
+                                </ng-container>
+                            </div>
+                        </sqx-modal>
                     </div>
                 </div>
             </div>
@@ -110,11 +113,11 @@
                 </button>
             </div>
                 
-            <ng-container *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false;closeAlways:true">
+            <sqx-modal [model]="addFieldDialog">
                 <sqx-field-wizard [schema]="schema" [parent]="field"
                     (complete)="addFieldDialog.hide()">
                 </sqx-field-wizard>
-            </ng-container>
+            </sqx-modal>
         </ng-container>
     </div>
 </div>

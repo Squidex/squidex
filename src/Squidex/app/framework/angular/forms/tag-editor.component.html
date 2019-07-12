@@ -22,13 +22,15 @@
         spellcheck="false">
 </div>
 
-<div *ngIf="snapshot.suggestedItems.length > 0" [sqxModalTarget]="form" class="control-dropdown" #container position="bottom-left">
-    <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
-        [class.active]="i === snapshot.suggestedIndex"
-        [container]="container"
-        (mousedown)="selectValue(item)" 
-        (mouseover)="selectIndex(i)"
-        [sqxScrollActive]="i === snapshot.suggestedIndex">
-        <ng-container>{{item}}</ng-container>
+<sqx-modal [model]="snapshot.suggestedItems.length > 0" [target]="form">
+    <div class="control-dropdown" #container @fade>
+        <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
+            [class.active]="i === snapshot.suggestedIndex"
+            [container]="container"
+            (mousedown)="selectValue(item)" 
+            (mouseover)="selectIndex(i)"
+            [sqxScrollActive]="i === snapshot.suggestedIndex">
+            <ng-container>{{item}}</ng-container>
+        </div>
     </div>
-</div>
+</sqx-modal>

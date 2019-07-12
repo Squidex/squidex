@@ -10,31 +10,33 @@
             </ng-template>
         </span>
 
-        <ng-container *ngIf="appsState.apps | async; let apps">
-            <div class="dropdown-menu" *sqxModalView="appsMenu;closeAlways:true" @fade>
-                <a class="dropdown-item all-apps" routerLink="/app">
-                    <span class="all-apps-text">All Apps</span> 
-                    <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>
-                </a>
-    
-                <ng-container *ngIf="apps.length > 0">
-                    <div class="dropdown-divider"></div>
+        <ng-container>
+            <sqx-modal [model]="appsMenu" closeAlways="true" *ngIf="appsState.apps | async; let apps">
+                <div class="dropdown-menu" @fade>
+                    <a class="dropdown-item all-apps" routerLink="/app">
+                        <span class="all-apps-text">All Apps</span> 
+                        <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>
+                    </a>
+        
+                    <ng-container *ngIf="apps.length > 0">
+                        <div class="dropdown-divider"></div>
 
-                    <div class="apps-list">
-                        <a class="dropdown-item" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.name}}</a>
-                    </div>
-                </ng-container>
+                        <div class="apps-list">
+                            <a class="dropdown-item" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.name}}</a>
+                        </div>
+                    </ng-container>
 
-                <ng-container *ngIf="(uiState.settings | async).canCreateApps">
-                    <div class="dropdown-divider"></div>
-    
-                    <div class="dropdown-button">
-                        <button type="button" class="btn btn-block btn-success" (click)="addAppDialog.show()">
-                            <i class="icon-plus"></i> Create New App
-                        </button>
-                    </div>
-                </ng-container>
-            </div>
+                    <ng-container *ngIf="(uiState.settings | async).canCreateApps">
+                        <div class="dropdown-divider"></div>
+        
+                        <div class="dropdown-button">
+                            <button type="button" class="btn btn-block btn-success" (click)="addAppDialog.show()">
+                                <i class="icon-plus"></i> Create New App
+                            </button>
+                        </div>
+                    </ng-container>
+                </div>
+            </sqx-modal>
         </ng-container>
     </li>
 
@@ -52,8 +54,9 @@
     </ng-container>
 </ul>
 
-<ng-container *sqxModalView="addAppDialog;onRoot:true">
+
+<sqx-modal [model]="addAppDialog">
     <sqx-app-form 
         (complete)="addAppDialog.hide()">
     </sqx-app-form>
-</ng-container>
+</sqx-modal>

@@ -70,70 +70,72 @@
     </div>
 </div>
 
-<sqx-modal-dialog *sqxModalView="connectDialog;onRoot:true" large="true" (close)="connectDialog.hide()">
-    <ng-container title>
-        Connect
-    </ng-container>
+<sqx-modal [model]="connectDialog">
+    <sqx-modal-dialog large="true" (close)="connectDialog.hide()">
+        <ng-container title>
+            Connect
+        </ng-container>
 
-    <ng-container content>
-        <div class="help">
-            <h2>How to connect to this client</h2>
-    
-            <h3>Using HTTP</h3>
-    
-            <p>
-                1. Make the following request to get an access token. It will be valid for 30 days.
+        <ng-container content>
+            <div class="help">
+                <h2>How to connect to this client</h2>
         
-                <sqx-code>{{connectHttpText}}</sqx-code>
-            </p>
-    
-            <p>
-                2. Add the bearer token as authorization header to all requests:
-    
-                <sqx-code>Authorization: Bearer [YOUR_TOKEN]</sqx-code>
-            </p>
+                <h3>Using HTTP</h3>
+        
+                <p>
+                    1. Make the following request to get an access token. It will be valid for 30 days.
+            
+                    <sqx-code>{{connectHttpText}}</sqx-code>
+                </p>
+        
+                <p>
+                    2. Add the bearer token as authorization header to all requests:
+        
+                    <sqx-code>Authorization: Bearer [YOUR_TOKEN]</sqx-code>
+                </p>
 
-            <p>
-                Use the following token for testing
+                <p>
+                    Use the following token for testing
 
-                <sqx-code>{{connectToken?.accessToken}}</sqx-code>
-            </p>
-    
-            <h3>Using the command line interface (CLI)</h3>
-    
-            <p>
-                Download the CLI here: <a href="https://github.com/Squidex/squidex-samples/releases" sqxExternalLink>CLI Releases (Linux, OS X, Windows)</a>
-            </p>
-    
-            <p>
-                Connect with .NET SDK:
+                    <sqx-code>{{connectToken?.accessToken}}</sqx-code>
+                </p>
+        
+                <h3>Using the command line interface (CLI)</h3>
+        
+                <p>
+                    Download the CLI here: <a href="https://github.com/Squidex/squidex-samples/releases" sqxExternalLink>CLI Releases (Linux, OS X, Windows)</a>
+                </p>
+        
+                <p>
+                    Connect with .NET SDK:
 
-                <sqx-code>{{connectCLINetText}}</sqx-code>
-            </p>
-    
-            <p>
-                Connect with Windows:
+                    <sqx-code>{{connectCLINetText}}</sqx-code>
+                </p>
+        
+                <p>
+                    Connect with Windows:
 
-                <sqx-code>{{connectCLIWinText}}</sqx-code>
-            </p>
-    
-            <p>
-                Connect with Linux / OS X
+                    <sqx-code>{{connectCLIWinText}}</sqx-code>
+                </p>
+        
+                <p>
+                    Connect with Linux / OS X
 
-                <sqx-code>{{connectCLINixText}}</sqx-code>
-            </p>
-    
-            <h3>Using the C# Client Library</h3>
+                    <sqx-code>{{connectCLINixText}}</sqx-code>
+                </p>
+        
+                <h3>Using the C# Client Library</h3>
 
-            <p>
-                Get the nuget library from <a href="https://www.nuget.org/packages/Squidex.ClientLibrary/" sqxExternalLink>nuget.org</a>
-            </p>
-    
-            <p>
-                Create a client manager
+                <p>
+                    Get the nuget library from <a href="https://www.nuget.org/packages/Squidex.ClientLibrary/" sqxExternalLink>nuget.org</a>
+                </p>
+        
+                <p>
+                    Create a client manager
 
-                <sqx-code>{{connectLibraryText}}</sqx-code>
-            </p>
-        </div>
-    </ng-container>
-</sqx-modal-dialog>
+                    <sqx-code>{{connectLibraryText}}</sqx-code>
+                </p>
+            </div>
+        </ng-container>
+    </sqx-modal-dialog>                
+</sqx-modal>

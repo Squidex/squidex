@@ -8,9 +8,12 @@
     <button type="button" class="btn btn-secondary dropdown-toggle" title="{{selectedLanguage.englishName}}" (click)="dropdown.toggle()" #button tabindex="-1">
         {{selectedLanguage.iso2Code}}
     </button>
-    <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="button" @fade>
-        <div class="dropdown-item" *ngFor="let language of languages; trackBy: trackByLanguage" [class.active]="language == selectedLanguage" (click)="selectLanguage(language)">
-            <strong class="iso-code iso-code-dropdown">{{language.iso2Code}}</strong> ({{language.englishName}})
+
+    <sqx-modal [model]="dropdown" [target]="button" closeAlways="true">
+        <div class="dropdown-menu" @fade>
+            <div class="dropdown-item" *ngFor="let language of languages; trackBy: trackByLanguage" [class.active]="language == selectedLanguage" (click)="selectLanguage(language)">
+                <strong class="iso-code iso-code-dropdown">{{language.iso2Code}}</strong> ({{language.englishName}})
+            </div>
         </div>
-    </div>
+    </sqx-modal>
 </div>

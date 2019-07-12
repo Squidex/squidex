@@ -38,11 +38,10 @@
     </ng-container>
 </sqx-panel>
 
-<ng-container *sqxModalView="addSchemaDialog;onRoot:true">
+<sqx-modal [model]="addSchemaDialog">
     <sqx-schema-form [import]="import"
-        (cancel)="addSchemaDialog.hide()"
-        (complete)="redirectSchema($event)">
+        (cancel)="addSchemaDialog.hide()" (complete)="redirectSchema($event)">
     </sqx-schema-form>
-</ng-container>
+</sqx-modal>
 
 <router-outlet></router-outlet>

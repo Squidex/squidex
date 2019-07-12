@@ -2,8 +2,8 @@
     <div class="editor" #editor>Loading editor...</div>
 </div>
 
-<ng-container *sqxModalView="assetsDialog;onRoot:true;closeAuto:false">
+<sqx-modal [model]="assetsDialog">
     <sqx-assets-selector
         (select)="insertAssets($event)">
     </sqx-assets-selector>
-</ng-container>
+</sqx-modal>

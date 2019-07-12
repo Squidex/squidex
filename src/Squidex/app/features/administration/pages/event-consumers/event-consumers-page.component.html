@@ -59,12 +59,14 @@
     </ng-container>
 </sqx-panel>
 
-<sqx-modal-dialog *sqxModalView="eventConsumerErrorDialog;onRoot:true" (close)="eventConsumerErrorDialog.hide()">
-    <ng-container title>
-        Error
-    </ng-container>
-
-    <ng-container content>
-        <textarea readonly class="form-control error-message">{{eventConsumerError}}</textarea>
-    </ng-container>
-</sqx-modal-dialog>
+<sqx-modal [model]="eventConsumerErrorDialog">
+    <sqx-modal-dialog (close)="eventConsumerErrorDialog.hide()">
+        <ng-container title>
+            Error
+        </ng-container>
+    
+        <ng-container content>
+            <textarea readonly class="form-control error-message">{{eventConsumerError}}</textarea>
+        </ng-container>
+    </sqx-modal-dialog>
+</sqx-modal>

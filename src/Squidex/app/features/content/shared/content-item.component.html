@@ -55,23 +55,26 @@
         <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
             <i class="icon-dots"></i>
         </button>
-        <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
-            <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="emitChangeStatus(info.status)">
-                Change to <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
-            </a>
-            <a class="dropdown-item" (click)="emitClone(); dropdown.hide()" *ngIf="canClone">
-                Clone
-            </a>
-            
-            <div class="dropdown-divider"></div>
 
-            <a class="dropdown-item dropdown-item-delete"
-                (sqxConfirmClick)="emitDelete()"
-                confirmTitle="Delete content" 
-                confirmText="Do you really want to delete the content?">
-                Delete
-            </a>
-        </div>
+        <sqx-modal [model]="dropdown" [target]="optionsButton" closeAlways="true">
+            <div class="dropdown-menu" @fade>
+                <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="emitChangeStatus(info.status)">
+                    Change to <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
+                </a>
+                <a class="dropdown-item" (click)="emitClone(); dropdown.hide()" *ngIf="canClone">
+                    Clone
+                </a>
+                
+                <div class="dropdown-divider"></div>
+    
+                <a class="dropdown-item dropdown-item-delete"
+                    (sqxConfirmClick)="emitDelete()"
+                    confirmTitle="Delete content" 
+                    confirmText="Do you really want to delete the content?">
+                    Delete
+                </a>
+            </div>
+        </sqx-modal>
     </div>
 </td>
 <td class="cell-actions" *ngIf="isReference" [sqxStopClick]="isDirty">

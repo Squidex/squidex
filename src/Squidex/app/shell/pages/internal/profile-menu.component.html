@@ -8,28 +8,30 @@
             </span>
         </span>
 
-        <div class="dropdown-menu" *sqxModalView="modalMenu;closeAlways:true" @fade>
-            <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
-                <div>Signed in with</div>
-        
-                <strong>{{snapshot.profileEmail}}</strong>
-            </a>
+        <sqx-modal [model]="modalMenu" closeAlways="true">
+            <div class="dropdown-menu" @fade>
+                <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
+                    <div>Signed in with</div>
             
-            <div class="dropdown-divider"></div>
+                    <strong>{{snapshot.profileEmail}}</strong>
+                </a>
+                
+                <div class="dropdown-divider"></div>
 
-            <a class="dropdown-item" routerLink="/app/administration" *ngIf="uiState.canUserAdminResource | async">
-                Administration
-            </a>
+                <a class="dropdown-item" routerLink="/app/administration" *ngIf="uiState.canUserAdminResource | async">
+                    Administration
+                </a>
 
-            <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl">
-                Profile
-            </a>
+                <a class="dropdown-item" [sqxPopupLink]="snapshot.profileUrl">
+                    Profile
+                </a>
 
-            <div class="dropdown-divider"></div>
+                <div class="dropdown-divider"></div>
 
-            <a class="dropdown-item" (click)="logout()" sqxExternalLink>
-                Logout
-            </a>
-        </div>
+                <a class="dropdown-item" (click)="logout()" sqxExternalLink>
+                    Logout
+                </a>
+            </div>
+        </sqx-modal>
     </li>
 </ul>

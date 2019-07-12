@@ -9,9 +9,11 @@
         <div class="btn-group" *ngIf="snapshot.alternativeNames.length > 0">
             <button type="button" class="btn btn-secondary dropdown-toggle" (click)="dropdown.toggle()"></button>
             
-            <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="buttonGroup" @fade>
-                <a *ngFor="let name of snapshot.alternativeNames" class="dropdown-item" (click)="follow(name)">{{name}}</a>
-            </div>
+            <sqx-modal [model]="dropdown" [target]="buttonGroup" closeAlways="true">
+                <div class="dropdown-menu" @fade>
+                    <a *ngFor="let name of snapshot.alternativeNames" class="dropdown-item" (click)="follow(name)">{{name}}</a>
+                </div>
+            </sqx-modal>
         </div>
     </div>
 </ng-container>

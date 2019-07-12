@@ -37,45 +37,47 @@
     Search for content using full text search over all fields and languages!
 </sqx-onboarding-tooltip>
 
-<div class="dropdown-menu" *sqxModalView="searchModal;onRoot:true" [sqxModalTarget]="inputFind">
-    <div class="form-horizontal">
-        <div class="form-group row">
-            <label class="col-2 col-form-label" for="search">Text</label>
+<sqx-modal [model]="searchModal" [target]="inputFind">
+    <div class="dropdown-menu">
+        <div class="form-horizontal">
+            <div class="form-group row">
+                <label class="col-2 col-form-label" for="search">Text</label>
 
-            <div class="col-10">
-                <input type="text" class="form-control" id="search" placeholder="Fulltext search"
-                    [ngModel]="filter.fullText | async"
-                    (ngModelChange)="filter.setFullText($event)" />
+                <div class="col-10">
+                    <input type="text" class="form-control" id="search" placeholder="Fulltext search"
+                        [ngModel]="filter.fullText | async"
+                        (ngModelChange)="filter.setFullText($event)" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-2 col-form-label" for="filter">Filter</label>
+
+                <div class="col-10">
+                    <input type="text" class="form-control" id="filter" placeholder="{{fieldExample}} eq [VALUE]"
+                        [ngModel]="filter.filter | async"
+                        (ngModelChange)="filter.setFilter($event)" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-2 col-form-label" for="orderBy">Order</label>
+                    
+                <div class="col-10">
+                    <input type="text" class="form-control" id="orderBy" placeholder="{{fieldExample}} desc"
+                        [ngModel]="filter.order | async"
+                        (ngModelChange)="filter.setOrder($event)" />
+                </div>
+            </div>
+
+            <div class="link">
+                Read more about filtering in the <a href="https://docs.squidex.io/04-guides/02-api.html" sqxExternalLink>Documentation</a>.
             </div>
         </div>
+    </div>        
+</sqx-modal>
 
-        <div class="form-group row">
-            <label class="col-2 col-form-label" for="filter">Filter</label>
-
-            <div class="col-10">
-                <input type="text" class="form-control" id="filter" placeholder="{{fieldExample}} eq [VALUE]"
-                    [ngModel]="filter.filter | async"
-                    (ngModelChange)="filter.setFilter($event)" />
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label class="col-2 col-form-label" for="orderBy">Order</label>
-                
-            <div class="col-10">
-                <input type="text" class="form-control" id="orderBy" placeholder="{{fieldExample}} desc"
-                    [ngModel]="filter.order | async"
-                    (ngModelChange)="filter.setOrder($event)" />
-            </div>
-        </div>
-
-        <div class="link">
-            Read more about filtering in the <a href="https://docs.squidex.io/04-guides/02-api.html" sqxExternalLink>Documentation</a>.
-        </div>
-    </div>
-</div>
-
-<ng-container *sqxModalView="saveQueryDialog;onRoot:true">
+<sqx-modal [model]="saveQueryDialog">
     <form [formGroup]="saveQueryForm.form" (ngSubmit)="saveQueryComplete()">
         <sqx-modal-dialog (close)="saveQueryDialog.hide()">
             <ng-container title>
@@ -96,4 +98,4 @@
             </ng-container>
         </sqx-modal-dialog>
     </form>
-</ng-container>
+</sqx-modal>
