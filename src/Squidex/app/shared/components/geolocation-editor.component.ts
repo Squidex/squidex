@@ -35,7 +35,7 @@ interface Geolocation {
     providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GeolocationEditorComponent extends StatefulControlComponent<any, Geolocation> implements AfterViewInit {
+export class GeolocationEditorComponent extends StatefulControlComponent<undefined, Geolocation> implements AfterViewInit {
     private readonly isGoogleMaps: boolean;
     private marker: any;
     private map: any;
@@ -72,9 +72,9 @@ export class GeolocationEditorComponent extends StatefulControlComponent<any, Ge
         private readonly formBuilder: FormBuilder,
         private readonly uiOptions: UIOptions
     ) {
-        super(changeDetector, {});
+        super(changeDetector, undefined);
 
-        this.isGoogleMaps = uiOptions.get('map.type');
+        this.isGoogleMaps = uiOptions.get('map.type') !== 'OSM';
     }
 
     public writeValue(obj: any) {
@@ -92,7 +92,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<any, Ge
     public setDisabledState(isDisabled: boolean): void {
         super.setDisabledState(isDisabled);
 
-        if (!this.snapshot.isGoogleMaps) {
+        if (!this.isGoogleMaps) {
             this.setDisabledStateOSM(isDisabled);
         } else {
             this.setDisabledStateGoogle(isDisabled);
@@ -258,7 +258,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<any, Ge
     }
 
     private updateMarker(zoom: boolean, fireEvent: boolean) {
-        if (!this.snapshot.isGoogleMaps) {
+        if (!this.isGoogleMaps) {
             this.updateMarkerOSM(zoom);
         } else {
             this.updateMarkerGoogle(zoom);

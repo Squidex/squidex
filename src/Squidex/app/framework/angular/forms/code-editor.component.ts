@@ -29,7 +29,7 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CodeEditorComponent extends StatefulControlComponent<any, string> implements AfterViewInit {
+export class CodeEditorComponent extends StatefulControlComponent<undefined, string> implements AfterViewInit {
     private valueChanged = new Subject();
     private aceEditor: any;
     private value: string;
@@ -44,7 +44,7 @@ export class CodeEditorComponent extends StatefulControlComponent<any, string> i
     constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
-        super(changeDetector, {});
+        super(changeDetector, undefined);
     }
 
     public writeValue(obj: string) {
