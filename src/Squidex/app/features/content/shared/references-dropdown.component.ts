@@ -140,13 +140,13 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         }
 
         return contents.map(content => {
-            const values: string[] = [];
+            const values: any[] = [];
 
             for (let field of schema.listFields) {
                 const value = getRawValue(field, content.data, this.languageField);
 
                 if (!Types.isUndefined(value)) {
-                    values.push(FieldFormatter.format(field, value));
+                    values.push(FieldFormatter.format(field, value, false));
                 }
             }
 

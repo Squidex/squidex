@@ -37,6 +37,13 @@ import {
     UIFieldPropertiesDto
 } from './../services/schemas.types';
 
+export class HtmlValue {
+    constructor(
+        public readonly html: string
+    ) {
+    }
+}
+
 export class SaveQueryForm extends Form<FormGroup, any> {
     constructor(formBuilder: FormBuilder) {
         super(formBuilder.group({
@@ -49,21 +56,22 @@ export class SaveQueryForm extends Form<FormGroup, any> {
     }
 }
 
-export class FieldFormatter implements FieldPropertiesVisitor<string> {
+export class FieldFormatter implements FieldPropertiesVisitor<any> {
     constructor(
-        private readonly value: any
+        private readonly value: any,
+        private readonly allowHtml: boolean
     ) {
     }
 
-    public static format(field: FieldDto, value: any) {
+    public static format(field: FieldDto, value: any, allowHtml = true) {
         if (value === null || value === undefined) {
             return '';
         }
 
-        return field.properties.accept(new FieldFormatter(value));
+        return field.properties.accept(new FieldFormatter(value, allowHtml));
     }
 
-    public visitDateTime(properties: DateTimeFieldPropertiesDto): string {
+    public visitDateTime(properties: DateTimeFieldPropertiesDto): string | any {
         try {
             const parsed = DateTime.parseISO_UTC(this.value);
 
@@ -121,15 +129,28 @@ export class FieldFormatter implements FieldPropertiesVisitor<string> {
         return '<Json />';
     }
 
-    public visitNumber(properties: NumberFieldPropertiesDto): string {
+    public visitNumber(properties: NumberFieldPropertiesDto): string | HtmlValue | number {
+        if (Types.isNumber(this.value) && properties.editor === 'Stars' && this.allowHtml) {
+            if (this.value <= 0 || this.value > 6) {
+                return new HtmlValue(`&#9733; ${this.value}`);
+            } else {
+                let html = '';
+
+                for (let i = 0; i < this.value; i++) {
+                    html += '&#9733; ';
+                }
+
+                return new HtmlValue(html);
+            }
+        }
         return this.value;
     }
 
-    public visitString(properties: StringFieldPropertiesDto): string {
+    public visitString(properties: StringFieldPropertiesDto): any {
         return this.value;
     }
 
-    public visitUI(properties: UIFieldPropertiesDto): string {
+    public visitUI(properties: UIFieldPropertiesDto): any {
         return this.value;
     }
 }
