@@ -146,9 +146,7 @@ export class ModalDirective implements OnDestroy {
             }
 
             for (let node of this.renderRoots) {
-                const bounds = node.getBoundingClientRect();
-
-                if (bounds.width > 0 && bounds.height > 0 && node.contains(<Node>event.target)) {
+                if (node.contains(<Node>event.target)) {
                     return true;
                 }
             }
