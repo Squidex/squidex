@@ -59,8 +59,8 @@
     </div>
 </div>
 
-<sqx-modal [model]="assetsDialog">
+<ng-container *sqxModal="assetsDialog">
     <sqx-assets-selector
         (select)="selectAssets($event)">
     </sqx-assets-selector>
-</sqx-modal>
+</ng-container>

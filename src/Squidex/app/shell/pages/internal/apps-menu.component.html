@@ -10,8 +10,8 @@
             </ng-template>
         </span>
 
-        <ng-container>
-            <sqx-modal [model]="appsMenu" closeAlways="true" *ngIf="appsState.apps | async; let apps">
+        <ng-container *ngIf="appsState.apps | async; let apps">
+            <ng-container *sqxModal="appsMenu;closeAlways:true">
                 <div class="dropdown-menu" @fade>
                     <a class="dropdown-item all-apps" routerLink="/app">
                         <span class="all-apps-text">All Apps</span> 
@@ -36,7 +36,7 @@
                         </div>
                     </ng-container>
                 </div>
-            </sqx-modal>
+            </ng-container>
         </ng-container>
     </li>
 
@@ -55,8 +55,8 @@
 </ul>
 
 
-<sqx-modal [model]="addAppDialog">
+<ng-container *sqxModal="addAppDialog">
     <sqx-app-form 
         (complete)="addAppDialog.hide()">
     </sqx-app-form>
-</sqx-modal>
+</ng-container>

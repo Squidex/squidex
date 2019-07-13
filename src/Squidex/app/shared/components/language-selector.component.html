@@ -9,11 +9,11 @@
         {{selectedLanguage.iso2Code}}
     </button>
 
-    <sqx-modal [model]="dropdown" [target]="button" closeAlways="true">
-        <div class="dropdown-menu" @fade>
+    <ng-container *sqxModal="dropdown">
+        <div class="dropdown-menu" [sqxAnchoredTo]="button" @fade>
             <div class="dropdown-item" *ngFor="let language of languages; trackBy: trackByLanguage" [class.active]="language == selectedLanguage" (click)="selectLanguage(language)">
                 <strong class="iso-code iso-code-dropdown">{{language.iso2Code}}</strong> ({{language.englishName}})
             </div>
         </div>
-    </sqx-modal>
+    </ng-container>
 </div>

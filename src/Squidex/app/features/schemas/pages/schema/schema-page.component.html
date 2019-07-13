@@ -6,7 +6,7 @@
     </ng-container>
 
     <ng-container menu>
-        <button type="button" class="btn btn-text mr-1" (click)="exportSchemaDialog.show()">
+        <button type="button" class="btn btn-text mr-1" (click)="exportDialog.show()">
             JSON Preview
         </button>
 
@@ -24,8 +24,8 @@
                 <i class="icon-dots"></i>
             </button>
 
-            <sqx-modal [model]="editOptionsDropdown" [target]="buttonOptions" closeAlways="true">
-                <div class="dropdown-menu" @fade>
+            <ng-container *sqxModal="editOptionsDropdown;closeAlways:true">
+                <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
                     <a class="dropdown-item" (click)="configureScriptsDialog.show()">
                         Scripts
                     </a>
@@ -53,7 +53,7 @@
                         </a>
                     </ng-container>
                 </div>
-            </sqx-modal>
+            </ng-container>
         </div>
 
         <sqx-onboarding-tooltip helpId="history" [for]="buttonOptions" position="bottom-right" after="60000">
@@ -101,40 +101,32 @@
 
 <router-outlet></router-outlet>
 
-<sqx-modal [model]="editSchemaDialog">
+<ng-container *sqxModal="editSchemaDialog">
     <sqx-schema-edit-form [schema]="schema" 
         (complete)="editSchemaDialog.hide()">
     </sqx-schema-edit-form>
-</sqx-modal>
+</ng-container>
 
-<sqx-modal [model]="addFieldDialog">
+<ng-container *sqxModal="addFieldDialog">
     <sqx-field-wizard [schema]="schema"
         (complete)="addFieldDialog.hide()">
     </sqx-field-wizard>
-</sqx-modal>
+</ng-container>
 
-<sqx-modal [model]="configureScriptsDialog">
+<ng-container *sqxModal="configureScriptsDialog">
     <sqx-schema-scripts-form [schema]="schema"
         (complete)="configureScriptsDialog.hide()">
     </sqx-schema-scripts-form> 
-</sqx-modal>
+</ng-container>
 
-<sqx-modal [model]="configurePreviewUrlsDialog">
+<ng-container *sqxModal="configurePreviewUrlsDialog">
     <sqx-schema-preview-urls-form [schema]="schema"
         (complete)="configurePreviewUrlsDialog.hide()">
     </sqx-schema-preview-urls-form>
-</sqx-modal>
+</ng-container>
 
-<sqx-modal [model]="exportSchemaDialog">
-    <sqx-modal-dialog (close)="exportSchemaDialog.hide()" large="true">
-        <ng-container title>
-            Export Schema
-        </ng-container>
-
-        <ng-container content>
-            <div class="json-preview">
-                <sqx-json-editor disabled [ngModel]="schemaExport"></sqx-json-editor>
-            </div>
-        </ng-container>
-    </sqx-modal-dialog>      
-</sqx-modal>
+<ng-container *sqxModal="exportDialog">
+    <sqx-schema-export-form [schema]="schema"
+        (complete)="exportDialog.hide()">
+    </sqx-schema-export-form>
+</ng-container>

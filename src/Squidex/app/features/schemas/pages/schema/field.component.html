@@ -29,8 +29,8 @@
                             <i class="icon-dots"></i>
                         </button>
 
-                        <sqx-modal [model]="dropdown" [target]="optionsButton" closeAlways="true">
-                            <div class="dropdown-menu" @fade>
+                        <ng-container *sqxModal="dropdown;closeAlways:true">
+                            <div class="dropdown-menu" [sqxAnchoredTo]="optionsButton" @fade>
                                 <ng-container *ngIf="field.properties.isContentField">
                                     <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
                                         Enable in UI
@@ -69,7 +69,7 @@
                                     </a>
                                 </ng-container>
                             </div>
-                        </sqx-modal>
+                        </ng-container>
                     </div>
                 </div>
             </div>
@@ -113,11 +113,11 @@
                 </button>
             </div>
                 
-            <sqx-modal [model]="addFieldDialog">
+            <ng-container *sqxModal="addFieldDialog">
                 <sqx-field-wizard [schema]="schema" [parent]="field"
                     (complete)="addFieldDialog.hide()">
                 </sqx-field-wizard>
-            </sqx-modal>
+            </ng-container>
         </ng-container>
     </div>
 </div>

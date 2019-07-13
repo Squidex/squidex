@@ -8,7 +8,7 @@
             </span>
         </span>
 
-        <sqx-modal [model]="modalMenu" closeAlways="true">
+        <ng-container *sqxModal="modalMenu;closeAlways:true">
             <div class="dropdown-menu" @fade>
                 <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
                     <div>Signed in with</div>
@@ -32,6 +32,6 @@
                     Logout
                 </a>
             </div>
-        </sqx-modal>
+        </ng-container>
     </li>
 </ul>

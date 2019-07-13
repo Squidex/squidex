@@ -27,7 +27,7 @@
     </div>
 </div>
 
-<sqx-modal [model]="selectorDialog">
+<ng-container *sqxModal="selectorDialog">
     <sqx-contents-selector 
         [allowDuplicates]="allowDuplicates"
         [alreadySelected]="snapshot.contentItems"
@@ -36,4 +36,4 @@
         [schema]="snapshot.schema"
         (select)="select($event)">
     </sqx-contents-selector>
-</sqx-modal>
+</ng-container>

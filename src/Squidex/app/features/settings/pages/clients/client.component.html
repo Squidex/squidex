@@ -70,7 +70,7 @@
     </div>
 </div>
 
-<sqx-modal [model]="connectDialog">
+<ng-container *sqxModal="connectDialog">
     <sqx-modal-dialog large="true" (close)="connectDialog.hide()">
         <ng-container title>
             Connect
@@ -138,4 +138,4 @@
             </div>
         </ng-container>
     </sqx-modal-dialog>                
-</sqx-modal>
+</ng-container>

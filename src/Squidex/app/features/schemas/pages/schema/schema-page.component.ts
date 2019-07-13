@@ -21,8 +21,7 @@ import {
     PatternsState,
     ResourceOwner,
     SchemaDetailsDto,
-    SchemasState,
-    Types
+    SchemasState
 } from '@app/shared';
 
 import {
@@ -40,18 +39,14 @@ import {
 export class SchemaPageComponent extends ResourceOwner implements OnInit {
     public fieldTypes = fieldTypes;
 
-    public schemaExport: any;
     public schema: SchemaDetailsDto;
 
-    public exportSchemaDialog = new DialogModel();
-
-    public configureScriptsDialog = new DialogModel();
+    public addFieldDialog = new DialogModel();
     public configurePreviewUrlsDialog = new DialogModel();
-
+    public configureScriptsDialog = new DialogModel();
     public editOptionsDropdown = new ModalModel();
     public editSchemaDialog = new DialogModel();
-
-    public addFieldDialog = new DialogModel();
+    public exportDialog = new DialogModel();
 
     constructor(
         public readonly appsState: AppsState,
@@ -72,8 +67,6 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
                 .subscribe(schema => {
                     if (schema) {
                         this.schema = schema;
-
-                        this.export();
                     }
                 }));
     }
@@ -102,52 +95,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
     }
 
     public cloneSchema() {
-        this.messageBus.emit(new SchemaCloning(this.schemaExport));
-    }
-
-    private export() {
-        const cleanup = (source: any, ...exclude: string[]): any => {
-            const clone = {};
-
-            for (const key in source) {
-                if (source.hasOwnProperty(key) && exclude.indexOf(key) < 0) {
-                    const value = source[key];
-
-                    if (value) {
-                        clone[key] = value;
-                    }
-                }
-            }
-
-            return clone;
-        };
-
-        const result: any = {
-            fields: this.schema.fields.map(field => {
-                const copy = cleanup(field, 'fieldId');
-
-                copy.properties = cleanup(field.properties);
-
-                if (Types.isArray(copy.nested)) {
-                    if (copy.nested.length === 0) {
-                        delete copy['nested'];
-                    } else {
-                        copy.nested = field.nested.map(nestedField => {
-                            const nestedCopy = cleanup(nestedField, 'fieldId', 'parentId');
-
-                            nestedCopy.properties = cleanup(nestedField.properties);
-
-                            return nestedCopy;
-                        });
-                    }
-                }
-
-                return copy;
-            }),
-            properties: cleanup(this.schema.properties)
-        };
-
-        this.schemaExport = result;
+        this.messageBus.emit(new SchemaCloning(this.schema.export()));
     }
 
     private back() {

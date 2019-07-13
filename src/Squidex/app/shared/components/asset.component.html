@@ -137,12 +137,12 @@
 </ng-template>
 
 <ng-container *ngIf="asset">
-    <sqx-modal [model]="editDialog">
+    <ng-container *sqxModal="editDialog">
         <sqx-asset-dialog
             [allTags]="allTags"
             [asset]="asset"
             (cancel)="cancelEdit()"
             (complete)="updateAsset($event, true)">
         </sqx-asset-dialog>
-    </sqx-modal>
+    </ng-container>
 </ng-container>

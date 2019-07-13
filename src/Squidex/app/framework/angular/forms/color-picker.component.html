@@ -14,8 +14,8 @@
     </ng-template>
 </span>
 
-<sqx-modal [model]="modal" [target]="input" closeAlways="true" position="bottom-left">
-    <div
+<ng-container *sqxModal="modal">
+    <div [sqxAnchoredTo]="input" position="bottom-left"
         [style.height]="'228px'"
         [style.width]="'130px'">
         <div [style.background]="snapshot.value" 
@@ -26,4 +26,4 @@
             (colorPickerChange)="updateValue($event)">
         </div>
     </div>
-</sqx-modal>
+</ng-container>

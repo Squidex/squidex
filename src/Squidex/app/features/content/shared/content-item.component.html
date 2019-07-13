@@ -56,8 +56,8 @@
             <i class="icon-dots"></i>
         </button>
 
-        <sqx-modal [model]="dropdown" [target]="optionsButton" closeAlways="true">
-            <div class="dropdown-menu" @fade>
+        <ng-container *sqxModal="dropdown;closeAlways:true">
+            <div class="dropdown-menu" [sqxAnchoredTo]="optionsButton" @fade>
                 <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="emitChangeStatus(info.status)">
                     Change to <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
                 </a>
@@ -74,7 +74,7 @@
                     Delete
                 </a>
             </div>
-        </sqx-modal>
+        </ng-container>
     </div>
 </td>
 <td class="cell-actions" *ngIf="isReference" [sqxStopClick]="isDirty">

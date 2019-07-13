@@ -102,20 +102,20 @@
 
 <div *ngIf="info" class="info">{{info}}</div>
 
-<sqx-modal [model]="addAppDialog">
+<ng-container *sqxModal="addAppDialog">
     <sqx-app-form [template]="addAppTemplate"
         (complete)="addAppDialog.hide()">
     </sqx-app-form>
-</sqx-modal>
+</ng-container>
 
-<sqx-modal [model]="onboardingDialog">
+<ng-container *sqxModal="onboardingDialog">
     <sqx-onboarding-dialog
         (close)="onboardingDialog.hide()">
     </sqx-onboarding-dialog>
-</sqx-modal>
+</ng-container>
 
-<sqx-modal [model]="newsDialog">
+<ng-container *sqxModal="newsDialog">
     <sqx-news-dialog [features]="newsFeatures"
         (close)="newsDialog.hide()">
     </sqx-news-dialog>
-</sqx-modal>
+</ng-container>

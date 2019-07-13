@@ -22,8 +22,8 @@
         spellcheck="false">
 </div>
 
-<sqx-modal [model]="snapshot.suggestedItems.length > 0" [target]="form">
-    <div class="control-dropdown" #container @fade>
+<ng-container *sqxModal="snapshot.suggestedItems.length > 0">
+    <div class="control-dropdown" [sqxAnchoredTo]="form" #container @fade>
         <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
             [class.active]="i === snapshot.suggestedIndex"
             [container]="container"
@@ -33,4 +33,4 @@
             <ng-container>{{item}}</ng-container>
         </div>
     </div>
-</sqx-modal>
+</ng-container>

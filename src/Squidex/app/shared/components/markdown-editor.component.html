@@ -4,8 +4,8 @@
     </div>
 </div>
 
-<sqx-modal [model]="assetsDialog">
+<ng-container *sqxModal="assetsDialog">
     <sqx-assets-selector
         (select)="insertAssets($event)">
     </sqx-assets-selector>
-</sqx-modal>
+</ng-container>

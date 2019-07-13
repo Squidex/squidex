@@ -5,8 +5,8 @@
         autocorrect="off"
         autocapitalize="off">
 
-    <sqx-modal [model]="snapshot.suggestedItems.length > 0" [target]="input" position="bottom-left">
-        <div  class="control-dropdown" #container>
+    <ng-container *sqxModal="snapshot.suggestedItems.length > 0" position="bottom-left">
+        <div class="control-dropdown" [sqxAnchoredTo]="input" #container>
             <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
                 [class.active]="i === snapshot.suggestedIndex"
                 [container]="container"
@@ -19,5 +19,5 @@
                 <ng-template *ngIf="itemTemplate" [sqxTemplateWrapper]="itemTemplate" [item]="item" [index]="i"></ng-template>
             </div>
         </div>
-    </sqx-modal>
+    </ng-container>
 </span>

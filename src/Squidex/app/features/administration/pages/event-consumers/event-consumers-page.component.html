@@ -59,7 +59,7 @@
     </ng-container>
 </sqx-panel>
 
-<sqx-modal [model]="eventConsumerErrorDialog">
+<ng-container *sqxModal="eventConsumerErrorDialog">
     <sqx-modal-dialog (close)="eventConsumerErrorDialog.hide()">
         <ng-container title>
             Error
@@ -69,4 +69,4 @@
             <textarea readonly class="form-control error-message">{{eventConsumerError}}</textarea>
         </ng-container>
     </sqx-modal-dialog>
-</sqx-modal>
+</ng-container>

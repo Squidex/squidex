@@ -1,4 +1,4 @@
-<sqx-modal [model]="dueTimeDialog">
+<ng-container *sqxModal="dueTimeDialog">
     <sqx-modal-dialog (close)="cancelStatusChange()">
         <ng-container title>
             {{dueTimeAction}} content item(s)
@@ -28,4 +28,4 @@
         </ng-container>
     </sqx-modal-dialog>
 
-</sqx-modal>
+</ng-container>

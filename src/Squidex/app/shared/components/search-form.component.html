@@ -37,8 +37,8 @@
     Search for content using full text search over all fields and languages!
 </sqx-onboarding-tooltip>
 
-<sqx-modal [model]="searchModal" [target]="inputFind">
-    <div class="dropdown-menu">
+<ng-container *sqxModal="searchModal">
+    <div class="dropdown-menu" [sqxAnchoredTo]="inputFind" @fade>
         <div class="form-horizontal">
             <div class="form-group row">
                 <label class="col-2 col-form-label" for="search">Text</label>
@@ -75,9 +75,9 @@
             </div>
         </div>
     </div>        
-</sqx-modal>
+</ng-container>
 
-<sqx-modal [model]="saveQueryDialog">
+<ng-container *sqxModal="saveQueryDialog">
     <form [formGroup]="saveQueryForm.form" (ngSubmit)="saveQueryComplete()">
         <sqx-modal-dialog (close)="saveQueryDialog.hide()">
             <ng-container title>
@@ -98,4 +98,4 @@
             </ng-container>
         </sqx-modal-dialog>
     </form>
-</sqx-modal>
+</ng-container>

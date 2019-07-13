@@ -1,0 +1,9 @@
+<sqx-modal-dialog (close)="emitComplete()" large="true">
+    <ng-container title>
+        Export Schema
+    </ng-container>
+
+    <ng-container content>
+        <sqx-json-editor disabled [ngModel]="export"></sqx-json-editor>
+    </ng-container>
+</sqx-modal-dialog>  

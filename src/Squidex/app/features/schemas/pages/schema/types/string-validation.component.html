@@ -45,8 +45,8 @@
                 (focus)="patternsModal.show()" (blur)="patternsModal.hide()" />
 
             <ng-container *ngIf="patterns.length > 0 && (showPatternSuggestions | async)">
-                <sqx-modal [model]="patternsModal" [target]="inputPattern" position="bottom-left">
-                    <div class="control-dropdown" @fade>
+                <ng-container *sqxModal="patternsModal" position="bottom-left">
+                    <div class="control-dropdown" [sqxAnchoredTo]="inputPattern" @fade>
                         <h4>Suggestions</h4>
         
                         <div *ngFor="let pattern of patterns" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
@@ -54,7 +54,7 @@
                             <div class="truncate text-muted">{{pattern.pattern}}</div>
                         </div>
                     </div>
-                </sqx-modal>
+                </ng-container>
             </ng-container>
         </div>
         <small class="col-3" style="align-self: center">

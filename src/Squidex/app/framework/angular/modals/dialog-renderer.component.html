@@ -1,7 +1,7 @@
 <ng-content></ng-content>
 
 
-<sqx-modal [model]="dialogView">
+<ng-container *sqxModal="dialogView">
     <sqx-modal-dialog showClose="false" (close)="cancel()">
         <ng-container title>
             {{snapshot.dialogRequest?.title}}
@@ -16,7 +16,7 @@
             <button type="button" class="float-right btn btn-danger" (click)="confirm()" sqxFocusOnInit>Yes</button>
         </ng-container>
     </sqx-modal-dialog>
-</sqx-modal>
+</ng-container>
 
 <div class="notification-container notification-container-bottom-right">
     <div class="alert alert-dismissible alert-{{notification.messageType}}" *ngFor="let notification of snapshot.notifications" (click)="close(notification)" @fade>
@@ -27,9 +27,7 @@
 </div>
 
 <ng-container *ngIf="snapshot.tooltip; let tooltip">
-    <sqx-modal [model]="true" [target]="tooltip.target" [position]="tooltip.position" [offset]="6">
-        <div class="tooltip2 tooltip2-{{tooltip.position}}">
-            {{tooltip.text}}
-        </div>
-    </sqx-modal>
+    <div class="tooltip2 tooltip2-{{tooltip.position}}" [sqxAnchoredTo]="tooltip.target" [position]="tooltip.position" [offset]="6">
+        {{tooltip.text}}
+    </div>
 </ng-container>
