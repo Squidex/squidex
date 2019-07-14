@@ -25,12 +25,12 @@
                     </button>
 
                     <div class="dropdown dropdown-options">
-                        <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" [class.active]="dropdown.isOpen | async" #optionsButton>
+                        <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" [class.active]="dropdown.isOpen | async" #buttonOptions>
                             <i class="icon-dots"></i>
                         </button>
 
                         <ng-container *sqxModal="dropdown;closeAlways:true">
-                            <div class="dropdown-menu" [sqxAnchoredTo]="optionsButton" @fade>
+                            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
                                 <ng-container *ngIf="field.properties.isContentField">
                                     <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
                                         Enable in UI

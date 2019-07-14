@@ -52,12 +52,12 @@
 
 <td class="cell-actions" *ngIf="!isReadOnly && !isDirty" sqxStopClick>
     <div class="dropdown dropdown-options" *ngIf="content">
-        <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
+        <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
             <i class="icon-dots"></i>
         </button>
 
         <ng-container *sqxModal="dropdown;closeAlways:true">
-            <div class="dropdown-menu" [sqxAnchoredTo]="optionsButton" @fade>
+            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
                 <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="emitChangeStatus(info.status)">
                     Change to <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
                 </a>

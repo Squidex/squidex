@@ -5,7 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, TemplateRef } from '@angular/core';
+import { ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, TemplateRef, ViewContainerRef } from '@angular/core';
+import { timer } from 'rxjs';
 
 import {
     DialogModel,
@@ -40,6 +41,9 @@ export class ModalDirective implements OnDestroy {
         }
     }
 
+    @Input('sqxModalOnRoot')
+    public placeOnRoot = true;
+
     @Input('sqxModalCloseAuto')
     public closeAuto = true;
 
@@ -50,7 +54,8 @@ export class ModalDirective implements OnDestroy {
         private readonly changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2,
         private readonly rootView: RootViewComponent,
-        private readonly templateRef: TemplateRef<any>
+        private readonly templateRef: TemplateRef<any>,
+        private readonly viewContainer: ViewContainerRef
     ) {
     }
 
@@ -70,7 +75,7 @@ export class ModalDirective implements OnDestroy {
 
         if (isOpen) {
             if (!this.renderedView) {
-                this.renderedView = this.rootView.viewContainer.createEmbeddedView(this.templateRef);
+                this.renderedView = this.getContainer().createEmbeddedView(this.templateRef);
                 this.renderRoots = this.renderedView.rootNodes.filter(x => !!x.style);
 
                 this.setupStyles();
@@ -89,6 +94,10 @@ export class ModalDirective implements OnDestroy {
         }
 
         this.isOpen = isOpen;
+    }
+
+    private getContainer() {
+        return this.placeOnRoot ? this.rootView.viewContainer : this.viewContainer;
     }
 
     private setupStyles() {
@@ -134,8 +143,12 @@ export class ModalDirective implements OnDestroy {
     }
 
     private documentClickListener = (event: MouseEvent) => {
+        const model = this.currentModel;
+
         if (!this.isClickedInside(event)) {
-            hideModal(this.currentModel);
+            this.eventsView.own(timer(0, 100).subscribe(() => {
+                hideModal(model);
+            }));
         }
     }
 
