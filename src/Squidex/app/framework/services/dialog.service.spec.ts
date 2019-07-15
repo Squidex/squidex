@@ -70,7 +70,7 @@ describe('DialogService', () => {
     it('should publish tooltip', () => {
         const dialogService = new DialogService();
 
-        const tooltip = new Tooltip('target', 'text', 'topLeft');
+        const tooltip = new Tooltip('target', 'text', 'left');
 
         let publishedTooltip: Tooltip;
 

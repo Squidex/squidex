@@ -6,7 +6,7 @@
     </ng-container>
 
     <ng-container menu>
-        <button type="button" class="btn btn-text mr-1" (click)="exportSchemaDialog.show()">
+        <button type="button" class="btn btn-text mr-1" (click)="exportDialog.show()">
             JSON Preview
         </button>
 
@@ -23,34 +23,37 @@
             <button type="button" class="btn btn-text-secondary ml-1" (click)="editOptionsDropdown.toggle()" [class.active]="editOptionsDropdown.isOpen | async" #buttonOptions>
                 <i class="icon-dots"></i>
             </button>
-            <div class="dropdown-menu" *sqxModalView="editOptionsDropdown;closeAlways:true" [sqxModalTarget]="buttonOptions" @fade>
-                <a class="dropdown-item" (click)="configureScriptsDialog.show()">
-                    Scripts
-                </a>
-                <a class="dropdown-item" (click)="configurePreviewUrlsDialog.show()">
-                    Preview Urls
-                </a>
-                
-                <ng-container *ngIf="schemasState.canCreate">
-                    <div class="dropdown-divider"></div>
-    
-                    <a class="dropdown-item" (click)="cloneSchema()">
-                        Clone
+
+            <ng-container *sqxModal="editOptionsDropdown;closeAlways:true">
+                <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
+                    <a class="dropdown-item" (click)="configureScriptsDialog.show()">
+                        Scripts
                     </a>
-                </ng-container>
-                
-                <ng-container>
-                    <div class="dropdown-divider"></div>
-    
-                    <a class="dropdown-item dropdown-item-delete"
-                        [class.disabled]="!schema.canDelete"
-                        (sqxConfirmClick)="deleteSchema()" 
-                        confirmTitle="Delete schema" 
-                        confirmText="Do you really want to delete the schema?">
-                        Delete
+                    <a class="dropdown-item" (click)="configurePreviewUrlsDialog.show()">
+                        Preview Urls
                     </a>
-                </ng-container>
-            </div>
+                    
+                    <ng-container *ngIf="schemasState.canCreate">
+                        <div class="dropdown-divider"></div>
+        
+                        <a class="dropdown-item" (click)="cloneSchema()">
+                            Clone
+                        </a>
+                    </ng-container>
+                    
+                    <ng-container>
+                        <div class="dropdown-divider"></div>
+        
+                        <a class="dropdown-item dropdown-item-delete"
+                            [class.disabled]="!schema.canDelete"
+                            (sqxConfirmClick)="deleteSchema()" 
+                            confirmTitle="Delete schema" 
+                            confirmText="Do you really want to delete the schema?">
+                            Delete
+                        </a>
+                    </ng-container>
+                </div>
+            </ng-container>
         </div>
 
         <sqx-onboarding-tooltip helpId="history" [for]="buttonOptions" position="bottom-right" after="60000">
@@ -98,40 +101,32 @@
 
 <router-outlet></router-outlet>
 
-<ng-container *sqxModalView="editSchemaDialog;onRoot:true">
+<ng-container *sqxModal="editSchemaDialog">
     <sqx-schema-edit-form [schema]="schema" 
         (complete)="editSchemaDialog.hide()">
     </sqx-schema-edit-form>
 </ng-container>
 
-<ng-container *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false">
+<ng-container *sqxModal="addFieldDialog">
     <sqx-field-wizard [schema]="schema"
         (complete)="addFieldDialog.hide()">
     </sqx-field-wizard>
 </ng-container>
 
-<ng-container *sqxModalView="configureScriptsDialog;onRoot:true">
+<ng-container *sqxModal="configureScriptsDialog">
     <sqx-schema-scripts-form [schema]="schema"
         (complete)="configureScriptsDialog.hide()">
-    </sqx-schema-scripts-form>
+    </sqx-schema-scripts-form> 
 </ng-container>
 
-<ng-container *sqxModalView="configurePreviewUrlsDialog;onRoot:true">
+<ng-container *sqxModal="configurePreviewUrlsDialog">
     <sqx-schema-preview-urls-form [schema]="schema"
         (complete)="configurePreviewUrlsDialog.hide()">
     </sqx-schema-preview-urls-form>
 </ng-container>
 
-<ng-container *sqxModalView="exportSchemaDialog;onRoot:true">
-    <sqx-modal-dialog (close)="exportSchemaDialog.hide()" large="true">
-        <ng-container title>
-            Export Schema
-        </ng-container>
-
-        <ng-container content>
-            <div class="json-preview">
-                <sqx-json-editor disabled [ngModel]="schemaExport"></sqx-json-editor>
-            </div>
-        </ng-container>
-    </sqx-modal-dialog>
+<ng-container *sqxModal="exportDialog">
+    <sqx-schema-export-form [schema]="schema"
+        (complete)="exportDialog.hide()">
+    </sqx-schema-export-form>
 </ng-container>

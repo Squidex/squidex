@@ -11,7 +11,7 @@ import { FormGroup } from '@angular/forms';
 import { FieldDto } from '@app/shared';
 
 @Component({
-    selector: 'sqx-content-item-editor',
+    selector: 'sqx-content-value-editor',
     template: `
         <div [formGroup]="form">
             <ng-container [ngSwitch]="field.properties.fieldType">
@@ -60,7 +60,7 @@ import { FieldDto } from '@app/shared';
         </div>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContentItemEditorComponent {
+export class ContentValueEditorComponent {
     @Input()
     public field: FieldDto;
 

@@ -10,6 +10,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import {
+    fadeAnimation,
     FieldDto,
     hasNoValue$,
     ImmutableArray,
@@ -24,7 +25,10 @@ import {
 @Component({
     selector: 'sqx-string-validation',
     styleUrls: ['string-validation.component.scss'],
-    templateUrl: 'string-validation.component.html'
+    templateUrl: 'string-validation.component.html',
+    animations: [
+        fadeAnimation
+    ]
 })
 export class StringValidationComponent extends ResourceOwner implements OnInit {
     @Input()

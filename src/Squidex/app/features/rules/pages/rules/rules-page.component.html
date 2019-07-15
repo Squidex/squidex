@@ -67,8 +67,8 @@
                 </tbody>
             </table>
 
-            <ng-container *sqxModalView="addRuleDialog;onRoot:true;closeAuto:false">
-                <sqx-rule-wizard 
+            <ng-container *sqxModal="addRuleDialog">
+                 <sqx-rule-wizard 
                     [schemas]="schemasState.schemas | async"
                     [rule]="wizardRule"
                     [ruleActions]="ruleActions"

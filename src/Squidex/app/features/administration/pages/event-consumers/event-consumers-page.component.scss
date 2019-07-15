@@ -1,10 +1,6 @@
 @import '_vars';
 @import '_mixins';
 
-.truncate {
-    @include truncate;
-}
-
 .faulted {
     & {
         color: $color-theme-error;

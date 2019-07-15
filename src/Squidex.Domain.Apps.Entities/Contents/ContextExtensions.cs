@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public static IEnumerable<Language> Languages(this Context context)
         {
-            if (context.Headers.TryGetValue(HeaderResolveAssetUrls, out var value))
+            if (context.Headers.TryGetValue(HeaderLanguages, out var value))
             {
                 var languages = new HashSet<Language>();
 

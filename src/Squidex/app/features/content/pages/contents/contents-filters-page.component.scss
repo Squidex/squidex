@@ -4,3 +4,7 @@
 .text-muted {
     pointer-events: none;
 }
+
+.status {
+    @include truncate;
+}

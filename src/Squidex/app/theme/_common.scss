@@ -75,6 +75,10 @@ body {
     }
 }
 
+.truncate {
+    @include truncate;
+}
+
 //
 // Green or red circle if element is published or unpublished
 //

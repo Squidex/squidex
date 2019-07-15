@@ -11,12 +11,12 @@ import { timer } from 'rxjs';
 import { positionModal, ResourceOwner } from '@app/framework/internal';
 
 @Directive({
-    selector: '[sqxModalTarget]'
+    selector: '[sqxAnchoredTo]'
 })
-export class ModalTargetDirective extends ResourceOwner implements AfterViewInit, OnDestroy {
+export class ModalPlacementDirective extends ResourceOwner implements AfterViewInit, OnDestroy {
     private targetElement: Element;
 
-    @Input('sqxModalTarget')
+    @Input('sqxAnchoredTo')
     public set target(element: Element) {
         if (element !== this.targetElement) {
             this.unsubscribeAll();
@@ -24,7 +24,7 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
             this.targetElement = element;
 
             if (element) {
-                this.subscribe(element);
+                this.listenToElement(element);
                 this.updatePosition();
             }
         }
@@ -37,7 +37,7 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
     public position = 'bottom-right';
 
     @Input()
-    public autoPosition = true;
+    public update = true;
 
     constructor(
         private readonly renderer: Renderer2,
@@ -46,7 +46,7 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
         super();
     }
 
-    private subscribe(element: any) {
+    private listenToElement(element: any) {
         this.own(
             this.renderer.listen(element, 'resize', () => {
                 this.updatePosition();
@@ -65,6 +65,9 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
 
         this.renderer.setStyle(modalRef, 'position', 'fixed');
         this.renderer.setStyle(modalRef, 'z-index', '1000000');
+        this.renderer.setStyle(modalRef, 'right', 'auto');
+        this.renderer.setStyle(modalRef, 'bottom', 'auto');
+        this.renderer.setStyle(modalRef, 'margin', '0');
 
         this.updatePosition();
     }
@@ -99,7 +102,7 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
             const viewH = document.documentElement!.clientHeight;
             const viewW = document.documentElement!.clientWidth;
 
-            const position = positionModal(targetRect, modalRect, this.position, this.offset, this.autoPosition, viewW, viewH);
+            const position = positionModal(targetRect, modalRect, this.position, this.offset, this.update, viewW, viewH);
 
             x = position.x;
             y = position.y;
@@ -107,8 +110,5 @@ export class ModalTargetDirective extends ResourceOwner implements AfterViewInit
 
         this.renderer.setStyle(modalRef, 'top', `${y}px`);
         this.renderer.setStyle(modalRef, 'left', `${x}px`);
-        this.renderer.setStyle(modalRef, 'right', 'auto');
-        this.renderer.setStyle(modalRef, 'bottom', 'auto');
-        this.renderer.setStyle(modalRef, 'margin', '0');
     }
 }

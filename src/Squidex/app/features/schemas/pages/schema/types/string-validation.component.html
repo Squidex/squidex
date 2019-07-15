@@ -38,20 +38,24 @@
         <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldPattern">Pattern</label>
 
         <div class="col-6">
-            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPattern" formControlName="pattern" placeholder="Regex Pattern" #patternInput
+            <input type="text" class="form-control" id="{{field.fieldId}}_fieldPattern" formControlName="pattern" placeholder="Regex Pattern" #inputPattern
                 autocomplete="off" 
                 autocorrect="off"
                 autocapitalize="off" 
-                (focus)="patternsModal.show()" (blur)="patternsModal.hide()" />
+                (focus)="patternsModal.show()" />
 
-            <div *ngIf="patterns.length > 0 && (patternsModal.isOpen | async) && (showPatternSuggestions | async)" [sqxModalTarget]="patternInput" class="control-dropdown">
-                <h4>Suggestions</h4>
-
-                <div *ngFor="let pattern of patterns" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
-                    <div class="truncate">{{pattern.name}}</div>
-                    <div class="truncate text-muted">{{pattern.pattern}}</div>
-                </div>
-            </div>
+            <ng-container *ngIf="patterns.length > 0 && (showPatternSuggestions | async)">
+                <ng-container *sqxModal="patternsModal">
+                    <div class="control-dropdown" [sqxAnchoredTo]="inputPattern" position="bottom-left" @fade>
+                        <h4>Suggestions</h4>
+        
+                        <div *ngFor="let pattern of patterns" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
+                            <div class="truncate">{{pattern.name}}</div>
+                            <div class="truncate text-muted">{{pattern.pattern}}</div>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
         </div>
         <small class="col-3" style="align-self: center">
             {{patternName}}

@@ -78,6 +78,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public ngOnInit() {
+        this.contentsState.loadIfNotLoaded();
+
         this.own(
             this.languagesState.languages
                 .subscribe(languages => {

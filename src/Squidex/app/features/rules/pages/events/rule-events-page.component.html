@@ -70,7 +70,7 @@
                                 Next: <ng-container *ngIf="event.nextAttempt">{{event.nextAttempt | sqxFromNow}}</ng-container>
                             </div>
                             <div class="col-3 text-right">
-                                <button type="button" class="btn btn-danger btn-sm mr-1" (click)="cancel(event)" [class.hidden]="!event.nextAttempt">
+                                <button type="button" class="btn btn-outline-danger btn-sm mr-1" (click)="cancel(event)" [class.hidden]="!event.nextAttempt">
                                     Cancel
                                 </button>
 

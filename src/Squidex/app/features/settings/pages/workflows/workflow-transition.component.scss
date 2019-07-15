@@ -22,3 +22,7 @@
         background: $panel-light-background;
     }
 }
+
+.transition-to {
+    @include truncate;
+}
