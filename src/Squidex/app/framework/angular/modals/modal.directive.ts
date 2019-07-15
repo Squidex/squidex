@@ -122,13 +122,11 @@ export class ModalDirective implements OnDestroy {
 
     private subscribeToView() {
         if (this.closeAuto) {
-            this.eventsView.own(timer(500).subscribe(() => {
-                document.addEventListener('click', this.documentClickListener, true);
+            document.addEventListener('mousedown', this.documentClickListener, true);
 
-                this.eventsView.own(() => {
-                    document.removeEventListener('click', this.documentClickListener, true);
-                });
-            }));
+            this.eventsView.own(() => {
+                document.removeEventListener('mousedown', this.documentClickListener, true);
+            });
         }
 
         if (this.closeAlways && this.renderRoots) {
