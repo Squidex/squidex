@@ -60,7 +60,7 @@ export class ModalDirective implements OnDestroy {
     }
 
     public ngOnDestroy() {
-        hideModal(this.currentModel);
+        this.hideModal(this.currentModel);
 
         this.eventsView.unsubscribeAll();
         this.eventsModel.unsubscribeAll();
@@ -122,11 +122,13 @@ export class ModalDirective implements OnDestroy {
 
     private subscribeToView() {
         if (this.closeAuto) {
-            document.addEventListener('click', this.documentClickListener, true);
+            this.eventsView.own(timer(500).subscribe(() => {
+                document.addEventListener('click', this.documentClickListener, true);
 
-            this.eventsView.own(() => {
-                document.removeEventListener('click', this.documentClickListener);
-            });
+                this.eventsView.own(() => {
+                    document.removeEventListener('click', this.documentClickListener, true);
+                });
+            }));
         }
 
         if (this.closeAlways && this.renderRoots) {
@@ -138,7 +140,7 @@ export class ModalDirective implements OnDestroy {
 
     private elementListener = (event: MouseEvent) => {
         if (this.isClickedInside(event)) {
-            hideModal(this.currentModel);
+            this.hideModal(this.currentModel);
         }
     }
 
@@ -146,8 +148,8 @@ export class ModalDirective implements OnDestroy {
         const model = this.currentModel;
 
         if (!this.isClickedInside(event)) {
-            this.eventsView.own(timer(0, 100).subscribe(() => {
-                hideModal(model);
+            this.eventsView.own(timer(100).subscribe(() => {
+                this.hideModal(model);
             }));
         }
     }
@@ -169,11 +171,13 @@ export class ModalDirective implements OnDestroy {
             return false;
         }
     }
-}
 
-function hideModal(model: Model) {
-    if (model && isModalModel(model)) {
-        model.hide();
+    private hideModal(model: Model) {
+        if (model && isModalModel(model)) {
+            model.hide();
+
+            this.eventsView.unsubscribeAll();
+        }
     }
 }
 

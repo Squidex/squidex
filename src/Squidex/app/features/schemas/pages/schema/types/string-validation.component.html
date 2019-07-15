@@ -42,11 +42,11 @@
                 autocomplete="off" 
                 autocorrect="off"
                 autocapitalize="off" 
-                (focus)="patternsModal.show()" (blur)="patternsModal.hide()" />
+                (focus)="patternsModal.show()" />
 
             <ng-container *ngIf="patterns.length > 0 && (showPatternSuggestions | async)">
-                <ng-container *sqxModal="patternsModal" position="bottom-left">
-                    <div class="control-dropdown" [sqxAnchoredTo]="inputPattern" @fade>
+                <ng-container *sqxModal="patternsModal">
+                    <div class="control-dropdown" [sqxAnchoredTo]="inputPattern" position="bottom-left" @fade>
                         <h4>Suggestions</h4>
         
                         <div *ngFor="let pattern of patterns" class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
