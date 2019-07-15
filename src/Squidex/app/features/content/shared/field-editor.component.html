@@ -47,7 +47,7 @@
                     <sqx-date-time-editor enforceTime="true" [mode]="field.properties['editor']" [formControl]="control"></sqx-date-time-editor>
                 </ng-container>
 				<ng-container *ngSwitchCase="'Geolocation'">
-					<sqx-geolocation-editor [formControl]="control"></sqx-geolocation-editor>
+					<sqx-geolocation-editor [isCompact]="isCompact" [formControl]="control"></sqx-geolocation-editor>
 				</ng-container>
 				<ng-container *ngSwitchCase="'Json'">
 					<sqx-json-editor [formControl]="control"></sqx-json-editor>

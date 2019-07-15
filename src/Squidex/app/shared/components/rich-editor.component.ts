@@ -40,7 +40,7 @@ const ImageTypes = [
     providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RichEditorComponent extends StatefulControlComponent<any, string> implements AfterViewInit, OnDestroy {
+export class RichEditorComponent extends StatefulControlComponent<undefined, string> implements AfterViewInit, OnDestroy {
     private tinyEditor: any;
     private tinyInitTimer: any;
     private value: string;
@@ -58,7 +58,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
         private readonly assetUploader: AssetUploaderState,
         private readonly resourceLoader: ResourceLoaderService
     ) {
-        super(changeDetector, {});
+        super(changeDetector, undefined);
     }
 
     public ngOnDestroy() {

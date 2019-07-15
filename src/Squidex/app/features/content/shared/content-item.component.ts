@@ -154,7 +154,7 @@ export class ContentItemComponent implements OnChanges {
             if (Types.isUndefined(value)) {
                 this.values.push('');
             } else {
-                this.values.push(FieldFormatter.format(field, value));
+                this.values.push(FieldFormatter.format(field, value, true));
             }
 
             if (this.patchForm) {

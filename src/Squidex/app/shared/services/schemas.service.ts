@@ -20,6 +20,7 @@ import {
     Resource,
     ResourceLinks,
     StringHelper,
+    Types,
     Version,
     Versioned
 } from '@app/framework';
@@ -111,6 +112,51 @@ export class SchemaDetailsDto extends SchemaDto {
             this.listFields = listFields;
             this.listFieldsEditable = listFields.filter(x => x.isInlineEditable);
         }
+    }
+
+    public export(): any {
+        const cleanup = (source: any, ...exclude: string[]): any => {
+            const clone = {};
+
+            for (const key in source) {
+                if (source.hasOwnProperty(key) && exclude.indexOf(key) < 0) {
+                    const value = source[key];
+
+                    if (value) {
+                        clone[key] = value;
+                    }
+                }
+            }
+
+            return clone;
+        };
+
+        const result: any = {
+            fields: this.fields.map(field => {
+                const copy = cleanup(field, 'fieldId');
+
+                copy.properties = cleanup(field.properties);
+
+                if (Types.isArray(copy.nested)) {
+                    if (copy.nested.length === 0) {
+                        delete copy['nested'];
+                    } else {
+                        copy.nested = field.nested.map(nestedField => {
+                            const nestedCopy = cleanup(nestedField, 'fieldId', 'parentId');
+
+                            nestedCopy.properties = cleanup(nestedField.properties);
+
+                            return nestedCopy;
+                        });
+                    }
+                }
+
+                return copy;
+            }),
+            properties: cleanup(this.properties)
+        };
+
+        return result;
     }
 }
 

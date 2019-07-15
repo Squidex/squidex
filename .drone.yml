@@ -20,7 +20,7 @@ steps:
     image: docker
     commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker build -t squidex/squidex:dev -t squidex/squidex:dev-$${DRONE_BUILD_NUMBER} --build-arg SQUIDEX__VERSION=dev-$${DRONE_BUILD_NUMBER} .
+      - docker build -t squidex/squidex:dev -t squidex/squidex:dev-$${DRONE_BUILD_NUMBER} --build-arg SQUIDEX__VERSION=3.0.0-dev-$${DRONE_BUILD_NUMBER} .
       - docker push squidex/squidex:dev
       - docker push squidex/squidex:dev-$${DRONE_BUILD_NUMBER}
     volumes:

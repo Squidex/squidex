@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Squidex.Domain.Apps.Entities.Apps;
@@ -16,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities
 {
     public sealed class Context
     {
-        public IDictionary<string, string> Headers { get; } = new Dictionary<string, string>();
+        public IDictionary<string, string> Headers { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         public IAppEntity App { get; set; }
 

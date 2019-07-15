@@ -16,7 +16,7 @@ Please join our community forum: https://support.squidex.io
 
 ## Status
 
-Current Version v2.2.0. Roadmap: https://trello.com/b/KakM4F3S/squidex-roadmap
+Current Version 3.0.0. Roadmap: https://trello.com/b/KakM4F3S/squidex-roadmap
 
 ## Prerequisites
 

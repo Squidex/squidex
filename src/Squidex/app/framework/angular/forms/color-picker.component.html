@@ -14,14 +14,16 @@
     </ng-template>
 </span>
 
-<div *sqxModalView="modal" [sqxModalTarget]="input" position="bottom-left"
-    [style.height]="'228px'"
-    [style.width]="'130px'">
-    <div [style.background]="snapshot.value" 
-        [cpToggle]="true"
-        [cpDialogDisplay]="'inline'"
-        [cpCancelButton]="false"
-        [colorPicker]="snapshot.value"
-        (colorPickerChange)="updateValue($event)">
+<ng-container *sqxModal="modal">
+    <div [sqxAnchoredTo]="input" position="bottom-left"
+        [style.height]="'280px'"
+        [style.width]="'230px'">
+        <div [style.background]="snapshot.value" 
+            [cpToggle]="true"
+            [cpDialogDisplay]="'inline'"
+            [cpCancelButton]="false"
+            [colorPicker]="snapshot.value"
+            (colorPickerChange)="updateValue($event)">
+        </div>
     </div>
-</div>
+</ng-container>

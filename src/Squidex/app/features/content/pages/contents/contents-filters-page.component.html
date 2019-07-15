@@ -14,7 +14,7 @@
         <div class="sidebar-section">
             <h3>Status Queries</h3>
 
-            <a class="sidebar-item" *ngFor="let query of contentsState.statusQueries | async; trackBy: trackByQuery" (click)="search(query.filter)"
+            <a class="sidebar-item status" *ngFor="let query of contentsState.statusQueries | async; trackBy: trackByQuery" (click)="search(query.filter)"
                 [class.active]="isSelectedQuery(query.filter)">
                 
                 <i class="icon-circle" [style.color]="query.color"></i> {{query.name}}
