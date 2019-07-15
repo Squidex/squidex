@@ -41,7 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Backups
         [HttpGet]
         [Route("apps/restore/")]
         [ProducesResponseType(typeof(RestoreJobDto), 200)]
-        [ApiPermission(Permissions.AdminRestoreRead)]
+        [ApiPermission(Permissions.AdminRestore)]
         public async Task<IActionResult> GetJob()
         {
             var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
@@ -67,8 +67,8 @@ namespace Squidex.Areas.Api.Controllers.Backups
         /// </returns>
         [HttpPost]
         [Route("apps/restore/")]
-        [ApiPermission(Permissions.AdminRestoreCreate)]
-        public async Task<IActionResult> PostRestore([FromBody] RestoreRequest request)
+        [ApiPermission(Permissions.AdminRestore)]
+        public async Task<IActionResult> PostRestore([FromBody] RestoreRequestDto request)
         {
             var restoreGrain = grainFactory.GetGrain<IRestoreGrain>(SingleGrain.Id);
 

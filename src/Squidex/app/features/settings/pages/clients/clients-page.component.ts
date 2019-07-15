@@ -9,8 +9,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
+    AddClientForm,
     AppsState,
-    AttachClientForm,
     ClientDto,
     ClientsState,
     RolesState
@@ -22,7 +22,7 @@ import {
     templateUrl: './clients-page.component.html'
 })
 export class ClientsPageComponent implements OnInit {
-    public addClientForm = new AttachClientForm(this.formBuilder);
+    public addClientForm = new AddClientForm(this.formBuilder);
 
     constructor(
         public readonly appsState: AppsState,

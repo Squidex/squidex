@@ -17,7 +17,7 @@
             
             <div class="dropdown-divider"></div>
 
-            <a class="dropdown-item" routerLink="/app/administration" *sqxPermission="'?squidex.admin.events|restore|users.read'">
+            <a class="dropdown-item" routerLink="/app/administration" *ngIf="uiState.canUserAdminResource | async">
                 Administration
             </a>
 

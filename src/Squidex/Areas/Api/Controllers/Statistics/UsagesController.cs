@@ -127,9 +127,9 @@ namespace Squidex.Areas.Api.Controllers.Statistics
                 return BadRequest();
             }
 
-            var entities = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date);
+            var usages = await usageTracker.QueryAsync(AppId.ToString(), fromDate.Date, toDate.Date);
 
-            var response = entities.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsageDto.FromUsage).ToArray());
+            var response = usages.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsageDto.FromUsage).ToArray());
 
             return Ok(response);
         }
@@ -181,9 +181,9 @@ namespace Squidex.Areas.Api.Controllers.Statistics
                 return BadRequest();
             }
 
-            var entities = await assetStatsRepository.QueryAsync(AppId, fromDate.Date, toDate.Date);
+            var usages = await assetStatsRepository.QueryAsync(AppId, fromDate.Date, toDate.Date);
 
-            var models = entities.Select(StorageUsageDto.FromStats).ToArray();
+            var models = usages.Select(StorageUsageDto.FromStats).ToArray();
 
             return Ok(models);
         }

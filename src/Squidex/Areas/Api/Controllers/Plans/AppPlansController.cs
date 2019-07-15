@@ -51,9 +51,12 @@ namespace Squidex.Areas.Api.Controllers.Plans
         {
             var hasPortal = appPlansBillingManager.HasPortal;
 
-            var response = AppPlansDto.FromApp(App, appPlansProvider, hasPortal);
+            var response = Deferred.Response(() =>
+            {
+                return AppPlansDto.FromApp(App, appPlansProvider, hasPortal);
+            });
 
-            Response.Headers[HeaderNames.ETag] = App.Version.ToString();
+            Response.Headers[HeaderNames.ETag] = App.ToEtag();
 
             return Ok(response);
         }
@@ -71,10 +74,9 @@ namespace Squidex.Areas.Api.Controllers.Plans
         [HttpPut]
         [Route("apps/{app}/plan/")]
         [ProducesResponseType(typeof(PlanChangedDto), 200)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppPlansChange)]
         [ApiCosts(0)]
-        public async Task<IActionResult> ChangePlanAsync(string app, [FromBody] ChangePlanDto request)
+        public async Task<IActionResult> PutPlan(string app, [FromBody] ChangePlanDto request)
         {
             var context = await CommandBus.PublishAsync(request.ToCommand());
 

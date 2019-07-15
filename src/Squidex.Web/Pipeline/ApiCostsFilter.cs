@@ -47,15 +47,15 @@ namespace Squidex.Web.Pipeline
         {
             context.HttpContext.Features.Set<IApiCostsFeature>(FilterDefinition);
 
-            var appFeature = context.HttpContext.Features.Get<IAppFeature>();
+            var app = context.HttpContext.Context().App;
 
-            if (appFeature?.App != null && FilterDefinition.Weight > 0)
+            if (app != null && FilterDefinition.Weight > 0)
             {
-                var appId = appFeature.App.Id.ToString();
+                var appId = app.Id.ToString();
 
                 using (Profiler.Trace("CheckUsage"))
                 {
-                    var plan = appPlansProvider.GetPlanForApp(appFeature.App);
+                    var plan = appPlansProvider.GetPlanForApp(app);
 
                     var usage = await usageTracker.GetMonthlyCallsAsync(appId, DateTime.Today);
 

@@ -54,3 +54,4 @@ if($createRules)
 
 
 .\6_CreateRefDataContent.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName
+.\7_AddTestUsers.ps1 -token $token -apiBaseUrl $apiBaseUrl -appName $appName

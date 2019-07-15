@@ -36,6 +36,30 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
             }
         }
 
+        protected override JsonArrayContract CreateArrayContract(Type objectType)
+        {
+            if (objectType.IsGenericType && objectType.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
+            {
+                var implementationType = typeof(List<>).MakeGenericType(objectType.GetGenericArguments());
+
+                return base.CreateArrayContract(implementationType);
+            }
+
+            return base.CreateArrayContract(objectType);
+        }
+
+        protected override JsonDictionaryContract CreateDictionaryContract(Type objectType)
+        {
+            if (objectType.IsGenericType && objectType.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
+            {
+                var implementationType = typeof(Dictionary<,>).MakeGenericType(objectType.GetGenericArguments());
+
+                return base.CreateDictionaryContract(implementationType);
+            }
+
+            return base.CreateDictionaryContract(objectType);
+        }
+
         protected override JsonConverter ResolveContractConverter(Type objectType)
         {
             var result = base.ResolveContractConverter(objectType);

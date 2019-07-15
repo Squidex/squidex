@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 {
                     return id;
                 }
-            }));
+            }).Where(x => x != "common"));
         }
     }
 }

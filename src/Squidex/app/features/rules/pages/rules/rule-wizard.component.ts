@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import {
@@ -26,7 +26,7 @@ export const MODE_EDIT_ACTION  = 'EditAction';
     styleUrls: ['./rule-wizard.component.scss'],
     templateUrl: './rule-wizard.component.html'
 })
-export class RuleWizardComponent implements OnInit {
+export class RuleWizardComponent implements AfterViewInit, OnInit {
     public actionForm = new Form<FormGroup, any>(new FormGroup({}));
     public actionType: string;
     public action: any = {};
@@ -34,6 +34,8 @@ export class RuleWizardComponent implements OnInit {
     public triggerForm = new Form<FormGroup, any>(new FormGroup({}));
     public triggerType: string;
     public trigger: any = {};
+
+    public isEditable: boolean;
 
     public step = 1;
 
@@ -61,6 +63,8 @@ export class RuleWizardComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.isEditable = !this.rule || this.rule.canUpdate;
+
         if (this.mode === MODE_EDIT_ACTION) {
             this.step = 4;
 
@@ -72,6 +76,12 @@ export class RuleWizardComponent implements OnInit {
             this.trigger = this.rule.trigger;
             this.triggerType = this.rule.triggerType;
         }
+    }
+
+    public ngAfterViewInit() {
+        this.actionForm.setEnabled(this.isEditable);
+
+        this.triggerForm.setEnabled(this.isEditable);
     }
 
     public emitComplete() {
@@ -132,6 +142,10 @@ export class RuleWizardComponent implements OnInit {
     }
 
     private updateTrigger() {
+        if (!this.isEditable) {
+            return;
+        }
+
         this.rulesState.updateTrigger(this.rule, this.trigger)
             .subscribe(() => {
                 this.emitComplete();
@@ -143,6 +157,10 @@ export class RuleWizardComponent implements OnInit {
     }
 
     private updateAction() {
+        if (!this.isEditable) {
+            return;
+        }
+
         this.rulesState.updateAction(this.rule, this.action)
             .subscribe(() => {
                 this.emitComplete();

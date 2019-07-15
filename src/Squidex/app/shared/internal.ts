@@ -32,6 +32,7 @@ export * from './services/ui.service';
 export * from './services/usages.service';
 export * from './services/users-provider.service';
 export * from './services/users.service';
+export * from './services/workflows.service';
 
 export * from './state/apps.forms';
 export * from './state/apps.state';
@@ -62,6 +63,8 @@ export * from './state/rules.state';
 export * from './state/schemas.forms';
 export * from './state/schemas.state';
 export * from './state/ui.state';
+export * from './state/workflows.forms';
+export * from './state/workflows.state';
 
 export * from './utils/messages';
 

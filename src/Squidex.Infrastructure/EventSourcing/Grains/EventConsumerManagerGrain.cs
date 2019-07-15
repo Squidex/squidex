@@ -74,33 +74,31 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
         {
             return Task.WhenAll(
                 eventConsumers
-                    .Select(c => GrainFactory.GetGrain<IEventConsumerGrain>(c.Name))
-                    .Select(c => c.StartAsync()));
+                    .Select(c => StartAsync(c.Name)));
         }
 
         public Task StopAllAsync()
         {
             return Task.WhenAll(
                 eventConsumers
-                    .Select(c => GrainFactory.GetGrain<IEventConsumerGrain>(c.Name))
-                    .Select(c => c.StopAsync()));
+                    .Select(c => StopAsync(c.Name)));
         }
 
-        public Task ResetAsync(string consumerName)
+        public Task<Immutable<EventConsumerInfo>> ResetAsync(string consumerName)
         {
             var eventConsumer = GrainFactory.GetGrain<IEventConsumerGrain>(consumerName);
 
             return eventConsumer.ResetAsync();
         }
 
-        public Task StartAsync(string consumerName)
+        public Task<Immutable<EventConsumerInfo>> StartAsync(string consumerName)
         {
             var eventConsumer = GrainFactory.GetGrain<IEventConsumerGrain>(consumerName);
 
             return eventConsumer.StartAsync();
         }
 
-        public Task StopAsync(string consumerName)
+        public Task<Immutable<EventConsumerInfo>> StopAsync(string consumerName)
         {
             var eventConsumer = GrainFactory.GetGrain<IEventConsumerGrain>(consumerName);
 

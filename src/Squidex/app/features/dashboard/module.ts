@@ -33,4 +33,4 @@ const routes: Routes = [
         DashboardPageComponent
     ]
 })
-export class SqxFeatureDashboardModule { }
+export class SqxFeatureDashboardModule {}

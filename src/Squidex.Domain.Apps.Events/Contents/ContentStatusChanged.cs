@@ -10,10 +10,10 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Events.Contents
 {
-    [EventType(nameof(ContentStatusChanged))]
+    [EventType(nameof(ContentStatusChanged), 2)]
     public sealed class ContentStatusChanged : ContentEvent
     {
-        public StatusChange? Change { get; set; }
+        public StatusChange Change { get; set; }
 
         public Status Status { get; set; }
     }

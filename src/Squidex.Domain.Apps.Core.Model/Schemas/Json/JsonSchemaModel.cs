@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
             SimpleMapper.Map(schema, this);
 
             Fields =
-                schema.Fields.ToArray(x =>
+                schema.Fields.Select(x =>
                     new JsonFieldModel
                     {
                         Id = x.Id,
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         IsDisabled = x.IsDisabled,
                         Partitioning = x.Partitioning.Key,
                         Properties = x.RawProperties
-                    });
+                    }).ToArray();
 
             PreviewUrls = schema.PreviewUrls.ToDictionary(x => x.Key, x => x.Value);
         }
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
         {
             if (field is ArrayField arrayField)
             {
-                return arrayField.Fields.ToArray(x =>
+                return arrayField.Fields.Select(x =>
                     new JsonNestedFieldModel
                     {
                         Id = x.Id,
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
                         IsLocked = x.IsLocked,
                         IsDisabled = x.IsDisabled,
                         Properties = x.RawProperties
-                    });
+                    }).ToArray();
             }
 
             return null;
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Core.Schemas.Json
 
         public Schema ToSchema()
         {
-            var fields = Fields.ToArray(f => f.ToField()) ?? Array.Empty<RootField>();
+            var fields = Fields.Map(f => f.ToField()) ?? Array.Empty<RootField>();
 
             var schema = new Schema(Name, fields, Properties, IsPublished, IsSingleton);
 

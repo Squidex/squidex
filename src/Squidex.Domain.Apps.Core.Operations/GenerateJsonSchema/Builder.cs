@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 
         public static JsonProperty DateTimeProperty(string description = null, bool isRequired = false)
         {
-            return new JsonProperty { Type = JsonObjectType.Number, Format = JsonFormatStrings.DateTime, Description = description, IsRequired = isRequired };
+            return new JsonProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.DateTime, Description = description, IsRequired = isRequired };
         }
 
         public static JsonProperty GuidProperty(string description = null, bool isRequired = false)

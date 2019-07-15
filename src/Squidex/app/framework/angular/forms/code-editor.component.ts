@@ -11,8 +11,8 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 import {
-    ExternalControlComponent,
     ResourceLoaderService,
+    StatefulControlComponent,
     Types
 } from '@app/framework/internal';
 
@@ -29,13 +29,13 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CodeEditorComponent extends ExternalControlComponent<string> implements AfterViewInit {
+export class CodeEditorComponent extends StatefulControlComponent<any, string> implements AfterViewInit {
     private valueChanged = new Subject();
     private aceEditor: any;
     private value: string;
     private isDisabled = false;
 
-    @ViewChild('editor')
+    @ViewChild('editor', { static: false })
     public editor: ElementRef;
 
     @Input()
@@ -44,10 +44,10 @@ export class CodeEditorComponent extends ExternalControlComponent<string> implem
     constructor(changeDetector: ChangeDetectorRef,
         private readonly resourceLoader: ResourceLoaderService
     ) {
-        super(changeDetector);
+        super(changeDetector, {});
     }
 
-    public writeValue(obj: any) {
+    public writeValue(obj: string) {
         this.value = Types.isString(obj) ? obj : '';
 
         if (this.aceEditor) {
@@ -64,8 +64,7 @@ export class CodeEditorComponent extends ExternalControlComponent<string> implem
     }
 
     public ngAfterViewInit() {
-        this.valueChanged.pipe(
-                debounceTime(500))
+        this.valueChanged.pipe(debounceTime(500))
             .subscribe(() => {
                 this.changeValue();
             });
@@ -87,6 +86,8 @@ export class CodeEditorComponent extends ExternalControlComponent<string> implem
             this.aceEditor.on('change', () => {
                 this.valueChanged.next();
             });
+
+            this.detach();
         });
     }
 

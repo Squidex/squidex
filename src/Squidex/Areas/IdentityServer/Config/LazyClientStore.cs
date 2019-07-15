@@ -176,7 +176,7 @@ namespace Squidex.Areas.IdentityServer.Config
                     },
                     Claims = new List<Claim>
                     {
-                        new Claim(SquidexClaimTypes.Permissions, Permissions.Admin)
+                        new Claim(SquidexClaimTypes.Permissions, Permissions.All)
                     }
                 };
             }

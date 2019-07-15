@@ -16,3 +16,12 @@
         }
     }
 }
+
+.color-container {
+    display: inline-block;
+}
+
+.circle {
+    @include circle(16px);
+    border: 1px solid $color-border-dark;
+}

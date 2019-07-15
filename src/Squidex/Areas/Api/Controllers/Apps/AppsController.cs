@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure;
@@ -58,13 +59,16 @@ namespace Squidex.Areas.Api.Controllers.Apps
         public async Task<IActionResult> GetApps()
         {
             var userOrClientId = HttpContext.User.UserOrClientId();
-            var userPermissions = HttpContext.User.Permissions();
+            var userPermissions = HttpContext.Permissions();
 
-            var entities = await appProvider.GetUserApps(userOrClientId, userPermissions);
+            var apps = await appProvider.GetUserApps(userOrClientId, userPermissions);
 
-            var response = entities.ToArray(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider));
+            var response = Deferred.Response(() =>
+            {
+                return apps.Select(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this)).ToArray();
+            });
 
-            Response.Headers[HeaderNames.ETag] = response.ToManyEtag();
+            Response.Headers[HeaderNames.ETag] = apps.ToEtag();
 
             return Ok(response);
         }
@@ -84,17 +88,18 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpPost]
         [Route("apps/")]
-        [ProducesResponseType(typeof(AppCreatedDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
-        [ProducesResponseType(typeof(ErrorDto), 409)]
+        [ProducesResponseType(typeof(AppDto), 201)]
         [ApiPermission]
         [ApiCosts(1)]
         public async Task<IActionResult> PostApp([FromBody] CreateAppDto request)
         {
             var context = await CommandBus.PublishAsync(request.ToCommand());
 
-            var result = context.Result<EntityCreatedResult<Guid>>();
-            var response = AppCreatedDto.FromResult(request.Name, result, appPlansProvider);
+            var userOrClientId = HttpContext.User.UserOrClientId();
+            var userPermissions = HttpContext.Permissions();
+
+            var result = context.Result<IAppEntity>();
+            var response = AppDto.FromApp(result, userOrClientId, userPermissions, appPlansProvider, this);
 
             return CreatedAtAction(nameof(GetApps), response);
         }

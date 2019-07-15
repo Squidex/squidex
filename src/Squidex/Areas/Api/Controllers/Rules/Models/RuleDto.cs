@@ -14,11 +14,12 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
-    public sealed class RuleDto : IGenerateETag
+    public sealed class RuleDto : Resource
     {
         /// <summary>
         /// The id of the rule.
@@ -70,19 +71,48 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
         [JsonConverter(typeof(RuleActionConverter))]
         public RuleAction Action { get; set; }
 
-        public static RuleDto FromRule(IRuleEntity rule)
+        public static RuleDto FromRule(IRuleEntity rule, ApiController controller, string app)
         {
-            var response = new RuleDto();
+            var result = new RuleDto();
 
-            SimpleMapper.Map(rule, response);
-            SimpleMapper.Map(rule.RuleDef, response);
+            SimpleMapper.Map(rule, result);
+            SimpleMapper.Map(rule.RuleDef, result);
 
             if (rule.RuleDef.Trigger != null)
             {
-                response.Trigger = RuleTriggerDtoFactory.Create(rule.RuleDef.Trigger);
+                result.Trigger = RuleTriggerDtoFactory.Create(rule.RuleDef.Trigger);
             }
 
-            return response;
+            return result.CreateLinks(controller, app);
+        }
+
+        private RuleDto CreateLinks(ApiController controller, string app)
+        {
+            var values = new { app, id = Id };
+
+            if (controller.HasPermission(Permissions.AppRulesDisable, app))
+            {
+                if (IsEnabled)
+                {
+                    AddPutLink("disable", controller.Url<RulesController>(x => nameof(x.DisableRule), values));
+                }
+                else
+                {
+                    AddPutLink("enable", controller.Url<RulesController>(x => nameof(x.EnableRule), values));
+                }
+            }
+
+            if (controller.HasPermission(Permissions.AppRulesUpdate))
+            {
+                AddPutLink("update", controller.Url<RulesController>(x => nameof(x.PutRule), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppRulesDelete))
+            {
+                AddDeleteLink("delete", controller.Url<RulesController>(x => nameof(x.DeleteRule), values));
+            }
+
+            return this;
         }
     }
 }

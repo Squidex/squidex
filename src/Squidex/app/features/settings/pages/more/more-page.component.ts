@@ -23,7 +23,7 @@ export class MorePageComponent {
     }
 
     public archiveApp() {
-        this.appsState.delete(this.appsState.appName)
+        this.appsState.delete(this.appsState.selectedAppState!)
             .subscribe(() => {
                 this.router.navigate(['/app']);
             });

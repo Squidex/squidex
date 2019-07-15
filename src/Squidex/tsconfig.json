@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "incremental": true,
     "importHelpers": true,
     "lib": ["es6", "esnext", "dom"],
     "moduleResolution": "node",
@@ -20,11 +21,6 @@
         "app*"
       ]
     }
-  },
-  "awesomeTypescriptLoaderOptions": {
-    "useBabel": true,
-    "useCache": true,
-    "emitRequireType": false
   },
   "angularCompilerOptions": { 
     "fullTemplateTypeCheck": true

@@ -1,17 +1,27 @@
-<input class="form-control" type="text" #input 
-    [style.background]="snapshot.value"
-    [style.color]="snapshot.foreground"
-    [placeholder]="placeholder"
-    [ngModel]="snapshot.value"
-    (ngModelChange)="writeValue($event)"
-    (focus)="modal.show()" (blur)="blur()" />
+<span class="color-container" #input>
+    <ng-container *ngIf="mode === 'Input'; else circle">
+        <input class="form-control" type="text"
+            [style.background]="snapshot.value"
+            [style.color]="snapshot.foreground"
+            [placeholder]="placeholder"
+            [ngModel]="snapshot.value"
+            (ngModelChange)="updateValue($event)"
+            (focus)="focus()" (blur)="blur()" />
+    </ng-container>
 
-<div *sqxModalView="modal" [sqxModalTarget]="input" position="bottom-left">
-    <div [style.background]="snapshot.value"
+    <ng-template #circle>
+        <div class="circle" [style.background]="snapshot.value" (click)="focus()"></div> 
+    </ng-template>
+</span>
+
+<div *sqxModalView="modal" [sqxModalTarget]="input" position="bottom-left"
+    [style.height]="'228px'"
+    [style.width]="'130px'">
+    <div [style.background]="snapshot.value" 
         [cpToggle]="true"
         [cpDialogDisplay]="'inline'"
         [cpCancelButton]="false"
         [colorPicker]="snapshot.value"
-        (colorPickerChange)="writeValue($event)">
+        (colorPickerChange)="updateValue($event)">
     </div>
 </div>

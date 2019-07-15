@@ -51,8 +51,8 @@ export class UsersPageComponent implements OnInit {
         this.usersState.unlock(user);
     }
 
-    public trackByUser(index: number, userInfo: { user: UserDto }) {
-        return userInfo.user.id;
+    public trackByUser(index: number, user: UserDto) {
+        return user.id;
     }
 }
 

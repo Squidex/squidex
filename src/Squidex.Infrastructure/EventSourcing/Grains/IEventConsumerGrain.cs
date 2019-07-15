@@ -16,11 +16,11 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
     {
         Task<Immutable<EventConsumerInfo>> GetStateAsync();
 
-        Task StopAsync();
+        Task<Immutable<EventConsumerInfo>> StopAsync();
 
-        Task StartAsync();
+        Task<Immutable<EventConsumerInfo>> StartAsync();
 
-        Task ResetAsync();
+        Task<Immutable<EventConsumerInfo>> ResetAsync();
 
         Task OnEventAsync(Immutable<IEventSubscription> subscription, Immutable<StoredEvent> storedEvent);
 

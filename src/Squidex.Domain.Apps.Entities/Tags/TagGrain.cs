@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [CollectionName("Index_Tags")]
         public sealed class GrainState
         {
-            public TagSet Tags { get; set; } = new TagSet();
+            public TagsExport Tags { get; set; } = new TagsExport();
         }
 
         public TagGrain(IStore<string> store)
@@ -33,7 +33,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return ClearStateAsync();
         }
 
-        public Task RebuildAsync(TagSet tags)
+        public Task RebuildAsync(TagsExport tags)
         {
             State.Tags = tags;
 
@@ -132,12 +132,14 @@ namespace Squidex.Domain.Apps.Entities.Tags
             return Task.FromResult(result);
         }
 
-        public Task<Dictionary<string, int>> GetTagsAsync()
+        public Task<TagsSet> GetTagsAsync()
         {
-            return Task.FromResult(State.Tags.Values.ToDictionary(x => x.Name, x => x.Count));
+            var tags = State.Tags.Values.ToDictionary(x => x.Name, x => x.Count);
+
+            return Task.FromResult(new TagsSet(tags, Persistence.Version));
         }
 
-        public Task<TagSet> GetExportableTagsAsync()
+        public Task<TagsExport> GetExportableTagsAsync()
         {
             return Task.FromResult(State.Tags);
         }

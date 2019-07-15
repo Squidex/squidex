@@ -15,12 +15,14 @@
         </ng-container>
 
         <ng-container menu>
-            <ng-container *ngIf="usersState.selectedUser | async; else noUserMenu">
-                <button type="submit" class="btn btn-primary" title="CTRL + S">
-                    Save
-                </button>
-                
-                <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
+            <ng-container *ngIf="usersState.selectedUser | async; let user; else noUserMenu">
+                <ng-container *ngIf="isEditable">
+                    <button type="submit" class="btn btn-primary" title="CTRL + S">
+                        Save
+                    </button>
+                    
+                    <sqx-shortcut keys="ctrl+s" (trigger)="save()"></sqx-shortcut>
+                </ng-container>
             </ng-container>
 
             <ng-template #noUserMenu>
@@ -50,7 +52,7 @@
                 <input type="text" class="form-control" id="displayName" maxlength="100" formControlName="displayName" autocomplete="false" spellcheck="false" />
             </div>
 
-            <div class="form-group form-group-password" [class.hidden]="user?.isCurrentUser">
+            <div class="form-group form-group-password">
                 <div class="form-group">
                     <label for="password">Password</label>
 

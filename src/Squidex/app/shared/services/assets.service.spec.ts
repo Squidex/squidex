@@ -12,64 +12,14 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     AssetDto,
-    AssetReplacedDto,
     AssetsDto,
     AssetsService,
     DateTime,
     ErrorDto,
-    Version,
-    Versioned
+    Resource,
+    ResourceLinks,
+    Version
 } from '@app/shared/internal';
-import { AssetUploadedDto } from './assets.service';
-
-describe('AssetDto', () => {
-    const creation = DateTime.today();
-    const creator = 'not-me';
-    const modified = DateTime.now();
-    const modifier = 'me';
-    const version = new Version('1');
-    const newVersion = new Version('2');
-
-    it('should update tag property and user info when annnoting', () => {
-        const update = { fileName: 'New-Name.png' };
-
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'Name.png', 'Hash', 'png', 1, 1, 'image/png', false, false, 1, 1, 'name.png', [], 'url', version);
-        const asset_2 = asset_1.annnotate(update, modifier, newVersion, modified);
-
-        expect(asset_2.fileName).toEqual(update.fileName);
-        expect(asset_2.tags).toEqual([]);
-        expect(asset_2.slug).toEqual(asset_1.slug);
-        expect(asset_2.lastModified).toEqual(modified);
-        expect(asset_2.lastModifiedBy).toEqual(modifier);
-        expect(asset_2.version).toEqual(newVersion);
-    });
-
-    it('should update file properties when uploading', () => {
-        const update = {
-            fileHash: 'Hash New',
-            fileSize: 1024,
-            fileVersion: 12,
-            mimeType: 'image/png',
-            isImage: true,
-            pixelWidth: 1024,
-            pixelHeight: 2048
-        };
-
-        const asset_1 = new AssetDto('1', creator, creator, creation, creation, 'Name.png', 'Hash', 'png', 1, 1, 'image/png', false, false, 1, 1, 'name.png', [], 'url', version);
-        const asset_2 = asset_1.update(update, modifier, newVersion, modified);
-
-        expect(asset_2.fileHash).toEqual(update.fileHash);
-        expect(asset_2.fileSize).toEqual(update.fileSize);
-        expect(asset_2.fileVersion).toEqual(update.fileVersion);
-        expect(asset_2.mimeType).toEqual(update.mimeType);
-        expect(asset_2.isImage).toBeTruthy();
-        expect(asset_2.pixelWidth).toEqual(update.pixelWidth);
-        expect(asset_2.pixelHeight).toEqual(update.pixelHeight);
-        expect(asset_2.lastModified).toEqual(modified);
-        expect(asset_2.lastModifiedBy).toEqual(modifier);
-        expect(asset_2.version).toEqual(newVersion);
-    });
-});
 
 describe('AssetsService', () => {
     const version = new Version('1');
@@ -133,85 +83,16 @@ describe('AssetsService', () => {
         req.flush({
             total: 10,
             items: [
-                {
-                    id: 'id1',
-                    created: '2016-12-12T10:10',
-                    createdBy: 'Created1',
-                    lastModified: '2017-12-12T10:10',
-                    lastModifiedBy: 'LastModifiedBy1',
-                    fileName: 'My Asset1.png',
-                    fileHash: 'My Hash1',
-                    fileType: 'png',
-                    fileSize: 1024,
-                    fileVersion: 2000,
-                    mimeType: 'image/png',
-                    isImage: true,
-                    pixelWidth: 1024,
-                    pixelHeight: 2048,
-                    slug: 'my-asset1.png',
-                    tags: undefined,
-                    version: 11
-                },
-                {
-                    id: 'id2',
-                    created: '2016-10-12T10:10',
-                    createdBy: 'Created2',
-                    lastModified: '2017-10-12T10:10',
-                    lastModifiedBy: 'LastModifiedBy2',
-                    fileName: 'My Asset2.png',
-                    fileHash: 'My Hash1',
-                    fileType: 'png',
-                    fileSize: 1024,
-                    fileVersion: 2000,
-                    mimeType: 'image/png',
-                    isImage: true,
-                    pixelWidth: 1024,
-                    pixelHeight: 2048,
-                    slug: 'my-asset2.png',
-                    tags: ['tag1', 'tag2'],
-                    version: 22
-                }
+                assetResponse(12),
+                assetResponse(13)
             ]
         });
 
         expect(assets!).toEqual(
             new AssetsDto(10, [
-                new AssetDto(
-                    'id1', 'Created1', 'LastModifiedBy1',
-                    DateTime.parseISO_UTC('2016-12-12T10:10'),
-                    DateTime.parseISO_UTC('2017-12-12T10:10'),
-                    'My Asset1.png',
-                    'My Hash1',
-                    'png',
-                    1024,
-                    2000,
-                    'image/png',
-                    false,
-                    true,
-                    1024,
-                    2048,
-                    'my-asset1.png',
-                    [],
-                    'http://service/p/api/assets/id1',
-                    new Version('11')),
-                new AssetDto('id2', 'Created2', 'LastModifiedBy2',
-                    DateTime.parseISO_UTC('2016-10-12T10:10'),
-                    DateTime.parseISO_UTC('2017-10-12T10:10'),
-                    'My Asset2.png',
-                    'My Hash1',
-                    'png',
-                    1024,
-                    2000,
-                    'image/png',
-                    false,
-                    true,
-                    1024,
-                    2048,
-                    'my-asset2.png',
-                    ['tag1', 'tag2'],
-                    'http://service/p/api/assets/id2',
-                    new Version('22'))
-        ]));
+                createAsset(12),
+                createAsset(13)
+            ]));
     }));
 
     it('should make get request to get asset',
@@ -228,48 +109,9 @@ describe('AssetsService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({
-            id: 'id1',
-            created: '2016-12-12T10:10',
-            createdBy: 'Created1',
-            lastModified: '2017-12-12T10:10',
-            lastModifiedBy: 'LastModifiedBy1',
-            fileName: 'My Asset1.png',
-            fileHash: 'My Hash1',
-            fileType: 'png',
-            fileSize: 1024,
-            fileVersion: 2000,
-            mimeType: 'image/png',
-            isImage: true,
-            pixelWidth: 1024,
-            pixelHeight: 2048,
-            slug: 'my-asset1.png',
-            tags: ['tag1', 'tag2']
-        }, {
-            headers: {
-                etag: '2'
-            }
-        });
+        req.flush(assetResponse(12));
 
-        expect(asset!).toEqual(
-            new AssetDto(
-                'id1', 'Created1', 'LastModifiedBy1',
-                DateTime.parseISO_UTC('2016-12-12T10:10'),
-                DateTime.parseISO_UTC('2017-12-12T10:10'),
-                'My Asset1.png',
-                'My Hash1',
-                'png',
-                1024,
-                2000,
-                'image/png',
-                false,
-                true,
-                1024,
-                2048,
-                'my-asset1.png',
-                ['tag1', 'tag2'],
-                'http://service/p/api/assets/id1',
-                new Version('2')));
+        expect(asset!).toEqual(createAsset(12));
     }));
 
     it('should append query to find by name',
@@ -314,10 +156,10 @@ describe('AssetsService', () => {
     it('should make post request to create asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: Versioned<AssetUploadedDto>;
+        let asset: AssetDto;
 
         assetsService.uploadFile('my-app', null!).subscribe(result => {
-            asset = <Versioned<AssetUploadedDto>>result;
+            asset = <AssetDto>result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets');
@@ -325,54 +167,19 @@ describe('AssetsService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({
-            id: 'id1',
-            fileName: 'My Asset1.png',
-            fileHash: 'My Hash1',
-            fileType: 'png',
-            fileSize: 1024,
-            fileVersion: 2,
-            mimeType: 'image/png',
-            isDuplicate: true,
-            isImage: true,
-            pixelWidth: 1024,
-            pixelHeight: 2048,
-            slug: 'my-asset1.png',
-            tags: ['tag1', 'tag2']
-        }, {
-            headers: {
-                etag: '1'
-            }
-        });
+        req.flush(assetResponse(12));
 
-        expect(asset!).toEqual({
-            payload: {
-                id: 'id1',
-                fileName: 'My Asset1.png',
-                fileHash: 'My Hash1',
-                fileType: 'png',
-                fileSize: 1024,
-                fileVersion: 2,
-                mimeType: 'image/png',
-                isDuplicate: true,
-                isImage: true,
-                pixelWidth: 1024,
-                pixelHeight: 2048,
-                slug: 'my-asset1.png',
-                tags: ['tag1', 'tag2']
-            },
-            version
-        });
+        expect(asset!).toEqual(createAsset(12));
     }));
 
     it('should return proper error when upload failed with 413',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: Versioned<AssetUploadedDto>;
+        let asset: AssetDto;
         let error: ErrorDto;
 
         assetsService.uploadFile('my-app', null!).subscribe(result => {
-            asset = <Versioned<AssetUploadedDto>>result;
+            asset = <AssetDto>result;
         }, e => {
             error = e;
         });
@@ -391,10 +198,16 @@ describe('AssetsService', () => {
     it('should make put request to replace asset content',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetReplacedDto;
+        const resource: Resource = {
+            _links: {
+                upload: { method: 'PUT', href: 'api/apps/my-app/assets/123/content' }
+            }
+        };
 
-        assetsService.replaceFile('my-app', '123', null!, version).subscribe(result => {
-            asset = (<Versioned<AssetReplacedDto>>result).payload;
+        let asset: AssetDto;
+
+        assetsService.replaceFile('my-app', resource, null!, version).subscribe(result => {
+            asset = <AssetDto>result;
         });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123/content');
@@ -402,35 +215,29 @@ describe('AssetsService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({
-            fileHash: 'Hash New',
-            fileSize: 1024,
-            fileVersion: 12,
-            mimeType: 'image/png',
-            isImage: true,
-            pixelWidth: 1024,
-            pixelHeight: 2048
+        req.flush(assetResponse(123), {
+            headers: {
+                etag: '1'
+            }
         });
 
-        expect(asset!).toEqual({
-            fileHash: 'Hash New',
-            fileSize: 1024,
-            fileVersion: 12,
-            mimeType: 'image/png',
-            isImage: true,
-            pixelWidth: 1024,
-            pixelHeight: 2048
-        });
+        expect(asset!).toEqual(createAsset(123));
     }));
 
     it('should return proper error when replace failed with 413',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        let asset: AssetReplacedDto;
+        const resource: Resource = {
+            _links: {
+                upload: { method: 'PUT', href: 'api/apps/my-app/assets/123/content' }
+            }
+        };
+
+        let asset: AssetDto;
         let error: ErrorDto;
 
-        assetsService.replaceFile('my-app', '123', null!, version).subscribe(result => {
-            asset = (<Versioned<AssetReplacedDto>>result).payload;
+        assetsService.replaceFile('my-app', resource, null!, version).subscribe(result => {
+            asset = <AssetDto>result;
         }, e => {
             error = e;
         });
@@ -451,20 +258,42 @@ describe('AssetsService', () => {
 
         const dto = { fileName: 'New-Name.png' };
 
-        assetsService.putAsset('my-app', '123', dto, version).subscribe();
+        const resource: Resource = {
+            _links: {
+                update: { method: 'PUT', href: 'api/apps/my-app/assets/123' }
+            }
+        };
+
+        let asset: AssetDto;
+
+        assetsService.putAsset('my-app', resource, dto, version).subscribe(result => {
+            asset = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({});
+        req.flush(assetResponse(123), {
+            headers: {
+                etag: '1'
+            }
+        });
+
+        expect(asset!).toEqual(createAsset(123));
     }));
 
     it('should make delete request to delete asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
-        assetsService.deleteAsset('my-app', '123', version).subscribe();
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: 'api/apps/my-app/assets/123' }
+            }
+        };
+
+        assetsService.deleteAsset('my-app', resource, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/123');
 
@@ -473,4 +302,59 @@ describe('AssetsService', () => {
 
         req.flush({});
     }));
+
+    function assetResponse(id: number, suffix = '') {
+        return {
+            id: `id${id}`,
+            created: `${id % 1000 + 2000}-12-12T10:10:00`,
+            createdBy: `creator-${id}`,
+            lastModified: `${id % 1000 + 2000}-11-11T10:10:00`,
+            lastModifiedBy: `modifier-${id}`,
+            fileName: `My Name${id}${suffix}.png`,
+            fileHash: `My Hash${id}${suffix}`,
+            fileType: 'png',
+            fileSize: id * 2,
+            fileVersion: id * 4,
+            mimeType: 'image/png',
+            isImage: true,
+            pixelWidth: id * 3,
+            pixelHeight: id * 5,
+            slug: `my-name${id}${suffix}.png`,
+            tags: ['tag1', 'tag2'],
+            version: id,
+            _links: {
+                update: { method: 'PUT', href: `/assets/${id}` }
+            },
+            _meta: {
+                isDuplicate: 'true'
+            }
+        };
+    }
 });
+
+export function createAsset(id: number, tags?: string[], suffix = '') {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/assets/${id}` }
+    };
+
+    const meta = {
+        isDuplicate: 'true'
+    };
+
+    return new AssetDto(links, meta,
+        `id${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
+        `My Name${id}${suffix}.png`,
+        `My Hash${id}${suffix}`,
+        'png',
+        id * 2,
+        id * 4,
+        'image/png',
+        true,
+        id * 3,
+        id * 5,
+        `my-name${id}${suffix}.png`,
+        tags || ['tag1', 'tag2'],
+        new Version(`${id}`));
+}

@@ -8,21 +8,14 @@
 using System;
 using System.Collections.Generic;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Assets;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Commands
 {
-    public sealed class CreateAsset : AssetCommand, IAppCommand
+    public sealed class CreateAsset : UploadAssetCommand, IAppCommand
     {
         public NamedId<Guid> AppId { get; set; }
 
-        public AssetFile File { get; set; }
-
-        public ImageInfo ImageInfo { get; set; }
-
         public HashSet<string> Tags { get; set; }
-
-        public string FileHash { get; set; }
 
         public CreateAsset()
         {

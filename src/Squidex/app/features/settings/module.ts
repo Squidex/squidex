@@ -16,7 +16,6 @@ import {
 } from '@app/shared';
 
 import {
-    BackupDownloadUrlPipe,
     BackupDurationPipe,
     BackupsPageComponent,
     ClientComponent,
@@ -30,7 +29,11 @@ import {
     PlansPageComponent,
     RoleComponent,
     RolesPageComponent,
-    SettingsAreaComponent
+    SettingsAreaComponent,
+    WorkflowComponent,
+    WorkflowsPageComponent,
+    WorkflowStepComponent,
+    WorkflowTransitionComponent
 } from './declarations';
 
 const routes: Routes = [
@@ -54,39 +57,6 @@ const routes: Routes = [
                         component: HelpComponent,
                         data: {
                             helpPage: '05-integrated/backups'
-                        }
-                    }
-                ]
-            },
-            {
-                path: 'plans',
-                component: PlansPageComponent,
-                children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'settings.plan'
-                        }
-                    }
-                ]
-            },
-            {
-                path: 'patterns',
-                component: PatternsPageComponent,
-                children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'settings.patterns'
-                        }
-                    },
-                    {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/patterns'
                         }
                     }
                 ]
@@ -132,6 +102,59 @@ const routes: Routes = [
                 ]
             },
             {
+                path: 'languages',
+                component: LanguagesPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.languages'
+                        }
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/languages'
+                        }
+                    }
+                ]
+            },
+            {
+                path: 'patterns',
+                component: PatternsPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.patterns'
+                        }
+                    },
+                    {
+                        path: 'help',
+                        component: HelpComponent,
+                        data: {
+                            helpPage: '05-integrated/patterns'
+                        }
+                    }
+                ]
+            },
+            {
+                path: 'plans',
+                component: PlansPageComponent,
+                children: [
+                    {
+                        path: 'history',
+                        component: HistoryComponent,
+                        data: {
+                            channel: 'settings.plan'
+                        }
+                    }
+                ]
+            },
+            {
                 path: 'roles',
                 component: RolesPageComponent,
                 children: [
@@ -152,21 +175,14 @@ const routes: Routes = [
                 ]
             },
             {
-                path: 'languages',
-                component: LanguagesPageComponent,
+                path: 'workflows',
+                component: WorkflowsPageComponent,
                 children: [
-                    {
-                        path: 'history',
-                        component: HistoryComponent,
-                        data: {
-                            channel: 'settings.languages'
-                        }
-                    },
                     {
                         path: 'help',
                         component: HelpComponent,
                         data: {
-                            helpPage: '05-integrated/languages'
+                            helpPage: '05-integrated/workflows'
                         }
                     }
                 ]
@@ -182,7 +198,6 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
-        BackupDownloadUrlPipe,
         BackupDurationPipe,
         BackupsPageComponent,
         ClientComponent,
@@ -196,7 +211,11 @@ const routes: Routes = [
         PlansPageComponent,
         RoleComponent,
         RolesPageComponent,
-        SettingsAreaComponent
+        SettingsAreaComponent,
+        WorkflowComponent,
+        WorkflowsPageComponent,
+        WorkflowTransitionComponent,
+        WorkflowStepComponent
     ]
 })
-export class SqxFeatureSettingsModule { }
+export class SqxFeatureSettingsModule {}

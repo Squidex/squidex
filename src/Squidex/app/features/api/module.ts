@@ -45,4 +45,4 @@ const routes: Routes = [
         GraphQLPageComponent
     ]
 })
-export class SqxFeatureApiModule { }
+export class SqxFeatureApiModule {}

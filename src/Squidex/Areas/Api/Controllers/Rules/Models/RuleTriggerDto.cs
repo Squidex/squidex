@@ -10,11 +10,11 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Web;
+using Squidex.Web.Json;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
-    [JsonConverter(typeof(MyJsonInheritanceConverter<RuleTriggerDto>), "triggerType")]
+    [JsonConverter(typeof(TypedJsonInheritanceConverter<RuleTriggerDto>), "triggerType")]
     [KnownType(nameof(Subtypes))]
     public abstract class RuleTriggerDto
     {

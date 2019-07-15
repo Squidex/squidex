@@ -3,11 +3,13 @@
 
 // sass-lint:disable class-name-format
 
+$editor-height: 20rem;
+
 :host ::ng-deep {
     .ace_editor {
         background: $color-dark-foreground;
         border: 1px solid $color-input;
-        height: 20rem;
+        height: $editor-height;
     }
 
     .ace_active-line,
@@ -22,4 +24,8 @@
     .ace_gutter {
         background: $color-border !important;
     }
+}
+
+.editor {
+    height: $editor-height;
 }

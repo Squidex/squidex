@@ -23,7 +23,8 @@ import {
     DecimalSeparatorConfig,
     SqxFrameworkModule,
     SqxSharedModule,
-    TitlesConfig
+    TitlesConfig,
+    UIOptions
 } from './shared';
 
 import { SqxShellModule } from './shell';
@@ -47,6 +48,10 @@ export function configApiUrl() {
     } else {
         return new ApiUrlConfig(window.location.protocol + '//' + window.location.host + baseHref);
     }
+}
+
+export function configUIOptions() {
+    return new UIOptions(window['options']);
 }
 
 export function configTitles() {
@@ -88,7 +93,8 @@ export function configCurrency() {
         { provide: ApiUrlConfig, useFactory: configApiUrl },
         { provide: CurrencyConfig, useFactory: configCurrency },
         { provide: DecimalSeparatorConfig, useFactory: configDecimalSeparator },
-        { provide: TitlesConfig, useFactory: configTitles }
+        { provide: TitlesConfig, useFactory: configTitles },
+        { provide: UIOptions, useFactory: configUIOptions }
     ],
     entryComponents: [AppComponent]
 })

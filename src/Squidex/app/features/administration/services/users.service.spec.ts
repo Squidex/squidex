@@ -8,7 +8,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 
-import { ApiUrlConfig } from '@app/framework';
+import { ApiUrlConfig, Resource, ResourceLinks } from '@app/framework';
 
 import {
     UserDto,
@@ -50,27 +50,15 @@ describe('UsersService', () => {
         req.flush({
             total: 100,
             items: [
-                {
-                    id: '123',
-                    email: 'mail1@domain.com',
-                    displayName: 'User1',
-                    permissions: ['Permission1'],
-                    isLocked: true
-                },
-                {
-                    id: '456',
-                    email: 'mail2@domain.com',
-                    displayName: 'User2',
-                    permissions: ['Permission2'],
-                    isLocked: true
-                }
+                userResponse(12),
+                userResponse(13)
             ]
         });
 
         expect(users!).toEqual(
             new UsersDto(100, [
-                new UserDto('123', 'mail1@domain.com', 'User1', ['Permission1'], true),
-                new UserDto('456', 'mail2@domain.com', 'User2', ['Permission2'], true)
+                createUser(12),
+                createUser(13)
             ]));
     }));
 
@@ -91,27 +79,15 @@ describe('UsersService', () => {
         req.flush({
             total: 100,
             items: [
-                {
-                    id: '123',
-                    email: 'mail1@domain.com',
-                    displayName: 'User1',
-                    permissions: ['Permission1'],
-                    isLocked: true
-                },
-                {
-                    id: '456',
-                    email: 'mail2@domain.com',
-                    displayName: 'User2',
-                    permissions: ['Permission2'],
-                    isLocked: true
-                }
+                userResponse(12),
+                userResponse(13)
             ]
         });
 
         expect(users!).toEqual(
             new UsersDto(100, [
-                new UserDto('123', 'mail1@domain.com', 'User1', ['Permission1'], true),
-                new UserDto('456', 'mail2@domain.com', 'User2', ['Permission2'], true)
+                createUser(12),
+                createUser(13)
             ]));
     }));
 
@@ -129,15 +105,9 @@ describe('UsersService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({
-            id: '123',
-            email: 'mail1@domain.com',
-            displayName: 'User1',
-            permissions: ['Permission1'],
-            isLocked: true
-        });
+        req.flush(userResponse(12));
 
-        expect(user!).toEqual(new UserDto('123', 'mail1@domain.com', 'User1', ['Permission1'], true));
+        expect(user!).toEqual(createUser(12));
     }));
 
     it('should make post request to create user',
@@ -156,9 +126,9 @@ describe('UsersService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({ id: '123', pictureUrl: 'path/to/image1' });
+        req.flush(userResponse(12));
 
-        expect(user!).toEqual(new UserDto('123', dto.email, dto.displayName, dto.permissions, false));
+        expect(user!).toEqual(createUser(12));
     }));
 
     it('should make put request to update user',
@@ -166,39 +136,107 @@ describe('UsersService', () => {
 
         const dto = { email: 'mail@squidex.io', displayName: 'Squidex User', permissions: ['Permission1'], password: 'password' };
 
-        userManagementService.putUser('123', dto).subscribe();
+        const resource: Resource = {
+            _links: {
+                update: { method: 'PUT', href: 'api/user-management/123' }
+            }
+        };
+
+        let user: UserDto;
+
+        userManagementService.putUser(resource, dto).subscribe(result => {
+            user = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/user-management/123');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({});
+        req.flush(userResponse(12));
+
+        expect(user!).toEqual(createUser(12));
     }));
 
     it('should make put request to lock user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
 
-        userManagementService.lockUser('123').subscribe();
+        const resource: Resource = {
+            _links: {
+                lock: { method: 'PUT', href: 'api/user-management/123/lock' }
+            }
+        };
+
+        let user: UserDto;
+
+        userManagementService.lockUser(resource).subscribe(result => {
+            user = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/user-management/123/lock');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({});
+        req.flush(userResponse(12));
+
+        expect(user!).toEqual(createUser(12));
     }));
 
     it('should make put request to unlock user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
 
-        userManagementService.unlockUser('123').subscribe();
+        const resource: Resource = {
+            _links: {
+                unlock: { method: 'PUT', href: 'api/user-management/123/unlock' }
+            }
+        };
+
+        let user: UserDto;
+
+        userManagementService.unlockUser(resource).subscribe(result => {
+            user = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/user-management/123/unlock');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({});
+        req.flush(userResponse(12));
+
+        expect(user!).toEqual(createUser(12));
     }));
+
+    function userResponse(id: number) {
+        return {
+            id: `${id}`,
+            email: `user${id}@domain.com`,
+            displayName: `user${id}`,
+            permissions: [
+                `Permission${id}`
+            ],
+            isLocked: true,
+            _links: {
+                update: {
+                    method: 'PUT', href: `/users/${id}`
+                }
+            }
+        };
+    }
 });
+
+export function createUser(id: number, suffix = '') {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/users/${id}` }
+    };
+
+    return new UserDto(links,
+        `${id}`,
+        `user${id}${suffix}@domain.com`,
+        `user${id}${suffix}`,
+        [
+            `Permission${id}${suffix}`
+        ],
+        true);
+}

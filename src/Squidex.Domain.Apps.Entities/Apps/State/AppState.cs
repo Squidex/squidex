@@ -7,6 +7,7 @@
 
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure.Dispatching;
@@ -41,6 +42,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         [DataMember]
         public LanguagesConfig LanguagesConfig { get; set; } = LanguagesConfig.English;
+
+        [DataMember]
+        public Workflows Workflows { get; set; } = Workflows.Empty;
 
         [DataMember]
         public bool IsArchived { get; set; }
@@ -90,6 +94,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         protected void On(AppClientRevoked @event)
         {
             Clients = Clients.Revoke(@event.Id);
+        }
+
+        protected void On(AppWorkflowAdded @event)
+        {
+            Workflows = Workflows.Add(@event.WorkflowId, @event.Name);
+        }
+
+        protected void On(AppWorkflowUpdated @event)
+        {
+            Workflows = Workflows.Update(@event.WorkflowId, @event.Workflow);
+        }
+
+        protected void On(AppWorkflowDeleted @event)
+        {
+            Workflows = Workflows.Remove(@event.WorkflowId);
         }
 
         protected void On(AppPatternAdded @event)

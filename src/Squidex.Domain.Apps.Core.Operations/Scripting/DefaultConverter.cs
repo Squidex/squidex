@@ -46,6 +46,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 case Instant instant:
                     result = JsValue.FromObject(engine, instant.ToDateTimeUtc());
                     return true;
+                case Status status:
+                    result = status.ToString();
+                    return true;
                 case NamedContentData content:
                     result = new ContentDataObject(engine, content);
                     return true;

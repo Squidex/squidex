@@ -10,11 +10,13 @@ import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
     DialogService,
-    RoleDto,
+    RolesPayload,
     RolesService,
     RolesState,
     versioned
 } from '@app/shared/internal';
+
+import { createRoles } from '../services/roles.service.spec';
 
 import { TestValues } from './_test-helpers';
 
@@ -26,10 +28,7 @@ describe('RolesState', () => {
         version
     } = TestValues;
 
-    const oldRoles = [
-        new RoleDto('Role1', 3, 5, ['P1']),
-        new RoleDto('Role2', 7, 9, ['P2'])
-    ];
+    const oldRoles = createRoles(1, 2);
 
     let dialogs: IMock<DialogService>;
     let rolesService: IMock<RolesService>;
@@ -45,11 +44,11 @@ describe('RolesState', () => {
     describe('Loading', () => {
         it('should load roles', () => {
             rolesService.setup(x => x.getRoles(app))
-                .returns(() => of({ payload: oldRoles, version })).verifiable();
+                .returns(() => of(versioned(version, oldRoles))).verifiable();
 
             rolesState.load().subscribe();
 
-            expect(rolesState.snapshot.roles.values).toEqual(oldRoles);
+            expect(rolesState.snapshot.roles.values).toEqual(oldRoles.items);
             expect(rolesState.snapshot.isLoaded).toBeTruthy();
             expect(rolesState.snapshot.version).toEqual(version);
 
@@ -76,42 +75,46 @@ describe('RolesState', () => {
             rolesState.load().subscribe();
         });
 
-        it('should add role to snapshot when added', () => {
-            const newRole = new RoleDto('Role3', 0, 0, ['P3']);
+        it('should update roles when role added', () => {
+            const updated = createRoles(4, 5);
 
-            const request = { name: newRole.name };
+            const request = { name: 'newRole' };
 
             rolesService.setup(x => x.postRole(app, request, version))
-                .returns(() => of(versioned(newVersion, newRole)));
+                .returns(() => of(versioned(newVersion, updated)));
 
             rolesState.add(request).subscribe();
 
-            expect(rolesState.snapshot.roles.values).toEqual([oldRoles[0], oldRoles[1], newRole]);
-            expect(rolesState.snapshot.version).toEqual(newVersion);
+            expectNewRoles(updated);
         });
 
-        it('should update permissions when updated', () => {
+        it('should update roles when role updated', () => {
+            const updated = createRoles(4, 5);
+
             const request = { permissions: ['P4', 'P5'] };
 
-            rolesService.setup(x => x.putRole(app, oldRoles[1].name, request, version))
-                .returns(() => of(versioned(newVersion)));
+            rolesService.setup(x => x.putRole(app, oldRoles.items[1], request, version))
+                .returns(() => of(versioned(newVersion, updated)));
 
-            rolesState.update(oldRoles[1], request).subscribe();
+            rolesState.update(oldRoles.items[1], request).subscribe();
 
-            const role_1 = rolesState.snapshot.roles.at(1);
-
-            expect(role_1.permissions).toEqual(request.permissions);
-            expect(rolesState.snapshot.version).toEqual(newVersion);
+            expectNewRoles(updated);
         });
 
-        it('should remove role from snapshot when deleted', () => {
-            rolesService.setup(x => x.deleteRole(app, oldRoles[0].name, version))
-                .returns(() => of(versioned(newVersion)));
+        it('should update roles when role deleted', () => {
+            const updated = createRoles(4, 5);
 
-            rolesState.delete(oldRoles[0]).subscribe();
+            rolesService.setup(x => x.deleteRole(app, oldRoles.items[1], version))
+                .returns(() => of(versioned(newVersion, updated)));
 
-            expect(rolesState.snapshot.roles.values).toEqual([oldRoles[1]]);
-            expect(rolesState.snapshot.version).toEqual(newVersion);
+            rolesState.delete(oldRoles.items[1]).subscribe();
+
+            expectNewRoles(updated);
         });
+
+        function expectNewRoles(updated: RolesPayload) {
+            expect(rolesState.snapshot.roles.values).toEqual(updated.items);
+            expect(rolesState.snapshot.version).toEqual(newVersion);
+        }
     });
 });

@@ -65,6 +65,7 @@
         <ng-template #notEditing>
             <form [formGroup]="editForm.form" class="edit-form" (ngSubmit)="save()">
                 <sqx-field-form
+                    [isEditable]="true"
                     [patterns]="patternsState.patterns | async"
                     [editForm]="editForm.form"
                     [editFormSubmitted]="editForm.submitted | async"

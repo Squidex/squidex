@@ -48,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
         [Fact]
         public async Task Should_call_grain_when_rebuilding()
         {
-            var tags = new TagSet();
+            var tags = new TagsExport();
 
             await sut.RebuildTagsAsync(appId, TagGroups.Assets, tags);
 

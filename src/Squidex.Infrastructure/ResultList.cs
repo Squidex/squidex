@@ -27,7 +27,7 @@ namespace Squidex.Infrastructure
             return new Impl<T>(items, total);
         }
 
-        public static IResultList<T> Create<T>(long total, params T[] items)
+        public static IResultList<T> CreateFrom<T>(long total, params T[] items)
         {
             return new Impl<T>(items, total);
         }

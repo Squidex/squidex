@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var clients_1 = clients_0.Revoke("2");
 
-            Assert.NotSame(clients_0, clients_1);
+            Assert.NotEmpty(clients_1);
         }
     }
 }

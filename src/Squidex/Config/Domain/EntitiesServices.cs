@@ -32,7 +32,6 @@ using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
 using Squidex.Domain.Apps.Entities.Contents.Text;
@@ -97,8 +96,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
 
+            services.AddSingletonAs<AssetEnricher>()
+                .As<IAssetEnricher>();
+
             services.AddSingletonAs<AssetQueryService>()
                 .As<IAssetQueryService>();
+
+            services.AddSingletonAs<ContentEnricher>()
+                .As<IContentEnricher>();
 
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
@@ -114,6 +119,12 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<SchemaHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
+
+            services.AddSingletonAs<DynamicContentWorkflow>()
+                .AsOptional<IContentWorkflow>();
+
+            services.AddSingletonAs<DefaultWorkflowsValidator>()
+                .AsOptional<IWorkflowsValidator>();
 
             services.AddSingletonAs<RolePermissionsProvider>()
                 .AsSelf();
@@ -219,6 +230,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
+            services.AddSingletonAs<ContentCommandMiddleware>()
+                .As<ICommandMiddleware>();
+
             services.AddSingletonAs<AppsByNameIndexCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
@@ -226,9 +240,6 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<CommentsCommand, ICommentGrain>>()
-                .As<ICommandMiddleware>();
-
-            services.AddSingletonAs<GrainCommandMiddleware<ContentCommand, IContentGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<SchemaCommand, ISchemaGrain>>()

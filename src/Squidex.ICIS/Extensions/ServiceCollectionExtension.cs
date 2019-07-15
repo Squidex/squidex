@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authentication;
 using Avro.Generic;
 using Confluent.SchemaRegistry;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,6 +44,8 @@ namespace Squidex.ICIS.Extensions
 
         public static void AddGenesisAuthentication(this IServiceCollection services, string authServer)
         {
+            services.AddSingleton<IClaimsTransformation, ClaimsTransformer>();
+
             services.AddSingleton<IUserManager, UserManager>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

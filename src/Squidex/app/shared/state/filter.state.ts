@@ -6,7 +6,7 @@
  */
 
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/internal/operators';
+import { distinctUntilChanged } from 'rxjs/internal/operators';
 
 import { State, Types } from '@app/framework';
 
@@ -45,20 +45,16 @@ export class FilterState extends State<Snapshot> {
     private readonly sortModes: { [key: string]: Observable<Sorting> } = {};
 
     public query =
-        this.changes.pipe(map(x => x.query),
-            distinctUntilChanged());
+        this.project(x => x.query);
 
     public order =
-        this.changes.pipe(map(x => x.order),
-            distinctUntilChanged());
+        this.project(x => x.order);
 
     public filter =
-        this.changes.pipe(map(x => x.filter),
-            distinctUntilChanged());
+        this.project(x => x.filter);
 
     public fullText =
-        this.changes.pipe(map(x => x.fullText),
-            distinctUntilChanged());
+        this.project(x => x.fullText);
 
     public get apiFilter() {
         return this.snapshot.query;
@@ -74,7 +70,7 @@ export class FilterState extends State<Snapshot> {
         let result = this.sortModes[key];
 
         if (!result) {
-            result = this.changes.pipe(map(x => sortMode(x, field)), distinctUntilChanged());
+            result = this.project(x => sortMode(x, field)), distinctUntilChanged();
 
             this.sortModes[key] = result;
         }

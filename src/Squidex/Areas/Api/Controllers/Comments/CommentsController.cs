@@ -55,9 +55,13 @@ namespace Squidex.Areas.Api.Controllers.Comments
         public async Task<IActionResult> GetComments(string app, Guid commentsId, [FromQuery] long version = EtagVersion.Any)
         {
             var result = await grainFactory.GetGrain<ICommentGrain>(commentsId).GetCommentsAsync(version);
-            var response = CommentsDto.FromResult(result);
 
-            Response.Headers[HeaderNames.ETag] = response.Version.ToString();
+            var response = Deferred.Response(() =>
+            {
+                return CommentsDto.FromResult(result);
+            });
+
+            Response.Headers[HeaderNames.ETag] = result.Version.ToString();
 
             return Ok(response);
         }
@@ -76,7 +80,6 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [HttpPost]
         [Route("apps/{app}/comments/{commentsId}")]
         [ProducesResponseType(typeof(EntityCreatedDto), 201)]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> PostComment(string app, Guid commentsId, [FromBody] UpsertCommentDto request)
@@ -104,7 +107,6 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> PutComment(string app, Guid commentsId, Guid commentId, [FromBody] UpsertCommentDto request)
@@ -126,7 +128,6 @@ namespace Squidex.Areas.Api.Controllers.Comments
         /// </returns>
         [HttpDelete]
         [Route("apps/{app}/comments/{commentsId}/{commentId}")]
-        [ProducesResponseType(typeof(ErrorDto), 400)]
         [ApiPermission(Permissions.AppCommon)]
         [ApiCosts(0)]
         public async Task<IActionResult> DeleteComment(string app, Guid commentsId, Guid commentId)

@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Tasks;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Web
 {
@@ -36,23 +35,26 @@ namespace Squidex.Web
         {
             if (permissionIds.Length > 0)
             {
-                var set = context.HttpContext.User.Permissions();
+                var permissions = context.HttpContext.Context().Permissions;
 
                 var hasPermission = false;
 
-                foreach (var permissionId in permissionIds)
+                if (permissions != null)
                 {
-                    var id = permissionId;
-
-                    foreach (var routeParam in context.RouteData.Values)
+                    foreach (var permissionId in permissionIds)
                     {
-                        id = id.Replace($"{{{routeParam.Key}}}", routeParam.Value?.ToString());
-                    }
+                        var id = permissionId;
 
-                    if (set.Allows(new Permission(id)))
-                    {
-                        hasPermission = true;
-                        break;
+                        foreach (var routeParam in context.RouteData.Values)
+                        {
+                            id = id.Replace($"{{{routeParam.Key}}}", routeParam.Value?.ToString());
+                        }
+
+                        if (permissions.Allows(new Permission(id)))
+                        {
+                            hasPermission = true;
+                            break;
+                        }
                     }
                 }
 

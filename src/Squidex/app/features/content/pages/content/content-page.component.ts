@@ -59,12 +59,12 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
 
-    @ViewChild('dueTimeSelector')
+    @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,
         public readonly appsState: AppsState,
-        private readonly contentsState: ContentsState,
+        public readonly contentsState: ContentsState,
         private readonly dialogs: DialogService,
         private readonly languagesState: LanguagesState,
         private readonly messageBus: MessageBus,
@@ -124,7 +124,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.saveContent(true, false);
     }
 
-    public saveAsProposal() {
+    public saveAsDraft() {
         this.saveContent(false, true);
     }
 
@@ -132,23 +132,27 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.saveContent(false, false);
     }
 
-    private saveContent(publish: boolean, asProposal: boolean) {
-        if (this.content && this.content.status === 'Archived') {
-            return;
-        }
-
+    private saveContent(publish: boolean, asDraft: boolean) {
         const value = this.contentForm.submit();
 
         if (value) {
             if (this.content) {
-                if (asProposal) {
-                    this.contentsState.proposeUpdate(this.content, value)
+                if (asDraft) {
+                    if (this.content && !this.content.canDraftPropose) {
+                        return;
+                    }
+
+                    this.contentsState.proposeDraft(this.content, value)
                         .subscribe(() => {
                             this.contentForm.submitCompleted({ noReset: true });
                         }, error => {
                             this.contentForm.submitFailed(error);
                         });
                 } else {
+                    if (this.content && !this.content.canUpdateAny) {
+                        return;
+                    }
+
                     this.contentsState.update(this.content, value)
                         .subscribe(() => {
                             this.contentForm.submitCompleted({ noReset: true });
@@ -157,6 +161,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         });
                 }
             } else {
+                if ((publish && !this.contentsState.snapshot.canCreate) || (!publish && !this.contentsState.snapshot.canCreateAndPublish)) {
+                    return;
+                }
+
                 this.contentsState.create(value, publish)
                     .subscribe(() => {
                         this.back();
@@ -174,27 +182,12 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     private loadContent(data: any) {
-        this.contentForm.loadContent(data, this.content && this.content.status === 'Archived');
+        this.contentForm.loadContent(data);
+        this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
     }
 
     public discardChanges() {
-        this.contentsState.discardChanges(this.content);
-    }
-
-    public publish() {
-        this.changeContentItems('Publish', 'Published');
-    }
-
-    public unpublish() {
-        this.changeContentItems('Unpublish', 'Draft');
-    }
-
-    public archive() {
-        this.changeContentItems('Archive', 'Archived');
-    }
-
-    public restore() {
-        this.changeContentItems('Restore', 'Draft');
+        this.contentsState.discardDraft(this.content);
     }
 
     public delete() {
@@ -206,13 +199,13 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
     public publishChanges() {
         this.dueTimeSelector.selectDueTime('Publish').pipe(
-                switchMap(d => this.contentsState.publishChanges(this.content, d)), onErrorResumeNext())
+                switchMap(d => this.contentsState.publishDraft(this.content, d)), onErrorResumeNext())
             .subscribe();
     }
 
-    private changeContentItems(action: string, status: string) {
-        this.dueTimeSelector.selectDueTime(action).pipe(
-                switchMap(d => this.contentsState.changeStatus(this.content, action, status, d)), onErrorResumeNext())
+    public changeStatus(status: string) {
+        this.dueTimeSelector.selectDueTime(status).pipe(
+                switchMap(d => this.contentsState.changeStatus(this.content, status, d)), onErrorResumeNext())
             .subscribe();
     }
 
@@ -227,13 +220,12 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     if (compare) {
                         if (this.contentFormCompare === null) {
                             this.contentFormCompare = new EditContentForm(this.schema, this.languages);
-                            this.contentFormCompare.form.disable();
                         }
 
-                        const isArchive = this.content && this.content.status === 'Archived';
+                        this.contentFormCompare.loadContent(dto.payload);
+                        this.contentFormCompare.setEnabled(false);
 
-                        this.contentFormCompare.loadContent(dto.payload, true);
-                        this.contentForm.loadContent(this.content.dataDraft, isArchive);
+                        this.loadContent(this.content.dataDraft);
                     } else {
                         if (this.contentFormCompare) {
                             this.contentFormCompare = null;

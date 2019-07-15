@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?wt9idh');
-  src:  url('fonts/icomoon.eot?wt9idh#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?wt9idh') format('truetype'),
-    url('fonts/icomoon.woff?wt9idh') format('woff'),
-    url('fonts/icomoon.svg?wt9idh#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?vuepjz');
+  src:  url('fonts/icomoon.eot?vuepjz#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?vuepjz') format('truetype'),
+    url('fonts/icomoon.woff?vuepjz') format('woff'),
+    url('fonts/icomoon.svg?vuepjz#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,6 +24,48 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-corner-down-right:before {
+  content: "\e977";
+}
+.icon-info-outline:before {
+  content: "\e974";
+}
+.icon-upload-2:before {
+  content: "\e972";
+}
+.icon-translate:before {
+  content: "\e96f";
+}
+.icon-arrow_back:before {
+  content: "\e96e";
+}
+.icon-external-link:before {
+  content: "\e96d";
+}
+.icon-minus-square:before {
+  content: "\e969";
+}
+.icon-plus-square:before {
+  content: "\e968";
+}
+.icon-drag2:before {
+  content: "\e961";
+}
+.icon-comments:before {
+  content: "\e95f";
+}
+.icon-backup:before {
+  content: "\e95b";
+}
+.icon-support:before {
+  content: "\e95a";
+}
+.icon-control-RichText:before {
+  content: "\e939";
+}
+.icon-download:before {
+  content: "\e93e";
+}
 .icon-type-UI:before {
   content: "\e975";
 }
@@ -189,44 +231,8 @@
 .icon-upload-4:before {
   content: "\e971";
 }
-.icon-info-outline:before {
-  content: "\e974";
-}
-.icon-upload-2:before {
-  content: "\e972";
-}
-.icon-translate:before {
-  content: "\e96f";
-}
-.icon-arrow_back:before {
-  content: "\e96e";
-}
-.icon-external-link:before {
-  content: "\e96d";
-}
-.icon-minus-square:before {
-  content: "\e969";
-}
-.icon-plus-square:before {
-  content: "\e968";
-}
-.icon-drag2:before {
-  content: "\e961";
-}
-.icon-comments:before {
-  content: "\e95f";
-}
-.icon-backup:before {
-  content: "\e95b";
-}
-.icon-support:before {
-  content: "\e95a";
-}
-.icon-control-RichText:before {
-  content: "\e939";
-}
-.icon-download:before {
-  content: "\e93e";
+.icon-arrow-right:before {
+  content: "\e976";
 }
 .icon-upload:before {
   content: "\e970";
