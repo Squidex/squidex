@@ -1,26 +1,26 @@
 {
     "commodities": [
         {
-            "ID": {
+            "id": {
                 "iv": "http://iddn.icis.com/ref-data/commodity-group/306"
             },
-            "Name": {
+            "name": {
                 "iv": "Benzene"
             }
         },
         {
-            "ID": {
+            "id": {
                 "iv": "http://iddn.icis.com/ref-data/commodity-group/297"
             },
-            "Name": {
+            "name": {
                 "iv": "Styrene"
             }
         },
         {
-            "ID": {
+            "id": {
                 "iv": "http://iddn.icis.com/ref-data/commodity-group/299"
             },
-            "Name": {
+            "name": {
                 "iv": "Toluene"
             }
         }

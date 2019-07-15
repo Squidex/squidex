@@ -59,8 +59,8 @@ import {
     LocalStoreService,
     MessageBus,
     ModalDialogComponent,
-    ModalTargetDirective,
-    ModalViewDirective,
+    ModalDirective,
+    ModalPlacementDirective,
     MoneyPipe,
     MonthPipe,
     OnboardingService,
@@ -93,10 +93,10 @@ import {
 
 @NgModule({
     imports: [
-        FormsModule,
+        ColorPickerModule,
         CommonModule,
-        ReactiveFormsModule,
-        ColorPickerModule
+        FormsModule,
+        ReactiveFormsModule
     ],
     declarations: [
         AutocompleteComponent,
@@ -137,8 +137,8 @@ import {
         KNumberPipe,
         LightenPipe,
         ModalDialogComponent,
-        ModalTargetDirective,
-        ModalViewDirective,
+        ModalDirective,
+        ModalPlacementDirective,
         MoneyPipe,
         MonthPipe,
         OnboardingTooltipComponent,
@@ -204,9 +204,9 @@ import {
         KeysPipe,
         KNumberPipe,
         LightenPipe,
+        ModalDirective,
         ModalDialogComponent,
-        ModalTargetDirective,
-        ModalViewDirective,
+        ModalPlacementDirective,
         MoneyPipe,
         MonthPipe,
         OnboardingTooltipComponent,

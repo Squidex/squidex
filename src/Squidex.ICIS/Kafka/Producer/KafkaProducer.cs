@@ -5,27 +5,30 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Threading.Tasks;
 using Avro.Specific;
 using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Squidex.ICIS.Kafka.Config;
+using Squidex.ICIS.Utilities;
 
-namespace Squidex.ICIS.Actions.Kafka
+namespace Squidex.ICIS.Kafka.Producer
 {
     public class KafkaProducer<T> : IKafkaProducer<T> where T : ISpecificRecord
     {
-        private readonly CachedSchemaRegistryClient schemaRegistry;
         private readonly IProducer<string, T> producer;
 
-        public KafkaProducer(ProducerConfig producerConfig, SchemaRegistryConfig schemaRegistryConfig)
+        public KafkaProducer(IOptions<ICISKafkaOptions> options, ISchemaRegistryClient schemaRegistry, ILogger<KafkaProducer<T>> log)
         {
-            schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
-
-            producer = new ProducerBuilder<string, T>(producerConfig)
+            producer = new ProducerBuilder<string, T>(options.Value.Producer)
                 .SetKeySerializer(Serializers.Utf8)
                 .SetValueSerializer(new AvroSerializer<T>(schemaRegistry))
+                .SetLogHandler(LogFactory<T>.ProducerLog(log))
+                .SetErrorHandler(LogFactory<T>.ProducerError(log))
+                .SetStatisticsHandler(LogFactory<T>.ProducerStats(log))
                 .Build();
         }
 
@@ -42,7 +45,6 @@ namespace Squidex.ICIS.Actions.Kafka
 
         public void Dispose()
         {
-            schemaRegistry?.Dispose();
             producer?.Dispose();
         }
     }

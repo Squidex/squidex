@@ -25,6 +25,7 @@ import {
     StringFieldPropertiesDto,
     TagsFieldPropertiesDto
 } from '@app/shared/internal';
+import { HtmlValue } from './contents.forms';
 
 describe('SchemaDetailsDto', () => {
     it('should return label as display name', () => {
@@ -227,7 +228,7 @@ describe('DateTimeField', () => {
     });
 
     it('should format to input if parsing failed', () => {
-        expect(FieldFormatter.format(field, true)).toBe(<any>true);
+        expect(FieldFormatter.format(field, true)).toBe(true);
     });
 
     it('should format to date', () => {
@@ -313,7 +314,37 @@ describe('NumberField', () => {
     });
 
     it('should format to number', () => {
-        expect(FieldFormatter.format(field, 42)).toEqual(<any>42);
+        expect(FieldFormatter.format(field, 42)).toEqual(42);
+    });
+
+    it('should format to stars if html allowed', () => {
+        const field2 = createField(new NumberFieldPropertiesDto('Stars'));
+
+        expect(FieldFormatter.format(field2, 3)).toEqual(new HtmlValue('&#9733; &#9733; &#9733; '));
+    });
+
+    it('should format to short star view for many stars', () => {
+        const field2 = createField(new NumberFieldPropertiesDto('Stars'));
+
+        expect(FieldFormatter.format(field2, 42)).toEqual(new HtmlValue('&#9733; 42'));
+    });
+
+    it('should format to short star view for no stars', () => {
+        const field2 = createField(new NumberFieldPropertiesDto('Stars'));
+
+        expect(FieldFormatter.format(field2, 0)).toEqual(new HtmlValue('&#9733; 0'));
+    });
+
+    it('should format to short star view for negative stars', () => {
+        const field2 = createField(new NumberFieldPropertiesDto('Stars'));
+
+        expect(FieldFormatter.format(field2, -13)).toEqual(new HtmlValue('&#9733; -13'));
+    });
+
+    it('should not format to stars if html not allowed', () => {
+        const field2 = createField(new NumberFieldPropertiesDto('Stars'));
+
+        expect(FieldFormatter.format(field2, 3, false)).toEqual(3);
     });
 
     it('should return default value for default properties', () => {

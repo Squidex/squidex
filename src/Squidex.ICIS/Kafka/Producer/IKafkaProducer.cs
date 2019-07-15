@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Avro.Specific;
 using Confluent.Kafka;
 
-namespace Squidex.ICIS.Actions.Kafka
+namespace Squidex.ICIS.Kafka.Producer
 {
     public interface IKafkaProducer<T> : IDisposable where T : ISpecificRecord
     {

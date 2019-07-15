@@ -1,7 +1,7 @@
 {
     "fields":[
        {
-          "name":"Commodity",
+          "name":"commodity",
           "partitioning":"invariant",
           "properties":{
              "label":"Commodity",
@@ -15,7 +15,7 @@
           }
        },
        {
-          "name":"CommentaryType",
+          "name":"commentarytype",
           "partitioning":"invariant",
           "properties":{
              "label":"Commentary Type",
@@ -29,7 +29,7 @@
           }
        },
        {
-         "name":"Region",
+         "name":"region",
          "partitioning":"invariant",
          "properties":{
             "label":"Region",
@@ -43,7 +43,7 @@
          }
        },
        {
-          "name":"Body",
+          "name":"body",
           "partitioning":"language",
           "properties":{
              "label":"Body",

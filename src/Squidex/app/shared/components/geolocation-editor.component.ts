@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
+    LocalStoreService,
     ResourceLoaderService,
     StatefulControlComponent,
     Types,
@@ -28,6 +29,10 @@ interface Geolocation {
     longitude: number;
 }
 
+interface Snapshot {
+    isMapHidden?: boolean;
+}
+
 @Component({
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
@@ -35,11 +40,12 @@ interface Geolocation {
     providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GeolocationEditorComponent extends StatefulControlComponent<any, Geolocation> implements AfterViewInit {
-    private readonly isGoogleMaps: boolean;
+export class GeolocationEditorComponent extends StatefulControlComponent<Snapshot, Geolocation> implements AfterViewInit {
     private marker: any;
     private map: any;
     private value: Geolocation | null = null;
+
+    public readonly isGoogleMaps: boolean;
 
     public get hasValue() {
         return !!this.value;
@@ -61,6 +67,9 @@ export class GeolocationEditorComponent extends StatefulControlComponent<any, Ge
             ]
         });
 
+    @Input()
+    public isCompact: boolean;
+
     @ViewChild('editor', { static: false })
     public editor: ElementRef<HTMLElement>;
 
@@ -68,13 +77,20 @@ export class GeolocationEditorComponent extends StatefulControlComponent<any, Ge
     public searchBoxInput: ElementRef<HTMLInputElement>;
 
     constructor(changeDetector: ChangeDetectorRef,
+        private readonly localStore: LocalStoreService,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
         private readonly uiOptions: UIOptions
     ) {
-        super(changeDetector, {});
+        super(changeDetector, { isMapHidden: localStore.getBoolean('hideMap') });
 
-        this.isGoogleMaps = uiOptions.get('map.type');
+        this.isGoogleMaps = uiOptions.get('map.type') !== 'OSM';
+    }
+
+    public hideMap(isMapHidden: boolean) {
+        this.next({ isMapHidden });
+
+        this.localStore.setBoolean('hideMap', isMapHidden);
     }
 
     public writeValue(obj: any) {
@@ -92,7 +108,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<any, Ge
     public setDisabledState(isDisabled: boolean): void {
         super.setDisabledState(isDisabled);
 
-        if (!this.snapshot.isGoogleMaps) {
+        if (!this.isGoogleMaps) {
             this.setDisabledStateOSM(isDisabled);
         } else {
             this.setDisabledStateGoogle(isDisabled);
@@ -258,7 +274,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<any, Ge
     }
 
     private updateMarker(zoom: boolean, fireEvent: boolean) {
-        if (!this.snapshot.isGoogleMaps) {
+        if (!this.isGoogleMaps) {
             this.updateMarkerOSM(zoom);
         } else {
             this.updateMarkerGoogle(zoom);

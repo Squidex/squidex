@@ -1,6 +1,6 @@
-<div *sqxModalView="tooltipModal;onRoot:true" @fade>
-    <div class="onboarding-rect" [sqxModalTarget]="for" [offset]="4" [autoPosition]="false" position="full"></div>
-    <div class="onboarding-help" [sqxModalTarget]="for" [offset]="4" [autoPosition]="false" [position]="position">
+<ng-container *sqxModal="tooltipModal">
+    <div class="onboarding-rect" [sqxAnchoredTo]="for" [offset]="4" position="full"></div>
+    <div class="onboarding-help" [sqxAnchoredTo]="for" [offset]="4" @fade>
         <div class="onboarding-text">
             <ng-content></ng-content>
         </div>
@@ -15,4 +15,4 @@
             </button>
         </div>
     </div>
-</div>
+</ng-container>

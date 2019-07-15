@@ -11,7 +11,12 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { distinctUntilChanged, map, tap } from 'rxjs/operators';
 
-import { Keys, StatefulControlComponent, Types } from '@app/framework/internal';
+import {
+    fadeAnimation,
+    Keys,
+    StatefulControlComponent,
+    Types
+} from '@app/framework/internal';
 
 export const CONVERSION_FAILED = {};
 
@@ -135,7 +140,10 @@ interface State {
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
     providers: [SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    animations: [
+        fadeAnimation
+    ]
 })
 export class TagEditorComponent extends StatefulControlComponent<State, any[]> implements AfterViewInit, OnInit {
     @ViewChild('form', { static: false })

@@ -8,7 +8,7 @@
 using Avro;
 using Avro.Specific;
 
-namespace Squidex.ICIS.Actions.Kafka.Entities
+namespace Squidex.ICIS.Kafka.Entities
 {
     // Please do not rename _SCHEMA variable. AvroSerializer class in Avro assembly looks for this particular property name.
     public class Commodity : ISpecificRecord

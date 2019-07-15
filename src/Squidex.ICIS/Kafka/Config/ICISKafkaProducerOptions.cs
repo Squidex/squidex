@@ -6,12 +6,10 @@
 // ==========================================================================
 
 using Confluent.Kafka;
-using Confluent.SchemaRegistry;
 
-namespace Squidex.ICIS.Actions.Kafka
+namespace Squidex.ICIS.Kafka.Config
 {
     public class ICISKafkaProducerOptions : ProducerConfig
     {
-        public new string BootstrapServers { get; set; }
     }
 }

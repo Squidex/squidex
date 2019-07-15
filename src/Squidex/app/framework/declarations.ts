@@ -37,11 +37,11 @@ export * from './angular/http/http-extensions';
 
 export * from './angular/modals/dialog-renderer.component';
 export * from './angular/modals/modal-dialog.component';
-export * from './angular/modals/modal-target.directive';
-export * from './angular/modals/modal-view.directive';
+export * from './angular/modals/modal-placement.directive';
+export * from './angular/modals/modal.directive';
 export * from './angular/modals/onboarding-tooltip.component';
-export * from './angular/modals/tooltip.directive';
 export * from './angular/modals/root-view.component';
+export * from './angular/modals/tooltip.directive';
 
 export * from './angular/pipes/colors.pipes';
 export * from './angular/pipes/date-time.pipes';

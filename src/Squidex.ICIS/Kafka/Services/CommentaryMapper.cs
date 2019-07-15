@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using Avro.Specific;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -17,10 +16,10 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.ICIS.Actions.Kafka.Entities;
+using Squidex.ICIS.Kafka.Entities;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.ICIS.Actions.Kafka
+namespace Squidex.ICIS.Kafka.Services
 {
     public class CommentaryMapper : IKafkaMessageMapper
     {
@@ -40,24 +39,24 @@ namespace Squidex.ICIS.Actions.Kafka
             commentary.LastModified = contentEvent.LastModified.ToUnixTimeSeconds();
             commentary.CreatedFor = contentEvent.Created.ToUnixTimeSeconds();
 
-            if (!contentEvent.Data.TryGetValue("Body", out var bodyData))
+            if (!contentEvent.Data.TryGetValue("body", out var bodyData))
             {
                 throw new Exception("Unable to find Body field.");
             }
 
             commentary.Body = bodyData["en"]?.ToString();
 
-            if (!contentEvent.Data.TryGetValue("CommentaryType", out var commentaryTypeData))
+            if (!contentEvent.Data.TryGetValue("commentarytype", out var commentaryTypeData))
             {
                 throw new Exception("Unable to find CommentaryType field.");
             }
 
-            if (!contentEvent.Data.TryGetValue("Commodity", out var commodityData))
+            if (!contentEvent.Data.TryGetValue("commodity", out var commodityData))
             {
                 throw new Exception("Unable to find Commodity field.");
             }
 
-            if (!contentEvent.Data.TryGetValue("Region", out var regionData))
+            if (!contentEvent.Data.TryGetValue("region", out var regionData))
             {
                 throw new Exception("Unable to find Region field.");
             }
@@ -72,17 +71,17 @@ namespace Squidex.ICIS.Actions.Kafka
             var commodity = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("commodity")).Item1;
             var region = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("region")).Item1;
 
-            if (!commentaryType.Data.TryGetValue("ID", out var commentaryTypeIdData))
+            if (!commentaryType.Data.TryGetValue("id", out var commentaryTypeIdData))
             {
                 throw new Exception("Unable to find commentary-type Id field.");
             }
 
-            if (!commodity.Data.TryGetValue("ID", out var commodityIdData))
+            if (!commodity.Data.TryGetValue("id", out var commodityIdData))
             {
                 throw new Exception("Unable to find commodity Id field.");
             }
 
-            if (!region.Data.TryGetValue("ID", out var regionIdData))
+            if (!region.Data.TryGetValue("id", out var regionIdData))
             {
                 throw new Exception("Unable to find commodity Id field.");
             }

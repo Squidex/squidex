@@ -1,7 +1,7 @@
 {
   "fields": [
     {
-      "name": "Name",
+      "name": "name",
       "partitioning": "invariant",
       "properties": {
         "label": "Name",
@@ -13,7 +13,7 @@
       }
     },
     {
-      "name": "Email",
+      "name": "email",
       "partitioning": "invariant",
       "properties": {
         "label": "Email",
@@ -25,10 +25,10 @@
       }
 	},
     {
-      "name": "ID",
+      "name": "id",
       "partitioning": "invariant",
       "properties": {
-        "label": "ID",
+        "label": "Id",
         "isRequired": true,
         "isListField": true,
         "fieldType": "String",

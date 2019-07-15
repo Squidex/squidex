@@ -1,19 +1,22 @@
 <ng-content></ng-content>
 
-<sqx-modal-dialog *sqxModalView="dialogView;onRoot:true" showClose="false" (close)="cancel()">
-    <ng-container title>
-        {{snapshot.dialogRequest?.title}}
-    </ng-container>
 
-    <ng-container content>
-        {{snapshot.dialogRequest?.text}}
-    </ng-container>
-
-    <ng-container footer>
-        <button type="button" class="float-left btn btn-secondary" (click)="cancel()">No</button>
-        <button type="button" class="float-right btn btn-danger" (click)="confirm()" sqxFocusOnInit>Yes</button>
-    </ng-container>
-</sqx-modal-dialog>
+<ng-container *sqxModal="dialogView">
+    <sqx-modal-dialog showClose="false" (close)="cancel()">
+        <ng-container title>
+            {{snapshot.dialogRequest?.title}}
+        </ng-container>
+    
+        <ng-container content>
+            {{snapshot.dialogRequest?.text}}
+        </ng-container>
+    
+        <ng-container footer>
+            <button type="button" class="float-left btn btn-secondary" (click)="cancel()">No</button>
+            <button type="button" class="float-right btn btn-danger" (click)="confirm()" sqxFocusOnInit>Yes</button>
+        </ng-container>
+    </sqx-modal-dialog>
+</ng-container>
 
 <div class="notification-container notification-container-bottom-right">
     <div class="alert alert-dismissible alert-{{notification.messageType}}" *ngFor="let notification of snapshot.notifications" (click)="close(notification)" @fade>
@@ -24,7 +27,7 @@
 </div>
 
 <ng-container *ngIf="snapshot.tooltip; let tooltip">
-    <div class="tooltip2 tooltip2-{{tooltip.position}}" [sqxModalTarget]="tooltip.target" [position]="tooltip.position" [offset]="8">
+    <div class="tooltip2 tooltip2-{{tooltip.position}}" [sqxAnchoredTo]="tooltip.target" [position]="tooltip.position" [offset]="6">
         {{tooltip.text}}
     </div>
 </ng-container>

@@ -15,12 +15,14 @@
     </div> 
 
     <div class="items-container">
-        <div class="control-dropdown" #container *sqxModalView="dropdown" [sqxModalTarget]="input" position="bottom-left">
-            <div *ngFor="let item of items; let i = index;" class="control-dropdown-item control-dropdown-item-selectable" [class.active]="i === snapshot.selectedIndex" (mousedown)="selectIndexAndClose(i)" [sqxScrollActive]="i === snapshot.selectedIndex" [container]="container">
-                <ng-container *ngIf="!templateItem">{{item}}</ng-container>
-                
-                <ng-template *ngIf="templateItem" [sqxTemplateWrapper]="templateItem" [item]="item" [index]="i"></ng-template>
+        <ng-container *sqxModal="dropdown">
+            <div class="control-dropdown" [sqxAnchoredTo]="input" position="bottom-left" #container>
+                <div *ngFor="let item of items; let i = index;" class="control-dropdown-item control-dropdown-item-selectable" [class.active]="i === snapshot.selectedIndex" (mousedown)="selectIndexAndClose(i)" [sqxScrollActive]="i === snapshot.selectedIndex" [container]="container">
+                    <ng-container *ngIf="!templateItem">{{item}}</ng-container>
+                    
+                    <ng-template *ngIf="templateItem" [sqxTemplateWrapper]="templateItem" [item]="item" [index]="i"></ng-template>
+                </div>
             </div>
-        </div>
+        </ng-container>
     </div>
 </span>

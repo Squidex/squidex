@@ -21,7 +21,8 @@
 
 .dropdown {
     &-menu {
-        @include absolute(2.6rem, 0, auto, auto);
+        @include absolute($size-navbar-height, .25rem, auto, auto);
+        margin: 0;
     }
 
     &-item {
