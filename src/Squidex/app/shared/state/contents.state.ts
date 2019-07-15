@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { forkJoin, Observable, of, empty } from 'rxjs';
+import { empty, forkJoin, Observable, of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 
 import {
