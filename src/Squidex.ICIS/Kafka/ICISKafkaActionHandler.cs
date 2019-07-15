@@ -6,22 +6,19 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using Avro;
-using Avro.Specific;
-using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.ICIS.Actions.Kafka.Entities;
-using Squidex.Infrastructure;
+using Squidex.ICIS.Kafka.Entities;
+using Squidex.ICIS.Kafka.Producer;
+using Squidex.ICIS.Kafka.Services;
 
-namespace Squidex.ICIS.Actions.Kafka
+namespace Squidex.ICIS.Kafka
 {
     public sealed class ICISKafkaActionHandler : RuleActionHandler<ICISKafkaAction, ICISKafkaJob>
     {
@@ -31,7 +28,7 @@ namespace Squidex.ICIS.Actions.Kafka
         private readonly KafkaProducer<Commodity> kafkaCommodityProducer;
         private readonly KafkaProducer<Region> kafkaRegionProducer;
         private readonly IAppProvider appProvider;
-        private readonly Dictionary<string, IAppEntity> commentaryAppDic = new Dictionary<string, IAppEntity>();
+        private readonly ConcurrentDictionary<string, IAppEntity> commentaryAppDic = new ConcurrentDictionary<string, IAppEntity>();
         private readonly IContentRepository contentRepository;
 
         public ICISKafkaActionHandler(RuleEventFormatter formatter, 
@@ -78,9 +75,9 @@ namespace Squidex.ICIS.Actions.Kafka
             {
                 if (!commentaryAppDic.ContainsKey("commentary"))
                 {
-                    var app = appProvider.GetAppAsync("commentary");
-                    app.Wait();
-                    commentaryAppDic.Add("commentary", app.Result);
+                    var app = await appProvider.GetAppAsync("commentary");
+
+                    commentaryAppDic["commentary"] = app;
                 }
 
                 switch (job.Message.SchemaId.Name)
