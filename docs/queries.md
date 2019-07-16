@@ -15,7 +15,7 @@ The query system is language agnostic but is based on OData for parsing. In theo
 
 The filter capabilities depends on the schema. 
 
-Lets take the following exawmple content:
+Lets take the following example content:
 
 ```json
 { 
@@ -52,7 +52,7 @@ Lets take the following exawmple content:
     * `contains`
     * `startsWith`
     * `endsWith`
-* **Clubs`** is a referance to other contents items, but also stored as a string. Similar to MongoDB arrays of strings are treated like strings, so when use an equality filter you actually filter out all content items, that contain at least one reference to the given id.
+* **Clubs`** is a reference to other contents items, but also stored as a string. Similar to MongoDB arrays of strings are treated like strings, so when use an equality filter you actually filter out all content items, that contain at least one reference to the given id.
 
 ## OData Queries
 
@@ -84,7 +84,7 @@ The $search query option allows clients to request entities matching a free-text
 
 Find the city with the english name Munich
 
-    $filter=data/name/de eq Munich
+    $filter=data/name/en eq Munich
 
 Find all cities with a population or more than 100000 people
 
