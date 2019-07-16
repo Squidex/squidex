@@ -63,11 +63,10 @@ export class ModalPlacementDirective extends ResourceOwner implements AfterViewI
     public ngAfterViewInit() {
         const modalRef = this.element.nativeElement;
 
-        this.renderer.setStyle(modalRef, 'position', 'fixed');
-        this.renderer.setStyle(modalRef, 'z-index', '1000000');
-        this.renderer.setStyle(modalRef, 'right', 'auto');
-        this.renderer.setStyle(modalRef, 'bottom', 'auto');
         this.renderer.setStyle(modalRef, 'margin', '0');
+        this.renderer.setStyle(modalRef, 'position', 'fixed');
+        this.renderer.setStyle(modalRef, 'bottom', 'auto');
+        this.renderer.setStyle(modalRef, 'right', 'auto');
 
         this.updatePosition();
     }
