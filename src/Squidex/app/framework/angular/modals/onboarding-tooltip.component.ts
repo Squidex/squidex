@@ -58,7 +58,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
         if (this.for && this.helpId && Types.isFunction(this.for.addEventListener)) {
             this.own(
                 timer(this.after).subscribe(() => {
-                    if (this.onboardingService.shouldShow(this.helpId)) {
+                    if (true || this.onboardingService.shouldShow(this.helpId)) {
                         const forRect = this.for.getBoundingClientRect();
 
                         const x = forRect.left + 0.5 * forRect.width;
