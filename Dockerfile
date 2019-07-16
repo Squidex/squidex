@@ -5,8 +5,6 @@ FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder
 
 ARG SQUIDEX__VERSION=1.0.0
 
-RUN exit 1
-
 WORKDIR /src
 
 COPY src/Squidex/package*.json /tmp/
