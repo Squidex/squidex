@@ -11,7 +11,7 @@ function getCharacterCount(editor)
     var charCountDiv = document.getElementById("charCount");
     charCountDiv.innerHTML = contents.length;
 }
-
+var isFirstCall = true;
 var field = new SquidexFormField();
 var editor = new tui.Editor({
     el: document.getElementById('mdEditor'),
@@ -21,12 +21,14 @@ var editor = new tui.Editor({
     toolbarItems: ["bold","italic","divider","ul","ol","divider"],
     events: {
         change: function () {
-            var data = editor.getMarkdown();
-            field.valueChanged(data);
-            getCharacterCount(editor);
+			if (isFirstCall) {
+				isFirstCall = false;
+			} else {
+				var data = editor.getMarkdown();
+				field.valueChanged(data);
+				getCharacterCount(editor);
+			}
         }
-
-
     }
 });
 
