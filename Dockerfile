@@ -23,6 +23,8 @@ RUN cp -a /tmp/node_modules src/Squidex/ \
 # Test Backend
 FROM nexus.cha.rbxd.ds:8000/dotnet:2.2-sdk-chromium-phantomjs-node as builder_backend
 
+ARG SQUIDEX__VERSION=1.0.0
+
 WORKDIR /src
 
 # Install Screen
@@ -65,7 +67,7 @@ COPY --from=builder /src/src/Squidex/wwwroot src/Squidex/wwwroot
 #  && npm run test
 
 # Publish
-RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -p:version=$SQUIDEX__VERSION
+RUN dotnet publish src/Squidex/Squidex.csproj /p:version=$SQUIDEX__VERSION --output /out/alpine --configuration Release 
 
 #
 # Stage 2, Build runtime
