@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
+using System;
 
 namespace Squidex.Web
 {
@@ -22,7 +23,7 @@ namespace Squidex.Web
 
                 foreach (var header in httpContext.Request.Headers)
                 {
-                    if (header.Key.StartsWith("X-", System.StringComparison.Ordinal))
+                    if (header.Key.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
                     {
                         context.Headers.Add(header.Key, header.Value.ToString());
                     }
