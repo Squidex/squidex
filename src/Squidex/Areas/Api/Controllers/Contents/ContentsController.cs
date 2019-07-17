@@ -25,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 {
     public sealed class ContentsController : ApiController
     {
-        private readonly IOptions<MyContentsControllerOptions> controllerOptions;
+        private readonly MyContentsControllerOptions controllerOptions;
         private readonly IContentQueryService contentQuery;
         private readonly IContentWorkflow contentWorkflow;
         private readonly IGraphQLService graphQl;
@@ -39,7 +39,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         {
             this.contentQuery = contentQuery;
             this.contentWorkflow = contentWorkflow;
-            this.controllerOptions = controllerOptions;
+            this.controllerOptions = controllerOptions.Value;
 
             this.graphQl = graphQl;
         }
@@ -205,7 +205,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = ContentDto.FromContent(Context, content, this);
 
-            if (controllerOptions.Value.EnableSurrogateKeys)
+            if (controllerOptions.EnableSurrogateKeys)
             {
                 Response.Headers["Surrogate-Key"] = content.ToSurrogateKey();
             }
@@ -240,7 +240,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = ContentDto.FromContent(Context, content, this);
 
-            if (controllerOptions.Value.EnableSurrogateKeys)
+            if (controllerOptions.EnableSurrogateKeys)
             {
                 Response.Headers["Surrogate-Key"] = content.ToSurrogateKey();
             }
@@ -446,7 +446,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
         private bool ShouldProvideSurrogateKeys(IReadOnlyList<IContentEntity> response)
         {
-            return controllerOptions.Value.EnableSurrogateKeys && response.Count <= controllerOptions.Value.MaxItemsForSurrogateKeys;
+            return controllerOptions.EnableSurrogateKeys && response.Count <= controllerOptions.MaxItemsForSurrogateKeys;
         }
     }
 }

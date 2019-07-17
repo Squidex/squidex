@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
+
 namespace Squidex.Config
 {
     public sealed class MyIdentityOptions
@@ -37,6 +39,12 @@ namespace Squidex.Config
 
         public string OidcAuthority { get; set; }
 
+        public string OidcRoleClaimType { get; set; }
+
+        public string[] OidcScopes { get; set; }
+
+        public Dictionary<string, string[]> OidcRoleMapping { get; set; }
+
         public string AuthorityUrl { get; set; }
 
         public string PrivacyUrl { get; set; }
@@ -46,6 +54,8 @@ namespace Squidex.Config
         public bool AllowPasswordAuth { get; set; }
 
         public bool LockAutomatically { get; set; }
+
+        public bool NoConsent { get; set; }
 
         public bool IsAdminConfigured()
         {
@@ -59,7 +69,7 @@ namespace Squidex.Config
 
         public bool IsOidcConfigured()
         {
-            return !string.IsNullOrWhiteSpace(OidcAuthority) && !string.IsNullOrWhiteSpace(OidcClient) && !string.IsNullOrWhiteSpace(OidcSecret);
+            return !string.IsNullOrWhiteSpace(OidcAuthority) && !string.IsNullOrWhiteSpace(OidcClient);
         }
 
         public bool IsGithubAuthConfigured()

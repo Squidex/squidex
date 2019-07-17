@@ -32,7 +32,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserPictureStore userPictureStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
-        private readonly IOptions<MyIdentityOptions> identityOptions;
+        private readonly MyIdentityOptions identityOptions;
 
         public ProfileController(
             SignInManager<IdentityUser> signInManager,
@@ -42,7 +42,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             IOptions<MyIdentityOptions> identityOptions)
         {
             this.signInManager = signInManager;
-            this.identityOptions = identityOptions;
+            this.identityOptions = identityOptions.Value;
             this.userManager = userManager;
             this.userPictureStore = userPictureStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
@@ -198,7 +198,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 DisplayName = user.DisplayName(),
                 IsHidden = user.IsHidden(),
                 HasPassword = taskForPassword.Result,
-                HasPasswordAuth = identityOptions.Value.AllowPasswordAuth,
+                HasPasswordAuth = identityOptions.AllowPasswordAuth,
                 SuccessMessage = successMessage
             };
 
