@@ -8,8 +8,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure.Tasks;
-using Squidex.Web;
 
 namespace Squidex.Config.Authentication
 {
