@@ -59,6 +59,9 @@ export class ContentItemComponent implements OnChanges {
     public schema: SchemaDetailsDto;
 
     @Input()
+    public schemaFields: RootFieldDto[];
+
+    @Input()
     public canClone: boolean;
 
     @Input()
@@ -148,7 +151,7 @@ export class ContentItemComponent implements OnChanges {
     private updateValues() {
         this.values = [];
 
-        for (let field of this.schema.listFields) {
+        for (let field of this.schemaFields) {
             const value = this.getRawValue(field);
 
             if (Types.isUndefined(value)) {

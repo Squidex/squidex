@@ -28,6 +28,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     yield return new ValidationError("UI field cannot be a list field.", nameof(properties.IsListField));
                 }
 
+                if (!properties.IsForApi() && properties.IsReferenceField)
+                {
+                    yield return new ValidationError("UI field cannot be a reference field.", nameof(properties.IsReferenceField));
+                }
+
                 foreach (var error in properties.Accept(Instance))
                 {
                     yield return error;

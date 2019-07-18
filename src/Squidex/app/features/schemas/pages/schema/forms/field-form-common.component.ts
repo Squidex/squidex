@@ -68,6 +68,21 @@ import { FieldDto } from '@app/shared';
                     </sqx-form-hint>
                 </div>
             </div>
+
+            <div class="form-group row" *ngIf="field.properties.isContentField">
+                <div class="col-6 offset-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldReferencefield" formControlName="isReferenceField" />
+                        <label class="form-check-label" for="{{field.fieldId}}_fieldReferencefield">
+                            Reference Field
+                        </label>
+                    </div>
+
+                    <sqx-form-hint>
+                        Reference fields are shown as a column in the content list when referenced by another content.<br />When no reference field is defined, the first field is used.
+                    </sqx-form-hint>
+                </div>
+            </div>
         </div>
     `
 })
@@ -87,6 +102,9 @@ export class FieldFormCommonComponent implements OnInit {
 
         this.editForm.setControl('isListField',
             new FormControl(this.field.properties.isListField));
+
+        this.editForm.setControl('isReferenceField',
+            new FormControl(this.field.properties.isReferenceField));
 
         this.editForm.setControl('editorUrl',
             new FormControl(this.field.properties.editorUrl));

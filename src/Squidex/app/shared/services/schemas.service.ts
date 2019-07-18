@@ -82,6 +82,7 @@ export class SchemaDto {
 export class SchemaDetailsDto extends SchemaDto {
     public listFields: RootFieldDto[];
     public listFieldsEditable: RootFieldDto[];
+    public referenceFields: RootFieldDto[];
 
     constructor(links: ResourceLinks, id: string, name: string, category: string,
         properties: SchemaPropertiesDto,
@@ -99,19 +100,24 @@ export class SchemaDetailsDto extends SchemaDto {
         super(links, id, name, category, properties, isSingleton, isPublished, created, createdBy, lastModified, lastModifiedBy, version);
 
         if (fields) {
-            let listFields = this.fields.filter(x => x.properties.isListField && x.properties.isContentField);
+            this.listFields = this.getField(x => x.properties.isListField);
+            this.listFieldsEditable = this.listFields.filter(x => x.isInlineEditable);
 
-            if (listFields.length === 0 && this.fields.length > 0) {
-                listFields = [this.fields[0]];
-            }
-
-            if (listFields.length === 0) {
-                listFields = NONE_FIELDS;
-            }
-
-            this.listFields = listFields;
-            this.listFieldsEditable = listFields.filter(x => x.isInlineEditable);
+            this.referenceFields = this.getField(x => x.properties.isReferenceField);
         }
+    }
+
+    private getField(predicate: (field: RootFieldDto) => boolean) {
+        let fields = this.fields.filter(x => predicate(x) && x.properties.isContentField);
+
+        if (fields.length === 0 && this.fields.length > 0) {
+            fields = [this.fields[0]];
+        }
+        if (fields.length === 0) {
+            fields = NONE_FIELDS;
+        }
+
+        return fields;
     }
 
     public export(): any {
