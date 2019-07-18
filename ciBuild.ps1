@@ -22,8 +22,18 @@ try{
         --build-arg https_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
 		--build-arg SQUIDEX__VERSION=$env:Version
 
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Failed to build docker image" -ForegroundColor Red
+        exit 1
+    }
+
     Write-Host "Pushing docker image $semanticDockerTag"
     docker push $semanticDockerTag
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Failed to push docker image" -ForegroundColor Red
+        exit 1
+    }
 
     Write-Host "Removing Docker Image on Build Agent"
     docker rmi $semanticDockerTag 
