@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
             var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
 
-            var result = sut.ExtractReferences(CreateValue(id1, id2)).ToArray();
+            var result = sut.GetReferencedIds(CreateValue(id1, id2)).ToArray();
 
             Assert.Equal(new[] { id1, id2 }, result);
         }
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         {
             var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
 
-            var result = sut.ExtractReferences(null).ToArray();
+            var result = sut.GetReferencedIds(null).ToArray();
 
             Assert.Empty(result);
         }
@@ -106,7 +106,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         {
             var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
 
-            var result = sut.ExtractReferences(JsonValue.Create("invalid")).ToArray();
+            var result = sut.GetReferencedIds(JsonValue.Create("invalid")).ToArray();
 
             Assert.Empty(result);
         }
@@ -116,7 +116,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         {
             var sut = Fields.String(1, "my-string", Partitioning.Invariant);
 
-            var result = sut.ExtractReferences(JsonValue.Create("invalid")).ToArray();
+            var result = sut.GetReferencedIds(JsonValue.Create("invalid")).ToArray();
 
             Assert.Empty(result);
         }
@@ -153,6 +153,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var sut = Fields.Assets(1, "my-asset", Partitioning.Invariant);
 
             var token = CreateValue(id1, id2);
+
             var result = sut.CleanReferences(token, HashSet.Of(Guid.NewGuid()));
 
             Assert.Same(token, result);
@@ -174,7 +175,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                     JsonValue.Object()
                         .Add("my-refs", CreateValue(id1, id2)));
 
-            var result = sut.ExtractReferences(value).ToArray();
+            var result = sut.GetReferencedIds(value).ToArray();
 
             Assert.Equal(new[] { id1, id2, schemaId }, result);
         }
@@ -188,7 +189,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
                 new ReferencesFieldProperties { SchemaId = schemaId });
 
-            var result = sut.ExtractReferences(CreateValue(id1, id2)).ToArray();
+            var result = sut.GetReferencedIds(CreateValue(id1, id2)).ToArray();
 
             Assert.Equal(new[] { id1, id2, schemaId }, result);
         }
@@ -199,7 +200,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
                 new ReferencesFieldProperties { SchemaId = schemaId });
 
-            var result = sut.ExtractReferences(JsonValue.Null).ToArray();
+            var result = sut.GetReferencedIds(JsonValue.Null).ToArray();
 
             Assert.Equal(new[] { schemaId }, result);
         }
@@ -210,7 +211,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
                 new ReferencesFieldProperties { SchemaId = schemaId });
 
-            var result = sut.ExtractReferences(JsonValue.Create("invalid")).ToArray();
+            var result = sut.GetReferencedIds(JsonValue.Create("invalid")).ToArray();
 
             Assert.Equal(new[] { schemaId }, result);
         }
@@ -261,10 +262,11 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
 
             var sut = Fields.References(1, "my-refs", Partitioning.Invariant);
 
-            var token = CreateValue(id1, id2);
-            var result = sut.CleanReferences(token, HashSet.Of(Guid.NewGuid()));
+            var value = CreateValue(id1, id2);
 
-            Assert.Same(token, result);
+            var result = sut.CleanReferences(value, HashSet.Of(Guid.NewGuid()));
+
+            Assert.Same(value, result);
         }
 
         private static IJsonValue CreateValue(params Guid[] ids)

@@ -11,7 +11,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.ExtractReferenceIds;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 
@@ -20,14 +23,24 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class ContentEnricher : IContentEnricher
     {
         private const string DefaultColor = StatusColors.Draft;
+        private readonly IAppProvider appProvider;
+        private readonly IContentQueryService contentQuery;
         private readonly IContentWorkflow contentWorkflow;
         private readonly IContextProvider contextProvider;
 
-        public ContentEnricher(IContentWorkflow contentWorkflow, IContextProvider contextProvider)
+        public ContentEnricher(
+            IAppProvider appProvider,
+            IContentQueryService contentQuery,
+            IContentWorkflow contentWorkflow,
+            IContextProvider contextProvider)
         {
+            Guard.NotNull(appProvider, nameof(appProvider));
+            Guard.NotNull(contentQuery, nameof(contentQuery));
             Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
             Guard.NotNull(contextProvider, nameof(contextProvider));
 
+            this.appProvider = appProvider;
+            this.contentQuery = contentQuery;
             this.contentWorkflow = contentWorkflow;
             this.contextProvider = contextProvider;
         }
@@ -50,25 +63,94 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 var results = new List<ContentEntity>();
 
-                var cache = new Dictionary<(Guid, Status), StatusInfo>();
-
-                foreach (var content in contents)
+                if (contents.Any())
                 {
-                    var result = SimpleMapper.Map(content, new ContentEntity());
+                    var cache = new Dictionary<(Guid, Status), StatusInfo>();
 
-                    await ResolveColorAsync(content, result, cache);
-
-                    if (ShouldEnrichWithStatuses())
+                    foreach (var content in contents)
                     {
-                        await ResolveNextsAsync(content, result, user);
-                        await ResolveCanUpdateAsync(content, result);
+                        var result = SimpleMapper.Map(content, new ContentEntity());
+
+                        await ResolveColorAsync(content, result, cache);
+
+                        if (ShouldEnrichWithStatuses())
+                        {
+                            await ResolveNextsAsync(content, result, user);
+                            await ResolveCanUpdateAsync(content, result);
+                        }
+
+                        results.Add(result);
                     }
 
-                    results.Add(result);
+                    if (contextProvider.Context.IsFrontendClient)
+                    {
+                        foreach (var group in results.GroupBy(x => x.SchemaId))
+                        {
+                            await ResolveReferencesAsync(group.Key, group);
+                        }
+                    }
                 }
 
                 return results;
             }
+        }
+
+        private async Task ResolveReferencesAsync(NamedId<Guid> schemaId, IEnumerable<ContentEntity> contents)
+        {
+            var appId = contents.First().AppId.Id;
+
+            var schema = await appProvider.GetSchemaAsync(appId, schemaId.Id);
+
+            var referenceFields =
+                schema.SchemaDef.Fields.OfType<IField<ReferencesFieldProperties>>()
+                    .Where(x =>
+                        x.Properties.MinItems == 1 &&
+                        x.Properties.MaxItems == 1 &&
+                        (x.Properties.IsListField || x.Properties.IsReferenceField));
+
+            foreach (var field in referenceFields)
+            {
+                var allIds = GetContentIds(contents, field);
+
+                if (allIds.Count > 0)
+                {
+                    var referenced = await contentQuery.QueryAsync(contextProvider.Context, schemaId.Id.ToString(), Q.Empty.WithIds(allIds));
+
+                    var byId = referenced.ToDictionary(x => x.Id);
+
+                    foreach (var content in contents)
+                    {
+                        content.ReferenceData = content.ReferenceData ?? new NamedContentData();
+
+                        if (content.DataDraft.TryGetValue(field.Name, out var fieldData))
+                        {
+                            foreach (var partitionValue in fieldData.Where(x => x.Value.Type != JsonValueType.Null))
+                            {
+                                var ids = field.GetReferencedIds(partitionValue.Value).ToArray();
+
+                                if (ids.Length == 1)
+                                {
+                                    if (byId.TryGetValue(ids[0], out var reference))
+                                    {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private static HashSet<Guid> GetContentIds(IEnumerable<ContentEntity> contents, IField<ReferencesFieldProperties> field)
+        {
+            var allIds = new HashSet<Guid>();
+
+            foreach (var content in contents)
+            {
+                allIds.AddRange(content.DataDraft.GetReferencedIds(field));
+            }
+
+            return allIds;
         }
 
         private bool ShouldEnrichWithStatuses()

@@ -11,7 +11,6 @@ using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
@@ -25,18 +24,47 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 
             foreach (var field in schema.Fields)
             {
-                var fieldData = source.GetOrDefault(field.Id);
+                var ids = source.GetReferencedIds(field);
 
-                if (fieldData == null)
+                foreach (var id in ids)
                 {
-                    continue;
+                    if (foundReferences.Add(id))
+                    {
+                        yield return id;
+                    }
                 }
+            }
+        }
 
-                foreach (var partitionValue in fieldData.Where(x => x.Value.Type != JsonValueType.Null))
+        public static IEnumerable<Guid> GetReferencedIds(this IdContentData source, IField field)
+        {
+            Guard.NotNull(field, nameof(field));
+
+            if (source.TryGetValue(field.Id, out var fieldData))
+            {
+                foreach (var partitionValue in fieldData)
                 {
-                    var ids = field.ExtractReferences(partitionValue.Value);
+                    var ids = field.GetReferencedIds(partitionValue.Value);
 
-                    foreach (var id in ids.Where(x => foundReferences.Add(x)))
+                    foreach (var id in ids)
+                    {
+                        yield return id;
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<Guid> GetReferencedIds(this NamedContentData source, IField field)
+        {
+            Guard.NotNull(field, nameof(field));
+
+            if (source.TryGetValue(field.Name, out var fieldData))
+            {
+                foreach (var partitionValue in fieldData)
+                {
+                    var ids = field.GetReferencedIds(partitionValue.Value);
+
+                    foreach (var id in ids)
                     {
                         yield return id;
                     }
