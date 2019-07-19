@@ -216,8 +216,13 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
     pure: true
 })
 export class AssetUrlPipe implements PipeTransform {
+    constructor(
+        private readonly apiUrl: ApiUrlConfig
+    ) {
+    }
+
     public transform(asset: AssetDto): string {
-        return `${asset.contentUrl}&sq=${MathHelper.guid()}`;
+        return `${asset.fullUrl(this.apiUrl)}&sq=${MathHelper.guid()}`;
     }
 }
 
@@ -226,8 +231,13 @@ export class AssetUrlPipe implements PipeTransform {
     pure: true
 })
 export class AssetPreviewUrlPipe implements PipeTransform {
+    constructor(
+        private readonly apiUrl: ApiUrlConfig
+    ) {
+    }
+
     public transform(asset: AssetDto): string {
-        return asset.contentUrl;
+        return asset.fullUrl(this.apiUrl);
     }
 }
 
