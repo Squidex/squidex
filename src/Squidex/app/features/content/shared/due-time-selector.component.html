@@ -1,21 +1,21 @@
-<ng-container *sqxModal="dueTimeDialog">
+<ng-container *sqxModal="dueTimeDialog;closeAuto:false">
     <sqx-modal-dialog (close)="cancelStatusChange()">
         <ng-container title>
-            {{dueTimeAction}} content item(s)
+            Change content item(s) to {{dueTimeAction}}
         </ng-container>
     
         <ng-container content>
             <div class="form-check">
                 <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Immediately" id="immediately" name="dueTimeMode">
                 <label class="form-check-label" for="immediately">
-                    {{dueTimeAction}} content item(s) immediately.
+                    Set to {{dueTimeAction}} immediately.
                 </label>
             </div>
     
             <div class="form-check">
                 <input class="form-check-input" type="radio" [(ngModel)]="dueTimeMode" value="Scheduled" id="scheduled" name="dueTimeMode">
                 <label class="form-check-label" for="scheduled">
-                    {{dueTimeAction}} content item(s) at a later point date and time.
+                    Set to {{dueTimeAction}} at a later point date and time.
                 </label>
             </div>
     
@@ -27,5 +27,4 @@
             <button type="button" class="float-right btn btn-primary" [disabled]="dueTimeMode === 'Scheduled' && !dueTime" (click)="confirmStatusChange()" sqxFocusOnInit>Confirm</button>
         </ng-container>
     </sqx-modal-dialog>
-
 </ng-container>

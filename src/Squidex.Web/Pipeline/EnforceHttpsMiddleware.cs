@@ -14,16 +14,16 @@ namespace Squidex.Web.Pipeline
 {
     public sealed class EnforceHttpsMiddleware : IMiddleware
     {
-        private readonly IOptions<UrlsOptions> urls;
+        private readonly UrlsOptions urls;
 
         public EnforceHttpsMiddleware(IOptions<UrlsOptions> urls)
         {
-            this.urls = urls;
+            this.urls = urls.Value;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            if (!urls.Value.EnforceHTTPS)
+            if (!urls.EnforceHTTPS)
             {
                 await next(context);
             }

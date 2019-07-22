@@ -11,6 +11,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
+    ApiUrlConfig,
     AssetDto,
     AssetUploaderState,
     DialogModel,
@@ -55,6 +56,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
+        private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
         private readonly resourceLoader: ResourceLoaderService
     ) {
@@ -102,7 +104,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
                 this.assetUploader.uploadFile(file)
                     .subscribe(asset => {
                         if (Types.is(asset, AssetDto)) {
-                            success(asset.contentUrl);
+                            success(asset.fullUrl(this.apiUrl));
                         }
                     }, error => {
                         if (!Types.is(error, UploadCanceled)) {
@@ -190,7 +192,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         let content = '';
 
         for (let asset of assets) {
-            content += `<img src="${asset.contentUrl}" alt="${asset.fileName}" />`;
+            content += `<img src="${asset.fullUrl(this.apiUrl)}" alt="${asset.fileName}" />`;
         }
 
         if (content.length > 0) {
@@ -220,7 +222,7 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                    replaceText(`<img src="${asset.contentUrl}" alt="${asset.fileName}" />`);
+                    replaceText(`<img src="${asset.fullUrl(this.apiUrl)}" alt="${asset.fileName}" />`);
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {

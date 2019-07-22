@@ -37,7 +37,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         private readonly IAssetQueryService assetQuery;
         private readonly IAssetUsageTracker assetStatsRepository;
         private readonly IAppPlansProvider appPlansProvider;
-        private readonly IOptions<MyContentsControllerOptions> controllerOptions;
+        private readonly MyContentsControllerOptions controllerOptions;
         private readonly ITagService tagService;
         private readonly AssetOptions assetOptions;
 
@@ -55,7 +55,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
             this.assetQuery = assetQuery;
             this.assetStatsRepository = assetStatsRepository;
             this.appPlansProvider = appPlansProvider;
-            this.controllerOptions = controllerOptions;
+            this.controllerOptions = controllerOptions.Value;
             this.tagService = tagService;
         }
 
@@ -110,7 +110,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return AssetsDto.FromAssets(assets, this, app);
             });
 
-            if (controllerOptions.Value.EnableSurrogateKeys && assets.Count <= controllerOptions.Value.MaxItemsForSurrogateKeys)
+            if (controllerOptions.EnableSurrogateKeys && assets.Count <= controllerOptions.MaxItemsForSurrogateKeys)
             {
                 Response.Headers["Surrogate-Key"] = assets.ToSurrogateKeys();
             }
@@ -148,7 +148,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 return AssetDto.FromAsset(asset, this, app);
             });
 
-            if (controllerOptions.Value.EnableSurrogateKeys)
+            if (controllerOptions.EnableSurrogateKeys)
             {
                 Response.Headers["Surrogate-Key"] = asset.ToSurrogateKey();
             }

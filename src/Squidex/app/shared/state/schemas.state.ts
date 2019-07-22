@@ -322,23 +322,21 @@ function getField(x: SchemaDetailsDto, request: AddFieldDto, parent?: RootFieldD
 }
 
 function buildCategories(categories: string[], schemas: SchemasList): SchemaCategory[] {
-    const uniqueCategories: { [name: string]: string } = {};
+    const uniqueCategories: { [name: string]: true } = {};
 
     for (let category of categories) {
-        uniqueCategories[category] = category;
+        uniqueCategories[category] = true;
     }
 
     for (let schema of schemas.values) {
-        uniqueCategories[schema.category || 'Schemas'] = schema.category;
+        uniqueCategories[getCategory(schema)] = true;
     }
 
     const result: SchemaCategory[] = [];
 
     for (let name in uniqueCategories) {
         if (uniqueCategories.hasOwnProperty(name)) {
-            const key = uniqueCategories[name];
-
-            result.push({ name, upper: name.toUpperCase(), schemas: schemas.filter(x => isSameCategory(key, x))});
+            result.push({ name, upper: name.toUpperCase(), schemas: schemas.filter(x => isSameCategory(name, x))});
         }
     }
 
@@ -347,6 +345,10 @@ function buildCategories(categories: string[], schemas: SchemasList): SchemaCate
     return result;
 }
 
+function getCategory(schema: SchemaDto) {
+    return schema.category || 'Schemas';
+}
+
 export function isSameCategory(name: string, schema: SchemaDto): boolean {
-    return (!name && !schema.category) || schema.category === name;
+    return getCategory(schema) === name;
 }
