@@ -28,8 +28,8 @@ export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class DateTimeEditorComponent extends StatefulControlComponent<{}, string | null> implements OnInit, AfterViewInit {
     private picker: any;
-    private timeValue: any | null = null;
-    private dateValue: any | null = null;
+    private timeValue: moment.Moment | null = null;
+    private dateValue: moment.Moment | null = null;
     private suppressEvents = false;
 
     @Input()
@@ -65,10 +65,10 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
                 if (!value || value.length === 0) {
                     this.timeValue = null;
                 } else {
-                    this.timeValue = moment(value, 'HH:mm:ss');
+                    this.timeValue = moment.utc(value, 'HH:mm:ss');
                 }
 
-                this.updateValue();
+                this.callChangeFormatted();
             }));
 
         this.own(
@@ -76,10 +76,10 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
                 if (!value || value.length === 0) {
                     this.dateValue = null;
                 } else {
-                    this.dateValue = moment(value, 'YYYY-MM-DD');
+                    this.dateValue = moment.utc(value, 'YYYY-MM-DD');
                 }
 
-                this.updateValue();
+                this.callChangeFormatted();
             }));
     }
 
@@ -87,10 +87,10 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         if (Types.isString(obj) && obj.length > 0) {
             const parsed = moment.parseZone(obj);
 
-            this.dateValue = moment(parsed);
+            this.dateValue = parsed;
 
             if (this.showTime) {
-                this.timeValue = moment(parsed);
+                this.timeValue = parsed;
             }
         } else {
             this.timeValue = null;
@@ -128,7 +128,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
                 }
                 this.dateValue = this.picker.getMoment();
 
-                this.updateValue();
+                this.callChangeFormatted();
                 this.callTouched();
             }
         });
@@ -140,7 +140,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         this.writeValue(new Date().toUTCString());
 
         this.updateControls();
-        this.updateValue();
+        this.callChangeFormatted();
         this.callTouched();
 
         return false;
@@ -158,26 +158,30 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         return false;
     }
 
-    private updateValue() {
-        let result: string | null;
+    private callChangeFormatted() {
+        this.callChange(this.getValue());
+    }
 
-        if ((this.dateValue && !this.dateValue.isValid()) || (this.timeValue && !this.timeValue.isValid())) {
-            result = null;
-        } else if (!this.dateValue && !this.timeValue) {
-            result = null;
-        } else {
-            result = this.dateValue.format('YYYY-MM-DD');
-
-            if (this.showTime && this.timeValue) {
-                result += 'T';
-                result += this.timeValue.format('HH:mm:ss');
-                result += 'Z';
-            } else if (this.enforceTime) {
-                result += 'T00:00:00Z';
-            }
+    private getValue(): string | null {
+        if (!this.dateValue || !this.dateValue.isValid()) {
+            return null;
         }
 
-        this.callChange(result);
+        if (this.timeValue && !this.timeValue.isValid()) {
+            return null;
+        }
+
+        let result = this.dateValue.format('YYYY-MM-DD');
+
+        if (this.showTime && this.timeValue) {
+            result += 'T';
+            result += this.timeValue.format('HH:mm:ss');
+            result += 'Z';
+        } else if (this.enforceTime) {
+            result += 'T00:00:00Z';
+        }
+
+        return result;
     }
 
     private updateControls() {
@@ -190,9 +194,12 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         }
 
         if (this.dateValue && this.dateValue.isValid() && this.picker) {
-            this.dateControl.setValue(this.dateValue.format('YYYY-MM-DD'), { emitEvent: false });
+            const dateString = this.dateValue.format('YYYY-MM-DD');
+            const dateLocal = moment(dateString);
 
-            this.picker.setMoment(this.dateValue);
+            this.dateControl.setValue(dateString, { emitEvent: false });
+
+            this.picker.setMoment(dateLocal);
         } else {
             this.dateControl.setValue(null, { emitEvent: false });
         }

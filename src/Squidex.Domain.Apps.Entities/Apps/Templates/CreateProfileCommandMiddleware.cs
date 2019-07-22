@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         private static async Task<NamedId<Guid>> CreateBasicsSchemaAsync(Func<ICommand, Task> publish)
         {
             var command =
-                SchemaBuilder.Create("basics")
+                SchemaBuilder.Create("Basics")
                     .AddString("First Name", f => f
                         .Required()
                         .ShowInList()
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         private static async Task<NamedId<Guid>> CreateProjectsSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
-                SchemaBuilder.Create("projects")
+                SchemaBuilder.Create("Projects")
                     .AddString("Name", f => f
                         .Required()
                         .ShowInList()

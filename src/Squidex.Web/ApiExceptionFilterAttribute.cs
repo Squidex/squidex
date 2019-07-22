@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Infrastructure;
@@ -27,11 +28,17 @@ namespace Squidex.Web
         static ApiExceptionFilterAttribute()
         {
             AddHandler<ValidationException>(OnValidationException);
+            AddHandler<DecoderFallbackException>(OnDecoderException);
             AddHandler<DomainObjectNotFoundException>(OnDomainObjectNotFoundException);
             AddHandler<DomainObjectVersionException>(OnDomainObjectVersionException);
             AddHandler<DomainForbiddenException>(OnDomainForbiddenException);
             AddHandler<DomainException>(OnDomainException);
             AddHandler<SecurityException>(OnSecurityException);
+        }
+
+        private static IActionResult OnDecoderException(DecoderFallbackException ex)
+        {
+            return ErrorResult(400, new ErrorDto { Message = ex.Message });
         }
 
         private static IActionResult OnDomainObjectNotFoundException(DomainObjectNotFoundException ex)
