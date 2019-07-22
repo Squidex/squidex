@@ -239,7 +239,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (command.Publish)
             {
-                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Status = Status.Published }));
+                RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Status = Status.Published, Change = StatusChange.Published }));
             }
         }
 
