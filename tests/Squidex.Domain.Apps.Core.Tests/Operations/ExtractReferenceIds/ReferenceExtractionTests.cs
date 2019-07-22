@@ -195,6 +195,20 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         }
 
         [Fact]
+        public void Should_return_ids_from_references_field_without_schema_id()
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+
+            var sut = Fields.References(1, "my-refs", Partitioning.Invariant,
+                new ReferencesFieldProperties { SchemaId = schemaId });
+
+            var result = sut.GetReferencedIds(CreateValue(id1, id2), Ids.ContentOnly).ToArray();
+
+            Assert.Equal(new[] { id1, id2 }, result);
+        }
+
+        [Fact]
         public void Should_return_list_from_references_field_with_schema_id_list_for_referenced_ids_when_null()
         {
             var sut = Fields.References(1, "my-refs", Partitioning.Invariant,

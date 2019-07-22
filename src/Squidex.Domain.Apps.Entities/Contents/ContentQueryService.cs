@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 var scriptText = schema.SchemaDef.Scripts.Query;
                 var scripting = !string.IsNullOrWhiteSpace(scriptText);
 
-                var enriched = await contentEnricher.EnrichAsync(contents, context.User);
+                var enriched = await contentEnricher.EnrichAsync(contents, context);
 
                 foreach (var content in enriched)
                 {

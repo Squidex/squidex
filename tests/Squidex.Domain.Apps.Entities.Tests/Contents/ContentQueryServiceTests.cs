@@ -527,7 +527,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void SetupEnricher()
         {
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>.Ignored, user))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>.Ignored, context))
                 .ReturnsLazily(x =>
                 {
                     var input = (IEnumerable<IContentEntity>)x.Arguments[0];

@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
@@ -23,41 +22,37 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class ContentEnricher : IContentEnricher
     {
         private const string DefaultColor = StatusColors.Draft;
-        private readonly IAppProvider appProvider;
-        private readonly IContentQueryService contentQuery;
+        private static readonly Dictionary<Guid, IEnrichedContentEntity> EmptyReferences = new Dictionary<Guid, IEnrichedContentEntity>();
+        private readonly Lazy<IContentQueryService> contentQuery;
         private readonly IContentWorkflow contentWorkflow;
-        private readonly IContextProvider contextProvider;
 
-        public ContentEnricher(
-            IAppProvider appProvider,
-            IContentQueryService contentQuery,
-            IContentWorkflow contentWorkflow,
-            IContextProvider contextProvider)
+        private IContentQueryService ContentQuery
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(contentQuery, nameof(contentQuery));
-            Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
-            Guard.NotNull(contextProvider, nameof(contextProvider));
-
-            this.appProvider = appProvider;
-            this.contentQuery = contentQuery;
-            this.contentWorkflow = contentWorkflow;
-            this.contextProvider = contextProvider;
+            get { return contentQuery.Value; }
         }
 
-        public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, ClaimsPrincipal user)
+        public ContentEnricher(Lazy<IContentQueryService> contentQuery, IContentWorkflow contentWorkflow)
+        {
+            Guard.NotNull(contentQuery, nameof(contentQuery));
+            Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
+
+            this.contentQuery = contentQuery;
+            this.contentWorkflow = contentWorkflow;
+        }
+
+        public async Task<IEnrichedContentEntity> EnrichAsync(IContentEntity content, Context context)
         {
             Guard.NotNull(content, nameof(content));
 
-            var enriched = await EnrichAsync(Enumerable.Repeat(content, 1), user);
+            var enriched = await EnrichAsync(Enumerable.Repeat(content, 1), context);
 
             return enriched[0];
         }
 
-        public async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, ClaimsPrincipal user)
+        public async Task<IReadOnlyList<IEnrichedContentEntity>> EnrichAsync(IEnumerable<IContentEntity> contents, Context context)
         {
             Guard.NotNull(contents, nameof(contents));
-            Guard.NotNull(user, nameof(user));
+            Guard.NotNull(context, nameof(context));
 
             using (Profiler.TraceMethod<ContentEnricher>())
             {
@@ -73,20 +68,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         await ResolveColorAsync(content, result, cache);
 
-                        if (ShouldEnrichWithStatuses())
+                        if (ShouldEnrichWithStatuses(context))
                         {
-                            await ResolveNextsAsync(content, result, user);
+                            await ResolveNextsAsync(content, result, context);
                             await ResolveCanUpdateAsync(content, result);
                         }
 
                         results.Add(result);
                     }
 
-                    if (contextProvider.Context.IsFrontendClient)
+                    if (ShouldEnrichWithReferences(context))
                     {
-                        foreach (var group in results.GroupBy(x => x.SchemaId))
+                        foreach (var group in results.GroupBy(x => x.SchemaId.Id))
                         {
-                            await ResolveReferencesAsync(group.Key, group);
+                            await ResolveReferencesAsync(group.Key, group, context);
                         }
                     }
                 }
@@ -95,67 +90,85 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task ResolveReferencesAsync(NamedId<Guid> schemaId, IEnumerable<ContentEntity> contents)
+        private async Task ResolveReferencesAsync(Guid schemaId, IEnumerable<ContentEntity> contents, Context context)
         {
             var appId = contents.First().AppId.Id;
 
-            var schema = await appProvider.GetSchemaAsync(appId, schemaId.Id);
+            var schema = await ContentQuery.GetSchemaOrThrowAsync(context, schemaId.ToString());
 
             var referenceFields =
                 schema.SchemaDef.Fields.OfType<IField<ReferencesFieldProperties>>()
                     .Where(x =>
+                        x.Properties.SchemaId != Guid.Empty &&
                         x.Properties.MinItems == 1 &&
                         x.Properties.MaxItems == 1 &&
-                        (x.Properties.IsListField || x.Properties.IsReferenceField));
+                        x.Properties.IsListField);
+
+            var formatted = new Dictionary<Guid, JsonObject>();
 
             foreach (var field in referenceFields)
             {
-                var allIds = GetContentIds(contents, field);
-
-                if (allIds.Count > 0)
+                foreach (var content in contents)
                 {
-                    var referenced = await contentQuery.QueryAsync(contextProvider.Context, schemaId.Id.ToString(), Q.Empty.WithIds(allIds));
+                    content.ReferenceData = new NamedContentData();
+                    content.ReferenceData.GetOrAddNew(field.Name);
+                }
 
-                    var byId = referenced.ToDictionary(x => x.Id);
+                try
+                {
+                    var referencedSchemaId = field.Properties.SchemaId;
+                    var referencedSchema = await ContentQuery.GetSchemaOrThrowAsync(context, referencedSchemaId.ToString());
+
+                    var references = await GetReferencesAsync(referencedSchemaId, contents, field, context);
 
                     foreach (var content in contents)
                     {
-                        content.ReferenceData = content.ReferenceData ?? new NamedContentData();
+                        var fieldReference = content.ReferenceData[field.Name];
 
                         if (content.DataDraft.TryGetValue(field.Name, out var fieldData))
                         {
-                            foreach (var partitionValue in fieldData.Where(x => x.Value.Type != JsonValueType.Null))
+                            foreach (var partition in fieldData)
                             {
-                                var ids = field.GetReferencedIds(partitionValue.Value).ToArray();
+                                var id = field.GetReferencedIds(partition.Value, Ids.ContentOnly).FirstOrDefault();
 
-                                if (ids.Length == 1)
+                                if (references.TryGetValue(id, out var reference))
                                 {
-                                    if (byId.TryGetValue(ids[0], out var reference))
-                                    {
-                                    }
+                                    var value =
+                                        formatted.GetOrAdd(id,
+                                            _ => reference.DataDraft.FormatReferences(referencedSchema.SchemaDef, context.App.LanguagesConfig));
+
+                                    fieldReference[partition.Key] = JsonValue.Create(value);
                                 }
                             }
                         }
                     }
                 }
+                catch (DomainObjectNotFoundException)
+                {
+                    continue;
+                }
             }
         }
 
-        private static HashSet<Guid> GetContentIds(IEnumerable<ContentEntity> contents, IField<ReferencesFieldProperties> field)
+        private async Task<Dictionary<Guid, IEnrichedContentEntity>> GetReferencesAsync(Guid schemaId, IEnumerable<ContentEntity> contents, IField field, Context context)
         {
-            var allIds = new HashSet<Guid>();
+            var ids = new HashSet<Guid>();
 
             foreach (var content in contents)
             {
-                allIds.AddRange(content.DataDraft.GetReferencedIds(field));
+                ids.AddRange(content.DataDraft.GetReferencedIds(field, Ids.ContentOnly));
             }
 
-            return allIds;
-        }
+            if (ids.Count > 0)
+            {
+                var references = await ContentQuery.QueryAsync(context.Clone().WithNoEnrichment(true), schemaId.ToString(), Q.Empty.WithIds(ids));
 
-        private bool ShouldEnrichWithStatuses()
-        {
-            return contextProvider.Context.IsFrontendClient || contextProvider.Context.IsResolveFlow();
+                return references.ToDictionary(x => x.Id);
+            }
+            else
+            {
+                return EmptyReferences;
+            }
         }
 
         private async Task ResolveCanUpdateAsync(IContentEntity content, ContentEntity result)
@@ -163,9 +176,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             result.CanUpdate = await contentWorkflow.CanUpdateAsync(content);
         }
 
-        private async Task ResolveNextsAsync(IContentEntity content, ContentEntity result, ClaimsPrincipal user)
+        private async Task ResolveNextsAsync(IContentEntity content, ContentEntity result, Context context)
         {
-            result.Nexts = await contentWorkflow.GetNextsAsync(content, user);
+            result.Nexts = await contentWorkflow.GetNextsAsync(content, context.User);
         }
 
         private async Task ResolveColorAsync(IContentEntity content, ContentEntity result, Dictionary<(Guid, Status), StatusInfo> cache)
@@ -188,6 +201,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
 
             return info.Color;
+        }
+
+        private static bool ShouldEnrichWithStatuses(Context context)
+        {
+            return context.IsFrontendClient || context.IsResolveFlow();
+        }
+
+        private static bool ShouldEnrichWithReferences(Context context)
+        {
+            return context.IsFrontendClient && !context.IsNoEnrichment();
         }
     }
 }

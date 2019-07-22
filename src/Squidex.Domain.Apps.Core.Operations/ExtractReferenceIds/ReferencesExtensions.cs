@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -15,9 +14,9 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ReferencesExtensions
     {
-        public static IEnumerable<Guid> GetReferencedIds(this IField field, IJsonValue value)
+        public static IEnumerable<Guid> GetReferencedIds(this IField field, IJsonValue value, Ids strategy = Ids.All)
         {
-            return ReferencesExtractor.ExtractReferences(field, value);
+            return ReferencesExtractor.ExtractReferences(field, value, strategy);
         }
 
         public static IJsonValue CleanReferences(this IField field, IJsonValue value, ICollection<Guid> oldReferences)

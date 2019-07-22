@@ -19,7 +19,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class ContentCommandMiddlewareTests : HandlerTestBase<ContentState>
     {
         private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
+        private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly Guid contentId = Guid.NewGuid();
+        private readonly Context requestContext = new Context();
         private readonly ContentCommandMiddleware sut;
 
         public sealed class MyCommand : SquidexCommand
@@ -33,7 +35,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentCommandMiddlewareTests()
         {
-            sut = new ContentCommandMiddleware(A.Fake<IGrainFactory>(), contentEnricher);
+            A.CallTo(() => contextProvider.Context)
+                .Returns(requestContext);
+
+            sut = new ContentCommandMiddleware(A.Fake<IGrainFactory>(), contentEnricher, contextProvider);
         }
 
         [Fact]
@@ -46,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>.Ignored, User))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>.Ignored, requestContext))
                 .MustNotHaveHappened();
         }
 
@@ -64,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             Assert.Same(result, context.Result<IEnrichedContentEntity>());
 
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>.Ignored, User))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnrichedContentEntity>.Ignored, requestContext))
                 .MustNotHaveHappened();
         }
 
@@ -80,7 +85,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var enriched = new ContentEntity();
 
-            A.CallTo(() => contentEnricher.EnrichAsync(result, User))
+            A.CallTo(() => contentEnricher.EnrichAsync(result, requestContext))
                 .Returns(enriched);
 
             await sut.HandleAsync(context);

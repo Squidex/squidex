@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             var count = context.Path.Count();
 
-            if (value != null && (count == 0 || (count == 2 && context.Path.Last() == InvariantPartitioning.Instance.Master.Key)))
+            if (value != null && (count == 0 || (count == 2 && context.Path.Last() == InvariantPartitioning.Key)))
             {
                 FilterNode filter = null;
 
