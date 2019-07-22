@@ -9,6 +9,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
+    ApiUrlConfig,
     AssetDto,
     AssetUploaderState,
     DialogModel,
@@ -52,6 +53,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
     public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
+        private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
         private readonly renderer: Renderer2,
         private readonly resourceLoader: ResourceLoaderService
@@ -205,7 +207,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         let content = '';
 
         for (let asset of assets) {
-            content += `![${asset.fileName}](${asset.contentUrl} '${asset.fileName}')`;
+            content += `![${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`;
         }
 
         if (content.length > 0) {
@@ -252,7 +254,7 @@ export class MarkdownEditorComponent extends StatefulControlComponent<State, str
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                    replaceText(`![${asset.fileName}](${asset.contentUrl} '${asset.fileName}')`);
+                    replaceText(`![${asset.fileName}](${asset.fullUrl(this.apiUrl)} '${asset.fileName}')`);
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {

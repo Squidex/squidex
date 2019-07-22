@@ -80,6 +80,10 @@ export class AssetDto {
 
         this._meta = meta;
     }
+
+    public fullUrl(apiUrl: ApiUrlConfig) {
+        return apiUrl.buildUrl(this.contentUrl);
+    }
 }
 
 export interface AnnotateAssetDto {
