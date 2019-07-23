@@ -50,6 +50,8 @@ namespace Squidex.Web.CommandMiddlewares
 
             httpContext.Context().App = app;
 
+            var schema = A.Fake<ISchemaEntity>();
+
             A.CallTo(() => schema.Id).Returns(schemaId.Id);
             A.CallTo(() => schema.SchemaDef).Returns(new Schema(schemaId.Name));
 
