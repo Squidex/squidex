@@ -262,6 +262,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
         }
 
         [Fact]
+        public void CanUpdate_should_throw_exception_if_marking_a_ui_field_as_reference_field()
+        {
+            var command = new UpdateField { FieldId = 4, Properties = new UIFieldProperties { IsReferenceField = true } };
+
+            ValidationAssert.Throws(() => GuardSchemaField.CanUpdate(schema_0, command),
+                new ValidationError("UI field cannot be a reference field.", "Properties.IsReferenceField"));
+        }
+
+        [Fact]
         public void CanUpdate_should_throw_exception_if_properties_null()
         {
             var command = new UpdateField { FieldId = 2, Properties = null };
