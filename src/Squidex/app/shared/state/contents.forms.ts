@@ -78,7 +78,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                 fieldValue[language.iso2Code] :
                 undefined;
 
-            value = value || '- No Value -'
+            value = value || '- No Value -';
 
             return { value, formatted: value };
         }
