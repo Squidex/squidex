@@ -47,11 +47,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         {
             var data = CreateData();
 
-            var schema =
-                new Schema("my-schema")
-                    .AddString(1, "ref1", Partitioning.Invariant)
-                    .AddString(2, "ref2", Partitioning.Invariant)
-                    .AddString(3, "non-ref", Partitioning.Invariant);
+            var schema = CreateNoRefSchema();
 
             var formatted = data.FormatReferences(schema, languages);
 
@@ -61,6 +57,31 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
                     .Add("de", "DE");
 
             Assert.Equal(expected, formatted);
+        }
+
+        [Fact]
+        public void Should_return_default_value_if_no_value_found()
+        {
+            var data = new NamedContentData();
+
+            var schema = CreateNoRefSchema();
+
+            var formatted = data.FormatReferences(schema, languages);
+
+            var expected =
+                JsonValue.Object()
+                    .Add("en", string.Empty)
+                    .Add("de", string.Empty);
+
+            Assert.Equal(expected, formatted);
+        }
+
+        private static Schema CreateNoRefSchema()
+        {
+            return new Schema("my-schema")
+                .AddString(1, "ref1", Partitioning.Invariant)
+                .AddString(2, "ref2", Partitioning.Invariant)
+                .AddString(3, "non-ref", Partitioning.Invariant);
         }
 
         private static NamedContentData CreateData()

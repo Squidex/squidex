@@ -73,11 +73,12 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
                 fieldValue = reference[fieldInvariant];
             }
 
-            let value = '';
+            let value: string | undefined =
+                fieldValue ?
+                fieldValue[language.iso2Code] :
+                undefined;
 
-            if (fieldValue) {
-                value = fieldValue[language.iso2Code] || '';
-            }
+            value = value || '- No Value -'
 
             return { value, formatted: value };
         }
