@@ -55,7 +55,7 @@ import { FieldDto } from '@app/shared';
             </div>
 
             <div class="form-group row" *ngIf="field.properties.isContentField">
-                <div class="col-6 offset-3">
+                <div class="col-9 offset-3">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldListfield" formControlName="isListField" />
                         <label class="form-check-label" for="{{field.fieldId}}_fieldListfield">
@@ -70,7 +70,7 @@ import { FieldDto } from '@app/shared';
             </div>
 
             <div class="form-group row" *ngIf="field.properties.isContentField">
-                <div class="col-6 offset-3">
+                <div class="col-9 offset-3">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="{{field.fieldId}}_fieldReferencefield" formControlName="isReferenceField" />
                         <label class="form-check-label" for="{{field.fieldId}}_fieldReferencefield">

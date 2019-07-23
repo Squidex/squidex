@@ -15,6 +15,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public int? MaxItems { get; set; }
 
+        public bool ResolveReference { get; set; }
+
         public bool AllowDuplicates { get; set; }
 
         public ReferencesFieldEditor Editor { get; set; }

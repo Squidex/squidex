@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
         }
 
         [Fact]
-        public void Should_remove_ids()
+        public void Should_get_ids_from_id_data()
         {
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
@@ -48,6 +48,23 @@ namespace Squidex.Domain.Apps.Core.Operations.ExtractReferenceIds
             var input =
                 new IdContentData()
                     .AddField(5,
+                        new ContentFieldData()
+                            .AddValue("iv", JsonValue.Array(id1.ToString(), id2.ToString())));
+
+            var ids = input.GetReferencedIds(schema).ToArray();
+
+            Assert.Equal(new[] { id1, id2 }, ids);
+        }
+
+        [Fact]
+        public void Should_get_ids_from_name_data()
+        {
+            var id1 = Guid.NewGuid();
+            var id2 = Guid.NewGuid();
+
+            var input =
+                new NamedContentData()
+                    .AddField("assets1",
                         new ContentFieldData()
                             .AddValue("iv", JsonValue.Array(id1.ToString(), id2.ToString())));
 

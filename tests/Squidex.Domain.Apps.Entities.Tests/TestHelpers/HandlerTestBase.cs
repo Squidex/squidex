@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 
         protected string SchemaName { get; } = "my-schema";
 
-        protected ClaimsPrincipal User { get; } = new ClaimsPrincipal();
+        protected ClaimsPrincipal User { get; } = Mocks.FrontendUser();
 
         protected NamedId<Guid> AppNamedId
         {

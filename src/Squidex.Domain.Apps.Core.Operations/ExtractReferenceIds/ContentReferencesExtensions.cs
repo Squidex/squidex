@@ -23,18 +23,13 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             Guard.NotNull(schema, nameof(schema));
 
-            var foundReferences = new HashSet<Guid>();
-
             foreach (var field in schema.Fields)
             {
                 var ids = source.GetReferencedIds(field, strategy);
 
                 foreach (var id in ids)
                 {
-                    if (foundReferences.Add(id))
-                    {
-                        yield return id;
-                    }
+                    yield return id;
                 }
             }
         }
@@ -53,6 +48,21 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                     {
                         yield return id;
                     }
+                }
+            }
+        }
+
+        public static IEnumerable<Guid> GetReferencedIds(this NamedContentData source, Schema schema, Ids strategy = Ids.All)
+        {
+            Guard.NotNull(schema, nameof(schema));
+
+            foreach (var field in schema.Fields)
+            {
+                var ids = source.GetReferencedIds(field, strategy);
+
+                foreach (var id in ids)
+                {
+                    yield return id;
                 }
             }
         }

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
@@ -22,7 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class ContentEnricher : IContentEnricher
     {
         private const string DefaultColor = StatusColors.Draft;
-        private static readonly Dictionary<Guid, IEnrichedContentEntity> EmptyReferences = new Dictionary<Guid, IEnrichedContentEntity>();
+        private static readonly ILookup<Guid, IEnrichedContentEntity> EmptyReferences = Enumerable.Empty<IEnrichedContentEntity>().ToLookup(x => x.Id);
         private readonly Lazy<IContentQueryService> contentQuery;
         private readonly IContentWorkflow contentWorkflow;
 
@@ -92,25 +93,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private async Task ResolveReferencesAsync(Guid schemaId, IEnumerable<ContentEntity> contents, Context context)
         {
-            var appId = contents.First().AppId.Id;
-
             var schema = await ContentQuery.GetSchemaOrThrowAsync(context, schemaId.ToString());
 
-            var referenceFields =
-                schema.SchemaDef.Fields.OfType<IField<ReferencesFieldProperties>>()
-                    .Where(x =>
-                        x.Properties.SchemaId != Guid.Empty &&
-                        x.Properties.MinItems == 1 &&
-                        x.Properties.MaxItems == 1 &&
-                        x.Properties.IsListField);
+            var references = await GetReferencesAsync(schema, contents, context);
 
-            var formatted = new Dictionary<Guid, JsonObject>();
+            var formatted = new Dictionary<IContentEntity, JsonObject>();
 
-            foreach (var field in referenceFields)
+            foreach (var field in schema.SchemaDef.ResolvingReferences())
             {
                 foreach (var content in contents)
                 {
-                    content.ReferenceData = new NamedContentData();
+                    if (content.ReferenceData == null)
+                    {
+                        content.ReferenceData = new NamedContentData();
+                    }
+
                     content.ReferenceData.GetOrAddNew(field.Name);
                 }
 
@@ -119,25 +116,33 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     var referencedSchemaId = field.Properties.SchemaId;
                     var referencedSchema = await ContentQuery.GetSchemaOrThrowAsync(context, referencedSchemaId.ToString());
 
-                    var references = await GetReferencesAsync(referencedSchemaId, contents, field, context);
-
                     foreach (var content in contents)
                     {
                         var fieldReference = content.ReferenceData[field.Name];
 
                         if (content.DataDraft.TryGetValue(field.Name, out var fieldData))
                         {
-                            foreach (var partition in fieldData)
+                            foreach (var partitionValue in fieldData)
                             {
-                                var id = field.GetReferencedIds(partition.Value, Ids.ContentOnly).FirstOrDefault();
+                                var referencedContents =
+                                    field.GetReferencedIds(partitionValue.Value, Ids.ContentOnly)
+                                        .Select(x => references[x])
+                                        .SelectMany(x => x)
+                                        .ToList();
 
-                                if (references.TryGetValue(id, out var reference))
+                                if (referencedContents.Count == 1)
                                 {
                                     var value =
-                                        formatted.GetOrAdd(id,
-                                            _ => reference.DataDraft.FormatReferences(referencedSchema.SchemaDef, context.App.LanguagesConfig));
+                                        formatted.GetOrAdd(referencedContents[0],
+                                            x => x.DataDraft.FormatReferences(referencedSchema.SchemaDef, context.App.LanguagesConfig));
 
-                                    fieldReference[partition.Key] = JsonValue.Create(value);
+                                    fieldReference.AddJsonValue(partitionValue.Key, value);
+                                }
+                                else if (referencedContents.Count > 1)
+                                {
+                                    var value = CreateFallback(context, referencedContents);
+
+                                    fieldReference.AddJsonValue(partitionValue.Key, value);
                                 }
                             }
                         }
@@ -150,20 +155,34 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<Dictionary<Guid, IEnrichedContentEntity>> GetReferencesAsync(Guid schemaId, IEnumerable<ContentEntity> contents, IField field, Context context)
+        private static JsonObject CreateFallback(Context context, List<IEnrichedContentEntity> referencedContents)
+        {
+            var text = $"{referencedContents.Count} Reference(s)";
+
+            var value = JsonValue.Object();
+
+            foreach (var language in context.App.LanguagesConfig)
+            {
+                value.Add(language.Key, text);
+            }
+
+            return value;
+        }
+
+        private async Task<ILookup<Guid, IEnrichedContentEntity>> GetReferencesAsync(ISchemaEntity schema, IEnumerable<ContentEntity> contents, Context context)
         {
             var ids = new HashSet<Guid>();
 
             foreach (var content in contents)
             {
-                ids.AddRange(content.DataDraft.GetReferencedIds(field, Ids.ContentOnly));
+                ids.AddRange(content.DataDraft.GetReferencedIds(schema.SchemaDef, Ids.ContentOnly));
             }
 
             if (ids.Count > 0)
             {
-                var references = await ContentQuery.QueryAsync(context.Clone().WithNoEnrichment(true), schemaId.ToString(), Q.Empty.WithIds(ids));
+                var references = await ContentQuery.QueryAsync(context.Clone().WithNoEnrichment(true), ids.ToList());
 
-                return references.ToDictionary(x => x.Id);
+                return references.ToLookup(x => x.Id);
             }
             else
             {

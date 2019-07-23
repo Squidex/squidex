@@ -12,6 +12,7 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -26,10 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public DefaultWorkflowsValidatorTests()
         {
-            var schema = A.Fake<ISchemaEntity>();
-
-            A.CallTo(() => schema.Id).Returns(schemaId.Id);
-            A.CallTo(() => schema.SchemaDef).Returns(new Schema(schemaId.Name));
+            var schema = Mocks.Schema(appId, schemaId, new Schema(schemaId.Name));
 
             A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<Guid>.Ignored, false))
                 .Returns(Task.FromResult<ISchemaEntity>(null));

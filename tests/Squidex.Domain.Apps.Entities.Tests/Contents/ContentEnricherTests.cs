@@ -89,10 +89,16 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var source1 = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
             var source2 = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
 
+            var source = new IContentEntity[]
+            {
+                source1,
+                source2
+            };
+
             A.CallTo(() => contentWorkflow.GetInfoAsync(source1))
                 .Returns(new StatusInfo(Status.Published, StatusColors.Published));
 
-            var result = await sut.EnrichAsync(new[] { source1, source2 }, requestContext);
+            var result = await sut.EnrichAsync(source, requestContext);
 
             Assert.Equal(StatusColors.Published, result[0].StatusColor);
             Assert.Equal(StatusColors.Published, result[1].StatusColor);

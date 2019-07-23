@@ -61,24 +61,26 @@ export class SaveQueryForm extends Form<FormGroup, any> {
 export type FieldValue = string | HtmlValue;
 
 export function getContentValue(content: ContentDto, language: LanguageDto, field: RootFieldDto, allowHtml = true): { value: any, formatted: FieldValue } {
-    const reference = content.referenceData[field.name];
+    if (content.referenceData) {
+        const reference = content.referenceData[field.name];
 
-    if (reference) {
-        let fieldValue: ContentReferencesValue;
+        if (reference) {
+            let fieldValue: ContentReferencesValue;
 
-        if (field.isLocalizable) {
-            fieldValue = reference[language.iso2Code];
-        } else {
-            fieldValue = reference[fieldInvariant];
+            if (field.isLocalizable) {
+                fieldValue = reference[language.iso2Code];
+            } else {
+                fieldValue = reference[fieldInvariant];
+            }
+
+            let value = '';
+
+            if (fieldValue) {
+                value = fieldValue[language.iso2Code] || '';
+            }
+
+            return { value, formatted: value };
         }
-
-        let value = '';
-
-        if (fieldValue) {
-            value = fieldValue[language.iso2Code] || '';
-        }
-
-        return { value, formatted: value };
     }
 
     const contentField = content.dataDraft[field.name];
