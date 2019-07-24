@@ -219,6 +219,10 @@
         @include force-width(150px);
     }
 
+    &-content {
+        min-width: 200px;
+    }
+
     &-separator,
     &-select {
         text-align: center;

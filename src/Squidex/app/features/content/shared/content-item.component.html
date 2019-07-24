@@ -11,7 +11,7 @@
     </ng-template>
 </td>
 
-<td class="cell-auto" *ngFor="let field of schemaFields; let i = index; trackBy: trackByField.bind(this)" [sqxStopClick]="isDirty || (field.isInlineEditable && patchAllowed)">
+<td class="cell-auto cell-content" *ngFor="let field of schemaFields; let i = index; trackBy: trackByField.bind(this)" [sqxStopClick]="isDirty || (field.isInlineEditable && patchAllowed)">
     <ng-container *ngIf="field.isInlineEditable && patchAllowed; else displayTemplate">
         <sqx-content-value-editor [form]="patchForm.form" [field]="field"></sqx-content-value-editor>
     </ng-container>

@@ -38,14 +38,14 @@
     </ng-container>
 
     <ng-container content>
-        <div class="grid-header">
-            <table class="table table-items table-fixed">
+        <div class="grid-header" #header>
+            <table class="table table-items">
                 <thead>
                     <tr>
                         <th class="cell-select">
                             <input type="checkbox" class="form-check" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
                         </th>
-                        <th class="cell-auto" *ngFor="let field of schema.listFields">
+                        <th class="cell-auto cell-content" *ngFor="let field of schema.listFields">
                             <sqx-table-header [text]="field.displayName" 
                                 [sortable]="field.properties.isSortable"
                                 [sorting]="filter.sortMode(field) | async"
@@ -85,9 +85,9 @@
             </button>
         </div>
 
-        <div class="grid-content">
+        <div class="grid-content" [sqxSyncScrolling]="header">
             <div sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed">
+                <table class="table table-items">
                     <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent">
                         <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
                             [selected]="isItemSelected(content)"
