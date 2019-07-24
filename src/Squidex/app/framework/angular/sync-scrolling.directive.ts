@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Directive, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
+import { Directive, HostListener, Input, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxSyncScrolling]'
 })
-export class SyncScollingDirective implements OnInit {
+export class SyncScollingDirective {
     @Input('sqxSyncScrolling')
     public target: HTMLElement;
 
@@ -19,18 +19,12 @@ export class SyncScollingDirective implements OnInit {
     ) {
     }
 
-    public ngOnInit() {
-        if (this.target) {
-            this.renderer.setStyle(this.target, 'overflow-x', 'hidden');
-        }
-    }
-
     @HostListener('scroll', ['$event'])
     public onScroll(event: Event) {
         if (this.target) {
             const scroll = (<HTMLElement>event.target).scrollLeft;
 
-            this.target.scrollLeft = scroll;
+            this.renderer.setStyle(this.target, 'transform', `translate(-${scroll - this.target.scrollLeft}px, 0px)`);
         }
     }
 }
