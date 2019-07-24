@@ -10,11 +10,11 @@
     "setupapp": "screen -dmS appstart ./setup-app.sh",
     "dbstart": "start node ./JSFiles/utils/Db.js",
     "appstart": "start dotnet run --project ../../cosmos/src/Squidex",
-    "deploymentscriptsrun": "wait-on https://localhost:5000/ && cd ../deploymentscripts && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./Deployment.ps1 -identityServiceBaseUrl 'http://identityservice.systest.tesla.cha.rbxd.ds' -apiBaseUrl 'https://localhost:5000/api' -tokenUser 'CMSDeployer' -tokenPassword 'p@55w0rd' -appName 'commentary'",
+    "deploymentscriptsrun": "wait-on http://localhost:5001/ && cd ../deploymentscripts && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./Deployment.ps1 -identityServiceBaseUrl 'http://identityservice.systest.tesla.cha.rbxd.ds' -apiBaseUrl 'http://localhost:5001/api' -tokenUser 'CMSDeployer' -tokenPassword 'p@55w0rd' -appName 'commentary'",
     "test": "protractor ./JSFiles/config.js",
     "posttest": "cd ./utils/ && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./TerminateTask.ps1 && rm -r ./database/*",
     "protractor": "./node_modules/protractor/built/cli.js",
-    "webdriver-update": "./node_modules/.bin/webdriver-manager update && ./node_modules/protractor/bin/webdriver-manager update"
+    "webdriver-update": "./node_modules/protractor/node_modules/webdriver-manager update & start webdriver-manager start"
   },
   "author": "Pavani",
   "license": "ISC",
@@ -30,8 +30,8 @@
     "protractor": "^5.4.2",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5",
-    "winston": "^3.2.1",
-    "webdriver-manager": "^12.1.5"
+    "webdriver-manager": "^12.1.5",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "fs": "0.0.1-security",
