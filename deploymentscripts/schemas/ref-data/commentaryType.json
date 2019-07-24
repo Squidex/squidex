@@ -20,8 +20,7 @@
         "isRequired": true,
         "isListField": true,
         "fieldType": "String",
-        "editor": "Input",
-		    "isUnique": true
+        "editor": "Input"
       }
     }
   ],
