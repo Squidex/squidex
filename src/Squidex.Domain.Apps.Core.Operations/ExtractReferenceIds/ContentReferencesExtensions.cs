@@ -56,7 +56,14 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             Guard.NotNull(schema, nameof(schema));
 
-            foreach (var field in schema.Fields)
+            return GetReferencedIds(source, schema.Fields, strategy);
+        }
+
+        public static IEnumerable<Guid> GetReferencedIds(this NamedContentData source, IEnumerable<IField> fields, Ids strategy = Ids.All)
+        {
+            Guard.NotNull(fields, nameof(fields));
+
+            foreach (var field in fields)
             {
                 var ids = source.GetReferencedIds(field, strategy);
 

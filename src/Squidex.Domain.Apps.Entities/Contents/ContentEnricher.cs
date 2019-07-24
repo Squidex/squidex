@@ -175,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             foreach (var content in contents)
             {
-                ids.AddRange(content.DataDraft.GetReferencedIds(schema.SchemaDef, Ids.ContentOnly));
+                ids.AddRange(content.DataDraft.GetReferencedIds(schema.SchemaDef.ResolvingReferences(), Ids.ContentOnly));
             }
 
             if (ids.Count > 0)
