@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using NodaTime;
 using NodaTime.Text;
+using Orleans;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -12,42 +14,58 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.ICIS.Commands
 {
-    public sealed class UniqueContentValidationCommand : ICommandMiddleware
+    public sealed class UniqueContentValidationCommand : ICustomCommandMiddleware
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContextProvider contextProvider;
+        private readonly IGrainFactory grainFactory;
 
-        public UniqueContentValidationCommand(IContentQueryService contentQuery, IContextProvider contextProvider)
+        public UniqueContentValidationCommand(
+            IContentQueryService contentQuery,
+            IContextProvider contextProvider, 
+            IGrainFactory grainFactory)
         {
             this.contentQuery = contentQuery;
             this.contextProvider = contextProvider;
+            this.grainFactory = grainFactory;
         }
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
             if (context.Command is CreateContent createContent)
             {
-                var (isFound, regionId, commodityId, contentType, createdFor) = GetValues(createContent.Data);
+                await ValidateContentAsync(createContent.ContentId, createContent.Data, createContent.SchemaId);
+            }
+            else if (context.Command is UpdateContent updateContent)
+            {
+                var content = await grainFactory.GetGrain<IContentGrain>(updateContent.ContentId).GetStateAsync();
 
-                if (isFound)
-                {
-                    var query = CreateQuery(regionId, commodityId, contentType, createdFor);
-
-                    var contents = await contentQuery.QueryAsync(contextProvider.Context, createContent.SchemaId.Name, Q.Empty.WithODataQuery(query));
-
-                    if (contents.Total > 0)
-                    {
-                        throw new DomainException("A content item with these values already exists.");
-                    }
-                }
+                await ValidateContentAsync(updateContent.ContentId, updateContent.Data, content.Value.SchemaId);
             }
 
             await next();
         }
 
+        private async Task ValidateContentAsync(Guid contentId, NamedContentData data, NamedId<Guid> schemaId)
+        {
+            var (isFound, regionId, commodityId, contentType, createdFor) = GetValues(data);
+
+            if (isFound)
+            {
+                var query = CreateQuery(regionId, commodityId, contentType, createdFor);
+
+                var contents = await contentQuery.QueryAsync(contextProvider.Context, schemaId.Name, Q.Empty.WithODataQuery(query));
+
+                if (contents.Any(x => x.Id != contentId))
+                {
+                    throw new DomainException("A content item with these values already exists.");
+                }
+            }
+        }
+
         private string CreateQuery(Guid regionId, Guid commodityId, Guid contentType, Instant createdFor)
         {
-            return $"$top=1&$filter=data/region/iv eq '{regionId}' and data/commodity/iv eq '{commodityId}' and data/commentarytype/iv eq '{contentType}' and data/createdfor/iv eq {createdFor}";
+            return $"$top=2&$filter=data/region/iv eq '{regionId}' and data/commodity/iv eq '{commodityId}' and data/commentarytype/iv eq '{contentType}' and data/createdfor/iv eq {createdFor}";
         }
 
         private static (bool isFound, Guid regionId, Guid commodityId, Guid contentType, Instant createdFor) GetValues(NamedContentData data)

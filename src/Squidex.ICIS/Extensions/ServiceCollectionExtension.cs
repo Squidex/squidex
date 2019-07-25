@@ -16,7 +16,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.ICIS.Commands;
 using Squidex.ICIS.Handlers;
 using Squidex.ICIS.Interfaces;
@@ -43,6 +42,7 @@ namespace Squidex.ICIS.Extensions
             services.Configure<ICISKafkaOptions>(config.GetSection("kafka"));
             services.AddKafkaRuleExtension(config);
             services.AddKafkaConsumers(config);
+            services.AddValidationCommands();
         }
 
         public static void AddGenesisAuthentication(this IServiceCollection services, string authServer)
@@ -109,7 +109,7 @@ namespace Squidex.ICIS.Extensions
 
         public static void AddValidationCommands(this IServiceCollection services)
         {
-            services.AddSingleton<ICommandMiddleware, UniqueContentValidationCommand>();
+            services.AddSingleton<ICustomCommandMiddleware, UniqueContentValidationCommand>();
         }
     }
 }
