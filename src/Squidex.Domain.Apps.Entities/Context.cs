@@ -28,6 +28,11 @@ namespace Squidex.Domain.Apps.Entities
             get { return User?.Permissions() ?? PermissionSet.Empty; }
         }
 
+        public bool IsFrontendClient
+        {
+            get { return User != null && User.IsInClient(DefaultClients.Frontend); }
+        }
+
         public Context()
         {
         }
@@ -39,9 +44,16 @@ namespace Squidex.Domain.Apps.Entities
             App = app;
         }
 
-        public bool IsFrontendClient
+        public Context Clone()
         {
-            get { return User != null && User.IsInClient(DefaultClients.Frontend); }
+            var clone = new Context(User, App);
+
+            foreach (var kvp in Headers)
+            {
+                clone.Headers[kvp.Key] = kvp.Value;
+            }
+
+            return clone;
         }
     }
 }

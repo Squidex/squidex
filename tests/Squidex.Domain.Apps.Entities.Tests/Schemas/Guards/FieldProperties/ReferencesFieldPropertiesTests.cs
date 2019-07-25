@@ -45,6 +45,20 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties
         }
 
         [Fact]
+        public void Should_add_error_if_resolving_references_with_more_than_one_max_items()
+        {
+            var sut = new ReferencesFieldProperties { ResolveReference = true, MaxItems = 2 };
+
+            var errors = FieldPropertiesValidator.Validate(sut).ToList();
+
+            errors.Should().BeEquivalentTo(
+                new List<ValidationError>
+                {
+                    new ValidationError("Can only resolve references when MaxItems is 1.", "ResolveReference", "MaxItems")
+                });
+        }
+
+        [Fact]
         public void Should_not_add_error_if_min_items_greater_equals_to_max_items()
         {
             var sut = new ReferencesFieldProperties { MinItems = 2, MaxItems = 2 };

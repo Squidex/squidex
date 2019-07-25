@@ -169,6 +169,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
                 this.contentsState.create(value, publish)
                     .subscribe(() => {
+                        this.contentForm.submitCompleted({ noReset: true });
+
                         this.back();
                     }, error => {
                         this.contentForm.submitFailed(error);

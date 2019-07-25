@@ -30,5 +30,8 @@ export class ReferencesUIComponent implements OnInit {
             new FormControl(this.properties.editor, [
                 Validators.required
             ]));
+
+        this.editForm.setControl('resolveReference',
+            new FormControl(this.properties.resolveReference));
     }
 }

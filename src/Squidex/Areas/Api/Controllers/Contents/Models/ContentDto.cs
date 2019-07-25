@@ -50,6 +50,11 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models
         public object DataDraft { get; set; }
 
         /// <summary>
+        /// The reference data for the frontend UI.
+        /// </summary>
+        public NamedContentData ReferenceData { get; set; }
+
+        /// <summary>
         /// Indicates if the draft data is pending.
         /// </summary>
         public bool IsPending { get; set; }

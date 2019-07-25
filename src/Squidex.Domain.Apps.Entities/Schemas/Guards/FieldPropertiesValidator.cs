@@ -218,6 +218,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     nameof(properties.MinItems),
                     nameof(properties.MaxItems));
             }
+
+            if (properties.ResolveReference && properties.MaxItems != 1)
+            {
+                yield return new ValidationError("Can only resolve references when MaxItems is 1.",
+                    nameof(properties.ResolveReference),
+                    nameof(properties.MaxItems));
+            }
         }
 
         public IEnumerable<ValidationError> Visit(StringFieldProperties properties)

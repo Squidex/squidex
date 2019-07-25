@@ -10,7 +10,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Services;
-using Squidex.Infrastructure;
 using Squidex.Shared;
 using Squidex.Web;
 
