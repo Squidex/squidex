@@ -153,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft }),
-                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published })
+                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published, Change = StatusChange.Published })
                 );
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<create-script>"))
