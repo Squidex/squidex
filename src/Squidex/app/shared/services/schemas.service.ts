@@ -100,24 +100,24 @@ export class SchemaDetailsDto extends SchemaDto {
         super(links, id, name, category, properties, isSingleton, isPublished, created, createdBy, lastModified, lastModifiedBy, version);
 
         if (fields) {
-            this.listFields = this.getField(x => x.properties.isListField);
+            this.listFields = this.fields.filter(x => x.properties.isListField && x.properties.isContentField);
+
+            if (this.listFields.length === 0 && this.fields.length > 0) {
+                this.listFields = [this.fields[0]];
+            }
+
+            if (this.listFields.length === 0) {
+                this.listFields = NONE_FIELDS;
+            }
+
             this.listFieldsEditable = this.listFields.filter(x => x.isInlineEditable);
 
-            this.referenceFields = this.getField(x => x.properties.isReferenceField);
-        }
-    }
+            this.referenceFields = this.fields.filter(x => x.properties.isReferenceField && x.properties.isContentField);
 
-    private getField(predicate: (field: RootFieldDto) => boolean) {
-        let fields = this.fields.filter(x => predicate(x) && x.properties.isContentField);
-
-        if (fields.length === 0 && this.fields.length > 0) {
-            fields = [this.fields[0]];
+            if (this.referenceFields.length === 0) {
+                this.referenceFields = this.listFields;
+            }
         }
-        if (fields.length === 0) {
-            fields = NONE_FIELDS;
-        }
-
-        return fields;
     }
 
     public export(): any {
