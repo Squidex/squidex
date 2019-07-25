@@ -40,11 +40,32 @@
     }
 }
 
+@mixin scrollbars($size, $foreground-color, $background-color: mix($foreground-color, white, 50%)) {
+    &::-webkit-scrollbar {
+        width:  $size;
+        height: $size;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $foreground-color;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: $background-color;
+    }
+
+    & {
+        scrollbar-face-color: $foreground-color;
+        scrollbar-track-color: $background-color;
+    }
+}
+
+
 @mixin clearfix() {
     &::after {
         content: '';
-        display: table;
         clear: both;
+        display: table;
     }
 }
 
@@ -53,6 +74,12 @@
     opacity: 0;
     overflow: hidden;
     position: absolute;
+}
+
+@mixin force-width($width) {
+    min-width: $width;
+    max-width: $width;
+    width:  $width;
 }
 
 @mixin flex-box {
@@ -160,8 +187,10 @@
 
 @mixin caret() {
     display: inline-block;
-      width: 0;
-     height: 0;
+    min-width: 0;
+    max-width: 0;
+    min-height: 0;
+    max-height: 0;
     content: '';
 }
  

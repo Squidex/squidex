@@ -45,7 +45,6 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
 using Squidex.Domain.Apps.Entities.Tags;
-using Squidex.ICIS.Extensions;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Email;
@@ -100,11 +99,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetEnricher>()
                 .As<IAssetEnricher>();
 
+            services.AddSingletonAs<ContentEnricher>()
+                .As<IContentEnricher>();
+
             services.AddSingletonAs<AssetQueryService>()
                 .As<IAssetQueryService>();
 
-            services.AddSingletonAs<ContentEnricher>()
-                .As<IContentEnricher>();
+            services.AddSingletonAs(c => new Lazy<IContentQueryService>(() => c.GetRequiredService<IContentQueryService>()))
+                .AsSelf();
 
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
@@ -225,7 +227,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<EnrichWithSchemaIdCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddValidationCommands();
+            services.AddSingletonAs<CustomCommandMiddlewareRunner>()
+                .As<ICommandMiddleware>();
 
             services.AddSingletonAs<InviteUserCommandMiddleware>()
                 .As<ICommandMiddleware>();

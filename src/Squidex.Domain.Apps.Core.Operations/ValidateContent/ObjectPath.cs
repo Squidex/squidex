@@ -26,7 +26,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
                 }
                 else if (index == 1)
                 {
-                    if (!property.Equals(InvariantPartitioning.Instance.Master.Key, StringComparison.OrdinalIgnoreCase))
+                    if (!property.Equals(InvariantPartitioning.Key, StringComparison.OrdinalIgnoreCase))
                     {
                         sb.Append("(");
                         sb.Append(property);

@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using NodaTime;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -31,13 +30,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class ContentGrainTests : HandlerTestBase<ContentState>
     {
-        private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
-        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+        private readonly Guid contentId = Guid.NewGuid();
+        private readonly IAppEntity app;
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IContentRepository contentRepository = A.Dummy<IContentRepository>();
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>(x => x.Wrapping(new DefaultContentWorkflow()));
-        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
-        private readonly LanguagesConfig languagesConfig = LanguagesConfig.Build(Language.DE);
+        private readonly ISchemaEntity schema;
+        private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
 
         private readonly NamedContentData invalidData =
             new NamedContentData()
@@ -66,7 +65,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     new ContentFieldData()
                         .AddValue("iv", 2));
         private readonly NamedContentData patched;
-        private readonly Guid contentId = Guid.NewGuid();
         private readonly ContentGrain sut;
 
         protected override Guid Id
@@ -76,6 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public ContentGrainTests()
         {
+            app = Mocks.App(AppNamedId, Language.DE);
+
             var scripts = new SchemaScripts
             {
                 Change = "<change-script>",
@@ -92,12 +92,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
                          new NumberFieldProperties { IsRequired = false })
                     .ConfigureScripts(scripts);
 
-            A.CallTo(() => appEntity.LanguagesConfig).Returns(languagesConfig);
+            schema = Mocks.Schema(AppNamedId, SchemaNamedId, schemaDef);
 
-            A.CallTo(() => appProvider.GetAppAsync(AppName)).Returns(appEntity);
-            A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppId, SchemaId)).Returns((appEntity, schema));
+            A.CallTo(() => appProvider.GetAppAsync(AppName))
+                .Returns(app);
 
-            A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
+            A.CallTo(() => appProvider.GetAppWithSchemaAsync(AppId, SchemaId))
+                .Returns((app, schema));
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, A<string>.Ignored))
                 .ReturnsLazily(x => x.GetArgument<ScriptContext>(0).Data);
@@ -153,7 +154,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateContentEvent(new ContentCreated { Data = data, Status = Status.Draft }),
-                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published })
+                    CreateContentEvent(new ContentStatusChanged { Status = Status.Published, Change = StatusChange.Published })
                 );
 
             A.CallTo(() => scriptEngine.ExecuteAndTransform(A<ScriptContext>.Ignored, "<create-script>"))

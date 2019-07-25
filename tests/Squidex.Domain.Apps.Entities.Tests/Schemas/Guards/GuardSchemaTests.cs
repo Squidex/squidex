@@ -354,7 +354,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                         Name = "field1",
                         Properties = new UIFieldProperties
                         {
-                            IsListField = true
+                            IsListField = true,
+                            IsReferenceField = true,
                         },
                         IsHidden = true,
                         IsDisabled = true,
@@ -367,6 +368,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             await ValidationAssert.ThrowsAsync(() => GuardSchema.CanCreate(command, appProvider),
                 new ValidationError("UI field cannot be a list field.",
                     "Fields[1].Properties.IsListField"),
+                new ValidationError("UI field cannot be a reference field.",
+                    "Fields[1].Properties.IsReferenceField"),
                 new ValidationError("UI field cannot be hidden.",
                     "Fields[1].IsHidden"),
                 new ValidationError("UI field cannot be disabled.",

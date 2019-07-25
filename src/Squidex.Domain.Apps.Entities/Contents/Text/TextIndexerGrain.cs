@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         private static readonly TimeSpan CommitDelay = TimeSpan.FromSeconds(10);
         private static readonly MergeScheduler MergeScheduler = new ConcurrentMergeScheduler();
         private static readonly Analyzer Analyzer = new MultiLanguageAnalyzer(Version);
-        private static readonly string[] Invariant = { InvariantPartitioning.Instance.Master.Key };
+        private static readonly string[] Invariant = { InvariantPartitioning.Key };
         private readonly SnapshotDeletionPolicy snapshotter = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
         private readonly IAssetStore assetStore;
         private IDisposable timer;

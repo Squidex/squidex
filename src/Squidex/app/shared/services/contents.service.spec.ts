@@ -366,6 +366,7 @@ describe('ContentsService', () => {
             isPending: true,
             data: {},
             dataDraft: {},
+            referenceData: {},
             version: `${id}`,
             _links: {
                 update: { method: 'PUT', href: `/contents/id${id}` }
@@ -387,6 +388,7 @@ export function createContent(id: number, suffix = '') {
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
         new ScheduleDto('Draft', `Scheduler${id}`, DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`)),
         true,
+        {},
         {},
         {},
         new Version(`${id}`));
