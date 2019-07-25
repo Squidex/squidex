@@ -14,19 +14,24 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
 {
     public static class ReferencesExtensions
     {
-        public static IEnumerable<Guid> ExtractReferences(this IField field, IJsonValue value)
+        public static IEnumerable<Guid> GetReferencedIds(this IField field, IJsonValue value, Ids strategy = Ids.All)
         {
-            return ReferencesExtractor.ExtractReferences(field, value);
+            return ReferencesExtractor.ExtractReferences(field, value, strategy);
         }
 
         public static IJsonValue CleanReferences(this IField field, IJsonValue value, ICollection<Guid> oldReferences)
         {
-            if (value.Type == JsonValueType.Null)
+            if (IsNull(value))
             {
                 return value;
             }
 
             return ReferencesCleaner.CleanReferences(field, value, oldReferences);
+        }
+
+        private static bool IsNull(IJsonValue value)
+        {
+            return value == null || value.Type == JsonValueType.Null;
         }
 
         public static JsonArray ToJsonArray(this HashSet<Guid> ids)

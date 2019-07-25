@@ -16,15 +16,18 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
     public sealed class ReferencesExtractor : IFieldVisitor<IEnumerable<Guid>>
     {
         private readonly IJsonValue value;
+        private readonly Ids strategy;
 
-        private ReferencesExtractor(IJsonValue value)
+        private ReferencesExtractor(IJsonValue value, Ids strategy)
         {
             this.value = value;
+
+            this.strategy = strategy;
         }
 
-        public static IEnumerable<Guid> ExtractReferences(IField field, IJsonValue value)
+        public static IEnumerable<Guid> ExtractReferences(IField field, IJsonValue value, Ids strategy)
         {
-            return field.Accept(new ReferencesExtractor(value));
+            return field.Accept(new ReferencesExtractor(value, strategy));
         }
 
         public IEnumerable<Guid> Visit(IArrayField field)
@@ -39,7 +42,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
                     {
                         if (item.TryGetValue(nestedField.Name, out var nestedValue))
                         {
-                            result.AddRange(nestedField.Accept(new ReferencesExtractor(nestedValue)));
+                            result.AddRange(nestedField.Accept(new ReferencesExtractor(nestedValue, strategy)));
                         }
                     }
                 }
@@ -59,7 +62,7 @@ namespace Squidex.Domain.Apps.Core.ExtractReferenceIds
         {
             var ids = value.ToGuidSet();
 
-            if (field.Properties.SchemaId != Guid.Empty)
+            if (strategy == Ids.All && field.Properties.SchemaId != Guid.Empty)
             {
                 ids.Add(field.Properties.SchemaId);
             }

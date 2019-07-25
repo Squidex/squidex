@@ -5,18 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Contents;
-
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Infrastructure.Commands
 {
-    public interface IEnrichedContentEntity : IContentEntity
+    public interface ICustomCommandMiddleware : ICommandMiddleware
     {
-        bool CanUpdate { get; }
-
-        string StatusColor { get; }
-
-        StatusInfo[] Nexts { get; }
-
-        NamedContentData ReferenceData { get; }
     }
 }

@@ -29,6 +29,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields
         public bool AllowDuplicates { get; set; }
 
         /// <summary>
+        /// True to resolve references in the content list.
+        /// </summary>
+        public bool ResolveReference { get; set; }
+
+        /// <summary>
         /// The editor that is used to manage this field.
         /// </summary>
         public ReferencesFieldEditor Editor { get; set; }

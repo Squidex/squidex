@@ -15,6 +15,7 @@ namespace Squidex.Domain.Apps.Core
     public sealed class InvariantPartitioning : IFieldPartitioning, IFieldPartitionItem
     {
         public static readonly InvariantPartitioning Instance = new InvariantPartitioning();
+        public static readonly string Key = "iv";
 
         public int Count
         {
@@ -28,7 +29,7 @@ namespace Squidex.Domain.Apps.Core
 
         string IFieldPartitionItem.Key
         {
-            get { return "iv"; }
+            get { return Key; }
         }
 
         string IFieldPartitionItem.Name
@@ -52,7 +53,7 @@ namespace Squidex.Domain.Apps.Core
 
         public bool TryGetItem(string key, out IFieldPartitionItem item)
         {
-            var isFound = string.Equals(key, "iv", StringComparison.OrdinalIgnoreCase);
+            var isFound = string.Equals(key, Key, StringComparison.OrdinalIgnoreCase);
 
             item = isFound ? this : null;
 

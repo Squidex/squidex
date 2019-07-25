@@ -17,22 +17,25 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class ContentCommandMiddleware : GrainCommandMiddleware<ContentCommand, IContentGrain>
     {
         private readonly IContentEnricher contentEnricher;
+        private readonly IContextProvider contextProvider;
 
-        public ContentCommandMiddleware(IGrainFactory grainFactory, IContentEnricher contentEnricher)
+        public ContentCommandMiddleware(IGrainFactory grainFactory, IContentEnricher contentEnricher, IContextProvider contextProvider)
             : base(grainFactory)
         {
             Guard.NotNull(contentEnricher, nameof(contentEnricher));
+            Guard.NotNull(contextProvider, nameof(contextProvider));
 
             this.contentEnricher = contentEnricher;
+            this.contextProvider = contextProvider;
         }
 
         public override async Task HandleAsync(CommandContext context, Func<Task> next)
         {
             await base.HandleAsync(context, next);
 
-            if (context.Command is SquidexCommand command && context.PlainResult is IContentEntity content && NotEnriched(context))
+            if (context.PlainResult is IContentEntity content && NotEnriched(context))
             {
-                var enriched = await contentEnricher.EnrichAsync(content, command.User);
+                var enriched = await contentEnricher.EnrichAsync(content, contextProvider.Context);
 
                 context.Complete(enriched);
             }

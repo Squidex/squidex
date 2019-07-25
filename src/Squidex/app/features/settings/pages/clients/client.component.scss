@@ -33,7 +33,7 @@ $color-editor: #eceeef;
 }
 
 .cell-actions {
-    width: 3.2rem;
+    @include force-width(3.2rem);
 }
 
 .cell-input {
