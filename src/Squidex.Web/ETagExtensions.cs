@@ -18,27 +18,27 @@ namespace Squidex.Web
     {
         private static readonly int GuidLength = Guid.Empty.ToString().Length;
 
-        public static string ToEtag<T>(this IReadOnlyList<T> items, IEntityWithVersion app = null) where T : IEntity, IEntityWithVersion
+        public static string ToEtag<T>(this IReadOnlyList<T> items, params IEntityWithVersion[] dependencies) where T : IEntity, IEntityWithVersion
         {
             using (Profiler.Trace("CalculateEtag"))
             {
-                var unhashed = Unhashed(items, 0, app);
+                var unhashed = Unhashed(items, 0, dependencies);
 
                 return unhashed.Sha256Base64();
             }
         }
 
-        public static string ToEtag<T>(this IResultList<T> items, IEntityWithVersion app = null) where T : IEntity, IEntityWithVersion
+        public static string ToEtag<T>(this IResultList<T> items, params IEntityWithVersion[] dependencies) where T : IEntity, IEntityWithVersion
         {
             using (Profiler.Trace("CalculateEtag"))
             {
-                var unhashed = Unhashed(items, items.Total, app);
+                var unhashed = Unhashed(items, items.Total, dependencies);
 
                 return unhashed.Sha256Base64();
             }
         }
 
-        private static string Unhashed<T>(IReadOnlyList<T> items, long total, IEntityWithVersion app) where T : IEntity, IEntityWithVersion
+        private static string Unhashed<T>(IReadOnlyList<T> items, long total, params IEntityWithVersion[] dependencies) where T : IEntity, IEntityWithVersion
         {
             var sb = new StringBuilder((items.Count * (GuidLength + 8)) + 10);
 
@@ -51,10 +51,10 @@ namespace Squidex.Web
             sb.Append("_");
             sb.Append(total);
 
-            if (app != null)
+            foreach (var dependency in dependencies)
             {
                 sb.Append("_");
-                sb.Append(app.Version);
+                sb.Append(dependency.Version);
             }
 
             return sb.ToString();

@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.News.Service
 {
     public sealed class FeaturesService
     {
-        private const int FeatureVersion = 3;
+        private const int FeatureVersion = 4;
         private static readonly QueryContext Flatten = QueryContext.Default.Flatten();
         private readonly SquidexClient<NewsEntity, FeatureDto> client;
 

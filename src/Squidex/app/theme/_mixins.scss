@@ -57,6 +57,8 @@
     & {
         scrollbar-face-color: $foreground-color;
         scrollbar-track-color: $background-color;
+        scrollbar-color: $foreground-color $background-color;
+        scrollbar-width: thin;
     }
 }
 

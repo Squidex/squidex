@@ -15,7 +15,9 @@ body {
     }
 }
 
-@include scrollbars(10px, $color-dark2-placeholder, transparent);
+* {
+    @include scrollbars(8px, $color-border-dark, transparent);
+}
 
 // Common style for user email.
 .user-email {
