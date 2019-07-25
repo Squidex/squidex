@@ -90,11 +90,12 @@
                 <table class="table table-items table-fixed">
                     <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent">
                         <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
-                            [language]="language"
-                            [schema]="schema"
                             [selected]="isItemSelected(content)"
                             (selectedChange)="selectItem(content, $event)"
                             (statusChange)="changeStatus(content, $event)"
+                            [language]="language"
+                            [schema]="schema"
+                            [schemaFields]="schema.listFields"
                             (delete)="delete(content)"
                             (clone)="clone(content)">
                         </tr>

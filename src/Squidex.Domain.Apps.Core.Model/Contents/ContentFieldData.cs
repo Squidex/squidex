@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public ContentFieldData AddValue(object value)
         {
-            return AddJsonValue(InvariantPartitioning.Instance.Master.Key, JsonValue.Create(value));
+            return AddJsonValue(InvariantPartitioning.Key, JsonValue.Create(value));
         }
 
         public ContentFieldData AddValue(string key, object value)

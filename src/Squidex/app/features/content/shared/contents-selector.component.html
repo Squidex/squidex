@@ -33,7 +33,7 @@
                         <th class="cell-select">
                             <input type="checkbox" class="form-check" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
                         </th>
-                        <th class="cell-auto" *ngFor="let field of schema.listFields">
+                        <th class="cell-auto" *ngFor="let field of schema.referenceFields">
                             <sqx-table-header [text]="field.displayName" 
                                 [sortable]="field.properties.isSortable"
                                 [sorting]="filter.sortMode(field) | async"
@@ -64,7 +64,8 @@
                             [selected]="isItemSelected(content)"
                             (selectedChange)="selectContent(content)"
                             [language]="language"
-                            [schema]="schema" 
+                            [schema]="schema"
+                            [schemaFields]="schema.referenceFields"
                             isReadOnly="true"></tr>
                         <tr class="spacer"></tr>
                     </tbody>

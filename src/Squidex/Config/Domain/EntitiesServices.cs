@@ -99,11 +99,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetEnricher>()
                 .As<IAssetEnricher>();
 
+            services.AddSingletonAs<ContentEnricher>()
+                .As<IContentEnricher>();
+
             services.AddSingletonAs<AssetQueryService>()
                 .As<IAssetQueryService>();
 
-            services.AddSingletonAs<ContentEnricher>()
-                .As<IContentEnricher>();
+            services.AddSingletonAs(c => new Lazy<IContentQueryService>(() => c.GetRequiredService<IContentQueryService>()))
+                .AsSelf();
 
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();

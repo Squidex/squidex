@@ -10,9 +10,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -23,16 +23,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
 {
     public class GrainTextIndexerTests
     {
+        private readonly IAppEntity app;
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ITextIndexerGrain grain = A.Fake<ITextIndexerGrain>();
-        private readonly Guid schemaId = Guid.NewGuid();
         private readonly Guid contentId = Guid.NewGuid();
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly NamedContentData data = new NamedContentData();
         private readonly GrainTextIndexer sut;
 
         public GrainTextIndexerTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<ITextIndexerGrain>(schemaId, null))
+            app = Mocks.App(appId);
+
+            A.CallTo(() => grainFactory.GetGrain<ITextIndexerGrain>(schemaId.Id, null))
                 .Returns(grain);
 
             sut = new GrainTextIndexer(grainFactory);
@@ -109,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
             A.CallTo(() => grain.SearchAsync("Search", A<SearchContext>.Ignored))
                 .Returns(foundIds);
 
-            var ids = await sut.SearchAsync("Search", GetApp(), schemaId, Scope.Draft);
+            var ids = await sut.SearchAsync("Search", app, schemaId.Id, Scope.Draft);
 
             Assert.Equal(foundIds, ids);
         }
@@ -117,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
         [Fact]
         public async Task Should_not_call_grain_when_input_is_empty()
         {
-            var ids = await sut.SearchAsync(string.Empty, GetApp(), schemaId, Scope.Published);
+            var ids = await sut.SearchAsync(string.Empty, app, schemaId.Id, Scope.Published);
 
             Assert.Null(ids);
 
@@ -125,19 +129,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text
                 .MustNotHaveHappened();
         }
 
-        private static IAppEntity GetApp()
-        {
-            var app = A.Fake<IAppEntity>();
-
-            A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.Build(Language.EN, Language.DE));
-
-            return app;
-        }
-
         private Envelope<IEvent> E(ContentEvent contentEvent)
         {
             contentEvent.ContentId = contentId;
-            contentEvent.SchemaId = NamedId.Of(schemaId, "my-schema");
+            contentEvent.SchemaId = schemaId;
 
             return new Envelope<IEvent>(contentEvent);
         }
