@@ -16,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.ICIS.Commands;
 using Squidex.ICIS.Handlers;
 using Squidex.ICIS.Interfaces;
 using Squidex.ICIS.Kafka;
@@ -23,6 +25,7 @@ using Squidex.ICIS.Kafka.Config;
 using Squidex.ICIS.Kafka.Consumer;
 using Squidex.ICIS.Kafka.Entities;
 using Squidex.ICIS.Kafka.Producer;
+using Squidex.Infrastructure.Commands;
 
 namespace Squidex.ICIS.Extensions
 {
@@ -102,6 +105,11 @@ namespace Squidex.ICIS.Extensions
                     });
                 }
             }
+        }
+
+        public static void AddValidationCommands(this IServiceCollection services)
+        {
+            services.AddSingleton<ICommandMiddleware, UniqueContentValidationCommand>();
         }
     }
 }
