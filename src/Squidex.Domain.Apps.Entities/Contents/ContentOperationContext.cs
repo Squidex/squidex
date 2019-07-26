@@ -30,8 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private IScriptEngine scriptEngine;
         private ISchemaEntity schemaEntity;
         private IAppEntity appEntity;
-        private IContentEntity contentEntity;
-        private Guid contentId;
+        private ContentCommand command;
         private Guid schemaId;
         private Func<string> message;
 
@@ -43,8 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public static async Task<ContentOperationContext> CreateAsync(
             Guid appId,
             Guid schemaId,
-            Guid contentId,
-            IContentEntity contentEntity,
+            ContentCommand command,
             IAppProvider appProvider,
             IAssetRepository assetRepository,
             IContentRepository contentRepository,
@@ -57,8 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             {
                 appEntity = appEntity,
                 assetRepository = assetRepository,
-                contentId = contentId,
-                contentEntity = contentEntity,
+                command = command,
                 contentRepository = contentRepository,
                 message = message,
                 schemaId = schemaId,
@@ -90,56 +87,34 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
         }
 
-        public Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, object operation, ContentCommand command,
-            NamedContentData data, Status? status = null)
+        public Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, ScriptContext context)
         {
-            var ctx = CreateScriptContext(operation, command, data, status);
+            Enrich(context);
 
-            var result = scriptEngine.ExecuteAndTransform(ctx, GetScript(script));
+            var result = scriptEngine.ExecuteAndTransform(context, GetScript(script));
 
             return Task.FromResult(result);
         }
 
-        public Task ExecuteScriptAsync(Func<SchemaScripts, string> script, object operation, ContentCommand command,
-            NamedContentData data, Status? status = null)
+        public Task ExecuteScriptAsync(Func<SchemaScripts, string> script, ScriptContext context)
         {
-            var ctx = CreateScriptContext(operation, command, data, status);
+            Enrich(context);
 
-            scriptEngine.Execute(ctx, GetScript(script));
+            scriptEngine.Execute(context, GetScript(script));
 
             return TaskHelper.Done;
         }
 
-        private ScriptContext CreateScriptContext(object operation, ContentCommand command, NamedContentData data, Status? status)
+        private void Enrich(ScriptContext context)
         {
-            var result = new ScriptContext { ContentId = command.ContentId, Data = data, User = command.User, Operation = operation.ToString() };
+            context.ContentId = command.ContentId;
 
-            if (data != null)
-            {
-                result.Data = data;
-                result.DataOld = contentEntity?.Data;
-            }
-            else
-            {
-                result.Data = contentEntity?.Data;
-            }
-
-            if (status.HasValue)
-            {
-                result.Status = status.Value;
-                result.StatusOld = contentEntity?.Status ?? default;
-            }
-            else
-            {
-                result.Status = contentEntity?.Status ?? default;
-            }
-
-            return result;
+            context.User = command.User;
         }
 
         private ValidationContext CreateValidationContext()
         {
-            return new ValidationContext(contentId, schemaId, QueryContentsAsync, QueryAssetsAsync);
+            return new ValidationContext(command.ContentId, schemaId, QueryContentsAsync, QueryAssetsAsync);
         }
 
         private async Task<IReadOnlyList<IAssetInfo>> QueryAssetsAsync(IEnumerable<Guid> assetIds)
