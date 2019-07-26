@@ -66,11 +66,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case CreateContent createContent:
                     return CreateReturnAsync(createContent, async c =>
                     {
-                        var ctx = await CreateContext(c.AppId.Id, c.SchemaId.Id, Guid.Empty, () => "Failed to create content.");
+                        var ctx = await CreateContext(c.AppId.Id, c.SchemaId.Id, c, () => "Failed to create content.");
+
+                        var status = (await contentWorkflow.GetInitialStatusAsync(ctx.Schema)).Status;
 
                         await GuardContent.CanCreate(ctx.Schema, contentWorkflow, c);
 
-                        await ctx.ExecuteScriptAndTransformAsync(s => s.Create, "Create", c, c.Data);
+                        c.Data = await ctx.ExecuteScriptAndTransformAsync(s => s.Create,
+                            new ScriptContext
+                            {
+                                Operation = "Create",
+                                Data = c.Data,
+                                Status = status,
+                                StatusOld = default
+                            });
+
                         await ctx.EnrichAsync(c.Data);
 
                         if (!c.DoNotValidate)
@@ -80,12 +90,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         if (c.Publish)
                         {
-                            await ctx.ExecuteScriptAsync(s => s.Change, "Published", c, c.Data);
+                            await ctx.ExecuteScriptAsync(s => s.Change,
+                                new ScriptContext
+                                {
+                                    Operation = "Published",
+                                    Data = c.Data,
+                                    Status = Status.Published,
+                                    StatusOld = status
+                                });
                         }
 
-                        var statusInfo = await contentWorkflow.GetInitialStatusAsync(ctx.Schema);
-
-                        Create(c, statusInfo.Status);
+                        Create(c, status);
 
                         return Snapshot;
                     });
@@ -117,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         {
                             var isChangeConfirm = Snapshot.IsPending && Snapshot.Status == Status.Published && c.Status == Status.Published;
 
-                            var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, Snapshot.Id, () => "Failed to change content.");
+                            var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, c, () => "Failed to change content.");
 
                             await GuardContent.CanChangeStatus(ctx.Schema, Snapshot, contentWorkflow, c, isChangeConfirm);
 
@@ -148,7 +163,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                         reason = StatusChange.Change;
                                     }
 
-                                    await ctx.ExecuteScriptAsync(s => s.Change, reason, c, Snapshot.Data);
+                                    await ctx.ExecuteScriptAsync(s => s.Change,
+                                        new ScriptContext
+                                        {
+                                            Operation = reason.ToString(),
+                                            Data = Snapshot.Data,
+                                            Status = c.Status,
+                                            StatusOld = Snapshot.Status
+                                        });
 
                                     ChangeStatus(c, reason);
                                 }
@@ -182,11 +204,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case DeleteContent deleteContent:
                     return UpdateAsync(deleteContent, async c =>
                     {
-                        var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, Snapshot.Id, () => "Failed to delete content.");
+                        var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, c, () => "Failed to delete content.");
 
                         GuardContent.CanDelete(ctx.Schema, c);
 
-                        await ctx.ExecuteScriptAsync(s => s.Delete, "Delete", c, Snapshot.Data);
+                        await ctx.ExecuteScriptAsync(s => s.Delete,
+                            new ScriptContext
+                            {
+                                Operation = "Delete",
+                                Data = Snapshot.Data,
+                                Status = Snapshot.Status,
+                                StatusOld = default
+                            });
 
                         Delete(c);
                     });
@@ -207,7 +236,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!currentData.Equals(newData))
             {
-                var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, Snapshot.Id, () => "Failed to update content.");
+                var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, command, () => "Failed to update content.");
 
                 if (partial)
                 {
@@ -218,7 +247,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     await ctx.ValidateAsync(command.Data);
                 }
 
-                newData = await ctx.ExecuteScriptAndTransformAsync(s => s.Update, "Update", command, newData, Snapshot.Data);
+                newData = await ctx.ExecuteScriptAndTransformAsync(s => s.Update,
+                    new ScriptContext
+                    {
+                        Operation = "Create",
+                        Data = newData,
+                        DataOld = currentData,
+                        Status = Snapshot.Status,
+                        StatusOld = default
+                    });
 
                 if (isProposal)
                 {
@@ -306,10 +343,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<ContentOperationContext> CreateContext(Guid appId, Guid schemaId, Guid contentId, Func<string> message)
+        private async Task<ContentOperationContext> CreateContext(Guid appId, Guid schemaId, ContentCommand command, Func<string> message)
         {
             var operationContext =
-                await ContentOperationContext.CreateAsync(appId, schemaId, contentId,
+                await ContentOperationContext.CreateAsync(appId, schemaId, command,
                     appProvider, assetRepository, contentRepository, scriptEngine, message);
 
             return operationContext;
