@@ -89,16 +89,18 @@
             <div sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed">
                     <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent">
-                        <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
+                        <tr [sqxContent]="content"
+                            (delete)="delete(content)"
                             [selected]="isItemSelected(content)"
                             (selectedChange)="selectItem(content, $event)"
                             (statusChange)="changeStatus(content, $event)"
+                            (clone)="clone(content)"
                             [language]="language"
-                            [canClone]="contentsState.canCreate | async"
+                            [canClone]="contentsState.snapshot.canCreate"
+                            [routerLink]="[content.id]"
+                            [routerLinkActive]="'active'"
                             [schema]="schema"
-                            [schemaFields]="schema.listFields"
-                            (delete)="delete(content)"
-                            (clone)="clone(content)">
+                            [schemaFields]="schema.listFields">
                         </tr>
                         <tr class="spacer"></tr>
                     </tbody>
