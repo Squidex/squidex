@@ -94,6 +94,7 @@
                             (selectedChange)="selectItem(content, $event)"
                             (statusChange)="changeStatus(content, $event)"
                             [language]="language"
+                            [canClone]="contentsState.canCreate | async"
                             [schema]="schema"
                             [schemaFields]="schema.listFields"
                             (delete)="delete(content)"
