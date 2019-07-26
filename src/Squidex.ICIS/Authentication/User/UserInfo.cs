@@ -12,7 +12,7 @@ using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
 using Squidex.Infrastructure.Security;
 
-namespace Squidex.ICIS.Models
+namespace Squidex.ICIS.Authentication.User
 {
     public class UserInfo
     {

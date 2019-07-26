@@ -6,9 +6,8 @@
 // ==========================================================================
 
 using Squidex.Domain.Users;
-using Squidex.ICIS.Models;
 
-namespace Squidex.ICIS.Extensions
+namespace Squidex.ICIS.Authentication.User
 {
     public static class UserInfoExtension
     {

@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.ICIS.Commands
+namespace Squidex.ICIS.Validation
 {
     public sealed class UniqueContentValidationCommand : ICustomCommandMiddleware
     {
