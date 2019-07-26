@@ -30,6 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private IScriptEngine scriptEngine;
         private ISchemaEntity schemaEntity;
         private IAppEntity appEntity;
+        private IContentEntity contentEntity;
         private Guid contentId;
         private Guid schemaId;
         private Func<string> message;
@@ -43,6 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             Guid appId,
             Guid schemaId,
             Guid contentId,
+            IContentEntity contentEntity,
             IAppProvider appProvider,
             IAssetRepository assetRepository,
             IContentRepository contentRepository,
@@ -56,6 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 appEntity = appEntity,
                 assetRepository = assetRepository,
                 contentId = contentId,
+                contentEntity = contentEntity,
                 contentRepository = contentRepository,
                 message = message,
                 schemaId = schemaId,
@@ -87,27 +90,51 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return data.ValidatePartialAsync(ctx, schemaEntity.SchemaDef, appEntity.PartitionResolver(), message);
         }
 
-        public Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
+        public Task<NamedContentData> ExecuteScriptAndTransformAsync(Func<SchemaScripts, string> script, object operation, ContentCommand command,
+            NamedContentData data, Status? status = null)
         {
-            var ctx = CreateScriptContext(operation, command, data, oldData);
+            var ctx = CreateScriptContext(operation, command, data, status);
 
             var result = scriptEngine.ExecuteAndTransform(ctx, GetScript(script));
 
             return Task.FromResult(result);
         }
 
-        public Task ExecuteScriptAsync(Func<SchemaScripts, string> script, object operation, ContentCommand command, NamedContentData data, NamedContentData oldData = null)
+        public Task ExecuteScriptAsync(Func<SchemaScripts, string> script, object operation, ContentCommand command,
+            NamedContentData data, Status? status = null)
         {
-            var ctx = CreateScriptContext(operation, command, data, oldData);
+            var ctx = CreateScriptContext(operation, command, data, status);
 
             scriptEngine.Execute(ctx, GetScript(script));
 
             return TaskHelper.Done;
         }
 
-        private static ScriptContext CreateScriptContext(object operation, ContentCommand command, NamedContentData data, NamedContentData oldData)
+        private ScriptContext CreateScriptContext(object operation, ContentCommand command, NamedContentData data, Status? status)
         {
-            return new ScriptContext { ContentId = command.ContentId, OldData = oldData, Data = data, User = command.User, Operation = operation.ToString() };
+            var result = new ScriptContext { ContentId = command.ContentId, Data = data, User = command.User, Operation = operation.ToString() };
+
+            if (data != null)
+            {
+                result.Data = data;
+                result.DataOld = contentEntity?.Data;
+            }
+            else
+            {
+                result.Data = contentEntity?.Data;
+            }
+
+            if (status.HasValue)
+            {
+                result.Status = status.Value;
+                result.StatusOld = contentEntity?.Status ?? default;
+            }
+            else
+            {
+                result.Status = contentEntity?.Status ?? default;
+            }
+
+            return result;
         }
 
         private ValidationContext CreateValidationContext()

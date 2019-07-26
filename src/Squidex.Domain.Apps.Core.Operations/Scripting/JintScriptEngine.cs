@@ -138,9 +138,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 contextInstance.FastAddProperty("data", new ContentDataObject(engine, context.Data), true, true, true);
             }
 
-            if (context.OldData != null)
+            if (context.DataOld != null)
             {
-                contextInstance.FastAddProperty("oldData", new ContentDataObject(engine, context.OldData), true, true, true);
+                contextInstance.FastAddProperty("oldData", new ContentDataObject(engine, context.DataOld), true, true, true);
             }
 
             if (context.User != null)
@@ -150,7 +150,14 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             if (!string.IsNullOrWhiteSpace(context.Operation))
             {
-                contextInstance.FastAddProperty("operation", context.Operation, false, true, false);
+                contextInstance.FastAddProperty("operation", context.Operation, false, false, false);
+            }
+
+            contextInstance.FastAddProperty("status", context.Status.ToString(), false, false, false);
+
+            if (context.StatusOld != default)
+            {
+                contextInstance.FastAddProperty("oldStatus", context.StatusOld.ToString(), false, false, false);
             }
 
             engine.SetValue("ctx", contextInstance);
