@@ -57,6 +57,8 @@ namespace Squidex.Config
 
         public bool NoConsent { get; set; }
 
+        public bool ShowPII { get; set; }
+
         public bool IsAdminConfigured()
         {
             return !string.IsNullOrWhiteSpace(AdminEmail) && !string.IsNullOrWhiteSpace(AdminPassword);

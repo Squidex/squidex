@@ -33,6 +33,8 @@ namespace Squidex.Areas.IdentityServer.Config
         {
             var options = services.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
 
+            IdentityModelEventSource.ShowPII = options.ShowPII;
+
             var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
             var userFactory = services.GetRequiredService<IUserFactory>();
 
