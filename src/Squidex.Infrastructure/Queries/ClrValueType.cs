@@ -7,9 +7,16 @@
 
 namespace Squidex.Infrastructure.Queries
 {
-    public enum FilterJunctionType
+    public enum ClrValueType
     {
-        And,
-        Or
+        Boolean,
+        Guid,
+        Double,
+        Instant,
+        Int32,
+        Int64,
+        Single,
+        String,
+        Null
     }
 }

@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Infrastructure.MongoDb.Queries
 {
-    public sealed class FilterVisitor<T> : FilterNodeVisitor<FilterDefinition<T>>
+    public sealed class FilterVisitor<T> : FilterNodeVisitor<FilterDefinition<T>, ClrValue>
     {
         private static readonly FilterDefinitionBuilder<T> Filter = Builders<T>.Filter;
         private static readonly FilterVisitor<T> Instance = new FilterVisitor<T>();
@@ -23,64 +23,64 @@ namespace Squidex.Infrastructure.MongoDb.Queries
         {
         }
 
-        public static FilterDefinition<T> Visit(FilterNode node)
+        public static FilterDefinition<T> Visit(FilterNode<ClrValue> node)
         {
             return node.Accept(Instance);
         }
 
-        public override FilterDefinition<T> Visit(FilterNegate nodeIn)
+        public override FilterDefinition<T> Visit(NegateFilter<ClrValue> nodeIn)
         {
-            return Filter.Not(nodeIn.Operand.Accept(this));
+            return Filter.Not(nodeIn.Filter.Accept(this));
         }
 
-        public override FilterDefinition<T> Visit(FilterJunction nodeIn)
+        public override FilterDefinition<T> Visit(LogicalFilter<ClrValue> nodeIn)
         {
-            if (nodeIn.JunctionType == FilterJunctionType.And)
+            if (nodeIn.Type == LogicalFilterType.And)
             {
-                return Filter.And(nodeIn.Operands.Select(x => x.Accept(this)));
+                return Filter.And(nodeIn.Filters.Select(x => x.Accept(this)));
             }
             else
             {
-                return Filter.Or(nodeIn.Operands.Select(x => x.Accept(this)));
+                return Filter.Or(nodeIn.Filters.Select(x => x.Accept(this)));
             }
         }
 
-        public override FilterDefinition<T> Visit(FilterComparison nodeIn)
+        public override FilterDefinition<T> Visit(CompareFilter<ClrValue> nodeIn)
         {
-            var propertyName = string.Join(".", nodeIn.Lhs);
+            var propertyName = nodeIn.Path.ToString();
 
             switch (nodeIn.Operator)
             {
-                case FilterOperator.Empty:
+                case CompareOperator.Empty:
                     return Filter.Or(Filter.Exists(propertyName, false), Filter.Eq(propertyName, default(T)), Filter.Eq(propertyName, string.Empty), Filter.Eq(propertyName, new T[0]));
-                case FilterOperator.StartsWith:
+                case CompareOperator.StartsWith:
                     return Filter.Regex(propertyName, BuildRegex(nodeIn, s => "^" + s));
-                case FilterOperator.Contains:
+                case CompareOperator.Contains:
                     return Filter.Regex(propertyName, BuildRegex(nodeIn, s => s));
-                case FilterOperator.EndsWith:
+                case CompareOperator.EndsWith:
                     return Filter.Regex(propertyName, BuildRegex(nodeIn, s => s + "$"));
-                case FilterOperator.Equals:
-                    return Filter.Eq(propertyName, nodeIn.Rhs.Value);
-                case FilterOperator.GreaterThan:
-                    return Filter.Gt(propertyName, nodeIn.Rhs.Value);
-                case FilterOperator.GreaterThanOrEqual:
-                    return Filter.Gte(propertyName, nodeIn.Rhs.Value);
-                case FilterOperator.LessThan:
-                    return Filter.Lt(propertyName, nodeIn.Rhs.Value);
-                case FilterOperator.LessThanOrEqual:
-                    return Filter.Lte(propertyName, nodeIn.Rhs.Value);
-                case FilterOperator.NotEquals:
-                    return Filter.Ne(propertyName, nodeIn.Rhs.Value);
-                case FilterOperator.In:
-                    return Filter.In(propertyName, ((IList)nodeIn.Rhs.Value).OfType<object>());
+                case CompareOperator.Equals:
+                    return Filter.Eq(propertyName, nodeIn.Value.Value);
+                case CompareOperator.GreaterThan:
+                    return Filter.Gt(propertyName, nodeIn.Value.Value);
+                case CompareOperator.GreaterThanOrEqual:
+                    return Filter.Gte(propertyName, nodeIn.Value.Value);
+                case CompareOperator.LessThan:
+                    return Filter.Lt(propertyName, nodeIn.Value.Value);
+                case CompareOperator.LessThanOrEqual:
+                    return Filter.Lte(propertyName, nodeIn.Value.Value);
+                case CompareOperator.NotEquals:
+                    return Filter.Ne(propertyName, nodeIn.Value.Value);
+                case CompareOperator.In:
+                    return Filter.In(propertyName, ((IList)nodeIn.Value.Value).OfType<object>());
             }
 
             throw new NotSupportedException();
         }
 
-        private static BsonRegularExpression BuildRegex(FilterComparison node, Func<string, string> formatter)
+        private static BsonRegularExpression BuildRegex(CompareFilter<ClrValue> node, Func<string, string> formatter)
         {
-            return new BsonRegularExpression(formatter(node.Rhs.Value.ToString()), "i");
+            return new BsonRegularExpression(formatter(node.Value.Value.ToString()), "i");
         }
     }
 }

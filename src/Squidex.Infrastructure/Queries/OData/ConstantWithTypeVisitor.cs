@@ -15,7 +15,7 @@ using NodaTime.Text;
 
 namespace Squidex.Infrastructure.Queries.OData
 {
-    public sealed class ConstantWithTypeVisitor : QueryNodeVisitor<FilterValue>
+    public sealed class ConstantWithTypeVisitor : QueryNodeVisitor<ClrValue>
     {
         private static readonly IEdmPrimitiveType BooleanType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Boolean);
         private static readonly IEdmPrimitiveType DateTimeType = EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.DateTimeOffset);
@@ -32,117 +32,117 @@ namespace Squidex.Infrastructure.Queries.OData
         {
         }
 
-        public static FilterValue Visit(QueryNode node)
+        public static ClrValue Visit(QueryNode node)
         {
             return node.Accept(Instance);
         }
 
-        public override FilterValue Visit(ConvertNode nodeIn)
+        public override ClrValue Visit(ConvertNode nodeIn)
         {
             if (nodeIn.TypeReference.Definition == BooleanType)
             {
                 var value = ConstantVisitor.Visit(nodeIn.Source);
 
-                return new FilterValue(bool.Parse(value.ToString()));
+                return bool.Parse(value.ToString());
             }
 
             if (nodeIn.TypeReference.Definition == GuidType)
             {
                 var value = ConstantVisitor.Visit(nodeIn.Source);
 
-                return new FilterValue(Guid.Parse(value.ToString()));
+                return Guid.Parse(value.ToString());
             }
 
             if (nodeIn.TypeReference.Definition == DateTimeType)
             {
                 var value = ConstantVisitor.Visit(nodeIn.Source);
 
-                return new FilterValue(ParseInstant(value));
+                return ParseInstant(value);
             }
 
             if (ConstantVisitor.Visit(nodeIn.Source) == null)
             {
-                return FilterValue.Null;
+                return ClrValue.Null;
             }
 
             throw new NotSupportedException();
         }
 
-        public override FilterValue Visit(CollectionConstantNode nodeIn)
+        public override ClrValue Visit(CollectionConstantNode nodeIn)
         {
             if (nodeIn.ItemType.Definition == DateTimeType)
             {
-                return new FilterValue(nodeIn.Collection.Select(x => ParseInstant(x.Value)).ToList());
+                return nodeIn.Collection.Select(x => ParseInstant(x.Value)).ToList();
             }
 
             if (nodeIn.ItemType.Definition == GuidType)
             {
-                return new FilterValue(nodeIn.Collection.Select(x => (Guid)x.Value).ToList());
+                return nodeIn.Collection.Select(x => (Guid)x.Value).ToList();
             }
 
             if (nodeIn.ItemType.Definition == BooleanType)
             {
-                return new FilterValue(nodeIn.Collection.Select(x => (bool)x.Value).ToList());
+                return nodeIn.Collection.Select(x => (bool)x.Value).ToList();
             }
 
             if (nodeIn.ItemType.Definition == SingleType)
             {
-                return new FilterValue(nodeIn.Collection.Select(x => (float)x.Value).ToList());
+                return nodeIn.Collection.Select(x => (float)x.Value).ToList();
             }
 
             if (nodeIn.ItemType.Definition == DoubleType)
             {
-                return new FilterValue(nodeIn.Collection.Select(x => (double)x.Value).ToList());
+                return nodeIn.Collection.Select(x => (double)x.Value).ToList();
             }
 
             if (nodeIn.ItemType.Definition == Int32Type)
             {
-                return new FilterValue(nodeIn.Collection.Select(x => (int)x.Value).ToList());
+                return nodeIn.Collection.Select(x => (int)x.Value).ToList();
             }
 
             if (nodeIn.ItemType.Definition == Int64Type)
             {
-                return new FilterValue(nodeIn.Collection.Select(x => (long)x.Value).ToList());
+                return nodeIn.Collection.Select(x => (long)x.Value).ToList();
             }
 
             if (nodeIn.ItemType.Definition == StringType)
             {
-                return new FilterValue(nodeIn.Collection.Select(x => (string)x.Value).ToList());
+                return nodeIn.Collection.Select(x => (string)x.Value).ToList();
             }
 
             throw new NotSupportedException();
         }
 
-        public override FilterValue Visit(ConstantNode nodeIn)
+        public override ClrValue Visit(ConstantNode nodeIn)
         {
             if (nodeIn.TypeReference.Definition == BooleanType)
             {
-                return new FilterValue((bool)nodeIn.Value);
+                return (bool)nodeIn.Value;
             }
 
             if (nodeIn.TypeReference.Definition == SingleType)
             {
-                return new FilterValue((float)nodeIn.Value);
+                return (float)nodeIn.Value;
             }
 
             if (nodeIn.TypeReference.Definition == DoubleType)
             {
-                return new FilterValue((double)nodeIn.Value);
+                return (double)nodeIn.Value;
             }
 
             if (nodeIn.TypeReference.Definition == Int32Type)
             {
-                return new FilterValue((int)nodeIn.Value);
+                return (int)nodeIn.Value;
             }
 
             if (nodeIn.TypeReference.Definition == Int64Type)
             {
-                return new FilterValue((long)nodeIn.Value);
+                return (long)nodeIn.Value;
             }
 
             if (nodeIn.TypeReference.Definition == StringType)
             {
-                return new FilterValue((string)nodeIn.Value);
+                return (string)nodeIn.Value;
             }
 
             throw new NotSupportedException();

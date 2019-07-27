@@ -115,7 +115,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var enriched1 = new AssetEntity();
             var enriched2 = new AssetEntity();
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.Ignored))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.Ignored))
                 .Returns(ResultList.CreateFrom(8, found1, found2));
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2)))
@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.QueryAsync(requestContext, query);
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("FullText: 'Hello World'; Take: 100; Sort: fileName Ascending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.That.Is("FullText: 'Hello World'; Take: 100; Sort: fileName Ascending")))
                 .MustHaveHappened();
         }
 
@@ -146,7 +146,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.QueryAsync(requestContext, query);
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("Filter: fileName == 'ABC'; Take: 200; Sort: lastModified Descending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.That.Is("Filter: fileName == 'ABC'; Take: 200; Sort: lastModified Descending")))
                 .MustHaveHappened();
         }
 
@@ -157,7 +157,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.QueryAsync(requestContext, query);
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("Take: 30; Sort: lastModified Descending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id,
+                    A<ClrQuery>.That.Is("Take: 30; Sort: lastModified Descending")))
                 .MustHaveHappened();
         }
 
@@ -168,7 +169,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             await sut.QueryAsync(requestContext, query);
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id,
+                    A<ClrQuery>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending")))
                 .MustHaveHappened();
         }
     }

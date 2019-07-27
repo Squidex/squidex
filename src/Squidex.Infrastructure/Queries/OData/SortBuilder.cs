@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Queries.OData
 {
     public static class SortBuilder
     {
-        public static void ParseSort(this ODataUriParser query, Query result)
+        public static void ParseSort(this ODataUriParser query, ClrQuery result)
         {
             var orderBy = query.ParseOrderBy();
 

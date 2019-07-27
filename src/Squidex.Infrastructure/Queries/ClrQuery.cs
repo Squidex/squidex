@@ -7,18 +7,7 @@
 
 namespace Squidex.Infrastructure.Queries
 {
-    public enum FilterOperator
+    public sealed class ClrQuery : Query<ClrValue>
     {
-        Contains,
-        Empty,
-        EndsWith,
-        Equals,
-        GreaterThan,
-        GreaterThanOrEqual,
-        In,
-        LessThan,
-        LessThanOrEqual,
-        NotEquals,
-        StartsWith
     }
 }
