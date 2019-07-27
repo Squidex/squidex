@@ -6,15 +6,16 @@
 // ==========================================================================
 
 using System;
+using GraphQL;
 using GraphQL.Instrumentation;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
-    public static class LoggingMiddleware
+    public static class Middlewares
     {
-        public static Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Create(ISemanticLog log)
+        public static Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Logging(ISemanticLog log)
         {
             Guard.NotNull(log, nameof(log));
 
@@ -34,6 +35,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             .WriteProperty("field", context.FieldName));
 
                         throw ex;
+                    }
+                };
+            });
+        }
+
+        public static Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Errors()
+        {
+            return new Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>(next =>
+            {
+                return async context =>
+                {
+                    try
+                    {
+                        return await next(context);
+                    }
+                    catch (DomainException ex)
+                    {
+                        throw new ExecutionError(ex.Message);
                     }
                 };
             });

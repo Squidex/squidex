@@ -118,7 +118,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case PatchContent patchContent:
                     return UpdateReturnAsync(patchContent, async c =>
                     {
-                        var isProposal = c.AsDraft && Snapshot.Status == Status.Published;
+                        var isProposal = IsProposal(c);
 
                         await GuardContent.CanPatch(Snapshot, contentWorkflow, c, isProposal);
 
@@ -130,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                     {
                         try
                         {
-                            var isChangeConfirm = Snapshot.IsPending && Snapshot.Status == Status.Published && c.Status == Status.Published;
+                            var isChangeConfirm = IsConfirm(c);
 
                             var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, c, () => "Failed to change content.");
 
@@ -148,31 +148,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 }
                                 else
                                 {
-                                    StatusChange reason;
-
-                                    if (c.Status == Status.Published)
-                                    {
-                                        reason = StatusChange.Published;
-                                    }
-                                    else if (Snapshot.Status == Status.Published)
-                                    {
-                                        reason = StatusChange.Unpublished;
-                                    }
-                                    else
-                                    {
-                                        reason = StatusChange.Change;
-                                    }
+                                    var change = GetChange(c);
 
                                     await ctx.ExecuteScriptAsync(s => s.Change,
                                         new ScriptContext
                                         {
-                                            Operation = reason.ToString(),
+                                            Operation = change.ToString(),
                                             Data = Snapshot.Data,
                                             Status = c.Status,
                                             StatusOld = Snapshot.Status
                                         });
 
-                                    ChangeStatus(c, reason);
+                                    ChangeStatus(c, change);
                                 }
                             }
                         }
@@ -333,6 +320,32 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
 
             RaiseEvent(Envelope.Create(@event));
+        }
+
+        private bool IsConfirm(ChangeContentStatus command)
+        {
+            return Snapshot.IsPending && Snapshot.Status == Status.Published && command.Status == Status.Published;
+        }
+
+        private bool IsProposal(PatchContent command)
+        {
+            return Snapshot.Status == Status.Published && command.AsDraft;
+        }
+
+        private StatusChange GetChange(ChangeContentStatus command)
+        {
+            var change = StatusChange.Change;
+
+            if (command.Status == Status.Published)
+            {
+                change = StatusChange.Published;
+            }
+            else if (Snapshot.Status == Status.Published)
+            {
+                change = StatusChange.Unpublished;
+            }
+
+            return change;
         }
 
         private void VerifyNotDeleted()

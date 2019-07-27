@@ -45,10 +45,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var loader = resolver.Resolve<DataLoaderDocumentListener>();
 
-            var logger = LoggingMiddleware.Create(resolver.Resolve<ISemanticLog>());
-
             execution.Listeners.Add(loader);
-            execution.FieldMiddleware.Use(logger);
+            execution.FieldMiddleware.Use(Middlewares.Logging(resolver.Resolve<ISemanticLog>()));
+            execution.FieldMiddleware.Use(Middlewares.Errors());
 
             execution.UserContext = this;
         }
