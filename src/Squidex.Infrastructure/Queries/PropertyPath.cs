@@ -15,6 +15,8 @@ namespace Squidex.Infrastructure.Queries
 {
     public sealed class PropertyPath : ReadOnlyCollection<string>
     {
+        private static readonly char[] Separators = { '.', '/' };
+
         public PropertyPath(IList<string> items)
             : base(items)
         {
@@ -26,7 +28,7 @@ namespace Squidex.Infrastructure.Queries
 
         public static implicit operator PropertyPath(string path)
         {
-            return new PropertyPath(path?.Split('.', '/')?.ToList());
+            return new PropertyPath(path?.Split(Separators, StringSplitOptions.RemoveEmptyEntries)?.ToList());
         }
 
         public static implicit operator PropertyPath(string[] path)
