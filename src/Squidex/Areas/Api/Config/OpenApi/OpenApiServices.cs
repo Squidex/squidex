@@ -10,18 +10,18 @@ using Microsoft.Extensions.DependencyInjection;
 using NJsonSchema;
 using NJsonSchema.Generation.TypeMappers;
 using NodaTime;
-using NSwag.SwaggerGeneration;
-using NSwag.SwaggerGeneration.Processors;
+using NSwag.Generation;
+using NSwag.Generation.Processors;
 using Squidex.Areas.Api.Controllers.Contents.Generator;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
-namespace Squidex.Areas.Api.Config.Swagger
+namespace Squidex.Areas.Api.Config.OpenApi
 {
-    public static class SwaggerServices
+    public static class OpenApiServices
     {
-        public static void AddMySwaggerSettings(this IServiceCollection services)
+        public static void AddMyOpenApiSettings(this IServiceCollection services)
         {
             services.AddSingletonAs<ErrorDtoProcessor>()
                 .As<IDocumentProcessor>();
@@ -58,15 +58,15 @@ namespace Squidex.Areas.Api.Config.Swagger
                 settings.OperationProcessors.Add(new ODataQueryParamsProcessor("/apps/{app}/assets", "assets", false));
             });
 
-            services.AddTransient<SchemasSwaggerGenerator>();
+            services.AddTransient<SchemasOpenApiGenerator>();
         }
 
-        public static void ConfigureName<T>(this T settings) where T : SwaggerGeneratorSettings
+        public static void ConfigureName<T>(this T settings) where T : OpenApiDocumentGeneratorSettings
         {
             settings.Title = "Squidex API";
         }
 
-        public static void ConfigureSchemaSettings<T>(this T settings) where T : SwaggerGeneratorSettings
+        public static void ConfigureSchemaSettings<T>(this T settings) where T : OpenApiDocumentGeneratorSettings
         {
             settings.TypeMappers = new List<ITypeMapper>
             {

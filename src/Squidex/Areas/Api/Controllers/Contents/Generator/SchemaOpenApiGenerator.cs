@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschränkt)
@@ -14,40 +14,40 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
-using Squidex.Pipeline.Swagger;
+using Squidex.Pipeline.OpenApi;
 using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
-    public sealed class SchemaSwaggerGenerator
+    public sealed class SchemaOpenApiGenerator
     {
         private static readonly string SchemaQueryDescription;
         private static readonly string SchemaBodyDescription;
         private readonly ContentSchemaBuilder schemaBuilder = new ContentSchemaBuilder();
-        private readonly SwaggerDocument document;
-        private readonly JsonSchema4 contentSchema;
-        private readonly JsonSchema4 dataSchema;
+        private readonly OpenApiDocument document;
+        private readonly JsonSchema contentSchema;
+        private readonly JsonSchema dataSchema;
         private readonly string schemaPath;
         private readonly string schemaName;
         private readonly string schemaType;
         private readonly string appPath;
-        private readonly JsonSchema4 statusSchema;
+        private readonly JsonSchema statusSchema;
         private readonly string appName;
 
-        static SchemaSwaggerGenerator()
+        static SchemaOpenApiGenerator()
         {
             SchemaBodyDescription = NSwagHelper.LoadDocs("schemabody");
             SchemaQueryDescription = NSwagHelper.LoadDocs("schemaquery");
         }
 
-        public SchemaSwaggerGenerator(
-            SwaggerDocument document,
+        public SchemaOpenApiGenerator(
+            OpenApiDocument document,
             string appName,
             string appPath,
             Schema schema,
             SchemaResolver schemaResolver,
-            JsonSchema4 statusSchema,
+            JsonSchema statusSchema,
             PartitionResolver partitionResolver)
         {
             this.document = document;
@@ -69,12 +69,12 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         public void GenerateSchemaOperations()
         {
             document.Tags.Add(
-                new SwaggerTag
+                new OpenApiTag
                 {
                     Name = schemaName, Description = $"API to managed {schemaName} contents."
                 });
 
-            var schemaOperations = new List<SwaggerPathItem>
+            var schemaOperations = new List<OpenApiPathItem>
             {
                 GenerateSchemaGetsOperation(),
                 GenerateSchemaGetOperation(),
@@ -92,9 +92,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             }
         }
 
-        private SwaggerPathItem GenerateSchemaGetsOperation()
+        private OpenApiPathItem GenerateSchemaGetsOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Get, null, $"{appPath}/{schemaPath}", operation =>
+            return AddOperation(OpenApiOperationMethod.Get, null, $"{appPath}/{schemaPath}", operation =>
             {
                 operation.OperationId = $"Query{schemaType}Contents";
 
@@ -115,9 +115,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerPathItem GenerateSchemaGetOperation()
+        private OpenApiPathItem GenerateSchemaGetOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Get, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
+            return AddOperation(OpenApiOperationMethod.Get, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
                 operation.OperationId = $"Get{schemaType}Content";
 
@@ -129,9 +129,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerPathItem GenerateSchemaCreateOperation()
+        private OpenApiPathItem GenerateSchemaCreateOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Post, null, $"{appPath}/{schemaPath}", operation =>
+            return AddOperation(OpenApiOperationMethod.Post, null, $"{appPath}/{schemaPath}", operation =>
             {
                 operation.OperationId = $"Create{schemaType}Content";
 
@@ -147,9 +147,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerPathItem GenerateSchemaUpdateOperation()
+        private OpenApiPathItem GenerateSchemaUpdateOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
+            return AddOperation(OpenApiOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
                 operation.OperationId = $"Update{schemaType}Content";
 
@@ -164,9 +164,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerPathItem GenerateSchemaUpdatePatchOperation()
+        private OpenApiPathItem GenerateSchemaUpdatePatchOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Patch, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
+            return AddOperation(OpenApiOperationMethod.Patch, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
             {
                 operation.OperationId = $"Path{schemaType}Content";
 
@@ -181,9 +181,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerPathItem GenerateSchemaStatusOperation()
+        private OpenApiPathItem GenerateSchemaStatusOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/status", operation =>
+            return AddOperation(OpenApiOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/status", operation =>
             {
                 operation.OperationId = $"Change{schemaType}ContentStatus";
 
@@ -198,9 +198,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerPathItem GenerateSchemaDiscardOperation()
+        private OpenApiPathItem GenerateSchemaDiscardOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/discard", operation =>
+            return AddOperation(OpenApiOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/discard", operation =>
             {
                 operation.OperationId = $"Discard{schemaType}Content";
 
@@ -213,9 +213,9 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerPathItem GenerateSchemaDeleteOperation()
+        private OpenApiPathItem GenerateSchemaDeleteOperation()
         {
-            return AddOperation(SwaggerOperationMethod.Delete, schemaName, $"{appPath}/{schemaPath}/{{id}}/", operation =>
+            return AddOperation(OpenApiOperationMethod.Delete, schemaName, $"{appPath}/{schemaPath}/{{id}}/", operation =>
             {
                 operation.OperationId = $"Delete{schemaType}Content";
 
@@ -227,10 +227,10 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             });
         }
 
-        private SwaggerPathItem AddOperation(string method, string entityName, string path, Action<SwaggerOperation> updater)
+        private OpenApiPathItem AddOperation(string method, string entityName, string path, Action<OpenApiOperation> updater)
         {
             var operations = document.Paths.GetOrAddNew(path);
-            var operation = new SwaggerOperation();
+            var operation = new OpenApiOperation();
 
             updater(operation);
 
@@ -246,17 +246,17 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return operations;
         }
 
-        private static JsonSchema4 CreateContentsSchema(string schemaName, JsonSchema4 contentSchema)
+        private static JsonSchema CreateContentsSchema(string schemaName, JsonSchema contentSchema)
         {
-            var schema = new JsonSchema4
+            var schema = new JsonSchema
             {
                 Properties =
                 {
-                    ["total"] = new JsonProperty
+                    ["total"] = new JsonSchemaProperty
                     {
                         Type = JsonObjectType.Number, IsRequired = true, Description = $"The total number of {schemaName} contents."
                     },
-                    ["items"] = new JsonProperty
+                    ["items"] = new JsonSchemaProperty
                     {
                         Type = JsonObjectType.Array, IsRequired = true, Item = contentSchema, Description = $"The {schemaName} contents."
                     }
@@ -267,14 +267,14 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             return schema;
         }
 
-        private void AddSecurity(SwaggerOperation operation, string permission)
+        private void AddSecurity(OpenApiOperation operation, string permission)
         {
             if (operation.Security == null)
             {
-                operation.Security = new List<SwaggerSecurityRequirement>();
+                operation.Security = new List<OpenApiSecurityRequirement>();
             }
 
-            operation.Security.Add(new SwaggerSecurityRequirement
+            operation.Security.Add(new OpenApiSecurityRequirement
             {
                 [Constants.SecurityDefinition] = new[] { Permissions.ForApp(permission, appName, schemaPath).Id }
             });

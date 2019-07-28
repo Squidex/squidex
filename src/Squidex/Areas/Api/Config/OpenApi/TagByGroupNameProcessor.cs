@@ -7,17 +7,15 @@
 
 using System.Collections.Generic;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.SwaggerGeneration.Processors;
-using NSwag.SwaggerGeneration.Processors.Contexts;
-using Squidex.Infrastructure.Tasks;
+using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
 
-namespace Squidex.Areas.Api.Config.Swagger
+namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class TagByGroupNameProcessor : IOperationProcessor
     {
-        public Task<bool> ProcessAsync(OperationProcessorContext context)
+        public bool Process(OperationProcessorContext context)
         {
             var groupName = context.ControllerType.GetCustomAttribute<ApiExplorerSettingsAttribute>()?.GroupName;
 
@@ -25,11 +23,11 @@ namespace Squidex.Areas.Api.Config.Swagger
             {
                 context.OperationDescription.Operation.Tags = new List<string> { groupName };
 
-                return TaskHelper.True;
+                return true;
             }
             else
             {
-                return TaskHelper.False;
+                return false;
             }
         }
     }

@@ -6,14 +6,12 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using NSwag.SwaggerGeneration.Processors;
-using NSwag.SwaggerGeneration.Processors.Contexts;
-using Squidex.Infrastructure.Tasks;
+using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Config.Swagger
+namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class ThemeProcessor : IDocumentProcessor
     {
@@ -26,7 +24,7 @@ namespace Squidex.Areas.Api.Config.Swagger
             url = urlOptions.Value.BuildUrl("images/logo-white.png", false);
         }
 
-        public Task ProcessAsync(DocumentProcessorContext context)
+        public void Process(DocumentProcessorContext context)
         {
             context.Document.BasePath = Constants.ApiPrefix;
 
@@ -34,8 +32,6 @@ namespace Squidex.Areas.Api.Config.Swagger
             {
                 ["x-logo"] = new { url, backgroundColor = Background }
             };
-
-            return TaskHelper.Done;
         }
     }
 }

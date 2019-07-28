@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
 
-            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema4 { Reference = s });
+            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema { Reference = s });
             var jsonProperties = AllPropertyNames(jsonSchema);
 
             void CheckField(IField field)
@@ -58,16 +58,16 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
         {
             var languagesConfig = LanguagesConfig.Build(Language.DE, Language.EN);
 
-            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema4 { Reference = s });
+            var jsonSchema = schema.BuildJsonSchema(languagesConfig.ToResolver(), (n, s) => new JsonSchema { Reference = s });
 
             Assert.NotNull(new ContentSchemaBuilder().CreateContentSchema(schema, jsonSchema));
         }
 
-        private static HashSet<string> AllPropertyNames(JsonSchema4 schema)
+        private static HashSet<string> AllPropertyNames(JsonSchema schema)
         {
             var result = new HashSet<string>();
 
-            void AddProperties(JsonSchema4 current)
+            void AddProperties(JsonSchema current)
             {
                 if (current != null)
                 {

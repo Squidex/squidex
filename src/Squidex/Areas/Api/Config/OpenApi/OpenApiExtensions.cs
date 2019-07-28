@@ -7,13 +7,13 @@
 
 using Microsoft.AspNetCore.Builder;
 
-namespace Squidex.Areas.Api.Config.Swagger
+namespace Squidex.Areas.Api.Config.OpenApi
 {
-    public static class SwaggerExtensions
+    public static class OpenApiExtensions
     {
-        public static void UseMySwagger(this IApplicationBuilder app)
+        public static void UseMyOpenApi(this IApplicationBuilder app)
         {
-            app.UseSwagger();
+            app.UseOpenApi();
         }
     }
 }

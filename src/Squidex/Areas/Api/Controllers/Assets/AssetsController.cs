@@ -177,7 +177,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostAsset(string app, [SwaggerIgnore] List<IFormFile> file)
+        public async Task<IActionResult> PostAsset(string app, [OpenApiIgnore] List<IFormFile> file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
@@ -207,7 +207,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetDto), 200)]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetContent(string app, Guid id, [SwaggerIgnore] List<IFormFile> file)
+        public async Task<IActionResult> PutAssetContent(string app, Guid id, [OpenApiIgnore] List<IFormFile> file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 

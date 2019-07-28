@@ -11,54 +11,54 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public static class Builder
     {
-        public static JsonSchema4 Object()
+        public static JsonSchema Object()
         {
-            return new JsonSchema4 { Type = JsonObjectType.Object, AllowAdditionalItems = false };
+            return new JsonSchema { Type = JsonObjectType.Object, AllowAdditionalItems = false };
         }
 
-        public static JsonSchema4 Guid()
+        public static JsonSchema Guid()
         {
-            return new JsonSchema4 { Type = JsonObjectType.String, Format = JsonFormatStrings.Guid };
+            return new JsonSchema { Type = JsonObjectType.String, Format = JsonFormatStrings.Guid };
         }
 
-        public static JsonSchema4 String()
+        public static JsonSchema String()
         {
-            return new JsonSchema4 { Type = JsonObjectType.String };
+            return new JsonSchema { Type = JsonObjectType.String };
         }
 
-        public static JsonProperty ArrayProperty(JsonSchema4 item)
+        public static JsonSchemaProperty ArrayProperty(JsonSchema item)
         {
-            return new JsonProperty { Type = JsonObjectType.Array, Item = item };
+            return new JsonSchemaProperty { Type = JsonObjectType.Array, Item = item };
         }
 
-        public static JsonProperty BooleanProperty()
+        public static JsonSchemaProperty BooleanProperty()
         {
-            return new JsonProperty { Type = JsonObjectType.Boolean };
+            return new JsonSchemaProperty { Type = JsonObjectType.Boolean };
         }
 
-        public static JsonProperty DateTimeProperty(string description = null, bool isRequired = false)
+        public static JsonSchemaProperty DateTimeProperty(string description = null, bool isRequired = false)
         {
-            return new JsonProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.DateTime, Description = description, IsRequired = isRequired };
+            return new JsonSchemaProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.DateTime, Description = description, IsRequired = isRequired };
         }
 
-        public static JsonProperty GuidProperty(string description = null, bool isRequired = false)
+        public static JsonSchemaProperty GuidProperty(string description = null, bool isRequired = false)
         {
-            return new JsonProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.Guid, Description = description, IsRequired = isRequired };
+            return new JsonSchemaProperty { Type = JsonObjectType.String, Format = JsonFormatStrings.Guid, Description = description, IsRequired = isRequired };
         }
 
-        public static JsonProperty NumberProperty(string description = null, bool isRequired = false)
+        public static JsonSchemaProperty NumberProperty(string description = null, bool isRequired = false)
         {
-            return new JsonProperty { Type = JsonObjectType.Number, Description = description, IsRequired = isRequired };
+            return new JsonSchemaProperty { Type = JsonObjectType.Number, Description = description, IsRequired = isRequired };
         }
 
-        public static JsonProperty ObjectProperty(JsonSchema4 item, string description = null, bool isRequired = false)
+        public static JsonSchemaProperty ObjectProperty(JsonSchema item, string description = null, bool isRequired = false)
         {
-            return new JsonProperty { Type = JsonObjectType.Object, Reference = item, Description = description, IsRequired = isRequired };
+            return new JsonSchemaProperty { Type = JsonObjectType.Object, Reference = item, Description = description, IsRequired = isRequired };
         }
 
-        public static JsonProperty StringProperty(string description = null, bool isRequired = false)
+        public static JsonSchemaProperty StringProperty(string description = null, bool isRequired = false)
         {
-            return new JsonProperty { Type = JsonObjectType.String, Description = description, IsRequired = isRequired };
+            return new JsonSchemaProperty { Type = JsonObjectType.String, Description = description, IsRequired = isRequired };
         }
     }
 }

@@ -7,23 +7,22 @@
 
 using System;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using NJsonSchema.Infrastructure;
+using Namotion.Reflection;
 using NSwag;
-using NSwag.SwaggerGeneration.Processors;
-using NSwag.SwaggerGeneration.Processors.Contexts;
+using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
 
-namespace Squidex.Areas.Api.Config.Swagger
+namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class XmlResponseTypesProcessor : IOperationProcessor
     {
         private static readonly Regex ResponseRegex = new Regex("(?<Code>[0-9]{3}) =&gt; (?<Description>.*)", RegexOptions.Compiled);
 
-        public async Task<bool> ProcessAsync(OperationProcessorContext context)
+        public bool Process(OperationProcessorContext context)
         {
             var operation = context.OperationDescription.Operation;
 
-            var returnsDescription = await context.MethodInfo.GetXmlDocumentationTagAsync("returns");
+            var returnsDescription = context.MethodInfo.GetXmlDocsTag("returns");
 
             if (!string.IsNullOrWhiteSpace(returnsDescription))
             {
@@ -33,7 +32,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 
                     if (!operation.Responses.TryGetValue(statusCode, out var response))
                     {
-                        response = new SwaggerResponse();
+                        response = new OpenApiResponse();
 
                         operation.Responses[statusCode] = response;
                     }

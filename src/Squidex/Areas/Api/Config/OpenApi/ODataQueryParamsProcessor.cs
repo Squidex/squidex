@@ -5,14 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using NJsonSchema;
-using NSwag.SwaggerGeneration.Processors;
-using NSwag.SwaggerGeneration.Processors.Contexts;
-using Squidex.Infrastructure.Tasks;
-using Squidex.Pipeline.Swagger;
+using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
+using Squidex.Pipeline.OpenApi;
 
-namespace Squidex.Areas.Api.Config.Swagger
+namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class ODataQueryParamsProcessor : IOperationProcessor
     {
@@ -28,7 +26,7 @@ namespace Squidex.Areas.Api.Config.Swagger
             this.supportedPath = supportedPath;
         }
 
-        public Task<bool> ProcessAsync(OperationProcessorContext context)
+        public bool Process(OperationProcessorContext context)
         {
             if (context.OperationDescription.Path == supportedPath)
             {
@@ -45,7 +43,7 @@ namespace Squidex.Areas.Api.Config.Swagger
                 operation.AddQueryParameter("$filter", JsonObjectType.String, "Optional OData filter definition.");
             }
 
-            return TaskHelper.True;
+            return true;
         }
     }
 }
