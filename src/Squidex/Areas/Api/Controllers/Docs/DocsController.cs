@@ -22,7 +22,10 @@ namespace Squidex.Areas.Api.Controllers.Docs
         [Route("docs/")]
         public IActionResult Docs()
         {
-            var vm = new DocsVM { Specification = "~/openapi/v1/openapi.json" };
+            var vm = new DocsVM
+            {
+                Specification = "~/swagger/v1/swagger.json"
+            };
 
             return View(nameof(Docs), vm);
         }

@@ -34,13 +34,16 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [AllowAnonymous]
         public IActionResult Docs(string app)
         {
-            var vm = new DocsVM { Specification = $"~/content/{app}/openapi/v1/openapi.json" };
+            var vm = new DocsVM
+            {
+                Specification = $"~/content/{app}/swagger/v1/swagger.json"
+            };
 
             return View(nameof(Docs), vm);
         }
 
         [HttpGet]
-        [Route("content/{app}/openapi/v1/openapi.json")]
+        [Route("content/{app}/swagger/v1/swagger.json")]
         [ApiCosts(0)]
         [AllowAnonymous]
         public async Task<IActionResult> GetOpenApi(string app)
