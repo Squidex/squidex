@@ -7,25 +7,25 @@
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class FilterNegate : FilterNode
+    public sealed class NegateFilter<TValue> : FilterNode<TValue>
     {
-        public FilterNode Operand { get; }
+        public FilterNode<TValue> Filter { get; }
 
-        public FilterNegate(FilterNode operand)
+        public NegateFilter(FilterNode<TValue> filter)
         {
-            Guard.NotNull(operand, nameof(operand));
+            Guard.NotNull(filter, nameof(filter));
 
-            Operand = operand;
+            Filter = filter;
         }
 
-        public override T Accept<T>(FilterNodeVisitor<T> visitor)
+        public override T Accept<T>(FilterNodeVisitor<T, TValue> visitor)
         {
             return visitor.Visit(this);
         }
 
         public override string ToString()
         {
-            return $"!({Operand})";
+            return $"!({Filter})";
         }
     }
 }

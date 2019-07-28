@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                 ct);
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Query query)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, ClrQuery query)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByQuery"))
             {

@@ -19,12 +19,9 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         protected override Language ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            if (reader.TokenType != JsonToken.String)
-            {
-                throw new JsonException($"Expected String, but got {reader.TokenType}.");
-            }
+            var value = serializer.Deserialize<string>(reader);
 
-            return Language.GetLanguage(reader.Value.ToString());
+            return Language.GetLanguage(value);
         }
     }
 }

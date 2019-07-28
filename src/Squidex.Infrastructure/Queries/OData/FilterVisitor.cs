@@ -11,7 +11,7 @@ using Microsoft.OData.UriParser;
 
 namespace Squidex.Infrastructure.Queries.OData
 {
-    public sealed class FilterVisitor : QueryNodeVisitor<FilterNode>
+    public sealed class FilterVisitor : QueryNodeVisitor<FilterNode<ClrValue>>
     {
         private static readonly FilterVisitor Instance = new FilterVisitor();
 
@@ -19,40 +19,40 @@ namespace Squidex.Infrastructure.Queries.OData
         {
         }
 
-        public static FilterNode Visit(QueryNode node)
+        public static FilterNode<ClrValue> Visit(QueryNode node)
         {
             return node.Accept(Instance);
         }
 
-        public override FilterNode Visit(ConvertNode nodeIn)
+        public override FilterNode<ClrValue> Visit(ConvertNode nodeIn)
         {
             return nodeIn.Source.Accept(this);
         }
 
-        public override FilterNode Visit(UnaryOperatorNode nodeIn)
+        public override FilterNode<ClrValue> Visit(UnaryOperatorNode nodeIn)
         {
             if (nodeIn.OperatorKind == UnaryOperatorKind.Not)
             {
-                return new FilterNegate(nodeIn.Operand.Accept(this));
+                return ClrFilter.Not(nodeIn.Operand.Accept(this));
             }
 
             throw new NotSupportedException();
         }
 
-        public override FilterNode Visit(InNode nodeIn)
+        public override FilterNode<ClrValue> Visit(InNode nodeIn)
         {
             var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-            return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.In, value);
+            return ClrFilter.In(PropertyPathVisitor.Visit(nodeIn.Left), value);
         }
 
-        public override FilterNode Visit(SingleValueFunctionCallNode nodeIn)
+        public override FilterNode<ClrValue> Visit(SingleValueFunctionCallNode nodeIn)
         {
             var fieldNode = nodeIn.Parameters.ElementAt(0);
 
             if (string.Equals(nodeIn.Name, "empty", StringComparison.OrdinalIgnoreCase))
             {
-                return new FilterComparison(PropertyPathVisitor.Visit(fieldNode), FilterOperator.Empty, FilterValue.Null);
+                return ClrFilter.Empty(PropertyPathVisitor.Visit(fieldNode));
             }
 
             var valueNode = nodeIn.Parameters.ElementAt(1);
@@ -61,36 +61,36 @@ namespace Squidex.Infrastructure.Queries.OData
             {
                 var value = ConstantWithTypeVisitor.Visit(valueNode);
 
-                return new FilterComparison(PropertyPathVisitor.Visit(fieldNode), FilterOperator.EndsWith, value);
+                return ClrFilter.EndsWith(PropertyPathVisitor.Visit(fieldNode), value);
             }
 
             if (string.Equals(nodeIn.Name, "startswith", StringComparison.OrdinalIgnoreCase))
             {
                 var value = ConstantWithTypeVisitor.Visit(valueNode);
 
-                return new FilterComparison(PropertyPathVisitor.Visit(fieldNode), FilterOperator.StartsWith, value);
+                return ClrFilter.StartsWith(PropertyPathVisitor.Visit(fieldNode), value);
             }
 
             if (string.Equals(nodeIn.Name, "contains", StringComparison.OrdinalIgnoreCase))
             {
                 var value = ConstantWithTypeVisitor.Visit(valueNode);
 
-                return new FilterComparison(PropertyPathVisitor.Visit(fieldNode), FilterOperator.Contains, value);
+                return ClrFilter.Contains(PropertyPathVisitor.Visit(fieldNode), value);
             }
 
             throw new NotSupportedException();
         }
 
-        public override FilterNode Visit(BinaryOperatorNode nodeIn)
+        public override FilterNode<ClrValue> Visit(BinaryOperatorNode nodeIn)
         {
             if (nodeIn.OperatorKind == BinaryOperatorKind.And)
             {
-                return new FilterJunction(FilterJunctionType.And, nodeIn.Left.Accept(this), nodeIn.Right.Accept(this));
+                return ClrFilter.And(nodeIn.Left.Accept(this), nodeIn.Right.Accept(this));
             }
 
             if (nodeIn.OperatorKind == BinaryOperatorKind.Or)
             {
-                return new FilterJunction(FilterJunctionType.Or, nodeIn.Left.Accept(this), nodeIn.Right.Accept(this));
+                return ClrFilter.Or(nodeIn.Left.Accept(this), nodeIn.Right.Accept(this));
             }
 
             if (nodeIn.Left is SingleValueFunctionCallNode functionNode)
@@ -99,12 +99,12 @@ namespace Squidex.Infrastructure.Queries.OData
 
                 var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                if (value.ValueType == FilterValueType.Boolean && value.Value is bool booleanRight)
+                if (value.ValueType == ClrValueType.Boolean && value.Value is bool booleanRight)
                 {
                     if ((nodeIn.OperatorKind == BinaryOperatorKind.Equal && !booleanRight) ||
                         (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual && booleanRight))
                     {
-                        regexFilter = new FilterNegate(regexFilter);
+                        regexFilter = ClrFilter.Not(regexFilter);
                     }
 
                     return regexFilter;
@@ -116,42 +116,42 @@ namespace Squidex.Infrastructure.Queries.OData
                 {
                     var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.NotEquals, value);
+                    return ClrFilter.Ne(PropertyPathVisitor.Visit(nodeIn.Left), value);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.Equal)
                 {
                     var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.Equals, value);
+                    return ClrFilter.Eq(PropertyPathVisitor.Visit(nodeIn.Left), value);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.LessThan)
                 {
                     var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.LessThan, value);
+                    return ClrFilter.Lt(PropertyPathVisitor.Visit(nodeIn.Left), value);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.LessThanOrEqual)
                 {
                     var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.LessThanOrEqual, value);
+                    return ClrFilter.Le(PropertyPathVisitor.Visit(nodeIn.Left), value);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThan)
                 {
                     var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.GreaterThan, value);
+                    return ClrFilter.Gt(PropertyPathVisitor.Visit(nodeIn.Left), value);
                 }
 
                 if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThanOrEqual)
                 {
                     var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-                    return new FilterComparison(PropertyPathVisitor.Visit(nodeIn.Left), FilterOperator.GreaterThanOrEqual, value);
+                    return ClrFilter.Ge(PropertyPathVisitor.Visit(nodeIn.Left), value);
                 }
             }
 

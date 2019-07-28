@@ -122,7 +122,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return await assetRepository.QueryAsync(appEntity.Id, new HashSet<Guid>(assetIds));
         }
 
-        private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid filterSchemaId, FilterNode filterNode)
+        private async Task<IReadOnlyList<Guid>> QueryContentsAsync(Guid filterSchemaId, FilterNode<ClrValue> filterNode)
         {
             return await contentRepository.QueryIdsAsync(appEntity.Id, filterSchemaId, filterNode);
         }

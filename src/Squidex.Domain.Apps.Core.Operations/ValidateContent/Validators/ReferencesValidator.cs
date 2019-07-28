@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 {
     public sealed class ReferencesValidator : IValidator
     {
-        private static readonly IReadOnlyList<string> Path = new List<string> { "Id" };
+        private static readonly PropertyPath Path = "Id";
 
         private readonly Guid schemaId;
 
@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             if (value is ICollection<Guid> contentIds)
             {
-                var filter = new FilterComparison(Path, FilterOperator.In, new FilterValue(contentIds.ToList()));
+                var filter = ClrFilter.In(Path, contentIds.ToList());
 
                 var foundIds = await context.GetContentIdsAsync(schemaId, filter);
 

@@ -11,11 +11,11 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public class ODataConversionTests
+    public class QueryODataConversionTests
     {
         private static readonly IEdmModel EdmModel;
 
-        static ODataConversionTests()
+        static QueryODataConversionTests()
         {
             var entityType = new EdmEntityType("Squidex", "Users");
 

@@ -20,15 +20,15 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
 
             if (value != null && (count == 0 || (count == 2 && context.Path.Last() == InvariantPartitioning.Key)))
             {
-                FilterNode filter = null;
+                FilterNode<ClrValue> filter = null;
 
                 if (value is string s)
                 {
-                    filter = new FilterComparison(Path(context), FilterOperator.Equals, new FilterValue(s));
+                    filter = ClrFilter.Eq(Path(context), s);
                 }
                 else if (value is double d)
                 {
-                    filter = new FilterComparison(Path(context), FilterOperator.Equals, new FilterValue(d));
+                    filter = ClrFilter.Eq(Path(context), d);
                 }
 
                 if (filter != null)

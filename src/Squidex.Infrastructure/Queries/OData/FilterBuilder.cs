@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.Queries.OData
 {
     public static class FilterBuilder
     {
-        public static void ParseFilter(this ODataUriParser query, Query result)
+        public static void ParseFilter(this ODataUriParser query, ClrQuery result)
         {
             SearchClause search;
             try

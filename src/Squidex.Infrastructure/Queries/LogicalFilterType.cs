@@ -7,16 +7,9 @@
 
 namespace Squidex.Infrastructure.Queries
 {
-    public enum FilterValueType
+    public enum LogicalFilterType
     {
-        Boolean,
-        Guid,
-        Double,
-        Instant,
-        Int32,
-        Int64,
-        Single,
-        String,
-        Null
+        And,
+        Or
     }
 }

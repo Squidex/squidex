@@ -7,8 +7,18 @@
 
 namespace Squidex.Infrastructure.Queries
 {
-    public abstract class FilterNode<TValue>
+    public enum CompareOperator
     {
-        public abstract T Accept<T>(FilterNodeVisitor<T, TValue> visitor);
+        Contains,
+        Empty,
+        EndsWith,
+        Equals,
+        GreaterThan,
+        GreaterThanOrEqual,
+        In,
+        LessThan,
+        LessThanOrEqual,
+        NotEquals,
+        StartsWith
     }
 }
