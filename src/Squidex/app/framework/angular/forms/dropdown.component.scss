@@ -17,6 +17,21 @@ $color-input-disabled: #eef1f4;
     }
 }
 
+.search-form {
+    padding: .5rem;
+}
+
+.control-dropdown {
+    max-width: 40rem;
+    max-height: none;
+    overflow-y: hidden;
+}
+
+.control-dropdown-items {
+    overflow-y: auto;
+    max-height: 15rem;
+}
+
 .selection {
     & {
         position: relative;
