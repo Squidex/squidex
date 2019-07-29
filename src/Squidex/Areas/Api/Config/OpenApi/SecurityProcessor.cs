@@ -9,11 +9,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using NSwag;
-using NSwag.SwaggerGeneration.Processors.Security;
-using Squidex.Pipeline.Swagger;
+using NSwag.Generation.Processors.Security;
+using Squidex.Pipeline.OpenApi;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Config.Swagger
+namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class SecurityProcessor : SecurityDefinitionAppender
     {
@@ -22,11 +22,11 @@ namespace Squidex.Areas.Api.Config.Swagger
         {
         }
 
-        private static SwaggerSecurityScheme CreateOAuthSchema(UrlsOptions urlOptions)
+        private static OpenApiSecurityScheme CreateOAuthSchema(UrlsOptions urlOptions)
         {
-            var security = new SwaggerSecurityScheme
+            var security = new OpenApiSecurityScheme
             {
-                Type = SwaggerSecuritySchemeType.OAuth2
+                Type = OpenApiSecuritySchemeType.OAuth2
             };
 
             var tokenUrl = urlOptions.BuildUrl($"{Constants.IdentityServerPrefix}/connect/token", false);
@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 
             SetupDescription(security, tokenUrl);
 
-            security.Flow = SwaggerOAuth2Flow.Application;
+            security.Flow = OpenApiOAuth2Flow.Application;
 
             security.Scopes = new Dictionary<string, string>
             {
@@ -45,7 +45,7 @@ namespace Squidex.Areas.Api.Config.Swagger
             return security;
         }
 
-        private static void SetupDescription(SwaggerSecurityScheme securityScheme, string tokenUrl)
+        private static void SetupDescription(OpenApiSecurityScheme securityScheme, string tokenUrl)
         {
             var securityDocs = NSwagHelper.LoadDocs("security");
             var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);

@@ -8,30 +8,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using NSwag;
-using NSwag.SwaggerGeneration.Processors;
-using NSwag.SwaggerGeneration.Processors.Contexts;
-using Squidex.Infrastructure.Tasks;
+using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
 using Squidex.Web;
 
-namespace Squidex.Areas.Api.Config.Swagger
+namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class ScopesProcessor : IOperationProcessor
     {
-        public Task<bool> ProcessAsync(OperationProcessorContext context)
+        public bool Process(OperationProcessorContext context)
         {
             if (context.OperationDescription.Operation.Security == null)
             {
-                context.OperationDescription.Operation.Security = new List<SwaggerSecurityRequirement>();
+                context.OperationDescription.Operation.Security = new List<OpenApiSecurityRequirement>();
             }
 
             var permissionAttribute = context.MethodInfo.GetCustomAttribute<ApiPermissionAttribute>();
 
             if (permissionAttribute != null)
             {
-                context.OperationDescription.Operation.Security.Add(new SwaggerSecurityRequirement
+                context.OperationDescription.Operation.Security.Add(new OpenApiSecurityRequirement
                 {
                     [Constants.SecurityDefinition] = permissionAttribute.PermissionIds
                 });
@@ -47,14 +45,14 @@ namespace Squidex.Areas.Api.Config.Swagger
                 {
                     var scopes = authorizeAttributes.Where(a => a.Roles != null).SelectMany(a => a.Roles.Split(',')).Distinct().ToList();
 
-                    context.OperationDescription.Operation.Security.Add(new SwaggerSecurityRequirement
+                    context.OperationDescription.Operation.Security.Add(new OpenApiSecurityRequirement
                     {
                         [Constants.SecurityDefinition] = scopes
                     });
                 }
             }
 
-            return TaskHelper.True;
+            return true;
         }
     }
 }

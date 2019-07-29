@@ -5,19 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
 using NJsonSchema;
-using NSwag.SwaggerGeneration.Processors;
-using NSwag.SwaggerGeneration.Processors.Contexts;
-using Squidex.Infrastructure.Tasks;
+using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
 
-namespace Squidex.Areas.Api.Config.Swagger
+namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class FixProcessor : IOperationProcessor
     {
-        private static readonly JsonSchema4 StringSchema = new JsonSchema4 { Type = JsonObjectType.String };
+        private static readonly JsonSchema StringSchema = new JsonSchema { Type = JsonObjectType.String };
 
-        public Task<bool> ProcessAsync(OperationProcessorContext context)
+        public bool Process(OperationProcessorContext context)
         {
             foreach (var parameter in context.Parameters.Values)
             {
@@ -27,7 +25,7 @@ namespace Squidex.Areas.Api.Config.Swagger
                 }
             }
 
-            return TaskHelper.True;
+            return true;
         }
     }
 }

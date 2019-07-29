@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 
@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.Queries.Json
 
         protected override void WriteValue(JsonWriter writer, PropertyPath value, JsonSerializer serializer)
         {
-            serializer.Serialize(writer, (IEnumerable<string>)value);
+            serializer.Serialize(writer, value.ToList());
         }
     }
 }

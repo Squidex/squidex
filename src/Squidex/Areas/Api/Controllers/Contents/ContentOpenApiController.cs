@@ -15,17 +15,17 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents
 {
-    public sealed class ContentSwaggerController : ApiController
+    public sealed class ContentOpenApiController : ApiController
     {
         private readonly IAppProvider appProvider;
-        private readonly SchemasSwaggerGenerator schemasSwaggerGenerator;
+        private readonly SchemasOpenApiGenerator schemasOpenApiGenerator;
 
-        public ContentSwaggerController(ICommandBus commandBus, IAppProvider appProvider, SchemasSwaggerGenerator schemasSwaggerGenerator)
+        public ContentOpenApiController(ICommandBus commandBus, IAppProvider appProvider, SchemasOpenApiGenerator schemasOpenApiGenerator)
             : base(commandBus)
         {
             this.appProvider = appProvider;
 
-            this.schemasSwaggerGenerator = schemasSwaggerGenerator;
+            this.schemasOpenApiGenerator = schemasOpenApiGenerator;
         }
 
         [HttpGet]
@@ -34,7 +34,10 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [AllowAnonymous]
         public IActionResult Docs(string app)
         {
-            var vm = new DocsVM { Specification = $"~/content/{app}/swagger/v1/swagger.json" };
+            var vm = new DocsVM
+            {
+                Specification = $"~/content/{app}/swagger/v1/swagger.json"
+            };
 
             return View(nameof(Docs), vm);
         }
@@ -43,13 +46,13 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [Route("content/{app}/swagger/v1/swagger.json")]
         [ApiCosts(0)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetSwagger(string app)
+        public async Task<IActionResult> GetOpenApi(string app)
         {
             var schemas = await appProvider.GetSchemasAsync(AppId);
 
-            var swaggerDocument = await schemasSwaggerGenerator.Generate(HttpContext, App, schemas);
+            var openApiDocument = schemasOpenApiGenerator.Generate(HttpContext, App, schemas);
 
-            return Content(swaggerDocument.ToJson(), "application/json");
+            return Content(openApiDocument.ToJson(), "application/json");
         }
     }
 }

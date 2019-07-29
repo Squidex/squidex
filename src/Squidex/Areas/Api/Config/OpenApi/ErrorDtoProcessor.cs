@@ -7,21 +7,20 @@
 
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using NJsonSchema;
 using NSwag;
-using NSwag.SwaggerGeneration.Processors;
-using NSwag.SwaggerGeneration.Processors.Contexts;
+using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
 using Squidex.ClientLibrary.Management;
-using Squidex.Pipeline.Swagger;
+using Squidex.Pipeline.OpenApi;
 
-namespace Squidex.Areas.Api.Config.Swagger
+namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class ErrorDtoProcessor : IDocumentProcessor
     {
-        public async Task ProcessAsync(DocumentProcessorContext context)
+        public void Process(DocumentProcessorContext context)
         {
-            var errorSchema = await GetErrorSchemaAsync(context);
+            var errorSchema = GetErrorSchema(context);
 
             foreach (var operation in context.Document.Paths.Values.SelectMany(x => x.Values))
             {
@@ -31,7 +30,7 @@ namespace Squidex.Areas.Api.Config.Swagger
             }
         }
 
-        private static void AddErrorResponses(SwaggerOperation operation, JsonSchema4 errorSchema)
+        private static void AddErrorResponses(OpenApiOperation operation, JsonSchema errorSchema)
         {
             if (!operation.Responses.ContainsKey("500"))
             {
@@ -47,7 +46,7 @@ namespace Squidex.Areas.Api.Config.Swagger
             }
         }
 
-        private static void CleanupResponses(SwaggerOperation operation)
+        private static void CleanupResponses(OpenApiOperation operation)
         {
             foreach (var (code, response) in operation.Responses.ToList())
             {
@@ -60,11 +59,11 @@ namespace Squidex.Areas.Api.Config.Swagger
             }
         }
 
-        private Task<JsonSchema4> GetErrorSchemaAsync(DocumentProcessorContext context)
+        private JsonSchema GetErrorSchema(DocumentProcessorContext context)
         {
             var errorType = typeof(ErrorDto);
 
-            return context.SchemaGenerator.GenerateWithReferenceAsync<JsonSchema4>(errorType, Enumerable.Empty<Attribute>(), context.SchemaResolver);
+            return context.SchemaGenerator.Generate(errorType);
         }
     }
 }

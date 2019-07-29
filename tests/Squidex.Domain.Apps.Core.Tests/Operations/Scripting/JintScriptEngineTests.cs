@@ -36,7 +36,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         [Fact]
         public void Should_catch_script_syntax_errors()
         {
-            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), "x => x"));
+            Assert.Throws<ValidationException>(() => sut.Execute(new ScriptContext(), "invalid()"));
         }
 
         [Fact]
@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
             var content = new NamedContentData();
             var context = new ScriptContext { Data = content };
 
-            Assert.Throws<ValidationException>(() => sut.ExecuteAndTransform(context, "x => x"));
+            Assert.Throws<ValidationException>(() => sut.ExecuteAndTransform(context, "invalid()"));
         }
 
         [Fact]

@@ -7,18 +7,16 @@
 
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NJsonSchema.Infrastructure;
-using NSwag.SwaggerGeneration.Processors;
-using NSwag.SwaggerGeneration.Processors.Contexts;
-using Squidex.Infrastructure.Tasks;
+using Namotion.Reflection;
+using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
 
-namespace Squidex.Areas.Api.Config.Swagger
+namespace Squidex.Areas.Api.Config.OpenApi
 {
     public sealed class XmlTagProcessor : IDocumentProcessor
     {
-        public Task ProcessAsync(DocumentProcessorContext context)
+        public void Process(DocumentProcessorContext context)
         {
             foreach (var controllerType in context.ControllerTypes)
             {
@@ -30,7 +28,7 @@ namespace Squidex.Areas.Api.Config.Swagger
 
                     if (tag != null)
                     {
-                        var description = controllerType.GetXmlSummaryAsync().Result;
+                        var description = controllerType.GetXmlDocsSummary();
 
                         if (description != null)
                         {
@@ -44,8 +42,6 @@ namespace Squidex.Areas.Api.Config.Swagger
                     }
                 }
             }
-
-            return TaskHelper.Done;
         }
     }
 }

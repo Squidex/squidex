@@ -13,7 +13,7 @@ using NJsonSchema;
 using NSwag;
 using Squidex.Web;
 
-namespace Squidex.Pipeline.Swagger
+namespace Squidex.Pipeline.OpenApi
 {
     public static class NSwagHelper
     {
@@ -30,16 +30,16 @@ namespace Squidex.Pipeline.Swagger
             }
         }
 
-        public static SwaggerDocument CreateApiDocument(HttpContext context, UrlsOptions urlOptions, string appName)
+        public static OpenApiDocument CreateApiDocument(HttpContext context, UrlsOptions urlOptions, string appName)
         {
             var scheme =
                 string.Equals(context.Request.Scheme, "http", StringComparison.OrdinalIgnoreCase) ?
-                    SwaggerSchema.Http :
-                    SwaggerSchema.Https;
+                    OpenApiSchema.Http :
+                    OpenApiSchema.Https;
 
-            var document = new SwaggerDocument
+            var document = new OpenApiDocument
             {
-                Schemes = new List<SwaggerSchema>
+                Schemes = new List<OpenApiSchema>
                 {
                     scheme
                 },
@@ -51,7 +51,7 @@ namespace Squidex.Pipeline.Swagger
                 {
                     "application/json"
                 },
-                Info = new SwaggerInfo
+                Info = new OpenApiInfo
                 {
                     Title = $"Squidex API for {appName} App"
                 },
@@ -66,9 +66,9 @@ namespace Squidex.Pipeline.Swagger
             return document;
         }
 
-        public static void AddQueryParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description = null)
+        public static void AddQueryParameter(this OpenApiOperation operation, string name, JsonObjectType type, string description = null)
         {
-            var parameter = new SwaggerParameter { Type = type, Name = name, Kind = SwaggerParameterKind.Query };
+            var parameter = new OpenApiParameter { Type = type, Name = name, Kind = OpenApiParameterKind.Query };
 
             if (!string.IsNullOrWhiteSpace(description))
             {
@@ -78,24 +78,9 @@ namespace Squidex.Pipeline.Swagger
             operation.Parameters.Add(parameter);
         }
 
-        public static void AddPathParameter(this SwaggerOperation operation, string name, JsonObjectType type, string description = null)
+        public static void AddPathParameter(this OpenApiOperation operation, string name, JsonObjectType type, string description = null)
         {
-            var parameter = new SwaggerParameter { Type = type, Name = name, Kind = SwaggerParameterKind.Path };
-
-            if (!string.IsNullOrWhiteSpace(description))
-            {
-                parameter.Description = description;
-            }
-
-            parameter.IsRequired = true;
-            parameter.IsNullableRaw = false;
-
-            operation.Parameters.Add(parameter);
-        }
-
-        public static void AddBodyParameter(this SwaggerOperation operation, string name, JsonSchema4 schema, string description)
-        {
-            var parameter = new SwaggerParameter { Schema = schema, Name = name, Kind = SwaggerParameterKind.Body };
+            var parameter = new OpenApiParameter { Type = type, Name = name, Kind = OpenApiParameterKind.Path };
 
             if (!string.IsNullOrWhiteSpace(description))
             {
@@ -108,9 +93,24 @@ namespace Squidex.Pipeline.Swagger
             operation.Parameters.Add(parameter);
         }
 
-        public static void AddResponse(this SwaggerOperation operation, string statusCode, string description, JsonSchema4 schema = null)
+        public static void AddBodyParameter(this OpenApiOperation operation, string name, JsonSchema schema, string description)
         {
-            var response = new SwaggerResponse { Description = description, Schema = schema };
+            var parameter = new OpenApiParameter { Schema = schema, Name = name, Kind = OpenApiParameterKind.Body };
+
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                parameter.Description = description;
+            }
+
+            parameter.IsRequired = true;
+            parameter.IsNullableRaw = false;
+
+            operation.Parameters.Add(parameter);
+        }
+
+        public static void AddResponse(this OpenApiOperation operation, string statusCode, string description, JsonSchema schema = null)
+        {
+            var response = new OpenApiResponse { Description = description, Schema = schema };
 
             operation.Responses.Add(statusCode, response);
         }
