@@ -5,13 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using NJsonSchema;
 
 namespace Squidex.Infrastructure.Queries.Json
 {
     public static class PropertyPathValidator
     {
-        public static bool TryGetProperty(this PropertyPath path, JsonSchema schema, out JsonSchema property)
+        public static bool TryGetProperty(this PropertyPath path, JsonSchema schema, List<string> errors, out JsonSchema property)
         {
             foreach (var element in path)
             {
@@ -21,6 +22,15 @@ namespace Squidex.Infrastructure.Queries.Json
                 }
                 else
                 {
+                    if (!string.IsNullOrWhiteSpace(schema.Title))
+                    {
+                        errors.Add($"{element} is not a property of {schema.Title}.");
+                    }
+                    else
+                    {
+                        errors.Add($"{path} does not point to a valid property in the model.");
+                    }
+
                     property = null;
 
                     return false;
