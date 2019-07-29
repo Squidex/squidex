@@ -19,8 +19,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
 {
     public class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEvent>, IHistoryEventRepository
     {
-        public MongoHistoryEventRepository(IMongoDatabase database, IOptions<MongoDbOptions> options)
-            : base(database, options)
+        public MongoHistoryEventRepository(IMongoDatabase database)
+            : base(database)
         {
         }
 
@@ -31,18 +31,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
 
         protected override Task SetupCollectionAsync(IMongoCollection<HistoryEvent> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateManyAsync(
-                new[]
-                {
-                    new CreateIndexModel<HistoryEvent>(
-                        Index
-                            .Ascending(x => x.AppId)
-                            .Ascending(x => x.Channel)
-                            .Descending(x => x.Created)
-                            .Descending(x => x.Version)),
-                    new CreateIndexModel<HistoryEvent>(Index.Ascending(x => x.Created),
-                        new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(365) })
-                }, ct);
+            return collection.Indexes.CreateManyAsync(new[]
+            {
+                new CreateIndexModel<HistoryEvent>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.Channel)
+                        .Descending(x => x.Created)
+                        .Descending(x => x.Version)),
+                new CreateIndexModel<HistoryEvent>(
+                    Index
+                        .Ascending(x => x.Created),
+                    new CreateIndexOptions
+                    {
+                        ExpireAfter = TimeSpan.FromDays(365)
+                    })
+            }, ct);
         }
 
         public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(Guid appId, string channelPrefix, int count)

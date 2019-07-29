@@ -31,8 +31,8 @@ namespace Squidex.Domain.Users.MongoDb.Infrastructure
             });
         }
 
-        public MongoPersistedGrantStore(IMongoDatabase database, IOptions<MongoDbOptions> options)
-            : base(database, options)
+        public MongoPersistedGrantStore(IMongoDatabase database)
+            : base(database)
         {
         }
 
@@ -43,12 +43,11 @@ namespace Squidex.Domain.Users.MongoDb.Infrastructure
 
         protected override Task SetupCollectionAsync(IMongoCollection<PersistedGrant> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateManyAsync(
-                new[]
-                {
-                    new CreateIndexModel<PersistedGrant>(Index.Ascending(x => x.ClientId)),
-                    new CreateIndexModel<PersistedGrant>(Index.Ascending(x => x.SubjectId))
-                }, ct);
+            return collection.Indexes.CreateManyAsync(new[]
+            {
+                new CreateIndexModel<PersistedGrant>(Index.Ascending(x => x.ClientId)),
+                new CreateIndexModel<PersistedGrant>(Index.Ascending(x => x.SubjectId))
+            }, ct);
         }
 
         public Task StoreAsync(PersistedGrant grant)

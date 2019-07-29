@@ -20,8 +20,8 @@ namespace Squidex.Infrastructure.UsageTracking
     {
         private static readonly BulkWriteOptions Unordered = new BulkWriteOptions { IsOrdered = false };
 
-        public MongoUsageRepository(IMongoDatabase database, IOptions<MongoDbOptions> options)
-            : base(database, options)
+        public MongoUsageRepository(IMongoDatabase database)
+            : base(database)
         {
         }
 

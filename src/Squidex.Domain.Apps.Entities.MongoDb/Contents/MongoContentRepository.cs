@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             StatusSerializer.Register();
         }
 
-        public MongoContentRepository(IMongoDatabase database, IOptions<MongoDbOptions> options, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer, TypeNameRegistry typeNameRegistry)
+        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer, TypeNameRegistry typeNameRegistry)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(database, nameof(database));
@@ -59,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             typeAssetDeleted = typeNameRegistry.GetName<AssetDeleted>();
             typeContentDeleted = typeNameRegistry.GetName<ContentDeleted>();
 
-            contents = new MongoContentCollection(database, options, serializer, appProvider);
+            contents = new MongoContentCollection(database, serializer, appProvider);
         }
 
         public Task InitializeAsync(CancellationToken ct = default)

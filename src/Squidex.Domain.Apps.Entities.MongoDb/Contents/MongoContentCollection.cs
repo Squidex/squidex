@@ -34,8 +34,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly IAppProvider appProvider;
         private readonly IJsonSerializer serializer;
 
-        public MongoContentCollection(IMongoDatabase database, IOptions<MongoDbOptions> options, IJsonSerializer serializer, IAppProvider appProvider)
-            : base(database, options)
+        public MongoContentCollection(IMongoDatabase database, IJsonSerializer serializer, IAppProvider appProvider)
+            : base(database)
         {
             this.appProvider = appProvider;
 

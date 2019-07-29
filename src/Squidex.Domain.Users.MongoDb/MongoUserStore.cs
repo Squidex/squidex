@@ -105,8 +105,8 @@ namespace Squidex.Domain.Users.MongoDb
             });
         }
 
-        public MongoUserStore(IMongoDatabase database, IOptions<MongoDbOptions> options)
-            : base(database, options)
+        public MongoUserStore(IMongoDatabase database)
+            : base(database)
         {
         }
 
@@ -115,36 +115,29 @@ namespace Squidex.Domain.Users.MongoDb
             return "Identity_Users";
         }
 
-        protected override string ShardKey()
-        {
-            return "Shard";
-        }
-
         protected override Task SetupCollectionAsync(IMongoCollection<MongoUser> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateManyAsync(
-                new[]
-                {
-                    Options.IsDocumentDb ?
-                        new CreateIndexModel<MongoUser>(Index.Ascending("Logins.LoginProvider")) :
-                        new CreateIndexModel<MongoUser>(Index.Ascending("Logins.LoginProvider").Ascending("Logins.ProviderKey")),
-                    new CreateIndexModel<MongoUser>(
-                        Index
-                            .Ascending("Shard")
-                            .Ascending(x => x.NormalizedUserName),
-                        new CreateIndexOptions
-                        {
-                            Unique = true
-                        }),
-                    new CreateIndexModel<MongoUser>(
-                        Index
-                            .Ascending("Shard")
-                            .Ascending(x => x.NormalizedEmail),
-                        new CreateIndexOptions
-                        {
-                            Unique = true
-                        })
-                }, ct);
+            return collection.Indexes.CreateManyAsync(new[]
+            {
+                new CreateIndexModel<MongoUser>(
+                    Index
+                        .Ascending("Logins.LoginProvider")
+                        .Ascending("Logins.ProviderKey")),
+                new CreateIndexModel<MongoUser>(
+                    Index
+                        .Ascending(x => x.NormalizedUserName),
+                    new CreateIndexOptions
+                    {
+                        Unique = true
+                    }),
+                new CreateIndexModel<MongoUser>(
+                    Index
+                        .Ascending(x => x.NormalizedEmail),
+                    new CreateIndexOptions
+                    {
+                        Unique = true
+                    })
+            }, ct);
         }
 
         protected override MongoCollectionSettings CollectionSettings()

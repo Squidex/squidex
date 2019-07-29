@@ -24,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
-        public MongoAssetRepository(IMongoDatabase database, IOptions<MongoDbOptions> options)
-            : base(database, options)
+        public MongoAssetRepository(IMongoDatabase database)
+            : base(database)
         {
         }
 
@@ -36,40 +36,26 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateManyAsync(
-                new[]
-                {
-                    new CreateIndexModel<MongoAssetEntity>(
-                        Index
-                            .Ascending(x => x.AppId)
-                            .Ascending(x => x.IsDeleted)
-                            .Ascending(x => x.FileName)
-                            .Ascending(x => x.Tags)
-                            .Descending(x => x.LastModified),
-                        new CreateIndexOptions
-                        {
-                            Name = Options.IsDocumentDb ? "FileName_Tags" : null
-                        }),
-                    new CreateIndexModel<MongoAssetEntity>(
-                        Index
-                            .Ascending(x => x.AppId)
-                            .Ascending(x => x.IsDeleted)
-                            .Ascending(x => x.FileHash),
-                        new CreateIndexOptions
-                        {
-                            Name = Options.IsDocumentDb ? "FileHash" : null
-                        }),
-                    new CreateIndexModel<MongoAssetEntity>(
-                        Index
-                            .Ascending(x => x.AppId)
-                            .Ascending(x => x.IsDeleted)
-                            .Ascending(x => x.Slug),
-                        new CreateIndexOptions
-                        {
-                            Name = Options.IsDocumentDb ? "Slug" : null
-                        })
-                },
-                ct);
+            return collection.Indexes.CreateManyAsync(new[]
+            {
+                new CreateIndexModel<MongoAssetEntity>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.IsDeleted)
+                        .Ascending(x => x.FileName)
+                        .Ascending(x => x.Tags)
+                        .Descending(x => x.LastModified)),
+                new CreateIndexModel<MongoAssetEntity>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.IsDeleted)
+                        .Ascending(x => x.FileHash)),
+                new CreateIndexModel<MongoAssetEntity>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.IsDeleted)
+                        .Ascending(x => x.Slug))
+            }, ct);
         }
 
         public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, ClrQuery query)

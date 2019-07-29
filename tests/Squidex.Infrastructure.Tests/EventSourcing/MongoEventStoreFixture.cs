@@ -29,7 +29,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             BsonJsonConvention.Register(JsonSerializer.Create(JsonHelper.DefaultSettings()));
 
-            EventStore = new MongoEventStore(mongoDatabase, Options.Create(new MongoDbOptions()), notifier);
+            EventStore = new MongoEventStore(mongoDatabase, notifier);
             EventStore.InitializeAsync().Wait();
         }
 

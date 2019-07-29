@@ -52,8 +52,6 @@ namespace Squidex.Config.Domain
                     var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
                     var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName);
 
-                    services.Configure<MongoDbOptions>(config.GetSection("store:mongoDB"));
-
                     services.AddSingleton(typeof(ISnapshotStore<,>), typeof(MongoSnapshotStore<,>));
 
                     services.AddSingletonAs(_ => Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s)))
@@ -105,7 +103,6 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new MongoContentRepository(
                             c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName),
-                            c.GetRequiredService<IOptions<MongoDbOptions>>(),
                             c.GetRequiredService<IAppProvider>(),
                             c.GetRequiredService<IJsonSerializer>(),
                             c.GetRequiredService<ITextIndexer>(),

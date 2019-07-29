@@ -31,7 +31,6 @@ namespace Squidex.Infrastructure.MongoDb
         protected static readonly ProjectionDefinitionBuilder<TEntity> Projection = Builders<TEntity>.Projection;
 
         private readonly IMongoDatabase mongoDatabase;
-        private readonly MongoDbOptions options;
         private Lazy<IMongoCollection<TEntity>> mongoCollection;
 
         protected IMongoCollection<TEntity> Collection
@@ -44,11 +43,6 @@ namespace Squidex.Infrastructure.MongoDb
             get { return mongoDatabase; }
         }
 
-        protected MongoDbOptions Options
-        {
-            get { return options; }
-        }
-
         static MongoRepositoryBase()
         {
             RefTokenSerializer.Register();
@@ -56,25 +50,17 @@ namespace Squidex.Infrastructure.MongoDb
             InstantSerializer.Register();
         }
 
-        protected MongoRepositoryBase(IMongoDatabase database, IOptions<MongoDbOptions> options)
+        protected MongoRepositoryBase(IMongoDatabase database)
         {
             Guard.NotNull(database, nameof(database));
-            Guard.NotNull(options, nameof(options));
 
             mongoDatabase = database;
             mongoCollection = CreateCollection();
-
-            this.options = options.Value;
         }
 
         protected virtual MongoCollectionSettings CollectionSettings()
         {
             return new MongoCollectionSettings();
-        }
-
-        protected virtual string ShardKey()
-        {
-            return "_id";
         }
 
         protected virtual string CollectionName()

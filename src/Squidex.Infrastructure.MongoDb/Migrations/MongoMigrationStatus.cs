@@ -17,8 +17,8 @@ namespace Squidex.Infrastructure.Migrations
         private const string DefaultId = "Default";
         private static readonly FindOneAndUpdateOptions<MongoMigrationEntity> UpsertFind = new FindOneAndUpdateOptions<MongoMigrationEntity> { IsUpsert = true };
 
-        public MongoMigrationStatus(IMongoDatabase database, IOptions<MongoDbOptions> options)
-            : base(database, options)
+        public MongoMigrationStatus(IMongoDatabase database)
+            : base(database)
         {
         }
 

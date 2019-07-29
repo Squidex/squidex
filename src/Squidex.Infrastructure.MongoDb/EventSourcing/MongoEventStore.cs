@@ -27,8 +27,8 @@ namespace Squidex.Infrastructure.EventSourcing
             get { return Database.GetCollection<BsonDocument>(CollectionName()); }
         }
 
-        public MongoEventStore(IMongoDatabase database, IOptions<MongoDbOptions> options, IEventNotifier notifier)
-            : base(database, options)
+        public MongoEventStore(IMongoDatabase database, IEventNotifier notifier)
+            : base(database)
         {
             Guard.NotNull(notifier, nameof(notifier));
 
@@ -47,12 +47,21 @@ namespace Squidex.Infrastructure.EventSourcing
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateManyAsync(
-                new[]
-                {
-                    new CreateIndexModel<MongoEventCommit>(Index.Ascending(x => x.Timestamp).Ascending(x => x.EventStream)),
-                    new CreateIndexModel<MongoEventCommit>(Index.Ascending(x => x.EventStream).Descending(x => x.EventStreamOffset), new CreateIndexOptions { Unique = true })
-                }, ct);
+            return collection.Indexes.CreateManyAsync(new[]
+            {
+                new CreateIndexModel<MongoEventCommit>(
+                    Index
+                        .Ascending(x => x.Timestamp)
+                        .Ascending(x => x.EventStream)),
+                new CreateIndexModel<MongoEventCommit>(
+                    Index
+                        .Ascending(x => x.EventStream)
+                        .Descending(x => x.EventStreamOffset),
+                    new CreateIndexOptions
+                    {
+                        Unique = true
+                    })
+            }, ct);
         }
     }
 }

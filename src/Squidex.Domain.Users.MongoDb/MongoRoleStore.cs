@@ -31,8 +31,8 @@ namespace Squidex.Domain.Users.MongoDb
             });
         }
 
-        public MongoRoleStore(IMongoDatabase database, IOptions<MongoDbOptions> options)
-            : base(database, options)
+        public MongoRoleStore(IMongoDatabase database)
+            : base(database)
         {
         }
 
@@ -41,17 +41,11 @@ namespace Squidex.Domain.Users.MongoDb
             return "Identity_Roles";
         }
 
-        protected override string ShardKey()
-        {
-            return "Shard";
-        }
-
         protected override Task SetupCollectionAsync(IMongoCollection<IdentityRole> collection, CancellationToken ct = default)
         {
             return collection.Indexes.CreateOneAsync(
                 new CreateIndexModel<IdentityRole>(
                     Index
-                        .Ascending("Shard")
                         .Ascending(x => x.NormalizedName),
                     new CreateIndexOptions
                     {
