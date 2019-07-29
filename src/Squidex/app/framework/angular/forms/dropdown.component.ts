@@ -198,10 +198,10 @@ export class DropdownComponent extends StatefulControlComponent<State, any[]> im
     }
 
     private up() {
-        this.selectIndex(this.snapshot.selectedIndex - 1, false);
+        this.selectIndex(this.snapshot.selectedIndex - 1, true);
     }
 
     private down() {
-        this.selectIndex(this.snapshot.selectedIndex + 1, false);
+        this.selectIndex(this.snapshot.selectedIndex + 1, true);
     }
 }
