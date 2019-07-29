@@ -39,7 +39,7 @@
 
     <ng-container content>
         <div class="grid-header" #header>
-            <table class="table table-items">
+            <table class="table table-items table-fixed" [style.minWidth]="minWidth">
                 <thead>
                     <tr>
                         <th class="cell-select">
@@ -87,7 +87,7 @@
 
         <div class="grid-content" [sqxSyncScrolling]="header">
             <div class="table-container" sqxIgnoreScrollbar>
-                <table class="table table-items">
+                <table class="table table-items table-fixed" [style.minWidth]="minWidth">
                     <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent">
                         <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
                             [selected]="isItemSelected(content)"
