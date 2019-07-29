@@ -92,8 +92,8 @@ namespace Squidex.ICIS.Test.Validation
 
         public void CreateWorkingContentData(CreateContent content)
         {
-             var currentTime = NodaTime.Instant.FromDateTimeUtc(DateTime.Now.ToUniversalTime());
-            IJsonValue value = JsonValue.Create(currentTime);
+            var currentTime = NodaTime.Instant.FromDateTimeUtc(DateTime.Now.ToUniversalTime());
+            var value = JsonValue.Create(currentTime);
 
             content.SchemaId = new NamedId<Guid>(Guid.NewGuid(), "test");
 
