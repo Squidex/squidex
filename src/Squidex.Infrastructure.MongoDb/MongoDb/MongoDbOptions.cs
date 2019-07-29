@@ -11,11 +11,6 @@ namespace Squidex.Infrastructure.MongoDb
     {
         public MongoDbEngine Engine { get; set; } = MongoDbEngine.MongoDb;
 
-        public bool IsCosmosDb
-        {
-            get { return Engine == MongoDbEngine.CosmosDb; }
-        }
-
         public bool IsDocumentDb
         {
             get { return Engine == MongoDbEngine.DocumentDb; }

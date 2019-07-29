@@ -7,6 +7,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
@@ -26,8 +27,8 @@ namespace Squidex.Infrastructure.EventSourcing
             get { return Database.GetCollection<BsonDocument>(CollectionName()); }
         }
 
-        public MongoEventStore(IMongoDatabase database, IEventNotifier notifier)
-            : base(database)
+        public MongoEventStore(IMongoDatabase database, IOptions<MongoDbOptions> options, IEventNotifier notifier)
+            : base(database, options)
         {
             Guard.NotNull(notifier, nameof(notifier));
 

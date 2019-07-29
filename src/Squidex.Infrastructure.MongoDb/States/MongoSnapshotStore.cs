@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -19,8 +20,8 @@ namespace Squidex.Infrastructure.States
 {
     public class MongoSnapshotStore<T, TKey> : MongoRepositoryBase<MongoState<T, TKey>>, ISnapshotStore<T, TKey>
     {
-        public MongoSnapshotStore(IMongoDatabase database, JsonSerializer jsonSerializer)
-            : base(database)
+        public MongoSnapshotStore(IMongoDatabase database, IOptions<MongoDbOptions> options, JsonSerializer jsonSerializer)
+            : base(database, options)
         {
             Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
 

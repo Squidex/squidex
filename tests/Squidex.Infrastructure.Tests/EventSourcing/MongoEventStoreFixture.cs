@@ -7,6 +7,7 @@
 
 using System;
 using FakeItEasy;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.MongoDb;
@@ -28,7 +29,7 @@ namespace Squidex.Infrastructure.EventSourcing
 
             BsonJsonConvention.Register(JsonSerializer.Create(JsonHelper.DefaultSettings()));
 
-            EventStore = new MongoEventStore(mongoDatabase, notifier);
+            EventStore = new MongoEventStore(mongoDatabase, Options.Create(new MongoDbOptions()), notifier);
             EventStore.InitializeAsync().Wait();
         }
 

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -22,8 +23,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Rules
 {
     public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEventEntity>, IRuleEventRepository
     {
-        public MongoRuleEventRepository(IMongoDatabase database)
-            : base(database)
+        public MongoRuleEventRepository(IMongoDatabase database, IOptions<MongoDbOptions> options)
+            : base(database, options)
         {
         }
 

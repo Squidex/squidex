@@ -78,12 +78,26 @@ namespace Squidex.Infrastructure.EventSourcing
             await documentClient.CreateDocumentCollectionIfNotExistsAsync(databaseUri,
                 new DocumentCollection
                 {
+                    PartitionKey = new PartitionKeyDefinition
+                    {
+                        Paths = new Collection<string>
+                        {
+                            "/PartitionId"
+                        }
+                    },
                     Id = Constants.LeaseCollection
                 });
 
             await documentClient.CreateDocumentCollectionIfNotExistsAsync(databaseUri,
                 new DocumentCollection
                 {
+                    PartitionKey = new PartitionKeyDefinition
+                    {
+                        Paths = new Collection<string>
+                        {
+                            "/eventStream"
+                        }
+                    },
                     IndexingPolicy = new IndexingPolicy
                     {
                         IncludedPaths = new Collection<IncludedPath>

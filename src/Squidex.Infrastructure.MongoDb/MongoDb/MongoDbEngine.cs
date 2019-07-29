@@ -9,7 +9,6 @@ namespace Squidex.Infrastructure.MongoDb
 {
     public enum MongoDbEngine
     {
-        CosmosDb,
         DocumentDb,
         MongoDb,
     }

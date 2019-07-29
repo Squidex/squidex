@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 
@@ -16,8 +17,8 @@ namespace Squidex.Infrastructure.Migrations
         private const string DefaultId = "Default";
         private static readonly FindOneAndUpdateOptions<MongoMigrationEntity> UpsertFind = new FindOneAndUpdateOptions<MongoMigrationEntity> { IsUpsert = true };
 
-        public MongoMigrationStatus(IMongoDatabase database)
-            : base(database)
+        public MongoMigrationStatus(IMongoDatabase database, IOptions<MongoDbOptions> options)
+            : base(database, options)
         {
         }
 

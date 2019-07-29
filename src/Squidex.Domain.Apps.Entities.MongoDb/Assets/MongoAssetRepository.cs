@@ -24,14 +24,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
-        private readonly MongoDbOptions options;
-
         public MongoAssetRepository(IMongoDatabase database, IOptions<MongoDbOptions> options)
-            : base(database)
+            : base(database, options)
         {
-            Guard.NotNull(options, nameof(options));
-
-            this.options = options.Value;
         }
 
         protected override string CollectionName()
@@ -53,7 +48,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             .Descending(x => x.LastModified),
                         new CreateIndexOptions
                         {
-                            Name = options.IsDocumentDb ? "FileName_Tags" : null
+                            Name = Options.IsDocumentDb ? "FileName_Tags" : null
                         }),
                     new CreateIndexModel<MongoAssetEntity>(
                         Index
@@ -62,7 +57,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             .Ascending(x => x.FileHash),
                         new CreateIndexOptions
                         {
-                            Name = options.IsDocumentDb ? "FileHash" : null
+                            Name = Options.IsDocumentDb ? "FileHash" : null
                         }),
                     new CreateIndexModel<MongoAssetEntity>(
                         Index
@@ -71,7 +66,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
                             .Ascending(x => x.Slug),
                         new CreateIndexOptions
                         {
-                            Name = options.IsDocumentDb ? "Slug" : null
+                            Name = Options.IsDocumentDb ? "Slug" : null
                         })
                 },
                 ct);

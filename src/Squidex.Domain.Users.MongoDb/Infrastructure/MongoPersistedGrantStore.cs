@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -30,8 +31,8 @@ namespace Squidex.Domain.Users.MongoDb.Infrastructure
             });
         }
 
-        public MongoPersistedGrantStore(IMongoDatabase database)
-            : base(database)
+        public MongoPersistedGrantStore(IMongoDatabase database, IOptions<MongoDbOptions> options)
+            : base(database, options)
         {
         }
 

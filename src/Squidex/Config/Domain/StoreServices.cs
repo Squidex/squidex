@@ -11,6 +11,7 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Migrate_01.Migrations.MongoDb;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities;
@@ -104,6 +105,7 @@ namespace Squidex.Config.Domain
 
                     services.AddSingletonAs(c => new MongoContentRepository(
                             c.GetRequiredService<IMongoClient>().GetDatabase(mongoContentDatabaseName),
+                            c.GetRequiredService<IOptions<MongoDbOptions>>(),
                             c.GetRequiredService<IAppProvider>(),
                             c.GetRequiredService<IJsonSerializer>(),
                             c.GetRequiredService<ITextIndexer>(),

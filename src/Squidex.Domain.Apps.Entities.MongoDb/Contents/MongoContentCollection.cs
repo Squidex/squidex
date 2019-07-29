@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using NodaTime;
@@ -33,8 +34,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         private readonly IAppProvider appProvider;
         private readonly IJsonSerializer serializer;
 
-        public MongoContentCollection(IMongoDatabase database, IJsonSerializer serializer, IAppProvider appProvider)
-            : base(database)
+        public MongoContentCollection(IMongoDatabase database, IOptions<MongoDbOptions> options, IJsonSerializer serializer, IAppProvider appProvider)
+            : base(database, options)
         {
             this.appProvider = appProvider;
 

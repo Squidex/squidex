@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.History.Repositories;
@@ -21,15 +20,8 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
     public class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEvent>, IHistoryEventRepository
     {
         public MongoHistoryEventRepository(IMongoDatabase database, IOptions<MongoDbOptions> options)
-            : base(database)
+            : base(database, options)
         {
-            if (options.Value.IsCosmosDb)
-            {
-                var classMap = BsonClassMap.RegisterClassMap<HistoryEvent>();
-
-                classMap.MapProperty(x => x.Created).SetElementName("_ts");
-                classMap.AutoMap();
-            }
         }
 
         protected override string CollectionName()

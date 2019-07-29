@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
@@ -22,6 +23,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
@@ -41,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             StatusSerializer.Register();
         }
 
-        public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer, TypeNameRegistry typeNameRegistry)
+        public MongoContentRepository(IMongoDatabase database, IOptions<MongoDbOptions> options, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer, TypeNameRegistry typeNameRegistry)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(database, nameof(database));
@@ -57,7 +59,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             typeAssetDeleted = typeNameRegistry.GetName<AssetDeleted>();
             typeContentDeleted = typeNameRegistry.GetName<ContentDeleted>();
 
-            contents = new MongoContentCollection(database, serializer, appProvider);
+            contents = new MongoContentCollection(database, options, serializer, appProvider);
         }
 
         public Task InitializeAsync(CancellationToken ct = default)

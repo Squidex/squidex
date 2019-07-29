@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Squidex.Infrastructure.MongoDb;
 
@@ -19,8 +20,8 @@ namespace Squidex.Infrastructure.UsageTracking
     {
         private static readonly BulkWriteOptions Unordered = new BulkWriteOptions { IsOrdered = false };
 
-        public MongoUsageRepository(IMongoDatabase database)
-            : base(database)
+        public MongoUsageRepository(IMongoDatabase database, IOptions<MongoDbOptions> options)
+            : base(database, options)
         {
         }
 

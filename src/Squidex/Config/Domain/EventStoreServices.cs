@@ -11,6 +11,7 @@ using EventStore.ClientAPI;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
@@ -18,6 +19,7 @@ using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Config.Domain
@@ -38,7 +40,7 @@ namespace Squidex.Config.Domain
                             var mongoClient = Singletons<IMongoClient>.GetOrAdd(mongoConfiguration, s => new MongoClient(s));
                             var mongDatabase = mongoClient.GetDatabase(mongoDatabaseName);
 
-                            return new MongoEventStore(mongDatabase, c.GetRequiredService<IEventNotifier>());
+                            return new MongoEventStore(mongDatabase, c.GetRequiredService<IOptions<MongoDbOptions>>(), c.GetRequiredService<IEventNotifier>());
                         })
                         .As<IEventStore>();
                 },
