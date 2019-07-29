@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.History.Repositories;

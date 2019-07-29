@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;

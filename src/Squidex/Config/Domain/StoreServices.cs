@@ -11,7 +11,6 @@ using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Migrate_01.Migrations.MongoDb;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities;
@@ -34,7 +33,6 @@ using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 

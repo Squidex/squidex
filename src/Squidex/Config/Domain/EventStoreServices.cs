@@ -11,7 +11,6 @@ using EventStore.ClientAPI;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure;
@@ -19,7 +18,6 @@ using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Grains;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Config.Domain

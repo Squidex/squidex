@@ -7,7 +7,6 @@
 
 using System;
 using FakeItEasy;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.MongoDb;
