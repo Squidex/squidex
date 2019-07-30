@@ -11,7 +11,7 @@
     "preserveConstEnums": true,    
     "outDir": "JSFiles",                     
     "esModuleInterop": true    ,
-    //"types": ["node", "chai", "mocha", "lodash"],                   
+    "types": ["jasmine", "node", "jasmine-expect"],                   
   },
   "exclude": [
     "node_modules",

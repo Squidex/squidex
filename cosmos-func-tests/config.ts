@@ -4,8 +4,8 @@ import { allure } from "jasmine-allure-reporter";
 declare const allure: any;
 export let config: Config = {
   // to auto start Selenium server every time before test through config, we can use the below command instead of the above one
-  // directConnect: false,
-  seleniumAddress: "http://localhost:4444/wd/hub/",
+  directConnect: true,
+  // seleniumAddress: "http://localhost:4444/wd/hub/",
   framework: "jasmine2",
   capabilities: {
     maxInstances: 1,
