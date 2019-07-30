@@ -8,45 +8,30 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Microsoft.OData;
-using Squidex.Domain.Apps.Core.Tags;
-using Squidex.Domain.Apps.Entities.Assets.Edm;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.Queries.OData;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetQueryService : IAssetQueryService
     {
-        private readonly ITagService tagService;
         private readonly IAssetEnricher assetEnricher;
         private readonly IAssetRepository assetRepository;
-        private readonly AssetOptions options;
-
-        public int DefaultPageSizeGraphQl
-        {
-            get { return options.DefaultPageSizeGraphQl; }
-        }
+        private readonly AssetQueryParser queryParser;
 
         public AssetQueryService(
-            ITagService tagService,
             IAssetEnricher assetEnricher,
             IAssetRepository assetRepository,
-            IOptions<AssetOptions> options)
+            AssetQueryParser queryParser)
         {
-            Guard.NotNull(tagService, nameof(tagService));
             Guard.NotNull(assetEnricher, nameof(assetEnricher));
             Guard.NotNull(assetRepository, nameof(assetRepository));
-            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(queryParser, nameof(queryParser));
 
-            this.tagService = tagService;
             this.assetEnricher = assetEnricher;
             this.assetRepository = assetRepository;
-            this.options = options.Value;
+            this.queryParser = queryParser;
         }
 
         public async Task<IEnrichedAssetEntity> FindAssetAsync( Guid id)
@@ -93,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         private async Task<IResultList<IAssetEntity>> QueryByQueryAsync(Context context, Q query)
         {
-            var parsedQuery = ParseQuery(context, query.ODataQuery);
+            var parsedQuery = queryParser.ParseQuery(context, query);
 
             return await assetRepository.QueryAsync(context.App.Id, parsedQuery);
         }
@@ -108,43 +93,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private static IResultList<IAssetEntity> Sort(IResultList<IAssetEntity> assets, IReadOnlyList<Guid> ids)
         {
             return assets.SortSet(x => x.Id, ids);
-        }
-
-        private ClrQuery ParseQuery(Context context, string query)
-        {
-            try
-            {
-                var result = EdmAssetModel.Edm.ParseQuery(query).ToQuery();
-
-                if (result.Filter != null)
-                {
-                    result.Filter = FilterTagTransformer.Transform(result.Filter, context.App.Id, tagService);
-                }
-
-                if (result.Sort.Count == 0)
-                {
-                    result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
-                }
-
-                if (result.Take == long.MaxValue)
-                {
-                    result.Take = options.DefaultPageSize;
-                }
-                else if (result.Take > options.MaxResults)
-                {
-                    result.Take = options.MaxResults;
-                }
-
-                return result;
-            }
-            catch (NotSupportedException)
-            {
-                throw new ValidationException("OData operation is not supported.");
-            }
-            catch (ODataException ex)
-            {
-                throw new ValidationException($"Failed to parse query: {ex.Message}", ex);
-            }
         }
     }
 }

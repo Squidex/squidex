@@ -9,18 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Microsoft.OData;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.Queries.OData;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared;
 
@@ -38,13 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IContentRepository contentRepository;
         private readonly IContentVersionLoader contentVersionLoader;
         private readonly IScriptEngine scriptEngine;
-        private readonly ContentOptions options;
-        private readonly EdmModelBuilder modelBuilder;
-
-        public int DefaultPageSizeGraphQl
-        {
-            get { return options.DefaultPageSizeGraphQl; }
-        }
+        private readonly ContentQueryParser queryParser;
 
         public ContentQueryService(
             IAppProvider appProvider,
@@ -53,16 +43,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IContentRepository contentRepository,
             IContentVersionLoader contentVersionLoader,
             IScriptEngine scriptEngine,
-            IOptions<ContentOptions> options,
-            EdmModelBuilder modelBuilder)
+            ContentQueryParser queryParser)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(assetUrlGenerator, nameof(assetUrlGenerator));
             Guard.NotNull(contentEnricher, nameof(contentEnricher));
             Guard.NotNull(contentRepository, nameof(contentRepository));
             Guard.NotNull(contentVersionLoader, nameof(contentVersionLoader));
-            Guard.NotNull(modelBuilder, nameof(modelBuilder));
-            Guard.NotNull(options, nameof(options));
+            Guard.NotNull(queryParser, nameof(queryParser));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
 
             this.appProvider = appProvider;
@@ -70,9 +58,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentEnricher = contentEnricher;
             this.contentRepository = contentRepository;
             this.contentVersionLoader = contentVersionLoader;
-            this.modelBuilder = modelBuilder;
-            this.options = options.Value;
+            this.queryParser = queryParser;
             this.scriptEngine = scriptEngine;
+            this.queryParser = queryParser;
         }
 
         public async Task<IEnrichedContentEntity> FindContentAsync(Context context, string schemaIdOrName, Guid id, long version = -1)
@@ -119,11 +107,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 if (query.Ids != null && query.Ids.Count > 0)
                 {
-                    contents = await QueryByIdsAsync(context, query, schema);
+                    contents = await QueryByIdsAsync(context, schema, query);
                 }
                 else
                 {
-                    contents = await QueryByQueryAsync(context, query, schema);
+                    contents = await QueryByQueryAsync(context, schema, query);
                 }
 
                 return await TransformAsync(context, schema, contents);
@@ -254,43 +242,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private ClrQuery ParseQuery(Context context, string query, ISchemaEntity schema)
-        {
-            using (Profiler.TraceMethod<ContentQueryService>())
-            {
-                try
-                {
-                    var model = modelBuilder.BuildEdmModel(context.App, schema, context.IsFrontendClient);
-
-                    var result = model.ParseQuery(query).ToQuery();
-
-                    if (result.Sort.Count == 0)
-                    {
-                        result.Sort.Add(new SortNode(new List<string> { "lastModified" }, SortOrder.Descending));
-                    }
-
-                    if (result.Take == long.MaxValue)
-                    {
-                        result.Take = options.DefaultPageSize;
-                    }
-                    else if (result.Take > options.MaxResults)
-                    {
-                        result.Take = options.MaxResults;
-                    }
-
-                    return result;
-                }
-                catch (NotSupportedException)
-                {
-                    throw new ValidationException("OData operation is not supported.");
-                }
-                catch (ODataException ex)
-                {
-                    throw new ValidationException($"Failed to parse query: {ex.Message}", ex);
-                }
-            }
-        }
-
         public async Task<ISchemaEntity> GetSchemaOrThrowAsync(Context context, string schemaIdOrName)
         {
             ISchemaEntity schema = null;
@@ -343,14 +294,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<IResultList<IContentEntity>> QueryByQueryAsync(Context context, Q query, ISchemaEntity schema)
+        private async Task<IResultList<IContentEntity>> QueryByQueryAsync(Context context, ISchemaEntity schema, Q query)
         {
-            var parsedQuery = ParseQuery(context, query.ODataQuery, schema);
+            var parsedQuery = queryParser.ParseQuery(context, schema, query);
 
             return await QueryCoreAsync(context, schema, parsedQuery);
         }
 
-        private async Task<IResultList<IContentEntity>> QueryByIdsAsync(Context context, Q query, ISchemaEntity schema)
+        private async Task<IResultList<IContentEntity>> QueryByIdsAsync(Context context, ISchemaEntity schema, Q query)
         {
             var contents = await QueryCoreAsync(context, schema, query.Ids.ToHashSet());
 

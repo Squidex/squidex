@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GraphQL;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
@@ -88,8 +89,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
                 return new GraphQLModel(app,
                     allSchemas,
-                    resolver.Resolve<IContentQueryService>().DefaultPageSizeGraphQl,
-                    resolver.Resolve<IAssetQueryService>().DefaultPageSizeGraphQl,
+                    resolver.Resolve<IOptions<ContentOptions>>().Value.DefaultPageSizeGraphQl,
+                    resolver.Resolve<IOptions<AssetOptions>>().Value.DefaultPageSizeGraphQl,
                     resolver.Resolve<IGraphQLUrlGenerator>());
             });
         }
