@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Migrate_01;
 using Squidex.Areas.Api;
-using Squidex.Areas.Api.Config.Swagger;
+using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Api.Controllers.Contents;
 using Squidex.Areas.Api.Controllers.News;
 using Squidex.Areas.Api.Controllers.UI;
@@ -69,11 +69,11 @@ namespace Squidex
             services.AddMyIdentityServer();
             services.AddMyInfrastructureServices(config);
             services.AddMyLoggingServices(config);
+            services.AddMyOpenApiSettings();
             services.AddMyMigrationServices();
             services.AddMyRuleServices();
             services.AddMySerializers();
             services.AddMyStoreServices(config);
-            services.AddMySwaggerSettings();
             services.AddMySubscriptionServices(config);
 
             services.Configure<ContentOptions>(

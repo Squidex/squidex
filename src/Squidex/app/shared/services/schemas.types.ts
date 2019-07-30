@@ -327,6 +327,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly maxItems?: number;
     public readonly editor: string;
     public readonly schemaId?: string;
+    public readonly resolveReference?: boolean;
     public readonly allowDuplicates?: boolean;
 
     public get isSortable() {

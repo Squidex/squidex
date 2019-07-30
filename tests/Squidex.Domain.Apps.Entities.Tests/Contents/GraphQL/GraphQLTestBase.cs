@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using FakeItEasy;
 using GraphQL;
 using GraphQL.DataLoader;
@@ -16,13 +15,13 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.TestData;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
@@ -36,21 +35,21 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public class GraphQLTestBase
     {
-        protected readonly Guid schemaId = Guid.NewGuid();
-        protected readonly Guid appId = Guid.NewGuid();
-        protected readonly string appName = "my-app";
-        protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
+        protected readonly IAppEntity app;
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
-        protected readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
-        protected readonly IJsonSerializer serializer = TestUtils.CreateSerializer(TypeNameHandling.None);
+        protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
         protected readonly IDependencyResolver dependencyResolver;
-        protected readonly IAppEntity app = A.Dummy<IAppEntity>();
-        protected readonly Context context;
-        protected readonly ClaimsPrincipal user = new ClaimsPrincipal();
+        protected readonly IJsonSerializer serializer = TestUtils.CreateSerializer(TypeNameHandling.None);
+        protected readonly ISchemaEntity schema;
+        protected readonly Context requestContext;
+        protected readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        protected readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         protected readonly IGraphQLService sut;
 
         public GraphQLTestBase()
         {
+            app = Mocks.App(appId, Language.DE, Language.GermanGermany);
+
             var schemaDef =
                 new Schema("my-schema")
                     .AddJson(1, "my-json", Partitioning.Invariant,
@@ -68,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .AddDateTime(7, "my-datetime", Partitioning.Invariant,
                         new DateTimeFieldProperties())
                     .AddReferences(8, "my-references", Partitioning.Invariant,
-                        new ReferencesFieldProperties { SchemaId = schemaId })
+                        new ReferencesFieldProperties { SchemaId = schemaId.Id })
                     .AddReferences(9, "my-invalid", Partitioning.Invariant,
                         new ReferencesFieldProperties { SchemaId = Guid.NewGuid() })
                     .AddGeolocation(10, "my-geolocation", Partitioning.Invariant,
@@ -84,14 +83,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                     .ConfigureScripts(new SchemaScripts { Query = "<query-script>" })
                     .Publish();
 
-            A.CallTo(() => app.Id).Returns(appId);
-            A.CallTo(() => app.Name).Returns(appName);
-            A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.Build(Language.DE, Language.GermanGermany));
+            schema = Mocks.Schema(appId, schemaId, schemaDef);
 
-            context = new Context(user, app);
-
-            A.CallTo(() => schema.Id).Returns(schemaId);
-            A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
+            requestContext = new Context(Mocks.FrontendUser(), app);
 
             sut = CreateSut();
         }
@@ -213,7 +207,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var appProvider = A.Fake<IAppProvider>();
 
-            A.CallTo(() => appProvider.GetSchemasAsync(appId))
+            A.CallTo(() => appProvider.GetSchemasAsync(appId.Id))
                 .Returns(new List<ISchemaEntity> { schema });
 
             var dataLoaderContext = new DataLoaderContextAccessor();

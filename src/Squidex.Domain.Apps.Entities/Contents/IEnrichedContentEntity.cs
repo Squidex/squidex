@@ -16,5 +16,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         string StatusColor { get; }
 
         StatusInfo[] Nexts { get; }
+
+        NamedContentData ReferenceData { get; }
     }
 }

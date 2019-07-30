@@ -15,11 +15,9 @@ import {
     AppsState,
     ContentDto,
     ContentsService,
-    FieldFormatter,
-    fieldInvariant,
+    getContentValue,
     ImmutableArray,
     MathHelper,
-    RootFieldDto,
     SchemaDetailsDto,
     SchemasService,
     StatefulControlComponent,
@@ -125,32 +123,12 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
             return ImmutableArray.empty();
         }
 
-        function getRawValue(field: RootFieldDto, data: any, language: AppLanguageDto): any {
-            const contentField = data[field.name];
-
-            if (contentField) {
-                if (field.isLocalizable) {
-                    return contentField[language.iso2Code];
-                } else {
-                    return contentField[fieldInvariant];
-                }
-            }
-
-            return undefined;
-        }
-
         return contents.map(content => {
-            const values: any[] = [];
-
-            for (let field of schema.referenceFields) {
-                const value = getRawValue(field, content.data, this.languageField);
-
-                if (!Types.isUndefined(value)) {
-                    values.push(FieldFormatter.format(field, value, false));
-                }
-            }
-
-            const name = values.join(', ');
+            const name =
+                schema.referenceFields
+                    .map(f => getContentValue(content, this.languageField, f, false))
+                    .map(v => v.formatted)
+                    .join(', ');
 
             return { name, id: content.id };
         });

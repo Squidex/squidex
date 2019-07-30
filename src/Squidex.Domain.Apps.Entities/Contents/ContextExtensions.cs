@@ -19,7 +19,27 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private const string HeaderLanguages = "X-Languages";
         private const string HeaderResolveFlow = "X-ResolveFlow";
         private const string HeaderResolveAssetUrls = "X-Resolve-Urls";
+        private const string HeaderNoEnrichment = "X-NoEnrichment";
         private static readonly char[] Separators = { ',', ';' };
+
+        public static bool IsNoEnrichment(this Context context)
+        {
+            return context.Headers.ContainsKey(HeaderNoEnrichment);
+        }
+
+        public static Context WithNoEnrichment(this Context context, bool value = true)
+        {
+            if (value)
+            {
+                context.Headers[HeaderNoEnrichment] = "1";
+            }
+            else
+            {
+                context.Headers.Remove(HeaderNoEnrichment);
+            }
+
+            return context;
+        }
 
         public static bool IsUnpublished(this Context context)
         {

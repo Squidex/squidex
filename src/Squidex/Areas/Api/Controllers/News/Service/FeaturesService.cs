@@ -16,7 +16,7 @@ namespace Squidex.Areas.Api.Controllers.News.Service
 {
     public sealed class FeaturesService
     {
-        private const int FeatureVersion = 3;
+        private const int FeatureVersion = 4;
         private static readonly QueryContext Flatten = QueryContext.Default.Flatten();
         private readonly SquidexClient<NewsEntity, FeatureDto> client;
 
@@ -43,7 +43,7 @@ namespace Squidex.Areas.Api.Controllers.News.Service
 
             if (client != null && version < FeatureVersion)
             {
-                var features = await client.GetAsync(filter: $"data/version/iv gt {version}", context: Flatten);
+                var features = await client.GetAsync(filter: $"data/version/iv ge {FeatureVersion}", context: Flatten);
 
                 result.Features.AddRange(features.Items.Select(x => x.Data));
             }

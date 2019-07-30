@@ -186,7 +186,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 var scriptText = schema.SchemaDef.Scripts.Query;
                 var scripting = !string.IsNullOrWhiteSpace(scriptText);
 
-                var enriched = await contentEnricher.EnrichAsync(contents, context.User);
+                var enriched = await contentEnricher.EnrichAsync(contents, context);
 
                 foreach (var content in enriched)
                 {
@@ -254,7 +254,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private Query ParseQuery(Context context, string query, ISchemaEntity schema)
+        private ClrQuery ParseQuery(Context context, string query, ISchemaEntity schema)
         {
             using (Profiler.TraceMethod<ContentQueryService>())
             {
@@ -362,7 +362,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             return contentRepository.QueryAsync(context.App, GetStatus(context), new HashSet<Guid>(ids), WithDraft(context));
         }
 
-        private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, Query query)
+        private Task<IResultList<IContentEntity>> QueryCoreAsync(Context context, ISchemaEntity schema, ClrQuery query)
         {
             return contentRepository.QueryAsync(context.App, schema, GetStatus(context), context.IsFrontendClient, query, WithDraft(context));
         }

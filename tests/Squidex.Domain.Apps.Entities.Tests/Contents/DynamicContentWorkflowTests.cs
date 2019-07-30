@@ -7,14 +7,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -22,11 +21,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class DynamicContentWorkflowTests
     {
+        private readonly IAppEntity app;
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly NamedId<Guid> simpleSchemaId = NamedId.Of(Guid.NewGuid(), "my-simple-schema");
-        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly IAppEntity appEntity = A.Fake<IAppEntity>();
         private readonly DynamicContentWorkflow sut;
 
         private readonly Workflow workflow = new Workflow(
@@ -62,6 +61,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public DynamicContentWorkflowTests()
         {
+            app = Mocks.App(appId);
+
             simpleWorkflow = new Workflow(
                 Status.Draft,
                 new Dictionary<Status, WorkflowStep>
@@ -86,9 +87,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var workflows = Workflows.Empty.Set(workflow).Set(Guid.NewGuid(), simpleWorkflow);
 
             A.CallTo(() => appProvider.GetAppAsync(appId.Id))
-                .Returns(appEntity);
+                .Returns(app);
 
-            A.CallTo(() => appEntity.Workflows)
+            A.CallTo(() => app.Workflows)
                 .Returns(workflows);
 
             sut = new DynamicContentWorkflow(new JintScriptEngine(), appProvider);
@@ -99,7 +100,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var expected = new StatusInfo(Status.Draft, StatusColors.Draft);
 
-            var result = await sut.GetInitialStatusAsync(CreateSchema());
+            var result = await sut.GetInitialStatusAsync(Mocks.Schema(appId, schemaId));
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -109,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanPublishOnCreateAsync(CreateSchema(), content.DataDraft, User("Editor"));
+            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.DataDraft, Mocks.FrontendUser("Editor"));
 
             Assert.True(result);
         }
@@ -119,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 4);
 
-            var result = await sut.CanPublishOnCreateAsync(CreateSchema(), content.DataDraft, User("Editor"));
+            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.DataDraft, Mocks.FrontendUser("Editor"));
 
             Assert.False(result);
         }
@@ -129,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanPublishOnCreateAsync(CreateSchema(), content.DataDraft, User("Developer"));
+            var result = await sut.CanPublishOnCreateAsync(Mocks.Schema(appId, schemaId), content.DataDraft, Mocks.FrontendUser("Developer"));
 
             Assert.False(result);
         }
@@ -139,7 +140,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanMoveToAsync(content, Status.Published, User("Editor"));
+            var result = await sut.CanMoveToAsync(content, Status.Published, Mocks.FrontendUser("Editor"));
 
             Assert.True(result);
         }
@@ -149,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 2);
 
-            var result = await sut.CanMoveToAsync(content, Status.Published, User("Developer"));
+            var result = await sut.CanMoveToAsync(content, Status.Published, Mocks.FrontendUser("Developer"));
 
             Assert.False(result);
         }
@@ -159,7 +160,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(Status.Draft, 4);
 
-            var result = await sut.CanMoveToAsync(content, Status.Published, User("Editor"));
+            var result = await sut.CanMoveToAsync(content, Status.Published, Mocks.FrontendUser("Editor"));
 
             Assert.False(result);
         }
@@ -204,7 +205,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Archived, StatusColors.Archived)
             };
 
-            var result = await sut.GetNextsAsync(content, User("Developer"));
+            var result = await sut.GetNextsAsync(content, Mocks.FrontendUser("Developer"));
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -219,7 +220,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Archived, StatusColors.Archived)
             };
 
-            var result = await sut.GetNextsAsync(content, User("Editor"));
+            var result = await sut.GetNextsAsync(content, Mocks.FrontendUser("Editor"));
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -235,7 +236,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetNextsAsync(content, User("Editor"));
+            var result = await sut.GetNextsAsync(content, Mocks.FrontendUser("Editor"));
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -281,7 +282,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetAllAsync(CreateSchema());
+            var result = await sut.GetAllAsync(Mocks.Schema(appId, schemaId));
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -295,7 +296,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetAllAsync(CreateSchema(true));
+            var result = await sut.GetAllAsync(Mocks.Schema(appId, simpleSchemaId));
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -303,7 +304,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_return_all_statuses_for_default_workflow_when_no_workflow_configured()
         {
-            A.CallTo(() => appEntity.Workflows).Returns(Workflows.Empty);
+            A.CallTo(() => app.Workflows).Returns(Workflows.Empty);
 
             var expected = new[]
             {
@@ -312,19 +313,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 new StatusInfo(Status.Published, StatusColors.Published)
             };
 
-            var result = await sut.GetAllAsync(CreateSchema(true));
+            var result = await sut.GetAllAsync(Mocks.Schema(appId, simpleSchemaId));
 
             result.Should().BeEquivalentTo(expected);
-        }
-
-        private ISchemaEntity CreateSchema(bool simple = false)
-        {
-            var schema = A.Fake<ISchemaEntity>();
-
-            A.CallTo(() => schema.AppId).Returns(appId);
-            A.CallTo(() => schema.Id).Returns(simple ? simpleSchemaId.Id : schemaId.Id);
-
-            return schema;
         }
 
         private IContentEntity CreateContent(Status status, int value, bool simple = false)
@@ -347,16 +338,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             .AddValue("iv", value));
 
             return content;
-        }
-
-        private ClaimsPrincipal User(string role)
-        {
-            var userIdentity = new ClaimsIdentity();
-            var userPrincipal = new ClaimsPrincipal(userIdentity);
-
-            userIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
-
-            return userPrincipal;
         }
     }
 }

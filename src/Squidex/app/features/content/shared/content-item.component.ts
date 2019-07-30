@@ -13,13 +13,11 @@ import {
     ContentsState,
     fadeAnimation,
     FieldDto,
-    FieldFormatter,
-    fieldInvariant,
+    getContentValue,
     ModalModel,
     PatchContentForm,
     RootFieldDto,
-    SchemaDetailsDto,
-    Types
+    SchemaDetailsDto
 } from '@app/shared';
 
 /* tslint:disable:component-selector */
@@ -152,13 +150,9 @@ export class ContentItemComponent implements OnChanges {
         this.values = [];
 
         for (let field of this.schemaFields) {
-            const value = this.getRawValue(field);
+            const { value, formatted } = getContentValue(this.content, this.language, field);
 
-            if (Types.isUndefined(value)) {
-                this.values.push('');
-            } else {
-                this.values.push(FieldFormatter.format(field, value, true));
-            }
+            this.values.push(formatted);
 
             if (this.patchForm) {
                 const formControl = this.patchForm.form.controls[field.name];
@@ -170,21 +164,7 @@ export class ContentItemComponent implements OnChanges {
         }
     }
 
-    private getRawValue(field: RootFieldDto): any {
-        const contentField = this.content.dataDraft[field.name];
-
-        if (contentField) {
-            if (field.isLocalizable) {
-                return contentField[this.language.iso2Code];
-            } else {
-                return contentField[fieldInvariant];
-            }
-        }
-
-        return undefined;
-    }
-
-    public trackByField(index: number, field: FieldDto) {
+    public trackByField(field: FieldDto) {
         return field.fieldId + this.schema.id;
     }
 }

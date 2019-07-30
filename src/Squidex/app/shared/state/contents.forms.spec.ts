@@ -16,7 +16,10 @@ import {
     FieldPropertiesDto,
     FieldValidatorsFactory,
     GeolocationFieldPropertiesDto,
+    getContentValue,
+    HtmlValue,
     JsonFieldPropertiesDto,
+    LanguageDto,
     NumberFieldPropertiesDto,
     ReferencesFieldPropertiesDto,
     RootFieldDto,
@@ -25,7 +28,6 @@ import {
     StringFieldPropertiesDto,
     TagsFieldPropertiesDto
 } from '@app/shared/internal';
-import { HtmlValue } from './contents.forms';
 
 describe('SchemaDetailsDto', () => {
     it('should return label as display name', () => {
@@ -314,7 +316,7 @@ describe('NumberField', () => {
     });
 
     it('should format to number', () => {
-        expect(FieldFormatter.format(field, 42)).toEqual(42);
+        expect(FieldFormatter.format(field, 42)).toEqual('42');
     });
 
     it('should format to stars if html allowed', () => {
@@ -344,7 +346,7 @@ describe('NumberField', () => {
     it('should not format to stars if html not allowed', () => {
         const field2 = createField(new NumberFieldPropertiesDto('Stars'));
 
-        expect(FieldFormatter.format(field2, 3, false)).toEqual(3);
+        expect(FieldFormatter.format(field2, 3, false)).toEqual('3');
     });
 
     it('should return default value for default properties', () => {
@@ -400,10 +402,106 @@ describe('StringField', () => {
     });
 });
 
+describe('GetContentValue', () => {
+    const language = new LanguageDto('en', 'English');
+    const fieldInvariant = createField(new NumberFieldPropertiesDto('Input'), 1, 'invariant');
+    const fieldLocalized = createField(new NumberFieldPropertiesDto('Input'));
+
+    it('should resolve invariant field from references value', () => {
+        const content: any = {
+            referenceData: {
+                field1: {
+                    iv: {
+                        en: '13'
+                    }
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldInvariant);
+
+        expect(result).toEqual({ value: '13', formatted: '13' });
+    });
+
+    it('should resolve localized field from references value', () => {
+        const content: any = {
+            referenceData: {
+                field1: {
+                    en: {
+                        en: '13'
+                    }
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldLocalized);
+
+        expect(result).toEqual({ value: '13', formatted: '13' });
+    });
+
+    it('should return default value if reference field not found', () => {
+        const content: any = {
+            referenceData: {
+                field1: {
+                    iv: {
+                        en: '13'
+                    }
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldLocalized);
+
+        expect(result).toEqual({ value: '- No Value -', formatted: '- No Value -' });
+    });
+
+    it('should resolve invariant field', () => {
+        const content: any = {
+            dataDraft: {
+                field1: {
+                    iv: 13
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldInvariant);
+
+        expect(result).toEqual({ value: 13, formatted: '13' });
+    });
+
+    it('should resolve localized field', () => {
+        const content: any = {
+            dataDraft: {
+                field1: {
+                    en: 13
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldLocalized);
+
+        expect(result).toEqual({ value: 13, formatted: '13' });
+    });
+
+    it('should return default values if field not found', () => {
+        const content: any = {
+            dataDraft: {
+                other: {
+                    en: 13
+                }
+            }
+        };
+
+        const result = getContentValue(content, language, fieldLocalized);
+
+        expect(result).toEqual({ value: undefined, formatted: '' });
+    });
+});
+
 function createSchema(properties: SchemaPropertiesDto, index = 1, fields: RootFieldDto[]) {
     return new SchemaDetailsDto({}, 'id' + index, 'schema' + index, '', properties, false, true, null!, null!, null!, null!, null!, fields);
 }
 
-function createField(properties: FieldPropertiesDto, index = 1, partitioning = 'languages') {
+function createField(properties: FieldPropertiesDto, index = 1, partitioning = 'language') {
     return new RootFieldDto({}, index, 'field' + index, properties, partitioning);
 }

@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 {
     public abstract class JsonClassConverter<T> : JsonConverter, ISupportedTypes where T : class
     {
-        public IEnumerable<Type> SupportedTypes
+        public virtual IEnumerable<Type> SupportedTypes
         {
             get { yield return typeof(T); }
         }

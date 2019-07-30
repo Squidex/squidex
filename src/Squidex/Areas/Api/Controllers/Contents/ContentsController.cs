@@ -162,12 +162,12 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(1)]
         public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null)
         {
+            var schema = await contentQuery.GetSchemaOrThrowAsync(Context, name);
+
             var contents = await contentQuery.QueryAsync(Context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
 
             var response = Deferred.AsyncResponse(async () =>
             {
-                var schema = await contentQuery.GetSchemaOrThrowAsync(Context, name);
-
                 return await ContentsDto.FromContentsAsync(contents, Context, this, schema, contentWorkflow);
             });
 
@@ -176,7 +176,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = contents.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = contents.ToEtag(App);
+            Response.Headers[HeaderNames.ETag] = contents.ToEtag(App, schema);
 
             return Ok(response);
         }

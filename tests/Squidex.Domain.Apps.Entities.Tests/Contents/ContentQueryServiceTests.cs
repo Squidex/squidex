@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -37,14 +36,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public class ContentQueryServiceTests
     {
+        private readonly IAppEntity app;
+        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
+        private readonly IAssetUrlGenerator urlGenerator = A.Fake<IAssetUrlGenerator>();
         private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
         private readonly IContentVersionLoader contentVersionLoader = A.Fake<IContentVersionLoader>();
+        private readonly ISchemaEntity schema;
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
-        private readonly IAppEntity app = A.Fake<IAppEntity>();
-        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly IAssetUrlGenerator urlGenerator = A.Fake<IAssetUrlGenerator>();
         private readonly Guid contentId = Guid.NewGuid();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
@@ -53,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly ClaimsPrincipal user;
         private readonly ClaimsIdentity identity = new ClaimsIdentity();
         private readonly EdmModelBuilder modelBuilder = new EdmModelBuilder(new MemoryCache(Options.Create(new MemoryCacheOptions())));
-        private readonly Context context;
+        private readonly Context requestContext;
         private readonly ContentQueryService sut;
 
         public static IEnumerable<object[]> ApiStatusTests = new[]
@@ -66,21 +65,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             user = new ClaimsPrincipal(identity);
 
-            A.CallTo(() => app.Id).Returns(appId.Id);
-            A.CallTo(() => app.Name).Returns(appId.Name);
-            A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.English);
+            app = Mocks.App(appId);
+
+            requestContext = new Context(user, app);
 
             var schemaDef =
                 new Schema(schemaId.Name)
                     .ConfigureScripts(new SchemaScripts { Query = "<query-script>" });
 
-            A.CallTo(() => schema.Id).Returns(schemaId.Id);
-            A.CallTo(() => schema.AppId).Returns(appId);
-            A.CallTo(() => schema.SchemaDef).Returns(schemaDef);
+            schema = Mocks.Schema(appId, schemaId, schemaDef);
 
             SetupEnricher();
-
-            context = new Context(user, app);
 
             var options = Options.Create(new ContentOptions { DefaultPageSize = 30 });
 
@@ -108,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchemaFound();
 
-            var result = await sut.GetSchemaOrThrowAsync(context, schemaId.Name);
+            var result = await sut.GetSchemaOrThrowAsync(requestContext, schemaId.Id.ToString());
 
             Assert.Equal(schema, result);
         }
@@ -118,7 +113,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchemaFound();
 
-            var result = await sut.GetSchemaOrThrowAsync(context, schemaId.Name);
+            var result = await sut.GetSchemaOrThrowAsync(requestContext, schemaId.Name);
 
             Assert.Equal(schema, result);
         }
@@ -128,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchemaNotFound();
 
-            var ctx = context;
+            var ctx = requestContext;
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(ctx, schemaId.Name));
         }
@@ -138,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             SetupSchemaNotFound();
 
-            var ctx = context;
+            var ctx = requestContext;
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(ctx, schemaId.Name));
         }
@@ -146,14 +141,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_apply_default_page_size()
         {
-            SetupClaims(isFrontend: false);
+            SetupUser(isFrontend: false);
             SetupSchemaFound();
 
             var query = Q.Empty;
 
-            await sut.QueryAsync(context, schemaId.Name, query);
+            await sut.QueryAsync(requestContext, schemaId.Name, query);
 
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(Status.Published), false, A<Query>.That.Is("Take: 30; Sort: lastModified Descending"), false))
+            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(Status.Published), false,
+                    A<ClrQuery>.That.Is("Take: 30; Sort: lastModified Descending"), false))
                 .MustHaveHappened();
         }
 
@@ -162,24 +158,25 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var status = new[] { Status.Published };
 
-            SetupClaims(isFrontend: false);
+            SetupUser(isFrontend: false);
             SetupSchemaFound();
 
             var query = Q.Empty.WithODataQuery("$top=300&$skip=20");
 
-            await sut.QueryAsync(context, schemaId.Name, query);
+            await sut.QueryAsync(requestContext, schemaId.Name, query);
 
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), false, A<Query>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending"), false))
+            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), false,
+                    A<ClrQuery>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending"), false))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_throw_for_single_content_if_no_permission()
         {
-            SetupClaims(false, false);
+            SetupUser(false, false);
             SetupSchemaFound();
 
-            var ctx = context;
+            var ctx = requestContext;
 
             await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindContentAsync(ctx, schemaId.Name, contentId));
         }
@@ -189,11 +186,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var status = new[] { Status.Published };
 
-            SetupClaims(isFrontend: false);
+            SetupUser(isFrontend: false);
             SetupSchemaFound();
             SetupContent(status, null, includeDraft: false);
 
-            var ctx = context;
+            var ctx = requestContext;
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(async () => await sut.FindContentAsync(ctx, schemaId.Name, contentId));
         }
@@ -203,12 +200,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(contentId);
 
-            SetupClaims(isFrontend: true);
+            SetupUser(isFrontend: true);
             SetupSchemaFound();
-            SetupScripting(contentId);
+            SetupSchemaScripting(contentId);
             SetupContent(null, content, includeDraft: true);
 
-            var ctx = context;
+            var ctx = requestContext;
 
             var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
 
@@ -225,12 +222,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(contentId);
 
-            SetupClaims(isFrontend: false);
+            SetupUser(isFrontend: false);
             SetupSchemaFound();
-            SetupScripting(contentId);
+            SetupSchemaScripting(contentId);
             SetupContent(status, content, unpublished == 1);
 
-            var ctx = context.WithUnpublished(unpublished == 1);
+            var ctx = requestContext.WithUnpublished(unpublished == 1);
 
             var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId);
 
@@ -246,14 +243,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var content = CreateContent(contentId);
 
-            SetupClaims(true);
+            SetupUser(true);
             SetupSchemaFound();
-            SetupScripting(contentId);
+            SetupSchemaScripting(contentId);
 
             A.CallTo(() => contentVersionLoader.LoadAsync(contentId, 10))
                 .Returns(content);
 
-            var ctx = context;
+            var ctx = requestContext;
 
             var result = await sut.FindContentAsync(ctx, schemaId.Name, contentId, 10);
 
@@ -264,10 +261,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_for_query_if_no_permission()
         {
-            SetupClaims(false, false);
+            SetupUser(false, false);
             SetupSchemaFound();
 
-            var ctx = context;
+            var ctx = requestContext;
 
             await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.QueryAsync(ctx, schemaId.Name, Q.Empty));
         }
@@ -279,12 +276,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var content = CreateContent(contentId);
 
-            SetupClaims(isFrontend: true);
+            SetupUser(isFrontend: true);
             SetupSchemaFound();
-            SetupScripting(contentId);
+            SetupSchemaScripting(contentId);
             SetupContents(null, count, total, content, inDraft: true, includeDraft: true);
 
-            var ctx = context;
+            var ctx = requestContext;
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
 
@@ -305,12 +302,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var content = CreateContent(contentId);
 
-            SetupClaims(isFrontend: false);
+            SetupUser(isFrontend: false);
             SetupSchemaFound();
-            SetupScripting(contentId);
+            SetupSchemaScripting(contentId);
             SetupContents(status, count, total, content, inDraft: false, unpublished == 1);
 
-            var ctx = context.WithUnpublished(unpublished == 1);
+            var ctx = requestContext.WithUnpublished(unpublished == 1);
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty);
 
@@ -326,12 +323,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         [Fact]
         public async Task Should_throw_if_query_is_invalid()
         {
-            SetupClaims(isFrontend: false);
+            SetupUser(isFrontend: false);
             SetupSchemaFound();
 
             var query = Q.Empty.WithODataQuery("$filter=invalid");
 
-            await Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(context, schemaId.Name, query));
+            await Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(requestContext, schemaId.Name, query));
         }
 
         [Fact]
@@ -341,12 +338,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ids = Enumerable.Range(0, count).Select(x => Guid.NewGuid()).ToList();
 
-            SetupClaims(isFrontend: true);
+            SetupUser(isFrontend: true);
             SetupSchemaFound();
-            SetupScripting(ids.ToArray());
+            SetupSchemaScripting(ids.ToArray());
             SetupContents(null, total, ids, includeDraft: true);
 
-            var ctx = context;
+            var ctx = requestContext;
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty.WithIds(ids));
 
@@ -365,12 +362,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ids = Enumerable.Range(0, count).Select(x => Guid.NewGuid()).ToList();
 
-            SetupClaims(isFrontend: false);
+            SetupUser(isFrontend: false);
             SetupSchemaFound();
-            SetupScripting(ids.ToArray());
+            SetupSchemaScripting(ids.ToArray());
             SetupContents(status, total, ids, unpublished == 1);
 
-            var ctx = context.WithUnpublished(unpublished == 1);
+            var ctx = requestContext.WithUnpublished(unpublished == 1);
 
             var result = await sut.QueryAsync(ctx, schemaId.Name, Q.Empty.WithIds(ids));
 
@@ -388,12 +385,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ids = Enumerable.Range(0, count).Select(x => Guid.NewGuid()).ToList();
 
-            SetupClaims(isFrontend: true);
+            SetupUser(isFrontend: true);
             SetupSchemaFound();
-            SetupScripting(ids.ToArray());
+            SetupSchemaScripting(ids.ToArray());
             SetupContents(null, ids, includeDraft: true);
 
-            var ctx = context;
+            var ctx = requestContext;
 
             var result = await sut.QueryAsync(ctx, ids);
 
@@ -411,12 +408,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var ids = Enumerable.Range(0, count).Select(x => Guid.NewGuid()).ToList();
 
-            SetupClaims(isFrontend: false);
+            SetupUser(isFrontend: false);
             SetupSchemaFound();
-            SetupScripting(ids.ToArray());
+            SetupSchemaScripting(ids.ToArray());
             SetupContents(status, ids, unpublished == 1);
 
-            var ctx = context.WithUnpublished(unpublished == 1);
+            var ctx = requestContext.WithUnpublished(unpublished == 1);
 
             var result = await sut.QueryAsync(ctx, ids);
 
@@ -431,12 +428,12 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var ids = Enumerable.Range(0, 1).Select(x => Guid.NewGuid()).ToList();
 
-            SetupClaims(isFrontend: false, allowSchema: false);
+            SetupUser(isFrontend: false, allowSchema: false);
             SetupSchemaFound();
-            SetupScripting(ids.ToArray());
+            SetupSchemaScripting(ids.ToArray());
             SetupContents(new Status[0], ids, includeDraft: false);
 
-            var ctx = context;
+            var ctx = requestContext;
 
             var result = await sut.QueryAsync(ctx, ids);
 
@@ -448,10 +445,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             var ids = new List<Guid>();
 
-            SetupClaims(isFrontend: false, allowSchema: false);
+            SetupUser(isFrontend: false, allowSchema: false);
             SetupSchemaFound();
 
-            var ctx = context;
+            var ctx = requestContext;
 
             var result = await sut.QueryAsync(ctx, ids);
 
@@ -461,7 +458,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .MustNotHaveHappened();
         }
 
-        private void SetupClaims(bool isFrontend, bool allowSchema = true)
+        private void SetupUser(bool isFrontend, bool allowSchema = true)
         {
             if (isFrontend)
             {
@@ -474,7 +471,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private void SetupScripting(params Guid[] ids)
+        private void SetupSchemaScripting(params Guid[] ids)
         {
             foreach (var id in ids)
             {
@@ -485,7 +482,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void SetupContents(Status[] status, int count, int total, IContentEntity content, bool inDraft, bool includeDraft)
         {
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), inDraft, A<Query>.Ignored, includeDraft))
+            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), inDraft, A<ClrQuery>.Ignored, includeDraft))
                 .Returns(ResultList.Create(total, Enumerable.Repeat(content, count)));
         }
 
@@ -527,7 +524,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void SetupEnricher()
         {
-            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>.Ignored, user))
+            A.CallTo(() => contentEnricher.EnrichAsync(A<IEnumerable<IContentEntity>>.Ignored, requestContext))
                 .ReturnsLazily(x =>
                 {
                     var input = (IEnumerable<IContentEntity>)x.Arguments[0];

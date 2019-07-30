@@ -8,13 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Tags;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
@@ -25,23 +22,16 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public class AssetQueryServiceTests
     {
-        private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
         private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
-        private readonly IAppEntity app = A.Fake<IAppEntity>();
+        private readonly ITagService tagService = A.Fake<ITagService>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly Context context;
+        private readonly Context requestContext;
         private readonly AssetQueryService sut;
 
         public AssetQueryServiceTests()
         {
-            var user = new ClaimsPrincipal(new ClaimsIdentity());
-
-            A.CallTo(() => app.Id).Returns(appId.Id);
-            A.CallTo(() => app.Name).Returns(appId.Name);
-            A.CallTo(() => app.LanguagesConfig).Returns(LanguagesConfig.English);
-
-            context = new Context(user, app);
+            requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
             var options = Options.Create(new AssetOptions { DefaultPageSize = 30 });
 
@@ -109,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2)))
                 .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
 
-            var result = await sut.QueryAsync(context, Q.Empty.WithIds(ids));
+            var result = await sut.QueryAsync(requestContext, Q.Empty.WithIds(ids));
 
             Assert.Equal(8, result.Total);
 
@@ -125,13 +115,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             var enriched1 = new AssetEntity();
             var enriched2 = new AssetEntity();
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.Ignored))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.Ignored))
                 .Returns(ResultList.CreateFrom(8, found1, found2));
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2)))
                 .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
 
-            var result = await sut.QueryAsync(context, Q.Empty);
+            var result = await sut.QueryAsync(requestContext, Q.Empty);
 
             Assert.Equal(8, result.Total);
 
@@ -143,9 +133,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var query = Q.Empty.WithODataQuery("$top=100&$orderby=fileName asc&$search=Hello World");
 
-            await sut.QueryAsync(context, query);
+            await sut.QueryAsync(requestContext, query);
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("FullText: 'Hello World'; Take: 100; Sort: fileName Ascending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.That.Is("FullText: 'Hello World'; Take: 100; Sort: fileName Ascending")))
                 .MustHaveHappened();
         }
 
@@ -154,9 +144,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var query = Q.Empty.WithODataQuery("$top=200&$filter=fileName eq 'ABC'");
 
-            await sut.QueryAsync(context, query);
+            await sut.QueryAsync(requestContext, query);
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("Filter: fileName == 'ABC'; Take: 200; Sort: lastModified Descending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.That.Is("Filter: fileName == 'ABC'; Take: 200; Sort: lastModified Descending")))
                 .MustHaveHappened();
         }
 
@@ -165,9 +155,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var query = Q.Empty;
 
-            await sut.QueryAsync(context, query);
+            await sut.QueryAsync(requestContext, query);
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("Take: 30; Sort: lastModified Descending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id,
+                    A<ClrQuery>.That.Is("Take: 30; Sort: lastModified Descending")))
                 .MustHaveHappened();
         }
 
@@ -176,9 +167,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var query = Q.Empty.WithODataQuery("$top=300&$skip=20");
 
-            await sut.QueryAsync(context, query);
+            await sut.QueryAsync(requestContext, query);
 
-            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<Query>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending")))
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id,
+                    A<ClrQuery>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending")))
                 .MustHaveHappened();
         }
     }

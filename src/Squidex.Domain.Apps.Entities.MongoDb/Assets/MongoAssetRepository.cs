@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -24,14 +23,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAssetEntity>, IAssetRepository
     {
-        private readonly MongoDbOptions options;
-
-        public MongoAssetRepository(IMongoDatabase database, IOptions<MongoDbOptions> options)
+        public MongoAssetRepository(IMongoDatabase database)
             : base(database)
         {
-            Guard.NotNull(options, nameof(options));
-
-            this.options = options.Value;
         }
 
         protected override string CollectionName()
@@ -41,43 +35,29 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateManyAsync(
-                new[]
-                {
-                    new CreateIndexModel<MongoAssetEntity>(
-                        Index
-                            .Ascending(x => x.AppId)
-                            .Ascending(x => x.IsDeleted)
-                            .Ascending(x => x.FileName)
-                            .Ascending(x => x.Tags)
-                            .Descending(x => x.LastModified),
-                        new CreateIndexOptions
-                        {
-                            Name = options.IsDocumentDb ? "FileName_Tags" : null
-                        }),
-                    new CreateIndexModel<MongoAssetEntity>(
-                        Index
-                            .Ascending(x => x.AppId)
-                            .Ascending(x => x.IsDeleted)
-                            .Ascending(x => x.FileHash),
-                        new CreateIndexOptions
-                        {
-                            Name = options.IsDocumentDb ? "FileHash" : null
-                        }),
-                    new CreateIndexModel<MongoAssetEntity>(
-                        Index
-                            .Ascending(x => x.AppId)
-                            .Ascending(x => x.IsDeleted)
-                            .Ascending(x => x.Slug),
-                        new CreateIndexOptions
-                        {
-                            Name = options.IsDocumentDb ? "Slug" : null
-                        })
-                },
-                ct);
+            return collection.Indexes.CreateManyAsync(new[]
+            {
+                new CreateIndexModel<MongoAssetEntity>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.IsDeleted)
+                        .Ascending(x => x.FileName)
+                        .Ascending(x => x.Tags)
+                        .Descending(x => x.LastModified)),
+                new CreateIndexModel<MongoAssetEntity>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.IsDeleted)
+                        .Ascending(x => x.FileHash)),
+                new CreateIndexModel<MongoAssetEntity>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.IsDeleted)
+                        .Ascending(x => x.Slug))
+            }, ct);
         }
 
-        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Query query)
+        public async Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, ClrQuery query)
         {
             using (Profiler.TraceMethod<MongoAssetRepository>("QueryAsyncByQuery"))
             {

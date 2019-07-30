@@ -11,7 +11,6 @@ using FakeItEasy;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
@@ -26,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
         private readonly Uri validUrl = new Uri("https://squidex.io");
         private readonly Rule rule_0 = new Rule(new ContentChangedTriggerV2(), new TestAction());
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
 
         public sealed class TestAction : RuleAction
@@ -35,8 +35,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.Guards
 
         public GuardRuleTests()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, A<Guid>.Ignored, false))
-                .Returns(A.Fake<ISchemaEntity>());
+            A.CallTo(() => appProvider.GetSchemaAsync(appId.Id, schemaId.Id, false))
+                .Returns(Mocks.Schema(appId, schemaId));
         }
 
         [Fact]
