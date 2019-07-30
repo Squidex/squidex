@@ -39,13 +39,19 @@
 
     <ng-container content>
         <div class="grid-header">
-            <table class="table table-items table-fixed">
+            <table class="table table-items table-fixed" [style.minWidth]="minWidth" #header>
                 <thead>
                     <tr>
                         <th class="cell-select">
                             <input type="checkbox" class="form-check" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
                         </th>
-                        <th class="cell-auto" *ngFor="let field of schema.listFields">
+                        <th class="cell-actions cell-actions-left">
+                            Actions
+                        </th>
+                        <th class="cell-user">
+                            <sqx-table-header text="By"></sqx-table-header>
+                        </th>
+                        <th class="cell-auto cell-content" *ngFor="let field of schema.listFields">
                             <sqx-table-header [text]="field.displayName" 
                                 [sortable]="field.properties.isSortable"
                                 [sorting]="filter.sortMode(field) | async"
@@ -58,12 +64,6 @@
                                 [sorting]="filter.sortMode('lastModified') | async"
                                 (sortingChange)="sort('lastModified', $event)">
                             </sqx-table-header>
-                        </th>
-                        <th class="cell-user">
-                            <sqx-table-header text="By"></sqx-table-header>
-                        </th>
-                        <th class="cell-actions">
-                            Actions
                         </th>
                     </tr>
                 </thead>
@@ -85,9 +85,9 @@
             </button>
         </div>
 
-        <div class="grid-content">
-            <div sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed">
+        <div class="grid-content" [sqxSyncScrolling]="header">
+            <div class="table-container" sqxIgnoreScrollbar>
+                <table class="table table-items table-fixed" [style.minWidth]="minWidth">
                     <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent">
                         <tr [sqxContent]="content"
                             (delete)="delete(content)"

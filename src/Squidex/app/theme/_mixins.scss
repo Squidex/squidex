@@ -50,6 +50,7 @@
         background: $foreground-color;
     }
 
+    &::-webkit-scrollbar-corner,
     &::-webkit-scrollbar-track {
         background: $background-color;
     }
