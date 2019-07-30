@@ -24,11 +24,11 @@ namespace Squidex.Infrastructure.Queries.Json
                 {
                     if (!string.IsNullOrWhiteSpace(schema.Title))
                     {
-                        errors.Add($"{element} is not a property of {schema.Title}.");
+                        errors.Add($"'{element}' is not a property of '{schema.Title}'.");
                     }
                     else
                     {
-                        errors.Add($"{path} does not point to a valid property in the model.");
+                        errors.Add($"Path '{path}' does not point to a valid property in the model.");
                     }
 
                     property = null;

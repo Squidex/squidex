@@ -15,12 +15,12 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class JsonFilterConversionTests
+    public sealed class JsonQueryConversionTests
     {
         private readonly List<string> errors = new List<string>();
         private readonly JsonSchema schema = new JsonSchema();
 
-        public JsonFilterConversionTests()
+        public JsonQueryConversionTests()
         {
             var nested = new JsonSchemaProperty { Title = "nested" };
 
@@ -69,6 +69,22 @@ namespace Squidex.Infrastructure.Queries
             };
 
             schema.Properties["object"] = nested;
+        }
+
+        [Fact]
+        public void Should_add_error_if_property_does_not_exist()
+        {
+            var json = new { path = "notfound", op = "eq", value = 1 };
+
+            AssertErrors(json, "Path 'notfound' does not point to a valid property in the model.");
+        }
+
+        [Fact]
+        public void Should_add_error_if_nested_property_does_not_exist()
+        {
+            var json = new { path = "object.notfound", op = "eq", value = 1 };
+
+            AssertErrors(json, "'notfound' is not a property of 'nested'.");
         }
 
         [Theory]
