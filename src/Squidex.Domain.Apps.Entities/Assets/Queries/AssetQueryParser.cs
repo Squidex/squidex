@@ -48,13 +48,13 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             {
                 var result = new ClrQuery();
 
-                if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
-                {
-                    result = ParseOData(q.ODataQuery);
-                }
-                else if (!string.IsNullOrWhiteSpace(q?.JsonQuery))
+                if (!string.IsNullOrWhiteSpace(q?.JsonQuery))
                 {
                     result = ParseJson(q?.JsonQuery);
+                }
+                else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
+                {
+                    result = ParseOData(q.ODataQuery);
                 }
 
                 if (result.Filter != null)

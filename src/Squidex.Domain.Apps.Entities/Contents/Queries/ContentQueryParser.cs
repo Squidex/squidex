@@ -50,13 +50,13 @@ namespace Squidex.Domain.Apps.Entities
             {
                 var result = new ClrQuery();
 
-                if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
-                {
-                    result = ParseOData(context, schema, q.ODataQuery);
-                }
-                else if (!string.IsNullOrWhiteSpace(q?.JsonQuery))
+                if (!string.IsNullOrWhiteSpace(q?.JsonQuery))
                 {
                     result = ParseJson(context, schema, q.JsonQuery);
+                }
+                else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
+                {
+                    result = ParseOData(context, schema, q.ODataQuery);
                 }
 
                 if (result.Sort.Count == 0)
