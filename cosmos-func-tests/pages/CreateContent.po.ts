@@ -77,9 +77,7 @@ export class CreateContent{
                 await commentaryApp.click()
                 await content.click();
                 await commentarySchema.click();
-                browser.sleep(1000);
                 await this.newButton().click();
-                browser.sleep(2000);
             
         }
 
@@ -121,7 +119,6 @@ export class CreateContent{
                          this.selectRefData().then((checkbox)=>{
                          const randomItem = checkbox[Math.floor(Math.random()*checkbox.length)];
                          randomItem.getWebElement().click();
-                         browser.sleep(5000);
                          return;
                          });    
                      this.submitSelection();
@@ -130,24 +127,18 @@ export class CreateContent{
             
 
         public async selectCommodity(commodity){
-            browser.sleep(2000);
-            this.scrollIntoView(this.commodityPlaceHolder());
-            browser.sleep(1000);
-            this.selectContent(commodity);
+            await this.scrollIntoView(this.commodityPlaceHolder());
+            await this.selectContent(commodity);
         }
 
         public async selectCommentaryType(commentaryType){
-            browser.sleep(2000);
-            this.scrollIntoView(this.commentaryTypePlaceHolder());
-            browser.sleep(1000);
-            this.selectContent(commentaryType);
+            await this.scrollIntoView(this.commentaryTypePlaceHolder());
+            await this.selectContent(commentaryType);
         }
 
         public async selectRegion(region){
-            browser.sleep(2000);
-            this.scrollIntoView(this.regionPlaceHolder());
-            browser.sleep(2000);
-            this.selectContent(region);
+            await this.scrollIntoView(this.regionPlaceHolder());
+            await this.selectContent(region);
         }
 
         public addCommentary(commentaryText){
