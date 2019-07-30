@@ -40,6 +40,7 @@ $color-input-disabled: #eef1f4;
 
     .control-dropdown-item {
         @include absolute(0, 1rem, 0, 0);
+        padding-bottom: 0;
         pointer-events: none;
         position: absolute;
         line-height: 1.2rem;
@@ -50,6 +51,10 @@ $color-input-disabled: #eef1f4;
         font-size: .9rem;
         font-weight: normal;
         pointer-events: none;
+    }
+
+    .truncate {
+        min-height: 1.2rem;
     }
 
     .form-control {
