@@ -69,7 +69,7 @@ namespace Squidex.Infrastructure.Queries.Json
                 {
                     if (value.IsList && nodeIn.Operator != CompareOperator.In)
                     {
-                        errors.Add("Array value can only be used with In-operator.");
+                        errors.Add($"Array value is not allowed for '{nodeIn.Operator}' operator and path '{nodeIn.Path}'.");
                     }
 
                     result = new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, value);

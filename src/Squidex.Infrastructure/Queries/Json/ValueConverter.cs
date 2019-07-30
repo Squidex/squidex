@@ -128,7 +128,7 @@ namespace Squidex.Infrastructure.Queries.Json
                 return true;
             }
 
-            errors.Add($"Expected Boolean for {path}, but got {value.Type}.");
+            errors.Add($"Expected Boolean for path '{path}', but got {value.Type}.");
 
             return false;
         }
@@ -144,7 +144,7 @@ namespace Squidex.Infrastructure.Queries.Json
                 return true;
             }
 
-            errors.Add($"Expected Number for {path}, but got {value.Type}.");
+            errors.Add($"Expected Number for path '{path}', but got {value.Type}.");
 
             return false;
         }
@@ -164,7 +164,7 @@ namespace Squidex.Infrastructure.Queries.Json
                 return true;
             }
 
-            errors.Add($"Expected String for {path}, but got {value.Type}.");
+            errors.Add($"Expected String for path '{path}', but got {value.Type}.");
 
             return false;
         }
@@ -179,9 +179,13 @@ namespace Squidex.Infrastructure.Queries.Json
                 {
                     return true;
                 }
-            }
 
-            errors.Add($"Expected Guid String for {path}, but got invalid {value.Type}.");
+                errors.Add($"Expected Guid String for path '{path}', but got invalid String.");
+            }
+            else
+            {
+                errors.Add($"Expected Guid String for path '{path}', but got {value.Type}.");
+            }
 
             return false;
         }
@@ -200,9 +204,13 @@ namespace Squidex.Infrastructure.Queries.Json
 
                     return true;
                 }
-            }
 
-            errors.Add($"Expected ISO8601 DateTime String for {path}, but got invalid {value.Type}.");
+                errors.Add($"Expected ISO8601 DateTime String for path '{path}', but got invalid String.");
+            }
+            else
+            {
+                errors.Add($"Expected ISO8601 DateTime String for path '{path}', but got {value.Type}.");
+            }
 
             return false;
         }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using NJsonSchema;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries.Json;
@@ -85,10 +86,23 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "datetime", op, value = "2012-11-10T09:08:07Z" };
 
-            var filter = Convert(json);
+            AssertFilter(json, expected);
+        }
 
-            Assert.Empty(errors);
-            Assert.Equal(expected, filter);
+        [Fact]
+        public void Should_add_error_if_datetime_string_property_got_invalid_string_value()
+        {
+            var json = new { path = "datetime", op = "eq", value = "invalid" };
+
+            AssertErrors(json, "Expected ISO8601 DateTime String for path 'datetime', but got invalid String.");
+        }
+
+        [Fact]
+        public void Should_add_error_if_datetime_string_property_got_invalid_value()
+        {
+            var json = new { path = "datetime", op = "eq", value = 1 };
+
+            AssertErrors(json, "Expected ISO8601 DateTime String for path 'datetime', but got Number.");
         }
 
         [Theory]
@@ -106,10 +120,23 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "guid", op, value = "bf57d32c-d4dd-4217-8c16-6dcb16975cf3" };
 
-            var filter = Convert(json);
+            AssertFilter(json, expected);
+        }
 
-            Assert.Empty(errors);
-            Assert.Equal(expected, filter);
+        [Fact]
+        public void Should_add_error_if_guid_string_property_got_invalid_string_value()
+        {
+            var json = new { path = "guid", op = "eq", value = "invalid" };
+
+            AssertErrors(json, "Expected Guid String for path 'guid', but got invalid String.");
+        }
+
+        [Fact]
+        public void Should_add_error_if_guid_string_property_got_invalid_value()
+        {
+            var json = new { path = "guid", op = "eq", value = 1 };
+
+            AssertErrors(json, "Expected Guid String for path 'guid', but got Number.");
         }
 
         [Theory]
@@ -127,10 +154,15 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "string", op, value = "Hello" };
 
-            var filter = Convert(json);
+            AssertFilter(json, expected);
+        }
 
-            Assert.Empty(errors);
-            Assert.Equal(expected, filter);
+        [Fact]
+        public void Should_add_error_if_string_property_got_invalid_value()
+        {
+            var json = new { path = "string", op = "eq", value = 1 };
+
+            AssertErrors(json, "Expected String for path 'string', but got Number.");
         }
 
         [Fact]
@@ -138,10 +170,7 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "string", op = "in", value = new[] { "Hello" } };
 
-            var filter = Convert(json);
-
-            Assert.Empty(errors);
-            Assert.Equal("string in ['Hello']", filter);
+            AssertFilter(json, "string in ['Hello']");
         }
 
         [Fact]
@@ -149,10 +178,7 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "object.property", op = "in", value = new[] { "Hello" } };
 
-            var filter = Convert(json);
-
-            Assert.Empty(errors);
-            Assert.Equal("object.property in ['Hello']", filter);
+            AssertFilter(json, "object.property in ['Hello']");
         }
 
         [Theory]
@@ -166,10 +192,15 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "number", op, value = 12 };
 
-            var filter = Convert(json);
+            AssertFilter(json, expected);
+        }
 
-            Assert.Empty(errors);
-            Assert.Equal(expected, filter);
+        [Fact]
+        public void Should_add_error_if_number_property_got_invalid_value()
+        {
+            var json = new { path = "number", op = "eq", value = true };
+
+            AssertErrors(json, "Expected Number for path 'number', but got Boolean.");
         }
 
         [Fact]
@@ -177,10 +208,7 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "number", op = "in", value = new[] { 12 } };
 
-            var filter = Convert(json);
-
-            Assert.Empty(errors);
-            Assert.Equal("number in [12]", filter);
+            AssertFilter(json, "number in [12]");
         }
 
         [Theory]
@@ -190,10 +218,15 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "boolean", op, value = true };
 
-            var filter = Convert(json);
+            AssertFilter(json, expected);
+        }
 
-            Assert.Empty(errors);
-            Assert.Equal(expected, filter);
+        [Fact]
+        public void Should_add_error_if_boolean_property_got_invalid_value()
+        {
+            var json = new { path = "boolean", op = "eq", value = 1 };
+
+            AssertErrors(json, "Expected Boolean for path 'boolean', but got Number.");
         }
 
         [Fact]
@@ -201,10 +234,7 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "boolean", op = "in", value = new[] { true } };
 
-            var filter = Convert(json);
-
-            Assert.Empty(errors);
-            Assert.Equal("boolean in [True]", filter);
+            AssertFilter(json, "boolean in [True]");
         }
 
         [Theory]
@@ -215,10 +245,7 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "stringArray", op, value = "Hello" };
 
-            var filter = Convert(json);
-
-            Assert.Empty(errors);
-            Assert.Equal(expected, filter);
+            AssertFilter(json, expected);
         }
 
         [Fact]
@@ -226,10 +253,33 @@ namespace Squidex.Infrastructure.Queries
         {
             var json = new { path = "stringArray", op = "in", value = new[] { "Hello" } };
 
+            AssertFilter(json, "stringArray in ['Hello']");
+        }
+
+        [Fact]
+        public void Should_add_error_when_using_array_value_for_non_allowed_operator()
+        {
+            var json = new { path = "string", op = "eq", value = new[] { "Hello" } };
+
+            AssertErrors(json, "Array value is not allowed for 'Equals' operator and path 'string'.");
+        }
+
+        private void AssertFilter(object json, string expectedFilter)
+        {
             var filter = Convert(json);
 
             Assert.Empty(errors);
-            Assert.Equal("stringArray in ['Hello']", filter);
+
+            Assert.Equal(expectedFilter, filter);
+        }
+
+        private void AssertErrors(object json, params string[] expectedErrors)
+        {
+            var filter = Convert(json);
+
+            Assert.Equal(expectedErrors.ToList(), errors);
+
+            Assert.Null(filter);
         }
 
         private string Convert<T>(T value)
