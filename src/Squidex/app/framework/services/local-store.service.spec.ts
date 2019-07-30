@@ -97,4 +97,13 @@ describe('LocalStore', () => {
 
         expect(localStoreService.getInt('not_set', 13)).toBe(13);
     });
+
+    it('should remove item from local store', () => {
+        const localStoreService = new LocalStoreService();
+
+        localStoreService.set('key1', 'abc');
+        localStoreService.remove('key1');
+
+        expect(localStoreService.get('key1')).toBeNull();
+    });
 });

@@ -7,6 +7,7 @@
 
 export * from './interceptors/auth.interceptor';
 
+export * from './services/autosave.service';
 export * from './services/app-languages.service';
 export * from './services/apps.service';
 export * from './services/assets.service';

@@ -521,9 +521,13 @@ export class EditContentForm extends Form<FormGroup, any> {
         super.load(value);
     }
 
+    public disable() {
+        this.form.disable({ emitEvent: false });
+    }
+
     protected enable() {
         if (this.schema.fields.length === 0) {
-            this.form.enable();
+            this.form.enable({ emitEvent: false });
             return;
         }
 
@@ -535,7 +539,7 @@ export class EditContentForm extends Form<FormGroup, any> {
             }
 
             if (field.isArray) {
-                fieldForm.enable();
+                fieldForm.enable({ emitEvent: false });
 
                 for (let partitionForm of formControls(fieldForm)) {
                     for (let itemForm of formControls(partitionForm)) {
@@ -547,17 +551,17 @@ export class EditContentForm extends Form<FormGroup, any> {
                             }
 
                             if (nested.isDisabled) {
-                                nestedForm.disable();
+                                nestedForm.disable({ emitEvent: false });
                             } else {
-                                nestedForm.enable();
+                                nestedForm.enable({ emitEvent: false });
                             }
                         }
                     }
                 }
             } else if (field.isDisabled) {
-                fieldForm.disable();
+                fieldForm.disable({ emitEvent: false });
             } else {
-                fieldForm.enable();
+                fieldForm.enable({ emitEvent: false });
             }
         }
     }
