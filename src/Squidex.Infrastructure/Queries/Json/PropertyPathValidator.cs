@@ -16,15 +16,17 @@ namespace Squidex.Infrastructure.Queries.Json
         {
             foreach (var element in path)
             {
-                if (schema.Properties.TryGetValue(element, out var p))
+                var parent = schema.Reference ?? schema;
+
+                if (parent.Properties.TryGetValue(element, out var p))
                 {
                     schema = p;
                 }
                 else
                 {
-                    if (!string.IsNullOrWhiteSpace(schema.Title))
+                    if (!string.IsNullOrWhiteSpace(parent.Title))
                     {
-                        errors.Add($"'{element}' is not a property of '{schema.Title}'.");
+                        errors.Add($"'{element}' is not a property of '{parent.Title}'.");
                     }
                     else
                     {

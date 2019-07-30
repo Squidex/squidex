@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using NJsonSchema;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
@@ -18,7 +19,7 @@ namespace Squidex.Infrastructure.Queries.Json
     {
         public static ClrQuery Parse(this JsonSchema schema, string json, IJsonSerializer jsonSerializer)
         {
-            var query = jsonSerializer.Deserialize<Query<IJsonValue>>(json);
+            var query = ParseFromJson(json, jsonSerializer);
 
             var result = SimpleMapper.Map(query, new ClrQuery());
 
@@ -43,6 +44,18 @@ namespace Squidex.Infrastructure.Queries.Json
             }
 
             return result;
+        }
+
+        private static Query<IJsonValue> ParseFromJson(string json, IJsonSerializer jsonSerializer)
+        {
+            try
+            {
+               return jsonSerializer.Deserialize<Query<IJsonValue>>(json);
+            }
+            catch (JsonException ex)
+            {
+                throw new ValidationException("Failed to parse json query.", new ValidationError(ex.Message));
+            }
         }
     }
 }

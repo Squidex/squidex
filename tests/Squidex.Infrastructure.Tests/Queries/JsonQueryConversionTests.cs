@@ -69,6 +69,11 @@ namespace Squidex.Infrastructure.Queries
             };
 
             schema.Properties["object"] = nested;
+
+            schema.Properties["reference"] = new JsonSchemaProperty
+            {
+                Reference = nested
+            };
         }
 
         [Fact]
@@ -195,6 +200,14 @@ namespace Squidex.Infrastructure.Queries
             var json = new { path = "object.property", op = "in", value = new[] { "Hello" } };
 
             AssertFilter(json, "object.property in ['Hello']");
+        }
+
+        [Fact]
+        public void Should_parse_referenced_string_filter()
+        {
+            var json = new { path = "reference.property", op = "in", value = new[] { "Hello" } };
+
+            AssertFilter(json, "reference.property in ['Hello']");
         }
 
         [Theory]

@@ -56,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
                 .Returns(new Dictionary<string, string>());
 
-            var source = ClrFilter.Eq("data.tags2.iv", "name1")
+            var source = ClrFilter.Eq("data.tags2.iv", "name1");
 
             var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
 
@@ -79,7 +79,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public void Should_not_normalize_other_typed_field()
         {
-            var source = ClrFilter.Eq("data.string.iv", "value")
+            var source = ClrFilter.Eq("data.string.iv", "value");
 
             var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
 

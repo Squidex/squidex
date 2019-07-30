@@ -1,177 +1,123 @@
-﻿//// ==========================================================================
-////  Squidex Headless CMS
-//// ==========================================================================
-////  Copyright (c) Squidex UG (haftungsbeschränkt)
-////  All rights reserved. Licensed under the MIT license.
-//// ==========================================================================
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
 
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
-//using FakeItEasy;
-//using Microsoft.Extensions.Options;
-//using Squidex.Domain.Apps.Core.Tags;
-//using Squidex.Domain.Apps.Entities.Assets.Repositories;
-//using Squidex.Domain.Apps.Entities.TestHelpers;
-//using Squidex.Infrastructure;
-//using Squidex.Infrastructure.Queries;
-//using Xunit;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using FakeItEasy;
+using Squidex.Domain.Apps.Entities.Assets.Queries;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
+using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Queries;
+using Xunit;
 
-//namespace Squidex.Domain.Apps.Entities.Assets
-//{
-//    public class AssetQueryServiceTests
-//    {
-//        private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
-//        private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
-//        private readonly ITagService tagService = A.Fake<ITagService>();
-//        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-//        private readonly Context requestContext;
-//        private readonly AssetQueryService sut;
+namespace Squidex.Domain.Apps.Entities.Assets
+{
+    public class AssetQueryServiceTests
+    {
+        private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
+        private readonly IAssetRepository assetRepository = A.Fake<IAssetRepository>();
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly Context requestContext;
+        private readonly AssetQueryParser queryParser = A.Fake<AssetQueryParser>();
+        private readonly AssetQueryService sut;
 
-//        public AssetQueryServiceTests()
-//        {
-//            requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
+        public AssetQueryServiceTests()
+        {
+            requestContext = new Context(Mocks.FrontendUser(), Mocks.App(appId));
 
-//            var options = Options.Create(new AssetOptions { DefaultPageSize = 30 });
+            A.CallTo(() => queryParser.ParseQuery(requestContext, A<Q>.Ignored))
+                .Returns(new ClrQuery());
 
-//            sut = new AssetQueryService(tagService, assetEnricher, assetRepository, options);
-//        }
+            sut = new AssetQueryService(assetEnricher, assetRepository, queryParser);
+        }
 
-//        [Fact]
-//        public void Should_provide_default_page_size()
-//        {
-//            var result = sut.DefaultPageSizeGraphQl;
+        [Fact]
+        public async Task Should_find_asset_by_id_and_enrich_it()
+        {
+            var found = new AssetEntity { Id = Guid.NewGuid() };
 
-//            Assert.Equal(20, result);
-//        }
+            var enriched = new AssetEntity();
 
-//        [Fact]
-//        public async Task Should_find_asset_by_id_and_enrich_it()
-//        {
-//            var found = new AssetEntity { Id = Guid.NewGuid() };
+            A.CallTo(() => assetRepository.FindAssetAsync(found.Id, false))
+                .Returns(found);
 
-//            var enriched = new AssetEntity();
+            A.CallTo(() => assetEnricher.EnrichAsync(found))
+                .Returns(enriched);
 
-//            A.CallTo(() => assetRepository.FindAssetAsync(found.Id, false))
-//                .Returns(found);
+            var result = await sut.FindAssetAsync(found.Id);
 
-//            A.CallTo(() => assetEnricher.EnrichAsync(found))
-//                .Returns(enriched);
+            Assert.Same(enriched, result);
+        }
 
-//            var result = await sut.FindAssetAsync(found.Id);
+        [Fact]
+        public async Task Should_find_assets_by_hash_and_and_enrich_it()
+        {
+            var found = new AssetEntity { Id = Guid.NewGuid() };
 
-//            Assert.Same(enriched, result);
-//        }
+            var enriched = new AssetEntity();
 
-//        [Fact]
-//        public async Task Should_find_assets_by_hash_and_and_enrich_it()
-//        {
-//            var found = new AssetEntity { Id = Guid.NewGuid() };
+            A.CallTo(() => assetRepository.QueryByHashAsync(appId.Id, "hash"))
+                .Returns(new List<IAssetEntity> { found });
 
-//            var enriched = new AssetEntity();
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found)))
+                .Returns(new List<IEnrichedAssetEntity> { enriched });
 
-//            A.CallTo(() => assetRepository.QueryByHashAsync(appId.Id, "hash"))
-//                .Returns(new List<IAssetEntity> { found });
+            var result = await sut.QueryByHashAsync(appId.Id, "hash");
 
-//            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found)))
-//                .Returns(new List<IEnrichedAssetEntity> { enriched });
+            Assert.Same(enriched, result.Single());
+        }
 
-//            var result = await sut.QueryByHashAsync(appId.Id, "hash");
+        [Fact]
+        public async Task Should_load_assets_from_ids_and_resolve_tags()
+        {
+            var found1 = new AssetEntity { Id = Guid.NewGuid() };
+            var found2 = new AssetEntity { Id = Guid.NewGuid() };
 
-//            Assert.Same(enriched, result.Single());
-//        }
+            var enriched1 = new AssetEntity();
+            var enriched2 = new AssetEntity();
 
-//        [Fact]
-//        public async Task Should_load_assets_from_ids_and_resolve_tags()
-//        {
-//            var found1 = new AssetEntity { Id = Guid.NewGuid() };
-//            var found2 = new AssetEntity { Id = Guid.NewGuid() };
+            var ids = HashSet.Of(found1.Id, found2.Id);
 
-//            var enriched1 = new AssetEntity();
-//            var enriched2 = new AssetEntity();
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<HashSet<Guid>>.That.IsSameSequenceAs(ids)))
+                .Returns(ResultList.CreateFrom(8, found1, found2));
 
-//            var ids = HashSet.Of(found1.Id, found2.Id);
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2)))
+                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
 
-//            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<HashSet<Guid>>.That.IsSameSequenceAs(ids)))
-//                .Returns(ResultList.CreateFrom(8, found1, found2));
+            var result = await sut.QueryAsync(requestContext, Q.Empty.WithIds(ids));
 
-//            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2)))
-//                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
+            Assert.Equal(8, result.Total);
 
-//            var result = await sut.QueryAsync(requestContext, Q.Empty.WithIds(ids));
+            Assert.Equal(new[] { enriched1, enriched2 }, result.ToArray());
+        }
 
-//            Assert.Equal(8, result.Total);
+        [Fact]
+        public async Task Should_load_assets_with_query_and_resolve_tags()
+        {
+            var found1 = new AssetEntity { Id = Guid.NewGuid() };
+            var found2 = new AssetEntity { Id = Guid.NewGuid() };
 
-//            Assert.Equal(new[] { enriched1, enriched2 }, result.ToArray());
-//        }
+            var enriched1 = new AssetEntity();
+            var enriched2 = new AssetEntity();
 
-//        [Fact]
-//        public async Task Should_load_assets_with_query_and_resolve_tags()
-//        {
-//            var found1 = new AssetEntity { Id = Guid.NewGuid() };
-//            var found2 = new AssetEntity { Id = Guid.NewGuid() };
+            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.Ignored))
+                .Returns(ResultList.CreateFrom(8, found1, found2));
 
-//            var enriched1 = new AssetEntity();
-//            var enriched2 = new AssetEntity();
+            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2)))
+                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
 
-//            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.Ignored))
-//                .Returns(ResultList.CreateFrom(8, found1, found2));
+            var result = await sut.QueryAsync(requestContext, Q.Empty);
 
-//            A.CallTo(() => assetEnricher.EnrichAsync(A<IEnumerable<IAssetEntity>>.That.IsSameSequenceAs(found1, found2)))
-//                .Returns(new List<IEnrichedAssetEntity> { enriched1, enriched2 });
+            Assert.Equal(8, result.Total);
 
-//            var result = await sut.QueryAsync(requestContext, Q.Empty);
-
-//            Assert.Equal(8, result.Total);
-
-//            Assert.Equal(new[] { enriched1, enriched2 }, result.ToArray());
-//        }
-
-//        [Fact]
-//        public async Task Should_transform_odata_query()
-//        {
-//            var query = Q.Empty.WithODataQuery("$top=100&$orderby=fileName asc&$search=Hello World");
-
-//            await sut.QueryAsync(requestContext, query);
-
-//            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.That.Is("FullText: 'Hello World'; Take: 100; Sort: fileName Ascending")))
-//                .MustHaveHappened();
-//        }
-
-//        [Fact]
-//        public async Task Should_transform_odata_query_and_enrich_with_defaults()
-//        {
-//            var query = Q.Empty.WithODataQuery("$top=200&$filter=fileName eq 'ABC'");
-
-//            await sut.QueryAsync(requestContext, query);
-
-//            A.CallTo(() => assetRepository.QueryAsync(appId.Id, A<ClrQuery>.That.Is("Filter: fileName == 'ABC'; Take: 200; Sort: lastModified Descending")))
-//                .MustHaveHappened();
-//        }
-
-//        [Fact]
-//        public async Task Should_apply_default_page_size()
-//        {
-//            var query = Q.Empty;
-
-//            await sut.QueryAsync(requestContext, query);
-
-//            A.CallTo(() => assetRepository.QueryAsync(appId.Id,
-//                    A<ClrQuery>.That.Is("Take: 30; Sort: lastModified Descending")))
-//                .MustHaveHappened();
-//        }
-
-//        [Fact]
-//        public async Task Should_limit_number_of_assets()
-//        {
-//            var query = Q.Empty.WithODataQuery("$top=300&$skip=20");
-
-//            await sut.QueryAsync(requestContext, query);
-
-//            A.CallTo(() => assetRepository.QueryAsync(appId.Id,
-//                    A<ClrQuery>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending")))
-//                .MustHaveHappened();
-//        }
-//    }
-//}
+            Assert.Equal(new[] { enriched1, enriched2 }, result.ToArray());
+        }
+    }
+}

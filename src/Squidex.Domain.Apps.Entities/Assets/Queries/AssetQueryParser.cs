@@ -21,7 +21,7 @@ using Squidex.Infrastructure.Queries.OData;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
-    public sealed class AssetQueryParser
+    public class AssetQueryParser
     {
         private readonly JsonSchema jsonSchema = BuildJsonSchema();
         private readonly IEdmModel edmModel = BuildEdmModel();
@@ -40,7 +40,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
             this.tagService = tagService;
         }
 
-        public ClrQuery ParseQuery(Context context, Q q)
+        public virtual ClrQuery ParseQuery(Context context, Q q)
         {
             Guard.NotNull(context, nameof(context));
 

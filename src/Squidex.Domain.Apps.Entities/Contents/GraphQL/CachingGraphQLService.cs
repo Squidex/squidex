@@ -89,10 +89,20 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 
                 return new GraphQLModel(app,
                     allSchemas,
-                    resolver.Resolve<IOptions<ContentOptions>>().Value.DefaultPageSizeGraphQl,
-                    resolver.Resolve<IOptions<AssetOptions>>().Value.DefaultPageSizeGraphQl,
+                    GetPageSizeForContents(),
+                    GetPageSizeForAssets(),
                     resolver.Resolve<IGraphQLUrlGenerator>());
             });
+        }
+
+        private int GetPageSizeForContents()
+        {
+            return resolver.Resolve<IOptions<ContentOptions>>().Value.DefaultPageSizeGraphQl;
+        }
+
+        private int GetPageSizeForAssets()
+        {
+            return resolver.Resolve<IOptions<AssetOptions>>().Value.DefaultPageSizeGraphQl;
         }
 
         private static object CreateCacheKey(Guid appId, string etag)
