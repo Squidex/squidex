@@ -49,7 +49,7 @@
                 <i class="icon-corner-down-right text-decent"></i>
             </div>
             <div class="col col-step">
-                <sqx-dropdown [items]="openSteps" [(ngModel)]="openStep">
+                <sqx-dropdown [items]="openSteps" [(ngModel)]="openStep" [canSearch]="false">
                     <ng-template let-target="$implicit">
                         <div class="color-circle" [style.background]="target.color"></div> {{target.name}}
                     </ng-template>

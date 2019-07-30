@@ -56,6 +56,7 @@ export * from './angular/routers/parent-link.directive';
 export * from './angular/code.component';
 export * from './angular/external-link.directive';
 export * from './angular/hover-background.directive';
+export * from './angular/highlight.pipe';
 export * from './angular/ignore-scrollbar.directive';
 export * from './angular/image-source.directive';
 export * from './angular/panel.component';
