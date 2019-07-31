@@ -13,14 +13,14 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public sealed class ContentSchemaBuilder
     {
-        public JsonSchema4 CreateContentSchema(Schema schema, JsonSchema4 dataSchema)
+        public JsonSchema CreateContentSchema(Schema schema, JsonSchema dataSchema)
         {
             Guard.NotNull(schema, nameof(schema));
             Guard.NotNull(dataSchema, nameof(dataSchema));
 
             var schemaName = schema.Properties.Label.WithFallback(schema.Name);
 
-            var contentSchema = new JsonSchema4
+            var contentSchema = new JsonSchema
             {
                 Properties =
                 {

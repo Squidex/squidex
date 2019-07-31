@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 {
     public static class SortBuilder
     {
-        public static SortDefinition<T> BuildSort<T>(this Query query)
+        public static SortDefinition<T> BuildSort<T>(this ClrQuery query)
         {
             if (query.Sort.Count > 0)
             {

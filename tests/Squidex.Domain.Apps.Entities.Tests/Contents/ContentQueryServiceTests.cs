@@ -149,7 +149,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await sut.QueryAsync(requestContext, schemaId.Name, query);
 
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(Status.Published), false,
-                    A<Query>.That.Is("Take: 30; Sort: lastModified Descending"), false))
+                    A<ClrQuery>.That.Is("Take: 30; Sort: lastModified Descending"), false))
                 .MustHaveHappened();
         }
 
@@ -166,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
             await sut.QueryAsync(requestContext, schemaId.Name, query);
 
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), false,
-                    A<Query>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending"), false))
+                    A<ClrQuery>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending"), false))
                 .MustHaveHappened();
         }
 
@@ -482,7 +482,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         private void SetupContents(Status[] status, int count, int total, IContentEntity content, bool inDraft, bool includeDraft)
         {
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), inDraft, A<Query>.Ignored, includeDraft))
+            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), inDraft, A<ClrQuery>.Ignored, includeDraft))
                 .Returns(ResultList.Create(total, Enumerable.Repeat(content, count)));
         }
 

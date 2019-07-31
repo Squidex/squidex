@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Builder;
-using Squidex.Areas.Api.Config.Swagger;
+using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api
@@ -17,7 +17,7 @@ namespace Squidex.Areas.Api
         {
             app.Map(Constants.ApiPrefix, appApi =>
             {
-                appApi.UseMySwagger();
+                appApi.UseMyOpenApi();
                 appApi.UseMvc();
             });
         }

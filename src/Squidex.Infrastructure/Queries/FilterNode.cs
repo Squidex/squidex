@@ -7,8 +7,8 @@
 
 namespace Squidex.Infrastructure.Queries
 {
-    public abstract class FilterNode
+    public abstract class FilterNode<TValue>
     {
-        public abstract T Accept<T>(FilterNodeVisitor<T> visitor);
+        public abstract T Accept<T>(FilterNodeVisitor<T, TValue> visitor);
     }
 }

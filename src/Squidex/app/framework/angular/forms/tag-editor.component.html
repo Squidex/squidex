@@ -26,10 +26,10 @@
     <div class="control-dropdown" [sqxAnchoredTo]="form" position="bottom-left" #container @fade>
         <div *ngFor="let item of snapshot.suggestedItems; let i = index" class="control-dropdown-item control-dropdown-item-selectable"
             [class.active]="i === snapshot.suggestedIndex"
-            [container]="container"
             (mousedown)="selectValue(item)" 
             (mouseover)="selectIndex(i)"
-            [sqxScrollActive]="i === snapshot.suggestedIndex">
+            [sqxScrollActive]="i === snapshot.suggestedIndex"
+            [sqxScrollContainer]="container">
             <ng-container>{{item}}</ng-container>
         </div>
     </div>

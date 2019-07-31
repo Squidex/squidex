@@ -208,7 +208,7 @@
     }
 
     &-time {
-        @include force-width(160px);
+        @include force-width(180px);
     }
 
     &-actions {
@@ -217,6 +217,10 @@
 
     &-actions-lg {
         @include force-width(150px);
+    }
+
+    &-content {
+        min-width: 200px;
     }
 
     &-separator,
@@ -228,6 +232,10 @@
     &-actions,
     &-actions-lg {
         text-align: right;
+    }
+
+    &-actions-left {
+        text-align: left;
     }
 }
 

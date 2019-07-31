@@ -17,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Repositories
     {
         Task<IReadOnlyList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash);
 
-        Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, Query query);
+        Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, ClrQuery query);
 
         Task<IResultList<IAssetEntity>> QueryAsync(Guid appId, HashSet<Guid> ids);
 

@@ -51,14 +51,17 @@ export class ContentsSelectorComponent implements OnInit {
 
     public isAllSelected = false;
 
+    public minWidth: string;
+
     constructor(
         public readonly contentsState: ManualContentsState
     ) {
     }
 
     public ngOnInit() {
-        this.contentsState.schema = this.schema;
+        this.minWidth = `${200 + (200 * this.schema.referenceFields.length)}px`;
 
+        this.contentsState.schema = this.schema;
         this.contentsState.load();
     }
 
