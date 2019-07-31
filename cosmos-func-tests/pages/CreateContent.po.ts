@@ -119,8 +119,7 @@ export class CreateContent {
             if (name === content) {
               const fav = contents.indexOf(contentName);
               this.selectRefData().then(checkbox => {
-                checkbox[fav].getWebElement().click();
-                browser.sleep(5000);
+              checkbox[fav].getWebElement().click();
                 return;
               });
             }
