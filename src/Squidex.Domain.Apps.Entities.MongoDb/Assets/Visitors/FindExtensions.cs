@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
                 .Select(x =>
                     new SortNode(
                         x.Path.Select(p => p.ToPascalCase()).ToList(),
-                        x.SortOrder))
+                        x.Order))
                     .ToList();
 
             return query;

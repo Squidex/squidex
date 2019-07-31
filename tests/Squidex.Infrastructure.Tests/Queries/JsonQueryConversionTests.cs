@@ -293,9 +293,50 @@ namespace Squidex.Infrastructure.Queries
             AssertErrors(json, "Array value is not allowed for 'Equals' operator and path 'string'.");
         }
 
+        [Fact]
+        public void Should_parse_query()
+        {
+            var json = new { skip = 10, take = 20, FullText = "Hello", Filter = new { path = "string", op = "eq", value = "Hello" } };
+
+            AssertQuery(json, "Filter: string == 'Hello'; FullText: 'Hello'; Skip: 10; Take: 20");
+        }
+
+        [Fact]
+        public void Should_parse_query_with_sorting()
+        {
+            var json = new { sort = new[] { new { path = "string", order = "ascending" } } };
+
+            AssertQuery(json, "Sort: string Ascending");
+        }
+
+        [Fact]
+        public void Should_throw_exception_for_invalid_query()
+        {
+            var json = new { sort = new[] { new { path = "invalid", order = "ascending" } } };
+
+            Assert.Throws<ValidationException>(() => AssertQuery(json, null));
+        }
+
+        [Fact]
+        public void Should_throw_exception_when_parsing_invalid_json()
+        {
+            var json = "invalid";
+
+            Assert.Throws<ValidationException>(() => AssertQuery(json, null));
+        }
+
+        private void AssertQuery(object json, string expectedFilter)
+        {
+            var filter = ConvertQuery(json);
+
+            Assert.Empty(errors);
+
+            Assert.Equal(expectedFilter, filter);
+        }
+
         private void AssertFilter(object json, string expectedFilter)
         {
-            var filter = Convert(json);
+            var filter = ConvertFilter(json);
 
             Assert.Empty(errors);
 
@@ -304,20 +345,29 @@ namespace Squidex.Infrastructure.Queries
 
         private void AssertErrors(object json, params string[] expectedErrors)
         {
-            var filter = Convert(json);
+            var filter = ConvertFilter(json);
 
             Assert.Equal(expectedErrors.ToList(), errors);
 
             Assert.Null(filter);
         }
 
-        private string Convert<T>(T value)
+        private string ConvertFilter<T>(T value)
         {
             var json = JsonHelper.DefaultSerializer.Serialize(value, true);
 
             var jsonFilter = JsonHelper.DefaultSerializer.Deserialize<FilterNode<IJsonValue>>(json);
 
             return JsonFilterVisitor.Parse(jsonFilter, schema, errors)?.ToString();
+        }
+
+        private string ConvertQuery<T>(T value)
+        {
+            var json = JsonHelper.DefaultSerializer.Serialize(value, true);
+
+            var jsonFilter = schema.Parse(json, JsonHelper.DefaultSerializer);
+
+            return jsonFilter.ToString();
         }
     }
 }
