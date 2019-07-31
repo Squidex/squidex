@@ -19,16 +19,16 @@ import {
         <div class="row">
             <div class="col">
                 <div class="form-inline">
-                    <select class="form-control mr-2" [ngModel]="filter.path" (ngModelChange)="changePath($event)">
+                    <select class="form-control path mb-1 mr-2" [ngModel]="filter.path" (ngModelChange)="changePath($event)">
                         <option *ngFor="let fieldName of model.fields | sqxKeys" [ngValue]="fieldName">{{fieldName}}</option>
                     </select>
 
                     <ng-container *ngIf="fieldModel">
-                        <select class="form-control mr-2" [ngModel]="filter.op" (ngModelChange)="changeOp($event)">
+                        <select class="form-control mb-1 mr-2" [ngModel]="filter.op" (ngModelChange)="changeOp($event)">
                             <option *ngFor="let operator of fieldModel.operators" [ngValue]="operator.value">{{operator.name || operator.value}}</option>
                         </select>
 
-                        <ng-container [ngSwitch]="fieldModel.type">
+                        <div class="mb-1" [ngSwitch]="fieldModel.type">
                             <ng-container *ngSwitchCase="'boolean'">
                                 <input type="checkbox" class="form-control"
                                     [ngModel]="filter.value"
@@ -73,7 +73,7 @@ import {
                                     [ngModel]="filter.value"
                                     (ngModelChange)="changeValue($event)" />
                             </ng-container>
-                        </ng-container>
+                        </div>
                     </ng-container>
                 </div>
             </div>
@@ -83,11 +83,11 @@ import {
                 </button>
             </div>
         </div>
-     `,
-     styles: [
-         'row: padding: .5rem;'
-     ],
-     changeDetection: ChangeDetectionStrategy.OnPush
+    `,
+    styles: [
+        '.path { max-width: 12rem; }'
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
  })
 export class FilterComparisonComponent implements OnChanges {
     public fieldModel: QueryFieldModel;

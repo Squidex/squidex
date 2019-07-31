@@ -3,15 +3,9 @@
 
 $field-line: #e1e8ef;
 
-.group {
-    padding: 1rem;
-    background: none;
-    border: 1px solid $color-border;
-}
-
 .filters {
     position: relative;
-    padding-left: 4rem;
+    padding-left: 3rem;
 }
 
 .filter {
@@ -20,17 +14,17 @@ $field-line: #e1e8ef;
     }
 
     &-line-v {
-        @include absolute(0, auto, 1.5rem, 2rem);
+        @include absolute(-.5rem, auto, 1.8rem, 1.5rem);
         border: 0;
         border-left: 2px dashed $field-line;
         width: 2px;
     }
 
     &-line-h {
-        @include absolute(1.5rem, auto, auto, -2rem);
+        @include absolute(1.2rem, auto, auto, -1.5rem);
         border: 0;
         border-bottom: 2px dashed $field-line;
-        width: 2rem;
+        width: 1.5rem;
     }
 
     &-add {

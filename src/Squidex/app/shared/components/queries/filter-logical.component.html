@@ -22,22 +22,22 @@
     <div class="filters">
         <span class="filter-line-v"></span>
         
-        <div class="filter mt-2" *ngFor="let filter of filters">
+        <div class="filter mt-3" *ngFor="let filter of filters">
             <span class="filter-line-h"></span>
     
-            <sqx-filter-node [filter]="filter" [model]="model"
+            <sqx-filter-node [filter]="filter" [model]="model" [level]="level + 1"
                 (remove)="removeFilter(filter)" (change)="change.emit()">
             </sqx-filter-node>
         </div>
 
-        <div class="filter filter-add mt-2">
+        <div class="filter filter-add mt-3">
             <span class="filter-line-h"></span>
 
             <button class="btn btn-outline-success btn-sm mr-2" (click)="addComparison()">
                 Add Filter
             </button>
             
-            <button class="btn btn-outline-success btn-sm" (click)="addLogical()">
+            <button class="btn btn-outline-success btn-sm" (click)="addLogical()" *ngIf="level < 1">
                 Add Group
             </button>
         </div>

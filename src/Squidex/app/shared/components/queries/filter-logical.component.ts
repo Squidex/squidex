@@ -36,6 +36,9 @@ export class FilterLogicalComponent {
     public remove = new EventEmitter();
 
     @Input()
+    public level = 0;
+
+    @Input()
     public isRoot = false;
 
     @Input()

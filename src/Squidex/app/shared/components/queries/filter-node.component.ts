@@ -18,7 +18,7 @@ import {
     selector: 'sqx-filter-node',
     template: `
         <ng-container *ngIf="logical">
-            <sqx-filter-logical [model]="model" [filter]="logical"
+            <sqx-filter-logical [model]="model" [filter]="logical" [level]="level"
                 (remove)="remove.emit()" (change)="change.emit()">
             </sqx-filter-logical>
         </ng-container>
@@ -41,6 +41,9 @@ export class FilterNodeComponent {
 
     @Output()
     public remove = new EventEmitter();
+
+    @Input()
+    public level: number;
 
     @Input()
     public model: QueryModel;
