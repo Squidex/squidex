@@ -15,12 +15,11 @@
                 </button>
             </div>
             <div class="col pl-1">
-                <sqx-search-form formClass="form" placeholder="Search for content" fieldExample="data/[MY_FIELD]/iv"
+                <sqx-search-form formClass="form" placeholder="Search for content"
                     [filter]="filter"
-                    (querySubmit)="search()" 
                     [queries]="schemaQueries"
-                    expandable="true"
-                    enableArchive="true"
+                    [queryModel]="queryModel"
+                    (querySubmit)="search()" 
                     enableShortcut="true">
                 </sqx-search-form>
             </div>

@@ -26,6 +26,12 @@ export * from './components/schema-category.component';
 export * from './components/search-form.component';
 export * from './components/table-header.component';
 
+export * from './components/queries/filter-comparison.component';
+export * from './components/queries/filter-logical.component';
+export * from './components/queries/filter-node.component';
+export * from './components/queries/query.component';
+export * from './components/queries/sorting.component';
+
 export * from './guards/app-must-exist.guard';
 export * from './guards/content-must-exist.guard';
 export * from './guards/load-apps.guard';

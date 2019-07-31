@@ -8,7 +8,7 @@
         (ngModelChange)="filter.setQuery($event)"
         [ngModelOptions]="{ standalone: true }" />
 
-    <ng-container *ngIf="expandable">
+    <ng-container *ngIf="queryModel">
         <a class="expand-search" (click)="searchModal.toggle()" #expand>
             <i class="icon-caret-down"></i>
         </a>
@@ -40,35 +40,7 @@
 <ng-container *sqxModal="searchModal">
     <div class="dropdown-menu" [sqxAnchoredTo]="inputFind" @fade>
         <div class="form-horizontal">
-            <div class="form-group row">
-                <label class="col-2 col-form-label" for="search">Text</label>
-
-                <div class="col-10">
-                    <input type="text" class="form-control" id="search" placeholder="Fulltext search"
-                        [ngModel]="filter.fullText | async"
-                        (ngModelChange)="filter.setFullText($event)" />
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label class="col-2 col-form-label" for="filter">Filter</label>
-
-                <div class="col-10">
-                    <input type="text" class="form-control" id="filter" placeholder="{{fieldExample}} eq [VALUE]"
-                        [ngModel]="filter.filter | async"
-                        (ngModelChange)="filter.setFilter($event)" />
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label class="col-2 col-form-label" for="orderBy">Order</label>
-                    
-                <div class="col-10">
-                    <input type="text" class="form-control" id="orderBy" placeholder="{{fieldExample}} desc"
-                        [ngModel]="filter.order | async"
-                        (ngModelChange)="filter.setOrder($event)" />
-                </div>
-            </div>
+            <sqx-query></sqx-query>
 
             <div class="link">
                 Read more about filtering in the <a href="https://docs.squidex.io/04-guides/02-api.html" sqxExternalLink>Documentation</a>.

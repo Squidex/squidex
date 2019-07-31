@@ -18,6 +18,8 @@ import {
     SaveQueryForm
 } from '@app/shared/internal';
 
+import { QueryModel } from './queries/model';
+
 @Component({
     selector: 'sqx-search-form',
     styleUrls: ['./search-form.component.scss'],
@@ -29,31 +31,25 @@ import {
 })
 export class SearchFormComponent implements OnInit {
     @Input()
-    public queries: Queries;
-
-    @Input()
     public placeholder = '';
-
-    @Input()
-    public fieldExample = '[MY_FIELD]';
-
-    @Input()
-    public expandable = false;
 
     @Input()
     public filter: FilterState;
 
     @Input()
-    public schemaName = '';
+    public queryModel: QueryModel;
+
+    @Input()
+    public queries: Queries;
+
+    @Output()
+    public querySubmit = new EventEmitter();
 
     @Input()
     public enableShortcut = false;
 
     @Input()
     public formClass = 'form-inline search-form';
-
-    @Output()
-    public querySubmit = new EventEmitter();
 
     public saveKey: Observable<string | undefined>;
     public saveQueryDialog = new DialogModel();

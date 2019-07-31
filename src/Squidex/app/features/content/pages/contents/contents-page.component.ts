@@ -28,6 +28,8 @@ import {
 
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
 
+import { QueryModel, queryModelFromSchema } from '@app/shared/components/queries/model';
+
 @Component({
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
@@ -51,6 +53,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public filter = new FilterState();
 
     public isAllSelected = false;
+
+    public queryModel: QueryModel;
 
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
@@ -78,6 +82,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
 
                     this.contentsState.load();
+
+                    this.updateModel();
                 }));
 
         this.own(
@@ -99,6 +105,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.language = this.languages.at(0);
 
                     this.filter.setLanguage(this.language);
+
+                    this.updateModel();
                 }));
     }
 
@@ -231,6 +239,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         }
 
         this.nextStatuses = Object.keys(allActions);
+    }
+
+    private updateModel() {
+        if (this.schema && this.languages) {
+            this.queryModel = queryModelFromSchema(this.schema, this.languages.values);
+        }
     }
 }
 

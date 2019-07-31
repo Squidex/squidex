@@ -13,10 +13,16 @@
     padding-right: 3rem;
 }
 
+.dropdown-menu {
+    max-height: 80%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
 .form-horizontal {
     padding: 1rem 1.5rem;
-    min-width: 25rem;
-    max-width: 25rem;
+    min-width: 50rem;
+    max-width: 50rem;
 }
 
 .save-search {
