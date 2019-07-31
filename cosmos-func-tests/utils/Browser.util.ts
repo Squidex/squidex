@@ -75,4 +75,21 @@ export class BrowserUtil {
     return browser.waitForAngularEnabled(false);
   }
 
+  public scrollIntoView(webelement: ElementFinder) {
+    browser
+      .executeScript("arguments[0].scrollIntoView()", webelement)
+      .then(() => {
+        webelement.click();
+      });
+  }
+
+  public selectAllContent(){
+    browser
+        .actions()
+        .keyDown(protractor.Key.ALT)
+        .sendKeys("a")
+        .keyUp(protractor.Key.ALT)
+        .perform();
+  }
+
 }

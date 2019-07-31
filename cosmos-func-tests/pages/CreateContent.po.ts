@@ -9,8 +9,7 @@ import {
 } from "protractor";
 import constants from "../utils/constants";
 
-export class CreateContent {
-  constructor() {}
+export class CreateContent extends BrowserUtil {
 
   // Create Commentary after Navigating to Commentary Page under Content
   public contentTable() {
@@ -39,20 +38,8 @@ export class CreateContent {
     );
   }
 
-  public applyBoldFont() {
-    return element(by.className("tui-bold tui-toolbar-icons"));
-  }
-
-  public applyItalicFont() {
-    return element(by.className("tui-italic tui-toolbar-icons"));
-  }
-
-  public applyBulletPoints() {
-    return element(by.className("tui-ul tui-toolbar-icons"));
-  }
-
-  public applyNumbering() {
-    return element(by.className("tui-ol tui-toolbar-icons"));
+  public applyEditorToolBarOptions(option) {
+    return element(by.className(option));
   }
 
   public navigateBackToContentsPage() {
@@ -65,14 +52,6 @@ export class CreateContent {
 
   public saveContent() {
     return element(by.buttonText(" Save "));
-  }
-
-  public scrollIntoView(webelement: ElementFinder) {
-    browser
-      .executeScript("arguments[0].scrollIntoView()", webelement)
-      .then(() => {
-        webelement.click();
-      });
   }
 
   public async navigateToContentPage() {
@@ -127,17 +106,17 @@ export class CreateContent {
   }
 
   public async selectCommodity(commodity) {
-    await this.scrollIntoView(this.commodityPlaceHolder());
+    await this.scrollIntoView(this.referencePlaceHolder('Commodity'));
     await this.selectContent(commodity);
   }
 
   public async selectCommentaryType(commentaryType) {
-    await this.scrollIntoView(this.commentaryTypePlaceHolder());
+    await this.scrollIntoView(this.referencePlaceHolder('Commentary Type'));
     await this.selectContent(commentaryType);
   }
 
   public async selectRegion(region) {
-    await this.scrollIntoView(this.regionPlaceHolder());
+    await this.scrollIntoView(this.referencePlaceHolder('Region'));
     await this.selectContent(region);
   }
 
@@ -160,12 +139,7 @@ export class CreateContent {
     );
     if (commentaryBody != null) {
       commentaryBody.sendKeys(commentaryText);
-      browser
-        .actions()
-        .keyDown(protractor.Key.ALT)
-        .sendKeys("a")
-        .keyUp(protractor.Key.ALT)
-        .perform();
+      this.selectAllContent();
     } else {
       // tslint:disable-next-line: no-console
       console.log("error");
@@ -180,25 +154,25 @@ export class CreateContent {
 
   public async createCommentaryWithBoldLetters(commentary) {
     this.commentaryEditorTest(commentary);
-    this.applyBoldFont().click();
+    this.applyEditorToolBarOptions("tui-bold tui-toolbar-icons").click();
     this.saveContent().click();
   }
 
   public async createCommentaryWithItalicFont(commentary) {
     this.commentaryEditorTest(commentary);
-    this.applyItalicFont().click();
+    this.applyEditorToolBarOptions("tui-italic tui-toolbar-icons").click();
     this.saveContent().click();
   }
 
   public async createBulletPointsCommentary(commentary) {
     this.commentaryEditorTest(commentary);
-    this.applyBulletPoints().click();
+    this.applyEditorToolBarOptions("tui-ul tui-toolbar-icons").click();
     this.saveContent().click();
   }
 
   public async createNumberedCommentary(commentary) {
     this.commentaryEditorTest(commentary);
-    this.applyNumbering().click();
+    this.applyEditorToolBarOptions("tui-ol tui-toolbar-icons").click();
     this.saveContent().click();
   }
 }
