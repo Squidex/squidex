@@ -62,8 +62,7 @@ export class BrowserUtil {
   // get current url of the page
   public async getCurrentURL() {
     return await browser.getCurrentUrl().then(url => url);
-    // alternatively we can use : return window.location.href;
-  }
+    }
 
   // wait for angular enabled
   public waitForAngularEnabledOnCurrentWindow() {

@@ -31,26 +31,10 @@ export class CreateContent {
     return element(by.buttonText("Link selected contents (1)")).click();
   }
 
-  public commodityPlaceHolder() {
+  public referencePlaceHolder(referenceName) {
     return element(
       by.xpath(
-        "//label[contains(text(), ' Commodity  ')]/following-sibling::div/sqx-references-editor/div/div/div[@class='drop-area']"
-      )
-    );
-  }
-
-  public commentaryTypePlaceHolder() {
-    return element(
-      by.xpath(
-        "//label[contains(text(), ' Commentary Type  ')]/following-sibling::div/sqx-references-editor/div/div/div[@class='drop-area']"
-      )
-    );
-  }
-
-  public regionPlaceHolder() {
-    return element(
-      by.xpath(
-        "//label[contains(text(), ' Region  ')]/following-sibling::div/sqx-references-editor/div/div/div[@class='drop-area']"
+        "//label[contains(text(), '" + referenceName +  "')]/following-sibling::div/sqx-references-editor/div/div/div[@class='drop-area']"
       )
     );
   }
@@ -79,8 +63,8 @@ export class CreateContent {
     return element(by.className("btn btn-success"));
   }
 
-  public saveContent(){
-      return element(by.buttonText(" Save "));
+  public saveContent() {
+    return element(by.buttonText(" Save "));
   }
 
   public scrollIntoView(webelement: ElementFinder) {
@@ -102,11 +86,11 @@ export class CreateContent {
   }
 
   public async selectRandomReferences() {
-    await this.scrollIntoView(this.commodityPlaceHolder());
+    await this.scrollIntoView(this.referencePlaceHolder('Commodity'));
     await this.randomSelection();
-    await this.scrollIntoView(this.regionPlaceHolder());
+    await this.scrollIntoView(this.referencePlaceHolder('Commentary Type'));
     await this.randomSelection();
-    await this.scrollIntoView(this.commodityPlaceHolder());
+    await this.scrollIntoView(this.referencePlaceHolder('Region'));
     await this.randomSelection();
   }
 
@@ -119,7 +103,7 @@ export class CreateContent {
             if (name === content) {
               const fav = contents.indexOf(contentName);
               this.selectRefData().then(checkbox => {
-              checkbox[fav].getWebElement().click();
+                checkbox[fav].getWebElement().click();
                 return;
               });
             }
@@ -177,42 +161,44 @@ export class CreateContent {
     if (commentaryBody != null) {
       commentaryBody.sendKeys(commentaryText);
       browser
-      .actions()
-      .keyDown(protractor.Key.ALT)
-      .sendKeys("a")
-      .keyUp(protractor.Key.ALT)
-      .perform();
+        .actions()
+        .keyDown(protractor.Key.ALT)
+        .sendKeys("a")
+        .keyUp(protractor.Key.ALT)
+        .perform();
     } else {
       // tslint:disable-next-line: no-console
       console.log("error");
     }
   }
-  public async commentaryEditorTest(commentary){
+  public async commentaryEditorTest(commentary) {
     this.navigateBackToContentsPage();
     this.newButton().click();
     this.selectRandomReferences();
     this.addCommentaryEditorOptions(commentary);
-    this.saveContent().click();
   }
-
 
   public async createCommentaryWithBoldLetters(commentary) {
     this.commentaryEditorTest(commentary);
     this.applyBoldFont().click();
+    this.saveContent().click();
   }
 
   public async createCommentaryWithItalicFont(commentary) {
     this.commentaryEditorTest(commentary);
     this.applyItalicFont().click();
+    this.saveContent().click();
   }
 
   public async createBulletPointsCommentary(commentary) {
     this.commentaryEditorTest(commentary);
     this.applyBulletPoints().click();
+    this.saveContent().click();
   }
 
   public async createNumberedCommentary(commentary) {
     this.commentaryEditorTest(commentary);
     this.applyNumbering().click();
+    this.saveContent().click();
   }
 }
