@@ -9,6 +9,8 @@ using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Xunit;
 
@@ -18,13 +20,38 @@ namespace Squidex.Domain.Apps.Entities.Contents
     {
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
         private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-        private readonly Context requestContext = new Context();
+        private readonly ISchemaEntity schema;
+        private readonly Context requestContext;
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
         private readonly ContentEnricher sut;
 
         public ContentEnricherTests()
         {
+            requestContext = new Context(Mocks.ApiUser(), Mocks.App(appId));
+
+            schema = Mocks.Schema(appId, schemaId);
+
+            A.CallTo(() => contentQuery.GetSchemaOrThrowAsync(requestContext, schemaId.Id.ToString()))
+                .Returns(schema);
+
             sut = new ContentEnricher(new Lazy<IContentQueryService>(() => contentQuery), contentWorkflow);
+        }
+
+        [Fact]
+        public async Task Should_add_app_version_and_schema_as_dependency()
+        {
+            var source = new ContentEntity { Status = Status.Published, SchemaId = schemaId };
+
+            A.CallTo(() => contentWorkflow.GetInfoAsync(source))
+                .Returns(new StatusInfo(Status.Published, StatusColors.Published));
+
+            var result = await sut.EnrichAsync(source, requestContext);
+
+            Assert.Contains(requestContext.App.Version.ToString(), result.CacheDependencies);
+
+            Assert.Contains(schema.Id.ToString(), result.CacheDependencies);
+            Assert.Contains(schema.Version.ToString(), result.CacheDependencies);
         }
 
         [Fact]

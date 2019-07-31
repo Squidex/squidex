@@ -6,18 +6,11 @@
 // ==========================================================================
 
 using System.Collections.Generic;
-using Squidex.Domain.Apps.Core.Contents;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities
 {
-    public interface IEnrichedContentEntity : IContentEntity, IEntityWithCacheDependencies
+    public interface IEntityWithCacheDependencies
     {
-        bool CanUpdate { get; }
-
-        string StatusColor { get; }
-
-        StatusInfo[] Nexts { get; }
-
-        NamedContentData ReferenceData { get; }
+        HashSet<string> CacheDependencies { get; }
     }
 }

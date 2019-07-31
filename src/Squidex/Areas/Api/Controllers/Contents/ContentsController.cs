@@ -137,7 +137,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = contents.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = contents.ToEtag(App);
+            Response.Headers[HeaderNames.ETag] = contents.ToEtag();
 
             return Ok(response);
         }
@@ -176,7 +176,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = contents.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = contents.ToEtag(App, schema);
+            Response.Headers[HeaderNames.ETag] = contents.ToEtag();
 
             return Ok(response);
         }
@@ -210,7 +210,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = content.ToSurrogateKey();
             }
 
-            Response.Headers[HeaderNames.ETag] = content.ToEtag(App);
+            Response.Headers[HeaderNames.ETag] = content.ToEtag();
 
             return Ok(response);
         }
@@ -245,7 +245,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = content.ToSurrogateKey();
             }
 
-            Response.Headers[HeaderNames.ETag] = content.ToEtag(App);
+            Response.Headers[HeaderNames.ETag] = content.ToEtag();
 
             return Ok(response.Data);
         }
