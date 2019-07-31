@@ -83,8 +83,7 @@ export class CreateContent extends BrowserUtil {
             }
           });
         } catch (error) {
-          // tslint:disable-next-line: no-console
-          console.log("Commodity doesn't exist", error);
+          process.stdout.write("Commodity doesn't exist" + error);
         }
       });
     });
@@ -123,8 +122,7 @@ export class CreateContent extends BrowserUtil {
       commentaryBody.sendKeys(commentaryText);
       this.saveContent();
     } else {
-      // tslint:disable-next-line: no-console
-      console.log("error");
+      process.stdout.write("error");
     }
   }
 
@@ -136,8 +134,7 @@ export class CreateContent extends BrowserUtil {
       commentaryBody.sendKeys(commentaryText);
       this.selectAllContent();
     } else {
-      // tslint:disable-next-line: no-console
-      console.log("error");
+      process.stdout.write("error");
     }
   }
   public async commentaryEditorTest(commentary) {

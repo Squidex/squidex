@@ -41,8 +41,7 @@ export default class SearchContent{
                      }
                  }
                  catch (error) {
-                     // tslint:disable-next-line: no-console
-                     console.log("Commentary doesn't exist", error);
+                     process.stdout.write("Commentary doesn't exist", error);
                  }
              });
          });
@@ -61,8 +60,7 @@ export default class SearchContent{
                     }
                 }
                 catch (error) {
-                    // tslint:disable-next-line: no-console
-                    console.log("Commentary doesn't exist", error);                   
+                    process.stdout.write("Commentary doesn't exist", error);                   
                 }
             });
         });
@@ -82,8 +80,7 @@ export default class SearchContent{
                         }
                     }
                     catch (error) {
-                        // tslint:disable-next-line: no-console
-                        console.log("Commentary doesn't exist", error);                     
+                        process.stdout.write("Commentary doesn't exist", error);                     
                     }
                 });
             });
@@ -103,8 +100,7 @@ export default class SearchContent{
                             }
                         }
                         catch (error) {
-                            // tslint:disable-next-line: no-console
-                            console.log("Commentary doesn't exist", error);
+                            process.stdout.write("Commentary doesn't exist", error);
                         }
                     });
                 });
@@ -124,8 +120,7 @@ export default class SearchContent{
                             }
                         }
                         catch (error) {
-                            // tslint:disable-next-line: no-console
-                            console.log("Commentary doesn't exist", error);
+                            process.stdout.write("Commentary doesn't exist", error);
                         }
                     });
                 });
