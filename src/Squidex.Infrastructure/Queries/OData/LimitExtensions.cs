@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Queries.OData
 {
     public static class LimitExtensions
     {
-        public static void ParseTake(this ODataUriParser query, Query result)
+        public static void ParseTake(this ODataUriParser query, ClrQuery result)
         {
             var top = query.ParseTop();
 
@@ -21,7 +21,7 @@ namespace Squidex.Infrastructure.Queries.OData
             }
         }
 
-        public static void ParseSkip(this ODataUriParser query, Query result)
+        public static void ParseSkip(this ODataUriParser query, ClrQuery result)
         {
             var skip = query.ParseSkip();
 

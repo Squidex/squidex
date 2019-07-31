@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, TagGroups.Schemas(schemaId.Id), A<HashSet<string>>.That.Contains("name1")))
                 .Returns(new Dictionary<string, string> { ["name1"] = "id1" });
 
-            var source = FilterBuilder.Eq("data.tags2.iv", "name1");
+            var source = ClrFilter.Eq("data.tags2.iv", "name1");
             var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.tags2.iv == 'id1'", result.ToString());
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             A.CallTo(() => tagService.GetTagIdsAsync(appId.Id, TagGroups.Assets, A<HashSet<string>>.That.Contains("name1")))
                 .Returns(new Dictionary<string, string>());
 
-            var source = FilterBuilder.Eq("data.tags2.iv", "name1");
+            var source = ClrFilter.Eq("data.tags2.iv", "name1");
             var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.tags2.iv == 'name1'", result.ToString());
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public void Should_not_normalize_other_tags_field()
         {
-            var source = FilterBuilder.Eq("data.tags1.iv", "value");
+            var source = ClrFilter.Eq("data.tags1.iv", "value");
             var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.tags1.iv == 'value'", result.ToString());
@@ -76,7 +76,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public void Should_not_normalize_other_typed_field()
         {
-            var source = FilterBuilder.Eq("data.string.iv", "value");
+            var source = ClrFilter.Eq("data.string.iv", "value");
             var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
 
             Assert.Equal("data.string.iv == 'value'", result.ToString());
@@ -88,7 +88,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         [Fact]
         public void Should_not_normalize_non_data_field()
         {
-            var source = FilterBuilder.Eq("no.data", "value");
+            var source = ClrFilter.Eq("no.data", "value");
             var result = FilterTagTransformer.Transform(source, appId.Id, schema, tagService);
 
             Assert.Equal("no.data == 'value'", result.ToString());

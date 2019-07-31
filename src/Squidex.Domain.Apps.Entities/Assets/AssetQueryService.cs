@@ -110,7 +110,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             return assets.SortSet(x => x.Id, ids);
         }
 
-        private Query ParseQuery(Context context, string query)
+        private ClrQuery ParseQuery(Context context, string query)
         {
             try
             {

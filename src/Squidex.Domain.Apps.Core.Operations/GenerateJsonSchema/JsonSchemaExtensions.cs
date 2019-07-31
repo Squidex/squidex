@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
     public static class JsonSchemaExtensions
     {
-        public static JsonSchema4 BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver, SchemaResolver schemaResolver)
+        public static JsonSchema BuildJsonSchema(this Schema schema, PartitionResolver partitionResolver, SchemaResolver schemaResolver)
         {
             Guard.NotNull(schemaResolver, nameof(schemaResolver));
             Guard.NotNull(partitionResolver, nameof(partitionResolver));
@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             var schemaName = schema.Name.ToPascalCase();
 
             var jsonTypeVisitor = new JsonTypeVisitor(schemaResolver);
-            var jsonSchema = new JsonSchema4 { Type = JsonObjectType.Object };
+            var jsonSchema = new JsonSchema { Type = JsonObjectType.Object };
 
             foreach (var field in schema.Fields.ForApi())
             {
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
             return jsonSchema;
         }
 
-        public static JsonProperty CreateProperty(IField field, JsonSchema4 reference)
+        public static JsonSchemaProperty CreateProperty(IField field, JsonSchema reference)
         {
             var jsonProperty = Builder.ObjectProperty(reference);
 

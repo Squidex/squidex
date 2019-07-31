@@ -9,22 +9,22 @@ using System.Linq;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class PascalCasePathConverter : TransformVisitor
+    public sealed class PascalCasePathConverter<TValue> : TransformVisitor<TValue>
     {
-        private static readonly PascalCasePathConverter Instance = new PascalCasePathConverter();
+        private static readonly PascalCasePathConverter<TValue> Instance = new PascalCasePathConverter<TValue>();
 
         private PascalCasePathConverter()
         {
         }
 
-        public static FilterNode Transform(FilterNode node)
+        public static FilterNode<TValue> Transform(FilterNode<TValue> node)
         {
             return node.Accept(Instance);
         }
 
-        public override FilterNode Visit(FilterComparison nodeIn)
+        public override FilterNode<TValue> Visit(CompareFilter<TValue> nodeIn)
         {
-            return new FilterComparison(nodeIn.Lhs.Select(x => x.ToPascalCase()).ToList(), nodeIn.Operator, nodeIn.Rhs);
+            return new CompareFilter<TValue>(nodeIn.Path.Select(x => x.ToPascalCase()).ToList(), nodeIn.Operator, nodeIn.Value);
         }
     }
 }

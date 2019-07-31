@@ -52,6 +52,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public isAllSelected = false;
 
+    public minWidth: string;
+
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
 
@@ -76,6 +78,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
                     this.schema = schema!;
                     this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
+
+                    this.minWidth = `${300 + (200 * this.schema.listFields.length)}px`;
 
                     this.contentsState.load();
                 }));
@@ -154,6 +158,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public selectLanguage(language: AppLanguageDto) {
         this.language = language;
+
+        this.filter.setLanguage(language);
     }
 
     public isItemSelected(content: ContentDto): boolean {

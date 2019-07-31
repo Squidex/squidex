@@ -19,12 +19,9 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         protected override NamedId<long> ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            if (reader.TokenType != JsonToken.String)
-            {
-                throw new JsonException($"Expected String, but got {reader.TokenType}.");
-            }
+            var value = serializer.Deserialize<string>(reader);
 
-            if (!NamedId<long>.TryParse(reader.Value.ToString(), long.TryParse, out var result))
+            if (!NamedId<long>.TryParse(value, long.TryParse, out var result))
             {
                 throw new JsonException("Named id must have at least 2 parts divided by commata.");
             }

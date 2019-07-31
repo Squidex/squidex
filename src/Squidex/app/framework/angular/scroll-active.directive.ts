@@ -14,7 +14,7 @@ export class ScrollActiveDirective implements AfterViewInit, OnChanges {
     @Input('sqxScrollActive')
     public isActive = false;
 
-    @Input()
+    @Input('sqxScrollContainer')
     public container: HTMLElement;
 
     constructor(
