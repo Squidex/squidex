@@ -11,8 +11,6 @@ export class LoginPage extends BrowserUtil {
   /**
    * signs in using specified username/password in login.json file.
    */
-
-
   public async login(loginData: LoginData) {
     this.waitForAngularDisabledOnCurrentWindow();
     this.switchToChildWindow();

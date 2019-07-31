@@ -1,13 +1,8 @@
 import { BrowserUtil } from "./../utils/Browser.util";
 import {
   element,
-  by,
-  ElementFinder,
-  browser,
-  ElementArrayFinder,
-  protractor
+  by
 } from "protractor";
-import constants from "../utils/constants";
 
 export class CreateContent extends BrowserUtil {
 
@@ -51,7 +46,7 @@ export class CreateContent extends BrowserUtil {
   }
 
   public saveContent() {
-    return element(by.buttonText(" Save "));
+    return element(by.buttonText(" Save ")).click();
   }
 
   public async navigateToContentPage() {
@@ -126,7 +121,7 @@ export class CreateContent extends BrowserUtil {
     );
     if (commentaryBody != null) {
       commentaryBody.sendKeys(commentaryText);
-      this.saveContent().click();
+      this.saveContent();
     } else {
       // tslint:disable-next-line: no-console
       console.log("error");
@@ -155,24 +150,24 @@ export class CreateContent extends BrowserUtil {
   public async createCommentaryWithBoldLetters(commentary) {
     this.commentaryEditorTest(commentary);
     this.applyEditorToolBarOptions("tui-bold tui-toolbar-icons").click();
-    this.saveContent().click();
+    this.saveContent();
   }
 
   public async createCommentaryWithItalicFont(commentary) {
     this.commentaryEditorTest(commentary);
     this.applyEditorToolBarOptions("tui-italic tui-toolbar-icons").click();
-    this.saveContent().click();
+    this.saveContent();
   }
 
   public async createBulletPointsCommentary(commentary) {
     this.commentaryEditorTest(commentary);
     this.applyEditorToolBarOptions("tui-ul tui-toolbar-icons").click();
-    this.saveContent().click();
+    this.saveContent();
   }
 
   public async createNumberedCommentary(commentary) {
     this.commentaryEditorTest(commentary);
     this.applyEditorToolBarOptions("tui-ol tui-toolbar-icons").click();
-    this.saveContent().click();
-  }
+    this.saveContent();
+}
 }
