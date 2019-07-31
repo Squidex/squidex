@@ -16,7 +16,7 @@ using Xunit;
 
 namespace Squidex.ICIS.Test.Validation
 {
-    public class UniqueContentValidationServiceTests
+    public class CommentaryValidationServiceTests
     {
         private readonly TestHelper testHelper;
 
@@ -29,7 +29,7 @@ namespace Squidex.ICIS.Test.Validation
         private readonly Guid commodityGuid = Guid.NewGuid();
         private readonly Guid commentaryTypeGuid = Guid.NewGuid();
 
-        public UniqueContentValidationServiceTests()
+        public CommentaryValidationServiceTests()
         {
             testHelper = new TestHelper();
         }
@@ -40,7 +40,7 @@ namespace Squidex.ICIS.Test.Validation
             var content = new CreateContent();
             CreateBrokenContentData(content);
             var context = new CommandContext(content, new InMemoryCommandBus(new List<ICommandMiddleware>()));
-            var validationCommand = new UniqueContentValidationCommand(contentQuery, contextProvider, grainFactory);
+            var validationCommand = new CommentaryValidationCommand(contentQuery, contextProvider, grainFactory);
            
             await Assert.ThrowsAsync<NullReferenceException>(() => validationCommand.HandleAsync(context, next));
         }
@@ -54,7 +54,7 @@ namespace Squidex.ICIS.Test.Validation
             var contentEntity = testHelper.CreateEnrichedContent(new Guid(), new Guid(), new Guid(), null, null); 
 
             var context = new CommandContext(content, new InMemoryCommandBus(new List<ICommandMiddleware>()));
-            var validationCommand = new UniqueContentValidationCommand(contentQuery, contextProvider, grainFactory);
+            var validationCommand = new CommentaryValidationCommand(contentQuery, contextProvider, grainFactory);
 
             A.CallTo(() => contentQuery.QueryAsync(contextProvider.Context, content.SchemaId.Name, A<Q>.Ignored)).Returns(ResultList.CreateFrom(1, contentEntity));
 
@@ -70,7 +70,7 @@ namespace Squidex.ICIS.Test.Validation
             CreateWorkingContentData(content);
 
             var context = new CommandContext(content, new InMemoryCommandBus(new List<ICommandMiddleware>()));
-            var validationCommand = new UniqueContentValidationCommand(contentQuery, contextProvider, grainFactory);
+            var validationCommand = new CommentaryValidationCommand(contentQuery, contextProvider, grainFactory);
 
             Assert.True(validationCommand.HandleAsync(context, next).IsCompletedSuccessfully);
         }
@@ -84,7 +84,7 @@ namespace Squidex.ICIS.Test.Validation
             var contentEntity = testHelper.CreateEnrichedContent(content.ContentId, new Guid(), new Guid(), null, null);
 
             var context = new CommandContext(content, new InMemoryCommandBus(new List<ICommandMiddleware>())); 
-            var validationCommand = new UniqueContentValidationCommand(contentQuery, contextProvider, grainFactory);
+            var validationCommand = new CommentaryValidationCommand(contentQuery, contextProvider, grainFactory);
 
             A.CallTo(() => contentQuery.QueryAsync(contextProvider.Context, content.SchemaId.Name, A<Q>.Ignored)).Returns(ResultList.CreateFrom(1, contentEntity));
 

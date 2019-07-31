@@ -14,13 +14,13 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.ICIS.Validation
 {
-    public sealed class UniqueContentValidationCommand : ICustomCommandMiddleware
+    public sealed class CommentaryValidationCommand : ICustomCommandMiddleware
     {
         private readonly IContentQueryService contentQuery;
         private readonly IContextProvider contextProvider;
         private readonly IGrainFactory grainFactory;
 
-        public UniqueContentValidationCommand(
+        public CommentaryValidationCommand(
             IContentQueryService contentQuery,
             IContextProvider contextProvider, 
             IGrainFactory grainFactory)

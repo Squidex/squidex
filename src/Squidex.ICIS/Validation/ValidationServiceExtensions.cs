@@ -15,7 +15,7 @@ namespace Squidex.ICIS.Validation
 
         private static void AddValidationCommandMiddleware(IServiceCollection services)
         {
-            services.AddSingleton<ICustomCommandMiddleware, UniqueContentValidationCommand>();
+            services.AddSingleton<ICustomCommandMiddleware, CommentaryValidationCommand>();
         }
     }
 }
