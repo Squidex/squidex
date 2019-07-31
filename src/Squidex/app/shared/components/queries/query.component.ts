@@ -40,41 +40,11 @@ import {
 export class QueryComponent {
     public queryValue: Query;
 
-    public model: QueryModel = {
-        fields: {
-            'number': {
-                type: 'number',
-                operators: [
-                    { value: 'eq', name: '==' },
-                    { value: 'ne', name: '!=' },
-                    { value: 'lt', name: '<' },
-                    { value: 'le', name: '<=' },
-                    { value: 'gt', name: '>' },
-                    { value: 'ge', name: '>=' }
-                ]
-            },
-            'string': {
-                type: 'string',
-                operators: [
-                    { value: 'eq', name: '==' },
-                    { value: 'ne', name: '!=' },
-                    { value: 'startsWith' },
-                    { value: 'endsWith' },
-                    { value: 'contains' }
-                ]
-            },
-            'boolean': {
-                type: 'boolean',
-                operators: [
-                    { value: 'eq', name: '==' },
-                    { value: 'ne', name: '!=' }
-                ]
-            }
-        }
-    };
-
     @Output()
     public change = new EventEmitter<Query>();
+
+    @Input()
+    public model: QueryModel;
 
     @Input()
     public set query(query: Query) {

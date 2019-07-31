@@ -40,7 +40,7 @@
 <ng-container *sqxModal="searchModal">
     <div class="dropdown-menu" [sqxAnchoredTo]="inputFind" @fade>
         <div class="form-horizontal">
-            <sqx-query></sqx-query>
+            <sqx-query [model]="queryModel"></sqx-query>
 
             <div class="link">
                 Read more about filtering in the <a href="https://docs.squidex.io/04-guides/02-api.html" sqxExternalLink>Documentation</a>.

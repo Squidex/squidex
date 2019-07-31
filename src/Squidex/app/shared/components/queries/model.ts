@@ -31,6 +31,9 @@ export interface QueryFieldModel {
 
     // The allowed operator.
     operators: FilterOperator[];
+
+    // Extra values.
+    extra?: any;
 }
 
 export interface QueryModel {
@@ -110,6 +113,14 @@ const TypeNumber: QueryFieldModel = {
     ]
 };
 
+const TypeReferences: QueryFieldModel = {
+    type: 'string',
+    operators: [
+        { value: 'eq', name: '==' },
+        { value: 'ne', name: '!=' }
+    ]
+};
+
 const TypeString: QueryFieldModel = {
     type: 'string',
     operators: [
@@ -153,6 +164,10 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Langua
             type = TypeString;
         } else if (field.properties.fieldType === 'DateTime') {
             type = TypeDateTime;
+        } else if (field.properties.fieldType === 'References') {
+            const extra = { schemaId: field.properties['schemaId'] };
+
+            type = { ...TypeReferences, extra };
         }
 
         if (type) {

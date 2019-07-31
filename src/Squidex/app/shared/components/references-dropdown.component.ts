@@ -22,7 +22,7 @@ import {
     SchemasService,
     StatefulControlComponent,
     Types
-} from '@app/shared';
+} from '@app/shared/internal';
 
 export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesDropdownComponent), multi: true
@@ -36,6 +36,8 @@ interface State {
 }
 
 type ContentName = { name: string, id: string };
+
+const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-references-dropdown',
@@ -52,6 +54,9 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
     @Input()
     public schemaId: string;
+
+    @Input()
+    public mode: 'Array' | 'Single';
 
     @Input()
     public set language(value: AppLanguageDto) {
@@ -111,10 +116,12 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     }
 
     public writeValue(obj: any) {
-        if (Types.isArrayOfString(obj)) {
-            this.selectedId.setValue(obj[0], { emitEvent: false });
+        if (Types.isString(obj)) {
+            this.selectedId.setValue(obj, NO_EMIT);
+        } else if (Types.isArrayOfString(obj)) {
+            this.selectedId.setValue(obj[0], NO_EMIT);
         } else {
-            this.selectedId.setValue(undefined, { emitEvent: false });
+            this.selectedId.setValue(undefined, NO_EMIT);
         }
     }
 

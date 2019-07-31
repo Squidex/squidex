@@ -30,29 +30,47 @@ import {
 
                         <ng-container [ngSwitch]="fieldModel.type">
                             <ng-container *ngSwitchCase="'boolean'">
-                                <input class="form-control"
+                                <input type="checkbox" class="form-control"
                                     [ngModel]="filter.value"
-                                    (ngModelChange)="changeValue($event)" type="checkbox" />
+                                    (ngModelChange)="changeValue($event)" />
                             </ng-container>
                             <ng-container *ngSwitchCase="'date'">
-                                <sqx-date-time-editor
+                                <sqx-date-time-editor mode="Date"
                                     [ngModel]="filter.value"
-                                    (ngModelChange)="changeValue($event)"></sqx-date-time-editor>
+                                    (ngModelChange)="changeValue($event)">
+                                </sqx-date-time-editor>
                             </ng-container>
                             <ng-container *ngSwitchCase="'datetime'">
                                 <sqx-date-time-editor
                                     [ngModel]="filter.value"
-                                    (ngModelChange)="changeValue($event)"></sqx-date-time-editor>
+                                    (ngModelChange)="changeValue($event)">
+                                </sqx-date-time-editor>
                             </ng-container>
                             <ng-container *ngSwitchCase="'number'">
-                                <input class="form-control"
+                                <input type="number" class="form-control"
                                     [ngModel]="filter.value"
-                                    (ngModelChange)="changeValue($event)" type="number" />
+                                    (ngModelChange)="changeValue($event)" />
                             </ng-container>
                             <ng-container *ngSwitchCase="'string'">
-                                <input class="form-control"
+                                <ng-container *ngIf="fieldModel.extra?.values; let values">
+                                    <select class="form-control"
+                                        [ngModel]="filter.value"
+                                        (ngModelChange)="changeValue($event)">
+                                        <option *ngFor="let value of values" [ngValue]="value">{{value}}</option>
+                                    </select>
+                                </ng-container>
+
+                                <ng-container *ngIf="fieldModel.extra?.schemaId; let schemaId">
+                                    <sqx-references-dropdown [schemaId]="schemaId"
+                                        mode="SingleValue"
+                                        [ngModel]="filter.value"
+                                        (ngModelChange)="changeValue($event)">
+                                    </sqx-references-dropdown>
+                                </ng-container>
+
+                                <input type="text" class="form-control" *ngIf="!fieldModel.extra"
                                     [ngModel]="filter.value"
-                                    (ngModelChange)="changeValue($event)" type="text" />
+                                    (ngModelChange)="changeValue($event)" />
                             </ng-container>
                         </ng-container>
                     </ng-container>

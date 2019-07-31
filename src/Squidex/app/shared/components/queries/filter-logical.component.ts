@@ -74,9 +74,9 @@ export class FilterLogicalComponent {
         if (this.filterValue.and) {
             this.filterValue.or = this.filterValue.and;
 
-            delete this.filterValue.or;
+            delete this.filterValue.and;
         } else {
-            this.filterValue.or = this.filterValue.and;
+            this.filterValue.and = this.filterValue.or;
 
             delete this.filterValue.or;
         }
