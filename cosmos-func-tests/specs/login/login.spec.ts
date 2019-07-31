@@ -43,7 +43,6 @@ describe("Create Commentary", () => {
     });
     browserPg.waitForAngularEnabledOnCurrentWindow().then(async () => {
       browserPg.switchToParentWindow();
-      // loginPg.skipTour();
       await expect(browserPg.getCurrentURL()).toBe(
         config.params.expectedUrlAfterNavigation
       );
