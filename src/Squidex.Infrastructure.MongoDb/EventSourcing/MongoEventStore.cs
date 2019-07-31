@@ -46,12 +46,21 @@ namespace Squidex.Infrastructure.EventSourcing
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoEventCommit> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateManyAsync(
-                new[]
-                {
-                    new CreateIndexModel<MongoEventCommit>(Index.Ascending(x => x.Timestamp).Ascending(x => x.EventStream)),
-                    new CreateIndexModel<MongoEventCommit>(Index.Ascending(x => x.EventStream).Descending(x => x.EventStreamOffset), new CreateIndexOptions { Unique = true })
-                }, ct);
+            return collection.Indexes.CreateManyAsync(new[]
+            {
+                new CreateIndexModel<MongoEventCommit>(
+                    Index
+                        .Ascending(x => x.Timestamp)
+                        .Ascending(x => x.EventStream)),
+                new CreateIndexModel<MongoEventCommit>(
+                    Index
+                        .Ascending(x => x.EventStream)
+                        .Descending(x => x.EventStreamOffset),
+                    new CreateIndexOptions
+                    {
+                        Unique = true
+                    })
+            }, ct);
         }
     }
 }

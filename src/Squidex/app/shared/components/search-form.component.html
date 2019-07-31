@@ -9,7 +9,7 @@
         [ngModelOptions]="{ standalone: true }" />
 
     <ng-container *ngIf="queryModel">
-        <a class="expand-search" (click)="searchModal.toggle()" #expand>
+        <a class="expand-search" (click)="searchDialog.toggle()" #expand>
             <i class="icon-caret-down"></i>
         </a>
 
@@ -37,7 +37,7 @@
     Search for content using full text search over all fields and languages!
 </sqx-onboarding-tooltip>
 
-<ng-container *sqxModal="searchModal">
+<ng-container *sqxModal="searchDialog;closeAuto:false">
     <div class="dropdown-menu" [sqxAnchoredTo]="inputFind" @fade>
         <div class="form-horizontal">
             <sqx-query [model]="queryModel"></sqx-query>

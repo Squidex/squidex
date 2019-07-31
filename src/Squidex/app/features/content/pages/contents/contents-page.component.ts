@@ -51,10 +51,11 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public languages: ImmutableArray<AppLanguageDto>;
 
     public filter = new FilterState();
+    public filterModel: QueryModel;
 
     public isAllSelected = false;
 
-    public queryModel: QueryModel;
+    public minWidth: string;
 
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
@@ -80,6 +81,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
                     this.schema = schema!;
                     this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
+
+                    this.minWidth = `${300 + (200 * this.schema.listFields.length)}px`;
 
                     this.contentsState.load();
 
@@ -162,6 +165,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public selectLanguage(language: AppLanguageDto) {
         this.language = language;
+
+        this.filter.setLanguage(language);
     }
 
     public isItemSelected(content: ContentDto): boolean {
@@ -243,7 +248,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     private updateModel() {
         if (this.schema && this.languages) {
-            this.queryModel = queryModelFromSchema(this.schema, this.languages.values);
+            this.filterModel = queryModelFromSchema(this.schema, this.languages.values);
         }
     }
 }

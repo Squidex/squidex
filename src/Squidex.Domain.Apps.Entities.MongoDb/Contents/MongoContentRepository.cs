@@ -28,7 +28,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 {
     public partial class MongoContentRepository : IContentRepository, IInitializable
     {
-        private readonly IMongoDatabase database;
         private readonly IAppProvider appProvider;
         private readonly IJsonSerializer serializer;
         private readonly ITextIndexer indexer;
@@ -44,13 +43,11 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, IJsonSerializer serializer, ITextIndexer indexer, TypeNameRegistry typeNameRegistry)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
-            Guard.NotNull(database, nameof(database));
             Guard.NotNull(serializer, nameof(serializer));
             Guard.NotNull(indexer, nameof(indexer));
             Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
 
             this.appProvider = appProvider;
-            this.database = database;
             this.indexer = indexer;
             this.serializer = serializer;
 
@@ -137,11 +134,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         public Task ClearAsync()
         {
             return contents.ClearAsync();
-        }
-
-        public Task DeleteArchiveAsync()
-        {
-            return database.DropCollectionAsync("States_Contents_Archive");
         }
     }
 }

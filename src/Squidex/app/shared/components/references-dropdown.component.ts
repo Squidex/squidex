@@ -16,7 +16,6 @@ import {
     ContentDto,
     ContentsService,
     getContentValue,
-    ImmutableArray,
     MathHelper,
     SchemaDetailsDto,
     SchemasService,
@@ -31,29 +30,37 @@ export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
 interface State {
     schema?: SchemaDetailsDto | null;
 
-    contentItems: ImmutableArray<ContentDto>;
-    contentNames: ImmutableArray<ContentName>;
+    contentItems: ContentDto[];
+    contentNames: ContentName[];
+
+    selectedItem?: ContentName;
 }
 
-type ContentName = { name: string, id: string };
-
-const NO_EMIT = { emitEvent: false };
+type ContentName = { name: string, id?: string };
 
 @Component({
     selector: 'sqx-references-dropdown',
     template: `
-        <select class="form-control" [formControl]="selectedId">
-            <option [ngValue]="null"></option>
-            <option *ngFor="let content of snapshot.contentNames" [ngValue]="content.id">{{content.name}}</option>
-        </select>`,
+        <sqx-dropdown [formControl]="selectionControl" [items]="snapshot.contentNames">
+            <ng-template let-content="$implicit" let-context="context">
+                <span class="truncate" [innerHTML]="content.name | sqxHighlight:context"></span>
+            </ng-template>
+        </sqx-dropdown>`,
+    styles: [
+        '.truncate { min-height: 1.2rem; }'
+    ],
     providers: [SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReferencesDropdownComponent extends StatefulControlComponent<State, string[]> implements OnInit {
+export class ReferencesDropdownComponent extends StatefulControlComponent<State, string[] | string> implements OnInit {
     private languageField: AppLanguageDto;
+    private selectedId: string | undefined;
 
     @Input()
     public schemaId: string;
+
+    @Input()
+    public isRequired = false;
 
     @Input()
     public mode: 'Array' | 'Single';
@@ -65,7 +72,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         this.next(s => ({ ...s, contentNames: this.createContentNames(s.schema, s.contentItems) }));
     }
 
-    public selectedId = new FormControl('');
+    public selectionControl = new FormControl('');
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
@@ -74,26 +81,36 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     ) {
         super(changeDetector, {
             schema: null,
-            contentItems: ImmutableArray.empty(),
-            contentNames: ImmutableArray.empty()
+            contentItems: [],
+            contentNames: []
         });
 
         this.own(
-            this.selectedId.valueChanges
-                .subscribe(value => {
-                    if (value) {
+            this.selectionControl.valueChanges
+                .subscribe((value: ContentName) => {
+                    if (value && value.id) {
                         this.callTouched();
-                        this.callChange([value]);
+
+                        if (this.mode === 'Single') {
+                            this.callChange(value.id);
+                        } else {
+                            this.callChange([value.id]);
+                        }
                     } else {
                         this.callTouched();
-                        this.callChange([]);
+
+                        if (this.mode === 'Single') {
+                            this.callChange(null);
+                        } else {
+                            this.callChange([]);
+                        }
                     }
                 }));
     }
 
     public ngOnInit() {
         if (this.schemaId === MathHelper.EMPTY_GUID) {
-            this.selectedId.disable();
+            this.selectionControl.disable();
             return;
         }
 
@@ -106,31 +123,47 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
                     }
                 }, (schema, contents) => ({ schema, contents })))
             .subscribe(({ schema, contents }) => {
-                const contentItems = ImmutableArray.of(contents.items);
+                const contentItems = contents.items;
                 const contentNames = this.createContentNames(schema, contentItems);
 
                 this.next(s => ({ ...s, schema, contentItems, contentNames }));
+
+                this.selectContent();
             }, () => {
-                this.selectedId.disable();
+                this.selectionControl.disable();
             });
     }
 
     public writeValue(obj: any) {
         if (Types.isString(obj)) {
-            this.selectedId.setValue(obj, NO_EMIT);
-        } else if (Types.isArrayOfString(obj)) {
-            this.selectedId.setValue(obj[0], NO_EMIT);
+            this.selectedId = obj;
+
+            this.selectContent();
+        } if (Types.isArrayOfString(obj)) {
+            this.selectedId = obj[0];
+
+            this.selectContent();
         } else {
-            this.selectedId.setValue(undefined, NO_EMIT);
+            this.selectedId = undefined;
+
+            this.unselectContent();
         }
     }
 
-    private createContentNames(schema: SchemaDetailsDto | undefined | null, contents: ImmutableArray<ContentDto>): ImmutableArray<ContentName> {
+    private selectContent() {
+        this.selectionControl.setValue(this.snapshot.contentNames.find(x => x.id === this.selectedId), { emitEvent: false });
+    }
+
+    private unselectContent() {
+        this.selectionControl.setValue(undefined, { emitEvent: false });
+    }
+
+    private createContentNames(schema: SchemaDetailsDto | undefined | null, contents: ContentDto[]): ContentName[] {
         if (contents.length === 0 || !schema) {
-            return ImmutableArray.empty();
+            return [];
         }
 
-        return contents.map(content => {
+        const names = contents.map(content => {
             const name =
                 schema.referenceFields
                     .map(f => getContentValue(content, this.languageField, f, false))
@@ -139,6 +172,12 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
             return { name, id: content.id };
         });
+
+        if (!this.isRequired) {
+            return [{ name: '- No Reference -' }, ...names];
+        }
+
+        return names;
     }
 
     public trackByContent(content: ContentDto) {

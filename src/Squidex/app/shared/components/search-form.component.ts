@@ -13,7 +13,6 @@ import {
     DialogModel,
     fadeAnimation,
     FilterState,
-    ModalModel,
     Queries,
     SaveQueryForm
 } from '@app/shared/internal';
@@ -55,7 +54,7 @@ export class SearchFormComponent implements OnInit {
     public saveQueryDialog = new DialogModel();
     public saveQueryForm = new SaveQueryForm(this.formBuilder);
 
-    public searchModal = new ModalModel();
+    public searchDialog = new DialogModel();
 
     constructor(
         private readonly formBuilder: FormBuilder

@@ -41,7 +41,7 @@ import {
                                 </sqx-date-time-editor>
                             </ng-container>
                             <ng-container *ngSwitchCase="'datetime'">
-                                <sqx-date-time-editor
+                                <sqx-date-time-editor mode="DateTime"
                                     [ngModel]="filter.value"
                                     (ngModelChange)="changeValue($event)">
                                 </sqx-date-time-editor>
@@ -64,7 +64,8 @@ import {
                                     <sqx-references-dropdown [schemaId]="schemaId"
                                         mode="SingleValue"
                                         [ngModel]="filter.value"
-                                        (ngModelChange)="changeValue($event)">
+                                        (ngModelChange)="changeValue($event)"
+                                        [isRequired]="true">
                                     </sqx-references-dropdown>
                                 </ng-container>
 
@@ -137,9 +138,7 @@ export class FilterComparisonComponent implements OnChanges {
                 this.filter.op = newModel.operators[0].value;
             }
 
-            if (!this.fieldModel || this.fieldModel.type !== newModel.type) {
-                this.filter.value = undefined;
-            }
+            this.filter.value = undefined;
         }
 
         this.fieldModel = newModel;

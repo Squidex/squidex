@@ -136,7 +136,7 @@ function getFieldPath(snapshot: Snapshot, field?: Field) {
         if (Types.isString(field)) {
             path = field;
         } else if (field.isLocalizable && snapshot.language) {
-            path = `data/${escapeField(field.name)}/${snapshot.language.iso2Code}`;
+            path = `data/${escapeField(field.name)}/${snapshot.language.iso2Code.replace('-', '_')}`;
         } else {
             path = `data/${escapeField(field.name)}/iv`;
         }
