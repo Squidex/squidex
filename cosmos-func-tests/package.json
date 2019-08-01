@@ -4,7 +4,7 @@
   "description": "Automation framework for Cosmos",
   "main": "index.js",
   "scripts": {
-    "pretest": "npm-run-all -s lint compile dbstart appstart deploymentscriptsrun",
+    "pretest": "npm-run-all -s lint compile dbstart appstart deploymentscriptsrun webdriver-update",
     "lint": "./node_modules/.bin/tslint -c tslint.json ./pages/*.ts",
     "compile": "tsc",
     "setupapp": "screen -dmS appstart ./setup-app.sh",
@@ -14,7 +14,7 @@
     "test": "protractor ./JSFiles/config.js",
     "posttest": "cd ./utils/ && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./TerminateTask.ps1 && rm -r ./database/*",
     "protractor": "./node_modules/protractor/built/cli.js",
-    "webdriver-update": "./node_modules/.bin/webdriver-manager update && ./node_modules/protractor/bin/webdriver-manager update"
+    "webdriver-update": "./node_modules/protractor/node_modules/webdriver-manager update & start webdriver-manager start"
   },
   "author": "Pavani",
   "license": "ISC",
@@ -30,11 +30,12 @@
     "protractor": "^5.4.2",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5",
-    "winston": "^3.2.1",
-    "webdriver-manager": "^12.1.5"
+    "webdriver-manager": "^12.1.5",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "fs": "0.0.1-security",
+    "jasmine-expect": "^4.0.3",
     "log4js": "^2.5.3",
     "log4js-protractor-appender": "^1.1.2",
     "nconf": "^0.10.0",
