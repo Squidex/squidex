@@ -77,6 +77,35 @@ namespace Squidex.Domain.Apps.Entities.Contents
         }
 
         [Fact]
+        public async Task Should_add_referenced_id_as_dependency()
+        {
+            var ref1_1 = CreateRefContent(Guid.NewGuid(), "ref1_1", 13);
+            var ref1_2 = CreateRefContent(Guid.NewGuid(), "ref1_2", 17);
+            var ref2_1 = CreateRefContent(Guid.NewGuid(), "ref2_1", 23);
+            var ref2_2 = CreateRefContent(Guid.NewGuid(), "ref2_2", 29);
+
+            var source = new IContentEntity[]
+            {
+                CreateContent(new Guid[] { ref1_1.Id }, new Guid[] { ref2_1.Id }),
+                CreateContent(new Guid[] { ref1_2.Id }, new Guid[] { ref2_2.Id })
+            };
+
+            A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
+                .Returns(ResultList.CreateFrom(4, ref1_1, ref1_2, ref2_1, ref2_2));
+
+            var enriched = await sut.EnrichAsync(source, requestContext);
+
+            var enriched1 = enriched.ElementAt(0);
+            var enriched2 = enriched.ElementAt(1);
+
+            Assert.Contains(refSchemaId1.Id.ToString(), enriched1.CacheDependencies);
+            Assert.Contains(refSchemaId2.Id.ToString(), enriched1.CacheDependencies);
+
+            Assert.Contains(refSchemaId1.Id.ToString(), enriched2.CacheDependencies);
+            Assert.Contains(refSchemaId2.Id.ToString(), enriched2.CacheDependencies);
+        }
+
+        [Fact]
         public async Task Should_enrich_with_reference_data()
         {
             var ref1_1 = CreateRefContent(Guid.NewGuid(), "ref1_1", 13);

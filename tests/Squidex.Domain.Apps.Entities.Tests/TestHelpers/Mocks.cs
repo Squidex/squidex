@@ -49,12 +49,22 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
             return schema;
         }
 
+        public static ClaimsPrincipal ApiUser(string role = null)
+        {
+            return CreateUser(role, "api");
+        }
+
         public static ClaimsPrincipal FrontendUser(string role = null)
+        {
+            return CreateUser(role, DefaultClients.Frontend);
+        }
+
+        private static ClaimsPrincipal CreateUser(string role, string client)
         {
             var claimsIdentity = new ClaimsIdentity();
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
-            claimsIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, DefaultClients.Frontend));
+            claimsIdentity.AddClaim(new Claim(OpenIdClaims.ClientId, client));
 
             if (role != null)
             {
