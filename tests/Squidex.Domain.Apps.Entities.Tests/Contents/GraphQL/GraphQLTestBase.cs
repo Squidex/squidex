@@ -219,6 +219,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 [typeof(IContentQueryService)] = contentQuery,
                 [typeof(IDataLoaderContextAccessor)] = dataLoaderContext,
                 [typeof(IGraphQLUrlGenerator)] = new FakeUrlGenerator(),
+                [typeof(IOptions<AssetOptions>)] = Options.Create(new AssetOptions()),
+                [typeof(IOptions<ContentOptions>)] = Options.Create(new ContentOptions()),
                 [typeof(ISemanticLog)] = A.Fake<ISemanticLog>(),
                 [typeof(DataLoaderDocumentListener)] = new DataLoaderDocumentListener(dataLoaderContext)
             };

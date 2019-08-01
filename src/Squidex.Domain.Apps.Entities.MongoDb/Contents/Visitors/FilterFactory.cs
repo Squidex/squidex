@@ -37,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                 query.Filter = query.Filter.Accept(new AdaptionVisitor(pathConverter));
             }
 
-            query.Sort = query.Sort.Select(x => new SortNode(pathConverter(x.Path), x.SortOrder)).ToList();
+            query.Sort = query.Sort.Select(x => new SortNode(pathConverter(x.Path), x.Order)).ToList();
 
             return query;
         }
