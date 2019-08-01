@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
-    isNotEmptyQuery,
     Query,
     QueryModel,
     QuerySorting
-} from './model';
+} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-query',
@@ -14,26 +13,20 @@ import {
             <h4>Filter</h4>
 
             <sqx-filter-logical isRoot="true" [filter]="queryValue.filter" [model]="model"
-                (change)="emitChange()">
+                (change)="emitQueryChange()">
             </sqx-filter-logical>
 
             <h4 class="mt-4">Sorting</h4>
 
-            <div class="mb-2" *ngFor="let sorting of queryValue.sorting">
+            <div class="mb-2" *ngFor="let sorting of queryValue.sort">
                 <sqx-sorting [sorting]="sorting" [model]="model"
-                    (remove)="removeSorting(sorting)" (change)="emitChange()">
+                    (remove)="removeSorting(sorting)" (change)="emitQueryChange()">
                 </sqx-sorting>
             </div>
 
             <button class="btn btn-outline-success btn-sm mr-2" (click)="addSorting()">
                 Add Sorting
             </button>
-
-            <h4 class="mt-4">Full Text</h4>
-
-            <input class="form-control"
-                [ngModel]="queryValue.fullText"
-                (ngModelChange)="changeFullText($event)" />
         </div>
     `,
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -42,7 +35,7 @@ export class QueryComponent {
     public queryValue: Query;
 
     @Output()
-    public change = new EventEmitter<Query>();
+    public queryChange = new EventEmitter<Query>();
 
     @Input()
     public model: QueryModel;
@@ -60,8 +53,8 @@ export class QueryComponent {
                 };
             }
 
-            if (!query.sorting) {
-                query.sorting = [];
+            if (!query.sort) {
+                query.sort = [];
             }
 
             this.queryValue = query;
@@ -72,31 +65,19 @@ export class QueryComponent {
         this.query = {};
     }
 
-    public changeFullText(fullText: string) {
-        this.query.fullText = fullText;
-
-        this.emitChange();
-    }
-
     public addSorting() {
-        this.queryValue.sorting!.push({ path: Object.keys(this.model.fields)[0], order: 'ascending' });
+        this.queryValue.sort!.push({ path: Object.keys(this.model.fields)[0], order: 'ascending' });
 
-        this.emitChange();
+        this.emitQueryChange();
     }
 
     public removeSorting(sorting: QuerySorting) {
-        this.queryValue.sorting!.splice(this.queryValue.sorting!.indexOf(sorting), 1);
+        this.queryValue.sort!.splice(this.queryValue.sort!.indexOf(sorting), 1);
 
-        this.emitChange();
+        this.emitQueryChange();
     }
 
-    public emitChange() {
-        const query = this.queryValue;
-
-        if (isNotEmptyQuery(query)) {
-            this.change.emit(query);
-        } else {
-            this.change.emit(undefined);
-        }
+    public emitQueryChange() {
+        this.queryChange.emit(this.queryValue);
     }
 }

@@ -20,6 +20,7 @@ import {
 
 import { AssetDto, AssetsService} from './../services/assets.service';
 import { AppsState } from './apps.state';
+import { encodeQuery, Query } from './query';
 
 interface Snapshot {
     // All assets tags.
@@ -35,7 +36,10 @@ interface Snapshot {
     assetsPager: Pager;
 
     // The query to filter assets.
-    assetsQuery?: string;
+    assetsQuery?: Query;
+
+    // The json of the assets query.
+    assetsQueryJson: string;
 
     // Indicates if the assets are loaded.
     isLoaded?: boolean;
@@ -75,7 +79,7 @@ export class AssetsState extends State<Snapshot> {
         private readonly assetsService: AssetsService,
         private readonly dialogs: DialogService
     ) {
-        super({ assets: ImmutableArray.empty(), assetsPager: new Pager(0, 0, 30), tags: {}, tagsSelected: {} });
+        super({ assets: ImmutableArray.empty(), assetsPager: new Pager(0, 0, 30), assetsQueryJson: '', tags: {}, tagsSelected: {} });
     }
 
     public load(isReload = false): Observable<any> {
@@ -198,8 +202,8 @@ export class AssetsState extends State<Snapshot> {
         return this.loadInternal();
     }
 
-    public search(query?: string): Observable<any> {
-        this.next(s => ({ ...s, assetsPager: new Pager(0, 0, 30), assetsQuery: query }));
+    public search(query?: Query): Observable<any> {
+        this.next(s => ({ ...s, assetsPager: new Pager(0, 0, 30), assetsQuery: query, assetsQueryJson: encodeQuery(query) }));
 
         return this.loadInternal();
     }

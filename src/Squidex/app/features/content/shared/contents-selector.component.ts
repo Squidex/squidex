@@ -9,12 +9,14 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import {
     ContentDto,
-    FilterState,
     LanguageDto,
     ManualContentsState,
+    QueryModel,
+    queryModelFromSchema,
+    QueryState,
     RootFieldDto,
     SchemaDetailsDto,
-    Sorting
+    SortMode
 } from '@app/shared';
 
 @Component({
@@ -44,7 +46,8 @@ export class ContentsSelectorComponent implements OnInit {
     @Output()
     public select = new EventEmitter<ContentDto[]>();
 
-    public filter = new FilterState();
+    public query = new QueryState();
+    public queryModel: QueryModel;
 
     public selectedItems:  { [id: string]: ContentDto; } = {};
     public selectionCount = 0;
@@ -61,6 +64,8 @@ export class ContentsSelectorComponent implements OnInit {
     public ngOnInit() {
         this.minWidth = `${200 + (200 * this.schema.referenceFields.length)}px`;
 
+        this.queryModel = queryModelFromSchema(this.schema, this.languages);
+
         this.contentsState.schema = this.schema;
         this.contentsState.load();
     }
@@ -70,7 +75,7 @@ export class ContentsSelectorComponent implements OnInit {
     }
 
     public search() {
-        this.contentsState.search(this.filter.apiFilter);
+        this.contentsState.search(this.query.snapshot.query);
     }
 
     public goNext() {
@@ -123,8 +128,8 @@ export class ContentsSelectorComponent implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public sort(field: string | RootFieldDto, sorting: Sorting) {
-        this.filter.setOrderField(field, sorting);
+    public sort(field: string | RootFieldDto, order: SortMode) {
+        this.query.setOrderField(field, order);
 
         this.search();
     }

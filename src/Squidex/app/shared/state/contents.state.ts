@@ -20,11 +20,12 @@ import {
     Versioned
 } from '@app/framework';
 
+import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
 import { SchemaDto } from './../services/schemas.service';
 import { AppsState } from './apps.state';
+import { SavedQuery } from './queries';
+import { encodeQuery, Query } from './query';
 import { SchemasState } from './schemas.state';
-
-import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
 
 interface Snapshot {
     // The current comments.
@@ -34,7 +35,10 @@ interface Snapshot {
     contentsPager: Pager;
 
     // The query to filter and sort contents.
-    contentsQuery?: string;
+    contentsQuery?: Query;
+
+    // The raw content query.
+    contentsQueryJson: string;
 
     // Indicates if the contents are loaded.
     isLoaded?: boolean;
@@ -89,7 +93,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService
     ) {
-        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0) });
+        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0), contentsQueryJson: '' });
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -298,8 +302,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         }
     }
 
-    public search(contentsQuery?: string): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery }));
+    public search(contentsQuery?: Query): Observable<any> {
+        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery, contentsQueryJson: encodeQuery(contentsQuery) }));
 
         return this.loadInternal();
     }
@@ -356,12 +360,20 @@ export class ManualContentsState extends ContentsStateBase {
     }
 }
 
-export type ContentQuery =  { color: string; name: string; filter: string; };
+export type ContentQuery =  { color: string; } & SavedQuery;
 
 function buildQueries(statuses: StatusInfo[] | undefined): ContentQuery[] {
     return statuses ? statuses.map(s => buildQuery(s)) : [];
 }
 
 function buildQuery(s: StatusInfo) {
-    return ({ name: s.status, color: s.color, filter: `$filter=status eq '${s.status}'` });
+    const query = {
+        filter: {
+            and: [
+                { path: 'status', op: 'eq', value: s.status }
+            ]
+        }
+    };
+
+    return ({ name: s.status, color: s.color, query, queryJson: encodeQuery(query) });
 }

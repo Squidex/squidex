@@ -7,13 +7,12 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { fadeAnimation } from '@app/framework/internal';
-
 import {
+    fadeAnimation,
     FilterLogical,
     FilterNode,
     QueryModel
-} from './model';
+} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-filter-logical',

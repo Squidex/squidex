@@ -21,7 +21,9 @@
                         </sqx-tag-editor>
                     </div>
                     <div class="col-6">
-                        <sqx-search-form formClass="form" placeholder="Search by name" [filter]="filter" (querySubmit)="search()"
+                        <sqx-search-form formClass="form" placeholder="Search by name"
+                            [query]="query"
+                            (querySubmit)="search()"
                             enableShortcut="true">
                         </sqx-search-form>
                     </div>

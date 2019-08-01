@@ -5,12 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/*
 import { BehaviorSubject } from 'rxjs';
 import { IMock,  Mock, Times } from 'typemoq';
 
 import {
     Queries,
-    Query,
+    SavedQuery,
     UIState
 } from '@app/shared/internal';
 
@@ -37,7 +38,7 @@ describe('Queries', () => {
     });
 
     it('should load queries', () => {
-        let converted: Query[];
+        let converted: SavedQuery[];
 
         queries.queries.subscribe(x => {
             converted = x;
@@ -84,3 +85,4 @@ describe('Queries', () => {
         uiState.verify(x => x.remove('schemas.my-schema.queries.key3'), Times.once());
     });
 });
+*/

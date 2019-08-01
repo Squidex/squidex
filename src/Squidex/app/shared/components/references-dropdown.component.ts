@@ -38,6 +38,8 @@ interface State {
 
 type ContentName = { name: string, id?: string };
 
+const NO_EMIT = { emitEvent: false };
+
 @Component({
     selector: 'sqx-references-dropdown',
     template: `
@@ -129,6 +131,12 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
                 this.next(s => ({ ...s, schema, contentItems, contentNames }));
 
                 this.selectContent();
+
+                if (this.isRequired && !this.selectedId) {
+                    this.selectFirstContent();
+                } else {
+                    this.selectContent();
+                }
             }, () => {
                 this.selectionControl.disable();
             });
@@ -151,11 +159,15 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     }
 
     private selectContent() {
-        this.selectionControl.setValue(this.snapshot.contentNames.find(x => x.id === this.selectedId), { emitEvent: false });
+        this.selectionControl.setValue(this.snapshot.contentNames.find(x => x.id === this.selectedId), NO_EMIT);
+    }
+
+    private selectFirstContent() {
+        this.selectionControl.setValue(this.snapshot.contentNames[0]);
     }
 
     private unselectContent() {
-        this.selectionControl.setValue(undefined, { emitEvent: false });
+        this.selectionControl.setValue(undefined, NO_EMIT);
     }
 
     private createContentNames(schema: SchemaDetailsDto | undefined | null, contents: ContentDto[]): ContentName[] {

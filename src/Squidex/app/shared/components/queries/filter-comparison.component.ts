@@ -11,7 +11,7 @@ import {
     FilterComparison,
     QueryFieldModel,
     QueryModel
-} from './model';
+} from '@app/shared/internal';
 
  @Component({
      selector: 'sqx-filter-comparison',
@@ -62,7 +62,7 @@ import {
 
                                 <ng-container *ngIf="fieldModel.extra?.schemaId; let schemaId">
                                     <sqx-references-dropdown [schemaId]="schemaId"
-                                        mode="SingleValue"
+                                        mode="Single"
                                         [ngModel]="filter.value"
                                         (ngModelChange)="changeValue($event)"
                                         [isRequired]="true">

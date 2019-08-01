@@ -7,6 +7,8 @@
 
 import { LanguageDto, SchemaDetailsDto } from '@app/shared/internal';
 
+import { Types } from '@app/framework';
+
 export type QueryValueType =
     'boolean' |
     'date' |
@@ -67,8 +69,10 @@ export interface QuerySorting {
     path: string;
 
     // The sort order.
-    order: 'ascending' | 'descending';
+    order: SortMode;
 }
+
+export type SortMode = 'ascending' | 'descending';
 
 export interface Query {
     // The optional filter.
@@ -78,27 +82,57 @@ export interface Query {
     fullText?: string;
 
     // The sorting.
-    sorting?: QuerySorting[];
+    sort?: QuerySorting[];
+
+    // The number of items to take.
+    take?: number;
+
+    // The number of items to skip.
+    skip?: number;
 }
 
-export function isNotEmptyQuery(query: Query) {
-    if (!query) {
-        return false;
+export function encodeQuery(query?: Query) {
+    if (isEmpty(query)) {
+        return '';
     }
 
-    if (query.fullText) {
+    query = { ...query };
+
+    if (!query.sort) {
+        query.sort = [];
+    }
+
+    if (!query.filter) {
+        query.filter = { and: [] };
+    }
+
+    return encodeURIComponent(JSON.stringify(query));
+}
+
+function isEmpty(value: any): boolean {
+    if (Types.isArray(value)) {
+        for (let v of value) {
+            if (!isEmpty(v)) {
+                return false;
+            }
+        }
+
         return true;
     }
 
-    if (query.sorting && query.sorting.length > 0) {
+    if (Types.isObject(value)) {
+        for (let key in value) {
+            if (value.hasOwnProperty(key)) {
+                if (!isEmpty(value[key])) {
+                    return false;
+                }
+            }
+        }
+
         return true;
     }
 
-    if (query.filter && ((query.filter['and'] && query.filter['and'].length > 0) || (query.filter['or'] && query.filter['or'].length > 0))) {
-        return true;
-    }
-
-    return false;
+    return Types.isUndefined(value) === true || Types.isNull(value) === true;
 }
 
 const EqualOperators: FilterOperator[] = [

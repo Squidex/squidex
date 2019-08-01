@@ -11,9 +11,9 @@ import { FormControl } from '@angular/forms';
 import {
     AppsState,
     AssetsState,
-    FilterState,
     LocalStoreService,
     Queries,
+    QueryState,
     ResourceOwner,
     UIState
 } from '@app/shared';
@@ -27,8 +27,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     public assetsFilter = new FormControl();
 
     public queries = new Queries(this.uiState, 'assets');
-
-    public filter = new FilterState();
+    public query = new QueryState();
 
     public isListView: boolean;
 
@@ -47,7 +46,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
         this.own(
             this.assetsState.assetsQuery
                 .subscribe(query => {
-                    this.filter.setQuery(query);
+                    this.query.setQuery(query);
                 }));
 
         this.assetsState.load();
@@ -58,7 +57,7 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public search() {
-        this.assetsState.search(this.filter.apiFilter);
+        this.assetsState.search(this.query.snapshot.query);
     }
 
     public selectTags(tags: string[]) {

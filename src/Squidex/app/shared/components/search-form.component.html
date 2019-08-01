@@ -3,34 +3,38 @@
 </ng-container>
 
 <form [class]="formClass" (ngSubmit)="search()">
-    <input class="form-control form-control-expandable" #inputFind [placeholder]="placeholder"
-        [ngModel]="filter.query | async"
-        (ngModelChange)="filter.setQuery($event)"
-        [ngModelOptions]="{ standalone: true }" />
+    <input class="form-control form-control-expandable" #inputFind
+        [ngModel]="query.fullText | async"
+        (ngModelChange)="query.setFullText($event)"
+        [ngModelOptions]="standalone"
+        [placeholder]="placeholder"
+    />
 
-    <ng-container *ngIf="queryModel">
-        <a class="expand-search" (click)="searchDialog.toggle()" #expand>
-            <i class="icon-caret-down"></i>
-        </a>
-
-        <sqx-onboarding-tooltip helpId="contentArchive" [for]="expand" position="bottom-right" after="60000">
-            Click this icon to show the advanced search menu and to show the archive!
-        </sqx-onboarding-tooltip>
-    </ng-container>
-
-    <ng-container *ngIf="queries">
-        <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
-            <a class="save-search" (click)="queries.remove(key)">
-                <i class="icon-star-full"></i>
-            </a>
+    <div class="buttons">
+        <ng-container *ngIf="queries">
+            <ng-container *ngIf="saveKey | async; else notBookmarked; let key">
+                <a class="save-search" (click)="queries.remove(key)">
+                    <i class="icon-star-full"></i>
+                </a>
+            </ng-container>
+        
+            <ng-template #notBookmarked>
+                <a class="save-search" (click)="saveQuery()">
+                    <i class="icon-star-empty"></i>
+                </a>
+            </ng-template>
         </ng-container>
-    
-        <ng-template #notBookmarked>
-            <a class="save-search" (click)="saveQuery()" *ngIf="filter.query | async">
-                <i class="icon-star-empty"></i>
+
+        <ng-container *ngIf="queryModel">
+            <a class="expand-search" (click)="searchDialog.toggle()" #expand>
+                <i class="icon-caret-down"></i>
             </a>
-        </ng-template>
-    </ng-container>
+    
+            <sqx-onboarding-tooltip helpId="contentArchive" [for]="expand" position="bottom-right" after="60000">
+                Click this icon to show the advanced search menu and to show the archive!
+            </sqx-onboarding-tooltip>
+        </ng-container>
+    </div>
 </form>
 
 <sqx-onboarding-tooltip helpId="contentFind" [for]="inputFind" position="bottom-right" after="120000">
@@ -40,7 +44,20 @@
 <ng-container *sqxModal="searchDialog;closeAuto:false">
     <div class="dropdown-menu" [sqxAnchoredTo]="inputFind" @fade>
         <div class="form-horizontal">
-            <sqx-query [model]="queryModel"></sqx-query>
+            <div class="submit">
+                <button type="button" class="btn btn-primary mr-2" (click)="search()">
+                    Submit
+                </button>
+
+                <button type="button" class="btn btn-text-secondary" (click)="searchDialog.hide()">
+                    <i class="icon-close"></i>
+                </button>
+            </div>
+            <sqx-query
+                [model]="queryModel" 
+                [query]="query.query | async"
+                (queryChange)="changeQuery($event)">
+            </sqx-query>
 
             <div class="link">
                 Read more about filtering in the <a href="https://docs.squidex.io/04-guides/02-api.html" sqxExternalLink>Documentation</a>.

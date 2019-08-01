@@ -12,7 +12,7 @@ import {
     FilterLogical,
     FilterNode,
     QueryModel
-} from './model';
+} from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-filter-node',

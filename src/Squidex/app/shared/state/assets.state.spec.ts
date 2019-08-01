@@ -131,12 +131,12 @@ describe('AssetsState', () => {
         });
 
         it('should load with query when searching', () => {
-            assetsService.setup(x => x.getAssets(app, 30, 0, 'my-query', It.isValue([])))
+            assetsService.setup(x => x.getAssets(app, 30, 0, { fullText: 'my-query' }, It.isValue([])))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
-            assetsState.search('my-query').subscribe();
+            assetsState.search({ fullText: 'my-query' }).subscribe();
 
-            expect(assetsState.snapshot.assetsQuery).toEqual('my-query');
+            expect(assetsState.snapshot.assetsQuery).toEqual({ fullText: 'my-query' });
         });
     });
 

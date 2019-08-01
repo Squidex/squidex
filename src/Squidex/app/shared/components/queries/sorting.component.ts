@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { QueryModel, QuerySorting } from './model';
+import { QueryModel, QuerySorting } from '@app/shared/internal';
 
  @Component({
      selector: 'sqx-sorting',

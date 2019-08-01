@@ -21,12 +21,20 @@
 
 .form-horizontal {
     padding: 1rem 1.5rem;
+    position: relative;
     min-width: 60rem;
     max-width: 60rem;
 }
 
+.submit {
+    @include absolute(.5rem, 1rem, auto, auto);
+}
+
+.buttons {
+    @include absolute(8px, 8px, auto, auto);
+}
+
 .save-search {
-    @include absolute(8px, 24px, auto, auto);
     color: $color-border-dark !important;
     font-size: .9rem;
     font-weight: normal;
@@ -34,11 +42,11 @@
 }
 
 .expand-search {
-    @include absolute(8px, 8px, auto, auto);
     color: $color-border-dark !important;
     font-size: .9rem;
     font-weight: normal;
     cursor: pointer !important;
+    padding: 0 .5rem;
 }
 
 .link {

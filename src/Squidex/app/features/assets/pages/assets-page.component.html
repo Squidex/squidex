@@ -26,9 +26,9 @@
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="Search by name" fieldExample="fileSize"
-                            [filter]="filter"
-                            (querySubmit)="search()"
+                            [query]="query"
                             [queries]="queries"
+                            (querySubmit)="search()"
                             enableShortcut="true">
                         </sqx-search-form>
                     </div>

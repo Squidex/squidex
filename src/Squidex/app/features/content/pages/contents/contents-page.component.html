@@ -16,9 +16,9 @@
             </div>
             <div class="col pl-1">
                 <sqx-search-form formClass="form" placeholder="Search for content"
-                    [filter]="filter"
-                    [queries]="schemaQueries"
-                    [queryModel]="filterModel"
+                    [query]="query"
+                    [queries]="queries"
+                    [queryModel]="queryModel"
                     (querySubmit)="search()" 
                     enableShortcut="true">
                 </sqx-search-form>
@@ -53,15 +53,15 @@
                         <th class="cell-auto cell-content" *ngFor="let field of schema.listFields">
                             <sqx-table-header [text]="field.displayName" 
                                 [sortable]="field.properties.isSortable"
-                                [sorting]="filter.sortMode(field) | async"
-                                (sortingChange)="sort(field, $event)">
+                                [order]="query.sortMode(field) | async"
+                                (orderChange)="sort(field, $event)">
                             </sqx-table-header>
                         </th>
                         <th class="cell-time">
                             <sqx-table-header text="Updated"
                                 [sortable]="true"
-                                [sorting]="filter.sortMode('lastModified') | async"
-                                (sortingChange)="sort('lastModified', $event)">
+                                [order]="query.sortMode('lastModified') | async"
+                                (orderChange)="sort('lastModified', $event)">
                             </sqx-table-header>
                         </th>
                     </tr>

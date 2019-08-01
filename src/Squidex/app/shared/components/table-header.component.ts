@@ -7,14 +7,14 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { Sorting } from '@app/shared/internal';
+import { SortMode } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-table-header',
     template: `
         <a *ngIf="sortable; else notSortable" (click)="sort()" class="pointer truncate">
-            <i *ngIf="sorting === 'Ascending'" class="icon-caret-down"></i>
-            <i *ngIf="sorting === 'Descending'" class="icon-caret-up"></i>
+            <i *ngIf="order === 'ascending'" class="icon-caret-down"></i>
+            <i *ngIf="order === 'descending'" class="icon-caret-up"></i>
 
             {{text}}
         </a>
@@ -32,20 +32,20 @@ export class TableHeaderComponent {
     public sortable = false;
 
     @Input()
-    public sorting: Sorting;
+    public order: SortMode;
 
     @Output()
-    public sortingChange = new EventEmitter<Sorting>();
+    public orderChange = new EventEmitter<SortMode>();
 
     public sort() {
         if (this.sortable) {
-            if (!this.sorting || this.sorting !== 'Ascending') {
-                this.sorting = 'Ascending';
+            if (!this.order || this.order !== 'ascending') {
+                this.order = 'ascending';
             } else {
-                this.sorting = 'Descending';
+                this.order = 'descending';
             }
 
-            this.sortingChange.emit(this.sorting);
+            this.orderChange.emit(this.order);
         }
     }
 }

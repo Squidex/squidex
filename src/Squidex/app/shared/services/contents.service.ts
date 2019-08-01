@@ -25,6 +25,8 @@ import {
     Versioned
 } from '@app/framework';
 
+import { encodeQuery, Query } from './../state/query';
+
 export class ScheduleDto {
     constructor(
         public readonly status: string,
@@ -109,34 +111,34 @@ export class ContentsService {
     ) {
     }
 
-    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: string, ids?: string[], status?: string[]): Observable<ContentsDto> {
+    public getContents(appName: string, schemaName: string, take: number, skip: number, query?: Query, ids?: string[]): Observable<ContentsDto> {
         const queryParts: string[] = [];
-
-        if (query && query.length > 0) {
-            if (query.indexOf('$filter') < 0 &&
-                query.indexOf('$search') < 0 &&
-                query.indexOf('$orderby') < 0) {
-                queryParts.push(`$search="${encodeURIComponent(query.trim())}"`);
-            } else {
-                queryParts.push(`${query.trim()}`);
-            }
-        }
-
-        if (take > 0) {
-            queryParts.push(`$top=${take}`);
-        }
-
-        if (skip > 0) {
-            queryParts.push(`$skip=${skip}`);
-        }
 
         if (ids && ids.length > 0) {
             queryParts.push(`ids=${ids.join(',')}`);
-        }
+        } else {
+            const queryObj: Query = { ...query };
 
-        if (status) {
-            for (let s of status) {
-                queryParts.push(`status=${s}`);
+            if (queryObj.fullText && queryObj.fullText.indexOf('$') >= 0) {
+                queryParts.push(`${queryObj.fullText.trim()}`);
+
+                if (take > 0) {
+                    queryParts.push(`$top=${take}`);
+                }
+
+                if (skip > 0) {
+                    queryParts.push(`$skip=${skip}`);
+                }
+            } else {
+                if (take > 0) {
+                    queryObj.take = take;
+                }
+
+                if (skip > 0) {
+                    queryObj.skip = skip;
+                }
+
+                queryParts.push(`q=${encodeQuery(queryObj)}`);
             }
         }
 

@@ -27,6 +27,8 @@ import {
     Versioned
 } from '@app/framework';
 
+import { encodeQuery, Query } from './../state/query';
+
 export class AssetsDto extends ResultSet<AssetDto> {
     public get canCreate() {
         return hasAnyLink(this._links, 'create');
@@ -107,18 +109,18 @@ export class AssetsService {
         return this.http.get<{ [name: string]: number }>(url);
     }
 
-    public getAssets(appName: string, take: number, skip: number, query?: string, tags?: string[], ids?: string[]): Observable<AssetsDto> {
+    public getAssets(appName: string, take: number, skip: number, query?: Query, tags?: string[], ids?: string[]): Observable<AssetsDto> {
         let fullQuery = '';
 
         if (ids) {
             fullQuery = `ids=${ids.join(',')}`;
         } else {
-            const queryObj: any = { skip, take };
+            const queryObj: Query = {};
 
             const filters: any[] = [];
 
-            if (query && query.length > 0) {
-                filters.push({ path: 'fileName', op: 'contains', value: query });
+            if (query && query.fullText && query.fullText.length > 0) {
+                filters.push({ path: 'fileName', op: 'contains', value: query.fullText });
             }
 
             if (tags) {
@@ -133,9 +135,15 @@ export class AssetsService {
                 queryObj.filter = { and: filters };
             }
 
-            const json = encodeURIComponent(JSON.stringify(queryObj));
+            if (take > 0) {
+                queryObj.take = take;
+            }
 
-            fullQuery = `q=${json}`;
+            if (skip > 0) {
+                queryObj.skip = skip;
+            }
+
+            fullQuery = `q=${encodeQuery(queryObj)}`;
         }
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);

@@ -20,6 +20,8 @@ import {
     templateUrl: './schema-edit-form.component.html'
 })
 export class SchemaEditFormComponent implements OnInit {
+    public readonly standalone = { standalone: true };
+
     @Output()
     public complete = new EventEmitter();
 

@@ -13,22 +13,22 @@ import {
     AppsState,
     ContentDto,
     ContentsState,
-    FilterState,
     ImmutableArray,
     LanguagesState,
     ModalModel,
     Queries,
+    QueryModel,
+    queryModelFromSchema,
+    QueryState,
     ResourceOwner,
     RootFieldDto,
     SchemaDetailsDto,
     SchemasState,
-    Sorting,
+    SortMode,
     UIState
 } from '@app/shared';
 
 import { DueTimeSelectorComponent } from './../../shared/due-time-selector.component';
-
-import { QueryModel, queryModelFromSchema } from '@app/shared/components/queries/model';
 
 @Component({
     selector: 'sqx-contents-page',
@@ -37,7 +37,6 @@ import { QueryModel, queryModelFromSchema } from '@app/shared/components/queries
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public schema: SchemaDetailsDto;
-    public schemaQueries: Queries;
 
     public searchModal = new ModalModel();
 
@@ -50,8 +49,9 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
 
-    public filter = new FilterState();
-    public filterModel: QueryModel;
+    public query = new QueryState();
+    public queryModel: QueryModel;
+    public queries: Queries;
 
     public isAllSelected = false;
 
@@ -74,13 +74,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
-                    this.filter = new FilterState();
-                    this.filter.setLanguage(this.language);
-
                     this.resetSelection();
 
                     this.schema = schema!;
-                    this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
+
+                    this.query = new QueryState();
+                    this.query.setLanguage(this.language);
+                    this.queries = new Queries(this.uiState, `schemas.${this.schema.name}`);
 
                     this.minWidth = `${300 + (200 * this.schema.listFields.length)}px`;
 
@@ -92,7 +92,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.own(
             this.contentsState.contentsQuery
                 .subscribe(query => {
-                    this.filter.setQuery(query);
+                    this.query.setQuery(query);
                 }));
 
         this.own(
@@ -107,7 +107,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.at(0);
 
-                    this.filter.setLanguage(this.language);
+                    this.query.setLanguage(this.language);
 
                     this.updateModel();
                 }));
@@ -160,13 +160,13 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public search() {
-        this.contentsState.search(this.filter.apiFilter);
+        this.contentsState.search(this.query.snapshot.query);
     }
 
     public selectLanguage(language: AppLanguageDto) {
         this.language = language;
 
-        this.filter.setLanguage(language);
+        this.query.setLanguage(language);
     }
 
     public isItemSelected(content: ContentDto): boolean {
@@ -201,8 +201,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public sort(field: string | RootFieldDto, sorting: Sorting) {
-        this.filter.setOrderField(field, sorting);
+    public sort(field: string | RootFieldDto, order: SortMode) {
+        this.query.setOrderField(field, order);
 
         this.search();
     }
@@ -248,7 +248,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     private updateModel() {
         if (this.schema && this.languages) {
-            this.filterModel = queryModelFromSchema(this.schema, this.languages.values);
+            this.queryModel = queryModelFromSchema(this.schema, this.languages.values);
         }
     }
 }

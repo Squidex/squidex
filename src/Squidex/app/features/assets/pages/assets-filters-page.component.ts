@@ -10,6 +10,8 @@ import { Component } from '@angular/core';
 import {
     AssetsState,
     Queries,
+    Query,
+    SavedQuery,
     UIState
 } from '@app/shared';
 
@@ -27,7 +29,7 @@ export class AssetsFiltersPageComponent {
     ) {
     }
 
-    public search(query: string) {
+    public search(query: Query) {
         this.assetsState.search(query);
     }
 
@@ -43,8 +45,8 @@ export class AssetsFiltersPageComponent {
         this.assetsState.resetTags();
     }
 
-    public isSelectedQuery(query: string) {
-        return query === this.assetsState.snapshot.assetsQuery || (!query && !this.assetsState.assetsQuery);
+    public isSelectedQuery(query: SavedQuery) {
+        return this.assetsState.snapshot.assetsQueryJson === query.queryJson;
     }
 
     public trackByTag(index: number, tag: { name: string }) {
