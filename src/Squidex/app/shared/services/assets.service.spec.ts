@@ -76,7 +76,7 @@ describe('AssetsService', () => {
             assets = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?$top=17&$skip=13');
+        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?q=${encodeQuery({ take: 17, skip: 13 })}`);
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -120,7 +120,7 @@ describe('AssetsService', () => {
 
         assetsService.getAssets('my-app', 17, 13, { fullText: 'my-query' }).subscribe();
 
-        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?q=${encodeQuery({ take: 17, skip: 13, filter: { path: 'fileName', op: 'contains', value: 'my-query' }})}`);
+        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?q=${encodeQuery({ filter: { and: [{ path: 'fileName', op: 'contains', value: 'my-query' }] }, take: 17, skip: 13 })}`);
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -133,7 +133,7 @@ describe('AssetsService', () => {
 
         assetsService.getAssets('my-app', 17, 13, undefined, ['tag1']).subscribe();
 
-        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?q=${encodeQuery({ take: 17, skip: 13, filter: { path: 'tags', op: 'eq', value: 'tag1' }})}`);
+        const req = httpMock.expectOne(`http://service/p/api/apps/my-app/assets?q=${encodeQuery({ filter: { and: [{ path: 'tags', op: 'eq', value: 'tag1' }] }, take: 17, skip: 13 })}`);
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();

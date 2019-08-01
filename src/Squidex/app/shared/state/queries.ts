@@ -62,16 +62,13 @@ export class Queries {
 
     public getSaveKey(query$: Observable<string | undefined>): Observable<string | undefined> {
         return combineLatest(this.queries, query$).pipe(
-            map(project => {
-                const filter = project[1];
-
-                if (filter) {
-                    for (let query of project[0]) {
-                        if (query.queryJson === filter) {
-                            return query.name;
-                        }
+            map(([queries, filter]) => {
+                for (let query of queries) {
+                    if (query.queryJson === filter) {
+                        return query.name;
                     }
                 }
+
                 return undefined;
             }));
     }
@@ -79,16 +76,16 @@ export class Queries {
 
 export function parseStored(name: string, raw?: string) {
     if (Types.isString(raw)) {
+        let query: Query;
+
         if (raw.indexOf('{') === 0) {
-            const query = JSON.parse(raw);
-
-            return { name, query, queryJson: encodeQuery(query) };
+            query = JSON.parse(raw);
         } else {
-            const query = { fullText: raw };
-
-            return { name, query, queryJson: raw };
+            query = { fullText: raw };
         }
+
+        return { name, query, queryJson: encodeQuery(query) };
     }
 
-    return { name, queryJson: '' };
+    return { name, query: undefined, queryJson: '' };
 }

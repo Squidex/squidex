@@ -5,148 +5,119 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/*
+
 import {
-    FilterState,
     LanguageDto,
-    Sorting
+    Query,
+    QueryState,
+    SortMode
 } from '@app/shared/internal';
 
-describe('FilterState', () => {
-    let query: string | undefined;
+describe('QueryState', () => {
+    let query: Query | undefined;
     let fullText: string | undefined;
-    let filterState: FilterState;
-    let filter: string | undefined;
-    let order: string | undefined;
+    let filterState: QueryState;
 
     beforeEach(() => {
-        filterState = new FilterState();
+        filterState = new QueryState();
         filterState.setLanguage(new LanguageDto('de', 'German'));
 
         filterState.query.subscribe(value => {
             query = value;
         });
 
-        filterState.filter.subscribe(value => {
-            filter = value;
-        });
-
         filterState.fullText.subscribe(value => {
             fullText = value;
         });
-
-        filterState.order.subscribe(value => {
-            order = value;
-        });
     });
 
-    it('should parse elements from query', () => {
-        const newQuery = '$filter=MY_FILTER&$orderby=MY_FIELD desc&$search=MY_TEXT';
+    it('should parse full text from query', () => {
+        filterState.setQuery({ fullText: 'text' });
 
-        filterState.setQuery(newQuery);
-
-        expect(order).toBe('MY_FIELD desc');
-        expect(query).toBe(newQuery);
-        expect(filter).toBe('MY_FILTER');
-        expect(fullText).toBe('MY_TEXT');
-    });
-
-    it('should set full text and order and calculate query', () => {
-        filterState.setFullText('Hello World');
-        filterState.setOrder('data/name/iv asc');
-
-        expect(query).toBe('$search=Hello World&$orderby=data/name/iv asc');
-        expect(fullText).toBe('Hello World');
-    });
-
-    it('should set full text only and calculate query', () => {
-        filterState.setFullText('Hello World');
-
-        expect(query).toBe('Hello World');
-        expect(fullText).toBe('Hello World');
-    });
-
-    it('should set filter and calculate query', () => {
-        filterState.setFilter('data/name/iv eq "Squidex"');
-
-        expect(query).toBe('$filter=data/name/iv eq "Squidex"');
-        expect(filter).toBe('data/name/iv eq "Squidex"');
-    });
-
-    it('should set order and calculate query', () => {
-        filterState.setOrder('data/name/iv asc');
-
-        expect(query).toBe('$orderby=data/name/iv asc');
-        expect(order).toBe('data/name/iv asc');
+        expect(fullText).toBe('text');
     });
 
     it('should set field name and calculate query', () => {
-        filterState.setOrderField('field', 'Descending');
+        filterState.setFullText('text');
+        filterState.setOrderField('field', 'descending');
 
-        expect(query).toBe('$orderby=field desc');
-        expect(order).toBe('field desc');
+        expect(query!).toEqual({
+            sort: [
+                { path: 'field', order: 'descending' }
+            ],
+            fullText: 'text'
+        });
     });
 
     it('should set field and calculate query', () => {
-        filterState.setOrderField(<any>{ name: 'first-name', isLocalizable: false }, 'Ascending');
+        filterState.setFullText('text');
+        filterState.setOrderField(<any>{ name: 'first-name', isLocalizable: false }, 'ascending');
 
-        expect(query).toBe('$orderby=data/first_name/iv asc');
-        expect(order).toBe('data/first_name/iv asc');
+        expect(query!).toEqual({
+            sort: [
+                { path: 'data.first-name.iv', order: 'ascending' }
+            ],
+            fullText: 'text'
+        });
     });
 
     it('should set localizable field and calculate query', () => {
-        filterState.setOrderField(<any>{ name: 'first-name', isLocalizable: true }, 'Ascending');
+        filterState.setFullText('text');
+        filterState.setOrderField(<any>{ name: 'first-name', isLocalizable: true }, 'ascending');
 
-        expect(query).toBe('$orderby=data/first_name/de asc');
-        expect(order).toBe('data/first_name/de asc');
+        expect(query!).toEqual({
+            sort: [
+                { path: 'data.first-name.de', order: 'ascending' }
+            ],
+            fullText: 'text'
+        });
     });
 
     it('should update field ordering for path', () => {
-        let sorting: Sorting;
+        let sorting: SortMode | null;
 
         filterState.sortMode('field').subscribe(value => {
             sorting = value;
         });
 
-        filterState.setQuery('$orderby=field desc');
+        filterState.setQuery({ sort: [{ path: 'field', order: 'descending' }]});
 
-        expect(sorting!).toBe('Descending');
+        expect(sorting!).toBe('descending');
     });
 
     it('should update field ordering for field', () => {
-        let sorting: Sorting;
+        let sorting: SortMode | null;
 
         filterState.sortMode(<any>{ name: 'first-name', fieldId: 1, isLocalizable: false }).subscribe(value => {
             sorting = value;
         });
 
-        filterState.setQuery('$orderby=data/first_name/iv asc');
+        filterState.setQuery({ sort: [{ path: 'data.first-name.iv', order: 'ascending' }]});
 
-        expect(sorting!).toBe('Ascending');
+        expect(sorting!).toBe('ascending');
     });
 
     it('should update field ordering for localizable field', () => {
-        let sorting: Sorting;
+        let sorting: SortMode | null;
 
         filterState.sortMode(<any>{ name: 'first-name', fieldId: 1, isLocalizable: true }).subscribe(value => {
             sorting = value;
         });
 
-        filterState.setQuery('$orderby=data/first_name/de asc');
+        filterState.setQuery({ sort: [{ path: 'data.first-name.de', order: 'ascending' }]});
 
-        expect(sorting!).toBe('Ascending');
+        expect(sorting!).toBe('ascending');
     });
 
     it('should update field ordering for localizable field and other language', () => {
-        let sorting: Sorting;
+        let sorting: SortMode | null;
 
         filterState.sortMode(<any>{ name: 'first-name', fieldId: 1, isLocalizable: true }).subscribe(value => {
             sorting = value;
         });
 
-        filterState.setQuery('$orderby=data/first_name/en asc');
+        filterState.setQuery({ sort: [{ path: 'data.first-name.iv', order: 'ascending' }]});
 
-        expect(sorting!).toBe('None');
+        expect(sorting!).toBeNull();
     });
 });
-*/
