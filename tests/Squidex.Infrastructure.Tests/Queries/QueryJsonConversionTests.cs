@@ -15,12 +15,12 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class JsonQueryConversionTests
+    public sealed class QueryJsonConversionTests
     {
         private readonly List<string> errors = new List<string>();
         private readonly JsonSchema schema = new JsonSchema();
 
-        public JsonQueryConversionTests()
+        public QueryJsonConversionTests()
         {
             var nested = new JsonSchemaProperty { Title = "nested" };
 
