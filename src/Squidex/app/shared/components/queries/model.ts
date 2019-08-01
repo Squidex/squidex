@@ -81,60 +81,71 @@ export interface Query {
     sorting?: QuerySorting[];
 }
 
+export function isNotEmptyQuery(query: Query) {
+    if (!query) {
+        return false;
+    }
+
+    if (query.fullText) {
+        return true;
+    }
+
+    if (query.sorting && query.sorting.length > 0) {
+        return true;
+    }
+
+    if (query.filter && ((query.filter['and'] && query.filter['and'].length > 0) || (query.filter['or'] && query.filter['or'].length > 0))) {
+        return true;
+    }
+
+    return false;
+}
+
+const EqualOperators: FilterOperator[] = [
+    { name: '==', value: 'eq' },
+    { name: '!=', value: 'ne' }
+];
+
+const CompareOperator: FilterOperator[] = [
+    { name: '<', value: 'lt' },
+    { name: '<=', value: 'le' },
+    { name: '>', value: 'gt' },
+    { name: '>=', value: 'ge' }
+];
+
+const StringOperators: FilterOperator[] = [
+    { name: 'T*', value: 'startsWith' },
+    { name: '*T', value: 'endsWith' },
+    { name: '*T*', value: 'contains' }
+];
+
+const ArrayOperators: FilterOperator[] = [
+    { value: 'empty', noValue: true }
+];
+
 const TypeBoolean: QueryFieldModel = {
     type: 'boolean',
-    operators: [
-        { value: 'eq', name: '==' },
-        { value: 'ne', name: '!=' }
-    ]
+    operators: EqualOperators
 };
 
 const TypeDateTime: QueryFieldModel = {
     type: 'datetime',
-    operators: [
-        { value: 'eq', name: '==' },
-        { value: 'ne', name: '!=' },
-        { value: 'lt', name: '<' },
-        { value: 'le', name: '<=' },
-        { value: 'gt', name: '>' },
-        { value: 'ge', name: '>=' }
-    ]
+    operators: [...EqualOperators, ...CompareOperator]
 };
 
 const TypeNumber: QueryFieldModel = {
     type: 'number',
-    operators: [
-        { value: 'eq', name: '==' },
-        { value: 'ne', name: '!=' },
-        { value: 'lt', name: '<' },
-        { value: 'le', name: '<=' },
-        { value: 'gt', name: '>' },
-        { value: 'ge', name: '>=' }
-    ]
+    operators: [...EqualOperators, ...CompareOperator]
 };
 
 const TypeReferences: QueryFieldModel = {
     type: 'string',
-    operators: [
-        { value: 'eq', name: '==' },
-        { value: 'ne', name: '!=' }
-    ]
+    operators: [...EqualOperators, ...ArrayOperators]
 };
 
 const TypeString: QueryFieldModel = {
     type: 'string',
-    operators: [
-        { value: 'eq', name: '==' },
-        { value: 'ne', name: '!=' },
-        { value: 'lt', name: '<' },
-        { value: 'le', name: '<=' },
-        { value: 'gt', name: '>' },
-        { value: 'ge', name: '>=' },
-        { value: 'startsWith' },
-        { value: 'empty' },
-        { value: 'endsWith' },
-        { value: 'contains' }
-    ]
+    operators: [...EqualOperators, ...CompareOperator, ...StringOperators, ...ArrayOperators]
 };
 
 export function queryModelFromSchema(schema: SchemaDetailsDto, languages: LanguageDto[]) {

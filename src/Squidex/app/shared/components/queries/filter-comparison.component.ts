@@ -28,7 +28,7 @@ import {
                             <option *ngFor="let operator of fieldModel.operators" [ngValue]="operator.value">{{operator.name || operator.value}}</option>
                         </select>
 
-                        <div class="mb-1" [ngSwitch]="fieldModel.type">
+                        <div class="mb-1" *ngIf="!noValue" [ngSwitch]="fieldModel.type">
                             <ng-container *ngSwitchCase="'boolean'">
                                 <input type="checkbox" class="form-control"
                                     [ngModel]="filter.value"
@@ -92,6 +92,8 @@ import {
 export class FilterComparisonComponent implements OnChanges {
     public fieldModel: QueryFieldModel;
 
+    public noValue = false;
+
     @Output()
     public change = new EventEmitter();
 
@@ -107,6 +109,7 @@ export class FilterComparisonComponent implements OnChanges {
     public ngOnChanges(changes: SimpleChanges) {
         if (changes['filter']) {
             this.updatePath(false);
+            this.updateOperator();
         }
     }
 
@@ -119,6 +122,8 @@ export class FilterComparisonComponent implements OnChanges {
     public changeOp(op: string) {
         this.filter.op = op;
 
+        this.updateOperator();
+
         this.emitChange();
     }
 
@@ -130,6 +135,14 @@ export class FilterComparisonComponent implements OnChanges {
         this.emitChange();
     }
 
+    private updateOperator() {
+        if (this.fieldModel) {
+            const operator = this.fieldModel.operators.find(x => x.value === this.filter.op);
+
+            this.noValue = !!(operator && operator.noValue);
+        }
+    }
+
     private updatePath(refresh: boolean) {
         const newModel = this.model.fields[this.filter.path];
 
@@ -138,7 +151,7 @@ export class FilterComparisonComponent implements OnChanges {
                 this.filter.op = newModel.operators[0].value;
             }
 
-            this.filter.value = undefined;
+            this.filter.value = null;
         }
 
         this.fieldModel = newModel;

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
+    isNotEmptyQuery,
     Query,
     QueryModel,
     QuerySorting
@@ -48,6 +49,10 @@ export class QueryComponent {
 
     @Input()
     public set query(query: Query) {
+        if (!query) {
+            query = {};
+        }
+
         if (query) {
             if (!query.filter) {
                 query.filter = {
@@ -86,6 +91,12 @@ export class QueryComponent {
     }
 
     public emitChange() {
-        this.change.emit();
+        const query = this.queryValue;
+
+        if (isNotEmptyQuery(query)) {
+            this.change.emit(query);
+        } else {
+            this.change.emit(undefined);
+        }
     }
 }

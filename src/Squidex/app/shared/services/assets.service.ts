@@ -113,30 +113,29 @@ export class AssetsService {
         if (ids) {
             fullQuery = `ids=${ids.join(',')}`;
         } else {
-            const queries: string[] = [];
+            const queryObj: any = { skip, take };
 
-            const filters: string[] = [];
+            const filters: any[] = [];
 
             if (query && query.length > 0) {
-                filters.push(`contains(fileName,'${encodeURIComponent(query)}')`);
+                filters.push({ path: 'fileName', op: 'contains', value: query });
             }
 
             if (tags) {
                 for (let tag of tags) {
                     if (tag && tag.length > 0) {
-                        filters.push(`tags eq '${encodeURIComponent(tag)}'`);
+                        filters.push({ path: 'tags', op: 'eq', value: tag });
                     }
                 }
             }
 
             if (filters.length > 0) {
-                queries.push(`$filter=${filters.join(' and ')}`);
+                queryObj.filter = { and: filters };
             }
 
-            queries.push(`$top=${take}`);
-            queries.push(`$skip=${skip}`);
+            const json = encodeURIComponent(JSON.stringify(queryObj));
 
-            fullQuery = queries.join('&');
+            fullQuery = `q=${json}`;
         }
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);
