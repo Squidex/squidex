@@ -11,7 +11,7 @@ using Orleans;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public sealed class ContentVersionLoader : IContentVersionLoader
     {

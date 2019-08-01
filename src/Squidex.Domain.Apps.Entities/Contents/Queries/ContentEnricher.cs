@@ -18,7 +18,7 @@ using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public sealed class ContentEnricher : IContentEnricher
     {

@@ -13,7 +13,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ContentVersionLoaderTests
     {

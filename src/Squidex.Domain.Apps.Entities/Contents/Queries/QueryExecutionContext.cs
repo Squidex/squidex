@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class QueryExecutionContext
     {

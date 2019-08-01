@@ -29,7 +29,7 @@ using Xunit;
 
 #pragma warning disable SA1401 // Fields must be private
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ContentQueryServiceTests
     {
