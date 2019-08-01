@@ -59,6 +59,8 @@ namespace Squidex
             services.AddMemoryCache();
             services.AddOptions();
 
+            services.AddMyAssetServices(config);
+
             services.AddIcisServices(config);
 
             services.AddMyMvcWithPlugins(config);
