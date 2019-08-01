@@ -29,21 +29,17 @@ describe("Create Commentary", () => {
   });
 
   it("Login with Vega Editor credentials", async () => {
-    loginPg.navigateTo();
     loginPg.login(
       authors.find(obj => {
         return obj.name === "vegaEditor";
       })
     );
-    await expect(browserPg.getCurrentURL()).toBe(
+    expect(browserPg.getCurrentURL()).toBe(
       config.params.expectedUrlAfterNavigation
     );
-    await expect(
-      homePg
-        .userNameDisplay()
-        .getText()
-        .toString()
-    ).toBe(constants.editorWelcomeMessage);
+    homePg.userNameDisplay().then((expectedText)=>{
+    expect(expectedText).toBe(constants.editorWelcomeMessage);  
+    })
   });
 
   it("should create valid commentary", async () => {
@@ -51,10 +47,8 @@ describe("Create Commentary", () => {
     createContentPg.selectCommodity(constants.commodity);
     createContentPg.selectCommentaryType(constants.commentaryType);
     createContentPg.selectRegion(constants.region);
-    createContentPg.addCommentary(constants.contentBody);
-    const commentaryText = searchContentPg
-      .verifyCommentaryCreation()
-      .toString();
+    createContentPg.createCommentary(constants.contentBody);
+    const commentaryText = searchContentPg.verifyCommentaryCreation();
     expect(commentaryText).toBe(constants.contentBody);
   });
 

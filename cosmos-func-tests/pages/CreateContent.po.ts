@@ -37,7 +37,7 @@ export class CreateContent extends BrowserUtil {
     return element(by.className(option));
   }
 
-  public navigateBackToContentsPage() {
+  public navigateToContentsPage() {
     return element(by.xpath("//h3[contains(text(),'Content')]"));
   }
 
@@ -120,29 +120,25 @@ export class CreateContent extends BrowserUtil {
     );
     if (commentaryBody != null) {
       commentaryBody.sendKeys(commentaryText);
-      this.saveContent();
     } else {
       process.stdout.write("error");
     }
   }
 
-  public addCommentaryEditorOptions(commentaryText) {
-    const commentaryBody = element(
-      by.xpath("//div[@class='te-editor']/div/div")
-    );
-    if (commentaryBody != null) {
-      commentaryBody.sendKeys(commentaryText);
-      this.selectAllContent();
-    } else {
-      process.stdout.write("error");
-    }
+  public createCommentary(commentary){
+    this.addCommentary(commentary);
+    this.saveContent();
   }
+
   public async commentaryEditorTest(commentary) {
-    this.navigateBackToContentsPage();
+    this.navigateToContentsPage();
     this.newButton().click();
     this.selectRandomReferences();
-    this.addCommentaryEditorOptions(commentary);
+    this.addCommentary(commentary);
+    this.selectAllContent();
   }
+
+
 
   public async createCommentaryWithBoldLetters(commentary) {
     this.commentaryEditorTest(commentary);
