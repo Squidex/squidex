@@ -10,14 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
     public class AssetQueryServiceTests
     {

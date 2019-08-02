@@ -18,7 +18,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ContentEnricherReferencesTests
     {

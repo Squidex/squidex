@@ -22,7 +22,7 @@ using Squidex.Shared;
 
 #pragma warning disable RECS0147
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public sealed class ContentQueryService : IContentQueryService
     {

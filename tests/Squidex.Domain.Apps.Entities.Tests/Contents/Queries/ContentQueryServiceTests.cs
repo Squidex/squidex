@@ -29,7 +29,7 @@ using Xunit;
 
 #pragma warning disable SA1401 // Fields must be private
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ContentQueryServiceTests
     {
@@ -435,7 +435,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private void SetupContents(Status[] status, int total, List<Guid> ids, bool includeDraft)
         {
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), A<HashSet<Guid>>.Ignored, includeDraft))
-                .Returns(ResultList.Create(total, ids.Select(x => CreateContent(x)).Shuffle()));
+                .Returns(ResultList.Create(total, ids.Select(CreateContent).Shuffle()));
         }
 
         private void SetupContents(Status[] status, List<Guid> ids, bool includeDraft)
