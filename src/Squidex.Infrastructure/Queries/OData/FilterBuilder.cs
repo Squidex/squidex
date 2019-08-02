@@ -14,34 +14,36 @@ namespace Squidex.Infrastructure.Queries.OData
     {
         public static void ParseFilter(this ODataUriParser query, ClrQuery result)
         {
-            SearchClause search;
+            SearchClause searchClause;
             try
             {
-                search = query.ParseSearch();
+                searchClause = query.ParseSearch();
             }
             catch (ODataException ex)
             {
                 throw new ValidationException("Query $search clause not valid.", new ValidationError(ex.Message));
             }
 
-            if (search != null)
+            if (searchClause != null)
             {
-                result.FullText = SearchTermVisitor.Visit(search.Expression).ToString();
+                result.FullText = SearchTermVisitor.Visit(searchClause.Expression).ToString();
             }
 
-            FilterClause filter;
+            FilterClause filterClause;
             try
             {
-                filter = query.ParseFilter();
+                filterClause = query.ParseFilter();
             }
             catch (ODataException ex)
             {
                 throw new ValidationException("Query $filter clause not valid.", new ValidationError(ex.Message));
             }
 
-            if (filter != null)
+            if (filterClause != null)
             {
-                result.Filter = FilterVisitor.Visit(filter.Expression);
+                var filter = FilterVisitor.Visit(filterClause.Expression);
+
+                result.Filter = Optimizer<ClrValue>.Optimize(filter);
             }
         }
     }

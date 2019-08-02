@@ -11,23 +11,23 @@ namespace Squidex.Infrastructure.Queries
     {
         public PropertyPath Path { get; }
 
-        public SortOrder SortOrder { get; set; }
+        public SortOrder Order { get; set; }
 
-        public SortNode(PropertyPath path, SortOrder sortOrder)
+        public SortNode(PropertyPath path, SortOrder order)
         {
             Guard.NotNull(path, nameof(path));
-            Guard.Enum(sortOrder, nameof(sortOrder));
+            Guard.Enum(order, nameof(order));
 
             Path = path;
 
-            SortOrder = sortOrder;
+            Order = order;
         }
 
         public override string ToString()
         {
             var path = string.Join(".", Path);
 
-            return $"{path} {SortOrder}";
+            return $"{path} {Order}";
         }
     }
 }

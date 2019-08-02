@@ -89,6 +89,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="ids">The optional asset ids.</param>
+        /// <param name="q">The optional json query.</param>
         /// <returns>
         /// 200 => Assets returned.
         /// 404 => App not found.
@@ -101,9 +102,13 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiPermission(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null, [FromQuery] string q = null)
         {
-            var assets = await assetQuery.QueryAsync(Context, Q.Empty.WithODataQuery(Request.QueryString.ToString()).WithIds(ids));
+            var assets = await assetQuery.QueryAsync(Context,
+                Q.Empty
+                    .WithIds(ids)
+                    .WithJsonQuery(q)
+                    .WithODataQuery(Request.QueryString.ToString()));
 
             var response = Deferred.Response(() =>
             {

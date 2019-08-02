@@ -15,14 +15,14 @@ namespace Squidex.Infrastructure.Queries
     public class QueryJsonTests
     {
         [Theory]
+        [InlineData("contains", "contains(property, 12)")]
+        [InlineData("endswith", "endsWith(property, 12)")]
         [InlineData("eq", "property == 12")]
-        [InlineData("ne", "property != 12")]
         [InlineData("le", "property <= 12")]
         [InlineData("lt", "property < 12")]
         [InlineData("ge", "property >= 12")]
         [InlineData("gt", "property > 12")]
-        [InlineData("contains", "contains(property, 12)")]
-        [InlineData("endswith", "endsWith(property, 12)")]
+        [InlineData("ne", "property != 12")]
         [InlineData("startswith", "startsWith(property, 12)")]
         public void Should_convert_comparison(string op, string expected)
         {

@@ -18,7 +18,6 @@ namespace Squidex.Infrastructure.Queries
         public LogicalFilter(LogicalFilterType type, IReadOnlyList<FilterNode<TValue>> filters)
         {
             Guard.NotNull(filters, nameof(filters));
-            Guard.GreaterEquals(filters.Count, 2, nameof(filters.Count));
             Guard.Enum(type, nameof(type));
 
             Filters = filters;

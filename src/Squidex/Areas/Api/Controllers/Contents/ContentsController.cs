@@ -137,7 +137,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = contents.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = contents.ToEtag(App);
+            Response.Headers[HeaderNames.ETag] = contents.ToEtag();
 
             return Ok(response);
         }
@@ -148,6 +148,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// <param name="app">The name of the app.</param>
         /// <param name="name">The name of the schema.</param>
         /// <param name="ids">The optional ids of the content to fetch.</param>
+        /// <param name="q">The optional json query.</param>
         /// <returns>
         /// 200 => Contents retrieved.
         /// 404 => Schema or app not found.
@@ -160,11 +161,15 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ProducesResponseType(typeof(ContentsDto), 200)]
         [ApiPermission]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null)
+        public async Task<IActionResult> GetContents(string app, string name, [FromQuery] string ids = null, [FromQuery] string q = null)
         {
             var schema = await contentQuery.GetSchemaOrThrowAsync(Context, name);
 
-            var contents = await contentQuery.QueryAsync(Context, name, Q.Empty.WithIds(ids).WithODataQuery(Request.QueryString.ToString()));
+            var contents = await contentQuery.QueryAsync(Context, name,
+                Q.Empty
+                    .WithIds(ids)
+                    .WithJsonQuery(q)
+                    .WithODataQuery(Request.QueryString.ToString()));
 
             var response = Deferred.AsyncResponse(async () =>
             {
@@ -176,7 +181,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = contents.ToSurrogateKeys();
             }
 
-            Response.Headers[HeaderNames.ETag] = contents.ToEtag(App, schema);
+            Response.Headers[HeaderNames.ETag] = contents.ToEtag();
 
             return Ok(response);
         }
@@ -210,7 +215,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = content.ToSurrogateKey();
             }
 
-            Response.Headers[HeaderNames.ETag] = content.ToEtag(App);
+            Response.Headers[HeaderNames.ETag] = content.ToEtag();
 
             return Ok(response);
         }
@@ -245,7 +250,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
                 Response.Headers["Surrogate-Key"] = content.ToSurrogateKey();
             }
 
-            Response.Headers[HeaderNames.ETag] = content.ToEtag(App);
+            Response.Headers[HeaderNames.ETag] = content.ToEtag();
 
             return Ok(response.Data);
         }

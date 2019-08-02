@@ -15,8 +15,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public interface IContentQueryService
     {
-        int DefaultPageSizeGraphQl { get; }
-
         Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, IReadOnlyList<Guid> ids);
 
         Task<IResultList<IEnrichedContentEntity>> QueryAsync(Context context, string schemaIdOrName, Q query);
