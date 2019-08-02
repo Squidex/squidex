@@ -92,7 +92,7 @@ export interface Query {
 }
 
 export function encodeQuery(query?: Query) {
-    if (isEmpty(query)) {
+    if (Types.isEmpty(query)) {
         return '';
     }
 
@@ -109,30 +109,8 @@ export function encodeQuery(query?: Query) {
     return encodeURIComponent(JSON.stringify(query));
 }
 
-function isEmpty(value: any): boolean {
-    if (Types.isArray(value)) {
-        for (let v of value) {
-            if (!isEmpty(v)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    if (Types.isObject(value)) {
-        for (let key in value) {
-            if (value.hasOwnProperty(key)) {
-                if (!isEmpty(value[key])) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    return Types.isUndefined(value) === true || Types.isNull(value) === true;
+export function hasFilter(query?: Query) {
+    return !!query && !Types.isEmpty(query.filter);
 }
 
 const EqualOperators: FilterOperator[] = [

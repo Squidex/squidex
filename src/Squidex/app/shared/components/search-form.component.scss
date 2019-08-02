@@ -42,11 +42,17 @@
 }
 
 .expand-search {
-    color: $color-border-dark !important;
-    font-size: .9rem;
-    font-weight: normal;
-    cursor: pointer !important;
-    padding: 0 .5rem;
+    & {
+        color: $color-border-dark !important;
+        font-size: .9rem;
+        font-weight: normal;
+        cursor: pointer !important;
+        padding: 0 .5rem;
+    }
+
+    &.highlighted {
+        color: $color-title !important;
+    }
 }
 
 .link {

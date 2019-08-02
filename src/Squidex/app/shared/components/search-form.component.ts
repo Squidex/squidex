@@ -19,6 +19,7 @@ import {
     ResourceOwner,
     SaveQueryForm
 } from '@app/shared/internal';
+import { hasFilter } from '../state/query';
 
 @Component({
     selector: 'sqx-search-form',
@@ -30,8 +31,6 @@ import {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchFormComponent extends ResourceOwner implements OnChanges, OnInit {
-    public currentQuery: Query | undefined;
-
     public readonly standalone = { standalone: true };
 
     @Input()
@@ -55,11 +54,15 @@ export class SearchFormComponent extends ResourceOwner implements OnChanges, OnI
     @Input()
     public formClass = 'form-inline search-form';
 
+    public currentQuery: Query | undefined;
+
     public saveKey: Observable<string | undefined>;
     public saveQueryDialog = new DialogModel();
     public saveQueryForm = new SaveQueryForm(this.formBuilder);
 
     public searchDialog = new DialogModel();
+
+    public hasFilter: boolean;
 
     constructor(
         private readonly formBuilder: FormBuilder
@@ -72,6 +75,8 @@ export class SearchFormComponent extends ResourceOwner implements OnChanges, OnI
             super.unsubscribeAll();
 
             this.own(this.query.query.subscribe(query => {
+                this.hasFilter = hasFilter(query);
+
                 this.currentQuery = query;
             }));
         }
@@ -81,6 +86,11 @@ export class SearchFormComponent extends ResourceOwner implements OnChanges, OnI
         if (this.queries) {
             this.saveKey = this.queries.getSaveKey(this.query.queryJson);
         }
+    }
+
+    public search() {
+        this.query.setQuery(this.currentQuery);
+        this.querySubmit.emit();
     }
 
     public saveQuery() {
@@ -104,10 +114,5 @@ export class SearchFormComponent extends ResourceOwner implements OnChanges, OnI
 
     public changeQuery(query: Query) {
         this.currentQuery = query;
-    }
-
-    public search() {
-        this.query.setQuery(this.currentQuery);
-        this.querySubmit.emit();
     }
 }

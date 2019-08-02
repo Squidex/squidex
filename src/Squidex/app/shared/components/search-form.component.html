@@ -26,12 +26,12 @@
         </ng-container>
 
         <ng-container *ngIf="queryModel">
-            <a class="expand-search" (click)="searchDialog.toggle()" #expand>
-                <i class="icon-caret-down"></i>
+            <a class="expand-search" (click)="searchDialog.toggle()" [class.highlighted]="hasFilter" #expand>
+                <i class="icon-filter-filled"></i>
             </a>
     
             <sqx-onboarding-tooltip helpId="contentArchive" [for]="expand" position="bottom-right" after="60000">
-                Click this icon to show the advanced search menu and to show the archive!
+                Click this icon to show the advanced search menu!
             </sqx-onboarding-tooltip>
         </ng-container>
     </div>

@@ -45,8 +45,8 @@ export class AssetsFiltersPageComponent {
         this.assetsState.resetTags();
     }
 
-    public isSelectedQuery(query: SavedQuery) {
-        return this.assetsState.snapshot.assetsQueryJson === query.queryJson;
+    public isSelectedQuery(saved: SavedQuery) {
+        return this.assetsState.isQueryUsed(saved);
     }
 
     public trackByTag(index: number, tag: { name: string }) {
