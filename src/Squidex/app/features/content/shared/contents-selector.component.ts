@@ -11,12 +11,10 @@ import {
     ContentDto,
     LanguageDto,
     ManualContentsState,
+    Query,
     QueryModel,
     queryModelFromSchema,
-    QueryState,
-    RootFieldDto,
-    SchemaDetailsDto,
-    SortMode
+    SchemaDetailsDto
 } from '@app/shared';
 
 @Component({
@@ -46,7 +44,6 @@ export class ContentsSelectorComponent implements OnInit {
     @Output()
     public select = new EventEmitter<ContentDto[]>();
 
-    public query = new QueryState();
     public queryModel: QueryModel;
 
     public selectedItems:  { [id: string]: ContentDto; } = {};
@@ -74,8 +71,8 @@ export class ContentsSelectorComponent implements OnInit {
         this.contentsState.load(true);
     }
 
-    public search() {
-        this.contentsState.search(this.query.snapshot.query);
+    public search(query: Query) {
+        this.contentsState.search(query);
     }
 
     public goNext() {
@@ -128,19 +125,13 @@ export class ContentsSelectorComponent implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public sort(field: string | RootFieldDto, order: SortMode) {
-        this.query.setOrderField(field, order);
-
-        this.search();
-    }
-
     private updateSelectionSummary() {
         this.selectionCount = Object.keys(this.selectedItems).length;
 
         this.isAllSelected = this.selectionCount === this.contentsState.snapshot.contents.length;
     }
 
-    public trackByContent(index: number, content: ContentDto): string {
+    public trackByContent(content: ContentDto): string {
         return content.id;
     }
 }

@@ -4,11 +4,10 @@
 
 <form [class]="formClass" (ngSubmit)="search()">
     <input class="form-control form-control-expandable" #inputFind
-        [ngModel]="query.fullText | async"
-        (ngModelChange)="query.setFullText($event)"
+        [ngModel]="query?.fullText"
+        (ngModelChange)="changeQueryFullText($event)"
         [ngModelOptions]="standalone"
-        [placeholder]="placeholder"
-    />
+        [placeholder]="placeholder" />
 
     <div class="buttons">
         <ng-container *ngIf="queries">
@@ -55,7 +54,7 @@
             </div>
             <sqx-query
                 [model]="queryModel" 
-                [query]="query.query | async"
+                [query]="query"
                 (queryChange)="changeQuery($event)">
             </sqx-query>
 

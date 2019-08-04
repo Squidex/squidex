@@ -55,7 +55,6 @@ export * from './state/patterns.forms';
 export * from './state/patterns.state';
 export * from './state/plans.state';
 export * from './state/queries';
-export * from './state/query.state';
 export * from './state/query';
 export * from './state/roles.forms';
 export * from './state/roles.state';

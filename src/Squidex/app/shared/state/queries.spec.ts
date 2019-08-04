@@ -10,18 +10,16 @@ import { BehaviorSubject } from 'rxjs';
 import { IMock,  Mock, Times } from 'typemoq';
 
 import {
+    encodeQuery,
     Queries,
     SavedQuery,
     UIState
 } from '@app/shared/internal';
-import { encodeQuery } from './query';
 
 describe('Queries', () => {
     const prefix = 'schemas.my-schema';
 
     let uiState: IMock<UIState>;
-
-    let filter = new BehaviorSubject('');
 
     let queries$ = new BehaviorSubject({});
     let queries: Queries;
@@ -68,11 +66,9 @@ describe('Queries', () => {
     it('should provide key', () => {
         let key: string;
 
-        queries.getSaveKey(filter).subscribe(x => {
+        queries.getSaveKey({}).subscribe(x => {
             key = x!;
         });
-
-        filter.next('');
 
         expect(key!).toEqual('key3');
     });

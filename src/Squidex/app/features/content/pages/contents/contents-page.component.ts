@@ -17,14 +17,12 @@ import {
     LanguagesState,
     ModalModel,
     Queries,
+    Query,
     QueryModel,
     queryModelFromSchema,
-    QueryState,
     ResourceOwner,
-    RootFieldDto,
     SchemaDetailsDto,
     SchemasState,
-    SortMode,
     UIState
 } from '@app/shared';
 
@@ -49,7 +47,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
 
-    public query = new QueryState();
     public queryModel: QueryModel;
     public queries: Queries;
 
@@ -78,21 +75,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
                     this.schema = schema!;
 
-                    this.query = new QueryState();
-                    this.query.setLanguage(this.language);
-                    this.queries = new Queries(this.uiState, `schemas.${this.schema.name}`);
-
                     this.minWidth = `${300 + (200 * this.schema.listFields.length)}px`;
 
                     this.contentsState.load();
 
+                    this.updateQueries();
                     this.updateModel();
-                }));
-
-        this.own(
-            this.contentsState.contentsQuery
-                .subscribe(query => {
-                    this.query.setQuery(query);
                 }));
 
         this.own(
@@ -106,8 +94,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 .subscribe(languages => {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.at(0);
-
-                    this.query.setLanguage(this.language);
 
                     this.updateModel();
                 }));
@@ -159,14 +145,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.goNext();
     }
 
-    public search() {
-        this.contentsState.search(this.query.snapshot.query);
+    public search(query: Query) {
+        this.contentsState.search(query);
     }
 
     public selectLanguage(language: AppLanguageDto) {
         this.language = language;
-
-        this.query.setLanguage(language);
     }
 
     public isItemSelected(content: ContentDto): boolean {
@@ -201,13 +185,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public sort(field: string | RootFieldDto, order: SortMode) {
-        this.query.setOrderField(field, order);
-
-        this.search();
-    }
-
-    public trackByContent(index: number, content: ContentDto): string {
+    public trackByContent(content: ContentDto): string {
         return content.id;
     }
 
@@ -244,6 +222,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         }
 
         this.nextStatuses = Object.keys(allActions);
+    }
+
+    private updateQueries() {
+        if (this.schema) {
+            this.queries = new Queries(this.uiState, `schemas.${this.schema.name}`);
+        }
     }
 
     private updateModel() {

@@ -22,8 +22,8 @@
                     </div>
                     <div class="col-6">
                         <sqx-search-form formClass="form" placeholder="Search by name"
-                            [query]="query"
-                            (querySubmit)="search()"
+                            [query]="assetsState.assetsQuery | async"
+                            (queryChange)="search($event)"
                             enableShortcut="true">
                         </sqx-search-form>
                     </div>
