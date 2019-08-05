@@ -106,7 +106,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.own(
             this.contentsState.selectedContent
                 .subscribe(content => {
-                    this.autoSaveKey = { schemaId: this.schema.id, schemaVersion: this.schema.version, contentId: this.content ? this.content.id : undefined };
+                    this.autoSaveKey = { schemaId: this.schema.id, schemaVersion: this.schema.version, contentId: content ? content.id : undefined };
 
                     const autosaved = this.autoSaveService.get(this.autoSaveKey);
 
@@ -116,7 +116,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         this.loadContent(this.content.dataDraft);
                     }
 
-                    if (autosaved && (!content || !this.content || content.id !== this.content.id)) {
+                    if (autosaved) {
                         this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
                             .subscribe(shouldLoad => {
                                 if (shouldLoad) {
@@ -135,7 +135,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     debounceTime(2000)
                 ).subscribe(value => {
                     this.autoSaveService.set(this.autoSaveKey, value);
-                }));
+            }));
 
         this.own(
             this.messageBus.of(ContentVersionSelected)
@@ -174,6 +174,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         const value = this.contentForm.submit();
 
         if (value) {
+            this.autoSaveService.remove(this.autoSaveKey);
+
             if (this.content) {
                 if (asDraft) {
                     if (this.content && !this.content.canDraftPropose) {
@@ -183,8 +185,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     this.contentsState.proposeDraft(this.content, value)
                         .subscribe(() => {
                             this.contentForm.submitCompleted({ noReset: true });
-
-                            this.autoSaveService.remove(this.autoSaveKey);
                         }, error => {
                             this.contentForm.submitFailed(error);
                         });
@@ -196,8 +196,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     this.contentsState.update(this.content, value)
                         .subscribe(() => {
                             this.contentForm.submitCompleted({ noReset: true });
-
-                            this.autoSaveService.remove(this.autoSaveKey);
                         }, error => {
                             this.contentForm.submitFailed(error);
                         });
@@ -210,8 +208,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 this.contentsState.create(value, publish)
                     .subscribe(() => {
                         this.contentForm.submitCompleted({ noReset: true });
-
-                        this.autoSaveService.remove(this.autoSaveKey);
 
                         this.back();
                     }, error => {
