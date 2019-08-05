@@ -135,7 +135,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     debounceTime(2000)
                 ).subscribe(value => {
                     this.autoSaveService.set(this.autoSaveKey, value);
-            }));
+                }));
 
         this.own(
             this.messageBus.of(ContentVersionSelected)
