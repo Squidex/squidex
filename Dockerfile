@@ -9,6 +9,8 @@ WORKDIR /src
 
 COPY src/Squidex/package*.json /tmp/
 
+RUN git config --global url."https://".insteadOf git://
+
 # Install Node packages 
 RUN cd /tmp && npm install --loglevel=error
 
