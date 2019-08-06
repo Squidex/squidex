@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public abstract class UpsertDto
+    public abstract class UpsertSchemaDto
     {
         /// <summary>
         /// The optional properties.
@@ -44,7 +44,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public bool IsPublished { get; set; }
 
-        public static TCommand ToCommand<TCommand, TDto>(TDto dto, TCommand command) where TCommand : UpsertCommand where TDto : UpsertDto
+        public static TCommand ToCommand<TCommand, TDto>(TDto dto, TCommand command) where TCommand : UpsertCommand where TDto : UpsertSchemaDto
         {
             SimpleMapper.Map(dto, command);
 
