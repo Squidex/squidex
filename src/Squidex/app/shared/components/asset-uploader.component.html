@@ -8,7 +8,7 @@
                     <span>{{uploads.length}}</span>
                 </span>
 
-                <ng-container *sqxModal="modalMenu;closeAuto:false;onRoot:false">
+                <ng-container *sqxModal="modalMenu;onRoot:false">
                     <div class="dropdown-menu container" (sqxDropFile)="addFiles($event)" @fade>
                         <div class="uploads">
                             <small class="uploads-empty text-muted" *ngIf="uploads.length === 0">

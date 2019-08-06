@@ -73,8 +73,12 @@ export class SearchFormComponent implements OnChanges {
         }
     }
 
-    public search() {
+    public search(close = false) {
         this.queryChange.emit(this.query);
+
+        if (close) {
+            this.searchDialog.hide();
+        }
     }
 
     public saveQuery() {

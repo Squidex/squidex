@@ -47,7 +47,7 @@
                             (ngModelChange)="changeStatus($event)"
                             [canSearch]="false">
                             <ng-template let-target="$implicit">
-                                <div class="color-circle" [style.background]="target.color"></div> {{target.status}}
+                                <i class="icon-circle" [style.color]="target.color"></i> {{target.status}}
                             </ng-template>
                         </sqx-dropdown>
                     </ng-container>
