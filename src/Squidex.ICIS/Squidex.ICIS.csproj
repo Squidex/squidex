@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -9,6 +9,7 @@
     <PackageReference Include="Confluent.Kafka.Avro" Version="0.11.6" />
     <PackageReference Include="Confluent.SchemaRegistry" Version="1.0.1.1" />
     <PackageReference Include="Confluent.SchemaRegistry.Serdes" Version="1.0.1.1" />
+    <PackageReference Include="FakeItEasy" Version="5.1.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />

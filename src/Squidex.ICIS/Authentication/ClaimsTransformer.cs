@@ -12,12 +12,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Squidex.ICIS.Extensions;
-using Squidex.ICIS.Interfaces;
-using Squidex.ICIS.Models;
+using Squidex.ICIS.Authentication.User;
 using Squidex.Infrastructure.Security;
 
-namespace Squidex.ICIS
+namespace Squidex.ICIS.Authentication
 {
     public class ClaimsTransformer : IClaimsTransformation
     {

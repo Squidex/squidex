@@ -8,7 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Avro.Specific;
+using NodaTime.Extensions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Entities;
@@ -37,7 +39,13 @@ namespace Squidex.ICIS.Kafka.Services
             var commentary = new Commentary();
             commentary.Id = contentEvent.Id.ToString();
             commentary.LastModified = contentEvent.LastModified.ToUnixTimeSeconds();
-            commentary.CreatedFor = contentEvent.Created.ToUnixTimeSeconds();
+
+            if (!contentEvent.Data.TryGetValue("createdfor", out var createdForData))
+            {
+                throw new Exception("Unable to find Created For field.");
+            }
+
+            commentary.CreatedFor = GetCreatedForTime(createdForData);
 
             if (!contentEvent.Data.TryGetValue("body", out var bodyData))
             {
@@ -99,6 +107,12 @@ namespace Squidex.ICIS.Kafka.Services
             entity.Wait();
 
             return entity.Result;
+        }
+
+        private static long GetCreatedForTime(ContentFieldData createdForData)
+        {
+            var time = createdForData["iv"].ToString();
+            return DateTime.Parse(time).ToUniversalTime().ToInstant().ToUnixTimeSeconds();
         }
     }
 }

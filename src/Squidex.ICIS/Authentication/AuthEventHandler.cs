@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Squidex.Infrastructure.Security;
 
-namespace Squidex.ICIS.Handlers
+namespace Squidex.ICIS.Authentication
 {
     internal class AuthEventsHandler : JwtBearerEvents
     {
