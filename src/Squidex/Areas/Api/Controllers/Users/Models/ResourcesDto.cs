@@ -29,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.Users.Models
 
             if (controller.HasPermission(Permissions.AdminRestore))
             {
-                result.AddGetLink("admin/restore", controller.Url<RestoreController>(x => nameof(x.GetJob)));
+                result.AddGetLink("admin/restore", controller.Url<RestoreController>(x => nameof(x.GetRestoreJob)));
             }
 
             if (controller.HasPermission(Permissions.AdminUsersRead))
