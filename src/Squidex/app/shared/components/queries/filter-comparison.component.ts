@@ -8,87 +8,22 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
 import {
+    fadeAnimation,
     FilterComparison,
     QueryFieldModel,
     QueryModel
 } from '@app/shared/internal';
+import { StatusInfo } from '@app/shared/services/contents.service';
 
  @Component({
-     selector: 'sqx-filter-comparison',
-     template: `
-        <div class="row">
-            <div class="col">
-                <div class="form-inline">
-                    <select class="form-control path mb-1 mr-2" [ngModel]="filter.path" (ngModelChange)="changePath($event)">
-                        <option *ngFor="let fieldName of model.fields | sqxKeys" [ngValue]="fieldName">{{fieldName}}</option>
-                    </select>
-
-                    <ng-container *ngIf="fieldModel">
-                        <select class="form-control mb-1 mr-2" [ngModel]="filter.op" (ngModelChange)="changeOp($event)">
-                            <option *ngFor="let operator of fieldModel.operators" [ngValue]="operator.value">{{operator.name || operator.value}}</option>
-                        </select>
-
-                        <div class="mb-1" *ngIf="!noValue" [ngSwitch]="fieldModel.type">
-                            <ng-container *ngSwitchCase="'boolean'">
-                                <input type="checkbox" class="form-control"
-                                    [ngModel]="filter.value"
-                                    (ngModelChange)="changeValue($event)" />
-                            </ng-container>
-                            <ng-container *ngSwitchCase="'date'">
-                                <sqx-date-time-editor mode="Date"
-                                    [ngModel]="filter.value"
-                                    (ngModelChange)="changeValue($event)">
-                                </sqx-date-time-editor>
-                            </ng-container>
-                            <ng-container *ngSwitchCase="'datetime'">
-                                <sqx-date-time-editor mode="DateTime"
-                                    [ngModel]="filter.value"
-                                    (ngModelChange)="changeValue($event)">
-                                </sqx-date-time-editor>
-                            </ng-container>
-                            <ng-container *ngSwitchCase="'number'">
-                                <input type="number" class="form-control"
-                                    [ngModel]="filter.value"
-                                    (ngModelChange)="changeValue($event)" />
-                            </ng-container>
-                            <ng-container *ngSwitchCase="'string'">
-                                <ng-container *ngIf="fieldModel.extra?.values; let values">
-                                    <select class="form-control"
-                                        [ngModel]="filter.value"
-                                        (ngModelChange)="changeValue($event)">
-                                        <option *ngFor="let value of values" [ngValue]="value">{{value}}</option>
-                                    </select>
-                                </ng-container>
-
-                                <ng-container *ngIf="fieldModel.extra?.schemaId; let schemaId">
-                                    <sqx-references-dropdown [schemaId]="schemaId"
-                                        mode="Single"
-                                        [ngModel]="filter.value"
-                                        (ngModelChange)="changeValue($event)"
-                                        [isRequired]="true">
-                                    </sqx-references-dropdown>
-                                </ng-container>
-
-                                <input type="text" class="form-control" *ngIf="!fieldModel.extra"
-                                    [ngModel]="filter.value"
-                                    (ngModelChange)="changeValue($event)" />
-                            </ng-container>
-                        </div>
-                    </ng-container>
-                </div>
-            </div>
-            <div class="col-auto pl-2">
-                <button type="button" class="btn btn-text-danger" (click)="remove.emit()">
-                    <i class="icon-bin2"></i>
-                </button>
-            </div>
-        </div>
-    `,
-    styles: [
-        '.path { max-width: 12rem; }'
+    selector: 'sqx-filter-comparison',
+    styleUrls: ['./filter-comparison.component.scss'],
+    templateUrl: './filter-comparison.component.html',
+    animations: [
+        fadeAnimation
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
- })
+})
 export class FilterComparisonComponent implements OnChanges {
     public fieldModel: QueryFieldModel;
 
@@ -111,6 +46,14 @@ export class FilterComparisonComponent implements OnChanges {
             this.updatePath(false);
             this.updateOperator();
         }
+    }
+
+    public getStatus(statuses: StatusInfo[]) {
+        return statuses.find(x => x.status === this.filter.value);
+    }
+
+    public changeStatus(status: StatusInfo) {
+        this.changeValue(status.status);
     }
 
     public changeValue(value: any) {

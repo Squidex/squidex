@@ -14,6 +14,7 @@ import {
     Query,
     QueryModel,
     queryModelFromSchema,
+    ResourceOwner,
     SchemaDetailsDto
 } from '@app/shared';
 
@@ -25,7 +26,7 @@ import {
         ManualContentsState
     ]
 })
-export class ContentsSelectorComponent implements OnInit {
+export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     @Input()
     public language: LanguageDto;
 
@@ -48,20 +49,24 @@ export class ContentsSelectorComponent implements OnInit {
 
     public selectedItems:  { [id: string]: ContentDto; } = {};
     public selectionCount = 0;
-
-    public isAllSelected = false;
+    public selectedAll = false;
 
     public minWidth: string;
 
     constructor(
         public readonly contentsState: ManualContentsState
     ) {
+        super();
     }
 
     public ngOnInit() {
         this.minWidth = `${200 + (200 * this.schema.referenceFields.length)}px`;
 
-        this.queryModel = queryModelFromSchema(this.schema, this.languages);
+        this.own(
+            this.contentsState.statuses
+                .subscribe(() => {
+                    this.updateModel();
+                }));
 
         this.contentsState.schema = this.schema;
         this.contentsState.load();
@@ -127,8 +132,11 @@ export class ContentsSelectorComponent implements OnInit {
 
     private updateSelectionSummary() {
         this.selectionCount = Object.keys(this.selectedItems).length;
+        this.selectedAll = this.selectionCount === this.contentsState.snapshot.contents.length;
+    }
 
-        this.isAllSelected = this.selectionCount === this.contentsState.snapshot.contents.length;
+    private updateModel() {
+        this.queryModel = queryModelFromSchema(this.schema, this.languages, this.contentsState.snapshot.statuses);
     }
 
     public trackByContent(content: ContentDto): string {

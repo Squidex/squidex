@@ -39,6 +39,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public searchModal = new ModalModel();
 
     public selectedItems:  { [id: string]: boolean; } = {};
+    public selectedAll = false;
     public selectionCount = 0;
     public selectionCanDelete = false;
 
@@ -49,8 +50,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     public queryModel: QueryModel;
     public queries: Queries;
-
-    public isAllSelected = false;
 
     public minWidth: string;
 
@@ -80,6 +79,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.contentsState.load();
 
                     this.updateQueries();
+                    this.updateModel();
+                }));
+
+        this.own(
+            this.contentsState.statuses
+                .subscribe(() => {
                     this.updateModel();
                 }));
 
@@ -190,8 +195,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     }
 
     private updateSelectionSummary() {
-        this.isAllSelected = this.contentsState.snapshot.contents.length > 0;
-
+        this.selectedAll = this.contentsState.snapshot.contents.length > 0;
         this.selectionCount = 0;
         this.selectionCanDelete = true;
 
@@ -217,7 +221,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.selectionCanDelete = false;
                 }
             } else {
-                this.isAllSelected = false;
+                this.selectedAll = false;
             }
         }
 
@@ -232,7 +236,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
 
     private updateModel() {
         if (this.schema && this.languages) {
-            this.queryModel = queryModelFromSchema(this.schema, this.languages.values);
+            this.queryModel = queryModelFromSchema(this.schema, this.languages.values, this.contentsState.snapshot.statuses);
         }
     }
 }

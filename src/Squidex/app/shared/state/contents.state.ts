@@ -85,6 +85,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public canCreateAny =
         this.project(x => !!x.canCreate || !!x.canCreateAndPublish);
 
+    public statuses =
+        this.project(x => x.statuses);
+
     public statusQueries =
         this.project2(x => x.statuses, x => buildQueries(x));
 

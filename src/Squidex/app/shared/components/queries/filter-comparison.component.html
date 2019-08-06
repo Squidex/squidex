@@ -1,0 +1,68 @@
+<div class="row">
+    <div class="col">
+        <div class="form-inline">
+            <select class="form-control path mb-1 mr-2" [ngModel]="filter.path" (ngModelChange)="changePath($event)">
+                <option *ngFor="let fieldName of model.fields | sqxKeys" [ngValue]="fieldName">{{fieldName}}</option>
+            </select>
+
+            <ng-container *ngIf="fieldModel">
+                <select class="form-control mb-1 mr-2" [ngModel]="filter.op" (ngModelChange)="changeOp($event)">
+                    <option *ngFor="let operator of fieldModel.operators" [ngValue]="operator.value">{{operator.name || operator.value}}</option>
+                </select>
+
+                <div class="mb-1" *ngIf="!noValue" [ngSwitch]="fieldModel.type">
+                    <ng-container *ngSwitchCase="'boolean'">
+                        <input type="checkbox" class="form-control"
+                            [ngModel]="filter.value"
+                            (ngModelChange)="changeValue($event)" />
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'date'">
+                        <sqx-date-time-editor mode="Date"
+                            [ngModel]="filter.value"
+                            (ngModelChange)="changeValue($event)">
+                        </sqx-date-time-editor>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'datetime'">
+                        <sqx-date-time-editor mode="DateTime"
+                            [ngModel]="filter.value"
+                            (ngModelChange)="changeValue($event)">
+                        </sqx-date-time-editor>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'number'">
+                        <input type="number" class="form-control"
+                            [ngModel]="filter.value"
+                            (ngModelChange)="changeValue($event)" />
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'reference'">
+                        <sqx-references-dropdown [schemaId]="fieldModel.extra"
+                            mode="Single"
+                            [ngModel]="filter.value"
+                            (ngModelChange)="changeValue($event)"
+                            [isRequired]="true">
+                        </sqx-references-dropdown>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'status'">
+                        <sqx-dropdown [items]="fieldModel.extra"
+                            [ngModel]="getStatus(fieldModel.extra)"
+                            (ngModelChange)="changeStatus($event)"
+                            [canSearch]="false">
+                            <ng-template let-target="$implicit">
+                                <div class="color-circle" [style.background]="target.color"></div> {{target.status}}
+                            </ng-template>
+                        </sqx-dropdown>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'string'">
+                        <input type="text" class="form-control" *ngIf="!fieldModel.extra"
+                            [ngModel]="filter.value"
+                            (ngModelChange)="changeValue($event)" />
+                    </ng-container>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <div class="col-auto pl-2">
+        <button type="button" class="btn btn-text-danger" (click)="remove.emit()">
+            <i class="icon-bin2"></i>
+        </button>
+    </div>
+</div>
