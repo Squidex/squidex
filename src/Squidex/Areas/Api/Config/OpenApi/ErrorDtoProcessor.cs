@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using Namotion.Reflection;
 using NJsonSchema;
 using NSwag;
 using NSwag.Generation.Processors;
@@ -61,9 +62,9 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
         private JsonSchema GetErrorSchema(DocumentProcessorContext context)
         {
-            var errorType = typeof(ErrorDto);
+            var errorType = typeof(ErrorDto).ToContextualType();
 
-            return context.SchemaGenerator.Generate(errorType);
+            return context.SchemaGenerator.GenerateWithReference<JsonSchema>(errorType, context.SchemaResolver);
         }
     }
 }

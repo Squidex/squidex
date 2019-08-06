@@ -28,12 +28,13 @@ using Squidex.Domain.Apps.Entities.Apps.Invitation;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Assets.Queries;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL;
+using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.History.Notifications;
@@ -102,10 +103,16 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentEnricher>()
                 .As<IContentEnricher>();
 
+            services.AddSingletonAs<AssetQueryParser>()
+                .AsSelf();
+
             services.AddSingletonAs<AssetQueryService>()
                 .As<IAssetQueryService>();
 
             services.AddSingletonAs(c => new Lazy<IContentQueryService>(() => c.GetRequiredService<IContentQueryService>()))
+                .AsSelf();
+
+            services.AddSingletonAs<ContentQueryParser>()
                 .AsSelf();
 
             services.AddSingletonAs<ContentQueryService>()
@@ -130,9 +137,6 @@ namespace Squidex.Config.Domain
                 .AsOptional<IWorkflowsValidator>();
 
             services.AddSingletonAs<RolePermissionsProvider>()
-                .AsSelf();
-
-            services.AddSingletonAs<EdmModelBuilder>()
                 .AsSelf();
 
             services.AddSingletonAs<GrainTagService>()

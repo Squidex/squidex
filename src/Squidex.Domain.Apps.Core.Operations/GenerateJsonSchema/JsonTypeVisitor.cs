@@ -16,17 +16,20 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
     public sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty>
     {
         private readonly SchemaResolver schemaResolver;
+        private readonly bool withHiddenFields;
 
-        public JsonTypeVisitor(SchemaResolver schemaResolver)
+        public JsonTypeVisitor(SchemaResolver schemaResolver, bool withHiddenFields)
         {
             this.schemaResolver = schemaResolver;
+
+            this.withHiddenFields = withHiddenFields;
         }
 
         public JsonSchemaProperty Visit(IArrayField field)
         {
             var item = Builder.Object();
 
-            foreach (var nestedField in field.Fields.ForApi())
+            foreach (var nestedField in field.Fields.ForApi(withHiddenFields))
             {
                 var childProperty = nestedField.Accept(this);
 

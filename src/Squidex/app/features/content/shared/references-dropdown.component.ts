@@ -47,7 +47,7 @@ type ContentName = { name: string, id?: string };
             </ng-template>
         </sqx-dropdown>`,
     styles: [
-        '.truncate { min-height: 1.2rem; }'
+        '.truncate { min-height: 1.5rem; }'
     ],
     providers: [SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush

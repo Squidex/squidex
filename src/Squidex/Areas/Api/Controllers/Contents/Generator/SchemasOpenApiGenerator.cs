@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Namotion.Reflection;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using NSwag;
@@ -78,7 +79,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         {
             var statusDtoType = typeof(ChangeStatusDto);
 
-            return schemaGenerator.Generate(statusDtoType);
+            return schemaGenerator.GenerateWithReference<JsonSchema>(statusDtoType.ToContextualType(), schemaResolver);
         }
 
         private void GenerateSchemasOperations(IEnumerable<ISchemaEntity> schemas, IAppEntity app)
