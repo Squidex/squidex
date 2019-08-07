@@ -122,7 +122,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(RolesDto), 200)]
         [ApiPermission(Permissions.AppRolesUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> UpdateRole(string app, string name, [FromBody] UpdateRoleDto request)
+        public async Task<IActionResult> PutRole(string app, string name, [FromBody] UpdateRoleDto request)
         {
             var command = request.ToCommand(name);
 

@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Controllers.Ping
         [HttpGet]
         [ProducesResponseType(typeof(ExposedValues), 200)]
         [Route("info/")]
-        public IActionResult Info()
+        public IActionResult GetInfo()
         {
             return Ok(exposedValues);
         }

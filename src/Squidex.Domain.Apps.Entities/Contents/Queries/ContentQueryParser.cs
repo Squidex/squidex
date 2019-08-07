@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private static string BuildJsonCacheKey(IAppEntity app, ISchemaEntity schema, bool withHidden)
         {
-            return $"EDM/{app.Version}/{schema.Id}_{schema.Version}/{withHidden}";
+            return $"JSON/{app.Version}/{schema.Id}_{schema.Version}/{withHidden}";
         }
     }
 }
