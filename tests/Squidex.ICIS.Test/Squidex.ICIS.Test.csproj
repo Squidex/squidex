@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Squidex.ICIS\Squidex.ICIS.csproj" />
-    <ProjectReference Include="..\tests\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj" />
+    <ProjectReference Include="..\..\src\Squidex.ICIS\Squidex.ICIS.csproj" />
+    <ProjectReference Include="..\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj" />
   </ItemGroup>
 
 </Project>
