@@ -246,7 +246,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AppsByNameIndexCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<GrainCommandMiddleware<AppCommand, IAppGrain>>()
+            services.AddSingletonAs<AppCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<CommentsCommand, ICommentGrain>>()

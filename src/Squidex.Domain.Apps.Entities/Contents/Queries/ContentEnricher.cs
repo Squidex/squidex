@@ -61,7 +61,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 if (contents.Any())
                 {
-                    var appVersion = context.App.Version.ToString();
+                    var appVersion = context.App?.Version.ToString();
 
                     var cache = new Dictionary<(Guid, Status), StatusInfo>();
 
@@ -77,27 +77,33 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                             await ResolveCanUpdateAsync(content, result);
                         }
 
-                        result.CacheDependencies.Add(appVersion);
+                        if (appVersion != null)
+                        {
+                            result.CacheDependencies.Add(appVersion);
+                        }
 
                         results.Add(result);
                     }
 
-                    foreach (var group in results.GroupBy(x => x.SchemaId.Id))
+                    if (context.App != null)
                     {
-                        var schema = await ContentQuery.GetSchemaOrThrowAsync(context, group.Key.ToString());
-
-                        var schemaIdentity = schema.Id.ToString();
-                        var schemaVersion = schema.Version.ToString();
-
-                        foreach (var content in group)
+                        foreach (var group in results.GroupBy(x => x.SchemaId.Id))
                         {
-                            content.CacheDependencies.Add(schemaIdentity);
-                            content.CacheDependencies.Add(schemaVersion);
-                        }
+                            var schema = await ContentQuery.GetSchemaOrThrowAsync(context, group.Key.ToString());
 
-                        if (ShouldEnrichWithReferences(context))
-                        {
-                            await ResolveReferencesAsync(schema, group, context);
+                            var schemaIdentity = schema.Id.ToString();
+                            var schemaVersion = schema.Version.ToString();
+
+                            foreach (var content in group)
+                            {
+                                content.CacheDependencies.Add(schemaIdentity);
+                                content.CacheDependencies.Add(schemaVersion);
+                            }
+
+                            if (ShouldEnrichWithReferences(context))
+                            {
+                                await ResolveReferencesAsync(schema, group, context);
+                            }
                         }
                     }
                 }
