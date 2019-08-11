@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Users
 {
@@ -157,6 +158,13 @@ namespace Squidex.Domain.Users
             await UpdateAsync(userManager, user, values);
 
             return await userManager.ResolveUserAsync(user);
+        }
+
+        public static Task<IdentityResult> GenerateClientSecretAsync(this UserManager<IdentityUser> userManager, IdentityUser user)
+        {
+            var claims = new[] { new Claim(SquidexClaimTypes.ClientSecret, RandomHash.New()) };
+
+            return userManager.SyncClaimsAsync(user, claims);
         }
 
         public static async Task<IdentityResult> UpdateSafeAsync(this UserManager<IdentityUser> userManager, IdentityUser user, UserValues values)

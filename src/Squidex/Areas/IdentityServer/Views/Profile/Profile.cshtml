@@ -216,6 +216,34 @@
     </div>
 }
 
+<div class="profile-section">
+    <h2>Client</h2>
+
+    <small class="form-text text-muted mt-2 mb-2">Use the client credentials to call the API with your profile information and permissions.</small>
+
+    <div class="row no-gutters form-group">
+        <div class="col-8">
+            <label for="clientId">Client Id</label>
+
+            <input class="form-control" name="clientId" id="clientId" readonly value="@Model.Id" />
+        </div>
+    </div>
+    <div class="row no-gutters form-group">
+        <div class="col-8">
+             <label for="clientSecret">Client Secret</label>
+
+            <input class="form-control" name="clientSecret" id="clientSecret" readonly value="@Model.ClientSecret" />
+        </div>
+        <div class="col-4 pl-2">
+            <label for="generate">&nbsp;</label>
+
+            <form class="profile-form" asp-controller="Profile" asp-action="GenerateClientSecret" method="post">
+                <button type="submit" class="btn btn-success btn-block">Generate</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     var pictureButton = document.getElementById('pictureButton');
     var pictureInput = document.getElementById('pictureInput');
@@ -235,8 +263,7 @@
 
     if (successMessage) {
         setTimeout(function() {
-                successMessage.remove();
-            },
-            5000);
+            successMessage.remove();
+        }, 5000);
     }
 </script>

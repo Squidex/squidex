@@ -54,6 +54,11 @@ namespace Squidex.Shared.Users
             return user.HasClaimValue(SquidexClaimTypes.PictureUrl, SquidexClaimTypes.PictureUrlStore);
         }
 
+        public static string ClientSecret(this IUser user)
+        {
+            return user.GetClaimValue(SquidexClaimTypes.ClientSecret);
+        }
+
         public static string PictureUrl(this IUser user)
         {
             return user.GetClaimValue(SquidexClaimTypes.PictureUrl);
