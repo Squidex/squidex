@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return "State_Contents";
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(ISchemaEntity schema, Query query, List<Guid> ids, Status[] status, bool inDraft, bool includeDraft = true)
+        public async Task<IResultList<IContentEntity>> QueryAsync(ISchemaEntity schema, ClrQuery query, List<Guid> ids, Status[] status, bool inDraft, bool includeDraft = true)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 });
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(ISchemaEntity schema, FilterNode filterNode)
+        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(ISchemaEntity schema, FilterNode<ClrValue> filterNode)
         {
             var filter = filterNode.AdjustToModel(schema.SchemaDef, true).ToFilter(schema.Id);
 

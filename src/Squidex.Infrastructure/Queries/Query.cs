@@ -9,9 +9,9 @@ using System.Collections.Generic;
 
 namespace Squidex.Infrastructure.Queries
 {
-    public sealed class Query
+    public class Query<TValue>
     {
-        public FilterNode Filter { get; set; }
+        public FilterNode<TValue> Filter { get; set; }
 
         public string FullText { get; set; }
 

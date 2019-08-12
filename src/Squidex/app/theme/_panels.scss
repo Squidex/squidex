@@ -26,6 +26,7 @@
 //
 .panel-container {
     @include fixed($size-navbar-height, 0, 0, $size-sidebar-width);
+    @include scrollbars(8px, $color-border-dark);
     overflow-x: auto;
     overflow-y: hidden;
 }
@@ -251,6 +252,10 @@
     .panel-header {
         background: $color-dark2-background;
         border: 0;
+    }
+
+    .panel-content {
+        @include scrollbars(8px, darken($color-dark2-foreground, 10%), transparent);
     }
 
     .panel-close {

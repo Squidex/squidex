@@ -12,10 +12,10 @@
             </div>
             <div class="col pl-1">
                 <sqx-search-form formClass="form" placeholder="Search for content" 
+                    expandable="true"
                     [fieldExample]="'data/[MY_FIELD]/iv'" 
                     [filter]="filter"
-                    (querySubmit)="search()"
-                    expandable="true">
+                    (querySubmit)="search()">
                 </sqx-search-form>
             </div>
                 
@@ -27,13 +27,16 @@
 
     <ng-container content>
         <div class="grid-header">
-            <table class="table table-items table-fixed">
+            <table class="table table-items table-fixed" [style.minWidth]="minWidth" #header>
                 <thead>
                     <tr>
                         <th class="cell-select">
                             <input type="checkbox" class="form-check" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
                         </th>
-                        <th class="cell-auto" *ngFor="let field of schema.listFields">
+                        <th class="cell-user">
+                            <sqx-table-header text="By"></sqx-table-header>
+                        </th>
+                        <th class="cell-content" *ngFor="let field of schema.referenceFields">
                             <sqx-table-header [text]="field.displayName" 
                                 [sortable]="field.properties.isSortable"
                                 [sorting]="filter.sortMode(field) | async"
@@ -47,24 +50,22 @@
                                 (sortingChange)="sort('lastModified', $event)">
                             </sqx-table-header>
                         </th>
-                        <th class="cell-user">
-                            <sqx-table-header text="By"></sqx-table-header>
-                        </th>
                     </tr>
                 </thead>
             </table>
         </div>
 
-        <div class="grid-content">
-            <div sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed" *ngIf="contentsState.contents | async; let contents">
+        <div class="grid-content" [sqxSyncScrolling]="header">
+            <div class="table-container" sqxIgnoreScrollbar>
+                <table class="table table-items table-fixed" [style.minWidth]="minWidth" *ngIf="contentsState.contents | async; let contents">
                     <tbody *ngFor="let content of contents; trackBy: trackByContent">
                         <tr [sqxContent]="content"
                             [selectable]="!isItemAlreadySelected(content)"
                             [selected]="isItemSelected(content)"
                             (selectedChange)="selectContent(content)"
                             [language]="language"
-                            [schema]="schema" 
+                            [schema]="schema"
+                            [schemaFields]="schema.referenceFields"
                             isReadOnly="true"></tr>
                         <tr class="spacer"></tr>
                     </tbody>

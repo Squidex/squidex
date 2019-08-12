@@ -165,6 +165,7 @@ a {
         @include box-shadow(0, 3px, 16px, .2);
         border: 0;
         background: $panel-light-background;
+        z-index: 1200;
     }
 
     a {

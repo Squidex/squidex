@@ -18,44 +18,38 @@ namespace Squidex.Web
     {
         private static readonly int GuidLength = Guid.Empty.ToString().Length;
 
-        public static string ToEtag<T>(this IReadOnlyList<T> items, IEntityWithVersion app = null) where T : IEntity, IEntityWithVersion
+        public static string ToEtag<T>(this IReadOnlyList<T> items) where T : IEntity, IEntityWithVersion
         {
             using (Profiler.Trace("CalculateEtag"))
             {
-                var unhashed = Unhashed(items, 0, app);
+                var unhashed = Unhashed(items, 0);
 
                 return unhashed.Sha256Base64();
             }
         }
 
-        public static string ToEtag<T>(this IResultList<T> items, IEntityWithVersion app = null) where T : IEntity, IEntityWithVersion
+        public static string ToEtag<T>(this IResultList<T> items) where T : IEntity, IEntityWithVersion
         {
             using (Profiler.Trace("CalculateEtag"))
             {
-                var unhashed = Unhashed(items, items.Total, app);
+                var unhashed = Unhashed(items, items.Total);
 
                 return unhashed.Sha256Base64();
             }
         }
 
-        private static string Unhashed<T>(IReadOnlyList<T> items, long total, IEntityWithVersion app) where T : IEntity, IEntityWithVersion
+        private static string Unhashed<T>(IReadOnlyList<T> items, long total) where T : IEntity, IEntityWithVersion
         {
-            var sb = new StringBuilder((items.Count * (GuidLength + 8)) + 10);
+            var sb = new StringBuilder();
 
-            for (var i = 0; i < items.Count; i++)
+            foreach (var item in items)
             {
+                AppendItem(item, sb);
+
                 sb.Append(";");
-                sb.Append(items[i].ToEtag());
             }
 
-            sb.Append("_");
             sb.Append(total);
-
-            if (app != null)
-            {
-                sb.Append("_");
-                sb.Append(app.Version);
-            }
 
             return sb.ToString();
         }
@@ -85,17 +79,32 @@ namespace Squidex.Web
             return sb.ToString();
         }
 
-        public static string ToEtag<T>(this T item, IEntityWithVersion app = null) where T : IEntity, IEntityWithVersion
+        public static string ToEtag<T>(this T item) where T : IEntity, IEntityWithVersion
         {
-            var result = $"{item.Id};{item.Version}";
+            var sb = new StringBuilder();
 
-            if (app != null)
+            AppendItem(item, sb);
+
+            return sb.ToString();
+        }
+
+        private static void AppendItem<T>(T item, StringBuilder sb) where T : IEntity, IEntityWithVersion
+        {
+            sb.Append(item.Id);
+            sb.Append(";");
+            sb.Append(item.Version);
+
+            if (item is IEntityWithCacheDependencies withDependencies)
             {
-                result += ";";
-                result += app.Version;
+                if (withDependencies.CacheDependencies != null)
+                {
+                    foreach (var dependency in withDependencies.CacheDependencies)
+                    {
+                        sb.Append(";");
+                        sb.Append(dependency);
+                    }
+                }
             }
-
-            return result;
         }
     }
 }

@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
-    public sealed class FilterTagTransformer : TransformVisitor
+    public sealed class FilterTagTransformer : TransformVisitor<ClrValue>
     {
         private readonly ITagService tagService;
         private readonly ISchemaEntity schema;
@@ -29,23 +29,24 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             this.tagService = tagService;
         }
 
-        public static FilterNode Transform(FilterNode nodeIn, Guid appId, ISchemaEntity schema, ITagService tagService)
+        public static FilterNode<ClrValue> Transform(FilterNode<ClrValue> nodeIn, Guid appId, ISchemaEntity schema, ITagService tagService)
         {
+            Guard.NotNull(nodeIn, nameof(nodeIn));
             Guard.NotNull(tagService, nameof(tagService));
             Guard.NotNull(schema, nameof(schema));
 
             return nodeIn.Accept(new FilterTagTransformer(appId, schema, tagService));
         }
 
-        public override FilterNode Visit(FilterComparison nodeIn)
+        public override FilterNode<ClrValue> Visit(CompareFilter<ClrValue> nodeIn)
         {
-            if (nodeIn.Rhs.Value is string stringValue && IsDataPath(nodeIn.Lhs) && IsTagField(nodeIn.Lhs))
+            if (nodeIn.Value.Value is string stringValue && IsDataPath(nodeIn.Path) && IsTagField(nodeIn.Path))
             {
                 var tagNames = Task.Run(() => tagService.GetTagIdsAsync(appId, TagGroups.Schemas(schema.Id), HashSet.Of(stringValue))).Result;
 
                 if (tagNames.TryGetValue(stringValue, out var normalized))
                 {
-                    return new FilterComparison(nodeIn.Lhs, nodeIn.Operator, new FilterValue(normalized));
+                    return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, normalized);
                 }
             }
 
@@ -59,9 +60,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private bool IsTagField(IReadOnlyList<string> path)
         {
-            return schema.SchemaDef.FieldsByName.TryGetValue(path[1], out var field) &&
-                field is IField<TagsFieldProperties> fieldTags &&
-                fieldTags.Properties.Normalization == TagsFieldNormalization.Schema;
+            return schema.SchemaDef.FieldsByName.TryGetValue(path[1], out var field) && IsTagField(field);
+        }
+
+        private bool IsTagField(IField field)
+        {
+            return field is IField<TagsFieldProperties> tags && tags.Properties.Normalization == TagsFieldNormalization.Schema;
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
             if (controller.HasPermission(Permissions.AppPatternsUpdate, app))
             {
-                AddPutLink("update", controller.Url<AppPatternsController>(x => nameof(x.UpdatePattern), values));
+                AddPutLink("update", controller.Url<AppPatternsController>(x => nameof(x.PutPattern), values));
             }
 
             if (controller.HasPermission(Permissions.AppPatternsDelete, app))

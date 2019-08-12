@@ -115,7 +115,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public canDeactivate(): Observable<boolean> {
-        if (!this.contentForm.form.dirty || !this.content) {
+        if (!this.contentForm.form.dirty) {
             return of(true);
         } else {
             return this.dialogs.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view and discard your changes?');
@@ -169,6 +169,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
 
                 this.contentsState.create(value, publish)
                     .subscribe(() => {
+                        this.contentForm.submitCompleted({ noReset: true });
+
                         this.back();
                     }, error => {
                         this.contentForm.submitFailed(error);

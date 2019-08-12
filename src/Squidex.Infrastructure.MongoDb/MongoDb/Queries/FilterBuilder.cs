@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 {
     public static class FilterBuilder
     {
-        public static (FilterDefinition<T> Filter, bool Last) BuildFilter<T>(this Query query, bool supportsSearch = true)
+        public static (FilterDefinition<T> Filter, bool Last) BuildFilter<T>(this ClrQuery query, bool supportsSearch = true)
         {
             if (query.FullText != null)
             {
@@ -32,7 +32,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
             return (null, false);
         }
 
-        public static FilterDefinition<T> BuildFilter<T>(this FilterNode filterNode)
+        public static FilterDefinition<T> BuildFilter<T>(this FilterNode<ClrValue> filterNode)
         {
             return FilterVisitor<T>.Visit(filterNode);
         }

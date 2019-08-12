@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -36,6 +37,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public NamedContentData DataDraft { get; set; }
 
+        public NamedContentData ReferenceData { get; set; }
+
         public Status Status { get; set; }
 
         public StatusInfo[] Nexts { get; set; }
@@ -45,5 +48,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         public bool CanUpdate { get; set; }
 
         public bool IsPending { get; set; }
+
+        public HashSet<string> CacheDependencies { get; } = new HashSet<string>();
     }
 }

@@ -13,6 +13,8 @@ namespace Squidex.Domain.Apps.Core.Schemas
 
         public bool IsListField { get; set; }
 
+        public bool IsReferenceField { get; set; }
+
         public string Placeholder { get; set; }
 
         public string EditorUrl { get; set; }

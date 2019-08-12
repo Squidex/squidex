@@ -28,7 +28,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             typeof(MongoContentEntity).GetProperties()
                 .ToDictionary(x => x.Name, x => x.GetCustomAttribute<BsonElementAttribute>()?.ElementName ?? x.Name, StringComparer.OrdinalIgnoreCase);
 
-        public static Query AdjustToModel(this Query query, Schema schema, bool useDraft)
+        public static ClrQuery AdjustToModel(this ClrQuery query, Schema schema, bool useDraft)
         {
             var pathConverter = PathConverter(schema, useDraft);
 
@@ -37,19 +37,19 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
                 query.Filter = query.Filter.Accept(new AdaptionVisitor(pathConverter));
             }
 
-            query.Sort = query.Sort.Select(x => new SortNode(pathConverter(x.Path), x.SortOrder)).ToList();
+            query.Sort = query.Sort.Select(x => new SortNode(pathConverter(x.Path), x.Order)).ToList();
 
             return query;
         }
 
-        public static FilterNode AdjustToModel(this FilterNode filterNode, Schema schema, bool inDraft)
+        public static FilterNode<ClrValue> AdjustToModel(this FilterNode<ClrValue> filterNode, Schema schema, bool inDraft)
         {
             var pathConverter = PathConverter(schema, inDraft);
 
             return filterNode.Accept(new AdaptionVisitor(pathConverter));
         }
 
-        private static Func<IReadOnlyList<string>, IReadOnlyList<string>> PathConverter(Schema schema, bool inDraft)
+        private static Func<PropertyPath, PropertyPath> PathConverter(Schema schema, bool inDraft)
         {
             return propertyNames =>
             {
@@ -107,17 +107,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             };
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSort(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, Query query)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSort(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ClrQuery query)
         {
             return cursor.Sort(query.BuildSort<MongoContentEntity>());
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentTake(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, Query query)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentTake(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ClrQuery query)
         {
             return cursor.Take(query);
         }
 
-        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSkip(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, Query query)
+        public static IFindFluent<MongoContentEntity, MongoContentEntity> ContentSkip(this IFindFluent<MongoContentEntity, MongoContentEntity> cursor, ClrQuery query)
         {
             return cursor.Skip(query);
         }
@@ -142,12 +142,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             return CreateFilter(null, schemaId, ids, status, null);
         }
 
-        public static FilterDefinition<MongoContentEntity> ToFilter(this Query query, Guid schemaId, ICollection<Guid> ids, Status[] status)
+        public static FilterDefinition<MongoContentEntity> ToFilter(this ClrQuery query, Guid schemaId, ICollection<Guid> ids, Status[] status)
         {
             return CreateFilter(null, schemaId, ids, status, query);
         }
 
-        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid? appId, Guid? schemaId, ICollection<Guid> ids, Status[] status, Query query)
+        private static FilterDefinition<MongoContentEntity> CreateFilter(Guid? appId, Guid? schemaId, ICollection<Guid> ids, Status[] status,
+            ClrQuery query)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>();
 
@@ -188,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Visitors
             return Filter.And(filters);
         }
 
-        public static FilterDefinition<MongoContentEntity> ToFilter(this FilterNode filterNode, Guid schemaId)
+        public static FilterDefinition<MongoContentEntity> ToFilter(this FilterNode<ClrValue> filterNode, Guid schemaId)
         {
             var filters = new List<FilterDefinition<MongoContentEntity>>
             {

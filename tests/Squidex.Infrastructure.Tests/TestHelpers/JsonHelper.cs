@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
+using Squidex.Infrastructure.Queries.Json;
 
 namespace Squidex.Infrastructure.TestHelpers
 {
@@ -34,11 +35,13 @@ namespace Squidex.Infrastructure.TestHelpers
                     new ClaimsPrincipalConverter(),
                     new InstantConverter(),
                     new EnvelopeHeadersConverter(),
+                    new FilterConverter(),
                     new JsonValueConverter(),
                     new LanguageConverter(),
                     new NamedGuidIdConverter(),
                     new NamedLongIdConverter(),
                     new NamedStringIdConverter(),
+                    new PropertyPathConverter(),
                     new RefTokenConverter(),
                     new StringEnumConverter()),
 

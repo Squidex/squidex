@@ -184,39 +184,43 @@
 //
 .cell {
     &-40 {
-        width: 40%;
+        @include force-width(40%);
     }
 
     &-60 {
-        width: 60%;
+        @include force-width(60%);
     }
 
     &-select {
-        width: 50px;
+        @include force-width(50px);
     }
 
     &-label {
-        width: 100px;
+        @include force-width(100px);
     }
 
     &-separator {
-        width: 60px;
+        @include force-width(60px);
     }
 
     &-user {
-        width: 55px;
+        @include force-width(55px);
     }
 
     &-time {
-        width: 160px;
+        @include force-width(180px);
     }
 
     &-actions {
-        width: 70px;
+        @include force-width(70px);
     }
 
     &-actions-lg {
-        width: 150px;
+        @include force-width(150px);
+    }
+
+    &-content {
+        min-width: 200px;
     }
 
     &-separator,
@@ -228,6 +232,10 @@
     &-actions,
     &-actions-lg {
         text-align: right;
+    }
+
+    &-actions-left {
+        text-align: left;
     }
 }
 

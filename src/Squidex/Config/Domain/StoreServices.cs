@@ -33,7 +33,6 @@ using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -50,8 +49,6 @@ namespace Squidex.Config.Domain
                     var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration");
                     var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database");
                     var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName);
-
-                    services.Configure<MongoDbOptions>(config.GetSection("store:mongoDB"));
 
                     services.AddSingleton(typeof(ISnapshotStore<,>), typeof(MongoSnapshotStore<,>));
 

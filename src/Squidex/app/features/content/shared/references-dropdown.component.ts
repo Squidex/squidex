@@ -15,11 +15,8 @@ import {
     AppsState,
     ContentDto,
     ContentsService,
-    FieldFormatter,
-    fieldInvariant,
-    ImmutableArray,
+    getContentValue,
     MathHelper,
-    RootFieldDto,
     SchemaDetailsDto,
     SchemasService,
     StatefulControlComponent,
@@ -33,24 +30,31 @@ export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
 interface State {
     schema?: SchemaDetailsDto | null;
 
-    contentItems: ImmutableArray<ContentDto>;
-    contentNames: ImmutableArray<ContentName>;
+    contentItems: ContentDto[];
+    contentNames: ContentName[];
+
+    selectedItem?: ContentName;
 }
 
-type ContentName = { name: string, id: string };
+type ContentName = { name: string, id?: string };
 
 @Component({
     selector: 'sqx-references-dropdown',
     template: `
-        <select class="form-control" [formControl]="selectedId">
-            <option [ngValue]="null"></option>
-            <option *ngFor="let content of snapshot.contentNames" [ngValue]="content.id">{{content.name}}</option>
-        </select>`,
+        <sqx-dropdown [formControl]="selectionControl" [items]="snapshot.contentNames">
+            <ng-template let-content="$implicit" let-context="context">
+                <span class="truncate" [innerHTML]="content.name | sqxHighlight:context"></span>
+            </ng-template>
+        </sqx-dropdown>`,
+    styles: [
+        '.truncate { min-height: 1.5rem; }'
+    ],
     providers: [SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReferencesDropdownComponent extends StatefulControlComponent<State, string[]> implements OnInit {
     private languageField: AppLanguageDto;
+    private selectedId: string | undefined;
 
     @Input()
     public schemaId: string;
@@ -62,7 +66,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         this.next(s => ({ ...s, contentNames: this.createContentNames(s.schema, s.contentItems) }));
     }
 
-    public selectedId = new FormControl('');
+    public selectionControl = new FormControl('');
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,
@@ -71,16 +75,16 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     ) {
         super(changeDetector, {
             schema: null,
-            contentItems: ImmutableArray.empty(),
-            contentNames: ImmutableArray.empty()
+            contentItems: [],
+            contentNames: []
         });
 
         this.own(
-            this.selectedId.valueChanges
-                .subscribe(value => {
-                    if (value) {
+            this.selectionControl.valueChanges
+                .subscribe((value: ContentName) => {
+                    if (value && value.id) {
                         this.callTouched();
-                        this.callChange([value]);
+                        this.callChange([value.id]);
                     } else {
                         this.callTouched();
                         this.callChange([]);
@@ -90,7 +94,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
     public ngOnInit() {
         if (this.schemaId === MathHelper.EMPTY_GUID) {
-            this.selectedId.disable();
+            this.selectionControl.disable();
             return;
         }
 
@@ -103,57 +107,53 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
                     }
                 }, (schema, contents) => ({ schema, contents })))
             .subscribe(({ schema, contents }) => {
-                const contentItems = ImmutableArray.of(contents.items);
+                const contentItems = contents.items;
                 const contentNames = this.createContentNames(schema, contentItems);
 
                 this.next(s => ({ ...s, schema, contentItems, contentNames }));
+
+                this.selectContent();
             }, () => {
-                this.selectedId.disable();
+                this.selectionControl.disable();
             });
     }
 
     public writeValue(obj: any) {
         if (Types.isArrayOfString(obj)) {
-            this.selectedId.setValue(obj[0], { emitEvent: false });
+            this.selectedId = obj[0];
+
+            this.selectContent();
         } else {
-            this.selectedId.setValue(undefined, { emitEvent: false });
+            this.selectedId = undefined;
+
+            this.unselectContent();
         }
     }
 
-    private createContentNames(schema: SchemaDetailsDto | undefined | null, contents: ImmutableArray<ContentDto>): ImmutableArray<ContentName> {
+    private selectContent() {
+        this.selectionControl.setValue(this.snapshot.contentNames.find(x => x.id === this.selectedId), { emitEvent: false });
+    }
+
+    private unselectContent() {
+        this.selectionControl.setValue(undefined, { emitEvent: false });
+    }
+
+    private createContentNames(schema: SchemaDetailsDto | undefined | null, contents: ContentDto[]): ContentName[] {
         if (contents.length === 0 || !schema) {
-            return ImmutableArray.empty();
+            return [];
         }
 
-        function getRawValue(field: RootFieldDto, data: any, language: AppLanguageDto): any {
-            const contentField = data[field.name];
-
-            if (contentField) {
-                if (field.isLocalizable) {
-                    return contentField[language.iso2Code];
-                } else {
-                    return contentField[fieldInvariant];
-                }
-            }
-
-            return undefined;
-        }
-
-        return contents.map(content => {
-            const values: any[] = [];
-
-            for (let field of schema.listFields) {
-                const value = getRawValue(field, content.data, this.languageField);
-
-                if (!Types.isUndefined(value)) {
-                    values.push(FieldFormatter.format(field, value, false));
-                }
-            }
-
-            const name = values.join(', ');
+        const names = contents.map(content => {
+            const name =
+                schema.referenceFields
+                    .map(f => getContentValue(content, this.languageField, f, false))
+                    .map(v => v.formatted)
+                    .join(', ');
 
             return { name, id: content.id };
         });
+
+        return [{ name: '- No Reference -' }, ...names];
     }
 
     public trackByContent(content: ContentDto) {

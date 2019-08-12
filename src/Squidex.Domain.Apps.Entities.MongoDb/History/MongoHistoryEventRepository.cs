@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.History.Repositories;
@@ -20,16 +18,9 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
 {
     public class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEvent>, IHistoryEventRepository
     {
-        public MongoHistoryEventRepository(IMongoDatabase database, IOptions<MongoDbOptions> options)
+        public MongoHistoryEventRepository(IMongoDatabase database)
             : base(database)
         {
-            if (options.Value.IsCosmosDb)
-            {
-                var classMap = BsonClassMap.RegisterClassMap<HistoryEvent>();
-
-                classMap.MapProperty(x => x.Created).SetElementName("_ts");
-                classMap.AutoMap();
-            }
         }
 
         protected override string CollectionName()
@@ -39,18 +30,22 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.History
 
         protected override Task SetupCollectionAsync(IMongoCollection<HistoryEvent> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateManyAsync(
-                new[]
-                {
-                    new CreateIndexModel<HistoryEvent>(
-                        Index
-                            .Ascending(x => x.AppId)
-                            .Ascending(x => x.Channel)
-                            .Descending(x => x.Created)
-                            .Descending(x => x.Version)),
-                    new CreateIndexModel<HistoryEvent>(Index.Ascending(x => x.Created),
-                        new CreateIndexOptions { ExpireAfter = TimeSpan.FromDays(365) })
-                }, ct);
+            return collection.Indexes.CreateManyAsync(new[]
+            {
+                new CreateIndexModel<HistoryEvent>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.Channel)
+                        .Descending(x => x.Created)
+                        .Descending(x => x.Version)),
+                new CreateIndexModel<HistoryEvent>(
+                    Index
+                        .Ascending(x => x.Created),
+                    new CreateIndexOptions
+                    {
+                        ExpireAfter = TimeSpan.FromDays(365)
+                    })
+            }, ct);
         }
 
         public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(Guid appId, string channelPrefix, int count)

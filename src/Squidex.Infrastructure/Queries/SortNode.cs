@@ -5,32 +5,29 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-
 namespace Squidex.Infrastructure.Queries
 {
     public sealed class SortNode
     {
-        public IReadOnlyList<string> Path { get; }
+        public PropertyPath Path { get; }
 
-        public SortOrder SortOrder { get; set; }
+        public SortOrder Order { get; set; }
 
-        public SortNode(IReadOnlyList<string> path, SortOrder sortOrder)
+        public SortNode(PropertyPath path, SortOrder order)
         {
             Guard.NotNull(path, nameof(path));
-            Guard.NotEmpty(path, nameof(path));
-            Guard.Enum(sortOrder, nameof(sortOrder));
+            Guard.Enum(order, nameof(order));
 
             Path = path;
 
-            SortOrder = sortOrder;
+            Order = order;
         }
 
         public override string ToString()
         {
             var path = string.Join(".", Path);
 
-            return $"{path} {SortOrder}";
+            return $"{path} {Order}";
         }
     }
 }

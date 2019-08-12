@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -22,19 +23,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
 {
     public class GuardContentTests
     {
-        private readonly ISchemaEntity schema = A.Fake<ISchemaEntity>();
         private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
-        private readonly ClaimsPrincipal user = new ClaimsPrincipal();
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
+        private readonly ClaimsPrincipal user = Mocks.FrontendUser();
         private readonly Instant dueTimeInPast = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromHours(1));
-
-        public GuardContentTests()
-        {
-            SetupSingleton(false);
-        }
 
         [Fact]
         public async Task CanCreate_should_throw_exception_if_data_is_null()
         {
+            var schema = CreateSchema(false);
+
             var command = new CreateContent();
 
             await ValidationAssert.ThrowsAsync(() => GuardContent.CanCreate(schema, contentWorkflow, command),
@@ -44,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanCreate_should_throw_exception_if_singleton()
         {
-            SetupSingleton(true);
+            var schema = CreateSchema(true);
 
             var command = new CreateContent { Data = new NamedContentData() };
 
@@ -54,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanCreate_should_not_throw_exception_if_singleton_and_id_is_schema_id()
         {
-            SetupSingleton(true);
+            var schema = CreateSchema(true);
 
             var command = new CreateContent { Data = new NamedContentData(), ContentId = schema.Id };
 
@@ -64,7 +62,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanCreate_should_throw_exception_publish_not_allowed()
         {
-            SetupCanCreatePublish(false);
+            var schema = CreateSchema(false);
+
+            SetupCanCreatePublish(schema, false);
 
             var command = new CreateContent { Data = new NamedContentData(), Publish = true };
 
@@ -74,7 +74,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanCreate_should_not_throw_exception_publishing_allowed()
         {
-            SetupCanCreatePublish(true);
+            var schema = CreateSchema(false);
+
+            SetupCanCreatePublish(schema, true);
 
             var command = new CreateContent { Data = new NamedContentData(), Publish = true };
 
@@ -84,6 +86,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanCreate_should_not_throw_exception_if_data_is_not_null()
         {
+            var schema = CreateSchema(false);
+
             var command = new CreateContent { Data = new NamedContentData() };
 
             await GuardContent.CanCreate(schema, contentWorkflow, command);
@@ -92,6 +96,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanUpdate_should_throw_exception_if_data_is_null()
         {
+            var schema = CreateSchema(false);
+
             SetupCanUpdate(true);
 
             var content = CreateContent(Status.Draft, false);
@@ -104,6 +110,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanUpdate_should_throw_exception_if_workflow_blocks_it()
         {
+            var schema = CreateSchema(false);
+
             SetupCanUpdate(false);
 
             var content = CreateContent(Status.Draft, false);
@@ -126,6 +134,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanPatch_should_throw_exception_if_data_is_null()
         {
+            var schema = CreateSchema(false);
+
             SetupCanUpdate(true);
 
             var content = CreateContent(Status.Draft, false);
@@ -138,6 +148,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanPatch_should_throw_exception_if_workflow_blocks_it()
         {
+            var schema = CreateSchema(false);
+
             SetupCanUpdate(false);
 
             var content = CreateContent(Status.Draft, false);
@@ -160,6 +172,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanChangeStatus_should_throw_exception_if_publishing_without_pending_changes()
         {
+            var schema = CreateSchema(false);
+
             var content = CreateContent(Status.Published, false);
             var command = new ChangeContentStatus { Status = Status.Published };
 
@@ -170,7 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanChangeStatus_should_throw_exception_if_singleton()
         {
-            SetupSingleton(true);
+            var schema = CreateSchema(true);
 
             var content = CreateContent(Status.Published, false);
             var command = new ChangeContentStatus { Status = Status.Draft };
@@ -181,7 +195,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanChangeStatus_should_not_throw_exception_if_publishing_with_pending_changes()
         {
-            SetupSingleton(true);
+            var schema = CreateSchema(true);
 
             var content = CreateContent(Status.Published, true);
             var command = new ChangeContentStatus { Status = Status.Published };
@@ -192,6 +206,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanChangeStatus_should_throw_exception_if_due_date_in_past()
         {
+            var schema = CreateSchema(false);
+
             var content = CreateContent(Status.Draft, false);
             var command = new ChangeContentStatus { Status = Status.Published, DueTime = dueTimeInPast, User = user };
 
@@ -205,6 +221,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanChangeStatus_should_throw_exception_if_status_flow_not_valid()
         {
+            var schema = CreateSchema(false);
+
             var content = CreateContent(Status.Draft, false);
             var command = new ChangeContentStatus { Status = Status.Published, User = user };
 
@@ -218,6 +236,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public async Task CanChangeStatus_should_not_throw_exception_if_status_flow_valid()
         {
+            var schema = CreateSchema(false);
+
             var content = CreateContent(Status.Draft, false);
             var command = new ChangeContentStatus { Status = Status.Published, User = user };
 
@@ -246,7 +266,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanDelete_should_throw_exception_if_singleton()
         {
-            SetupSingleton(true);
+            var schema = CreateSchema(true);
 
             var command = new DeleteContent();
 
@@ -256,6 +276,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
         [Fact]
         public void CanDelete_should_not_throw_exception()
         {
+            var schema = CreateSchema(false);
+
             var command = new DeleteContent();
 
             GuardContent.CanDelete(schema, command);
@@ -267,16 +289,15 @@ namespace Squidex.Domain.Apps.Entities.Contents.Guard
                 .Returns(canUpdate);
         }
 
-        private void SetupCanCreatePublish(bool canCreate)
+        private void SetupCanCreatePublish(ISchemaEntity schema, bool canCreate)
         {
             A.CallTo(() => contentWorkflow.CanPublishOnCreateAsync(schema, A<NamedContentData>.Ignored, user))
                 .Returns(canCreate);
         }
 
-        private void SetupSingleton(bool isSingleton)
+        private ISchemaEntity CreateSchema(bool isSingleton)
         {
-            A.CallTo(() => schema.SchemaDef)
-                .Returns(new Schema("schema", isSingleton: isSingleton));
+            return Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), "my-schema"), new Schema("schema", isSingleton: isSingleton));
         }
 
         private IContentEntity CreateContent(Status status, bool isPending)

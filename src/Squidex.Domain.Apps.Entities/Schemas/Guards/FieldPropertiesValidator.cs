@@ -28,6 +28,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
                     yield return new ValidationError("UI field cannot be a list field.", nameof(properties.IsListField));
                 }
 
+                if (!properties.IsForApi() && properties.IsReferenceField)
+                {
+                    yield return new ValidationError("UI field cannot be a reference field.", nameof(properties.IsReferenceField));
+                }
+
                 foreach (var error in properties.Accept(Instance))
                 {
                     yield return error;
@@ -211,6 +216,13 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Guards
             {
                 yield return new ValidationError(Not.GreaterEquals("Max items", "min items"),
                     nameof(properties.MinItems),
+                    nameof(properties.MaxItems));
+            }
+
+            if (properties.ResolveReference && properties.MaxItems != 1)
+            {
+                yield return new ValidationError("Can only resolve references when MaxItems is 1.",
+                    nameof(properties.ResolveReference),
                     nameof(properties.MaxItems));
             }
         }

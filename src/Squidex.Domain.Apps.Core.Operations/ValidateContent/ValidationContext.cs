@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {
-    public delegate Task<IReadOnlyList<Guid>> CheckContents(Guid schemaId, FilterNode filter);
+    public delegate Task<IReadOnlyList<Guid>> CheckContents(Guid schemaId, FilterNode<ClrValue> filter);
 
     public delegate Task<IReadOnlyList<IAssetInfo>> CheckAssets(IEnumerable<Guid> ids);
 
@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Core.ValidateContent
             return new ValidationContext(contentId, schemaId, checkContent, checkAsset, propertyPath.Enqueue(property), IsOptional);
         }
 
-        public Task<IReadOnlyList<Guid>> GetContentIdsAsync(Guid validatedSchemaId, FilterNode filter)
+        public Task<IReadOnlyList<Guid>> GetContentIdsAsync(Guid validatedSchemaId, FilterNode<ClrValue> filter)
         {
             return checkContent(validatedSchemaId, filter);
         }

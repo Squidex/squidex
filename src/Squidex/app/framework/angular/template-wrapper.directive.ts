@@ -17,6 +17,9 @@ export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
     @Input()
     public index: number;
 
+    @Input()
+    public context: any;
+
     @Input('sqxTemplateWrapper')
     public templateRef: TemplateRef<any>;
 
@@ -34,18 +37,29 @@ export class TemplateWrapperDirective implements OnDestroy, OnInit, OnChanges {
     }
 
     public ngOnInit() {
-        this.view = this.viewContainer.createEmbeddedView(this.templateRef, {
+        const { index, context } = this;
+
+        const data = {
             '\$implicit': this.item,
-            'index': this.index
-        });
+            index,
+            context
+        };
+
+        this.view = this.viewContainer.createEmbeddedView(this.templateRef, data);
     }
 
     public ngOnChanges(changes: SimpleChanges) {
         if (this.view) {
             if (changes.item) {
                 this.view.context.$implicit = this.item;
-            } else if (changes.index) {
+            }
+
+            if (changes.index) {
                 this.view.context.index = this.index;
+            }
+
+            if (changes.context) {
+                this.view.context.context = this.context;
             }
         }
     }

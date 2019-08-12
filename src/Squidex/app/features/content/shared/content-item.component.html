@@ -11,7 +11,53 @@
     </ng-template>
 </td>
 
-<td class="cell-auto" *ngFor="let field of schema.listFields; let i = index; trackBy: trackByField.bind(this)" [sqxStopClick]="isDirty || (field.isInlineEditable && patchAllowed)">
+<td class="cell-actions cell-actions-left" *ngIf="!isReadOnly && !isDirty" sqxStopClick>
+    <div class="dropdown dropdown-options" *ngIf="content">
+        <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
+            <i class="icon-dots"></i>
+        </button>
+
+        <ng-container *sqxModal="dropdown;closeAlways:true">
+            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" position="bottom-left" @fade>
+                <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="emitChangeStatus(info.status)">
+                    Change to <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
+                </a>
+                <a class="dropdown-item" (click)="emitClone(); dropdown.hide()" *ngIf="canClone">
+                    Clone
+                </a>
+                
+                <div class="dropdown-divider"></div>
+    
+                <a class="dropdown-item dropdown-item-delete"
+                    (sqxConfirmClick)="emitDelete()"
+                    confirmTitle="Delete content" 
+                    confirmText="Do you really want to delete the content?">
+                    Delete
+                </a>
+            </div>
+        </ng-container>
+    </div>
+</td>
+
+<ng-container *ngIf="isDirty">
+    <td class="cell-actions" >
+        <button type="button" class="btn btn-text-secondary btn-cancel" (click)="cancel()" sqxStopClick>
+            <i class="icon-close"></i>
+        </button>
+    </td>
+
+    <td class="cell-user" >
+        <button type="button" class="btn btn-success" (click)="save()" sqxStopClick>
+            <i class="icon-checkmark"></i>
+        </button>
+    </td>
+</ng-container>
+
+<td class="cell-user" *ngIf="!isCompact && !isDirty" [sqxStopClick]="isDirty">
+    <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
+</td>
+
+<td class="cell-auto cell-content" *ngFor="let field of schemaFields; let i = index; trackBy: trackByField.bind(this)" [sqxStopClick]="isDirty || (field.isInlineEditable && patchAllowed)">
     <ng-container *ngIf="field.isInlineEditable && patchAllowed; else displayTemplate">
         <sqx-content-value-editor [form]="patchForm.form" [field]="field"></sqx-content-value-editor>
     </ng-container>
@@ -33,50 +79,6 @@
     <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
 </td>
 
-<td class="cell-user" *ngIf="!isCompact && !isDirty" [sqxStopClick]="isDirty">
-    <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
-</td>
-
-<ng-container *ngIf="isDirty">
-    <td class="cell-user" >
-        <button type="button" class="btn btn-success" (click)="save()" sqxStopClick>
-            <i class="icon-checkmark"></i>
-        </button>
-    </td>
-    <td class="cell-actions" >
-        <button type="button" class="btn btn-text-secondary btn-cancel" (click)="cancel()" sqxStopClick>
-            <i class="icon-close"></i>
-        </button>
-    </td>
-</ng-container>
-
-<td class="cell-actions" *ngIf="!isReadOnly && !isDirty" sqxStopClick>
-    <div class="dropdown dropdown-options" *ngIf="content">
-        <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
-            <i class="icon-dots"></i>
-        </button>
-
-        <ng-container *sqxModal="dropdown;closeAlways:true">
-            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
-                <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="emitChangeStatus(info.status)">
-                    Change to <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{info.status}}
-                </a>
-                <a class="dropdown-item" (click)="emitClone(); dropdown.hide()" *ngIf="canClone">
-                    Clone
-                </a>
-                
-                <div class="dropdown-divider"></div>
-    
-                <a class="dropdown-item dropdown-item-delete"
-                    (sqxConfirmClick)="emitDelete()"
-                    confirmTitle="Delete content" 
-                    confirmText="Do you really want to delete the content?">
-                    Delete
-                </a>
-            </div>
-        </ng-container>
-    </div>
-</td>
 <td class="cell-actions" *ngIf="isReference" [sqxStopClick]="isDirty">
     <div class="reference-edit">
         <button type="button" class="btn btn-text-secondary">

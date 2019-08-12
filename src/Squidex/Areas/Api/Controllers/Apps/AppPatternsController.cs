@@ -97,7 +97,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ProducesResponseType(typeof(PatternsDto), 200)]
         [ApiPermission(Permissions.AppPatternsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> UpdatePattern(string app, Guid id, [FromBody] UpdatePatternDto request)
+        public async Task<IActionResult> PutPattern(string app, Guid id, [FromBody] UpdatePatternDto request)
         {
             var command = request.ToUpdateCommand(id);
 

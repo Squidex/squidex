@@ -13,6 +13,7 @@ using GraphQL;
 using GraphQL.DataLoader;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
+using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 
@@ -45,10 +46,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             var loader = resolver.Resolve<DataLoaderDocumentListener>();
 
-            var logger = LoggingMiddleware.Create(resolver.Resolve<ISemanticLog>());
-
             execution.Listeners.Add(loader);
-            execution.FieldMiddleware.Use(logger);
+            execution.FieldMiddleware.Use(Middlewares.Logging(resolver.Resolve<ISemanticLog>()));
+            execution.FieldMiddleware.Use(Middlewares.Errors());
 
             execution.UserContext = this;
         }

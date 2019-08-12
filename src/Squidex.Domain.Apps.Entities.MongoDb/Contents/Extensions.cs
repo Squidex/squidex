@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
     {
         public static List<Guid> ToReferencedIds(this IdContentData data, Schema schema)
         {
-            return data.GetReferencedIds(schema).ToList();
+            return data.GetReferencedIds(schema).Distinct().ToList();
         }
 
         public static NamedContentData FromMongoModel(this IdContentData result, Schema schema, List<Guid> deletedIds, IJsonSerializer serializer)

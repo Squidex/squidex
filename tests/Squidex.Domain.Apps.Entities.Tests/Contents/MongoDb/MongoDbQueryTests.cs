@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using FakeItEasy;
 using MongoDB.Bson.Serialization;
@@ -23,7 +24,7 @@ using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.MongoDb.Queries;
 using Squidex.Infrastructure.Queries;
 using Xunit;
-using FilterBuilder = Squidex.Infrastructure.Queries.FilterBuilder;
+using ClrFilter = Squidex.Infrastructure.Queries.ClrFilter;
 using SortBuilder = Squidex.Infrastructure.Queries.SortBuilder;
 
 namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
@@ -78,13 +79,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_throw_exception_for_invalid_field()
         {
-            Assert.Throws<NotSupportedException>(() => F(FilterBuilder.Eq("data/invalid/iv", "Me")));
+            Assert.Throws<NotSupportedException>(() => F(ClrFilter.Eq("data/invalid/iv", "Me")));
         }
 
         [Fact]
         public void Should_make_query_with_lastModified()
         {
-            var i = F(FilterBuilder.Eq("lastModified", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
+            var i = F(ClrFilter.Eq("lastModified", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
             var o = C("{ 'mt' : '1988-01-19T12:00:00Z' }");
 
             Assert.Equal(o, i);
@@ -93,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_lastModifiedBy()
         {
-            var i = F(FilterBuilder.Eq("lastModifiedBy", "Me"));
+            var i = F(ClrFilter.Eq("lastModifiedBy", "Me"));
             var o = C("{ 'mb' : 'Me' }");
 
             Assert.Equal(o, i);
@@ -102,7 +103,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_created()
         {
-            var i = F(FilterBuilder.Eq("created", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
+            var i = F(ClrFilter.Eq("created", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
             var o = C("{ 'ct' : '1988-01-19T12:00:00Z' }");
 
             Assert.Equal(o, i);
@@ -111,7 +112,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_createdBy()
         {
-            var i = F(FilterBuilder.Eq("createdBy", "Me"));
+            var i = F(ClrFilter.Eq("createdBy", "Me"));
             var o = C("{ 'cb' : 'Me' }");
 
             Assert.Equal(o, i);
@@ -120,7 +121,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_version()
         {
-            var i = F(FilterBuilder.Eq("version", 0L));
+            var i = F(ClrFilter.Eq("version", 0L));
             var o = C("{ 'vs' : NumberLong(0) }");
 
             Assert.Equal(o, i);
@@ -129,7 +130,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_version_and_list()
         {
-            var i = F(FilterBuilder.In("version", 0L, 2L, 5L));
+            var i = F(ClrFilter.In("version", new List<long> { 0L, 2L, 5L }));
             var o = C("{ 'vs' : { '$in' : [NumberLong(0), NumberLong(2), NumberLong(5)] } }");
 
             Assert.Equal(o, i);
@@ -138,7 +139,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_from_draft()
         {
-            var i = F(FilterBuilder.Eq("data/dashed_field/iv", "Value"), true);
+            var i = F(ClrFilter.Eq("data/dashed_field/iv", "Value"), true);
             var o = C("{ 'dd.8.iv' : 'Value' }");
 
             Assert.Equal(o, i);
@@ -147,7 +148,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_empty_test()
         {
-            var i = F(FilterBuilder.Empty("data/firstName/iv"), true);
+            var i = F(ClrFilter.Empty("data/firstName/iv"), true);
             var o = C("{ '$or' : [{ 'dd.1.iv' : { '$exists' : false } }, { 'dd.1.iv' : null }, { 'dd.1.iv' : '' }, { 'dd.1.iv' : [] }] }");
 
             Assert.Equal(o, i);
@@ -156,7 +157,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_datetime_data()
         {
-            var i = F(FilterBuilder.Eq("data/birthday/iv", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
+            var i = F(ClrFilter.Eq("data/birthday/iv", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
             var o = C("{ 'do.5.iv' : '1988-01-19T12:00:00Z' }");
 
             Assert.Equal(o, i);
@@ -165,7 +166,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_underscore_field()
         {
-            var i = F(FilterBuilder.Eq("data/dashed_field/iv", "Value"));
+            var i = F(ClrFilter.Eq("data/dashed_field/iv", "Value"));
             var o = C("{ 'do.8.iv' : 'Value' }");
 
             Assert.Equal(o, i);
@@ -174,7 +175,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_references_equals()
         {
-            var i = F(FilterBuilder.Eq("data/friends/iv", "guid"));
+            var i = F(ClrFilter.Eq("data/friends/iv", "guid"));
             var o = C("{ 'do.7.iv' : 'guid' }");
 
             Assert.Equal(o, i);
@@ -183,7 +184,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_array_field()
         {
-            var i = F(FilterBuilder.Eq("data/hobbies/iv/name", "PC"));
+            var i = F(ClrFilter.Eq("data/hobbies/iv/name", "PC"));
             var o = C("{ 'do.9.iv.91' : 'PC' }");
 
             Assert.Equal(o, i);
@@ -192,7 +193,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_assets_equals()
         {
-            var i = F(FilterBuilder.Eq("data/pictures/iv", "guid"));
+            var i = F(ClrFilter.Eq("data/pictures/iv", "guid"));
             var o = C("{ 'do.6.iv' : 'guid' }");
 
             Assert.Equal(o, i);
@@ -201,7 +202,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_query_with_full_text()
         {
-            var i = Q(new Query { FullText = "Hello my World" });
+            var i = Q(new ClrQuery { FullText = "Hello my World" });
             var o = C("{ '$text' : { '$search' : 'Hello my World' } }");
 
             Assert.Equal(o, i);
@@ -228,7 +229,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_take_statement()
         {
-            var query = new Query { Take = 3 };
+            var query = new ClrQuery { Take = 3 };
             var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             cursor.ContentTake(query.AdjustToModel(schemaDef, false));
@@ -240,7 +241,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
         [Fact]
         public void Should_make_skip_statement()
         {
-            var query = new Query { Skip = 3 };
+            var query = new ClrQuery { Skip = 3 };
             var cursor = A.Fake<IFindFluent<MongoContentEntity, MongoContentEntity>>();
 
             cursor.ContentSkip(query.AdjustToModel(schemaDef, false));
@@ -254,9 +255,9 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
             return value.Replace('\'', '"');
         }
 
-        private string F(FilterNode filter, bool useDraft = false)
+        private string F(FilterNode<ClrValue> filter, bool useDraft = false)
         {
-            return Q(new Query { Filter = filter }, useDraft);
+            return Q(new ClrQuery { Filter = filter }, useDraft);
         }
 
         private string S(params SortNode[] sorts)
@@ -271,12 +272,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.MongoDb
                     i = sortDefinition.Render(Serializer, Registry).ToString();
                 });
 
-            cursor.ContentSort(new Query { Sort = sorts.ToList() }.AdjustToModel(schemaDef, false));
+            cursor.ContentSort(new ClrQuery { Sort = sorts.ToList() }.AdjustToModel(schemaDef, false));
 
             return i;
         }
 
-        private string Q(Query query, bool useDraft = false)
+        private string Q(ClrQuery query, bool useDraft = false)
         {
             var rendered =
                 query.AdjustToModel(schemaDef, useDraft).BuildFilter<MongoContentEntity>().Filter

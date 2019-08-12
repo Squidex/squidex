@@ -89,6 +89,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </summary>
         /// <param name="app">The name of the app.</param>
         /// <param name="ids">The optional asset ids.</param>
+        /// <param name="q">The optional json query.</param>
         /// <returns>
         /// 200 => Assets returned.
         /// 404 => App not found.
@@ -101,9 +102,13 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetsDto), 200)]
         [ApiPermission(Permissions.AppAssetsRead)]
         [ApiCosts(1)]
-        public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null)
+        public async Task<IActionResult> GetAssets(string app, [FromQuery] string ids = null, [FromQuery] string q = null)
         {
-            var assets = await assetQuery.QueryAsync(Context, Q.Empty.WithODataQuery(Request.QueryString.ToString()).WithIds(ids));
+            var assets = await assetQuery.QueryAsync(Context,
+                Q.Empty
+                    .WithIds(ids)
+                    .WithJsonQuery(q)
+                    .WithODataQuery(Request.QueryString.ToString()));
 
             var response = Deferred.Response(() =>
             {
@@ -177,7 +182,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PostAsset(string app, [SwaggerIgnore] List<IFormFile> file)
+        public async Task<IActionResult> PostAsset(string app, [OpenApiIgnore] List<IFormFile> file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 
@@ -207,7 +212,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [ProducesResponseType(typeof(AssetDto), 200)]
         [ApiPermission(Permissions.AppAssetsUpdate)]
         [ApiCosts(1)]
-        public async Task<IActionResult> PutAssetContent(string app, Guid id, [SwaggerIgnore] List<IFormFile> file)
+        public async Task<IActionResult> PutAssetContent(string app, Guid id, [OpenApiIgnore] List<IFormFile> file)
         {
             var assetFile = await CheckAssetFileAsync(file);
 

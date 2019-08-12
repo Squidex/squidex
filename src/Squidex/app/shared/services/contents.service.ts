@@ -55,6 +55,11 @@ export class ContentsDto extends ResultSet<ContentDto> {
     }
 }
 
+export type ContentReferencesValue = { [partition: string]: string };
+export type ContentReferences = { [fieldName: string ]: ContentFieldData<ContentReferencesValue> };
+export type ContentFieldData<T = any> = { [partition: string]: T };
+export type ContentData = { [fieldName: string ]: ContentFieldData };
+
 export class ContentDto {
     public readonly _links: ResourceLinks;
 
@@ -77,8 +82,9 @@ export class ContentDto {
         public readonly lastModifiedBy: string,
         public readonly scheduleJob: ScheduleDto | null,
         public readonly isPending: boolean,
-        public readonly data: object | any,
-        public readonly dataDraft: object,
+        public readonly data: ContentData | undefined,
+        public readonly dataDraft: ContentData,
+        public readonly referenceData: ContentReferences,
         public readonly version: Version
     ) {
         this._links = links;
@@ -299,5 +305,6 @@ function parseContent(response: any) {
         response.isPending === true,
         response.data,
         response.dataDraft,
+        response.referenceData,
         new Version(response.version.toString()));
 }
