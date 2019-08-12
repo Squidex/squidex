@@ -140,8 +140,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
                 operation.AddQueryParameter("publish", JsonObjectType.Boolean, "Set to true to autopublish content.");
 
-                operation.AddResponse("200", $"{schemaName} content created.", contentSchema);
-                operation.AddResponse("400", "Content data valid.");
+                operation.AddResponse("201", $"{schemaName} content created.", contentSchema);
+                operation.AddResponse("400", $"{schemaName} content not valid.");
 
                 AddSecurity(operation, Permissions.AppContentsCreate);
             });
@@ -158,7 +158,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
                 operation.AddResponse("200", $"{schemaName} content updated.", contentSchema);
-                operation.AddResponse("400", "Content data valid.");
+                operation.AddResponse("400", $"{schemaName} content not valid.");
 
                 AddSecurity(operation, Permissions.AppContentsUpdate);
             });
@@ -175,7 +175,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
 
                 operation.AddResponse("200", $"{schemaName} content patched.", contentSchema);
-                operation.AddResponse("400", "Status change not valid.");
+                operation.AddResponse("400", $"{schemaName} status not valid.");
 
                 AddSecurity(operation, Permissions.AppContentsUpdate);
             });
@@ -192,7 +192,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                 operation.AddBodyParameter("request", statusSchema, "The request to change content status.");
 
                 operation.AddResponse("204", $"{schemaName} content status changed.", contentSchema);
-                operation.AddResponse("400", "Content data valid.");
+                operation.AddResponse("400", $"{schemaName} content not valid.");
 
                 AddSecurity(operation, Permissions.AppContentsUpdate);
             });
@@ -206,8 +206,8 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
                 operation.Summary = $"Discard changes of {schemaName} content.";
 
-                operation.AddResponse("400", "No pending draft.");
                 operation.AddResponse("200", $"{schemaName} content status changed.", contentSchema);
+                operation.AddResponse("400", $"{schemaName} content has no pending draft.");
 
                 AddSecurity(operation, Permissions.AppContentsDraftDiscard);
             });

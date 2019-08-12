@@ -132,19 +132,21 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 return IdentityResult.Failed(new IdentityError { Description = "Please upload a single file." });
             }
 
-            var thumbnailStream = new MemoryStream();
-            try
+            using (var thumbnailStream = new MemoryStream())
             {
-                await assetThumbnailGenerator.CreateThumbnailAsync(file[0].OpenReadStream(), thumbnailStream, 128, 128, "Crop");
+                try
+                {
+                    await assetThumbnailGenerator.CreateThumbnailAsync(file[0].OpenReadStream(), thumbnailStream, 128, 128, "Crop");
 
-                thumbnailStream.Position = 0;
-            }
-            catch
-            {
-                return IdentityResult.Failed(new IdentityError { Description = "Picture is not a valid image." });
-            }
+                    thumbnailStream.Position = 0;
+                }
+                catch
+                {
+                    return IdentityResult.Failed(new IdentityError { Description = "Picture is not a valid image." });
+                }
 
-            await userPictureStore.UploadAsync(user.Id, thumbnailStream);
+                await userPictureStore.UploadAsync(user.Id, thumbnailStream);
+            }
 
             return await userManager.UpdateSafeAsync(user.Identity, new UserValues { PictureUrl = SquidexClaimTypes.PictureUrlStore });
         }

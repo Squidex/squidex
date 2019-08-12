@@ -18,7 +18,7 @@ using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Reflection;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public sealed class ContentEnricher : IContentEnricher
     {
@@ -61,6 +61,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                 if (contents.Any())
                 {
+                    var appVersion = context.App.Version.ToString();
+
                     var cache = new Dictionary<(Guid, Status), StatusInfo>();
 
                     foreach (var content in contents)
@@ -75,14 +77,27 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             await ResolveCanUpdateAsync(content, result);
                         }
 
+                        result.CacheDependencies.Add(appVersion);
+
                         results.Add(result);
                     }
 
-                    if (ShouldEnrichWithReferences(context))
+                    foreach (var group in results.GroupBy(x => x.SchemaId.Id))
                     {
-                        foreach (var group in results.GroupBy(x => x.SchemaId.Id))
+                        var schema = await ContentQuery.GetSchemaOrThrowAsync(context, group.Key.ToString());
+
+                        var schemaIdentity = schema.Id.ToString();
+                        var schemaVersion = schema.Version.ToString();
+
+                        foreach (var content in group)
                         {
-                            await ResolveReferencesAsync(group.Key, group, context);
+                            content.CacheDependencies.Add(schemaIdentity);
+                            content.CacheDependencies.Add(schemaVersion);
+                        }
+
+                        if (ShouldEnrichWithReferences(context))
+                        {
+                            await ResolveReferencesAsync(schema, group, context);
                         }
                     }
                 }
@@ -91,10 +106,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task ResolveReferencesAsync(Guid schemaId, IEnumerable<ContentEntity> contents, Context context)
+        private async Task ResolveReferencesAsync(ISchemaEntity schema, IEnumerable<ContentEntity> contents, Context context)
         {
-            var schema = await ContentQuery.GetSchemaOrThrowAsync(context, schemaId.ToString());
-
             var references = await GetReferencesAsync(schema, contents, context);
 
             var formatted = new Dictionary<IContentEntity, JsonObject>();
@@ -115,6 +128,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 {
                     var referencedSchemaId = field.Properties.SchemaId;
                     var referencedSchema = await ContentQuery.GetSchemaOrThrowAsync(context, referencedSchemaId.ToString());
+
+                    var schemaIdentity = referencedSchema.Id.ToString();
+                    var schemaVersion = referencedSchema.Version.ToString();
 
                     foreach (var content in contents)
                     {
@@ -146,6 +162,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 }
                             }
                         }
+
+                        content.CacheDependencies.Add(schemaIdentity);
+                        content.CacheDependencies.Add(schemaVersion);
                     }
                 }
                 catch (DomainObjectNotFoundException)

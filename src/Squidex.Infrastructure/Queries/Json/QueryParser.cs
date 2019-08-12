@@ -25,18 +25,8 @@ namespace Squidex.Infrastructure.Queries.Json
 
             var errors = new List<string>();
 
-            if (result.Sort != null)
-            {
-                foreach (var sorting in result.Sort)
-                {
-                    sorting.Path.TryGetProperty(schema, errors, out _);
-                }
-            }
-
-            if (query.Filter != null)
-            {
-                result.Filter = JsonFilterVisitor.Parse(query.Filter, schema, errors);
-            }
+            ConvertSorting(schema, result, errors);
+            ConvertFilters(schema, result, errors, query);
 
             if (errors.Count > 0)
             {
@@ -44,6 +34,27 @@ namespace Squidex.Infrastructure.Queries.Json
             }
 
             return result;
+        }
+
+        private static void ConvertFilters(JsonSchema schema, ClrQuery result, List<string> errors, Query<IJsonValue> query)
+        {
+            if (query.Filter != null)
+            {
+                var filter = JsonFilterVisitor.Parse(query.Filter, schema, errors);
+
+                result.Filter = Optimizer<ClrValue>.Optimize(filter);
+            }
+        }
+
+        private static void ConvertSorting(JsonSchema schema, ClrQuery result, List<string> errors)
+        {
+            if (result.Sort != null)
+            {
+                foreach (var sorting in result.Sort)
+                {
+                    sorting.Path.TryGetProperty(schema, errors, out _);
+                }
+            }
         }
 
         private static Query<IJsonValue> ParseFromJson(string json, IJsonSerializer jsonSerializer)

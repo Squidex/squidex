@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             .WriteProperty("status", "failed")
                             .WriteProperty("field", context.FieldName));
 
-                        throw ex;
+                        throw;
                     }
                 };
             });

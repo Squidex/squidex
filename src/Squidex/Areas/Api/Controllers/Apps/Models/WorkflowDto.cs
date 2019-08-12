@@ -46,16 +46,13 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static WorkflowDto FromWorkflow(Guid id, Workflow workflow, ApiController controller, string app)
         {
-            var result = SimpleMapper.Map(workflow, new WorkflowDto { Id = id });
-
-            result.Steps = workflow.Steps.ToDictionary(
-                x => x.Key,
-                x => SimpleMapper.Map(x.Value, new WorkflowStepDto
-                {
-                    Transitions = x.Value.Transitions.ToDictionary(
-                        y => y.Key,
-                        y => new WorkflowTransitionDto { Expression = y.Value.Expression, Role = y.Value.Role })
-                }));
+            var result = SimpleMapper.Map(workflow, new WorkflowDto
+            {
+                Steps = workflow.Steps.ToDictionary(
+                    x => x.Key,
+                    x => WorkflowStepDto.FromWorkflowStep(x.Value)),
+                Id = id
+            });
 
             return result.CreateLinks(controller, app, id);
         }

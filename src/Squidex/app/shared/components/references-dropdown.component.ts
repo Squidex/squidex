@@ -62,9 +62,6 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     public schemaId: string;
 
     @Input()
-    public isRequired = false;
-
-    @Input()
     public mode: 'Array' | 'Single';
 
     @Input()
@@ -131,12 +128,6 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
                 this.next(s => ({ ...s, schema, contentItems, contentNames }));
 
                 this.selectContent();
-
-                if (this.isRequired && !this.selectedId) {
-                    this.selectFirstContent();
-                } else {
-                    this.selectContent();
-                }
             }, () => {
                 this.selectionControl.disable();
             });
@@ -162,10 +153,6 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         this.selectionControl.setValue(this.snapshot.contentNames.find(x => x.id === this.selectedId), NO_EMIT);
     }
 
-    private selectFirstContent() {
-        this.selectionControl.setValue(this.snapshot.contentNames[0]);
-    }
-
     private unselectContent() {
         this.selectionControl.setValue(undefined, NO_EMIT);
     }
@@ -185,11 +172,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
             return { name, id: content.id };
         });
 
-        if (!this.isRequired) {
-            return [{ name: '- No Reference -' }, ...names];
-        }
-
-        return names;
+        return [{ name: '- No Reference -' }, ...names];
     }
 
     public trackByContent(content: ContentDto) {
