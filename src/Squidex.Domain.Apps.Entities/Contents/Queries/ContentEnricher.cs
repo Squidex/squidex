@@ -77,6 +77,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                             await ResolveCanUpdateAsync(content, result);
                         }
 
+                        result.CacheDependencies = new HashSet<string>();
                         result.CacheDependencies.Add(appVersion);
 
                         results.Add(result);

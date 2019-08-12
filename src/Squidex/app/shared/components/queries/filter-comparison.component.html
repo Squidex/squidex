@@ -37,8 +37,7 @@
                         <sqx-references-dropdown [schemaId]="fieldModel.extra"
                             mode="Single"
                             [ngModel]="filter.value"
-                            (ngModelChange)="changeValue($event)"
-                            [isRequired]="true">
+                            (ngModelChange)="changeValue($event)">
                         </sqx-references-dropdown>
                     </ng-container>
                     <ng-container *ngSwitchCase="'status'">
