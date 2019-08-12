@@ -43,7 +43,12 @@ namespace Squidex.Areas.Api.Controllers.News.Service
 
             if (client != null && version < FeatureVersion)
             {
-                var features = await client.GetAsync(filter: $"data/version/iv ge {FeatureVersion}", context: Flatten);
+                var query = new ODataQuery
+                {
+                    Filter = $"data/version/iv ge {FeatureVersion}"
+                };
+
+                var features = await client.GetAsync(query, Flatten);
 
                 result.Features.AddRange(features.Items.Select(x => x.Data));
             }
