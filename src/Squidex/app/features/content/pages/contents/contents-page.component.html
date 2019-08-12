@@ -16,10 +16,10 @@
             </div>
             <div class="col pl-1">
                 <sqx-search-form formClass="form" placeholder="Search for content"
-                    [query]="query"
+                    [query]="contentsState.contentsQuery | async"
                     [queries]="queries"
                     [queryModel]="queryModel"
-                    (querySubmit)="search()" 
+                    (queryChange)="search($event)" 
                     enableShortcut="true">
                 </sqx-search-form>
             </div>
@@ -42,7 +42,7 @@
                 <thead>
                     <tr>
                         <th class="cell-select">
-                            <input type="checkbox" class="form-check" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
+                            <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
                         </th>
                         <th class="cell-actions cell-actions-left">
                             Actions
@@ -53,15 +53,19 @@
                         <th class="cell-auto cell-content" *ngFor="let field of schema.listFields">
                             <sqx-table-header [text]="field.displayName" 
                                 [sortable]="field.properties.isSortable"
-                                [order]="query.sortMode(field) | async"
-                                (orderChange)="sort(field, $event)">
+                                [field]="field"
+                                [query]="contentsState.contentsQuery | async"
+                                (queryChange)="search($event)"
+                                [language]="language">
                             </sqx-table-header>
                         </th>
                         <th class="cell-time">
                             <sqx-table-header text="Updated"
                                 [sortable]="true"
-                                [order]="query.sortMode('lastModified') | async"
-                                (orderChange)="sort('lastModified', $event)">
+                                [field]="'lastModified'"
+                                [query]="contentsState.contentsQuery | async"
+                                (queryChange)="search($event)"
+                                [language]="language">
                             </sqx-table-header>
                         </th>
                     </tr>

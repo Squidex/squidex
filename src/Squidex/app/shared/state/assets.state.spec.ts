@@ -19,6 +19,7 @@ import {
 import { createAsset } from './../services/assets.service.spec';
 
 import { TestValues } from './_test-helpers';
+import { encodeQuery } from './query';
 
 describe('AssetsState', () => {
     const {
@@ -131,12 +132,15 @@ describe('AssetsState', () => {
         });
 
         it('should load with query when searching', () => {
-            assetsService.setup(x => x.getAssets(app, 30, 0, { fullText: 'my-query' }, It.isValue([])))
+            const query = { fullText: 'my-query' };
+
+            assetsService.setup(x => x.getAssets(app, 30, 0, query, It.isValue([])))
                 .returns(() => of(new AssetsDto(0, []))).verifiable();
 
-            assetsState.search({ fullText: 'my-query' }).subscribe();
+            assetsState.search(query).subscribe();
 
-            expect(assetsState.snapshot.assetsQuery).toEqual({ fullText: 'my-query' });
+            expect(assetsState.snapshot.assetsQuery).toEqual(query);
+            expect(assetsState.isQueryUsed({ name: 'name', query, queryJson: encodeQuery(query) })).toBeTruthy();
         });
     });
 

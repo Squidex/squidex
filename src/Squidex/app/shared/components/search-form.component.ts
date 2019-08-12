@@ -5,18 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import {
     DialogModel,
     fadeAnimation,
+    hasFilter,
     Queries,
     Query,
     QueryModel,
-    QueryState,
-    ResourceOwner,
     SaveQueryForm
 } from '@app/shared/internal';
 
@@ -29,9 +28,7 @@ import {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchFormComponent extends ResourceOwner implements OnChanges, OnInit {
-    public currentQuery: Query | undefined;
-
+export class SearchFormComponent implements OnChanges {
     public readonly standalone = { standalone: true };
 
     @Input()
@@ -41,13 +38,13 @@ export class SearchFormComponent extends ResourceOwner implements OnChanges, OnI
     public queryModel: QueryModel;
 
     @Input()
-    public query: QueryState;
+    public query: Query;
+
+    @Output()
+    public queryChange = new EventEmitter<Query>();
 
     @Input()
     public queries: Queries;
-
-    @Output()
-    public querySubmit = new EventEmitter();
 
     @Input()
     public enableShortcut = false;
@@ -61,25 +58,26 @@ export class SearchFormComponent extends ResourceOwner implements OnChanges, OnI
 
     public searchDialog = new DialogModel();
 
+    public hasFilter: boolean;
+
     constructor(
         private readonly formBuilder: FormBuilder
     ) {
-        super();
     }
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes['query']) {
-            super.unsubscribeAll();
+        if (changes['query'] || changes['queries']) {
+            this.updateSaveKey();
 
-            this.own(this.query.query.subscribe(query => {
-                this.currentQuery = query;
-            }));
+            this.hasFilter = hasFilter(this.query);
         }
     }
 
-    public ngOnInit() {
-        if (this.queries) {
-            this.saveKey = this.queries.getSaveKey(this.query.queryJson);
+    public search(close = false) {
+        this.queryChange.emit(this.query);
+
+        if (close) {
+            this.searchDialog.hide();
         }
     }
 
@@ -92,8 +90,8 @@ export class SearchFormComponent extends ResourceOwner implements OnChanges, OnI
         const value = this.saveQueryForm.submit();
 
         if (value) {
-            if (this.queries && this.currentQuery) {
-                this.queries.add(value.name, this.currentQuery);
+            if (this.queries && this.query) {
+                this.queries.add(value.name, this.query);
             }
 
             this.saveQueryForm.submitCompleted();
@@ -102,12 +100,21 @@ export class SearchFormComponent extends ResourceOwner implements OnChanges, OnI
         this.saveQueryDialog.hide();
     }
 
-    public changeQuery(query: Query) {
-        this.currentQuery = query;
+    public changeQueryFullText(fullText: string) {
+        this.query = { ...this.query, fullText };
+
+        this.updateSaveKey();
     }
 
-    public search() {
-        this.query.setQuery(this.currentQuery);
-        this.querySubmit.emit();
+    public changeQuery(query: Query) {
+        this.query = query;
+
+        this.updateSaveKey();
+    }
+
+    private updateSaveKey() {
+        if (this.queries && this.query) {
+            this.saveKey = this.queries.getSaveKey(this.query);
+        }
     }
 }

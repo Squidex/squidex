@@ -48,7 +48,7 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
     }
 
     public isSelectedQuery(saved: SavedQuery) {
-        return this.contentsState.snapshot.contentsQueryJson === saved.queryJson;
+        return this.contentsState.isQueryUsed(saved);
     }
 
     public trackByTag(index: number, tag: { name: string }) {

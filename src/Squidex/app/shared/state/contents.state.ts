@@ -85,6 +85,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public canCreateAny =
         this.project(x => !!x.canCreate || !!x.canCreateAndPublish);
 
+    public statuses =
+        this.project(x => x.statuses);
+
     public statusQueries =
         this.project2(x => x.statuses, x => buildQueries(x));
 
@@ -173,6 +176,11 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     };
                 });
             }));
+    }
+
+    public loadVersion(content: ContentDto, version: Version): Observable<Versioned<any>> {
+        return this.contentsService.getVersionData(this.appName, this.schemaName, content.id, version).pipe(
+            shareSubscribed(this.dialogs));
     }
 
     public create(request: any, publish: boolean): Observable<ContentDto> {
@@ -286,22 +294,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    private replaceContent(content: ContentDto, oldVersion?: Version) {
-        if (!oldVersion || !oldVersion.eq(content.version)) {
-            return this.next(s => {
-                const contents = s.contents.replaceBy('id', content);
-
-                const selectedContent =
-                    s.selectedContent &&
-                    s.selectedContent.id === content.id ?
-                    content :
-                    s.selectedContent;
-
-                return { ...s, contents, selectedContent };
-            });
-        }
-    }
-
     public search(contentsQuery?: Query): Observable<any> {
         this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery, contentsQueryJson: encodeQuery(contentsQuery) }));
 
@@ -320,13 +312,28 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.loadInternal();
     }
 
-    public loadVersion(content: ContentDto, version: Version): Observable<Versioned<any>> {
-        return this.contentsService.getVersionData(this.appName, this.schemaName, content.id, version).pipe(
-            shareSubscribed(this.dialogs));
+    public isQueryUsed(saved: SavedQuery) {
+        return this.snapshot.contentsQueryJson === saved.queryJson;
     }
 
     private get appName() {
         return this.appsState.appName;
+    }
+
+    private replaceContent(content: ContentDto, oldVersion?: Version) {
+        if (!oldVersion || !oldVersion.eq(content.version)) {
+            return this.next(s => {
+                const contents = s.contents.replaceBy('id', content);
+
+                const selectedContent =
+                    s.selectedContent &&
+                    s.selectedContent.id === content.id ?
+                    content :
+                    s.selectedContent;
+
+                return { ...s, contents, selectedContent };
+            });
+        }
     }
 
     protected abstract get schemaName(): string;

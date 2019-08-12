@@ -10,10 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
-<<<<<<< HEAD:tests/Squidex.Domain.Apps.Entities.Tests/Assets/AssetQueryServiceTests.cs
-using Squidex.Domain.Apps.Entities.Assets.Queries;
-=======
->>>>>>> master:tests/Squidex.Domain.Apps.Entities.Tests/Assets/Queries/AssetQueryServiceTests.cs
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;

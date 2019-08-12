@@ -20,6 +20,7 @@ import {
 
 import { AssetDto, AssetsService} from './../services/assets.service';
 import { AppsState } from './apps.state';
+import { SavedQuery } from './queries';
 import { encodeQuery, Query } from './query';
 
 interface Snapshot {
@@ -218,6 +219,10 @@ export class AssetsState extends State<Snapshot> {
         this.next(s => ({ ...s, assetsPager: s.assetsPager.goPrev() }));
 
         return this.loadInternal();
+    }
+
+    public isQueryUsed(saved: SavedQuery) {
+        return this.snapshot.assetsQueryJson === saved.queryJson;
     }
 
     public isTagSelected(tag: string) {

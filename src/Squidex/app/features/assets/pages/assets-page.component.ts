@@ -13,7 +13,7 @@ import {
     AssetsState,
     LocalStoreService,
     Queries,
-    QueryState,
+    Query,
     ResourceOwner,
     UIState
 } from '@app/shared';
@@ -27,7 +27,6 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     public assetsFilter = new FormControl();
 
     public queries = new Queries(this.uiState, 'assets');
-    public query = new QueryState();
 
     public isListView: boolean;
 
@@ -43,12 +42,6 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     }
 
     public ngOnInit() {
-        this.own(
-            this.assetsState.assetsQuery
-                .subscribe(query => {
-                    this.query.setQuery(query);
-                }));
-
         this.assetsState.load();
     }
 
@@ -56,8 +49,8 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
         this.assetsState.load(true);
     }
 
-    public search() {
-        this.assetsState.search(this.query.snapshot.query);
+    public search(query: Query) {
+        this.assetsState.search(query);
     }
 
     public selectTags(tags: string[]) {

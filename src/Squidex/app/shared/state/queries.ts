@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { combineLatest, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { compareStringsAsc, Types } from '@app/framework';
@@ -60,12 +60,14 @@ export class Queries {
         this.uiState.remove(`${this.prefix}.queries.${saved.name}`);
     }
 
-    public getSaveKey(query$: Observable<string | undefined>): Observable<string | undefined> {
-        return combineLatest(this.queries, query$).pipe(
-            map(([queries, filter]) => {
-                for (let query of queries) {
-                    if (query.queryJson === filter) {
-                        return query.name;
+    public getSaveKey(query: Query): Observable<string | undefined> {
+        const json = encodeQuery(query);
+
+        return this.queries.pipe(
+            map(queries => {
+                for (let saved of queries) {
+                    if (saved.queryJson === json) {
+                        return saved.name;
                     }
                 }
 

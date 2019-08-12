@@ -5,15 +5,19 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { LanguageDto, SchemaDetailsDto } from '@app/shared/internal';
-
 import { Types } from '@app/framework';
+
+import { StatusInfo } from './../services/contents.service';
+import { LanguageDto } from './../services/languages.service';
+import { SchemaDetailsDto } from './../services/schemas.service';
 
 export type QueryValueType =
     'boolean' |
     'date' |
     'datetime' |
     'number' |
+    'reference' |
+    'status' |
     'string';
 
 export interface FilterOperator {
@@ -92,7 +96,7 @@ export interface Query {
 }
 
 export function encodeQuery(query?: Query) {
-    if (isEmpty(query)) {
+    if (Types.isEmpty(query)) {
         return '';
     }
 
@@ -109,30 +113,8 @@ export function encodeQuery(query?: Query) {
     return encodeURIComponent(JSON.stringify(query));
 }
 
-function isEmpty(value: any): boolean {
-    if (Types.isArray(value)) {
-        for (let v of value) {
-            if (!isEmpty(v)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    if (Types.isObject(value)) {
-        for (let key in value) {
-            if (value.hasOwnProperty(key)) {
-                if (!isEmpty(value[key])) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    return Types.isUndefined(value) === true || Types.isNull(value) === true;
+export function hasFilter(query?: Query) {
+    return !!query && !Types.isEmpty(query.filter);
 }
 
 const EqualOperators: FilterOperator[] = [
@@ -172,9 +154,14 @@ const TypeNumber: QueryFieldModel = {
     operators: [...EqualOperators, ...CompareOperator]
 };
 
-const TypeReferences: QueryFieldModel = {
-    type: 'string',
+const TypeReference: QueryFieldModel = {
+    type: 'reference',
     operators: [...EqualOperators, ...ArrayOperators]
+};
+
+const TypeStatus: QueryFieldModel = {
+    type: 'status',
+    operators: EqualOperators
 };
 
 const TypeString: QueryFieldModel = {
@@ -182,7 +169,7 @@ const TypeString: QueryFieldModel = {
     operators: [...EqualOperators, ...CompareOperator, ...StringOperators, ...ArrayOperators]
 };
 
-export function queryModelFromSchema(schema: SchemaDetailsDto, languages: LanguageDto[]) {
+export function queryModelFromSchema(schema: SchemaDetailsDto, languages: LanguageDto[], statuses: StatusInfo[] | undefined) {
     let languagesCodes = languages.map(x => x.iso2Code);
 
     let invariantCodes = ['iv'];
@@ -195,8 +182,11 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Langua
     model.fields['createdBy'] = TypeString;
     model.fields['lastModified'] = TypeDateTime;
     model.fields['lastModifiedBy'] = TypeString;
-    model.fields['status'] = TypeString;
     model.fields['version'] = TypeNumber;
+
+    if (statuses) {
+        model.fields['status'] = { ...TypeStatus, extra: statuses };
+    }
 
     for (let field of schema.fields) {
         let type: QueryFieldModel | null = null;
@@ -212,7 +202,7 @@ export function queryModelFromSchema(schema: SchemaDetailsDto, languages: Langua
         } else if (field.properties.fieldType === 'References') {
             const extra = { schemaId: field.properties['schemaId'] };
 
-            type = { ...TypeReferences, extra };
+            type = { ...TypeReference, extra };
         }
 
         if (type) {
