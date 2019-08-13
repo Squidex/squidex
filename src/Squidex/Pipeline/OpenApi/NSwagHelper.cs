@@ -11,7 +11,6 @@ using System.IO;
 using Microsoft.AspNetCore.Http;
 using NJsonSchema;
 using NSwag;
-using Squidex.Web;
 
 namespace Squidex.Pipeline.OpenApi
 {
@@ -30,7 +29,7 @@ namespace Squidex.Pipeline.OpenApi
             }
         }
 
-        public static OpenApiDocument CreateApiDocument(HttpContext context, UrlsOptions urlOptions, string appName)
+        public static OpenApiDocument CreateApiDocument(HttpContext context, string appName)
         {
             var scheme =
                 string.Equals(context.Request.Scheme, "http", StringComparison.OrdinalIgnoreCase) ?

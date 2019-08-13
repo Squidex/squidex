@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Namotion.Reflection;
 using NJsonSchema;
 using NJsonSchema.Generation;
@@ -23,23 +22,19 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Pipeline.OpenApi;
-using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemasOpenApiGenerator
     {
-        private readonly UrlsOptions urlOptions;
         private readonly OpenApiDocumentGeneratorSettings settings = new OpenApiDocumentGeneratorSettings();
         private OpenApiSchemaGenerator schemaGenerator;
         private OpenApiDocument document;
         private JsonSchema statusSchema;
         private JsonSchemaResolver schemaResolver;
 
-        public SchemasOpenApiGenerator(IOptions<UrlsOptions> urlOptions, IEnumerable<IDocumentProcessor> documentProcessors)
+        public SchemasOpenApiGenerator(IEnumerable<IDocumentProcessor> documentProcessors)
         {
-            this.urlOptions = urlOptions.Value;
-
             settings.ConfigureSchemaSettings();
 
             foreach (var processor in documentProcessors)
@@ -50,7 +45,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         public OpenApiDocument Generate(HttpContext httpContext, IAppEntity app, IEnumerable<ISchemaEntity> schemas)
         {
-            document = NSwagHelper.CreateApiDocument(httpContext, urlOptions, app.Name);
+            document = NSwagHelper.CreateApiDocument(httpContext, app.Name);
 
             schemaGenerator = new OpenApiSchemaGenerator(settings);
             schemaResolver = new OpenApiSchemaResolver(document, settings);

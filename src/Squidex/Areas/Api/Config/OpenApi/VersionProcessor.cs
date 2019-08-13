@@ -5,33 +5,27 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
-using Microsoft.Extensions.Options;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Config.OpenApi
 {
-    public sealed class ThemeProcessor : IDocumentProcessor
+    public sealed class VersionProcessor : IDocumentProcessor
     {
-        private const string Background = "#3f83df";
+        private readonly ExposedValues exposedValues;
 
-        private readonly string url;
-
-        public ThemeProcessor(IOptions<UrlsOptions> urlOptions)
+        public VersionProcessor(ExposedValues exposedValues)
         {
-            url = urlOptions.Value.BuildUrl("images/logo-white.png", false);
+            this.exposedValues = exposedValues;
         }
 
         public void Process(DocumentProcessorContext context)
         {
-            context.Document.BasePath = Constants.ApiPrefix;
-
-            context.Document.Info.ExtensionData = new Dictionary<string, object>
+            if (exposedValues.TryGetValue("version", out var version))
             {
-                ["x-logo"] = new { url, backgroundColor = Background }
-            };
+                context.Document.Info.Version = version;
+            }
         }
     }
 }
