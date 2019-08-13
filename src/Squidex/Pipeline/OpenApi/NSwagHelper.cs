@@ -55,7 +55,7 @@ namespace Squidex.Pipeline.OpenApi
                 {
                     Title = $"Squidex API for {appName} App"
                 },
-                BasePath = Constants.ApiPrefix
+                SchemaType = SchemaType.OpenApi3
             };
 
             if (!string.IsNullOrWhiteSpace(context.Request.Host.Value))
@@ -68,42 +68,36 @@ namespace Squidex.Pipeline.OpenApi
 
         public static void AddQueryParameter(this OpenApiOperation operation, string name, JsonObjectType type, string description = null)
         {
-            var parameter = new OpenApiParameter { Type = type, Name = name, Kind = OpenApiParameterKind.Query };
+            var schema = new JsonSchema { Type = type };
 
-            if (!string.IsNullOrWhiteSpace(description))
-            {
-                parameter.Description = description;
-            }
-
-            operation.Parameters.Add(parameter);
+            operation.AddParameter(name, schema, OpenApiParameterKind.Query, description, false);
         }
 
         public static void AddPathParameter(this OpenApiOperation operation, string name, JsonObjectType type, string description = null)
         {
-            var parameter = new OpenApiParameter { Type = type, Name = name, Kind = OpenApiParameterKind.Path };
+            var schema = new JsonSchema { Type = type };
 
-            if (!string.IsNullOrWhiteSpace(description))
-            {
-                parameter.Description = description;
-            }
-
-            parameter.IsRequired = true;
-            parameter.IsNullableRaw = false;
-
-            operation.Parameters.Add(parameter);
+            operation.AddParameter(name, schema, OpenApiParameterKind.Path, description, true);
         }
 
         public static void AddBodyParameter(this OpenApiOperation operation, string name, JsonSchema schema, string description)
         {
-            var parameter = new OpenApiParameter { Schema = schema, Name = name, Kind = OpenApiParameterKind.Body };
+            operation.AddParameter(name, schema, OpenApiParameterKind.Body, description, true);
+        }
+
+        private static void AddParameter(this OpenApiOperation operation, string name, JsonSchema schema, OpenApiParameterKind kind, string description, bool isRequired)
+        {
+            var parameter = new OpenApiParameter { Schema = schema, Name = name, Kind = kind };
 
             if (!string.IsNullOrWhiteSpace(description))
             {
                 parameter.Description = description;
             }
 
-            parameter.IsRequired = true;
-            parameter.IsNullableRaw = false;
+            if (isRequired)
+            {
+                parameter.IsRequired = true;
+            }
 
             operation.Parameters.Add(parameter);
         }

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NJsonSchema;
 using NSwag;
+using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.GenerateJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -102,14 +103,10 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
                 operation.Description = SchemaQueryDescription;
 
-                operation.AddQueryParameter("$top", JsonObjectType.Number, "Optional number of contents to take (Default: 20).");
-                operation.AddQueryParameter("$skip", JsonObjectType.Number, "Optional number of contents to skip.");
-                operation.AddQueryParameter("$filter", JsonObjectType.String, "Optional OData filter.");
-                operation.AddQueryParameter("$search", JsonObjectType.String, "Optional OData full text search.");
-                operation.AddQueryParameter("$orderby", JsonObjectType.String, "Optional OData order definition.");
-                operation.AddQueryParameter("$orderby", JsonObjectType.String, "Optional OData order definition.");
+                operation.AddOData("contents", true);
 
-                operation.AddResponse("200", $"{schemaName} content retrieved.", CreateContentsSchema(schemaName, contentSchema));
+                operation.AddResponse("200", $"{schemaName} contents retrieved.", CreateContentsSchema(schemaName, contentSchema));
+                operation.AddResponse("400", $"{schemaName} query not valid.");
 
                 AddSecurity(operation, Permissions.AppContentsRead);
             });

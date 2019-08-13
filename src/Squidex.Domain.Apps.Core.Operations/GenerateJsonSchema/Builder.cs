@@ -13,7 +13,7 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
     {
         public static JsonSchema Object()
         {
-            return new JsonSchema { Type = JsonObjectType.Object, AllowAdditionalItems = false };
+            return new JsonSchema { Type = JsonObjectType.Object };
         }
 
         public static JsonSchema Guid()

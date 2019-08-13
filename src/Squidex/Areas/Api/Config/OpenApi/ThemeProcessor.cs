@@ -26,7 +26,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
         public void Process(DocumentProcessorContext context)
         {
-            context.Document.BasePath = Constants.ApiPrefix;
+            context.Document.BasePath = $"{Constants.ApiPrefix}/";
 
             context.Document.Info.ExtensionData = new Dictionary<string, object>
             {
