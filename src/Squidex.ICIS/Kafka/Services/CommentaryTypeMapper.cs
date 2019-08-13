@@ -15,21 +15,14 @@ namespace Squidex.ICIS.Kafka.Services
     {
         public ISpecificRecord ToAvro(EnrichedContentEvent contentEvent)
         {
-            var commentaryType = new CommentaryType();
+            var data = contentEvent.Data;
 
-            if (!contentEvent.Data.TryGetValue("id", out var idData))
+            var commentaryType = new CommentaryType
             {
-                throw new System.Exception("Unable to find Id field.");
-            }
+                Id = data.GetInvariantString("id"),
+                Name = data.GetInvariantString("name")
+            };
 
-            commentaryType.Id = idData["iv"].ToString();
-
-            if (!contentEvent.Data.TryGetValue("name", out var nameData))
-            {
-                throw new System.Exception("Unable to find Name field.");
-            }
-
-            commentaryType.Name = nameData["iv"].ToString();
             return commentaryType;
         }
     }

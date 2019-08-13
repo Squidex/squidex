@@ -25,7 +25,7 @@ namespace Squidex.ICIS.Kafka.Services
 {
     public class CommentaryMapper : IKafkaMessageMapper
     {
-        private IContentRepository contentRepository;
+        private readonly IContentRepository contentRepository;
         private readonly IAppEntity commentaryApp;
 
         public CommentaryMapper(IAppEntity commentaryApp, IContentRepository contentRepository)
@@ -36,9 +36,11 @@ namespace Squidex.ICIS.Kafka.Services
 
         public ISpecificRecord ToAvro(EnrichedContentEvent contentEvent)
         {
-            var commentary = new Commentary();
-            commentary.Id = contentEvent.Id.ToString();
-            commentary.LastModified = contentEvent.LastModified.ToUnixTimeSeconds();
+            var commentary = new Commentary
+            {
+                Id = contentEvent.Id.ToString(),
+                LastModified = contentEvent.LastModified.ToUnixTimeSeconds()
+            };
 
             if (!contentEvent.Data.TryGetValue("createdfor", out var createdForData))
             {
