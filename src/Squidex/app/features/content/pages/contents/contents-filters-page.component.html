@@ -28,12 +28,12 @@
 
             <ng-container *ngIf="schemaQueries.queries | async; let queries">
                 <ng-container *ngIf="queries.length > 0; else noQuery">
-                    <a class="sidebar-item" *ngFor="let status of queries; trackBy: trackByQuery" (click)="search(status.query)"
-                        [class.active]="isSelectedQuery(status.filter)">
+                    <a class="sidebar-item" *ngFor="let saved of queries; trackBy: trackByQuery" (click)="search(saved.query)"
+                        [class.active]="isSelectedQuery(saved)">
                         
-                        {{status.name}}
+                        {{saved.name}}
                         
-                        <a class="sidebar-item-remove float-right" (click)="schemaQueries.remove(status)" sqxStopClick>
+                        <a class="sidebar-item-remove float-right" (click)="schemaQueries.remove(saved)" sqxStopClick>
                             <i class="icon-close"></i>
                         </a>
                     </a>
