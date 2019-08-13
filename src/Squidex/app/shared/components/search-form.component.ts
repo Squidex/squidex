@@ -74,6 +74,8 @@ export class SearchFormComponent implements OnChanges {
     }
 
     public search(close = false) {
+        this.hasFilter = hasFilter(this.query);
+
         this.queryChange.emit(this.query);
 
         if (close) {
