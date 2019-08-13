@@ -35,7 +35,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
             SetupDescription(security, tokenUrl);
             SetupFlow(security);
-            SetupScropes(security);
+            SetupScopes(security);
 
             return security;
         }
@@ -45,7 +45,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
             security.Flow = OpenApiOAuth2Flow.Application;
         }
 
-        private static void SetupScropes(OpenApiSecurityScheme security)
+        private static void SetupScopes(OpenApiSecurityScheme security)
         {
             security.Scopes = new Dictionary<string, string>
             {
@@ -55,8 +55,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
 
         private static void SetupDescription(OpenApiSecurityScheme securityScheme, string tokenUrl)
         {
-            var securityDocs = NSwagHelper.LoadDocs("security");
-            var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
+            var securityText = NSwagHelper.SecurityDocs.Replace("<TOKEN_URL>", tokenUrl);
 
             securityScheme.Description = securityText;
         }

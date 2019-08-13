@@ -5,10 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NJsonSchema;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
-using Squidex.Pipeline.OpenApi;
 
 namespace Squidex.Areas.Api.Config.OpenApi
 {

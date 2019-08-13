@@ -23,8 +23,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 {
     public sealed class SchemaOpenApiGenerator
     {
-        private static readonly string SchemaQueryDescription;
-        private static readonly string SchemaBodyDescription;
         private readonly ContentSchemaBuilder schemaBuilder = new ContentSchemaBuilder();
         private readonly OpenApiDocument document;
         private readonly JsonSchema contentSchema;
@@ -35,12 +33,6 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
         private readonly string appPath;
         private readonly JsonSchema statusSchema;
         private readonly string appName;
-
-        static SchemaOpenApiGenerator()
-        {
-            SchemaBodyDescription = NSwagHelper.LoadDocs("schemabody");
-            SchemaQueryDescription = NSwagHelper.LoadDocs("schemaquery");
-        }
 
         public SchemaOpenApiGenerator(
             OpenApiDocument document,
@@ -72,10 +64,10 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
             document.Tags.Add(
                 new OpenApiTag
                 {
-                    Name = schemaName, Description = $"API to managed {schemaName} contents."
+                    Name = schemaName, Description = $"API to manage {schemaName} contents."
                 });
 
-            var schemaOperations = new List<OpenApiPathItem>
+            var schemaOperations = new[]
             {
                 GenerateSchemaGetsOperation(),
                 GenerateSchemaGetOperation(),
@@ -95,109 +87,103 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
         private OpenApiPathItem GenerateSchemaGetsOperation()
         {
-            return AddOperation(OpenApiOperationMethod.Get, null, $"{appPath}/{schemaPath}", operation =>
+            return Add(OpenApiOperationMethod.Get, Permissions.AppContentsRead, "/",
+                operation =>
             {
                 operation.OperationId = $"Query{schemaType}Contents";
 
                 operation.Summary = $"Queries {schemaName} contents.";
 
-                operation.Description = SchemaQueryDescription;
+                operation.Description = NSwagHelper.SchemaQueryDocs;
 
                 operation.AddOData("contents", true);
 
                 operation.AddResponse("200", $"{schemaName} contents retrieved.", CreateContentsSchema(schemaName, contentSchema));
                 operation.AddResponse("400", $"{schemaName} query not valid.");
-
-                AddSecurity(operation, Permissions.AppContentsRead);
             });
         }
 
         private OpenApiPathItem GenerateSchemaGetOperation()
         {
-            return AddOperation(OpenApiOperationMethod.Get, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
+            return Add(OpenApiOperationMethod.Get, Permissions.AppContentsRead, "/{id}", operation =>
             {
                 operation.OperationId = $"Get{schemaType}Content";
 
                 operation.Summary = $"Get a {schemaName} content.";
 
                 operation.AddResponse("200", $"{schemaName} content found.", contentSchema);
-
-                AddSecurity(operation, Permissions.AppContentsRead);
             });
         }
 
         private OpenApiPathItem GenerateSchemaCreateOperation()
         {
-            return AddOperation(OpenApiOperationMethod.Post, null, $"{appPath}/{schemaPath}", operation =>
+            return Add(OpenApiOperationMethod.Post, Permissions.AppContentsCreate, "/",
+                operation =>
             {
                 operation.OperationId = $"Create{schemaType}Content";
 
                 operation.Summary = $"Create a {schemaName} content.";
 
-                operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
-                operation.AddQueryParameter("publish", JsonObjectType.Boolean, "Set to true to autopublish content.");
+                operation.AddBody("data", dataSchema, NSwagHelper.SchemaBodyDocs);
+                operation.AddQuery("publish", JsonObjectType.Boolean, "Set to true to autopublish content.");
 
                 operation.AddResponse("201", $"{schemaName} content created.", contentSchema);
                 operation.AddResponse("400", $"{schemaName} content not valid.");
-
-                AddSecurity(operation, Permissions.AppContentsCreate);
             });
         }
 
         private OpenApiPathItem GenerateSchemaUpdateOperation()
         {
-            return AddOperation(OpenApiOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
+            return Add(OpenApiOperationMethod.Put, Permissions.AppContentsUpdate, "/{id}",
+                operation =>
             {
                 operation.OperationId = $"Update{schemaType}Content";
 
                 operation.Summary = $"Update a {schemaName} content.";
 
-                operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
+                operation.AddBody("data", dataSchema, NSwagHelper.SchemaBodyDocs);
 
                 operation.AddResponse("200", $"{schemaName} content updated.", contentSchema);
                 operation.AddResponse("400", $"{schemaName} content not valid.");
-
-                AddSecurity(operation, Permissions.AppContentsUpdate);
             });
         }
 
         private OpenApiPathItem GenerateSchemaUpdatePatchOperation()
         {
-            return AddOperation(OpenApiOperationMethod.Patch, schemaName, $"{appPath}/{schemaPath}/{{id}}", operation =>
+            return Add(OpenApiOperationMethod.Patch, Permissions.AppContentsUpdate, "/{id}",
+                operation =>
             {
                 operation.OperationId = $"Path{schemaType}Content";
 
                 operation.Summary = $"Patch a {schemaName} content.";
 
-                operation.AddBodyParameter("data", dataSchema, SchemaBodyDescription);
+                operation.AddBody("data", dataSchema, NSwagHelper.SchemaBodyDocs);
 
                 operation.AddResponse("200", $"{schemaName} content patched.", contentSchema);
                 operation.AddResponse("400", $"{schemaName} status not valid.");
-
-                AddSecurity(operation, Permissions.AppContentsUpdate);
             });
         }
 
         private OpenApiPathItem GenerateSchemaStatusOperation()
         {
-            return AddOperation(OpenApiOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/status", operation =>
+            return Add(OpenApiOperationMethod.Put, Permissions.AppContentsUpdate, "/{id}/status",
+                operation =>
             {
                 operation.OperationId = $"Change{schemaType}ContentStatus";
 
                 operation.Summary = $"Change status of {schemaName} content.";
 
-                operation.AddBodyParameter("request", statusSchema, "The request to change content status.");
+                operation.AddBody("request", statusSchema, "The request to change content status.");
 
-                operation.AddResponse("204", $"{schemaName} content status changed.", contentSchema);
+                operation.AddResponse("200", $"{schemaName} content status changed.", contentSchema);
                 operation.AddResponse("400", $"{schemaName} content not valid.");
-
-                AddSecurity(operation, Permissions.AppContentsUpdate);
             });
         }
 
         private OpenApiPathItem GenerateSchemaDiscardOperation()
         {
-            return AddOperation(OpenApiOperationMethod.Put, schemaName, $"{appPath}/{schemaPath}/{{id}}/discard", operation =>
+            return Add(OpenApiOperationMethod.Put, Permissions.AppContentsDraftDiscard, "/{id}/discard",
+                operation =>
             {
                 operation.OperationId = $"Discard{schemaType}Content";
 
@@ -205,39 +191,48 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
 
                 operation.AddResponse("200", $"{schemaName} content status changed.", contentSchema);
                 operation.AddResponse("400", $"{schemaName} content has no pending draft.");
-
-                AddSecurity(operation, Permissions.AppContentsDraftDiscard);
             });
         }
 
         private OpenApiPathItem GenerateSchemaDeleteOperation()
         {
-            return AddOperation(OpenApiOperationMethod.Delete, schemaName, $"{appPath}/{schemaPath}/{{id}}/", operation =>
+            return Add(OpenApiOperationMethod.Delete, Permissions.AppContentsDelete, "/{id}",
+                operation =>
             {
                 operation.OperationId = $"Delete{schemaType}Content";
 
                 operation.Summary = $"Delete a {schemaName} content.";
 
                 operation.AddResponse("204", $"{schemaName} content deleted.");
-
-                AddSecurity(operation, Permissions.AppContentsDelete);
             });
         }
 
-        private OpenApiPathItem AddOperation(string method, string entityName, string path, Action<OpenApiOperation> updater)
+        private OpenApiPathItem Add(string method, string permission, string path, Action<OpenApiOperation> updater)
         {
-            var operations = document.Paths.GetOrAddNew(path);
-            var operation = new OpenApiOperation();
+            var operations = document.Paths.GetOrAddNew($"{appPath}/{schemaPath}{path}");
+            var operation = new OpenApiOperation
+            {
+                Security = new List<OpenApiSecurityRequirement>
+                {
+                    new OpenApiSecurityRequirement
+                    {
+                        [Constants.SecurityDefinition] = new[]
+                        {
+                            Permissions.ForApp(permission, appName, schemaPath).Id
+                        }
+                    }
+                }
+            };
 
             updater(operation);
 
             operations[method] = operation;
 
-            if (entityName != null)
+            if (path.StartsWith("/{id}", StringComparison.OrdinalIgnoreCase))
             {
-                operation.AddPathParameter("id", JsonObjectType.String, $"The id of the {entityName} content (GUID).");
+                operation.AddPathParameter("id", JsonObjectType.String, $"The id of the {schemaName} content.", JsonFormatStrings.Guid);
 
-                operation.AddResponse("404", $"App, schema or {entityName} content not found.");
+                operation.AddResponse("404", $"App, schema or {schemaName} content not found.");
             }
 
             return operations;
@@ -255,26 +250,13 @@ namespace Squidex.Areas.Api.Controllers.Contents.Generator
                     },
                     ["items"] = new JsonSchemaProperty
                     {
-                        Type = JsonObjectType.Array, IsRequired = true, Item = contentSchema, Description = $"The {schemaName} contents."
+                        Type = JsonObjectType.Array, IsRequired = true, Description = $"The {schemaName} contents.", Item = contentSchema
                     }
                 },
                 Type = JsonObjectType.Object
             };
 
             return schema;
-        }
-
-        private void AddSecurity(OpenApiOperation operation, string permission)
-        {
-            if (operation.Security == null)
-            {
-                operation.Security = new List<OpenApiSecurityRequirement>();
-            }
-
-            operation.Security.Add(new OpenApiSecurityRequirement
-            {
-                [Constants.SecurityDefinition] = new[] { Permissions.ForApp(permission, appName, schemaPath).Id }
-            });
         }
     }
 }
