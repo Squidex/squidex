@@ -63,12 +63,10 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Data.Edm" Version="5.8.4" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.6.0" />
-    <PackageReference Include="Microsoft.Orleans.Client" Version="2.4.0" />
-    <PackageReference Include="Microsoft.Orleans.Core" Version="2.4.0" />
-    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.4.0" />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.4.0" />
-    <PackageReference Include="Microsoft.Orleans.OrleansTelemetryConsumers.Counters" Version="2.4.0" />
-    <PackageReference Include="Microsoft.Orleans.OrleansTelemetryConsumers.Linux" Version="2.4.0" />
+    <PackageReference Include="Microsoft.Orleans.Client" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.3.6" />
     <PackageReference Include="MongoDB.Driver" Version="2.8.1" />
     <PackageReference Include="Namotion.Reflection" Version="1.0.6" />
     <PackageReference Include="NJsonSchema" Version="10.0.21" />
@@ -76,7 +74,7 @@
     <PackageReference Include="OpenCover" Version="4.7.922" PrivateAssets="all" />
     <PackageReference Include="Orleans.Providers.MongoDB" Version="2.5.0" />
     <PackageReference Include="Orleans.WebHostCompatibilityLayer" Version="2.3.1" />
-    <PackageReference Include="OrleansDashboard" Version="2.4.0" />
+    <PackageReference Include="OrleansDashboard" Version="2.3.6" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="4.2.15" PrivateAssets="all" />
     <PackageReference Include="Squidex.ClientLibrary" Version="3.7.0" />

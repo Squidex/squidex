@@ -7,14 +7,12 @@
 
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Providers.MongoDB.Configuration;
-using Orleans.Statistics;
 using OrleansDashboard;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
@@ -61,18 +59,6 @@ namespace Squidex.Config.Orleans
                 {
                     options.HostSelf = false;
                 });
-
-                if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                    {
-                        builder.UseLinuxEnvironmentStatistics();
-                    }
-                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    {
-                        builder.UsePerfCounterEnvironmentStatistics();
-                    }
-                }
 
                 var orleansPortSilo = config.GetOptionalValue("orleans:siloPort", 11111);
                 var orleansPortGateway = config.GetOptionalValue("orleans:gatewayPort", 40000);
