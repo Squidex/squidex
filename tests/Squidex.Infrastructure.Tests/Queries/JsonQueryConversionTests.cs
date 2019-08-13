@@ -111,6 +111,14 @@ namespace Squidex.Infrastructure.Queries
         }
 
         [Fact]
+        public void Should_parse_date_string_filter()
+        {
+            var json = new { path = "datetime", op = "eq", value = "2012-11-10" };
+
+            AssertFilter(json, "datetime == 2012-11-10T00:00:00Z");
+        }
+
+        [Fact]
         public void Should_add_error_if_datetime_string_property_got_invalid_string_value()
         {
             var json = new { path = "datetime", op = "eq", value = "invalid" };
