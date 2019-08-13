@@ -14,12 +14,12 @@
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.6.0" />
-    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="2.4.0">
+    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="2.3.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Orleans.Core" Version="2.4.0" />
-    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.4.0" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="2.3.6" />
+    <PackageReference Include="Microsoft.Orleans.OrleansRuntime" Version="2.3.6" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="NJsonSchema" Version="10.0.21" />
     <PackageReference Include="NodaTime" Version="2.4.6" />
