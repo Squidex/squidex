@@ -60,9 +60,6 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     public schemaId: string;
 
     @Input()
-    public isRequired = false;
-
-    @Input()
     public set language(value: AppLanguageDto) {
         this.languageField = value;
 
@@ -156,11 +153,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
             return { name, id: content.id };
         });
 
-        if (!this.isRequired) {
-            return [{ name: '- No Reference -' }, ...names];
-        }
-
-        return names;
+        return [{ name: '- No Reference -' }, ...names];
     }
 
     public trackByContent(content: ContentDto) {
