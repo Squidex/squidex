@@ -39,3 +39,4 @@ Write-Host $addContributorUrl
 
 AddContributor -role "Editor" -email "vegatesteditor@cha.rbxd.ds"
 AddContributor -role "Editor" -email "vegatestreviewer@cha.rbxd.ds"
+AddContributor -role "Owner" -email "vegatestadmin@cha.rbxd.ds"
