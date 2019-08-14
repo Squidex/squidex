@@ -29,10 +29,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
             services.AddSingletonAs<RuleActionProcessor>()
                 .As<IDocumentProcessor>();
 
-            services.AddSingletonAs<ThemeProcessor>()
-                .As<IDocumentProcessor>();
-
-            services.AddSingletonAs<VersionProcessor>()
+            services.AddSingletonAs<CommonProcessor>()
                 .As<IDocumentProcessor>();
 
             services.AddSingletonAs<XmlTagProcessor>()

@@ -24,17 +24,22 @@ namespace Squidex.Infrastructure.Commands
 
         public virtual async Task HandleAsync(CommandContext context, Func<Task> next)
         {
+            await ExecuteCommandAsync(context);
+
+            await next();
+        }
+
+        protected async Task ExecuteCommandAsync(CommandContext context)
+        {
             if (context.Command is TCommand typedCommand)
             {
                 var result = await ExecuteCommandAsync(typedCommand);
 
                 context.Complete(result);
             }
-
-            await next();
         }
 
-        protected async Task<object> ExecuteCommandAsync(TCommand typedCommand)
+        private async Task<object> ExecuteCommandAsync(TCommand typedCommand)
         {
             var grain = grainFactory.GetGrain<TGrain>(typedCommand.AggregateId);
 

@@ -16,7 +16,13 @@ namespace Squidex.Pipeline.OpenApi
 {
     public static class NSwagHelper
     {
-        public static string LoadDocs(string name)
+        public static readonly string SecurityDocs = LoadDocs("security");
+
+        public static readonly string SchemaBodyDocs = LoadDocs("schemabody");
+
+        public static readonly string SchemaQueryDocs = LoadDocs("schemaquery");
+
+        private static string LoadDocs(string name)
         {
             var assembly = typeof(NSwagHelper).Assembly;
 
@@ -65,21 +71,21 @@ namespace Squidex.Pipeline.OpenApi
             return document;
         }
 
-        public static void AddQueryParameter(this OpenApiOperation operation, string name, JsonObjectType type, string description = null)
+        public static void AddQuery(this OpenApiOperation operation, string name, JsonObjectType type, string description)
         {
             var schema = new JsonSchema { Type = type };
 
             operation.AddParameter(name, schema, OpenApiParameterKind.Query, description, false);
         }
 
-        public static void AddPathParameter(this OpenApiOperation operation, string name, JsonObjectType type, string description = null)
+        public static void AddPathParameter(this OpenApiOperation operation, string name, JsonObjectType type, string description, string format = null)
         {
-            var schema = new JsonSchema { Type = type };
+            var schema = new JsonSchema { Type = type, Format = format };
 
             operation.AddParameter(name, schema, OpenApiParameterKind.Path, description, true);
         }
 
-        public static void AddBodyParameter(this OpenApiOperation operation, string name, JsonSchema schema, string description)
+        public static void AddBody(this OpenApiOperation operation, string name, JsonSchema schema, string description)
         {
             operation.AddParameter(name, schema, OpenApiParameterKind.Body, description, true);
         }
@@ -93,10 +99,7 @@ namespace Squidex.Pipeline.OpenApi
                 parameter.Description = description;
             }
 
-            if (isRequired)
-            {
-                parameter.IsRequired = true;
-            }
+            parameter.IsRequired = isRequired;
 
             operation.Parameters.Add(parameter);
         }
