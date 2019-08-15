@@ -29,3 +29,6 @@ node_modules/
 appsettings.Development.json
 appsettings.Production.json
 launchSettings.json
+
+JSFiles
+allure-results

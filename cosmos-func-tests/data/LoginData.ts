@@ -1,9 +1,9 @@
 export class LoginData {
-  constructor(uname: string, pwd: string) {
-    this.username = uname;
-    this.password = pwd;
-  }
+    constructor(uname: string, pwd: string) {
+        this.username = uname;
+        this.password = pwd;
+    }
 
-  username: string;
-  password: string;
+    public username: string;
+    public password: string;
 }

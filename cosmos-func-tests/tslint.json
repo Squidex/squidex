@@ -1,16 +1,3 @@
 {
-    "defaultSeverity": "error",
-    "extends": [
-        "tslint:recommended",
-        "tslint-config-prettier" 
-    ],
-    "jsRules": {},
-    "rules": {
-        "object-literal-sort-keys": false,
-        "ordered-imports": false,
-        "no-empty": [
-            false,
-            "allow-empty-functions"
-          ]         },
-    "rulesDirectory": []
+   "extends": "../src/Squidex/tslint.json"
 }
