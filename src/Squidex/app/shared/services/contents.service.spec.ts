@@ -21,6 +21,7 @@ import {
     Version,
     Versioned
 } from '@app/shared/internal';
+import { encodeQuery } from '../state/query';
 
 describe('ContentsService', () => {
     const version = new Version('1');
@@ -47,11 +48,11 @@ describe('ContentsService', () => {
 
         let contents: ContentsDto;
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, undefined, ['Draft', 'Published']).subscribe(result => {
+        contentsService.getContents('my-app', 'my-schema', 17, 13).subscribe(result => {
             contents = result;
         });
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&status=Draft&status=Published');
+        const req = httpMock.expectOne(`http://service/p/api/content/my-app/my-schema?q=${encodeQuery({ take: 17, skip: 13 })}`);
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -77,9 +78,9 @@ describe('ContentsService', () => {
     it('should append query to get request as search',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13, 'my-query').subscribe();
+        contentsService.getContents('my-app', 'my-schema', 17, 13, { fullText: 'my-query' }).subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$search="my-query"&$top=17&$skip=13');
+        const req = httpMock.expectOne(`http://service/p/api/content/my-app/my-schema?q=${encodeQuery({ fullText: 'my-query', take: 17, skip: 13 })}`);
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -92,7 +93,7 @@ describe('ContentsService', () => {
 
         contentsService.getContents('my-app', 'my-schema', 17, 13, undefined, ['id1', 'id2']).subscribe();
 
-        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$top=17&$skip=13&ids=id1,id2');
+        const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?ids=id1,id2');
 
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
@@ -100,10 +101,10 @@ describe('ContentsService', () => {
         req.flush({ total: 10, items: [] });
     }));
 
-    it('should append query to get request as plain query string',
+    it('should append odata query to get request as plain query string',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
 
-        contentsService.getContents('my-app', 'my-schema', 17, 13, '$filter=my-filter').subscribe();
+        contentsService.getContents('my-app', 'my-schema', 17, 13, { fullText: '$filter=my-filter' }).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema?$filter=my-filter&$top=17&$skip=13');
 

@@ -29,7 +29,7 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public HashSet<string> Tags { get; set; }
 
-        public AssetCommand ToCommand(Guid id)
+        public AnnotateAsset ToCommand(Guid id)
         {
             return SimpleMapper.Map(this, new AnnotateAsset { AssetId = id });
         }
