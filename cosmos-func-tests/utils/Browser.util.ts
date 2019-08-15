@@ -4,7 +4,8 @@ import {
   by,
   ExpectedConditions,
   protractor,
-  ElementFinder
+  ElementFinder,
+  WebElement
 } from "protractor";
 
 /**
@@ -16,47 +17,65 @@ export class BrowserUtil {
 
   constructor() {}
 
-  // waits for element to be present on the DOM
-  public waitForElementPresent(locator: ElementFinder) {
+  // waits for element to be present on the DOM - angular
+  public waitForElementToBePresent(locator: ElementFinder, timeout = 100000) {
     const until = protractor.ExpectedConditions;
-    browser.wait(until.visibilityOf(locator), 100000);
+    return browser.wait(until.visibilityOf(locator), timeout);
   }
 
-  // waits for the element to be clickable
-  public waitForElementToBeClickable(locator: ElementFinder){
+  // waits for the element to be clickable and clicks
+  public async waitForElementToBeVisibleAndClick(locator: ElementFinder, timeout = 100000){
     const until = protractor.ExpectedConditions;
-    browser.wait(until.elementToBeClickable(locator), 100000).then(function(){
-      locator.click();
-    });
+    await browser.wait(until.elementToBeClickable(locator), timeout, "Element not clickable");
+    return await locator.click();
   }
+
+  // waits for the element to be present and writes
+  public async waitForElementToBePresentAndWrite(locator: ElementFinder, text){
+    const until = protractor.ExpectedConditions;
+    await browser.wait(until.presenceOf(locator), 100000);
+    await locator.clear();
+    await locator.sendKeys(text);
+  }
+
+  // brings the element to focus and clicks
+  public async mouseMoveAndClick(locator){
+    await browser.actions().mouseMove(locator).perform();
+    await locator.click();
+  }
+
+  // brings the element to focus and writes
+  public async mouseMoveAndWrite(locator : ElementFinder, text : string){
+    await browser.actions().mouseMove(locator).click().perform();
+    await locator.sendKeys(text);
+  }
+
   // switching between windows
-  public switchToChildWindow() {
-    browser.getAllWindowHandles().then(function(handles) {
+  public async switchToChildWindow() {
+      const handles = await browser.getAllWindowHandles();
       const count = handles.length;
       const newWindow = handles[count - 1];
-      browser.switchTo().window(newWindow);
-    });
+      await browser.switchTo().window(newWindow);
   }
 
-  public switchToParentWindow() {
-    browser.getAllWindowHandles().then(function(handles) {
+  public async switchToParentWindow() {
+    const handles = await browser.getAllWindowHandles()
       browser.switchTo().window(handles[0]);
-      browser.driver.executeScript("window.focus();");
-    });
+      await browser.driver.executeScript("window.focus();");
   }
   // waits for the page to load before performing any further operations. waits until the document.ready state becomes interactive or complete and returns the same.
   public async getReadyState() {
     let states;
     const until = protractor.ExpectedConditions;
-    await browser.wait(() => {
-      return browser.executeScript("return document.readyState").then(state => {
+    await browser.wait(async () => {
+      return await browser.executeScript("return document.readyState").then(state => {
         states = state;
         if (state === "interactive" || state === "complete") {
           return true;
         }
       });
     }, 100000);
-    return states;
+    return await states;
   }
 
   // get current url of the page
@@ -65,26 +84,25 @@ export class BrowserUtil {
     }
 
   // wait for angular enabled
-  public waitForAngularEnabledOnCurrentWindow() {
-    return browser.waitForAngularEnabled(true).then(async () => {
-      browser.waitForAngular();
-    });
+  public async waitForAngularEnabledOnCurrentWindow(value : boolean) {
+    await browser.waitForAngularEnabled(value);
+    return await browser.waitForAngular();
   }
 
-  public waitForAngularDisabledOnCurrentWindow() {
-    return browser.waitForAngularEnabled(false);
+  public async waitForAngularDisabledOnCurrentWindow() {
+  return await browser.waitForAngularEnabled(false);
   }
 
-  public scrollIntoView(webelement: ElementFinder) {
-    browser
+  public async scrollIntoViewAndClick(webelement: ElementFinder) {
+    await browser
       .executeScript("arguments[0].scrollIntoView()", webelement)
       .then(() => {
         webelement.click();
       });
   }
 
-  public selectAllContent(){
-    browser
+  public async selectAllContent(){
+    await browser
         .actions()
         .keyDown(protractor.Key.ALT)
         .sendKeys("a")

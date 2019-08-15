@@ -6,7 +6,7 @@
         "properties": {
           "label": "Id",
           "isRequired": true,
-          "isListField": true,
+          "isListField": false,
           "fieldType": "String",
           "editor": "Input",
               "isUnique": true

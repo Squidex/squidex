@@ -5,6 +5,7 @@ declare const allure: any;
 export let config: Config = {
   // to auto start Selenium server every time before test through config, we can use the below command instead of the above one
   directConnect: true,
+  SELENIUM_PROMISE_MANAGER: false,
   // seleniumAddress: "http://localhost:4444/wd/hub/",
   framework: "jasmine2",
   capabilities: {
@@ -15,7 +16,12 @@ export let config: Config = {
     //   args: ["--headless", "--disable-gpu", "--window-size=800,600"]
     // }
   },
+    // Delaying for 3 sec before interacting with element and hightlighting it
+    // highlightDelay: 3000,
+    // Log file location
+    // webDriverLogDir: 'logs',
 
+  
   // options for Jasmine
   jasmineNodeOpts: {
     showColors: true,
@@ -23,9 +29,10 @@ export let config: Config = {
     defaultTimeoutInterval: 150000
   },
 
-  specs: ["../JSFiles/specs/login/*.spec.js"],
+  specs: ["../JSFiles/utils/customConfig.js", "../JSFiles/specs/login/*.spec.js"],
 
   onPrepare: () => {
+    browser.manage().timeouts().implicitlyWait(5000);
     const AllureReporter = require("jasmine-allure-reporter");
     jasmine.getEnv().addReporter(
       new AllureReporter({
@@ -61,8 +68,8 @@ export let config: Config = {
       .maximize();
   },
   params: {
-    baseUrl: "https://localhost:5000",
-    expectedUrlAfterNavigation: "https://localhost:5000/app"
+    baseUrl: "http://localhost:5001",
+    expectedUrlAfterNavigation: "http://localhost:5001/app"
   },
   // protractor timeouts
   getPageTimeout: 50000,

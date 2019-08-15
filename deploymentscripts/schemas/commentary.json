@@ -8,7 +8,7 @@
              "isRequired":true,
              "isListField":true,
              "fieldType":"References",
-             "editor":"List",
+             "editor":"Dropdown",
              "isUnique":true,
              "minItems":1,
              "maxItems":1
@@ -22,7 +22,7 @@
              "isRequired":true,
              "isListField":true,
              "fieldType":"References",
-             "editor":"List",
+             "editor":"Dropdown",
              "isUnique":true,
              "minItems":1,
              "maxItems":1
@@ -36,7 +36,7 @@
             "isRequired":true,
             "isListField":true,
             "fieldType":"References",
-            "editor":"List",
+            "editor":"Dropdown",
             "isUnique":true,
             "minItems":1,
             "maxItems":1

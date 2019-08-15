@@ -10,15 +10,26 @@
     "setupapp": "screen -dmS appstart ./setup-app.sh",
     "dbstart": "start node ./JSFiles/utils/Db.js",
     "appstart": "start dotnet run --project ../../cosmos/src/Squidex",
-    "deploymentscriptsrun": "wait-on https://localhost:5000/ && cd ../deploymentscripts && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./Deployment.ps1 -identityServiceBaseUrl 'http://identityservice.systest.tesla.cha.rbxd.ds' -apiBaseUrl 'https://localhost:5000/api' -tokenUser 'CMSDeployer' -tokenPassword 'p@55w0rd' -appName 'commentary'",
+    "deploymentscriptsrun": "wait-on http://localhost:5001/ && cd ../deploymentscripts && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./Deployment.ps1 -identityServiceBaseUrl 'http://identityservice.systest.tesla.cha.rbxd.ds' -apiBaseUrl 'https://localhost:5000/api' -tokenUser 'CMSDeployer' -tokenPassword 'p@55w0rd' -appName 'commentary'",
     "test": "protractor ./JSFiles/config.js",
     "posttest": "cd ./utils/ && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./TerminateTask.ps1 && rm -r ./database/*",
     "protractor": "./node_modules/protractor/built/cli.js",
-    "webdriver-update": "./node_modules/protractor/node_modules/webdriver-manager update & start webdriver-manager start"
+    "webdriver-update": "node ./node_modules/protractor/node_modules/webdriver-manager update --versions.standalone=3.141.59 && start webdriver-manager start"
   },
   "author": "Pavani",
   "license": "ISC",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
+    "fs": "0.0.1-security",
+    "jasmine-expect": "^4.0.3",
+    "log4js": "^2.5.3",
+    "log4js-protractor-appender": "^1.1.2",
+    "nconf": "^0.10.0",
+    "npm-run-all": "^4.1.5",
+    "tslint": "^5.17.0",
+    "tslint-config-prettier": "^1.18.0",
+    "wait-on": "^3.2.0",
+    "webdriver-manager": "^12.1.6",
     "@types/jasmine": "^3.3.5",
     "@types/jasminewd2": "^2.0.6",
     "@types/node": "^12.0.0",
@@ -30,19 +41,6 @@
     "protractor": "^5.4.2",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5",
-    "webdriver-manager": "^12.1.5",
     "winston": "^3.2.1"
-  },
-  "devDependencies": {
-    "fs": "0.0.1-security",
-    "jasmine-expect": "^4.0.3",
-    "log4js": "^2.5.3",
-    "log4js-protractor-appender": "^1.1.2",
-    "nconf": "^0.10.0",
-    "npm-run-all": "^4.1.5",
-    "ts-node": "^3.0.2",
-    "tslint": "^5.17.0",
-    "tslint-config-prettier": "^1.18.0",
-    "wait-on": "^3.2.0"
   }
 }

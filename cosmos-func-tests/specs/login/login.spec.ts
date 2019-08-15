@@ -6,6 +6,7 @@ import { config } from "../../config";
 import constants from "../../utils/constants";
 import { CreateContent } from "../../pages/CreateContent.po";
 import SearchContent from "../../pages/SearchContent.po";
+import { browser } from "protractor";
 
 describe("Create Commentary", () => {
   const loginData = require("../../../data/login.json");
@@ -16,61 +17,61 @@ describe("Create Commentary", () => {
   let createContentPg: CreateContent;
   let searchContentPg: SearchContent;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     loginPg = new LoginPage();
     homePg = new HomePage();
     browserPg = new BrowserUtil();
     createContentPg = new CreateContent();
     searchContentPg = new SearchContent();
+    await loginPg.login(
+      authors.find(obj => {
+        return obj.name === "vegaEditor";
+      })
+    );
+    await browser.sleep(3000);
   });
 
   afterAll(() => {
     homePg.userLogout();
   });
 
-  it("Login with Vega Editor credentials", async () => {
-    loginPg.login(
-      authors.find(obj => {
-        return obj.name === "vegaEditor";
-      })
-    );
-    expect(browserPg.getCurrentURL()).toBe(
+  xit("Login with Vega Editor credentials", async () => {
+    await expect(browserPg.getCurrentURL()).toBe(
       config.params.expectedUrlAfterNavigation
     );
-    homePg.userNameDisplay().then((expectedText)=>{
-    expect(expectedText).toBe(constants.editorWelcomeMessage);  
-    })
+    const text = await homePg.userNameDisplay();
+    await expect(text).toEqual(constants.editorWelcomeMessage);  
   });
 
   it("should create valid commentary", async () => {
-    createContentPg.navigateToContentPage();
-    createContentPg.selectCommodity(constants.commodity);
-    createContentPg.selectCommentaryType(constants.commentaryType);
-    createContentPg.selectRegion(constants.region);
-    createContentPg.createCommentary(constants.contentBody);
-    const commentaryText = searchContentPg.verifyCommentaryCreation();
-    expect(commentaryText).toBe(constants.contentBody);
+    await createContentPg.navigateToCommentaryAppPage();
+    await createContentPg.selectCommodity(constants.commodity);
+    await createContentPg.selectCommentaryType(constants.commentaryType);
+    await createContentPg.selectRegion(constants.region);
+    await createContentPg.createCommentary(constants.contentBody);
+    const commentaryText = await searchContentPg.verifyCommentaryCreation();
+    await expect(commentaryText).toBe(constants.contentBody);
   });
 
-  it("Commentary should support bold text", () => {
+  xit("Commentary should support bold text", () => {
     createContentPg.createCommentaryWithBoldLetters(constants.boldCommentary);
     const commentaryText = searchContentPg.verifyBoldCommentaryCreation();
     expect(commentaryText).toBe(constants.boldCommentary);
   });
 
-  it("Commentary should support Italic text", () => {
+  xit("Commentary should support Italic text", () => {
     createContentPg.createCommentaryWithItalicFont(constants.italicCommentary);
     const commentaryText = searchContentPg.verifyItalicCommentaryCreation();
     expect(commentaryText).toBe(constants.italicCommentary);
   });
 
-  it("Commentary should support numbered list", () => {
+  xit("Commentary should support numbered list", () => {
     createContentPg.createNumberedCommentary(constants.numberedList);
     const commentaryText = searchContentPg.verifyNumberedCommentaryCreation();
     expect(commentaryText).toBe(constants.italicCommentary);
   });
 
-  it("Commentary should support bulleted list", () => {
+  xit("Commentary should support bulleted list", () => {
     createContentPg.createBulletPointsCommentary(constants.bulletPoints);
     const commentaryText = searchContentPg.verifyBulletPointsCommentaryCreation();
     expect(commentaryText).toBe(constants.italicCommentary);

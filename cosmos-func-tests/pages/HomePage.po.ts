@@ -1,6 +1,7 @@
 import {
   element,
   by,
+  promise,
   ElementFinder,
 } from "protractor";
 /**
@@ -13,8 +14,8 @@ export class HomePage {
     return element(by.className("card-title"));
   }
 
-  public userNameDisplay(): ElementFinder {
-    return element(by.className("apps-title"));
+  public userNameDisplay() : promise.Promise<string> {
+    return element(by.className("apps-title")).getText();
   }
 
  public userProfileIconDisplay(): ElementFinder {
