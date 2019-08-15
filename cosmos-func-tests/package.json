@@ -19,10 +19,8 @@
   },
   "author": "Pavani",
   "license": "ISC",
-  "dependencies": {
-    "@types/nconf": "^0.10.0"
-  },
   "devDependencies": {
+    "@types/nconf": "^0.10.0",
     "@types/jasmine": "^3.3.5",
     "@types/jasminewd2": "^2.0.6",
     "@types/node": "^12.0.0",
