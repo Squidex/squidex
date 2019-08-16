@@ -21,12 +21,6 @@ namespace Squidex.Extensions.Actions.Kafka
         ReadMore = "https://kafka.apache.org/quickstart")]
     public sealed class KafkaAction : RuleAction
     {
-        [AbsoluteUrl]
-        [Required]
-        [Display(Name = "Broker Url", Description = "The url to the broker.")]
-        [DataType(DataType.Url)]
-        public Uri Broker { get; set; }
-
         [Required]
         [Display(Name = "Topic Name", Description = "The name of the topic.")]
         [DataType(DataType.Text)]

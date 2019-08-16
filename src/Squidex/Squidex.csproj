@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\extensions\Squidex.Extensions.SelfHosted\Squidex.Extensions.SelfHosted.csproj" />
     <ProjectReference Include="..\..\extensions\Squidex.Extensions\Squidex.Extensions.csproj" />
     <ProjectReference Include="..\..\tools\Migrate_01\Migrate_01.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj" />
