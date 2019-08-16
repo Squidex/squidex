@@ -6,6 +6,8 @@
  */
 
 export class Version {
+    public static readonly EMPTY = new Version('');
+
     constructor(
         public readonly value: string
     ) {

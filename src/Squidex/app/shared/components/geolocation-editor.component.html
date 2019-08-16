@@ -1,31 +1,41 @@
-<div class="editor-container">
-    <form>
+<div class="editor-container" [class.compact]="isCompact">
+    <form [class.hidden]="snapshot.isMapHidden">
         <div class="editor" #editor></div>
-        <input [class.hidden]="!snapshot.isGoogleMaps" class="form-control search-control" type="text" [disabled]="snapshot.isDisabled" placeholder="Search Google Maps" #searchBox />
+
+        <input [class.hidden]="!isGoogleMaps" class="form-control search-control" type="text" [disabled]="snapshot.isDisabled" placeholder="Search Google Maps" #searchBox />
     </form>
-    <div>
-        <form class="form-inline no-gutters" [formGroup]="geolocationForm" (change)="updateValueByInput()" (ngSubmit)="updateValueByInput()">
-            <div class="form-group col-auto pr-2">
-                <label for="latitude">Latitude: </label>
+
+    <div class="row mt-2">
+        <form class="col form-inline no-gutters" [formGroup]="geolocationForm" (change)="updateValueByInput()" (ngSubmit)="updateValueByInput()">
+            <div class="form-group col-auto pr-2" *ngIf="!isCompact">
+                <label for="latitude">Lat: </label>
             </div>
-            <div class="form-group">
+            <div class="form-group pr-2">
                 <sqx-control-errors for="latitude" style="z-index: 10000"></sqx-control-errors>
 
                 <input type="number" class="form-control" id="latitude" formControlName="latitude" step="any" />
             </div>
 
-            <div class="form-group col-auto pr-2 pl-2">
-                <label for="longitude">Longitude: </label>
+            <div class="form-group col-auto pr-2" *ngIf="!isCompact">
+                <label for="longitude">Lon: </label>
             </div>
-            <div class="form-group">
+            <div class="form-group pr-2">
                 <sqx-control-errors for="longitude" style="z-index: 10000"></sqx-control-errors>
                 
                 <input type="number" class="form-control" id="longitude" formControlName="longitude" step="any" />
             </div>
 
-            <div class="form-group col-auto">
+            <div class="form-group col-auto" *ngIf="!isCompact">
                 <button [class.hidden]="!hasValue" type="reset" class="btn btn-text clear" [disabled]="snapshot.isDisabled" (click)="reset()">Clear</button>
             </div>
         </form>
+        <div class="col-auto">
+            <button type="button" class="btn btn-text-secondary" [class.hidden]="!snapshot.isMapHidden" (click)="hideMap(false)" title="Show map">
+                <i class="icon-plus-square"></i>
+            </button>
+            <button type="button" class="btn btn-text-secondary" [class.hidden]="snapshot.isMapHidden" (click)="hideMap(true)" title="Hide map">
+                <i class="icon-minus-square"></i>
+            </button>
+        </div>
     </div>
 </div>

@@ -15,6 +15,10 @@ body {
     }
 }
 
+* {
+    @include scrollbars(8px, $color-border-dark, transparent);
+}
+
 // Common style for user email.
 .user-email {
     font-style: italic;
@@ -73,6 +77,10 @@ body {
     &:not([src]) {
         @include opacity(0);
     }
+}
+
+.truncate {
+    @include truncate;
 }
 
 //

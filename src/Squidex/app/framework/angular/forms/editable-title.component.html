@@ -1,0 +1,23 @@
+<div class="title">
+    <form *ngIf="isRenaming; else noRenaming" class="form-inline" [formGroup]="renameForm" (ngSubmit)="rename()">
+        <div class="form-group mr-1">
+            <sqx-control-errors for="name"></sqx-control-errors>
+            
+            <input type="text" class="form-control form-underlined" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" spellcheck="false" />
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="!renameForm.valid || !renameForm.dirty">Save</button>
+
+        <button type="button" class="btn btn-text-secondary btn-cancel" (click)="toggleRename()">
+            <i class="icon-close"></i>
+        </button>
+    </form>
+
+    <ng-template #noRenaming>
+        <h3 class="title-name" (dblclick)="toggleRename()">
+            {{name}}
+        </h3>
+
+        <i class="title-edit icon-pencil" *ngIf="!disabled" (click)="toggleRename()"></i>
+    </ng-template>
+</div>

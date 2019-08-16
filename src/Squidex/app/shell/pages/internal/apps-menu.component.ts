@@ -36,11 +36,6 @@ export class AppsMenuComponent {
     ) {
     }
 
-    public createApp() {
-        this.appsMenu.hide();
-        this.addAppDialog.show();
-    }
-
     public trackByApp(index: number, app: AppDto) {
         return app.id;
     }

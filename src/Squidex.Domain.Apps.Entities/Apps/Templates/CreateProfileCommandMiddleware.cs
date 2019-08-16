@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         private static async Task<NamedId<Guid>> CreateBasicsSchemaAsync(Func<ICommand, Task> publish)
         {
             var command =
-                SchemaBuilder.Create("basics")
+                SchemaBuilder.Create("Basics")
                     .AddString("First Name", f => f
                         .Required()
                         .ShowInList()
@@ -120,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         private static async Task<NamedId<Guid>> CreateProjectsSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
-                SchemaBuilder.Create("projects")
+                SchemaBuilder.Create("Projects")
                     .AddString("Name", f => f
                         .Required()
                         .ShowInList()
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         private static async Task<NamedId<Guid>> CreateExperienceSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
-                SchemaBuilder.Create("experience")
+                SchemaBuilder.Create("Experience")
                     .AddString("Position", f => f
                         .Required()
                         .ShowInList()
@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates
         private static async Task<NamedId<Guid>> CreateEducationSchemaAsync(Func<ICommand, Task> publish)
         {
             var schema =
-                SchemaBuilder.Create("Experience")
+                SchemaBuilder.Create("Education")
                     .AddString("Degree", f => f
                         .Required()
                         .ShowInList()

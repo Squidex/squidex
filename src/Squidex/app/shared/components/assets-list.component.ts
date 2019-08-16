@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { onErrorResumeNext } from 'rxjs/operators';
 
 import {
@@ -38,10 +38,23 @@ export class AssetsListComponent {
     @Output()
     public select = new EventEmitter<AssetDto>();
 
-    public add(file: File, asset: AssetDto) {
-        this.newFiles = this.newFiles.remove(file);
+    constructor(
+        private readonly changeDetector: ChangeDetectorRef
+    ) {
+    }
 
-        this.state.add(asset);
+    public add(file: File, asset: AssetDto) {
+        if (asset.isDuplicate) {
+            setTimeout(() => {
+                this.newFiles = this.newFiles.remove(file);
+
+                this.changeDetector.detectChanges();
+            }, 2000);
+        } else {
+            this.newFiles = this.newFiles.remove(file);
+
+            this.state.add(asset);
+        }
     }
 
     public search() {

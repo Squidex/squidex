@@ -7,21 +7,17 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { distinctUntilChanged, map, publishReplay, refCount, takeUntil } from 'rxjs/operators';
+import { map, publishReplay, refCount, takeUntil } from 'rxjs/operators';
 
 import {
-    ApiUrlConfig,
-    DateTime,
     DialogService,
     ImmutableArray,
     MathHelper,
     State,
-    Types,
-    Versioned
+    Types
 } from '@app/framework';
 
-import { AssetDto, AssetsService, AssetUploadedDto } from './../services/assets.service';
-import { AuthService } from './../services/auth.service';
+import { AssetDto, AssetsService } from './../services/assets.service';
 import { AppsState } from './apps.state';
 import { AssetsState } from './assets.state';
 
@@ -47,7 +43,7 @@ interface Snapshot {
     uploads: UploadList;
 }
 
-export class UploadCanceled { }
+export class UploadCanceled {}
 
 type UploadList = ImmutableArray<Upload>;
 type UploadResult = AssetDto | number;
@@ -55,14 +51,11 @@ type UploadResult = AssetDto | number;
 @Injectable()
 export class AssetUploaderState extends State<Snapshot> {
     public uploads =
-        this.changes.pipe(map(x => x.uploads),
-            distinctUntilChanged());
+        this.project(x => x.uploads);
 
     constructor(
         private readonly appsState: AppsState,
-        private readonly apiUrl: ApiUrlConfig,
         private readonly assetsService: AssetsService,
-        private readonly authService: AuthService,
         private readonly dialogs: DialogService
     ) {
         super({ uploads: ImmutableArray.empty() });
@@ -78,12 +71,10 @@ export class AssetUploaderState extends State<Snapshot> {
         });
     }
 
-    public uploadFile(file: File, target?: AssetsState, now?: DateTime): Observable<UploadResult> {
+    public uploadFile(file: File, target?: AssetsState): Observable<UploadResult> {
         const stream = this.assetsService.uploadFile(this.appName, file);
 
-        return this.upload(stream, MathHelper.guid(), file, response  => {
-            const asset = createAsset(response, this.apiUrl, this.user, now);
-
+        return this.upload(stream, MathHelper.guid(), file, asset  => {
             if (asset.isDuplicate) {
                 this.dialogs.notifyError('Asset has already been uploaded.');
             } else if (target) {
@@ -94,17 +85,13 @@ export class AssetUploaderState extends State<Snapshot> {
         });
     }
 
-    public uploadAsset(asset: AssetDto, file: File, now?: DateTime): Observable<UploadResult> {
-        const stream = this.assetsService.replaceFile(this.appName, asset.id, file, asset.version);
+    public uploadAsset(asset: AssetDto, file: File): Observable<UploadResult> {
+        const stream = this.assetsService.replaceFile(this.appName, asset, file, asset.version);
 
-        return this.upload(stream, asset.id, file, ({ version, payload }) => {
-            const newAsset =  asset.update(payload, this.user, version, now);
-
-            return newAsset;
-        });
+        return this.upload(stream, asset.id, file);
     }
 
-    private upload<T>(source: Observable<number | T>, id: string, file: File, complete: ((completion: T) => AssetDto)) {
+    private upload(source: Observable<number | AssetDto>, id: string, file: File, complete?: ((completion: AssetDto) => AssetDto)) {
         let upload = { id, name: file.name, progress: 1, status: 'Running', cancel: new Subject() };
 
         this.addUpload(upload);
@@ -114,7 +101,11 @@ export class AssetUploaderState extends State<Snapshot> {
                 if (Types.isNumber(event)) {
                     return event;
                 } else {
-                    return complete(event);
+                    if (complete) {
+                        return complete(event);
+                    } else {
+                        return event;
+                    }
                 }
             }),
             publishReplay(), refCount());
@@ -170,37 +161,4 @@ export class AssetUploaderState extends State<Snapshot> {
     private get appName() {
         return this.appsState.appName;
     }
-
-    private get user() {
-        return this.authService.user!.token;
-    }
-}
-
-function createAsset({ payload, version }: Versioned<AssetUploadedDto>, apiUrl: ApiUrlConfig, user: string, now?: DateTime) {
-    const assetUrl = apiUrl.buildUrl(`api/assets/${payload.id}`);
-
-    now = now || DateTime.now();
-
-    const asset =  new AssetDto(
-        payload.id,
-        user,
-        user,
-        now,
-        now,
-        payload.fileName,
-        payload.fileHash,
-        payload.fileType,
-        payload.fileSize,
-        payload.fileVersion,
-        payload.mimeType,
-        payload.isDuplicate,
-        payload.isImage,
-        payload.pixelWidth,
-        payload.pixelHeight,
-        payload.slug,
-        payload.tags || [],
-        assetUrl,
-        version);
-
-    return asset;
 }

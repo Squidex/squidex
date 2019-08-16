@@ -14,12 +14,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public interface IAssetQueryService
     {
-        int DefaultPageSizeGraphQl { get; }
+        Task<IReadOnlyList<IEnrichedAssetEntity>> QueryByHashAsync(Guid appId, string hash);
 
-        Task<IList<IAssetEntity>> QueryByHashAsync(Guid appId, string hash);
+        Task<IResultList<IEnrichedAssetEntity>> QueryAsync(Context context, Q query);
 
-        Task<IResultList<IAssetEntity>> QueryAsync(QueryContext contex, Q query);
-
-        Task<IAssetEntity> FindAssetAsync(QueryContext context, Guid id);
+        Task<IEnrichedAssetEntity> FindAssetAsync(Guid id);
     }
 }

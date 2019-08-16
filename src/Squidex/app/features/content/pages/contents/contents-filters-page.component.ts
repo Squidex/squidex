@@ -10,7 +10,9 @@ import { Component, OnInit } from '@angular/core';
 import {
     ContentsState,
     Queries,
+    Query,
     ResourceOwner,
+    SavedQuery,
     SchemasState,
     UIState
 } from '@app/shared';
@@ -24,7 +26,7 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
     public schemaQueries: Queries;
 
     constructor(
-        private readonly contentsState: ContentsState,
+        public readonly contentsState: ContentsState,
         private readonly schemasState: SchemasState,
         private readonly uiState: UIState
     ) {
@@ -41,12 +43,12 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
                 }));
     }
 
-    public search(query: string) {
+    public search(query: Query) {
         this.contentsState.search(query);
     }
 
-    public isSelectedQuery(query: string) {
-        return query === this.contentsState.snapshot.contentsQuery || (!query && !this.contentsState.snapshot.contentsQuery);
+    public isSelectedQuery(saved: SavedQuery) {
+        return this.contentsState.isQueryUsed(saved);
     }
 
     public trackByTag(index: number, tag: { name: string }) {

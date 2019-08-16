@@ -116,13 +116,27 @@ namespace Squidex.Domain.Users.MongoDb
 
         protected override Task SetupCollectionAsync(IMongoCollection<MongoUser> collection, CancellationToken ct = default)
         {
-            return collection.Indexes.CreateManyAsync(
-                new[]
-                {
-                    new CreateIndexModel<MongoUser>(Index.Ascending("Logins.LoginProvider").Ascending("Logins.ProviderKey")),
-                    new CreateIndexModel<MongoUser>(Index.Ascending(x => x.NormalizedUserName), new CreateIndexOptions { Unique = true }),
-                    new CreateIndexModel<MongoUser>(Index.Ascending(x => x.NormalizedEmail), new CreateIndexOptions { Unique = true })
-                }, ct);
+            return collection.Indexes.CreateManyAsync(new[]
+            {
+                new CreateIndexModel<MongoUser>(
+                    Index
+                        .Ascending("Logins.LoginProvider")
+                        .Ascending("Logins.ProviderKey")),
+                new CreateIndexModel<MongoUser>(
+                    Index
+                        .Ascending(x => x.NormalizedUserName),
+                    new CreateIndexOptions
+                    {
+                        Unique = true
+                    }),
+                new CreateIndexModel<MongoUser>(
+                    Index
+                        .Ascending(x => x.NormalizedEmail),
+                    new CreateIndexOptions
+                    {
+                        Unique = true
+                    })
+            }, ct);
         }
 
         protected override MongoCollectionSettings CollectionSettings()

@@ -1,9 +1,8 @@
-
-<div class="assets-container" [class.disabled]="snapshot.isDisabled" (sqxFileDrop)="addFiles($event)" tabindex="1000">
+<div class="assets-container" [class.disabled]="snapshot.isDisabled" (sqxDropFile)="addFiles($event)" tabindex="1000">
     <div class="header list">
         <div class="row no-gutters">
             <div class="col">
-                <div class="drop-area align-items-center" (click)="assetsDialog.show()" (sqxFileDrop)="addFiles($event)">
+                <div class="drop-area align-items-center" (click)="assetsDialog.show()" (sqxDropFile)="addFiles($event)">
                     Drop files or click
                 </div>
             </div>
@@ -59,7 +58,7 @@
     </div>
 </div>
 
-<ng-container *sqxModalView="assetsDialog;onRoot:true;closeAuto:false">
+<ng-container *sqxModal="assetsDialog">
     <sqx-assets-selector
         (select)="selectAssets($event)">
     </sqx-assets-selector>

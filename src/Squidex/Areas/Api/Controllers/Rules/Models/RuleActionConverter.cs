@@ -8,11 +8,11 @@
 using System;
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Web;
+using Squidex.Web.Json;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models
 {
-    public sealed class RuleActionConverter : MyJsonInheritanceConverter<RuleAction>
+    public sealed class RuleActionConverter : TypedJsonInheritanceConverter<RuleAction>
     {
         public static IReadOnlyDictionary<string, Type> Mapping { get; set; }
 

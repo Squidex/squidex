@@ -7,10 +7,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Namotion.Reflection;
 using NJsonSchema;
-using NSwag.SwaggerGeneration.Processors;
-using NSwag.SwaggerGeneration.Processors.Contexts;
+using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
@@ -28,7 +28,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
             this.ruleRegistry = ruleRegistry;
         }
 
-        public async Task ProcessAsync(DocumentProcessorContext context)
+        public void Process(DocumentProcessorContext context)
         {
             try
             {
@@ -41,21 +41,21 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                         JsonInheritanceConverter = new RuleActionConverter(), PropertyName = "actionType"
                     };
 
-                    schema.Properties["actionType"] = new JsonProperty
+                    schema.Properties["actionType"] = new JsonSchemaProperty
                     {
                         Type = JsonObjectType.String, IsRequired = true
                     };
 
                     foreach (var action in ruleRegistry.Actions)
                     {
-                        var derivedSchema = await context.SchemaGenerator.GenerateAsync(action.Value.Type, context.SchemaResolver);
+                        var derivedSchema = context.SchemaGenerator.Generate<JsonSchema>(action.Value.Type.ToContextualType(), context.SchemaResolver);
 
                         var oldName = context.Document.Definitions.FirstOrDefault(x => x.Value == derivedSchema).Key;
 
                         if (oldName != null)
                         {
                             context.Document.Definitions.Remove(oldName);
-                            context.Document.Definitions.Add(action.Key, derivedSchema);
+                            context.Document.Definitions.Add($"{action.Key}RuleActionDto", derivedSchema);
                         }
                     }
 
@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
             }
         }
 
-        private static void RemoveFreezable(DocumentProcessorContext context, JsonSchema4 schema)
+        private static void RemoveFreezable(DocumentProcessorContext context, JsonSchema schema)
         {
             context.Document.Definitions.Remove("Freezable");
 

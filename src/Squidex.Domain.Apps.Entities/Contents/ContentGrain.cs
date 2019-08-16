@@ -32,6 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IAssetRepository assetRepository;
         private readonly IContentRepository contentRepository;
         private readonly IScriptEngine scriptEngine;
+        private readonly IContentWorkflow contentWorkflow;
 
         public ContentGrain(
             IStore<Guid> store,
@@ -39,17 +40,20 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IAppProvider appProvider,
             IAssetRepository assetRepository,
             IScriptEngine scriptEngine,
+            IContentWorkflow contentWorkflow,
             IContentRepository contentRepository)
             : base(store, log)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(scriptEngine, nameof(scriptEngine));
             Guard.NotNull(assetRepository, nameof(assetRepository));
+            Guard.NotNull(contentWorkflow, nameof(contentWorkflow));
             Guard.NotNull(contentRepository, nameof(contentRepository));
 
             this.appProvider = appProvider;
             this.scriptEngine = scriptEngine;
             this.assetRepository = assetRepository;
+            this.contentWorkflow = contentWorkflow;
             this.contentRepository = contentRepository;
         }
 
@@ -62,11 +66,21 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 case CreateContent createContent:
                     return CreateReturnAsync(createContent, async c =>
                     {
-                        var ctx = await CreateContext(c.AppId.Id, c.SchemaId.Id, Guid.Empty, () => "Failed to create content.");
+                        var ctx = await CreateContext(c.AppId.Id, c.SchemaId.Id, c, () => "Failed to create content.");
 
-                        GuardContent.CanCreate(ctx.Schema, c);
+                        var status = (await contentWorkflow.GetInitialStatusAsync(ctx.Schema)).Status;
 
-                        await ctx.ExecuteScriptAndTransformAsync(s => s.Create, "Create", c, c.Data);
+                        await GuardContent.CanCreate(ctx.Schema, contentWorkflow, c);
+
+                        c.Data = await ctx.ExecuteScriptAndTransformAsync(s => s.Create,
+                            new ScriptContext
+                            {
+                                Operation = "Create",
+                                Data = c.Data,
+                                Status = status,
+                                StatusOld = default
+                            });
+
                         await ctx.EnrichAsync(c.Data);
 
                         if (!c.DoNotValidate)
@@ -76,38 +90,51 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
                         if (c.Publish)
                         {
-                            await ctx.ExecuteScriptAsync(s => s.Change, "Published", c, c.Data);
+                            await ctx.ExecuteScriptAsync(s => s.Change,
+                                new ScriptContext
+                                {
+                                    Operation = "Published",
+                                    Data = c.Data,
+                                    Status = Status.Published,
+                                    StatusOld = status
+                                });
                         }
 
-                        Create(c);
+                        Create(c, status);
 
-                        return EntityCreatedResult.Create(c.Data, Version);
+                        return Snapshot;
                     });
 
                 case UpdateContent updateContent:
-                    return UpdateReturnAsync(updateContent, c =>
+                    return UpdateReturnAsync(updateContent, async c =>
                     {
-                        GuardContent.CanUpdate(c);
+                        var isProposal = c.AsDraft && Snapshot.Status == Status.Published;
 
-                        return UpdateAsync(c, x => c.Data, false);
+                        await GuardContent.CanUpdate(Snapshot, contentWorkflow, c, isProposal);
+
+                        return await UpdateAsync(c, x => c.Data, false, isProposal);
                     });
 
                 case PatchContent patchContent:
-                    return UpdateReturnAsync(patchContent, c =>
+                    return UpdateReturnAsync(patchContent, async c =>
                     {
-                        GuardContent.CanPatch(c);
+                        var isProposal = IsProposal(c);
 
-                        return UpdateAsync(c, c.Data.MergeInto, true);
+                        await GuardContent.CanPatch(Snapshot, contentWorkflow, c, isProposal);
+
+                        return await UpdateAsync(c, c.Data.MergeInto, true, isProposal);
                     });
 
                 case ChangeContentStatus changeContentStatus:
-                    return UpdateAsync(changeContentStatus, async c =>
+                    return UpdateReturnAsync(changeContentStatus, async c =>
                     {
                         try
                         {
-                            var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, Snapshot.Id, () => "Failed to change content.");
+                            var isChangeConfirm = IsConfirm(c);
 
-                            GuardContent.CanChangeContentStatus(ctx.Schema, Snapshot.IsPending, Snapshot.Status, c);
+                            var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, c, () => "Failed to change content.");
+
+                            await GuardContent.CanChangeStatus(ctx.Schema, Snapshot, contentWorkflow, c, isChangeConfirm);
 
                             if (c.DueTime.HasValue)
                             {
@@ -115,34 +142,24 @@ namespace Squidex.Domain.Apps.Entities.Contents
                             }
                             else
                             {
-                                if (Snapshot.IsPending && Snapshot.Status == Status.Published && c.Status == Status.Published)
+                                if (isChangeConfirm)
                                 {
                                     ConfirmChanges(c);
                                 }
                                 else
                                 {
-                                    StatusChange reason;
+                                    var change = GetChange(c);
 
-                                    if (c.Status == Status.Published)
-                                    {
-                                        reason = StatusChange.Published;
-                                    }
-                                    else if (c.Status == Status.Archived)
-                                    {
-                                        reason = StatusChange.Archived;
-                                    }
-                                    else if (Snapshot.Status == Status.Published)
-                                    {
-                                        reason = StatusChange.Unpublished;
-                                    }
-                                    else
-                                    {
-                                        reason = StatusChange.Restored;
-                                    }
+                                    await ctx.ExecuteScriptAsync(s => s.Change,
+                                        new ScriptContext
+                                        {
+                                            Operation = change.ToString(),
+                                            Data = Snapshot.Data,
+                                            Status = c.Status,
+                                            StatusOld = Snapshot.Status
+                                        });
 
-                                    await ctx.ExecuteScriptAsync(s => s.Change, reason, c, Snapshot.Data);
-
-                                    ChangeStatus(c, reason);
+                                    ChangeStatus(c, change);
                                 }
                             }
                         }
@@ -157,26 +174,37 @@ namespace Squidex.Domain.Apps.Entities.Contents
                                 throw;
                             }
                         }
+
+                        return Snapshot;
+                    });
+
+                case DiscardChanges discardChanges:
+                    return UpdateReturn(discardChanges, c =>
+                    {
+                        GuardContent.CanDiscardChanges(Snapshot.IsPending, c);
+
+                        DiscardChanges(c);
+
+                        return Snapshot;
                     });
 
                 case DeleteContent deleteContent:
                     return UpdateAsync(deleteContent, async c =>
                     {
-                        var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, Snapshot.Id, () => "Failed to delete content.");
+                        var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, c, () => "Failed to delete content.");
 
                         GuardContent.CanDelete(ctx.Schema, c);
 
-                        await ctx.ExecuteScriptAsync(s => s.Delete, "Delete", c, Snapshot.Data);
+                        await ctx.ExecuteScriptAsync(s => s.Delete,
+                            new ScriptContext
+                            {
+                                Operation = "Delete",
+                                Data = Snapshot.Data,
+                                Status = Snapshot.Status,
+                                StatusOld = default
+                            });
 
                         Delete(c);
-                    });
-
-                case DiscardChanges discardChanges:
-                    return UpdateAsync(discardChanges, c =>
-                    {
-                        GuardContent.CanDiscardChanges(Snapshot.IsPending, c);
-
-                        DiscardChanges(c);
                     });
 
                 default:
@@ -184,10 +212,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<object> UpdateAsync(ContentDataCommand c, Func<NamedContentData, NamedContentData> newDataFunc, bool partial)
+        private async Task<object> UpdateAsync(ContentUpdateCommand command, Func<NamedContentData, NamedContentData> newDataFunc, bool partial, bool isProposal)
         {
-            var isProposal = c.AsDraft && Snapshot.Status == Status.Published;
-
             var currentData =
                 isProposal ?
                 Snapshot.DataDraft :
@@ -197,35 +223,43 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (!currentData.Equals(newData))
             {
-                var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, Snapshot.Id, () => "Failed to update content.");
+                var ctx = await CreateContext(Snapshot.AppId.Id, Snapshot.SchemaId.Id, command, () => "Failed to update content.");
 
                 if (partial)
                 {
-                    await ctx.ValidatePartialAsync(c.Data);
+                    await ctx.ValidatePartialAsync(command.Data);
                 }
                 else
                 {
-                    await ctx.ValidateAsync(c.Data);
+                    await ctx.ValidateAsync(command.Data);
                 }
 
-                newData = await ctx.ExecuteScriptAndTransformAsync(s => s.Update, "Update", c, newData, Snapshot.Data);
+                newData = await ctx.ExecuteScriptAndTransformAsync(s => s.Update,
+                    new ScriptContext
+                    {
+                        Operation = "Create",
+                        Data = newData,
+                        DataOld = currentData,
+                        Status = Snapshot.Status,
+                        StatusOld = default
+                    });
 
                 if (isProposal)
                 {
-                    ProposeUpdate(c, newData);
+                    ProposeUpdate(command, newData);
                 }
                 else
                 {
-                    Update(c, newData);
+                    Update(command, newData);
                 }
             }
 
-            return new ContentDataChangedResult(newData, Version);
+            return Snapshot;
         }
 
-        public void Create(CreateContent command)
+        public void Create(CreateContent command, Status status)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentCreated()));
+            RaiseEvent(SimpleMapper.Map(command, new ContentCreated { Status = status }));
 
             if (command.Publish)
             {
@@ -268,9 +302,9 @@ namespace Squidex.Domain.Apps.Entities.Contents
             RaiseEvent(SimpleMapper.Map(command, new ContentStatusScheduled { DueTime = command.DueTime.Value }));
         }
 
-        public void ChangeStatus(ChangeContentStatus command, StatusChange reason)
+        public void ChangeStatus(ChangeContentStatus command, StatusChange change)
         {
-            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Change = reason }));
+            RaiseEvent(SimpleMapper.Map(command, new ContentStatusChanged { Change = change }));
         }
 
         private void RaiseEvent(SchemaEvent @event)
@@ -288,6 +322,32 @@ namespace Squidex.Domain.Apps.Entities.Contents
             RaiseEvent(Envelope.Create(@event));
         }
 
+        private bool IsConfirm(ChangeContentStatus command)
+        {
+            return Snapshot.IsPending && Snapshot.Status == Status.Published && command.Status == Status.Published;
+        }
+
+        private bool IsProposal(PatchContent command)
+        {
+            return Snapshot.Status == Status.Published && command.AsDraft;
+        }
+
+        private StatusChange GetChange(ChangeContentStatus command)
+        {
+            var change = StatusChange.Change;
+
+            if (command.Status == Status.Published)
+            {
+                change = StatusChange.Published;
+            }
+            else if (Snapshot.Status == Status.Published)
+            {
+                change = StatusChange.Unpublished;
+            }
+
+            return change;
+        }
+
         private void VerifyNotDeleted()
         {
             if (Snapshot.IsDeleted)
@@ -296,10 +356,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
             }
         }
 
-        private async Task<ContentOperationContext> CreateContext(Guid appId, Guid schemaId, Guid contentId, Func<string> message)
+        private async Task<ContentOperationContext> CreateContext(Guid appId, Guid schemaId, ContentCommand command, Func<string> message)
         {
             var operationContext =
-                await ContentOperationContext.CreateAsync(appId, schemaId, contentId,
+                await ContentOperationContext.CreateAsync(appId, schemaId, command,
                     appProvider, assetRepository, contentRepository, scriptEngine, message);
 
             return operationContext;

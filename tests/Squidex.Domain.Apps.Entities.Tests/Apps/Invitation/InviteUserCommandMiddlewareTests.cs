@@ -5,9 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared.Users;
 using Xunit;
@@ -34,13 +37,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .Returns(true);
 
-            var result = EntityCreatedResult.Create("13", 13L);
+            var result = Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"));
 
             context.Complete(result);
 
             await sut.HandleAsync(context);
 
-            Assert.Same(context.Result<InvitedResult>().Id, result);
+            Assert.Same(context.Result<InvitedResult>().App, result);
 
             A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .MustHaveHappened();
@@ -55,13 +58,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .Returns(false);
 
-            var result = EntityCreatedResult.Create("13", 13L);
+            var result = Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"));
 
             context.Complete(result);
 
             await sut.HandleAsync(context);
 
-            Assert.Same(context.Result<EntityCreatedResult<string>>(), result);
+            Assert.Same(context.Result<IAppEntity>(), result);
 
             A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .MustHaveHappened();

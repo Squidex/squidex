@@ -12,13 +12,18 @@ namespace Squidex.Domain.Apps.Entities.TestHelpers
 {
     public static class AExtensions
     {
-        public static Query Is(this INegatableArgumentConstraintManager<Query> that, string query)
+        public static ClrQuery Is(this INegatableArgumentConstraintManager<ClrQuery> that, string query)
         {
             return that.Matches(x => x.ToString() == query);
         }
 
         public static T[] Is<T>(this INegatableArgumentConstraintManager<T[]> that, params T[] values)
         {
+            if (values == null)
+            {
+                return that.IsNull();
+            }
+
             return that.IsSameSequenceAs(values);
         }
     }

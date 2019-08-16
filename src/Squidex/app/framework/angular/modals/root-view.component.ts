@@ -9,11 +9,14 @@ import { ChangeDetectionStrategy, Component, ViewChild, ViewContainerRef } from 
 
 @Component({
     selector: 'sqx-root-view',
-    styleUrls: ['./root-view.component.scss'],
-    templateUrl: './root-view.component.html',
+    template: `
+        <div #element></div>
+
+        <ng-content></ng-content>
+    `,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RootViewComponent {
-    @ViewChild('element', { read: ViewContainerRef })
+    @ViewChild('element', { read: ViewContainerRef, static: false })
     public viewContainer: ViewContainerRef;
 }

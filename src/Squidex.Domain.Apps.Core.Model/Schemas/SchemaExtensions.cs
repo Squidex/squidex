@@ -5,8 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Schemas
 {
@@ -50,6 +52,16 @@ namespace Squidex.Domain.Apps.Core.Schemas
         public static string DisplayName(this Schema schema)
         {
             return schema.Properties.Label.WithFallback(schema.TypeName());
+        }
+
+        public static IEnumerable<IField<ReferencesFieldProperties>> ResolvingReferences(this Schema schema)
+        {
+            return schema.Fields.OfType<IField<ReferencesFieldProperties>>()
+                .Where(x =>
+                    x.Properties.SchemaId != Guid.Empty &&
+                    x.Properties.ResolveReference &&
+                    x.Properties.MaxItems == 1 &&
+                    (x.Properties.IsListField || schema.Fields.Count == 1));
         }
     }
 }

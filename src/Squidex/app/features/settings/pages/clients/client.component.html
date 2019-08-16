@@ -2,33 +2,20 @@
     <div class="card-header">
         <div class="row no-gutters">
             <div class="col col-name">
-                <form *ngIf="isRenaming; else noRenaming" class="form-inline" [formGroup]="renameForm.form" (ngSubmit)="rename()">
-                    <div class="form-group mr-1">
-                        <sqx-control-errors for="name"></sqx-control-errors>
-                        
-                        <input type="text" class="form-control client-name form-underlined" formControlName="name" maxlength="20" sqxFocusOnInit (keydown)="onKeyDown($event.keyCode)" />
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" [disabled]="!renameForm.form.valid || !renameForm.form.dirty">Save</button>
-
-                    <button type="button" class="btn btn-text-secondary btn-cancel" (click)="toggleRename()">
-                        <i class="icon-close"></i>
-                    </button>
-                </form>
-
-                <ng-template #noRenaming>
-                    <h3 class="client-name" (dblclick)="toggleRename()">
-                        {{client.name}}
-                    </h3>
-
-                    <i class="client-edit icon-pencil" (click)="toggleRename()"></i>
-                </ng-template>
+                <div class="row">
+                    <sqx-editable-title 
+                        [name]="client.name"
+                        (nameChanged)="rename($event)"
+                        [disabled]="!client.canUpdate">
+                    </sqx-editable-title>
+                </div>
             </div>
             <div class="col-auto">
                 <button type="button" class="btn btn-primary" (click)="connect()">Connect</button>
             </div>
             <div class="col-auto cell-actions no-padding">
                 <button type="button" class="btn btn-text-danger"
+                    [disabled]="!client.canRevoke"
                     (sqxConfirmClick)="revoke()"
                     confirmTitle="Revoke client" 
                     confirmText="Do you really want to revoke the client?">
@@ -70,7 +57,10 @@
                     Role
                 </label>
                 <div class="col cell-input">
-                    <select class="form-control" [ngModel]="client.role" (ngModelChange)="update($event)">
+                    <select class="form-control"
+                        [disabled]="!client.canUpdate"
+                        [ngModel]="client.role"
+                        (ngModelChange)="update($event)">
                         <option *ngFor="let role of clientRoles; trackBy: trackByRole" [ngValue]="role.name">{{role.name}}</option>
                     </select>
                 </div>
@@ -80,70 +70,72 @@
     </div>
 </div>
 
-<sqx-modal-dialog *sqxModalView="connectDialog;onRoot:true" large="true" (close)="connectDialog.hide()">
-    <ng-container title>
-        Connect
-    </ng-container>
+<ng-container *sqxModal="connectDialog">
+    <sqx-modal-dialog large="true" (close)="connectDialog.hide()">
+        <ng-container title>
+            Connect
+        </ng-container>
 
-    <ng-container content>
-        <div class="help">
-            <h2>How to connect to this client</h2>
-    
-            <h3>Using HTTP</h3>
-    
-            <p>
-                1. Make the following request to get an access token. It will be valid for 30 days.
+        <ng-container content>
+            <div class="help">
+                <h2>How to connect to this client</h2>
         
-                <sqx-code>{{connectHttpText}}</sqx-code>
-            </p>
-    
-            <p>
-                2. Add the bearer token as authorization header to all requests:
-    
-                <sqx-code>Authorization: Bearer [YOUR_TOKEN]</sqx-code>
-            </p>
+                <h3>Using HTTP</h3>
+        
+                <p>
+                    1. Make the following request to get an access token. It will be valid for 30 days.
+            
+                    <sqx-code>{{connectHttpText}}</sqx-code>
+                </p>
+        
+                <p>
+                    2. Add the bearer token as authorization header to all requests:
+        
+                    <sqx-code>Authorization: Bearer [YOUR_TOKEN]</sqx-code>
+                </p>
 
-            <p>
-                Use the following token for testing
+                <p>
+                    Use the following token for testing
 
-                <sqx-code>{{connectToken?.accessToken}}</sqx-code>
-            </p>
-    
-            <h3>Using the command line interface (CLI)</h3>
-    
-            <p>
-                Download the CLI here: <a href="https://github.com/Squidex/squidex-samples/releases" sqxExternalLink>CLI Releases (Linux, OS X, Windows)</a>
-            </p>
-    
-            <p>
-                Connect with .NET SDK:
+                    <sqx-code>{{connectToken?.accessToken}}</sqx-code>
+                </p>
+        
+                <h3>Using the command line interface (CLI)</h3>
+        
+                <p>
+                    Download the CLI here: <a href="https://github.com/Squidex/squidex-samples/releases" sqxExternalLink>CLI Releases (Linux, OS X, Windows)</a>
+                </p>
+        
+                <p>
+                    Connect with .NET SDK:
 
-                <sqx-code>{{connectCLINetText}}</sqx-code>
-            </p>
-    
-            <p>
-                Connect with Windows:
+                    <sqx-code>{{connectCLINetText}}</sqx-code>
+                </p>
+        
+                <p>
+                    Connect with Windows:
 
-                <sqx-code>{{connectCLIWinText}}</sqx-code>
-            </p>
-    
-            <p>
-                Connect with Linux / OS X
+                    <sqx-code>{{connectCLIWinText}}</sqx-code>
+                </p>
+        
+                <p>
+                    Connect with Linux / OS X
 
-                <sqx-code>{{connectCLINixText}}</sqx-code>
-            </p>
-    
-            <h3>Using the C# Client Library</h3>
+                    <sqx-code>{{connectCLINixText}}</sqx-code>
+                </p>
+        
+                <h3>Using the C# Client Library</h3>
 
-            <p>
-                Get the nuget library from <a href="https://www.nuget.org/packages/Squidex.ClientLibrary/" sqxExternalLink>nuget.org</a>
-            </p>
-    
-            <p>
-                Create a client manager
+                <p>
+                    Get the nuget library from <a href="https://www.nuget.org/packages/Squidex.ClientLibrary/" sqxExternalLink>nuget.org</a>
+                </p>
+        
+                <p>
+                    Create a client manager
 
-                <sqx-code>{{connectLibraryText}}</sqx-code>
-            </p>
-        </div>
-    </ng-container>
-</sqx-modal-dialog>
+                    <sqx-code>{{connectLibraryText}}</sqx-code>
+                </p>
+            </div>
+        </ng-container>
+    </sqx-modal-dialog>                
+</ng-container>

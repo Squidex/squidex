@@ -13,7 +13,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 {
     public static class SortBuilder
     {
-        public static SortDefinition<T> BuildSort<T>(this Query query)
+        public static SortDefinition<T> BuildSort<T>(this ClrQuery query)
         {
             if (query.Sort.Count > 0)
             {
@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
         {
             var propertyName = string.Join(".", sort.Path);
 
-            if (sort.SortOrder == SortOrder.Ascending)
+            if (sort.Order == SortOrder.Ascending)
             {
                 return Builders<T>.Sort.Ascending(propertyName);
             }

@@ -6,8 +6,10 @@
 // ==========================================================================
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
@@ -17,9 +19,12 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         private readonly IValidator[] validators;
         private readonly IField field;
 
-        public FieldValidator(IValidator[] validators, IField field)
+        public FieldValidator(IEnumerable<IValidator> validators, IField field)
         {
-            this.validators = validators;
+            Guard.NotNull(field, nameof(field));
+
+            this.validators = validators.ToArray();
+
             this.field = field;
         }
 
@@ -27,21 +32,31 @@ namespace Squidex.Domain.Apps.Core.ValidateContent.Validators
         {
             try
             {
-                object typedValue = null;
+                var typedValue = value;
 
                 if (value is IJsonValue jsonValue)
                 {
-                    typedValue = jsonValue.Type == JsonValueType.Null ? null : JsonValueConverter.ConvertValue(field, jsonValue);
+                    if (jsonValue.Type == JsonValueType.Null)
+                    {
+                        typedValue = null;
+                    }
+                    else
+                    {
+                        typedValue = JsonValueConverter.ConvertValue(field, jsonValue);
+                    }
                 }
 
-                var tasks = new List<Task>();
-
-                foreach (var validator in validators)
+                if (validators?.Length > 0)
                 {
-                    tasks.Add(validator.ValidateAsync(typedValue, context, addError));
-                }
+                    var tasks = new List<Task>();
 
-                await Task.WhenAll(tasks);
+                    foreach (var validator in validators)
+                    {
+                        tasks.Add(validator.ValidateAsync(typedValue, context, addError));
+                    }
+
+                    await Task.WhenAll(tasks);
+                }
             }
             catch
             {

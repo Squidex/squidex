@@ -12,8 +12,11 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     BackupDto,
+    BackupsDto,
     BackupsService,
     DateTime,
+    Resource,
+    ResourceLinks,
     RestoreDto
 } from '@app/shared/internal';
 
@@ -38,7 +41,7 @@ describe('BackupsService', () => {
     it('should make get request to get backups',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
 
-        let backups: BackupDto[];
+        let backups: BackupsDto;
 
         backupsService.getBackups('my-app').subscribe(result => {
             backups = result;
@@ -49,30 +52,18 @@ describe('BackupsService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush([
-            {
-                id: '1',
-                started: '2017-02-03',
-                stopped: '2017-02-04',
-                handledEvents: 13,
-                handledAssets: 17,
-                status: 'Failed'
-            },
-            {
-                id: '2',
-                started: '2018-02-03',
-                stopped: null,
-                handledEvents: 23,
-                handledAssets: 27,
-                status: 'Completed'
-            }
-        ]);
+        req.flush({
+            items: [
+                backupResponse(12),
+                backupResponse(13)
+            ]
+        });
 
         expect(backups!).toEqual(
-            [
-                new BackupDto('1', DateTime.parseISO_UTC('2017-02-03'), DateTime.parseISO_UTC('2017-02-04'), 13, 17, 'Failed'),
-                new BackupDto('2', DateTime.parseISO_UTC('2018-02-03'), null, 23, 27, 'Completed')
-            ]);
+            new BackupsDto([
+                createBackup(12),
+                createBackup(13)
+            ]));
     }));
 
     it('should make get request to get restore',
@@ -184,7 +175,13 @@ describe('BackupsService', () => {
     it('should make delete request to remove language',
         inject([BackupsService, HttpTestingController], (backupsService: BackupsService, httpMock: HttpTestingController) => {
 
-        backupsService.deleteBackup('my-app', '1').subscribe();
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: '/api/apps/my-app/backups/1' }
+            }
+        };
+
+        backupsService.deleteBackup('my-app', resource).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/backups/1');
 
@@ -193,4 +190,32 @@ describe('BackupsService', () => {
 
         req.flush({});
     }));
+
+    function backupResponse(id: number) {
+        return {
+            id: `id${id}`,
+            started: `${id % 1000 + 2000}-12-12T10:10:00`,
+            stopped: id % 2 === 0 ? `${id % 1000 + 2000}-11-11T10:10:00` : null,
+            handledEvents: id * 17,
+            handledAssets: id * 23,
+            status: id % 2 === 0 ? 'Status' : 'Failed',
+            _links: {
+                download: { method: 'GET', href: '/api/backups/1' }
+            }
+        };
+    }
 });
+
+export function createBackup(id: number) {
+    const links: ResourceLinks = {
+        download: { method: 'GET', href: '/api/backups/1' }
+    };
+
+    return new BackupDto(links,
+        `id${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`),
+        id % 2 === 0 ? DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`) : null,
+        id * 17,
+        id * 23,
+        id % 2 === 0 ? 'Status' : 'Failed');
+}

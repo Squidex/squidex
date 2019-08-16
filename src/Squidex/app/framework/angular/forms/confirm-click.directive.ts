@@ -90,7 +90,6 @@ export class ConfirmClickDirective implements OnDestroy {
             this.clickConfirmed.emit();
         }
 
-        event.stopPropagation();
         event.preventDefault();
     }
 }

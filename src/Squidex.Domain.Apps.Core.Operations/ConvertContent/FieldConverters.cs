@@ -34,7 +34,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static FieldConverter ExcludeHidden()
         {
-            return (data, field) => field.IsHidden ? null : data;
+            return (data, field) => !field.IsForApi() ? null : data;
         }
 
         public static FieldConverter ExcludeChangedTypes()
@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static FieldConverter ResolveInvariant(LanguagesConfig config)
         {
-            var codeForInvariant = InvariantPartitioning.Instance.Master.Key;
+            var codeForInvariant = InvariantPartitioning.Key;
             var codeForMasterLanguage = config.Master.Language.Iso2Code;
 
             return (data, field) =>
@@ -126,7 +126,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent
 
         public static FieldConverter ResolveLanguages(LanguagesConfig config)
         {
-            var codeForInvariant = InvariantPartitioning.Instance.Master.Key;
+            var codeForInvariant = InvariantPartitioning.Key;
 
             return (data, field) =>
             {

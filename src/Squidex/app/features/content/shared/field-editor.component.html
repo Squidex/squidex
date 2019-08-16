@@ -1,19 +1,57 @@
-<ng-container *ngIf="field">
-	<label>
-		{{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
-	</label> 
-
-	<span class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</span>
-
-	<sqx-control-errors *ngIf="form" [for]="control" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
+<div [class.ui]="!field.properties.isContentField" *ngIf="field">
+    <ng-container *ngIf="field.properties.isContentField">
+        <label>
+            {{field.displayName}} {{displaySuffix}} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+        </label> 
+    
+        <span class="field-disabled pl-1" *ngIf="field.isDisabled">Disabled</span>
+    
+        <sqx-control-errors *ngIf="form" [for]="control" [fieldName]="field.displayName" [submitted]="form.submitted | async"></sqx-control-errors>
+    </ng-container>
 
 	<div>
 		<ng-container *ngIf="field.properties.editorUrl; else noEditor">
-			<sqx-iframe-editor [url]="field.properties.editorUrl" [formControl]="control"></sqx-iframe-editor>
+            <sqx-iframe-editor [url]="field.properties.editorUrl"
+                [context]="formContext"
+                [formControl]="control"
+                [formValue]="form?.value | async">
+            </sqx-iframe-editor>
 		</ng-container>
 
 		<ng-template #noEditor>
 			<ng-container [ngSwitch]="field.properties.fieldType">
+                <ng-container *ngSwitchCase="'Array'">
+                    <sqx-array-editor 
+                        [arrayControl]="control"
+                        [form]="form"
+                        [formContext]="formContext"
+                        [field]="field"
+                        [language]="language"
+                        [languages]="languages">
+                    </sqx-array-editor>
+                </ng-container>
+                <ng-container *ngSwitchCase="'Assets'">
+                    <sqx-assets-editor [formControl]="control" [isCompact]="isCompact"></sqx-assets-editor>
+                </ng-container>
+                <ng-container *ngSwitchCase="'Boolean'">
+                    <ng-container [ngSwitch]="field.properties['editor']">
+                        <ng-container *ngSwitchCase="'Toggle'">
+                            <sqx-toggle [formControl]="control" [threeStates]="!field.properties.isRequired"></sqx-toggle>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Checkbox'">
+                            <input type="checkbox" [formControl]="control" class="form-check" sqxIndeterminateValue />
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'DateTime'">
+                    <sqx-date-time-editor enforceTime="true" [mode]="field.properties['editor']" [formControl]="control"></sqx-date-time-editor>
+                </ng-container>
+				<ng-container *ngSwitchCase="'Geolocation'">
+					<sqx-geolocation-editor [isCompact]="isCompact" [formControl]="control"></sqx-geolocation-editor>
+				</ng-container>
+				<ng-container *ngSwitchCase="'Json'">
+					<sqx-json-editor [formControl]="control"></sqx-json-editor>
+				</ng-container>
 				<ng-container *ngSwitchCase="'Number'">
 					<ng-container [ngSwitch]="field.properties['editor']">
 						<ng-container *ngSwitchCase="'Input'">
@@ -37,6 +75,27 @@
 							</div>
 						</ng-container>
 					</ng-container>
+				</ng-container>
+				<ng-container *ngSwitchCase="'References'">
+                    <ng-container [ngSwitch]="field.properties['editor']">
+                        <ng-container *ngSwitchCase="'List'">
+                            <sqx-references-editor
+                                [formControl]="control" 
+                                [allowDuplicates]="field.properties['allowDuplicated']"
+                                [language]="language"
+                                [languages]="languages"
+                                [schemaId]="field.properties['schemaId']"
+                                [isCompact]="isCompact">
+                            </sqx-references-editor>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Dropdown'">
+                            <sqx-references-dropdown
+                                [formControl]="control" 
+                                [language]="language"
+								[schemaId]="field.properties['schemaId']">
+                            </sqx-references-dropdown>
+                        </ng-container>
+                    </ng-container>
 				</ng-container>
 				<ng-container *ngSwitchCase="'String'">
 					<ng-container [ngSwitch]="field.properties['editor']">
@@ -77,28 +136,6 @@
 						</ng-container>
 					</ng-container>
 				</ng-container>
-				<ng-container *ngSwitchCase="'Boolean'">
-					<ng-container [ngSwitch]="field.properties['editor']">
-						<ng-container *ngSwitchCase="'Toggle'">
-							<sqx-toggle [formControl]="control" [threeStates]="!field.properties.isRequired"></sqx-toggle>
-						</ng-container>
-						<ng-container *ngSwitchCase="'Checkbox'">
-							<input type="checkbox" [formControl]="control" class="form-check" sqxIndeterminateValue />
-						</ng-container>
-					</ng-container>
-				</ng-container>
-				<ng-container *ngSwitchCase="'DateTime'">
-					<sqx-date-time-editor enforceTime="true" [mode]="field.properties['editor']" [formControl]="control"></sqx-date-time-editor>
-				</ng-container>
-				<ng-container *ngSwitchCase="'Geolocation'">
-					<sqx-geolocation-editor [formControl]="control"></sqx-geolocation-editor>
-				</ng-container>
-				<ng-container *ngSwitchCase="'Json'">
-					<sqx-json-editor [formControl]="control"></sqx-json-editor>
-				</ng-container>
-				<ng-container *ngSwitchCase="'Assets'">
-					<sqx-assets-editor [formControl]="control" [isCompact]="isCompact"></sqx-assets-editor>
-				</ng-container>
 				<ng-container *ngSwitchCase="'Tags'">
                     <ng-container [ngSwitch]="field.properties['editor']">
                         <ng-container *ngSwitchCase="'Tags'">
@@ -113,37 +150,10 @@
                             </select>
                         </ng-container>
                     </ng-container>
-				</ng-container>
-				<ng-container *ngSwitchCase="'Array'">
-					<sqx-array-editor 
-						[arrayControl]="control"
-						[form]="form"
-                        [field]="field"
-						[language]="language"
-						[languages]="languages">
-					</sqx-array-editor>
-				</ng-container>
-				<ng-container *ngSwitchCase="'References'">
-                    <ng-container [ngSwitch]="field.properties['editor']">
-                        <ng-container *ngSwitchCase="'List'">
-                            <sqx-references-editor
-                                [formControl]="control" 
-                                [allowDuplicates]="field.properties['allowDuplicated']"
-                                [language]="language"
-                                [languages]="languages"
-                                [schemaId]="field.properties['schemaId']"
-                                [isCompact]="isCompact">
-                            </sqx-references-editor>
-                        </ng-container>
-                        <ng-container *ngSwitchCase="'Dropdown'">
-                            <sqx-references-dropdown
-                                [formControl]="control" 
-                                [language]="language"
-                                [schemaId]="field.properties['schemaId']">
-                            </sqx-references-dropdown>
-                        </ng-container>
-                    </ng-container>
-				</ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'UI'">
+                    <h4 class="ui-separator">{{field.displayName}}</h4>
+                </ng-container>
 			</ng-container>
 		</ng-template>
 	</div>
@@ -153,4 +163,4 @@
 			{{hints}}
 		</sqx-form-hint>
 	</ng-container>
-</ng-container>
+</div>

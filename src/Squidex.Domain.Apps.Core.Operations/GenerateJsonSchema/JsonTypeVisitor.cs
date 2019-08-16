@@ -5,183 +5,147 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
 {
-    public sealed class JsonTypeVisitor : IFieldVisitor<JsonProperty>
-    {
-        private readonly Func<string, JsonSchema4, JsonSchema4> schemaResolver;
+    public delegate JsonSchema SchemaResolver(string name, JsonSchema schema);
 
-        public JsonTypeVisitor(Func<string, JsonSchema4, JsonSchema4> schemaResolver)
+    public sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty>
+    {
+        private readonly SchemaResolver schemaResolver;
+        private readonly bool withHiddenFields;
+
+        public JsonTypeVisitor(SchemaResolver schemaResolver, bool withHiddenFields)
         {
             this.schemaResolver = schemaResolver;
+
+            this.withHiddenFields = withHiddenFields;
         }
 
-        public JsonProperty Visit(IArrayField field)
+        public JsonSchemaProperty Visit(IArrayField field)
         {
-            return CreateProperty(field, jsonProperty =>
+            var item = Builder.Object();
+
+            foreach (var nestedField in field.Fields.ForApi(withHiddenFields))
             {
-                var itemSchema = new JsonSchema4
-                {
-                    Type = JsonObjectType.Object
-                };
+                var childProperty = nestedField.Accept(this);
 
-                foreach (var nestedField in field.Fields.Where(x => !x.IsHidden))
+                if (childProperty != null)
                 {
-                    var childProperty = nestedField.Accept(this);
-
                     childProperty.Description = nestedField.RawProperties.Hints;
                     childProperty.IsRequired = nestedField.RawProperties.IsRequired;
 
-                    itemSchema.Properties.Add(nestedField.Name, childProperty);
+                    item.Properties.Add(nestedField.Name, childProperty);
                 }
+            }
 
-                jsonProperty.Type = JsonObjectType.Object;
-                jsonProperty.Item = itemSchema;
-            });
+            return Builder.ArrayProperty(item);
         }
 
-        public JsonProperty Visit(IField<AssetsFieldProperties> field)
+        public JsonSchemaProperty Visit(IField<AssetsFieldProperties> field)
         {
-            return CreateProperty(field, jsonProperty =>
+            var item = schemaResolver("AssetItem", Builder.Guid());
+
+            return Builder.ArrayProperty(item);
+        }
+
+        public JsonSchemaProperty Visit(IField<BooleanFieldProperties> field)
+        {
+            return Builder.BooleanProperty();
+        }
+
+        public JsonSchemaProperty Visit(IField<DateTimeFieldProperties> field)
+        {
+            return Builder.DateTimeProperty();
+        }
+
+        public JsonSchemaProperty Visit(IField<GeolocationFieldProperties> field)
+        {
+            var geolocationSchema = Builder.Object();
+
+            geolocationSchema.Properties.Add("latitude", new JsonSchemaProperty
             {
-                var itemSchema = schemaResolver("AssetItem", new JsonSchema4 { Type = JsonObjectType.String });
-
-                jsonProperty.Type = JsonObjectType.Array;
-                jsonProperty.Item = itemSchema;
+                Type = JsonObjectType.Number,
+                Minimum = -90,
+                Maximum = 90,
+                IsRequired = true
             });
-        }
 
-        public JsonProperty Visit(IField<BooleanFieldProperties> field)
-        {
-            return CreateProperty(field, jsonProperty =>
+            geolocationSchema.Properties.Add("longitude", new JsonSchemaProperty
             {
-                jsonProperty.Type = JsonObjectType.Boolean;
+                Type = JsonObjectType.Number,
+                Minimum = -180,
+                Maximum = 180,
+                IsRequired = true
             });
+
+            var reference = schemaResolver("GeolocationDto", geolocationSchema);
+
+            return Builder.ObjectProperty(reference);
         }
 
-        public JsonProperty Visit(IField<DateTimeFieldProperties> field)
+        public JsonSchemaProperty Visit(IField<JsonFieldProperties> field)
         {
-            return CreateProperty(field, jsonProperty =>
+            return Builder.StringProperty();
+        }
+
+        public JsonSchemaProperty Visit(IField<NumberFieldProperties> field)
+        {
+            var property = Builder.NumberProperty();
+
+            if (field.Properties.MinValue.HasValue)
             {
-                jsonProperty.Type = JsonObjectType.String;
-                jsonProperty.Format = JsonFormatStrings.DateTime;
-            });
-        }
+                property.Minimum = (decimal)field.Properties.MinValue.Value;
+            }
 
-        public JsonProperty Visit(IField<GeolocationFieldProperties> field)
-        {
-            return CreateProperty(field, jsonProperty =>
+            if (field.Properties.MaxValue.HasValue)
             {
-                var geolocationSchema = new JsonSchema4
-                {
-                    AllowAdditionalProperties = false
-                };
-
-                geolocationSchema.Properties.Add("latitude", new JsonProperty
-                {
-                    Type = JsonObjectType.Number,
-                    Minimum = -90,
-                    Maximum = 90,
-                    IsRequired = true
-                });
-
-                geolocationSchema.Properties.Add("longitude", new JsonProperty
-                {
-                    Type = JsonObjectType.Number,
-                    Minimum = -180,
-                    Maximum = 180,
-                    IsRequired = true
-                });
-
-                var schemaReference = schemaResolver("GeolocationDto", geolocationSchema);
-
-                jsonProperty.Type = JsonObjectType.Object;
-                jsonProperty.Reference = schemaReference;
-            });
-        }
-
-        public JsonProperty Visit(IField<JsonFieldProperties> field)
-        {
-            return CreateProperty(field, jsonProperty =>
-            {
-                jsonProperty.Type = JsonObjectType.Object;
-            });
-        }
-
-        public JsonProperty Visit(IField<NumberFieldProperties> field)
-        {
-            return CreateProperty(field, jsonProperty =>
-            {
-                jsonProperty.Type = JsonObjectType.Number;
-
-                if (field.Properties.MinValue.HasValue)
-                {
-                    jsonProperty.Minimum = (decimal)field.Properties.MinValue.Value;
-                }
-
-                if (field.Properties.MaxValue.HasValue)
-                {
-                    jsonProperty.Maximum = (decimal)field.Properties.MaxValue.Value;
-                }
-            });
-        }
-
-        public JsonProperty Visit(IField<ReferencesFieldProperties> field)
-        {
-            return CreateProperty(field, jsonProperty =>
-            {
-                var itemSchema = schemaResolver("ReferenceItem", new JsonSchema4 { Type = JsonObjectType.String });
-
-                jsonProperty.Type = JsonObjectType.Array;
-                jsonProperty.Item = itemSchema;
-            });
-        }
-
-        public JsonProperty Visit(IField<StringFieldProperties> field)
-        {
-            return CreateProperty(field, jsonProperty =>
-            {
-                jsonProperty.Type = JsonObjectType.String;
-
-                jsonProperty.MinLength = field.Properties.MinLength;
-                jsonProperty.MaxLength = field.Properties.MaxLength;
-
-                if (field.Properties.AllowedValues != null)
-                {
-                    var names = jsonProperty.EnumerationNames = jsonProperty.EnumerationNames ?? new Collection<string>();
-
-                    foreach (var value in field.Properties.AllowedValues)
-                    {
-                        names.Add(value);
-                    }
-                }
-            });
-        }
-
-        public JsonProperty Visit(IField<TagsFieldProperties> field)
-        {
-            return CreateProperty(field, jsonProperty =>
-            {
-                var itemSchema = schemaResolver("TagsItem", new JsonSchema4 { Type = JsonObjectType.String });
-
-                jsonProperty.Type = JsonObjectType.Array;
-                jsonProperty.Item = itemSchema;
-            });
-        }
-
-        private static JsonProperty CreateProperty(IField field, Action<JsonProperty> updater)
-        {
-            var property = new JsonProperty { IsRequired = field.RawProperties.IsRequired };
-
-            updater(property);
+                property.Maximum = (decimal)field.Properties.MaxValue.Value;
+            }
 
             return property;
+        }
+
+        public JsonSchemaProperty Visit(IField<ReferencesFieldProperties> field)
+        {
+            var item = schemaResolver("ReferenceItem", Builder.Guid());
+
+            return Builder.ArrayProperty(item);
+        }
+
+        public JsonSchemaProperty Visit(IField<StringFieldProperties> field)
+        {
+            var property = Builder.StringProperty();
+
+            property.MinLength = field.Properties.MinLength;
+            property.MaxLength = field.Properties.MaxLength;
+
+            if (field.Properties.AllowedValues != null)
+            {
+                var names = property.EnumerationNames = property.EnumerationNames ?? new Collection<string>();
+
+                foreach (var value in field.Properties.AllowedValues)
+                {
+                    names.Add(value);
+                }
+            }
+
+            return property;
+        }
+
+        public JsonSchemaProperty Visit(IField<TagsFieldProperties> field)
+        {
+            var item = schemaResolver("ReferenceItem", Builder.String());
+
+            return Builder.ArrayProperty(item);
+        }
+
+        public JsonSchemaProperty Visit(IField<UIFieldProperties> field)
+        {
+            return null;
         }
     }
 }

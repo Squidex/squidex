@@ -32,7 +32,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserPictureStore userPictureStore;
         private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
-        private readonly IOptions<MyIdentityOptions> identityOptions;
+        private readonly MyIdentityOptions identityOptions;
 
         public ProfileController(
             SignInManager<IdentityUser> signInManager,
@@ -42,7 +42,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             IOptions<MyIdentityOptions> identityOptions)
         {
             this.signInManager = signInManager;
-            this.identityOptions = identityOptions;
+            this.identityOptions = identityOptions.Value;
             this.userManager = userManager;
             this.userPictureStore = userPictureStore;
             this.assetThumbnailGenerator = assetThumbnailGenerator;
@@ -132,19 +132,21 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 return IdentityResult.Failed(new IdentityError { Description = "Please upload a single file." });
             }
 
-            var thumbnailStream = new MemoryStream();
-            try
+            using (var thumbnailStream = new MemoryStream())
             {
-                await assetThumbnailGenerator.CreateThumbnailAsync(file[0].OpenReadStream(), thumbnailStream, 128, 128, "Crop");
+                try
+                {
+                    await assetThumbnailGenerator.CreateThumbnailAsync(file[0].OpenReadStream(), thumbnailStream, 128, 128, "Crop");
 
-                thumbnailStream.Position = 0;
-            }
-            catch
-            {
-                return IdentityResult.Failed(new IdentityError { Description = "Picture is not a valid image." });
-            }
+                    thumbnailStream.Position = 0;
+                }
+                catch
+                {
+                    return IdentityResult.Failed(new IdentityError { Description = "Picture is not a valid image." });
+                }
 
-            await userPictureStore.UploadAsync(user.Id, thumbnailStream);
+                await userPictureStore.UploadAsync(user.Id, thumbnailStream);
+            }
 
             return await userManager.UpdateSafeAsync(user.Identity, new UserValues { PictureUrl = SquidexClaimTypes.PictureUrlStore });
         }
@@ -198,7 +200,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
                 DisplayName = user.DisplayName(),
                 IsHidden = user.IsHidden(),
                 HasPassword = taskForPassword.Result,
-                HasPasswordAuth = identityOptions.Value.AllowPasswordAuth,
+                HasPasswordAuth = identityOptions.AllowPasswordAuth,
                 SuccessMessage = successMessage
             };
 

@@ -10,8 +10,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Domain.Apps.Entities.Apps.Services.Implementations;
 using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
@@ -36,6 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private readonly string planIdPaid = "premium";
         private readonly string planIdFree = "free";
         private readonly AppGrain sut;
+        private readonly Guid workflowId = Guid.NewGuid();
         private readonly Guid patternId1 = Guid.NewGuid();
         private readonly Guid patternId2 = Guid.NewGuid();
         private readonly Guid patternId3 = Guid.NewGuid();
@@ -53,6 +56,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId))
                 .Returns(user);
+
+            A.CallTo(() => appPlansProvider.GetPlan(A<string>.Ignored))
+                .Returns(new ConfigAppLimitsPlan { MaxContributors = 10 });
 
             initialPatterns = new InitialPatterns
             {
@@ -76,18 +82,18 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task Create_should_create_events_and_update_state()
         {
-            var command = new CreateApp { Name = AppName, Actor = User, AppId = AppId };
+            var command = new CreateApp { Name = AppName, Actor = Actor, AppId = AppId };
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(EntityCreatedResult.Create(Id, 4));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(AppName, sut.Snapshot.Name);
 
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppCreated { Name = AppName }),
-                    CreateEvent(new AppContributorAssigned { ContributorId = User.Identifier, Role = Role.Owner }),
+                    CreateEvent(new AppContributorAssigned { ContributorId = Actor.Identifier, Role = Role.Owner }),
                     CreateEvent(new AppLanguageAdded { Language = Language.EN }),
                     CreateEvent(new AppPatternAdded { PatternId = patternId1, Name = "Number", Pattern = "[0-9]" }),
                     CreateEvent(new AppPatternAdded { PatternId = patternId2, Name = "Numbers", Pattern = "[0-9]*" })
@@ -99,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid))
                 .Returns(new PlanChangedResult());
 
             await ExecuteCreateAsync();
@@ -121,10 +127,10 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var command = new ChangePlan { PlanId = planIdFree };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid))
                 .Returns(new PlanChangedResult());
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planIdFree))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdFree))
                 .Returns(new PlanResetResult());
 
             await ExecuteCreateAsync();
@@ -147,7 +153,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var command = new ChangePlan { PlanId = planIdPaid };
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid))
                 .Returns(new RedirectToCheckoutResult(new Uri("http://squidex.io")));
 
             await ExecuteCreateAsync();
@@ -170,7 +176,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(new EntitySavedResult(5));
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(User.Identifier, AppId, AppName, planIdPaid))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(Actor.Identifier, AppNamedId, planIdPaid))
                 .MustNotHaveHappened();
         }
 
@@ -183,7 +189,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(EntityCreatedResult.Create(contributorId, 5));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Role.Editor, sut.Snapshot.Contributors[contributorId]);
 
@@ -203,7 +209,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(EntityCreatedResult.Create(contributorId, 6));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(Role.Owner, sut.Snapshot.Contributors[contributorId]);
 
@@ -223,7 +229,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(6));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(sut.Snapshot.Contributors.ContainsKey(contributorId));
 
@@ -242,33 +248,13 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(5));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(sut.Snapshot.Clients.ContainsKey(clientId));
 
             LastEvents
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppClientAttached { Id = clientId, Secret = command.Secret })
-                );
-        }
-
-        [Fact]
-        public async Task RevokeClient_should_create_events_and_update_state()
-        {
-            var command = new RevokeClient { Id = clientId };
-
-            await ExecuteCreateAsync();
-            await ExecuteAttachClientAsync();
-
-            var result = await sut.ExecuteAsync(CreateCommand(command));
-
-            result.ShouldBeEquivalent(new EntitySavedResult(6));
-
-            Assert.False(sut.Snapshot.Clients.ContainsKey(clientId));
-
-            LastEvents
-                .ShouldHaveSameEvents(
-                    CreateEvent(new AppClientRevoked { Id = clientId })
                 );
         }
 
@@ -282,7 +268,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(7));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(clientNewName, sut.Snapshot.Clients[clientId].Name);
 
@@ -290,6 +276,85 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 .ShouldHaveSameEvents(
                     CreateEvent(new AppClientRenamed { Id = clientId, Name = clientNewName }),
                     CreateEvent(new AppClientUpdated { Id = clientId, Role = Role.Developer })
+                );
+        }
+
+        [Fact]
+        public async Task RevokeClient_should_create_events_and_update_state()
+        {
+            var command = new RevokeClient { Id = clientId };
+
+            await ExecuteCreateAsync();
+            await ExecuteAttachClientAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.False(sut.Snapshot.Clients.ContainsKey(clientId));
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppClientRevoked { Id = clientId })
+                );
+        }
+
+        [Fact]
+        public async Task AddWorkflow_should_create_events_and_update_state()
+        {
+            var command = new AddWorkflow { WorkflowId = workflowId, Name = "my-workflow" };
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.NotEmpty(sut.Snapshot.Workflows);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppWorkflowAdded { WorkflowId = workflowId, Name = "my-workflow" })
+                );
+        }
+
+        [Fact]
+        public async Task UpdateWorkflow_should_create_events_and_update_state()
+        {
+            var command = new UpdateWorkflow { WorkflowId = workflowId, Workflow = Workflow.Default };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddWorkflowAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.NotEmpty(sut.Snapshot.Workflows);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppWorkflowUpdated { WorkflowId = workflowId, Workflow = Workflow.Default })
+                );
+        }
+
+        [Fact]
+        public async Task DeleteWorkflow_should_create_events_and_update_state()
+        {
+            var command = new DeleteWorkflow { WorkflowId = workflowId };
+
+            await ExecuteCreateAsync();
+            await ExecuteAddWorkflowAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Empty(sut.Snapshot.Workflows);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppWorkflowDeleted { WorkflowId = workflowId })
                 );
         }
 
@@ -302,7 +367,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(5));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(sut.Snapshot.LanguagesConfig.Contains(Language.DE));
 
@@ -322,7 +387,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(6));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.False(sut.Snapshot.LanguagesConfig.Contains(Language.DE));
 
@@ -342,7 +407,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(6));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.True(sut.Snapshot.LanguagesConfig.Contains(Language.DE));
 
@@ -361,7 +426,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(5));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(5, sut.Snapshot.Roles.Count);
 
@@ -381,7 +446,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(6));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(4, sut.Snapshot.Roles.Count);
 
@@ -401,7 +466,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(6));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -418,7 +483,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(5));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(initialPatterns.Count + 1, sut.Snapshot.Patterns.Count);
 
@@ -438,7 +503,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(6));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(initialPatterns.Count, sut.Snapshot.Patterns.Count);
 
@@ -458,7 +523,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             var result = await sut.ExecuteAsync(CreateCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(6));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(
@@ -482,7 +547,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     CreateEvent(new AppArchived())
                 );
 
-            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppId, AppName, null))
+            A.CallTo(() => appPlansBillingManager.ChangePlanAsync(command.Actor.Identifier, AppNamedId, null))
                 .MustHaveHappened();
         }
 
@@ -514,6 +579,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private Task ExecuteAddLanguageAsync(Language language)
         {
             return sut.ExecuteAsync(CreateCommand(new AddLanguage { Language = language }));
+        }
+
+        private Task ExecuteAddWorkflowAsync()
+        {
+            return sut.ExecuteAsync(CreateCommand(new AddWorkflow { WorkflowId = workflowId, Name = "my-workflow" }));
         }
 
         private Task ExecuteChangePlanAsync()

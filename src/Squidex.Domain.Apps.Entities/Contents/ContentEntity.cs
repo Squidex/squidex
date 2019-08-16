@@ -6,15 +6,14 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentEntity : IContentEntity
+    public sealed class ContentEntity : IEnrichedContentEntity
     {
         public Guid Id { get; set; }
 
@@ -38,27 +37,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public NamedContentData DataDraft { get; set; }
 
+        public NamedContentData ReferenceData { get; set; }
+
         public Status Status { get; set; }
+
+        public StatusInfo[] Nexts { get; set; }
+
+        public string StatusColor { get; set; }
+
+        public bool CanUpdate { get; set; }
 
         public bool IsPending { get; set; }
 
-        public static ContentEntity Create(CreateContent command, EntityCreatedResult<NamedContentData> result)
-        {
-            var now = SystemClock.Instance.GetCurrentInstant();
-
-            var response = new ContentEntity
-            {
-                Id = command.ContentId,
-                Data = result.IdOrValue,
-                Version = result.Version,
-                Created = now,
-                CreatedBy = command.Actor,
-                LastModified = now,
-                LastModifiedBy = command.Actor,
-                Status = command.Publish ? Status.Published : Status.Draft
-            };
-
-            return response;
-        }
+        public HashSet<string> CacheDependencies { get; set; }
     }
 }

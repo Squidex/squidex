@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
 
@@ -17,40 +18,48 @@ namespace Squidex.Web
     {
         private static readonly int GuidLength = Guid.Empty.ToString().Length;
 
-        public static string ToManyEtag<T>(this IReadOnlyList<T> items, long total = 0) where T : IGenerateETag
+        public static string ToEtag<T>(this IReadOnlyList<T> items) where T : IEntity, IEntityWithVersion
         {
             using (Profiler.Trace("CalculateEtag"))
             {
-                var unhashed = Unhashed(items, total);
+                var unhashed = Unhashed(items, 0);
 
                 return unhashed.Sha256Base64();
             }
         }
 
-        private static string Unhashed<T>(IReadOnlyList<T> items, long total) where T : IGenerateETag
+        public static string ToEtag<T>(this IResultList<T> items) where T : IEntity, IEntityWithVersion
         {
-            var sb = new StringBuilder((items.Count * (GuidLength + 4)) + 10);
-
-            sb.Append(total);
-            sb.Append("_");
-
-            if (items.Count > 0)
+            using (Profiler.Trace("CalculateEtag"))
             {
-                sb.Append(items[0].Id.ToString());
-                sb.Append(items[0].Version);
+                var unhashed = Unhashed(items, items.Total);
 
-                for (var i = 1; i < items.Count; i++)
-                {
-                    sb.Append(";");
-                    sb.Append(items[i].Id.ToString());
-                    sb.Append(items[i].Version);
-                }
+                return unhashed.Sha256Base64();
             }
-
-            return sb.ToString().Sha256Base64();
         }
 
-        public static string ToSurrogateKeys<T>(this IReadOnlyList<T> items) where T : IGenerateETag
+        private static string Unhashed<T>(IReadOnlyList<T> items, long total) where T : IEntity, IEntityWithVersion
+        {
+            var sb = new StringBuilder();
+
+            foreach (var item in items)
+            {
+                AppendItem(item, sb);
+
+                sb.Append(";");
+            }
+
+            sb.Append(total);
+
+            return sb.ToString();
+        }
+
+        public static string ToSurrogateKey<T>(this T item) where T : IEntity
+        {
+            return item.Id.ToString();
+        }
+
+        public static string ToSurrogateKeys<T>(this IReadOnlyList<T> items) where T : IEntity
         {
             if (items.Count == 0)
             {
@@ -70,9 +79,32 @@ namespace Squidex.Web
             return sb.ToString();
         }
 
-        public static string ToEtag<T>(this T item) where T : IGenerateETag
+        public static string ToEtag<T>(this T item) where T : IEntity, IEntityWithVersion
         {
-            return item.Version.ToString();
+            var sb = new StringBuilder();
+
+            AppendItem(item, sb);
+
+            return sb.ToString();
+        }
+
+        private static void AppendItem<T>(T item, StringBuilder sb) where T : IEntity, IEntityWithVersion
+        {
+            sb.Append(item.Id);
+            sb.Append(";");
+            sb.Append(item.Version);
+
+            if (item is IEntityWithCacheDependencies withDependencies)
+            {
+                if (withDependencies.CacheDependencies != null)
+                {
+                    foreach (var dependency in withDependencies.CacheDependencies)
+                    {
+                        sb.Append(";");
+                        sb.Append(dependency);
+                    }
+                }
+            }
         }
     }
 }

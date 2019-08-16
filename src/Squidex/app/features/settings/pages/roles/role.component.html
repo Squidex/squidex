@@ -1,7 +1,7 @@
 <div class="table-items-row table-items-row-expandable"> 
     <div class="table-items-row-summary">        
         <div class="row">
-            <div class="col-5" [class.built]="isDefaultRole">
+            <div class="col-5" [class.built]="role.isDefaultRole">
                 <span class="role-name">{{role.name}}</span>
             </div>
             <div class="col text-decent">
@@ -16,7 +16,8 @@
                         <i class="icon-settings"></i>
                     </button>
 
-                    <button type="button" class="btn btn-text-danger" [class.invisible]="isDefaultRole || role.numClients > 0 || role.numContributors > 0"
+                    <button type="button" class="btn btn-text-danger"
+                        [disabled]="!role.canDelete"
                         (sqxConfirmClick)="remove()"
                         confirmTitle="Delete role" 
                         confirmText="Do you really want to delete the role?">
@@ -32,7 +33,7 @@
             <div class="table-items-row-details-tabs clearfix">
                 <div class="float-right">
                     <button type="reset" class="btn btn-text" (click)="toggleEditing()">Cancel</button>
-                    <button type="submit" class="btn btn-primary" *ngIf="!isDefaultRole">Save</button>
+                    <button type="submit" class="btn btn-primary" *ngIf="isEditable">Save</button>
                 </div>
             </div>
 
@@ -43,14 +44,14 @@
 
                         <sqx-autocomplete [formControl]="control" [source]="allPermissions"></sqx-autocomplete>
                     </div>
-                    <div class="col-auto pl-1" *ngIf="!isDefaultRole">
+                    <div class="col-auto pl-1" *ngIf="isEditable">
                         <button type="button" class="btn btn-text-danger" (click)="removePermission(i)">
                             <i class="icon-bin2"></i>
                         </button>
                     </div>
                 </div>
 
-                <form class="form-group row no-gutters" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="!isDefaultRole">
+                <form class="form-group row no-gutters" [formGroup]="addPermissionForm.form" (ngSubmit)="addPermission()" *ngIf="isEditable">
                     <div class="col">
                         <sqx-autocomplete formControlName="permission" [source]="allPermissions" #addInput></sqx-autocomplete>
                     </div>

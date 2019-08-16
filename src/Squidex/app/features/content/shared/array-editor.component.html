@@ -4,8 +4,10 @@
     <div class="item" *ngFor="let itemForm of arrayControl.controls; let i = index">
         <sqx-array-item
             [form]="form"
+            [formContext]="formContext"
             [field]="field"
             [isHidden]="snapshot.isHidden"
+            [isDisabled]="arrayControl.disabled"
             [isFirst]="i === 0"
             [isLast]="i === arrayControl.controls.length - 1"
             [index]="i"
@@ -20,7 +22,7 @@
     </div>
 </div>
 
-<button type="button" class="btn btn-success" [disabled]="field.nested.length === 0" (click)="addItem(undefined)">
+<button type="button" class="btn btn-success" [disabled]="field.nested.length === 0 || arrayControl.disabled" (click)="addItem(undefined)">
     Add Item
 </button>
 

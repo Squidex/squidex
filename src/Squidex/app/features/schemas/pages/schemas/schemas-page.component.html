@@ -6,12 +6,17 @@
     </ng-container>
     
     <ng-container secondHeader>
-        <sqx-shortcut keys="ctrl+shift+g" (trigger)="addSchemaDialog.show()"></sqx-shortcut>
         <sqx-shortcut keys="ctrl+shift+f" (trigger)="inputFind.focus()"></sqx-shortcut>
 
-        <button type="button" class="btn btn-success subheader-button" (click)="createSchema()" title="New Schema (CTRL + SHIFT + G)" titlePosition="top-left">
-            <i class="icon-plus"></i>          
-        </button>
+        <ng-container *ngIf="schemasState.canCreate | async">
+            <sqx-shortcut keys="ctrl+shift+g" (trigger)="addSchemaDialog.show()"></sqx-shortcut>
+
+            <button type="button" class="btn btn-success subheader-button" (click)="createSchema()"
+                title="New Schema (CTRL + SHIFT + G)" 
+                titlePosition="top-left">
+                <i class="icon-plus"></i>          
+            </button>
+        </ng-container>
         
         <div class="search-form">
             <input class="form-control form-control-dark" #inputFind [formControl]="schemasFilter" placeholder="Search for schemas..." />
@@ -22,10 +27,9 @@
 
     <ng-container content>
         <sqx-schema-category *ngFor="let category of schemasState.categories | async; trackBy: trackByCategory"
-            [name]="category"
-            [schemas]="schemasState.schemas | async"
+            [schemaCategory]="category"
             [schemasFilter]="schemasFilter.valueChanges | async"
-            (remove)="removeCategory(category)">
+            (remove)="removeCategory(category.name)">
         </sqx-schema-category>
 
         <form [formGroup]="addCategoryForm.form" (ngSubmit)="addCategory()">
@@ -34,10 +38,9 @@
     </ng-container>
 </sqx-panel>
 
-<ng-container *sqxModalView="addSchemaDialog;onRoot:true">
+<ng-container *sqxModal="addSchemaDialog">
     <sqx-schema-form [import]="import"
-        (cancel)="addSchemaDialog.hide()"
-        (complete)="redirectSchema($event)">
+        (cancel)="addSchemaDialog.hide()" (complete)="redirectSchema($event)">
     </sqx-schema-form>
 </ng-container>
 

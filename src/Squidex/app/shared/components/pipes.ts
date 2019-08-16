@@ -13,6 +13,7 @@ import { map } from 'rxjs/operators';
 
 import {
     ApiUrlConfig,
+    AssetDto,
     formatHistoryMessage,
     HistoryEventDto,
     MathHelper,
@@ -215,8 +216,13 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
     pure: true
 })
 export class AssetUrlPipe implements PipeTransform {
-    public transform(asset: { url: any }): string {
-        return `${asset.url}?q=${MathHelper.guid()}`;
+    constructor(
+        private readonly apiUrl: ApiUrlConfig
+    ) {
+    }
+
+    public transform(asset: AssetDto): string {
+        return `${asset.fullUrl(this.apiUrl)}&sq=${MathHelper.guid()}`;
     }
 }
 
@@ -230,8 +236,8 @@ export class AssetPreviewUrlPipe implements PipeTransform {
     ) {
     }
 
-    public transform(asset: { id: any, fileVersion: number }): string {
-        return this.apiUrl.buildUrl(`api/assets/${asset.id}?version=${asset.fileVersion}`);
+    public transform(asset: AssetDto): string {
+        return asset.fullUrl(this.apiUrl);
     }
 }
 

@@ -1,7 +1,7 @@
 @import '_mixins';
 @import '_vars';
 
-:host /deep/ {
+:host ::ng-deep {
     .color-picker {
         & {
             border-color: $color-border;
@@ -15,4 +15,13 @@
             }
         }
     }
+}
+
+.color-container {
+    display: inline-block;
+}
+
+.circle {
+    @include circle(16px);
+    border: 1px solid $color-border-dark;
 }

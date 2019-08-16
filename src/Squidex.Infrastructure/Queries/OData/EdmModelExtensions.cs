@@ -43,9 +43,9 @@ namespace Squidex.Infrastructure.Queries.OData
             return parser;
         }
 
-        public static Query ToQuery(this ODataUriParser parser)
+        public static ClrQuery ToQuery(this ODataUriParser parser)
         {
-            var query = new Query();
+            var query = new ClrQuery();
 
             if (parser != null)
             {

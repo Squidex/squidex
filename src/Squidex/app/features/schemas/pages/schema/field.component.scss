@@ -18,6 +18,7 @@ $padding: 1rem;
 
 .table-items-row-summary {
     position: relative;
+    padding-right: 1.25rem;
     padding-left: 3rem;
 }
 
@@ -57,12 +58,14 @@ $padding: 1rem;
 
     &-line-v {
         @include absolute($padding, auto, 3 * $padding + .25rem, $padding);
+        border: 0;
         border-left: 2px dashed $field-line;
         width: 2px;
     }
 
     &-line-h {
         @include absolute(-2px, auto, 50%, -$padding);
+        border: 0;
         border-bottom: 2px dashed $field-line;
         width: $padding - .25rem;
     }

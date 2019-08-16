@@ -8,15 +8,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 import {
-    CONTENT_STATUSES,
     ContentDto,
-    ContentQueryStatus,
-    FilterState,
     LanguageDto,
     ManualContentsState,
-    RootFieldDto,
-    SchemaDetailsDto,
-    Sorting
+    Query,
+    QueryModel,
+    queryModelFromSchema,
+    ResourceOwner,
+    SchemaDetailsDto
 } from '@app/shared';
 
 @Component({
@@ -27,7 +26,7 @@ import {
         ManualContentsState
     ]
 })
-export class ContentsSelectorComponent implements OnInit {
+export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
     @Input()
     public language: LanguageDto;
 
@@ -46,23 +45,30 @@ export class ContentsSelectorComponent implements OnInit {
     @Output()
     public select = new EventEmitter<ContentDto[]>();
 
-    public filter = new FilterState();
-
-    public statuses = CONTENT_STATUSES;
+    public queryModel: QueryModel;
 
     public selectedItems:  { [id: string]: ContentDto; } = {};
     public selectionCount = 0;
+    public selectedAll = false;
 
-    public isAllSelected = false;
+    public minWidth: string;
 
     constructor(
         public readonly contentsState: ManualContentsState
     ) {
+        super();
     }
 
     public ngOnInit() {
-        this.contentsState.schema = this.schema;
+        this.minWidth = `${200 + (200 * this.schema.referenceFields.length)}px`;
 
+        this.own(
+            this.contentsState.statuses
+                .subscribe(() => {
+                    this.updateModel();
+                }));
+
+        this.contentsState.schema = this.schema;
         this.contentsState.load();
     }
 
@@ -70,12 +76,8 @@ export class ContentsSelectorComponent implements OnInit {
         this.contentsState.load(true);
     }
 
-    public search() {
-        this.contentsState.search(this.filter.apiFilter);
-    }
-
-    public filterStatus(status: ContentQueryStatus) {
-        this.contentsState.filterStatus(status);
+    public search(query: Query) {
+        this.contentsState.search(query);
     }
 
     public goNext() {
@@ -128,19 +130,16 @@ export class ContentsSelectorComponent implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public sort(field: string | RootFieldDto, sorting: Sorting) {
-        this.filter.setOrderField(field, sorting);
-
-        this.search();
-    }
-
     private updateSelectionSummary() {
         this.selectionCount = Object.keys(this.selectedItems).length;
-
-        this.isAllSelected = this.selectionCount === this.contentsState.snapshot.contents.length;
+        this.selectedAll = this.selectionCount === this.contentsState.snapshot.contents.length;
     }
 
-    public trackByContent(index: number, content: ContentDto): string {
+    private updateModel() {
+        this.queryModel = queryModelFromSchema(this.schema, this.languages, this.contentsState.snapshot.statuses);
+    }
+
+    public trackByContent(content: ContentDto): string {
         return content.id;
     }
 }

@@ -77,10 +77,16 @@
 }
 
 .alert-info {
+    background: $color-theme-blue;
+    border: 0;
+}
+
+.alert-hint {
     @include border-radius(0);
     background: lighten($color-theme-blue, 35%);
     border: 1px solid $color-border;
     font-size: 90%;
+    font-weight: normal;
     color: $color-text;
 
     .alert-link {
@@ -156,9 +162,10 @@ a {
 .dropdown-menu {
     // White dropdown menu without border and shadow.
     & {
-        @include box-shadow(0, 3px, 16px, .2px);
+        @include box-shadow(0, 3px, 16px, .2);
         border: 0;
         background: $panel-light-background;
+        z-index: 1200;
     }
 
     a {
@@ -188,6 +195,20 @@ a {
                 color: $color-dark-foreground;
             }
         }
+    }
+}
+
+.dropdown-divider {
+    &:first-child {
+        display: none;
+    }
+
+    &:last-child {
+        display: none;
+    }
+
+    & + .dropdown-divider {
+        display: none;
     }
 }
 
@@ -282,6 +303,10 @@ a {
     &-twitter {
         color: $color-extern-twitter-icon;
     }
+}
+
+.icon-sm {
+    font-size: 70%;
 }
 
 //

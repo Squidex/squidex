@@ -42,13 +42,13 @@
                         <span>{{eventConsumer.position}}</span>
                     </td>
                     <td class="cell-actions-lg">
-                        <button type="button" class="btn btn-text" (click)="reset(eventConsumer)" *ngIf="!eventConsumer.isResetting" title="Reset Event Consumer">
+                        <button type="button" class="btn btn-text" (click)="reset(eventConsumer)" *ngIf="eventConsumer.canReset" title="Reset Event Consumer">
                             <i class="icon icon-reset"></i>
                         </button>
-                        <button type="button" class="btn btn-text" (click)="start(eventConsumer)" *ngIf="eventConsumer.isStopped" title="Start Event Consumer">
+                        <button type="button" class="btn btn-text" (click)="start(eventConsumer)" *ngIf="eventConsumer.canStart" title="Start Event Consumer">
                             <i class="icon icon-play"></i>
                         </button>
-                        <button type="button" class="btn btn-text" (click)="stop(eventConsumer)" *ngIf="!eventConsumer.isStopped" title="Stop Event Consumer">
+                        <button type="button" class="btn btn-text" (click)="stop(eventConsumer)" *ngIf="eventConsumer.canStop" title="Stop Event Consumer">
                             <i class="icon icon-pause"></i>
                         </button>
                     </td>
@@ -59,12 +59,14 @@
     </ng-container>
 </sqx-panel>
 
-<sqx-modal-dialog *sqxModalView="eventConsumerErrorDialog;onRoot:true" (close)="eventConsumerErrorDialog.hide()">
-    <ng-container title>
-        Error
-    </ng-container>
-
-    <ng-container content>
-        <textarea readonly class="form-control error-message">{{eventConsumerError}}</textarea>
-    </ng-container>
-</sqx-modal-dialog>
+<ng-container *sqxModal="eventConsumerErrorDialog">
+    <sqx-modal-dialog (close)="eventConsumerErrorDialog.hide()">
+        <ng-container title>
+            Error
+        </ng-container>
+    
+        <ng-container content>
+            <textarea readonly class="form-control error-message">{{eventConsumerError}}</textarea>
+        </ng-container>
+    </sqx-modal-dialog>
+</ng-container>

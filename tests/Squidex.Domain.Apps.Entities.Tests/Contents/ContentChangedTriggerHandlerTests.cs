@@ -54,9 +54,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             new object[] { new ContentCreated(), EnrichedContentEventType.Created },
             new object[] { new ContentUpdated(), EnrichedContentEventType.Updated },
             new object[] { new ContentDeleted(), EnrichedContentEventType.Deleted },
-            new object[] { new ContentStatusChanged { Change = StatusChange.Archived }, EnrichedContentEventType.Archived },
+            new object[] { new ContentStatusChanged { Change = StatusChange.Change }, EnrichedContentEventType.StatusChanged },
             new object[] { new ContentStatusChanged { Change = StatusChange.Published }, EnrichedContentEventType.Published },
-            new object[] { new ContentStatusChanged { Change = StatusChange.Restored }, EnrichedContentEventType.Restored },
             new object[] { new ContentStatusChanged { Change = StatusChange.Unpublished }, EnrichedContentEventType.Unpublished }
         };
 
@@ -72,7 +71,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 .Returns(contentGrain);
 
             A.CallTo(() => contentGrain.GetStateAsync(12))
-                .Returns(A.Fake<IContentEntity>().AsJ());
+                .Returns(J.Of<IContentEntity>(new ContentEntity { SchemaId = SchemaMatch }));
 
             var result = await sut.CreateEnrichedEventAsync(envelope);
 

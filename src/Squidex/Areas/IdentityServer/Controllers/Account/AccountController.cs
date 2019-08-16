@@ -36,7 +36,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUserFactory userFactory;
         private readonly IUserEvents userEvents;
-        private readonly IOptions<MyIdentityOptions> identityOptions;
+        private readonly MyIdentityOptions identityOptions;
         private readonly ISemanticLog log;
         private readonly IIdentityServerInteractionService interactions;
 
@@ -54,7 +54,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             this.userManager = userManager;
             this.userFactory = userFactory;
             this.interactions = interactions;
-            this.identityOptions = identityOptions;
+            this.identityOptions = identityOptions.Value;
             this.signInManager = signInManager;
         }
 
@@ -97,7 +97,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
         [Route("account/consent/")]
         public IActionResult Consent(string returnUrl = null)
         {
-            return View(new ConsentVM { PrivacyUrl = identityOptions.Value.PrivacyUrl, ReturnUrl = returnUrl });
+            return View(new ConsentVM { PrivacyUrl = identityOptions.PrivacyUrl, ReturnUrl = returnUrl });
         }
 
         [HttpPost]
@@ -116,7 +116,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             if (!ModelState.IsValid)
             {
-                var vm = new ConsentVM { PrivacyUrl = identityOptions.Value.PrivacyUrl, ReturnUrl = returnUrl };
+                var vm = new ConsentVM { PrivacyUrl = identityOptions.PrivacyUrl, ReturnUrl = returnUrl };
 
                 return View(vm);
             }
@@ -194,9 +194,20 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         private async Task<IActionResult> LoginViewAsync(string returnUrl, bool isLogin, bool isFailed)
         {
-            var allowPasswordAuth = identityOptions.Value.AllowPasswordAuth;
+            var allowPasswordAuth = identityOptions.AllowPasswordAuth;
 
             var externalProviders = await signInManager.GetExternalProvidersAsync();
+
+            if (externalProviders.Count == 1 && !allowPasswordAuth)
+            {
+                var provider = externalProviders[0].AuthenticationScheme;
+
+                var properties =
+                    signInManager.ConfigureExternalAuthenticationProperties(provider,
+                        Url.Action(nameof(ExternalCallback), new { ReturnUrl = returnUrl }));
+
+                return Challenge(properties, provider);
+            }
 
             var vm = new LoginVM
             {
@@ -242,7 +253,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
             var isLoggedIn = result.Succeeded;
 
-            UserWithClaims user = null;
+            UserWithClaims user;
 
             if (isLoggedIn)
             {
@@ -287,7 +298,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
             {
                 return RedirectToAction(nameof(Login));
             }
-            else if (user != null && !user.HasConsent())
+            else if (user != null && !user.HasConsent() && !identityOptions.NoConsent)
             {
                 return RedirectToAction(nameof(Consent), new { returnUrl });
             }
@@ -316,7 +327,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Account
 
         private Task<bool> LockAsync(UserWithClaims user, bool isFirst)
         {
-            if (isFirst || !identityOptions.Value.LockAutomatically)
+            if (isFirst || !identityOptions.LockAutomatically)
             {
                 return TaskHelper.True;
             }

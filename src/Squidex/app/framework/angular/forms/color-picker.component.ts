@@ -32,28 +32,76 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ColorPickerComponent extends StatefulControlComponent<State, string> {
+    private wasOpen = false;
+
     @Input()
     public placeholder = '';
+
+    @Input()
+    public mode: 'Input' | 'Circle' = 'Input';
+
+    @Input()
+    public set disabled(value: boolean) {
+        super.setDisabledState(value);
+    }
 
     public modal = new ModalModel();
 
     constructor(changeDetector: ChangeDetectorRef) {
         super(changeDetector, { foreground: 'black' });
+
+        this.modal.isOpen.subscribe(open => {
+            if (open) {
+                this.wasOpen = true;
+            } else {
+                if (this.wasOpen) {
+                    this.callTouched();
+                }
+
+                this.wasOpen = false;
+            }
+        });
     }
 
     public writeValue(obj: any) {
-        let foreground = 'black';
+        const previousColor = this.snapshot.value;
 
-        if (MathHelper.toLuminance(MathHelper.parseColor(obj)!) < .5) {
-            foreground = 'white';
+        if (previousColor !== obj) {
+            let foreground = 'black';
+
+            if (MathHelper.toLuminance(MathHelper.parseColor(obj)!) < .5) {
+                foreground = 'white';
+            }
+
+            this.next(s => ({ ...s, value: obj, foreground }));
+        }
+    }
+
+    public focus() {
+        if (this.snapshot.isDisabled) {
+            return;
         }
 
-        this.next(s => ({ ...s, value: obj, foreground }));
-
-        this.callChange(obj);
+        this.modal.show();
     }
 
     public blur() {
+        if (this.snapshot.isDisabled) {
+            return;
+        }
+
         this.callTouched();
+    }
+
+    public updateValue(value: string) {
+        if (this.snapshot.isDisabled) {
+            return;
+        }
+
+        if (this.snapshot.value !== value) {
+            this.callChange(value);
+
+            this.writeValue(value);
+        }
     }
 }

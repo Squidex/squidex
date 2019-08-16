@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -26,7 +27,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// Optional fallback languages.
         /// </summary>
-        public Language[] Fallback { get; set; }
+        public List<Language> Fallback { get; set; }
 
         public UpdateLanguage ToCommand(Language language)
         {

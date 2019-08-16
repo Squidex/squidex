@@ -5,24 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
-
 namespace Squidex.Areas.Api.Controllers.UI.Models
 {
     public sealed class UISettingsDto
     {
-        /// <summary>
-        /// The type of the map control.
-        /// </summary>
-        [Required]
-        public string MapType { get; set; }
-
-        /// <summary>
-        /// The key for the map control.
-        /// </summary>
-        [Required]
-        public string MapKey { get; set; }
-
         /// <summary>
         /// True when the user can create apps.
         /// </summary>

@@ -13,9 +13,9 @@
             </div>
             <div class="col col-tags">
                 <div class="float-right">
-                    <span class="badge badge-pill badge-danger" *ngIf="field.isLocked">Locked</span>
-                    <span class="badge badge-pill badge-success" *ngIf="!field.isDisabled">Enabled</span>
-                    <span class="badge badge-pill badge-danger" *ngIf="field.isDisabled">Disabled</span>
+                    <span class="ml-1 badge badge-pill badge-danger" *ngIf="field.isLocked">Locked</span>
+                    <span class="ml-1 badge badge-pill badge-success" *ngIf="!field.isDisabled">Enabled</span>
+                    <span class="ml-1 badge badge-pill badge-danger" *ngIf="field.isDisabled">Disabled</span>
                 </div>
             </div>
             <div class="col col-options">
@@ -25,43 +25,51 @@
                     </button>
 
                     <div class="dropdown dropdown-options">
-                        <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #optionsButton>
+                        <button type="button" class="btn btn-text-secondary ml-1" (click)="dropdown.toggle()" [disabled]="!field.properties.isContentField && field.isLocked" [class.active]="dropdown.isOpen | async" #buttonOptions>
                             <i class="icon-dots"></i>
                         </button>
-                        <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="optionsButton" @fade>
-                            <a class="dropdown-item" (click)="enableField()" *ngIf="field.isDisabled">
-                                Enable in UI
-                            </a>
-                            <a class="dropdown-item" (click)="disableField()" *ngIf="!field.isDisabled">
-                                Disable in UI
-                            </a>
-                            <a class="dropdown-item" (click)="hideField()" *ngIf="!field.isHidden && !field.isLocked">
-                                Hide in API
-                            </a>
-                            <a class="dropdown-item" (click)="showField()" *ngIf="field.isHidden && !field.isLocked">
-                                Show in API
-                            </a>                           
-                            
-                            <ng-container *ngIf="!field.isLocked">
-                                <div class="dropdown-divider"></div>
-                        
-                                <a class="dropdown-item" 
-                                    (sqxConfirmClick)="lockField()"
-                                    confirmTitle="Lock field" 
-                                    confirmText="Do you really want to lock the field? Locked fields cannot be deleted or changed anymore.">
-                                    Lock and prevent changes
-                                </a>
-                            
-                                <div class="dropdown-divider"></div>
 
-                                <a class="dropdown-item dropdown-item-delete"
-                                    (sqxConfirmClick)="deleteField()"
-                                    confirmTitle="Delete field" 
-                                    confirmText="Do you really want to delete the field?">
-                                    Delete
-                                </a>
-                            </ng-container>
-                        </div>
+                        <ng-container *sqxModal="dropdown;closeAlways:true">
+                            <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" @fade>
+                                <ng-container *ngIf="field.properties.isContentField">
+                                    <a class="dropdown-item" (click)="enableField()" *ngIf="field.canEnable">
+                                        Enable in UI
+                                    </a>
+                                    <a class="dropdown-item" (click)="disableField()" *ngIf="field.canDisable">
+                                        Disable in UI
+                                    </a>
+                                    <a class="dropdown-item" (click)="hideField()" *ngIf="field.canHide">
+                                        Hide in API
+                                    </a>
+                                    <a class="dropdown-item" (click)="showField()" *ngIf="field.canShow">
+                                        Show in API
+                                    </a>
+                                </ng-container>                
+                                
+                                <ng-container *ngIf="field.canLock">
+                                    <div class="dropdown-divider"></div>
+                            
+                                    <a class="dropdown-item" 
+                                        (sqxConfirmClick)="lockField()"
+                                        confirmTitle="Lock field" 
+                                        confirmText="Do you really want to lock the field? Locked fields cannot be deleted or changed anymore.">
+                                        Lock and prevent changes
+                                    </a>
+                                </ng-container>
+    
+                                <ng-container>
+                                    <div class="dropdown-divider"></div>
+    
+                                    <a class="dropdown-item dropdown-item-delete"
+                                        [class.disabled]="!field.canDelete"
+                                        (sqxConfirmClick)="deleteField()"
+                                        confirmTitle="Delete field" 
+                                        confirmText="Do you really want to delete the field?">
+                                        Delete
+                                    </a>
+                                </ng-container>
+                            </div>
+                        </ng-container>
                     </div>
                 </div>
             </div>
@@ -70,36 +78,15 @@
 
     <div class="table-items-row-details" *ngIf="isEditing">
         <form [formGroup]="editForm.form" (ngSubmit)="save()">
-            <div class="table-items-row-details-tabs clearfix">
-                <ul class="nav nav-tabs2">
-                    <li class="nav-item">
-                        <a class="nav-link" (click)="selectTab(0)" [class.active]="selectedTab === 0">Common</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" (click)="selectTab(1)" [class.active]="selectedTab === 1">Validation</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" (click)="selectTab(2)" [class.active]="selectedTab === 2">Editing</a>
-                    </li>
-                </ul>
-
-                <div class="float-right">
-                    <button [disabled]="field.isLocked" type="reset" class="btn btn-secondary" (click)="toggleEditing()">Cancel</button>
-                    <button [disabled]="field.isLocked" type="submit" class="btn btn-primary ml-1">Save</button>
-                </div>
-            </div>
-
-            <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 0">
-                <sqx-field-form-common [editForm]="editForm.form" [editFormSubmitted]="editForm.submitted | async" [field]="field"></sqx-field-form-common>
-            </div>
-
-            <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 1">
-                <sqx-field-form-validation [patterns]="patterns" [editForm]="editForm.form" [field]="field"></sqx-field-form-validation>
-            </div>
-
-            <div class="table-items-row-details-tab" [class.hidden]="selectedTab !== 2">
-                <sqx-field-form-ui [editForm]="editForm.form" [field]="field"></sqx-field-form-ui>
-            </div>
+            <sqx-field-form
+                (cancel)="toggleEditing()"
+                [showButtons]="true"
+                [patterns]="patterns"
+                [editForm]="editForm.form"
+                [editFormSubmitted]="editForm.submitted | async"
+                [isEditable]="isEditable"
+                [field]="field">
+            </sqx-field-form>
         </form> 
     </div>
 
@@ -107,7 +94,10 @@
         <ng-container *ngIf="field['nested']; let nested">
             <span class="nested-field-line-v"></span>
 
-            <div [sqxSortModel]="nested" (sqxSort)="sortFields($event)">
+            <div
+                [sqxSortDisabled]="!isEditable"
+                [sqxSortModel]="nested"
+                (sqxSort)="sortFields($event)">
                 <div class="nested-field" *ngFor="let nested of nested; trackBy: trackByField.bind(this)">
                     <span class="nested-field-line-h"></span>
     
@@ -115,7 +105,7 @@
                 </div>
             </div>
             
-            <div class="nested-field nested-field-add">
+            <div class="nested-field nested-field-add" *ngIf="isEditable">
                 <span class="nested-field-line-h"></span>
 
                 <button type="button" class="btn btn-success btn-sm" (click)="addFieldDialog.show()">
@@ -123,7 +113,7 @@
                 </button>
             </div>
                 
-            <ng-container *sqxModalView="addFieldDialog;onRoot:true;closeAuto:false;closeAlways:true">
+            <ng-container *sqxModal="addFieldDialog">
                 <sqx-field-wizard [schema]="schema" [parent]="field"
                     (complete)="addFieldDialog.hide()">
                 </sqx-field-wizard>

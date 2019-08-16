@@ -9,13 +9,11 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ImmutableArray,
-    mapVersioned,
-    shareMapSubscribed,
     shareSubscribed,
     State,
     Version
@@ -25,6 +23,7 @@ import { AppsState } from './apps.state';
 
 import {
     ClientDto,
+    ClientsPayload,
     ClientsService,
     CreateClientDto,
     UpdateClientDto
@@ -39,6 +38,9 @@ interface Snapshot {
 
     // Indicates if the clients are loaded.
     isLoaded?: boolean;
+
+    // Indicates if the user can create new clients.
+    canCreate?: boolean;
 }
 
 type ClientsList = ImmutableArray<ClientDto>;
@@ -46,19 +48,20 @@ type ClientsList = ImmutableArray<ClientDto>;
 @Injectable()
 export class ClientsState extends State<Snapshot> {
     public clients =
-        this.changes.pipe(map(x => x.clients),
-            distinctUntilChanged());
+        this.project(x => x.clients);
 
     public isLoaded =
-        this.changes.pipe(map(x => !!x.isLoaded),
-            distinctUntilChanged());
+        this.project(x => !!x.isLoaded);
+
+    public canCreate =
+        this.project(x => !!x.canCreate);
 
     constructor(
         private readonly clientsService: ClientsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ clients: ImmutableArray.empty(), version: new Version('') });
+        super({ clients: ImmutableArray.empty(), version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -72,50 +75,43 @@ export class ClientsState extends State<Snapshot> {
                     this.dialogs.notifyInfo('Clients reloaded.');
                 }
 
-                const clients = ImmutableArray.of(payload);
-
-                this.next(s => {
-                    return { ...s, clients, isLoaded: true, version };
-                });
+                this.replaceClients(payload, version);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public attach(request: CreateClientDto): Observable<ClientDto> {
+    public attach(request: CreateClientDto): Observable<any> {
         return this.clientsService.postClient(this.appName, request, this.version).pipe(
             tap(({ version, payload }) => {
-                this.next(s => {
-                    const clients = s.clients.push(payload);
-
-                    return { ...s, clients, version: version };
-                });
+                this.replaceClients(payload, version);
             }),
-            shareMapSubscribed(this.dialogs, x => x.payload));
+            shareSubscribed(this.dialogs));
     }
 
     public revoke(client: ClientDto): Observable<any> {
-        return this.clientsService.deleteClient(this.appName, client.id, this.version).pipe(
-            tap(({ version }) => {
-                this.next(s => {
-                    const clients = s.clients.filter(c => c.id !== client.id);
-
-                    return { ...s, clients, version };
-                });
+        return this.clientsService.deleteClient(this.appName, client, this.version).pipe(
+            tap(({ version, payload }) => {
+                this.replaceClients(payload, version);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public update(client: ClientDto, request: UpdateClientDto): Observable<ClientDto> {
-        return this.clientsService.putClient(this.appName, client.id, request, this.version).pipe(
-            mapVersioned(() => update(client, request)),
+    public update(client: ClientDto, request: UpdateClientDto): Observable<any> {
+        return this.clientsService.putClient(this.appName, client, request, this.version).pipe(
             tap(({ version, payload }) => {
-                this.next(s => {
-                    const clients = s.clients.replaceBy('id', payload);
-
-                    return { ...s, clients, version };
-                });
+                this.replaceClients(payload, version);
             }),
-            shareMapSubscribed(this.dialogs, x => x.payload));
+            shareSubscribed(this.dialogs));
+    }
+
+    private replaceClients(payload: ClientsPayload, version: Version) {
+        const { canCreate, items } = payload;
+
+        const clients = ImmutableArray.of(items);
+
+        this.next(s => {
+            return { ...s, clients, isLoaded: true, version, canCreate };
+        });
     }
 
     private get appName() {
@@ -126,6 +122,3 @@ export class ClientsState extends State<Snapshot> {
         return this.snapshot.version;
     }
 }
-
-const update = (client: ClientDto, request: UpdateClientDto) =>
-    client.with({ name: request.name || client.name, role: request.role || client.role });

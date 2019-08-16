@@ -5,23 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+
 import { of, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
-import { SchemasState } from './schemas.state';
+import { SchemaCategory, SchemasState } from './schemas.state';
 
 import {
-    createProperties,
     DialogService,
-    NestedFieldDto,
-    RootFieldDto,
+    FieldDto,
+    ImmutableArray,
     SchemaDetailsDto,
-    SchemaDto,
-    SchemaPropertiesDto,
     SchemasService,
     UpdateSchemaCategoryDto,
     versioned
 } from '@app/shared/internal';
+
+import { createSchema, createSchemaDetails } from '../services/schemas.service.spec';
 
 import { TestValues } from './_test-helpers';
 
@@ -29,32 +29,23 @@ describe('SchemasState', () => {
     const {
         app,
         appsState,
-        authService,
-        creation,
-        creator,
-        modified,
-        modifier,
         newVersion,
         version
     } = TestValues;
 
-    const oldSchemas = [
-        new SchemaDto('id1', 'name1', 'category1', {}, false, false, creation, creator, creation, creator, version),
-        new SchemaDto('id2', 'name2', 'category2', {}, false, true , creation, creator, creation, creator, version)
-    ];
+    const schema1 = createSchema(1);
+    const schema2 = createSchema(2);
 
-    const nested1 = new NestedFieldDto(3, '3', createProperties('Number'), 2);
-    const nested2 = new NestedFieldDto(4, '4', createProperties('String'), 2, true, true);
+    const oldSchemas = {
+        canCreate: true,
+        items: [
+            schema1,
+            schema2
+        ],
+        _links: {}
+    };
 
-    const field1 = new RootFieldDto(1, '1', createProperties('String'), 'invariant');
-    const field2 = new RootFieldDto(2, '2', createProperties('Array'), 'invariant', true, true, true, [nested1, nested2]);
-
-    const schema =
-        new SchemaDetailsDto('id2', 'name2', 'category2', {}, false, true,
-            creation, creator,
-            creation, creator,
-            version,
-            [field1, field2]);
+    const schema = createSchemaDetails(1, version);
 
     let dialogs: IMock<DialogService>;
     let schemasService: IMock<SchemasService>;
@@ -64,7 +55,7 @@ describe('SchemasState', () => {
         dialogs = Mock.ofType<DialogService>();
 
         schemasService = Mock.ofType<SchemasService>();
-        schemasState = new SchemasState(appsState.object, authService.object, dialogs.object, schemasService.object);
+        schemasState = new SchemasState(appsState.object, dialogs.object, schemasService.object);
     });
 
     afterEach(() => {
@@ -78,9 +69,15 @@ describe('SchemasState', () => {
 
             schemasState.load().subscribe();
 
-            expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas);
+            expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas.items);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
-            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, '': true });
+
+            const categories = getCategories(schemasState);
+
+            expect(categories!).toEqual([
+                { name: 'category1', upper: 'CATEGORY1', schemas: ImmutableArray.of([schema1]) },
+                { name: 'category2', upper: 'CATEGORY2', schemas: ImmutableArray.of([schema2]) }
+            ]);
 
             schemasService.verifyAll();
         });
@@ -92,9 +89,16 @@ describe('SchemasState', () => {
             schemasState.addCategory('category3');
             schemasState.load(true).subscribe();
 
-            expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas);
+            expect(schemasState.snapshot.schemas.values).toEqual(oldSchemas.items);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
-            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true, '': true });
+
+            const categories = getCategories(schemasState);
+
+            expect(categories!).toEqual([
+                { name: 'category1', upper: 'CATEGORY1', schemas: ImmutableArray.of([schema1]) },
+                { name: 'category2', upper: 'CATEGORY2', schemas: ImmutableArray.of([schema2]) },
+                { name: 'category3', upper: 'CATEGORY3', schemas: ImmutableArray.empty() }
+            ]);
 
             schemasService.verifyAll();
         });
@@ -122,38 +126,61 @@ describe('SchemasState', () => {
         it('should add category', () => {
             schemasState.addCategory('category3');
 
-            expect(schemasState.snapshot.categories).toEqual({ 'category1': false, 'category2': false, 'category3': true, '': true });
+            const categories = getCategories(schemasState);
+
+            expect(categories!).toEqual([
+                { name: 'category1', upper: 'CATEGORY1', schemas: ImmutableArray.of([schema1]) },
+                { name: 'category2', upper: 'CATEGORY2', schemas: ImmutableArray.of([schema2]) },
+                { name: 'category3', upper: 'CATEGORY3', schemas: ImmutableArray.empty() }
+            ]);
+        });
+
+        it('should not remove category with schemas', () => {
+            schemasState.addCategory('category1');
+
+            const categories = getCategories(schemasState);
+
+            expect(categories!).toEqual([
+                { name: 'category1', upper: 'CATEGORY1', schemas: ImmutableArray.of([schema1]) },
+                { name: 'category2', upper: 'CATEGORY2', schemas: ImmutableArray.of([schema2]) }
+            ]);
         });
 
         it('should remove category', () => {
-            schemasState.removeCategory('category1');
+            schemasState.addCategory('category3');
+            schemasState.removeCategory('category3');
 
-            expect(schemasState.snapshot.categories).toEqual({ 'category2': false, '': true });
+            const categories = getCategories(schemasState);
+
+            expect(categories!).toEqual([
+                { name: 'category1', upper: 'CATEGORY1', schemas: ImmutableArray.of([schema1]) },
+                { name: 'category2', upper: 'CATEGORY2', schemas: ImmutableArray.of([schema2]) }
+            ]);
         });
 
         it('should return schema on select and reload when already loaded', () => {
-            schemasService.setup(x => x.getSchema(app, schema.name))
+            schemasService.setup(x => x.getSchema(app, schema1.name))
                 .returns(() => of(schema)).verifiable(Times.exactly(2));
 
-            schemasState.select('name2').subscribe();
-            schemasState.select('name2').subscribe();
+            schemasState.select(schema1.name).subscribe();
+            schemasState.select(schema1.name).subscribe();
 
             expect().nothing();
         });
 
         it('should return schema on select and load when not loaded', () => {
-            schemasService.setup(x => x.getSchema(app, schema.name))
+            schemasService.setup(x => x.getSchema(app, schema1.name))
                 .returns(() => of(schema)).verifiable();
 
             let selectedSchema: SchemaDetailsDto;
 
-            schemasState.select('name2').subscribe(x => {
+            schemasState.select(schema1.name).subscribe(x => {
                 selectedSchema = x!;
             });
 
             expect(selectedSchema!).toBe(schema);
             expect(schemasState.snapshot.selectedSchema).toBe(schema);
-            expect(schemasState.snapshot.selectedSchema).toBe(<SchemaDetailsDto>schemasState.snapshot.schemas.at(1));
+            expect(schemasState.snapshot.selectedSchema).toBe(<SchemaDetailsDto>schemasState.snapshot.schemas.at(0));
         });
 
         it('should return null on select  when loading failed', () => {
@@ -181,378 +208,336 @@ describe('SchemasState', () => {
             expect(schemasState.snapshot.selectedSchema).toBeNull();
         });
 
-        it('should mark published and update user info when published', () => {
-            schemasService.setup(x => x.publishSchema(app, oldSchemas[0].name, version))
-                .returns(() => of(versioned(newVersion))).verifiable();
+        it('should update schema when schema published', () => {
+            const updated = createSchemaDetails(1, newVersion, '-new');
 
-            schemasState.publish(oldSchemas[0], modified).subscribe();
+            schemasService.setup(x => x.publishSchema(app, schema1, version))
+                .returns(() => of(updated)).verifiable();
 
-            const schema_1 = schemasState.snapshot.schemas.at(0);
+            schemasState.publish(schema1).subscribe();
 
-            expect(schema_1.isPublished).toBeTruthy();
-            expectToBeModified(schema_1);
+            const schema1New = schemasState.snapshot.schemas.at(0);
+
+            expect(schema1New).toEqual(updated);
         });
 
-        it('should unmark published and update user info when unpublished', () => {
-            schemasService.setup(x => x.unpublishSchema(app, oldSchemas[1].name, version))
-                .returns(() => of(versioned(newVersion))).verifiable();
+        it('should update schema when schema unpublished', () => {
+            const updated = createSchemaDetails(1, newVersion, '-new');
 
-            schemasState.unpublish(oldSchemas[1], modified).subscribe();
+            schemasService.setup(x => x.unpublishSchema(app, schema1, version))
+                .returns(() => of(updated)).verifiable();
 
-            const schema_1 = schemasState.snapshot.schemas.at(1);
+            schemasState.unpublish(schema1).subscribe();
 
-            expect(schema_1.isPublished).toBeFalsy();
-            expectToBeModified(schema_1);
+            const schema1New = schemasState.snapshot.schemas.at(0);
+
+            expect(schema1New).toEqual(updated);
         });
 
-        it('should change category and update user info when category changed', () => {
+        it('should update schema when schema category changed', () => {
             const category = 'my-new-category';
 
-            schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
-                .returns(() => of(versioned(newVersion))).verifiable();
+            const updated = createSchemaDetails(1, newVersion, '-new');
 
-            schemasState.changeCategory(oldSchemas[0], category, modified).subscribe();
+            schemasService.setup(x => x.putCategory(app, schema1, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
+                .returns(() => of(updated)).verifiable();
 
-            const schema_1 = schemasState.snapshot.schemas.at(0);
+            schemasState.changeCategory(schema1, category).subscribe();
 
-            expect(schema_1.category).toEqual(category);
-            expectToBeModified(schema_1);
+            const schema1New = schemasState.snapshot.schemas.at(0);
+
+            expect(schema1New).toEqual(updated);
         });
 
         describe('with selection', () => {
             beforeEach(() => {
-                schemasService.setup(x => x.getSchema(app, schema.name))
+                schemasService.setup(x => x.getSchema(app, schema1.name))
                     .returns(() => of(schema)).verifiable();
 
-                schemasState.select(schema.name).subscribe();
+                schemasState.select(schema1.name).subscribe();
             });
 
-            it('should nmark published and update user info when published selected schema', () => {
-                schemasService.setup(x => x.publishSchema(app, schema.name, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+            it('should update schema and selected schema when schema published', () => {
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.publish(schema, modified).subscribe();
+                schemasService.setup(x => x.publishSchema(app, schema1, version))
+                    .returns(() => of(updated)).verifiable();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.publish(schema1).subscribe();
 
-                expect(schema_1.isPublished).toBeTruthy();
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should change category and update user info when category of selected schema changed', () => {
+            it('should update schema and selected schema when schema category changed', () => {
                 const category = 'my-new-category';
 
-                schemasService.setup(x => x.putCategory(app, oldSchemas[0].name, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.changeCategory(oldSchemas[0], category, modified).subscribe();
+                schemasService.setup(x => x.putCategory(app, schema1, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
+                    .returns(() => of(updated)).verifiable();
 
-                const schema_1 = schemasState.snapshot.schemas.at(0);
+                schemasState.changeCategory(schema1, category).subscribe();
 
-                expect(schema_1.category).toEqual(category);
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should update properties and update user info when updated', () => {
+            it('should update schema and selected schema when schema updated', () => {
                 const request = { label: 'name2_label', hints: 'name2_hints' };
 
-                schemasService.setup(x => x.putSchema(app, schema.name, It.isAny(), version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.update(schema, request, modified).subscribe();
+                schemasService.setup(x => x.putSchema(app, schema1, It.isAny(), version))
+                    .returns(() => of(updated)).verifiable();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.update(schema1, request).subscribe();
 
-                expect(schema_1.properties.label).toEqual(request.label);
-                expect(schema_1.properties.hints).toEqual(request.hints);
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should update script properties and update user info when scripts configured', () => {
+            it('should update schema and selected schema when scripts configured', () => {
                 const request = { query: '<query-script>' };
 
-                schemasService.setup(x => x.putScripts(app, schema.name, It.isAny(), version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.configureScripts(schema, request, modified).subscribe();
+                schemasService.setup(x => x.putScripts(app, schema1, It.isAny(), version))
+                    .returns(() => of(updated)).verifiable();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.configureScripts(schema1, request).subscribe();
 
-                expect(schema_1.scripts['query']).toEqual('<query-script>');
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should update script properties and update user info when preview urls configured', () => {
+            it('should update schema and selected schema when preview urls configured', () => {
                 const request = { web: 'url' };
 
-                schemasService.setup(x => x.putPreviewUrls(app, schema.name, It.isAny(), version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.configurePreviewUrls(schema, request, modified).subscribe();
+                schemasService.setup(x => x.putPreviewUrls(app, schema1, It.isAny(), version))
+                    .returns(() => of(updated)).verifiable();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.configurePreviewUrls(schema1, request).subscribe();
 
-                expect(schema_1.previewUrls).toEqual(request);
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
             it('should add schema to snapshot when created', () => {
                 const request = { name: 'newName' };
 
-                const result = new SchemaDetailsDto('id4', 'newName', '', new SchemaPropertiesDto(), false, false, modified, modifier, modified, modifier, version);
+                const updated = createSchemaDetails(3, newVersion, '-new');
 
                 schemasService.setup(x => x.postSchema(app, request))
-                    .returns(() => of(versioned(version, { id: 'id4' }))).verifiable();
+                    .returns(() => of(updated)).verifiable();
 
-                schemasState.create(request, modified).subscribe();
+                schemasState.create(request).subscribe();
 
                 expect(schemasState.snapshot.schemas.values.length).toBe(3);
-                expect(schemasState.snapshot.schemas.at(2)).toEqual(result);
+                expect(schemasState.snapshot.schemas.at(2)).toEqual(updated);
             });
 
             it('should remove schema from snapshot when deleted', () => {
-                schemasService.setup(x => x.deleteSchema(app, schema.name, version))
+                schemasService.setup(x => x.deleteSchema(app, schema1, version))
                     .returns(() => of(versioned(newVersion))).verifiable();
 
-                schemasState.delete(schema).subscribe();
+                schemasState.delete(schema1).subscribe();
 
                 expect(schemasState.snapshot.schemas.values.length).toBe(1);
                 expect(schemasState.snapshot.selectedSchema).toBeNull();
             });
 
-            it('should add field and update user info when field added', () => {
-                const request = { ...field1 };
+            it('should update schema and selected schema when field added', () => {
+                const request = { ...schema.fields[0] };
 
-                const newField = new RootFieldDto(3, '3', createProperties('String'), 'invariant');
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasService.setup(x => x.postField(app, schema.name, It.isAny(), undefined, version))
-                    .returns(() => of(versioned(newVersion, newField))).verifiable();
+                schemasService.setup(x => x.postField(app, schema1, It.isAny(), version))
+                    .returns(() => of(updated)).verifiable();
 
-                schemasState.addField(schema, request, undefined, modified).subscribe();
+                let newField: FieldDto;
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.addField(schema1, request).subscribe(result => {
+                    newField = result;
+                });
 
-                expect(schema_1.fields).toEqual([field1, field2, newField]);
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
+                expect(newField!).toBeDefined();
             });
 
-            it('should add field and update user info when nested field added', () => {
-                const request = { ...field1 };
+            it('should update schema and selected schema when nested field added', () => {
+                const request = { ...schema.fields[0].nested[0] };
 
-                const newField = new NestedFieldDto(3, '3', createProperties('String'), 2);
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasService.setup(x => x.postField(app, schema.name, It.isAny(), 2, version))
-                    .returns(() => of(versioned(newVersion, newField))).verifiable();
+                schemasService.setup(x => x.postField(app, schema.fields[0], It.isAny(), version))
+                    .returns(() => of(updated)).verifiable();
 
-                schemasState.addField(schema, request, field2, modified).subscribe();
+                let newField: FieldDto;
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.addField(schema1, request, schema.fields[0]).subscribe(result => {
+                    newField = result;
+                });
 
-                expect(schema_1.fields[1].nested).toEqual([nested1, nested2, newField]);
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
+                expect(newField!).toBeDefined();
             });
 
-            it('should remove field and update user info when field removed', () => {
-                schemasService.setup(x => x.deleteField(app, schema.name, field1.fieldId, undefined, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+            it('should update schema and selected schema when field removed', () => {
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.deleteField(schema, field1, modified).subscribe();
+                schemasService.setup(x => x.deleteField(app, schema.fields[0], version))
+                    .returns(() => of(updated)).verifiable();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.deleteField(schema1, schema.fields[0]).subscribe();
 
-                expect(schema_1.fields).toEqual([field2]);
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should remove field and update user info when nested field removed', () => {
-                schemasService.setup(x => x.deleteField(app, schema.name, nested1.fieldId, 2, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+            it('should update schema and selected schema when fields sorted', () => {
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.deleteField(schema, nested1, modified).subscribe();
+                schemasService.setup(x => x.putFieldOrdering(app, schema1, [schema.fields[1].fieldId, schema.fields[2].fieldId], version))
+                    .returns(() => of(updated)).verifiable();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.orderFields(schema1, [schema.fields[1], schema.fields[2]]).subscribe();
 
-                expect(schema_1.fields[1].nested).toEqual([nested2]);
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should sort fields and update user info when fields sorted', () => {
-                schemasService.setup(x => x.putFieldOrdering(app, schema.name, [field2.fieldId, field1.fieldId], undefined, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+            it('should update schema and selected schema when nested fields sorted', () => {
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.sortFields(schema, [field2, field1], undefined, modified).subscribe();
+                schemasService.setup(x => x.putFieldOrdering(app, schema.fields[0], [schema.fields[1].fieldId, schema.fields[2].fieldId], version))
+                    .returns(() => of(updated)).verifiable();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.orderFields(schema1, [schema.fields[1], schema.fields[2]], schema.fields[0]).subscribe();
 
-                expect(schema_1.fields).toEqual([field2, field1]);
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should sort fields and update user info when nested fields sorted', () => {
-                schemasService.setup(x => x.putFieldOrdering(app, schema.name, [nested2.fieldId, nested1.fieldId], 2, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+            it('should update schema and selected schema when field updated', () => {
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.sortFields(schema, [nested2, nested1], field2, modified).subscribe();
+                const request = { ...schema.fields[0] };
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasService.setup(x => x.putField(app, schema.fields[0], request, version))
+                    .returns(() => of(updated)).verifiable();
 
-                expect(schema_1.fields[1].nested).toEqual([nested2, nested1]);
-                expectToBeModified(schema_1);
+                schemasState.updateField(schema1, schema.fields[0], request).subscribe();
+
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should update field properties and update user info when field updated', () => {
-                const request = { properties: createProperties('String') };
+            it('should update schema and selected schema when field hidden', () => {
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasService.setup(x => x.putField(app, schema.name, field1.fieldId, request, undefined, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+                schemasService.setup(x => x.hideField(app, schema.fields[0], version))
+                    .returns(() => of(updated)).verifiable();
 
-                schemasState.updateField(schema, field1, request, modified).subscribe();
+                schemasState.hideField(schema1, schema.fields[0]).subscribe();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
 
-                expect(schema_1.fields[0].properties).toBe(request.properties);
-                expectToBeModified(schema_1);
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should update field properties and update user info when nested field updated', () => {
-                const request = { properties: createProperties('String') };
+            it('should update schema and selected schema when field disabled', () => {
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasService.setup(x => x.putField(app, schema.name, nested1.fieldId, request, 2, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+                schemasService.setup(x => x.disableField(app, schema.fields[0], version))
+                    .returns(() => of(updated));
 
-                schemasState.updateField(schema, nested1, request, modified).subscribe();
+                schemasState.disableField(schema1, schema.fields[0]).subscribe();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
 
-                expect(schema_1.fields[1].nested[0].properties).toBe(request.properties);
-                expectToBeModified(schema_1);
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should mark field hidden and update user info when field hidden', () => {
-                schemasService.setup(x => x.hideField(app, schema.name, field1.fieldId, undefined, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+            it('should update schema and selected schema when field locked', () => {
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.hideField(schema, field1, modified).subscribe();
+                schemasService.setup(x => x.lockField(app, schema.fields[0], version))
+                    .returns(() => of(updated)).verifiable();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.lockField(schema1, schema.fields[0]).subscribe();
 
-                expect(schema_1.fields[0].isHidden).toBeTruthy();
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should mark field hidden and update user info when nested field hidden', () => {
-                schemasService.setup(x => x.hideField(app, schema.name, nested1.fieldId, 2, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
+            it('should update schema and selected schema when field shown', () => {
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.hideField(schema, nested1, modified).subscribe();
+                schemasService.setup(x => x.showField(app, schema.fields[0], version))
+                    .returns(() => of(updated)).verifiable();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.showField(schema1, schema.fields[0]).subscribe();
 
-                expect(schema_1.fields[1].nested[0].isHidden).toBeTruthy();
-                expectToBeModified(schema_1);
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
+
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
 
-            it('should mark field disabled and update user info when field disabled', () => {
-                schemasService.setup(x => x.disableField(app, schema.name, field1.fieldId, undefined, version))
-                    .returns(() => of(versioned(newVersion)));
+            it('should update schema and selected schema when field enabled', () => {
+                const updated = createSchemaDetails(1, newVersion, '-new');
 
-                schemasState.disableField(schema, field1, modified).subscribe();
+                schemasService.setup(x => x.enableField(app, schema.fields[0], version))
+                    .returns(() => of(updated)).verifiable();
 
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
+                schemasState.enableField(schema1, schema.fields[0]).subscribe();
 
-                expect(schema_1.fields[0].isDisabled).toBeTruthy();
-                expectToBeModified(schema_1);
-            });
+                const schema1New = <SchemaDetailsDto>schemasState.snapshot.schemas.at(0);
 
-            it('should mark field disabled and update user info when nested disabled', () => {
-                schemasService.setup(x => x.disableField(app, schema.name, nested1.fieldId, 2, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
-
-                schemasState.disableField(schema, nested1, modified).subscribe();
-
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
-
-                expect(schema_1.fields[1].nested[0].isDisabled).toBeTruthy();
-                expectToBeModified(schema_1);
-            });
-
-            it('should mark field locked and update user info when field locked', () => {
-                schemasService.setup(x => x.lockField(app, schema.name, field1.fieldId, undefined, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
-
-                schemasState.lockField(schema, field1, modified).subscribe();
-
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
-
-                expect(schema_1.fields[0].isLocked).toBeTruthy();
-                expectToBeModified(schema_1);
-            });
-
-            it('should mark field locked and update user info when nested field locked', () => {
-                schemasService.setup(x => x.lockField(app, schema.name, nested1.fieldId, 2, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
-
-                schemasState.lockField(schema, nested1, modified).subscribe();
-
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
-
-                expect(schema_1.fields[1].nested[0].isLocked).toBeTruthy();
-                expectToBeModified(schema_1);
-            });
-
-            it('should unmark field hidden and update user info when field shown', () => {
-                schemasService.setup(x => x.showField(app, schema.name, field2.fieldId, undefined, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
-
-                schemasState.showField(schema, field2, modified).subscribe();
-
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
-
-                expect(schema_1.fields[1].isHidden).toBeFalsy();
-                expectToBeModified(schema_1);
-            });
-
-            it('should unmark field hidden and update user info when nested field shown', () => {
-                schemasService.setup(x => x.showField(app, schema.name, nested2.fieldId, 2, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
-
-                schemasState.showField(schema, nested2, modified).subscribe();
-
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
-
-                expect(schema_1.fields[1].nested[1].isHidden).toBeFalsy();
-                expectToBeModified(schema_1);
-            });
-
-            it('should unmark field disabled and update user info when field enabled', () => {
-                schemasService.setup(x => x.enableField(app, schema.name, field2.fieldId, undefined, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
-
-                schemasState.enableField(schema, field2, modified).subscribe();
-
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
-
-                expect(schema_1.fields[1].isDisabled).toBeFalsy();
-                expectToBeModified(schema_1);
-            });
-
-            it('should unmark field disabled and update user info when nested field enabled', () => {
-                schemasService.setup(x => x.enableField(app, schema.name, nested2.fieldId, 2, version))
-                    .returns(() => of(versioned(newVersion))).verifiable();
-
-                schemasState.enableField(schema, nested2, modified).subscribe();
-
-                const schema_1 = <SchemaDetailsDto>schemasState.snapshot.schemas.at(1);
-
-                expect(schema_1.fields[1].nested[1].isDisabled).toBeFalsy();
-                expectToBeModified(schema_1);
+                expect(schema1New).toEqual(updated);
+                expect(schemasState.snapshot.selectedSchema).toEqual(updated);
             });
         });
-
-        function expectToBeModified(schema_1: SchemaDto) {
-            expect(schema_1.lastModified).toEqual(modified);
-            expect(schema_1.lastModifiedBy).toEqual(modifier);
-            expect(schema_1.version).toEqual(newVersion);
-        }
     });
 });
+
+function getCategories(schemasState: SchemasState) {
+    let categories: SchemaCategory[];
+
+    schemasState.categories.subscribe(result => {
+        categories = result;
+    });
+
+    return categories!;
+}

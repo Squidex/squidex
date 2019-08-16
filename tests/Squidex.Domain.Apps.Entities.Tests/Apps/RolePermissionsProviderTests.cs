@@ -9,8 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Xunit;
 
 #pragma warning disable xUnit2017 // Do not use Contains() to check if a value exists in a collection
@@ -19,13 +20,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
 {
     public class RolePermissionsProviderTests
     {
+        private readonly IAppEntity app;
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
-        private readonly IAppEntity app = A.Fake<IAppEntity>();
+        private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly RolePermissionsProvider sut;
 
         public RolePermissionsProviderTests()
         {
-            A.CallTo(() => app.Name).Returns("my-app");
+            app = Mocks.App(appId);
 
             sut = new RolePermissionsProvider(appProvider);
         }
@@ -36,26 +38,17 @@ namespace Squidex.Domain.Apps.Entities.Apps
             A.CallTo(() => appProvider.GetSchemasAsync(A<Guid>.Ignored))
                 .Returns(new List<ISchemaEntity>
                 {
-                    CreateSchema("schema1"),
-                    CreateSchema("schema2")
+                    Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), "schema1")),
+                    Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), "schema2")),
                 });
 
             var result = await sut.GetPermissionsAsync(app);
 
             Assert.True(result.Contains("*"));
             Assert.True(result.Contains("clients.read"));
-            Assert.True(result.Contains("schemas.*.read"));
-            Assert.True(result.Contains("schemas.schema1.read"));
-            Assert.True(result.Contains("schemas.schema2.read"));
-        }
-
-        private static ISchemaEntity CreateSchema(string name)
-        {
-            var schema = A.Fake<ISchemaEntity>();
-
-            A.CallTo(() => schema.SchemaDef).Returns(new Schema(name));
-
-            return schema;
+            Assert.True(result.Contains("schemas.*.update"));
+            Assert.True(result.Contains("schemas.schema1.update"));
+            Assert.True(result.Contains("schemas.schema2.update"));
         }
     }
 }

@@ -19,12 +19,9 @@ namespace Squidex.Infrastructure.Json.Newtonsoft
 
         protected override RefToken ReadValue(JsonReader reader, Type objectType, JsonSerializer serializer)
         {
-            if (reader.TokenType != JsonToken.String)
-            {
-                throw new JsonException($"Expected String, but got {reader.TokenType}.");
-            }
+            var value = serializer.Deserialize<string>(reader);
 
-            if (!RefToken.TryParse(reader.Value.ToString(), out var result))
+            if (!RefToken.TryParse(value, out var result))
             {
                 throw new JsonException("Named id must have at least 2 parts divided by colon.");
             }

@@ -40,7 +40,10 @@ namespace Squidex.Areas.Api.Controllers.Languages
         [ApiPermission]
         public IActionResult GetLanguages()
         {
-            var response = Language.AllLanguages.Select(LanguageDto.FromLanguage).ToArray();
+            var response = Deferred.Response(() =>
+            {
+                return Language.AllLanguages.Select(LanguageDto.FromLanguage).ToArray();
+            });
 
             Response.Headers[HeaderNames.ETag] = "1";
 

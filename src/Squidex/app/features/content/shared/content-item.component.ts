@@ -13,13 +13,11 @@ import {
     ContentsState,
     fadeAnimation,
     FieldDto,
-    FieldFormatter,
-    fieldInvariant,
+    getContentValue,
     ModalModel,
     PatchContentForm,
     RootFieldDto,
-    SchemaDetailsDto,
-    Types
+    SchemaDetailsDto
 } from '@app/shared';
 
 /* tslint:disable:component-selector */
@@ -41,16 +39,7 @@ export class ContentItemComponent implements OnChanges {
     public delete = new EventEmitter();
 
     @Output()
-    public archive = new EventEmitter();
-
-    @Output()
-    public restore = new EventEmitter();
-
-    @Output()
-    public publish = new EventEmitter();
-
-    @Output()
-    public unpublish = new EventEmitter();
+    public statusChange = new EventEmitter<string>();
 
     @Output()
     public selectedChange = new EventEmitter();
@@ -68,6 +57,12 @@ export class ContentItemComponent implements OnChanges {
     public schema: SchemaDetailsDto;
 
     @Input()
+    public schemaFields: RootFieldDto[];
+
+    @Input()
+    public canClone: boolean;
+
+    @Input()
     public isReadOnly = false;
 
     @Input()
@@ -80,13 +75,14 @@ export class ContentItemComponent implements OnChanges {
     public content: ContentDto;
 
     public patchForm: PatchContentForm;
+    public patchAllowed = false;
 
     public dropdown = new ModalModel();
 
     public values: any[] = [];
 
     public get isDirty() {
-        return this.patchForm.form.dirty;
+        return this.patchForm && this.patchForm.form.dirty;
     }
 
     constructor(
@@ -96,8 +92,14 @@ export class ContentItemComponent implements OnChanges {
     }
 
     public ngOnChanges(changes: SimpleChanges) {
+        if (changes['content']) {
+            this.patchAllowed = !this.isReadOnly && this.content.canUpdate;
+        }
+
         if (changes['schema'] || changes['language']) {
-            this.patchForm = new PatchContentForm(this.schema, this.language);
+            if (this.patchAllowed) {
+                this.patchForm = new PatchContentForm(this.schema, this.language);
+            }
         }
 
         if (changes['content'] || changes['language']) {
@@ -106,6 +108,10 @@ export class ContentItemComponent implements OnChanges {
     }
 
     public save() {
+        if (!this.content.canUpdate) {
+            return;
+        }
+
         const value = this.patchForm.submit();
 
         if (value) {
@@ -132,20 +138,8 @@ export class ContentItemComponent implements OnChanges {
         this.delete.emit();
     }
 
-    public emitPublish() {
-        this.publish.emit();
-    }
-
-    public emitUnpublish() {
-        this.unpublish.emit();
-    }
-
-    public emitArchive() {
-        this.archive.emit();
-    }
-
-    public emitRestore() {
-        this.unpublish.emit();
+    public emitChangeStatus(status: string) {
+        this.statusChange.emit(status);
     }
 
     public emitClone() {
@@ -155,14 +149,10 @@ export class ContentItemComponent implements OnChanges {
     private updateValues() {
         this.values = [];
 
-        for (let field of this.schema.listFields) {
-            const value = this.getRawValue(field);
+        for (let field of this.schemaFields) {
+            const { value, formatted } = getContentValue(this.content, this.language, field);
 
-            if (Types.isUndefined(value)) {
-                this.values.push('');
-            } else {
-                this.values.push(FieldFormatter.format(field, value));
-            }
+            this.values.push(formatted);
 
             if (this.patchForm) {
                 const formControl = this.patchForm.form.controls[field.name];
@@ -174,21 +164,7 @@ export class ContentItemComponent implements OnChanges {
         }
     }
 
-    private getRawValue(field: RootFieldDto): any {
-        const contentField = this.content.dataDraft[field.name];
-
-        if (contentField) {
-            if (field.isLocalizable) {
-                return contentField[this.language.iso2Code];
-            } else {
-                return contentField[fieldInvariant];
-            }
-        }
-
-        return undefined;
-    }
-
-    public trackByField(index: number, field: FieldDto) {
+    public trackByField(field: FieldDto) {
         return field.fieldId + this.schema.id;
     }
 }

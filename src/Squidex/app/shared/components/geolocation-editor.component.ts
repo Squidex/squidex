@@ -5,14 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { FormBuilder, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
+    LocalStoreService,
     ResourceLoaderService,
     StatefulControlComponent,
     Types,
-    UIState,
+    UIOptions,
     ValidatorsEx
 } from '@app/shared/internal';
 
@@ -28,8 +29,8 @@ interface Geolocation {
     longitude: number;
 }
 
-interface State {
-    isGoogleMaps: boolean;
+interface Snapshot {
+    isMapHidden?: boolean;
 }
 
 @Component({
@@ -39,10 +40,12 @@ interface State {
     providers: [SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GeolocationEditorComponent extends StatefulControlComponent<State, Geolocation> implements AfterViewInit {
+export class GeolocationEditorComponent extends StatefulControlComponent<Snapshot, Geolocation> implements AfterViewInit {
     private marker: any;
     private map: any;
     private value: Geolocation | null = null;
+
+    public readonly isGoogleMaps: boolean;
 
     public get hasValue() {
         return !!this.value;
@@ -64,20 +67,30 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
             ]
         });
 
-    @ViewChild('editor')
+    @Input()
+    public isCompact: boolean;
+
+    @ViewChild('editor', { static: false })
     public editor: ElementRef<HTMLElement>;
 
-    @ViewChild('searchBox')
+    @ViewChild('searchBox', { static: false })
     public searchBoxInput: ElementRef<HTMLInputElement>;
 
     constructor(changeDetector: ChangeDetectorRef,
+        private readonly localStore: LocalStoreService,
         private readonly resourceLoader: ResourceLoaderService,
         private readonly formBuilder: FormBuilder,
-        private readonly uiState: UIState
+        private readonly uiOptions: UIOptions
     ) {
-        super(changeDetector, {
-            isGoogleMaps: false
-        });
+        super(changeDetector, { isMapHidden: localStore.getBoolean('hideMap') });
+
+        this.isGoogleMaps = uiOptions.get('map.type') !== 'OSM';
+    }
+
+    public hideMap(isMapHidden: boolean) {
+        this.next({ isMapHidden });
+
+        this.localStore.setBoolean('hideMap', isMapHidden);
     }
 
     public writeValue(obj: any) {
@@ -95,7 +108,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     public setDisabledState(isDisabled: boolean): void {
         super.setDisabledState(isDisabled);
 
-        if (!this.snapshot.isGoogleMaps) {
+        if (!this.isGoogleMaps) {
             this.setDisabledStateOSM(isDisabled);
         } else {
             this.setDisabledStateGoogle(isDisabled);
@@ -154,18 +167,11 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     }
 
     public ngAfterViewInit() {
-        this.uiState.settings
-            .subscribe(settings => {
-                const isGoogleMaps = settings.mapType === 'GoogleMaps';
-
-                this.next(s => ({ ...s, isGoogleMaps }));
-
-                if (!this.snapshot.isGoogleMaps) {
-                    this.ngAfterViewInitOSM();
-                } else {
-                    this.ngAfterViewInitGoogle(settings.mapKey);
-                }
-            });
+        if (!this.isGoogleMaps) {
+            this.ngAfterViewInitOSM();
+        } else {
+            this.ngAfterViewInitGoogle(this.uiOptions.get('map.googleMaps.key'));
+        }
     }
 
     private ngAfterViewInitOSM() {
@@ -224,11 +230,11 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
                         }
                     });
 
-                this.map.addListener('bounds_changed', (event: any) => {
+                this.map.addListener('bounds_changed', () => {
                     searchBox.setBounds(this.map.getBounds());
                 });
 
-                searchBox.addListener('places_changed', (event: any) => {
+                searchBox.addListener('places_changed', () => {
                     let places = searchBox.getPlaces();
 
                     if (places.length === 1) {
@@ -268,7 +274,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
     }
 
     private updateMarker(zoom: boolean, fireEvent: boolean) {
-        if (!this.snapshot.isGoogleMaps) {
+        if (!this.isGoogleMaps) {
             this.updateMarkerOSM(zoom);
         } else {
             this.updateMarkerGoogle(zoom);

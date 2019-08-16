@@ -11,20 +11,18 @@ import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 import {
     AppLanguageDto,
     AppsState,
-    CONTENT_STATUSES,
     ContentDto,
-    ContentQueryStatus,
     ContentsState,
-    FilterState,
     ImmutableArray,
     LanguagesState,
     ModalModel,
     Queries,
+    Query,
+    QueryModel,
+    queryModelFromSchema,
     ResourceOwner,
-    RootFieldDto,
     SchemaDetailsDto,
     SchemasState,
-    Sorting,
     UIState
 } from '@app/shared';
 
@@ -37,26 +35,25 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public schema: SchemaDetailsDto;
-    public schemaQueries: Queries;
 
     public searchModal = new ModalModel();
 
     public selectedItems:  { [id: string]: boolean; } = {};
+    public selectedAll = false;
     public selectionCount = 0;
+    public selectionCanDelete = false;
 
-    public canUnpublish = false;
-    public canPublish = false;
-
-    public statuses = CONTENT_STATUSES;
+    public nextStatuses: string[] = [];
 
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
 
-    public filter = new FilterState();
+    public queryModel: QueryModel;
+    public queries: Queries;
 
-    public isAllSelected = false;
+    public minWidth: string;
 
-    @ViewChild('dueTimeSelector')
+    @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(
@@ -73,21 +70,22 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
-                    this.filter = new FilterState();
-                    this.filter.setLanguage(this.language);
-
                     this.resetSelection();
 
                     this.schema = schema!;
-                    this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
+
+                    this.minWidth = `${300 + (200 * this.schema.listFields.length)}px`;
 
                     this.contentsState.load();
+
+                    this.updateQueries();
+                    this.updateModel();
                 }));
 
         this.own(
-            this.contentsState.contentsQuery
-                .subscribe(query => {
-                    this.filter.setQuery(query);
+            this.contentsState.statuses
+                .subscribe(() => {
+                    this.updateModel();
                 }));
 
         this.own(
@@ -102,7 +100,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.at(0);
 
-                    this.filter.setLanguage(this.language);
+                    this.updateModel();
                 }));
     }
 
@@ -118,36 +116,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.deleteMany([content]);
     }
 
-    public publish(content: ContentDto) {
-        this.changeContentItems([content], 'Publish');
+    public changeStatus(content: ContentDto, status: string) {
+        this.changeContentItems([content], status);
     }
 
-    public publishSelected() {
-        this.changeContentItems(this.selectItems(c => c.status !== 'Published'), 'Publish');
-    }
-
-    public unpublish(content: ContentDto) {
-        this.changeContentItems([content], 'Unpublish');
-    }
-
-    public unpublishSelected() {
-        this.changeContentItems(this.selectItems(c => c.status === 'Published'), 'Unpublish');
-    }
-
-    public archive(content: ContentDto) {
-        this.changeContentItems([content], 'Archive');
-    }
-
-    public archiveSelected() {
-        this.changeContentItems(this.selectItems(), 'Archive');
-    }
-
-    public restore(content: ContentDto) {
-        this.changeContentItems([content], 'Restore');
-    }
-
-    public restoreSelected() {
-        this.changeContentItems(this.selectItems(), 'Restore');
+    public changeSelectedStatus(status: string) {
+        this.changeContentItems(this.selectItems(c => c.status !== status), status);
     }
 
     public clone(content: ContentDto) {
@@ -168,10 +142,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
             .subscribe();
     }
 
-    public filterStatus(status: ContentQueryStatus) {
-        this.contentsState.filterStatus(status);
-    }
-
     public goPrev() {
         this.contentsState.goPrev();
     }
@@ -180,8 +150,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.goNext();
     }
 
-    public search() {
-        this.contentsState.search(this.filter.apiFilter);
+    public search(query: Query) {
+        this.contentsState.search(query);
     }
 
     public selectLanguage(language: AppLanguageDto) {
@@ -220,38 +190,53 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public sort(field: string | RootFieldDto, sorting: Sorting) {
-        this.filter.setOrderField(field, sorting);
-
-        this.search();
-    }
-
-    public trackByContent(index: number, content: ContentDto): string {
+    public trackByContent(content: ContentDto): string {
         return content.id;
     }
 
     private updateSelectionSummary() {
-        this.isAllSelected = this.contentsState.snapshot.contents.length > 0;
-
+        this.selectedAll = this.contentsState.snapshot.contents.length > 0;
         this.selectionCount = 0;
+        this.selectionCanDelete = true;
 
-        this.canPublish = true;
-        this.canUnpublish = true;
+        const allActions = {};
+
+        for (let content of this.contentsState.snapshot.contents.values) {
+            for (let info of content.statusUpdates) {
+                allActions[info.status] = info.color;
+            }
+        }
 
         for (let content of this.contentsState.snapshot.contents.values) {
             if (this.selectedItems[content.id]) {
                 this.selectionCount++;
 
-                if (content.status !== 'Published') {
-                    this.canUnpublish = false;
+                for (let action in allActions) {
+                    if (!content.statusUpdates) {
+                        delete allActions[action];
+                    }
                 }
 
-                if (content.status === 'Published') {
-                    this.canPublish = false;
+                if (!content.canDelete) {
+                    this.selectionCanDelete = false;
                 }
             } else {
-                this.isAllSelected = false;
+                this.selectedAll = false;
             }
+        }
+
+        this.nextStatuses = Object.keys(allActions);
+    }
+
+    private updateQueries() {
+        if (this.schema) {
+            this.queries = new Queries(this.uiState, `schemas.${this.schema.name}`);
+        }
+    }
+
+    private updateModel() {
+        if (this.schema && this.languages) {
+            this.queryModel = queryModelFromSchema(this.schema, this.languages.values, this.contentsState.snapshot.statuses);
         }
     }
 }

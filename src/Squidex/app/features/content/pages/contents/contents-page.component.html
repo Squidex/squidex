@@ -2,18 +2,12 @@
 
 <sqx-panel desiredWidth="*" minWidth="50rem" contentClass="grid" showSidebar="true">
     <ng-container title>
-        <ng-container *ngIf="contentsState.isArchive | async; else noArchive">
-            Archive
-        </ng-container>
-
-        <ng-template #noArchive>
-            Contents
-        </ng-template>
+        Contents
     </ng-container>
 
     <ng-container menu>
         <div class="row no-gutters pl-1">
-            <div class="col-auto offset-xl-4">
+            <div class="col-auto ml-8">
                 <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
 
                 <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh Contents (CTRL + SHIFT + R)">
@@ -21,15 +15,11 @@
                 </button>
             </div>
             <div class="col pl-1">
-                <sqx-search-form formClass="form" placeholder="Search for content" fieldExample="data/[MY_FIELD]/iv"
-                    [filter]="filter"
-                    (querySubmit)="search()" 
-                    [queries]="schemaQueries"
-                    (statusChange)="filterStatus($event)"
-                    [status]="contentsState.status | async"
-                    [statuses]="statuses"
-                    expandable="true"
-                    enableArchive="true"
+                <sqx-search-form formClass="form" placeholder="Search for content"
+                    [query]="contentsState.contentsQuery | async"
+                    [queries]="queries"
+                    [queryModel]="queryModel"
+                    (queryChange)="search($event)" 
                     enableShortcut="true">
                 </sqx-search-form>
             </div>
@@ -37,7 +27,7 @@
                 <sqx-language-selector class="languages-buttons" (selectedLanguageChange)="selectLanguage($event)" [languages]="languages.mutableValues"></sqx-language-selector>
             </div>
             <div class="col-auto pl-1">
-                <button type="button" class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)">
+                <button type="button" class="btn btn-success" #newButton routerLink="new" title="New Content (CTRL + SHIFT + G)" [disabled]="(contentsState.canCreateAny | async) === false">
                     <i class="icon-plus"></i> New
                 </button>
                 
@@ -48,31 +38,35 @@
 
     <ng-container content>
         <div class="grid-header">
-            <table class="table table-items table-fixed">
+            <table class="table table-items table-fixed" [style.minWidth]="minWidth" #header>
                 <thead>
                     <tr>
                         <th class="cell-select">
-                            <input type="checkbox" class="form-check" [ngModel]="isAllSelected" (ngModelChange)="selectAll($event)" />
+                            <input type="checkbox" class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" />
                         </th>
-                        <th class="cell-auto" *ngFor="let field of schema.listFields">
+                        <th class="cell-actions cell-actions-left">
+                            Actions
+                        </th>
+                        <th class="cell-user">
+                            <sqx-table-header text="By"></sqx-table-header>
+                        </th>
+                        <th class="cell-auto cell-content" *ngFor="let field of schema.listFields">
                             <sqx-table-header [text]="field.displayName" 
                                 [sortable]="field.properties.isSortable"
-                                [sorting]="filter.sortMode(field) | async"
-                                (sortingChange)="sort(field, $event)">
+                                [field]="field"
+                                [query]="contentsState.contentsQuery | async"
+                                (queryChange)="search($event)"
+                                [language]="language">
                             </sqx-table-header>
                         </th>
                         <th class="cell-time">
                             <sqx-table-header text="Updated"
                                 [sortable]="true"
-                                [sorting]="filter.sortMode('lastModified') | async"
-                                (sortingChange)="sort('lastModified', $event)">
+                                [field]="'lastModified'"
+                                [query]="contentsState.contentsQuery | async"
+                                (queryChange)="search($event)"
+                                [language]="language">
                             </sqx-table-header>
-                        </th>
-                        <th class="cell-user">
-                            <sqx-table-header text="By"></sqx-table-header>
-                        </th>
-                        <th class="cell-actions">
-                            Actions
                         </th>
                     </tr>
                 </thead>
@@ -80,25 +74,13 @@
         </div>
 
         <div class="selection" *ngIf="selectionCount > 0">
-            {{selectionCount}} items selected:&nbsp;&nbsp;
+            {{selectionCount}} items selected&nbsp;&nbsp;
 
-            <button type="button" class="btn btn-secondary mr-1" (click)="publishSelected()" *ngIf="canPublish">
-                Publish
+            <button type="button" class="btn btn-secondary mr-1" *ngFor="let status of nextStatuses" (click)="changeSelectedStatus(status)">
+                Status to {{status}}
             </button>
             
-            <button type="button" class="btn btn-secondary mr-1" (click)="unpublishSelected()" *ngIf="canUnpublish">
-                Unpublish
-            </button>
-            
-            <button type="button" class="btn btn-secondary mr-1" (click)="archiveSelected()" *ngIf="(contentsState.isArchive | async) === false">
-                Archive
-            </button>
-            
-            <button type="button" class="btn btn-secondary mr-1" (click)="restoreSelected()" *ngIf="contentsState.isArchive | async">
-                Restore
-            </button>
-            
-            <button type="button" class="btn btn-danger"
+            <button type="button" class="btn btn-danger" *ngIf="selectionCanDelete"
                 (sqxConfirmClick)="deleteSelected()"
                 confirmTitle="Delete content" 
                 confirmText="Do you really want to delete the selected content items?">
@@ -106,21 +88,22 @@
             </button>
         </div>
 
-        <div class="grid-content">
-            <div sqxIgnoreScrollbar>
-                <table class="table table-items table-fixed">
+        <div class="grid-content" [sqxSyncScrolling]="header">
+            <div class="table-container" sqxIgnoreScrollbar>
+                <table class="table table-items table-fixed" [style.minWidth]="minWidth">
                     <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent">
-                        <tr [sqxContent]="content" [routerLink]="[content.id]" routerLinkActive="active"
-                            [language]="language"
-                            [schema]="schema"
+                        <tr [sqxContent]="content"
+                            (delete)="delete(content)"
                             [selected]="isItemSelected(content)"
                             (selectedChange)="selectItem(content, $event)"
-                            (unpublish)="unpublish(content)"
-                            (publish)="publish(content)"
-                            (archive)="archive(content)"
-                            (restore)="restore(content)"
-                            (delete)="delete(content)"
-                            (clone)="clone(content)">
+                            (statusChange)="changeStatus(content, $event)"
+                            (clone)="clone(content)"
+                            [language]="language"
+                            [canClone]="contentsState.snapshot.canCreate"
+                            [routerLink]="[content.id]"
+                            [routerLinkActive]="'active'"
+                            [schema]="schema"
+                            [schemaFields]="schema.listFields">
                         </tr>
                         <tr class="spacer"></tr>
                     </tbody>

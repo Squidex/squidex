@@ -7,82 +7,97 @@
 
 using System;
 using System.Collections.Generic;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using NodaTime;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
 {
     public sealed class MongoAssetEntity :
-        MongoEntity,
         IAssetEntity,
         IUpdateableEntityWithVersion,
         IUpdateableEntityWithCreatedBy,
         IUpdateableEntityWithLastModifiedBy
     {
+        [BsonId]
+        [BsonElement("_id")]
+        [BsonRepresentation(BsonType.String)]
+        public Guid Id { get; set; }
+
         [BsonRequired]
-        [BsonElement("AppIdId")]
+        [BsonElement("_ai")]
+        [BsonRepresentation(BsonType.String)]
         public Guid IndexedAppId { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("ct")]
+        public Instant Created { get; set; }
+
+        [BsonRequired]
+        [BsonElement("mt")]
+        public Instant LastModified { get; set; }
+
+        [BsonRequired]
+        [BsonElement("ai")]
         public NamedId<Guid> AppId { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("mm")]
         public string MimeType { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("fn")]
         public string FileName { get; set; }
 
         [BsonIgnoreIfDefault]
-        [BsonElement]
+        [BsonElement("fh")]
         public string FileHash { get; set; }
 
         [BsonIgnoreIfDefault]
-        [BsonElement]
+        [BsonElement("sl")]
         public string Slug { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("fs")]
         public long FileSize { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("fv")]
         public long FileVersion { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("im")]
         public bool IsImage { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("vs")]
         public long Version { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("pw")]
         public int? PixelWidth { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("ph")]
         public int? PixelHeight { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("cb")]
         public RefToken CreatedBy { get; set; }
 
         [BsonRequired]
-        [BsonElement]
+        [BsonElement("mb")]
         public RefToken LastModifiedBy { get; set; }
 
         [BsonIgnoreIfNull]
-        [BsonElement]
+        [BsonElement("td")]
         public HashSet<string> Tags { get; set; }
 
-        [BsonElement]
+        [BsonRequired]
+        [BsonElement("dl")]
         public bool IsDeleted { get; set; }
 
         Guid IAssetInfo.AssetId

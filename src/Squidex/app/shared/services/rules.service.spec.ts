@@ -13,16 +13,17 @@ import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
+    Resource,
+    ResourceLinks,
     RuleDto,
     RuleElementDto,
     RuleElementPropertyDto,
     RuleEventDto,
     RuleEventsDto,
+    RulesDto,
     RulesService,
-    Version,
-    Versioned
+    Version
 } from '@app/shared/internal';
-import { RuleCreatedDto } from './rules.service';
 
 describe('RulesService', () => {
     const version = new Version('1');
@@ -107,7 +108,7 @@ describe('RulesService', () => {
     it('should make get request to get app rules',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
-        let rules: RuleDto[];
+        let rules: RulesDto;
 
         rulesService.getRules('my-app').subscribe(result => {
             rules = result;
@@ -118,49 +119,18 @@ describe('RulesService', () => {
         expect(req.request.method).toEqual('GET');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush([
-            {
-                id: 'id1',
-                created: '2016-12-12T10:10',
-                createdBy: 'CreatedBy1',
-                lastModified: '2017-12-12T10:10',
-                lastModifiedBy: 'LastModifiedBy1',
-                url: 'http://squidex.io/hook',
-                version: '1',
-                trigger: {
-                    param1: 1,
-                    param2: 2,
-                    triggerType: 'ContentChanged'
-                },
-                action: {
-                    param3: 3,
-                    param4: 4,
-                    actionType: 'Webhook'
-                },
-                isEnabled: true
-            }
-        ]);
+        req.flush({
+            items: [
+                ruleResponse(12),
+                ruleResponse(13)
+            ]
+        });
 
         expect(rules!).toEqual(
-            [
-                new RuleDto('id1', 'CreatedBy1', 'LastModifiedBy1',
-                    DateTime.parseISO_UTC('2016-12-12T10:10'),
-                    DateTime.parseISO_UTC('2017-12-12T10:10'),
-                    version,
-                    true,
-                    {
-                        param1: 1,
-                        param2: 2,
-                        triggerType: 'ContentChanged'
-                    },
-                    'ContentChanged',
-                    {
-                        param3: 3,
-                        param4: 4,
-                        actionType: 'Webhook'
-                    },
-                    'Webhook')
-            ]);
+            new RulesDto([
+                createRule(12),
+                createRule(13)
+            ]));
     }));
 
     it('should make post request to create rule',
@@ -179,7 +149,7 @@ describe('RulesService', () => {
             }
         };
 
-        let rule: Versioned<RuleCreatedDto>;
+        let rule: RuleDto;
 
         rulesService.postRule('my-app', dto).subscribe(result => {
             rule = result;
@@ -190,18 +160,13 @@ describe('RulesService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush({ id: 'id1' }, {
+        req.flush(ruleResponse(12), {
             headers: {
                 etag: '1'
             }
         });
 
-        expect(rule!).toEqual({
-            payload: {
-                id: 'id1'
-            },
-            version
-        });
+        expect(rule!).toEqual(createRule(12));
     }));
 
     it('should make put request to update rule',
@@ -216,46 +181,88 @@ describe('RulesService', () => {
             }
         };
 
-        rulesService.putRule('my-app', '123', dto, version).subscribe();
+        const resource: Resource = {
+            _links: {
+                update: { method: 'PUT', href: '/api/apps/my-app/rules/123' }
+            }
+        };
+
+        let rule: RuleDto;
+
+        rulesService.putRule('my-app', resource, dto, version).subscribe(result => {
+            rule = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/123');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({});
+        req.flush(ruleResponse(123));
+
+        expect(rule!).toEqual(createRule(123));
     }));
 
     it('should make put request to enable rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
-        rulesService.enableRule('my-app', '123', version).subscribe();
+        const resource: Resource = {
+            _links: {
+                enable: { method: 'PUT', href: '/api/apps/my-app/rules/123/enable' }
+            }
+        };
+
+        let rule: RuleDto;
+
+        rulesService.enableRule('my-app', resource, version).subscribe(result => {
+            rule = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/123/enable');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({});
+        req.flush(ruleResponse(123));
+
+        expect(rule!).toEqual(createRule(123));
     }));
 
     it('should make put request to disable rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
-        rulesService.disableRule('my-app', '123', version).subscribe();
+        const resource: Resource = {
+            _links: {
+                disable: { method: 'PUT', href: '/api/apps/my-app/rules/123/disable' }
+            }
+        };
+
+        let rule: RuleDto;
+
+        rulesService.disableRule('my-app', resource, version).subscribe(result => {
+            rule = result;
+        });
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/123/disable');
 
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush({});
+        req.flush(ruleResponse(123));
+
+        expect(rule!).toEqual(createRule(123));
     }));
 
     it('should make delete request to delete rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
-        rulesService.deleteRule('my-app', '123', version).subscribe();
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: '/api/apps/my-app/rules/123' }
+            }
+        };
+
+        rulesService.deleteRule('my-app', resource, version).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/123');
 
@@ -281,48 +288,28 @@ describe('RulesService', () => {
         req.flush({
             total: 20,
             items: [
-                {
-                    id: 'id1',
-                    created: '2017-12-12T10:10',
-                    eventName: 'event1',
-                    nextAttempt: '2017-12-12T12:10',
-                    jobResult: 'Failed',
-                    lastDump: 'dump1',
-                    numCalls: 1,
-                    description: 'url1',
-                    result: 'Failed'
-                },
-                {
-                    id: 'id2',
-                    created: '2017-12-13T10:10',
-                    eventName: 'event2',
-                    nextAttempt: '2017-12-13T12:10',
-                    jobResult: 'Failed',
-                    lastDump: 'dump2',
-                    numCalls: 2,
-                    description: 'url2',
-                    result: 'Failed'
-                }
+                ruleEventResponse(1),
+                ruleEventResponse(2)
             ]
         });
 
         expect(rules!).toEqual(
             new RuleEventsDto(20, [
-                new RuleEventDto('id1',
-                    DateTime.parseISO_UTC('2017-12-12T10:10'),
-                    DateTime.parseISO_UTC('2017-12-12T12:10'),
-                    'event1', 'url1', 'dump1', 'Failed', 'Failed', 1),
-                new RuleEventDto('id2',
-                    DateTime.parseISO_UTC('2017-12-13T10:10'),
-                    DateTime.parseISO_UTC('2017-12-13T12:10'),
-                    'event2', 'url2', 'dump2', 'Failed', 'Failed', 2)
+                createRuleEvent(1),
+                createRuleEvent(2)
             ]));
     }));
 
     it('should make put request to enqueue rule event',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
-        rulesService.enqueueEvent('my-app', '123').subscribe();
+        const resource: Resource = {
+            _links: {
+                update: { method: 'PUT', href: '/api/apps/my-app/rules/events/123' }
+            }
+        };
+
+        rulesService.enqueueEvent('my-app', resource).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/events/123');
 
@@ -335,7 +322,13 @@ describe('RulesService', () => {
     it('should make delete request to cancel rule event',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
 
-        rulesService.cancelEvent('my-app', '123').subscribe();
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: '/api/apps/my-app/rules/events/123' }
+            }
+        };
+
+        rulesService.cancelEvent('my-app', resource).subscribe();
 
         const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/events/123');
 
@@ -344,4 +337,87 @@ describe('RulesService', () => {
 
         req.flush({});
     }));
+
+    function ruleEventResponse(id: number, suffix = '') {
+        return {
+            id: `id${id}`,
+            created: `${id % 1000 + 2000}-12-12T10:10:00`,
+            eventName: `event${id}${suffix}`,
+            nextAttempt: `${id % 1000 + 2000}-11-11T10:10`,
+            jobResult: `Failed${id}${suffix}`,
+            lastDump: `dump${id}${suffix}`,
+            numCalls: id,
+            description: `url${id}${suffix}`,
+            result: `Failed${id}${suffix}`,
+            _links: {
+                update: { method: 'PUT', href: `/rules/events/${id}` }
+            }
+        };
+    }
+
+    function ruleResponse(id: number, suffix = '') {
+        return {
+            id: `id${id}`,
+            created: `${id % 1000 + 2000}-12-12T10:10`,
+            createdBy: `creator-${id}`,
+            lastModified: `${id % 1000 + 2000}-11-11T10:10`,
+            lastModifiedBy: `modifier-${id}`,
+            isEnabled: id % 2 === 0,
+            trigger: {
+                param1: 1,
+                param2: 2,
+                triggerType: `ContentChanged${id}${suffix}`
+            },
+            action: {
+                param3: 3,
+                param4: 4,
+                actionType: `Webhook${id}${suffix}`
+            },
+            version: id,
+            _links: {
+                update: { method: 'PUT', href: `/rules/${id}` }
+            }
+        };
+    }
 });
+
+export function createRuleEvent(id: number, suffix = '') {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/rules/events/${id}` }
+    };
+
+    return new RuleEventDto(links, `id${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`),
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`),
+        `event${id}${suffix}`,
+        `url${id}${suffix}`,
+        `dump${id}${suffix}`,
+        `Failed${id}${suffix}`,
+        `Failed${id}${suffix}`,
+        id);
+}
+
+export function createRule(id: number, suffix = '') {
+    const links: ResourceLinks = {
+        update: { method: 'PUT', href: `/rules/${id}` }
+    };
+
+    return new RuleDto(links,
+        `id${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
+        new Version(`${id}`),
+        id % 2 === 0,
+        {
+            param1: 1,
+            param2: 2,
+            triggerType: `ContentChanged${id}${suffix}`
+        },
+        `ContentChanged${id}${suffix}`,
+        {
+            param3: 3,
+            param4: 4,
+            actionType: `Webhook${id}${suffix}`
+        },
+        `Webhook${id}${suffix}`);
+}

@@ -17,7 +17,6 @@ import {
 } from '@app/shared';
 
 import {
-    AssetsUIComponent,
     AssetsValidationComponent,
     BooleanUIComponent,
     BooleanValidationComponent,
@@ -25,6 +24,7 @@ import {
     DateTimeValidationComponent,
     FieldComponent,
     FieldFormCommonComponent,
+    FieldFormComponent,
     FieldFormUIComponent,
     FieldFormValidationComponent,
     FieldWizardComponent,
@@ -37,6 +37,7 @@ import {
     ReferencesUIComponent,
     ReferencesValidationComponent,
     SchemaEditFormComponent,
+    SchemaExportFormComponent,
     SchemaFormComponent,
     SchemaPageComponent,
     SchemaPreviewUrlsFormComponent,
@@ -81,13 +82,13 @@ const routes: Routes = [
         SchemaMustExistGuard
     ],
     declarations: [
-        FieldComponent,
-        AssetsUIComponent,
         AssetsValidationComponent,
         BooleanUIComponent,
         BooleanValidationComponent,
         DateTimeUIComponent,
         DateTimeValidationComponent,
+        FieldComponent,
+        FieldFormComponent,
         FieldFormCommonComponent,
         FieldFormUIComponent,
         FieldFormValidationComponent,
@@ -101,6 +102,7 @@ const routes: Routes = [
         ReferencesUIComponent,
         ReferencesValidationComponent,
         SchemaEditFormComponent,
+        SchemaExportFormComponent,
         SchemaFormComponent,
         SchemaPageComponent,
         SchemaPreviewUrlsFormComponent,
@@ -112,4 +114,4 @@ const routes: Routes = [
         TagsValidationComponent
     ]
 })
-export class SqxFeatureSchemasModule { }
+export class SqxFeatureSchemasModule {}

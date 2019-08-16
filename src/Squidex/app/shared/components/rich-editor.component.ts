@@ -11,6 +11,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import {
+    ApiUrlConfig,
     AssetDto,
     AssetUploaderState,
     DialogModel,
@@ -40,13 +41,13 @@ const ImageTypes = [
     providers: [SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RichEditorComponent extends StatefulControlComponent<any, string> implements AfterViewInit, OnDestroy {
+export class RichEditorComponent extends StatefulControlComponent<undefined, string> implements AfterViewInit, OnDestroy {
     private tinyEditor: any;
     private tinyInitTimer: any;
     private value: string;
     private isDisabled = false;
 
-    @ViewChild('editor')
+    @ViewChild('editor', { static: false })
     public editor: ElementRef;
 
     @Output()
@@ -55,10 +56,11 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
     public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
+        private readonly apiUrl: ApiUrlConfig,
         private readonly assetUploader: AssetUploaderState,
         private readonly resourceLoader: ResourceLoaderService
     ) {
-        super(changeDetector, {});
+        super(changeDetector, undefined);
     }
 
     public ngOnDestroy() {
@@ -78,6 +80,10 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
     }
 
     private showSelector = () => {
+        if (this.isDisabled) {
+            return;
+        }
+
         this.assetsDialog.show();
     }
 
@@ -98,7 +104,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
                 this.assetUploader.uploadFile(file)
                     .subscribe(asset => {
                         if (Types.is(asset, AssetDto)) {
-                            success(asset.url);
+                            success(asset.fullUrl(this.apiUrl));
                         }
                     }, error => {
                         if (!Types.is(error, UploadCanceled)) {
@@ -186,7 +192,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
         let content = '';
 
         for (let asset of assets) {
-            content += `<img src="${asset.url}" alt="${asset.fileName}" />`;
+            content += `<img src="${asset.fullUrl(this.apiUrl)}" alt="${asset.fileName}" />`;
         }
 
         if (content.length > 0) {
@@ -216,7 +222,7 @@ export class RichEditorComponent extends StatefulControlComponent<any, string> i
         this.assetUploader.uploadFile(file)
             .subscribe(asset => {
                 if (Types.is(asset, AssetDto)) {
-                    replaceText(`<img src="${asset.url}" alt="${asset.fileName}" />`);
+                    replaceText(`<img src="${asset.fullUrl(this.apiUrl)}" alt="${asset.fileName}" />`);
                 }
             }, error => {
                 if (!Types.is(error, UploadCanceled)) {

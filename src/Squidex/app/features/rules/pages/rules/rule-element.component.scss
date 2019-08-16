@@ -82,7 +82,9 @@
     display: inline-block;
 }
 
-/deep/ svg {
-    fill: $color-dark-foreground;
-    display: block;
+::ng-deep {
+    svg {
+        fill: $color-dark-foreground;
+        display: block;
+    }
 }

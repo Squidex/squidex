@@ -10,6 +10,7 @@ import { inject, TestBed } from '@angular/core/testing';
 
 import {
     ApiUrlConfig,
+    ResourcesDto,
     UserDto,
     UsersService
 } from '@app/shared/internal';
@@ -112,5 +113,32 @@ describe('UsersService', () => {
         req.flush({ id: '123', displayName: 'User1' });
 
         expect(user!).toEqual(new UserDto('123', 'User1'));
+    }));
+
+    it('should make get request to get resources',
+        inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
+
+        let resources: ResourcesDto;
+
+        usersService.getResources().subscribe(result => {
+            resources = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({
+            _links: {
+                schemas: { method: 'GET', href: '/api/schemas' }
+            }
+        });
+
+        const expected = new ResourcesDto({
+            schemas: { method: 'GET', href: '/api/schemas' }
+        });
+
+        expect(resources!).toEqual(expected);
     }));
 });

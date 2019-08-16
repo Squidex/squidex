@@ -24,7 +24,7 @@ export class UserForm extends Form<FormGroup, UpdateUserDto> {
             ],
             password: ['',
                 [
-                    Validators.nullValidator
+                    Validators.required
                 ]
             ],
             passwordConfirm: ['',
@@ -34,6 +34,16 @@ export class UserForm extends Form<FormGroup, UpdateUserDto> {
             ],
             permissions: ['']
         }));
+    }
+
+    public load(value: any) {
+        if (value) {
+            this.form.controls['password'].setValidators(Validators.nullValidator);
+        } else {
+            this.form.controls['password'].setValidators(Validators.required);
+        }
+
+        super.load(value);
     }
 
     protected transformLoad(user: UpdateUserDto) {

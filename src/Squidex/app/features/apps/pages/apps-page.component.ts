@@ -17,6 +17,7 @@ import {
     LocalStoreService,
     NewsService,
     OnboardingService,
+    UIOptions,
     UIState
 } from '@app/shared';
 
@@ -34,14 +35,20 @@ export class AppsPageComponent implements OnInit {
     public newsFeatures: FeatureDto[];
     public newsDialog = new DialogModel();
 
+    public info: string;
+
     constructor(
         public readonly appsState: AppsState,
         public readonly authState: AuthService,
         public readonly uiState: UIState,
         private readonly localStore: LocalStoreService,
         private readonly newsService: NewsService,
-        private readonly onboardingService: OnboardingService
+        private readonly onboardingService: OnboardingService,
+        private readonly uiOptions: UIOptions
     ) {
+        if (uiOptions.get('showInfo')) {
+            this.info = uiOptions.get('more.info');
+        }
     }
 
     public ngOnInit() {
@@ -52,7 +59,7 @@ export class AppsPageComponent implements OnInit {
                 if (shouldShowOnboarding && apps.length === 0) {
                     this.onboardingService.disable('dialog');
                     this.onboardingDialog.show();
-                } else {
+                } else if (!this.uiOptions.get('hideNews')) {
                     const newsVersion = this.localStore.getInt('squidex.news.version');
 
                     this.newsService.getFeatures(newsVersion)

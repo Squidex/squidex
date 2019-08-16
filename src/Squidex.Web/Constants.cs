@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
+using Squidex.Shared;
 
 namespace Squidex.Web
 {
@@ -31,7 +32,7 @@ namespace Squidex.Web
 
         public static readonly string ProfileScope = "squidex-profile";
 
-        public static readonly string FrontendClient = "squidex-frontend";
+        public static readonly string FrontendClient = DefaultClients.Frontend;
 
         public static readonly string InternalClientId = "squidex-internal";
 

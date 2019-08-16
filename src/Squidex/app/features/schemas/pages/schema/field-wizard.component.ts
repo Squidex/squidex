@@ -29,7 +29,7 @@ const DEFAULT_FIELD = { name: '', partitioning: 'invariant', properties: createP
     templateUrl: './field-wizard.component.html'
 })
 export class FieldWizardComponent implements OnInit {
-    @ViewChild('nameInput')
+    @ViewChild('nameInput', { static: false })
     public nameInput: ElementRef<HTMLElement>;
 
     @Input()
@@ -46,10 +46,8 @@ export class FieldWizardComponent implements OnInit {
 
     public addFieldForm = new AddFieldForm(this.formBuilder);
 
+    public editing = false;
     public editForm = new EditFieldForm(this.formBuilder);
-
-    public isEditing = false;
-    public selectedTab = 0;
 
     constructor(
         private readonly formBuilder: FormBuilder,
@@ -82,9 +80,7 @@ export class FieldWizardComponent implements OnInit {
                             this.nameInput.nativeElement.focus();
                         }
                     } else if (edit) {
-                        this.selectTab(0);
-
-                        this.isEditing = true;
+                        this.editing = true;
                     } else {
                         this.emitComplete();
                     }
@@ -92,10 +88,6 @@ export class FieldWizardComponent implements OnInit {
                     this.addFieldForm.submitFailed(error);
                 });
         }
-    }
-
-    public selectTab(tab: number) {
-        this.selectedTab = tab;
     }
 
     public save(addNew = false) {
@@ -109,7 +101,7 @@ export class FieldWizardComponent implements OnInit {
                     this.editForm.submitCompleted();
 
                     if (addNew) {
-                        this.isEditing = false;
+                        this.editing = false;
                     } else {
                         this.emitComplete();
                     }

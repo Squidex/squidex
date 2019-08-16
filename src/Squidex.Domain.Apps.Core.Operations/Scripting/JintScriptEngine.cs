@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Esprima;
 using Jint;
 using Jint.Native;
 using Jint.Native.Date;
@@ -125,6 +126,10 @@ namespace Squidex.Domain.Apps.Core.Scripting
             {
                 throw new ValidationException($"Failed to execute script with javascript error: {ex.Message}", new ValidationError(ex.Message));
             }
+            catch (ParserException ex)
+            {
+                throw new ValidationException($"Failed to execute script with javascript error: {ex.Message}", new ValidationError(ex.Message));
+            }
         }
 
         private Engine CreateScriptEngine(ScriptContext context)
@@ -138,9 +143,9 @@ namespace Squidex.Domain.Apps.Core.Scripting
                 contextInstance.FastAddProperty("data", new ContentDataObject(engine, context.Data), true, true, true);
             }
 
-            if (context.OldData != null)
+            if (context.DataOld != null)
             {
-                contextInstance.FastAddProperty("oldData", new ContentDataObject(engine, context.OldData), true, true, true);
+                contextInstance.FastAddProperty("oldData", new ContentDataObject(engine, context.DataOld), true, true, true);
             }
 
             if (context.User != null)
@@ -150,7 +155,14 @@ namespace Squidex.Domain.Apps.Core.Scripting
 
             if (!string.IsNullOrWhiteSpace(context.Operation))
             {
-                contextInstance.FastAddProperty("operation", context.Operation, false, true, false);
+                contextInstance.FastAddProperty("operation", context.Operation, false, false, false);
+            }
+
+            contextInstance.FastAddProperty("status", context.Status.ToString(), false, false, false);
+
+            if (context.StatusOld != default)
+            {
+                contextInstance.FastAddProperty("oldStatus", context.StatusOld.ToString(), false, false, false);
             }
 
             engine.SetValue("ctx", contextInstance);

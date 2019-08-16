@@ -11,50 +11,51 @@
         </span>
 
         <ng-container *ngIf="appsState.apps | async; let apps">
-            <div class="dropdown-menu" *sqxModalView="appsMenu;closeAlways:true" @fade>
-                <a class="dropdown-item all-apps" routerLink="/app">
-                    <span class="all-apps-text">All Apps</span> 
-                    <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>
-                </a>
-    
-                <ng-container *ngIf="apps.length > 0">
-                    <div class="dropdown-divider"></div>
+            <ng-container *sqxModal="appsMenu;closeAlways:true">
+                <div class="dropdown-menu" @fade>
+                    <a class="dropdown-item all-apps" routerLink="/app">
+                        <span class="all-apps-text">All Apps</span> 
+                        <span class="all-apps-pill badge badge-pill badge-primary">{{apps.length}}</span>
+                    </a>
+        
+                    <ng-container *ngIf="apps.length > 0">
+                        <div class="dropdown-divider"></div>
 
-                    <div class="apps-list">
-                        <a class="dropdown-item" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.name}}</a>
-                    </div>
-                </ng-container>
+                        <div class="apps-list">
+                            <a class="dropdown-item" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.name}}</a>
+                        </div>
+                    </ng-container>
 
-                <ng-container *ngIf="(uiState.settings | async).canCreateApps">
-                    <div class="dropdown-divider"></div>
-    
-                    <div class="dropdown-button">
-                        <button type="button" class="btn btn-block btn-success" (click)="createApp()">
-                            <i class="icon-plus"></i> Create New App
-                        </button>
-                    </div>
-                </ng-container>
-            </div>
+                    <ng-container *ngIf="(uiState.settings | async).canCreateApps">
+                        <div class="dropdown-divider"></div>
+        
+                        <div class="dropdown-button">
+                            <button type="button" class="btn btn-block btn-success" (click)="addAppDialog.show()">
+                                <i class="icon-plus"></i> Create New App
+                            </button>
+                        </div>
+                    </ng-container>
+                </div>
+            </ng-container>
         </ng-container>
     </li>
 
-    <ng-container *ngIf="appsState.selectedApp | async; let selectedApp">
-        <ng-container *ngIf="selectedApp.planUpgrade && selectedApp.planName">
-            <li class="nav-item" *sqxPermission="'squidex.apps.{app}.plans.change'">
-                <div class="btn-group app-upgrade">
-                    <button type="button" class="btn btn-primary btn-plan">
-                        You are on the <strong>{{selectedApp.planName}}</strong> plan.
-                    </button>
-                    <button type="button" class="btn btn-warning" [routerLink]="['/app', selectedApp.name, 'settings', 'plans']">
-                        Upgrade!
-                    </button>
-                </div>
-            </li>
-        </ng-container>
+    <ng-container *ngIf="appsState.selectedValidApp | async; let selectedApp">
+        <li class="nav-item" *ngIf="selectedApp.planUpgrade && selectedApp.planName">
+            <div class="btn-group app-upgrade">
+                <button type="button" class="btn btn-primary btn-plan">
+                    You are on the <strong>{{selectedApp.planName}}</strong> plan.
+                </button>
+                <button type="button" class="btn btn-warning" [routerLink]="['/app', selectedApp.name, 'settings', 'plans']">
+                    Upgrade!
+                </button>
+            </div>
+        </li>
     </ng-container>
 </ul>
 
-<ng-container *sqxModalView="addAppDialog;onRoot:true">
+
+<ng-container *sqxModal="addAppDialog">
     <sqx-app-form 
         (complete)="addAppDialog.hide()">
     </sqx-app-form>

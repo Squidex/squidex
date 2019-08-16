@@ -75,8 +75,8 @@ namespace Squidex.Domain.Apps.Core.Operations.Scripting
         {
             var identity = new ClaimsIdentity();
 
-            identity.AddClaim(new Claim("claim1", "1a"));
-            identity.AddClaim(new Claim("claim1", "1b"));
+            identity.AddClaim(new Claim("prefix1.claim1", "1a"));
+            identity.AddClaim(new Claim("prefix2.claim1", "1b"));
             identity.AddClaim(new Claim("claim2", "2a"));
             identity.AddClaim(new Claim("claim2", "2b"));
 

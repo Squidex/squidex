@@ -12,7 +12,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
 {
     public static class LimitExtensions
     {
-        public static IFindFluent<T, T> Take<T>(this IFindFluent<T, T> cursor, Query query)
+        public static IFindFluent<T, T> Take<T>(this IFindFluent<T, T> cursor, ClrQuery query)
         {
             if (query.Take < long.MaxValue)
             {
@@ -22,7 +22,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
             return cursor;
         }
 
-        public static IFindFluent<T, T> Skip<T>(this IFindFluent<T, T> cursor, Query query)
+        public static IFindFluent<T, T> Skip<T>(this IFindFluent<T, T> cursor, ClrQuery query)
         {
             if (query.Skip > 0)
             {

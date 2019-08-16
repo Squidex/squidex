@@ -1,0 +1,68 @@
+<sqx-title message="{app} | Workflows | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
+
+<sqx-panel desiredWidth="60rem" [showSidebar]="true" [isLazyLoaded]="false">
+    <ng-container title>
+        Workflows
+    </ng-container>
+
+    <ng-container menu>
+        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh workflows (CTRL + SHIFT + R)">
+            <i class="icon-reset"></i> Refresh
+        </button>
+
+        <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+    </ng-container>
+
+    <ng-container content>
+        <ng-container *ngIf="workflowsState.errors | async; let errors">
+            <div class="panel-alert panel-alert-danger" *ngIf="errors.length > 1">
+                <ul>
+                    <li *ngFor="let error of errors">{{error}}</li>
+                </ul>
+            </div>
+            <div class="panel-alert panel-alert-danger" *ngIf="errors.length === 1">
+                {{errors[0]}}
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="schemasSource && workflowsState.workflows | async; let workflows">
+            <ng-container *ngIf="rolesState.roles | async; let roles">
+                <div class="table-items-row table-items-row-empty" *ngIf="workflows.length === 0">
+                    No workflows created yet.
+                </div>
+
+                <sqx-workflow *ngFor="let workflow of workflows; trackBy: trackByWorkflow"
+                    [workflow]="workflow" [roles]="roles" [schemasSource]="schemasSource">
+                </sqx-workflow>
+
+                <div class="table-items-footer" *ngIf="workflowsState.canCreate | async">
+                    <form [formGroup]="addWorkflowForm.form" (ngSubmit)="addWorkflow()">
+                        <div class="row no-gutters">
+                            <div class="col">
+                                <sqx-control-errors for="name" [submitted]="addWorkflowForm.submitted | async"></sqx-control-errors>
+                                    
+                                <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter workflow name" autocomplete="off" />
+                            </div>
+                            <div class="col-auto pl-1">
+                                <button type="submit" class="btn btn-success" [disabled]="addWorkflowForm.hasNoName | async">Add Workflow</button>
+                            </div>
+                            <div class="col-auto pl-1">
+                                <button type="reset" class="btn btn-secondary" (click)="cancelAddWorkflow()">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+
+    <ng-container sidebar>
+        <div class="panel-nav">
+            <a class="panel-link" routerLink="help" routerLinkActive="active" title="Help" titlePosition="left">
+                <i class="icon-help"></i>
+            </a>
+        </div>
+    </ng-container>
+</sqx-panel>
+
+<router-outlet></router-outlet>

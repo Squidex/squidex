@@ -32,6 +32,7 @@ export * from './services/ui.service';
 export * from './services/usages.service';
 export * from './services/users-provider.service';
 export * from './services/users.service';
+export * from './services/workflows.service';
 
 export * from './state/apps.forms';
 export * from './state/apps.state';
@@ -48,13 +49,13 @@ export * from './state/contents.forms';
 export * from './state/contents.state';
 export * from './state/contributors.forms';
 export * from './state/contributors.state';
-export * from './state/filter.state';
 export * from './state/languages.forms';
 export * from './state/languages.state';
 export * from './state/patterns.forms';
 export * from './state/patterns.state';
 export * from './state/plans.state';
 export * from './state/queries';
+export * from './state/query';
 export * from './state/roles.forms';
 export * from './state/roles.state';
 export * from './state/rule-events.state';
@@ -62,6 +63,8 @@ export * from './state/rules.state';
 export * from './state/schemas.forms';
 export * from './state/schemas.state';
 export * from './state/ui.state';
+export * from './state/workflows.forms';
+export * from './state/workflows.state';
 
 export * from './utils/messages';
 

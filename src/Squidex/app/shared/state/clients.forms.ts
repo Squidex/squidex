@@ -25,7 +25,7 @@ export class RenameClientForm extends Form<FormGroup, { name: string }> {
     }
 }
 
-export class AttachClientForm extends Form<FormGroup, { name: string}> {
+export class AddClientForm extends Form<FormGroup, { name: string}> {
     public hasNoName = hasNoValue$(this.form.controls['name']);
 
     constructor(formBuilder: FormBuilder) {

@@ -7,37 +7,114 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using GraphQL;
+using GraphQL.DataLoader;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
+using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
     public sealed class GraphQLExecutionContext : QueryExecutionContext
     {
+        private static readonly List<IEnrichedAssetEntity> EmptyAssets = new List<IEnrichedAssetEntity>();
+        private static readonly List<IContentEntity> EmptyContents = new List<IContentEntity>();
+        private readonly IDataLoaderContextAccessor dataLoaderContextAccessor;
+        private readonly IDependencyResolver resolver;
+
         public IGraphQLUrlGenerator UrlGenerator { get; }
 
-        public GraphQLExecutionContext(QueryContext context,
-            IAssetQueryService assetQuery,
-            IContentQueryService contentQuery,
-            IGraphQLUrlGenerator urlGenerator)
-            : base(context, assetQuery, contentQuery)
+        public ISemanticLog Log { get; }
+
+        public GraphQLExecutionContext(Context context, IDependencyResolver resolver)
+            : base(context,
+                resolver.Resolve<IAssetQueryService>(),
+                resolver.Resolve<IContentQueryService>())
         {
-            UrlGenerator = urlGenerator;
+            UrlGenerator = resolver.Resolve<IGraphQLUrlGenerator>();
+
+            dataLoaderContextAccessor = resolver.Resolve<IDataLoaderContextAccessor>();
+
+            this.resolver = resolver;
         }
 
-        public Task<IReadOnlyList<IAssetEntity>> GetReferencedAssetsAsync(IJsonValue value)
+        public void Setup(ExecutionOptions execution)
+        {
+            var loader = resolver.Resolve<DataLoaderDocumentListener>();
+
+            execution.Listeners.Add(loader);
+            execution.FieldMiddleware.Use(Middlewares.Logging(resolver.Resolve<ISemanticLog>()));
+            execution.FieldMiddleware.Use(Middlewares.Errors());
+
+            execution.UserContext = this;
+        }
+
+        public override Task<IEnrichedAssetEntity> FindAssetAsync(Guid id)
+        {
+            var dataLoader = GetAssetsLoader();
+
+            return dataLoader.LoadAsync(id);
+        }
+
+        public override Task<IContentEntity> FindContentAsync(Guid schemaId, Guid id)
+        {
+            var dataLoader = GetContentsLoader(schemaId);
+
+            return dataLoader.LoadAsync(id);
+        }
+
+        public async Task<IReadOnlyList<IEnrichedAssetEntity>> GetReferencedAssetsAsync(IJsonValue value)
         {
             var ids = ParseIds(value);
 
-            return GetReferencedAssetsAsync(ids);
+            if (ids == null)
+            {
+                return EmptyAssets;
+            }
+
+            var dataLoader = GetAssetsLoader();
+
+            return await dataLoader.LoadManyAsync(ids);
         }
 
-        public Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, IJsonValue value)
+        public async Task<IReadOnlyList<IContentEntity>> GetReferencedContentsAsync(Guid schemaId, IJsonValue value)
         {
             var ids = ParseIds(value);
 
-            return GetReferencedContentsAsync(schemaId, ids);
+            if (ids == null)
+            {
+                return EmptyContents;
+            }
+
+            var dataLoader = GetContentsLoader(schemaId);
+
+            return await dataLoader.LoadManyAsync(ids);
+        }
+
+        private IDataLoader<Guid, IEnrichedAssetEntity> GetAssetsLoader()
+        {
+            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IEnrichedAssetEntity>("Assets",
+                async batch =>
+                {
+                    var result = await GetReferencedAssetsAsync(new List<Guid>(batch));
+
+                    return result.ToDictionary(x => x.Id);
+                });
+        }
+
+        private IDataLoader<Guid, IContentEntity> GetContentsLoader(Guid schemaId)
+        {
+            return dataLoaderContextAccessor.Context.GetOrAddBatchLoader<Guid, IContentEntity>($"Schema_{schemaId}",
+                async batch =>
+                {
+                    var result = await GetReferencedContentsAsync(schemaId, new List<Guid>(batch));
+
+                    return result.ToDictionary(x => x.Id);
+                });
         }
 
         private static ICollection<Guid> ParseIds(IJsonValue value)
@@ -58,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             }
             catch
             {
-                return new List<Guid>();
+                return null;
             }
         }
     }

@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
-            result.ShouldBeEquivalent(new AssetSavedResult(0, 0, fileHash));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(0, sut.Snapshot.FileVersion);
             Assert.Equal(fileHash, sut.Snapshot.FileHash);
@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
-            result.ShouldBeEquivalent(new AssetSavedResult(1, 1, fileHash));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal(1, sut.Snapshot.FileVersion);
             Assert.Equal(fileHash, sut.Snapshot.FileHash);
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal("My New Image.png", sut.Snapshot.FileName);
 
@@ -142,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             Assert.Equal("my-new-image.png", sut.Snapshot.Slug);
 
@@ -161,7 +161,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             var result = await sut.ExecuteAsync(CreateAssetCommand(command));
 
-            result.ShouldBeEquivalent(new EntitySavedResult(1));
+            result.ShouldBeEquivalent(sut.Snapshot);
 
             LastEvents
                 .ShouldHaveSameEvents(

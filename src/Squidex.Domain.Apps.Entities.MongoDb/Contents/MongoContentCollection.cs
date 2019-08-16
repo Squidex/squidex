@@ -68,7 +68,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
             return "State_Contents";
         }
 
-        public async Task<IResultList<IContentEntity>> QueryAsync(ISchemaEntity schema, Query query, List<Guid> ids, Status[] status, bool inDraft, bool includeDraft = true)
+        public async Task<IResultList<IContentEntity>> QueryAsync(ISchemaEntity schema, ClrQuery query, List<Guid> ids, Status[] status, bool inDraft, bool includeDraft = true)
         {
             try
             {
@@ -137,17 +137,14 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
         {
             var find = Collection.Find(FilterFactory.IdsBySchema(schema.Id, ids, status));
 
-            var contentItems = find.WithoutDraft(includeDraft).ToListAsync();
-            var contentCount = find.CountDocumentsAsync();
+            var contentItems = await find.WithoutDraft(includeDraft).ToListAsync();
 
-            await Task.WhenAll(contentItems, contentCount);
-
-            foreach (var entity in contentItems.Result)
+            foreach (var entity in contentItems)
             {
                 entity.ParseData(schema.SchemaDef, serializer);
             }
 
-            return ResultList.Create<IContentEntity>(contentCount.Result, contentItems.Result);
+            return ResultList.Create<IContentEntity>(contentItems.Count, contentItems);
         }
 
         public async Task<IContentEntity> FindContentAsync(ISchemaEntity schema, Guid id, Status[] status, bool includeDraft)
@@ -172,7 +169,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
                 });
         }
 
-        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(ISchemaEntity schema, FilterNode filterNode)
+        public async Task<IReadOnlyList<Guid>> QueryIdsAsync(ISchemaEntity schema, FilterNode<ClrValue> filterNode)
         {
             var filter = filterNode.AdjustToModel(schema.SchemaDef, true).ToFilter(schema.Id);
 

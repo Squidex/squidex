@@ -60,9 +60,9 @@ namespace Squidex.Domain.Apps.Entities.Rules
         }
 
         [Fact]
-        public Task Should_do_nothing_on_clear()
+        public async Task Should_do_nothing_on_clear()
         {
-            return sut.ClearAsync();
+            await sut.ClearAsync();
         }
 
         [Fact]

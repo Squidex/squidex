@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, forwardRef, Input, OnChanges, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
-import { ExternalControlComponent, Types } from '@app/framework/internal';
+import { StatefulControlComponent, Types } from '@app/framework/internal';
 
 export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => IFrameEditorComponent), multi: true
@@ -21,13 +21,19 @@ export const SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     providers: [SQX_IFRAME_EDITOR_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class IFrameEditorComponent extends ExternalControlComponent<any> implements OnChanges, OnInit {
+export class IFrameEditorComponent extends StatefulControlComponent<any, any> implements OnChanges, AfterViewInit {
     private value: any;
     private isDisabled = false;
     private isInitialized = false;
 
-    @ViewChild('iframe')
+    @ViewChild('iframe', { static: false })
     public iframe: ElementRef<HTMLIFrameElement>;
+
+    @Input()
+    public context: any = {};
+
+    @Input()
+    public formValue: any;
 
     @Input()
     public url: string;
@@ -35,14 +41,28 @@ export class IFrameEditorComponent extends ExternalControlComponent<any> impleme
     constructor(changeDetector: ChangeDetectorRef,
         private readonly renderer: Renderer2
     ) {
-        super(changeDetector);
+        super(changeDetector, {});
     }
 
-    public ngOnChanges() {
+    public ngOnChanges(changes: SimpleChanges) {
+        if (this.iframe) {
+            if (changes['url']) {
+                this.setupUrl();
+            }
+
+            if (changes['formValue'] && this.formValue) {
+                this.sendFormValue();
+            }
+        }
+    }
+
+    private setupUrl() {
         this.iframe.nativeElement.src = this.url;
     }
 
-    public ngOnInit(): void {
+    public ngAfterViewInit() {
+        this.setupUrl();
+
         this.own(
             this.renderer.listen('window', 'message', (event: MessageEvent) => {
                 if (event.source === this.iframe.nativeElement.contentWindow) {
@@ -51,8 +71,10 @@ export class IFrameEditorComponent extends ExternalControlComponent<any> impleme
                     if (type === 'started') {
                         this.isInitialized = true;
 
-                        this.sendMessage({ type: 'disabled', isDisabled: this.isDisabled });
-                        this.sendMessage({ type: 'valueChanged', value: this.value });
+                        this.sendMessage('init', { context: this.context || {} });
+                        this.sendFormValue();
+                        this.sendDisabled();
+                        this.sendValue();
                     } else if (type === 'resize') {
                         const { height } = event.data;
 
@@ -75,19 +97,37 @@ export class IFrameEditorComponent extends ExternalControlComponent<any> impleme
     public writeValue(obj: any) {
         this.value = obj;
 
-        this.sendMessage({ type: 'valueChanged', value: this.value });
+        this.sendValue();
     }
 
     public setDisabledState(isDisabled: boolean): void {
         this.isDisabled = isDisabled;
 
-        this.sendMessage({ type: 'disabled', isDisabled: this.isDisabled });
+        this.sendDisabled();
     }
 
-    private sendMessage(message: any) {
+    private sendValue() {
+        this.sendMessage('valueChanged', { value: this.value });
+    }
+
+    private sendDisabled() {
+        this.sendMessage('disabled', { isDisabled: this.isDisabled });
+    }
+
+    private sendFormValue() {
+        this.sendMessage('formValueChanged', { formValue: this.formValue });
+    }
+
+    private sendMessage(type: string, payload: any) {
+        if (!this.iframe) {
+            return;
+        }
+
         const iframe = this.iframe.nativeElement;
 
         if (this.isInitialized && iframe.contentWindow && Types.isFunction(iframe.contentWindow.postMessage)) {
+            const message = { type, ...payload };
+
             iframe.contentWindow.postMessage(message, '*');
         }
     }

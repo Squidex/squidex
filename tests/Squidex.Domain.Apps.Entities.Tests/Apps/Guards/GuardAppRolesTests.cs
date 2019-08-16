@@ -43,7 +43,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public void CanAdd_should_not_throw_exception_if_success()
+        public void CanAdd_should_not_throw_exception_if_command_is_valid()
         {
             var command = new AddRole { Name = roleName };
 
@@ -101,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         }
 
         [Fact]
-        public void CanDelete_should_not_throw_exception_if_success()
+        public void CanDelete_should_not_throw_exception_if_command_is_valid()
         {
             var roles_1 = roles_0.Add(roleName);
 

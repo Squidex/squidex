@@ -1,26 +1,62 @@
 
 function SquidexFormField() {
+    var initHandler;
+    var initCalled = false;
     var disabledHandler;
     var disabled;
     var valueHandler;
     var value;
+    var formValueHandler;
+    var formValue;
+    var context;
     var timer;
     var height = document.body.offsetHeight;
 
+    function raiseDisabled() {
+        if (disabledHandler) {
+            disabledHandler(disabled);
+        }
+    }
+
+    function raiseValueChanged() {
+        if (valueHandler) {
+            valueHandler(value);
+        }
+    }
+
+    function raiseFormValueChanged() {
+        if (formValueHandler && formValue) {
+            formValueHandler(formValue);
+        }
+    }
+
+    function raiseInit() {
+        if (initHandler && !initCalled && context) {
+            initHandler(context);
+            initCalled = true;
+        }
+    }
+
     function eventListener(event) {
         if (event.source !== window) {
-            if (event.data.type === 'disabled') {
+            var type = event.data.type;
+
+            if (type === 'disabled') {
                 disabled = event.data.isDisabled;
 
-                if (disabledHandler) {
-                    disabledHandler(disabled);
-                }
-            } else if (event.data.type === 'valueChanged') {
-                var value = event.data.value;
+                raiseDisabled();
+            } else if (type === 'valueChanged') {
+                value = event.data.value;
 
-                if (valueHandler) {
-                    valueHandler(value);
-                }
+                raiseValueChanged();
+            } else if (type === 'formValueChanged') {
+                formValue = event.data.formValue;
+
+                raiseFormValueChanged();
+            } else if (type === 'init') {
+                context = event.data.context;
+
+                raiseInit();
             }
         }
     }
@@ -45,6 +81,27 @@ function SquidexFormField() {
 
     var editor = {
         /**
+         * Get the current value.
+         */
+        getValue: function () {
+            return value;
+        },
+
+        /**
+         * Get the current value.
+         */
+        getContext: function () {
+            return context;
+        },
+
+        /**
+         * Get the current form value.
+         */
+        getFormValue: function () {
+            return formValue;
+        },
+
+        /**
          * Notifies the control container that the editor has been touched.
          */
         touched: function () {
@@ -63,25 +120,39 @@ function SquidexFormField() {
         },
 
         /**
-         * Register the disabled handler.
+         * Register the init handler.
          */
-        onDisabled: function (callback) {
-            disabledHandler = callback;
+        onInit: function (callback) {
+            initHandler = callback;
 
-            if (callback) {
-                callback(disabled);
-            }
+            raiseInit();
         },
 
         /**
          * Register the disabled handler.
          */
+        onDisabled: function (callback) {
+            disabledHandler = callback;
+
+            raiseDisabled();
+        },
+
+        /**
+         * Register the value changed handler.
+         */
         onValueChanged: function (callback) {
             valueHandler = callback;
 
-            if (callback) {
-                callback(value);
-            }
+            raiseValueChanged();
+        },
+        
+        /**
+         * Register the form value changed handler.
+         */
+        onFormValueChanged: function (callback) {
+            formValueHandler = callback;
+
+            raiseFormValueChanged();
         },
 
         /**

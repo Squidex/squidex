@@ -13,7 +13,17 @@ namespace Squidex.Areas.Api.Controllers.UI
     {
         public Dictionary<string, string> RegexSuggestions { get; set; }
 
+        public Dictionary<string, string> More { get; set; } = new Dictionary<string, string>();
+
         public MapOptions Map { get; set; }
+
+        public bool ShowInfo { get; set; }
+
+        public bool HideNews { get; set; }
+
+        public bool HideOnboarding { get; set; }
+
+        public bool RedirectToLogin { get; set; }
 
         public bool OnlyAdminsCanCreateApps { get; set; }
 

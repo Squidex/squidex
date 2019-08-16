@@ -1,30 +1,30 @@
-<ul class="nav flex-column">
-    <li class="nav-item" *sqxPermission="'squidex.apps.{app}.schemas.*.read'">
+<ul class="nav flex-column" *ngIf="appsState.selectedValidApp | async; let selectedApp">
+    <li class="nav-item" *ngIf="selectedApp.canReadSchemas">
         <a class="nav-link" routerLink="schemas" routerLinkActive="active">
             <i class="nav-icon icon-schemas"></i> <div class="nav-text">Schemas</div>
         </a>
     </li>
-    <li class="nav-item" *sqxPermission="'?squidex.apps.{app}.contents.*.read'">
+    <li class="nav-item" *ngIf="selectedApp.canAccessContent">
         <a class="nav-link" routerLink="content" routerLinkActive="active">
             <i class="nav-icon icon-contents"></i> <div class="nav-text">Content</div>
         </a>
     </li>
-    <li class="nav-item" *sqxPermission="'squidex.apps.{app}.assets.read'">
+    <li class="nav-item" *ngIf="selectedApp.canReadAssets">
         <a class="nav-link" routerLink="assets/filters" routerLinkActive="active">
             <i class="nav-icon icon-assets"></i> <div class="nav-text">Assets</div> 
         </a>
     </li>
-    <li class="nav-item" *sqxPermission="'squidex.apps.{app}.rules.read'">
+    <li class="nav-item" *ngIf="selectedApp.canReadRules">
         <a class="nav-link" routerLink="rules" routerLinkActive="active">
             <i class="nav-icon icon-rules"></i> <div class="nav-text">Rules</div>
         </a>
     </li>
-    <li class="nav-item" *sqxPermission="'?squidex.apps.{app}.backups|clients|contributors|languages|patterns|plans.read;squidex.apps.{app}.delete'">
+    <li class="nav-item">
         <a class="nav-link" routerLink="settings" routerLinkActive="active">
             <i class="nav-icon icon-settings"></i> <div class="nav-text">Settings</div>
         </a>
     </li>
-    <li class="nav-item" *sqxPermission="'squidex.apps.{app}.api'">
+    <li class="nav-item" *ngIf="selectedApp.canAccessApi">
         <a class="nav-link" routerLink="api" routerLinkActive="active">
             <i class="nav-icon icon-api"></i> <div class="nav-text">API</div>
         </a>

@@ -20,39 +20,39 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
     {
         private static readonly FilterDefinitionBuilder<MongoAssetEntity> Filter = Builders<MongoAssetEntity>.Filter;
 
-        public static Query AdjustToModel(this Query query)
+        public static ClrQuery AdjustToModel(this ClrQuery query)
         {
             if (query.Filter != null)
             {
-                query.Filter = PascalCasePathConverter.Transform(query.Filter);
+                query.Filter = PascalCasePathConverter<ClrValue>.Transform(query.Filter);
             }
 
             query.Sort = query.Sort
                 .Select(x =>
                     new SortNode(
                         x.Path.Select(p => p.ToPascalCase()).ToList(),
-                        x.SortOrder))
+                        x.Order))
                     .ToList();
 
             return query;
         }
 
-        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetSort(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, Query query)
+        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetSort(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, ClrQuery query)
         {
             return cursor.Sort(query.BuildSort<MongoAssetEntity>());
         }
 
-        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetTake(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, Query query)
+        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetTake(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, ClrQuery query)
         {
             return cursor.Take(query);
         }
 
-        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetSkip(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, Query query)
+        public static IFindFluent<MongoAssetEntity, MongoAssetEntity> AssetSkip(this IFindFluent<MongoAssetEntity, MongoAssetEntity> cursor, ClrQuery query)
         {
             return cursor.Skip(query);
         }
 
-        public static FilterDefinition<MongoAssetEntity> BuildFilter(this Query query, Guid appId)
+        public static FilterDefinition<MongoAssetEntity> BuildFilter(this ClrQuery query, Guid appId)
         {
             var filters = new List<FilterDefinition<MongoAssetEntity>>
             {

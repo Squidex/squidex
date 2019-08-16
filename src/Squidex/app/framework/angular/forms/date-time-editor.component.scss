@@ -16,26 +16,27 @@
     }
 }
 
-.date-group {
-    & {
-        padding-right: .25rem;
-    }
+.form-group {
+    position: relative;
+}
 
+.input-group {
     .form-control {
         width: 7.5rem;
+
+        &:last-child {
+            position: relative;
+            padding-right: 2rem;
+        }
     }
 }
 
-.time-group {
+.btn-clear {
     & {
-        padding-right: .25rem;
+        @include absolute(auto, 4px, 3px, auto);
     }
 
-    .form-control {
-        width: 7.5rem;
+    &:focus {
+        @include box-shadow-none;
     }
-}
-
-.clear {
-    margin-left: .5rem;
 }

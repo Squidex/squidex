@@ -16,6 +16,7 @@ using Squidex.Areas.Api.Controllers.News.Service;
 using Squidex.Domain.Apps.Entities.Apps.Diagnostics;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing.Grains;
@@ -55,6 +56,9 @@ namespace Squidex.Config.Domain
                 .AsSelf();
 
             services.AddSingletonAs<GrainBootstrap<IUsageTrackerGrain>>()
+                .AsSelf();
+
+            services.AddSingletonAs<LanguagesInitializer>()
                 .AsSelf();
 
             services.AddSingletonAs<DeepLTranslator>()

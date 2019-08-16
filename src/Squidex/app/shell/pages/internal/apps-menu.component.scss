@@ -37,16 +37,19 @@ $color-apps-border: #65a6ff;
     }
 }
 
-.dropdown-button {
-    padding: 1rem 1.5rem;
-}
+.dropdown {
+    &-button {
+        padding: 1rem 1.5rem;
+    }
 
-.dropdown-menu {
-    @include absolute(2.65rem, auto, auto, auto);
-}
+    &-menu {
+        @include absolute($size-navbar-height, auto, auto, 9rem);
+        margin: 0;
+    }
 
-.dropdown-item {
-    @include border-radius(0);
+    &-item {
+        @include border-radius(0);
+    }
 }
 
 .btn-block {

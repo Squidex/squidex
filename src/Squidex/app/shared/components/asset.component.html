@@ -1,5 +1,8 @@
 <ng-container *ngIf="!isListView; else listTemplate">
-    <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="emitSelect()" (sqxFileDrop)="updateFile($event)" [noDrop]="true">
+    <div class="card" [class.selectable]="isSelectable" [class.border-primary]="isSelected" (click)="emitSelect()" 
+        (sqxDropFile)="updateFile($event)"
+        [sqxDropDisabled]="!asset || !asset.canUpload"
+        [noDrop]="true">
         <div class="card-body">
             <div class="file-preview" *ngIf="asset && snapshot.progress === 0" @fade>
                 <span class="file-type" *ngIf="asset.fileType">
@@ -23,7 +26,10 @@
                         <a class="file-download ml-2" [href]="asset | sqxAssetUrl" sqxStopClick sqxExternalLink="noicon">
                             <i class="icon-download"></i>
                         </a>
-                        <a class="file-delete ml-2" (click)="emitDelete()" *ngIf="!isDisabled && !removeMode">
+                        <a class="file-delete ml-2" *ngIf="!isDisabled && !removeMode && asset.canDelete"
+                            (sqxConfirmClick)="emitDelete()"
+                            confirmTitle="Delete asset" 
+                            confirmText="Do you really want to delete the asset?">
                             <i class="icon-delete"></i>
                         </a>
                         <a class="file-delete ml-2" (click)="emitRemove()" *ngIf="removeMode">
@@ -63,7 +69,7 @@
                     </div>
                 </div>
                 <div class="file-tags tags">
-                    <sqx-tag-editor [disabled]="true" [ngModel]="asset.tags" class="blank" placeholder="+Tag"></sqx-tag-editor>
+                    <sqx-tag-editor [ngModel]="asset.tags" disabled="true" styleBlank="true" placeholder="+Tag"></sqx-tag-editor>
                 </div>
                 <div class="file-info">
                     <ng-container *ngIf="asset.pixelWidth">{{asset.pixelWidth}}x{{asset.pixelHeight}}px, </ng-container> {{asset.fileSize | sqxFileSize}}
@@ -74,7 +80,10 @@
 </ng-container>
 
 <ng-template #listTemplate>
-    <div class="table-items-row" [class.selectable]="isSelectable" (click)="emitSelect()" (sqxFileDrop)="updateFile($event)" [noDrop]="true">
+    <div class="table-items-row" [class.selectable]="isSelectable" (click)="emitSelect()" 
+        (sqxDropFile)="updateFile($event)"
+        [sqxDropDisabled]="!asset || !asset.canUpload"
+        [noDrop]="true">
         <div class="left-border" [class.hidden]="!isSelectable" [class.selected]="isSelected" ></div>
 
         <div *ngIf="asset && asset.canPreview && snapshot.progress === 0" class="image drag-handle" [class.image-left]="!isSelectable" @fade>
@@ -103,7 +112,10 @@
                     </a>
                 </td>
                 <td class="col-actions text-right" *ngIf="!isDisabled || removeMode">
-                    <button type="button" class="btn btn-text-danger" (click)="emitDelete()" *ngIf="!isDisabled && !removeMode">
+                    <button type="button" class="btn btn-text-danger" *ngIf="!isDisabled && !removeMode && asset.canDelete"
+                        (sqxConfirmClick)="emitDelete()"
+                        confirmTitle="Delete asset" 
+                        confirmText="Do you really want to delete the asset?">
                         <i class="icon-bin2"></i>
                     </button>
                     <button type="button" class="btn btn-text-secondary" (click)="emitRemove()" *ngIf="removeMode">
@@ -125,9 +137,12 @@
 </ng-template>
 
 <ng-container *ngIf="asset">
-    <sqx-asset-dialog  *sqxModalView="editDialog;onRoot:true"
-        [asset]="asset" [allTags]="allTags"
-        (cancel)="cancelEdit()"
-        (complete)="updateAsset($event, true)">
-    </sqx-asset-dialog>
+    <ng-container *sqxModal="editDialog">
+        <sqx-asset-dialog
+            [allTags]="allTags"
+            [asset]="asset"
+            (cancel)="cancelEdit()"
+            (complete)="updateAsset($event, true)">
+        </sqx-asset-dialog>
+    </ng-container>
 </ng-container>

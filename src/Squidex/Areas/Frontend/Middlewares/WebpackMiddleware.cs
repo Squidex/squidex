@@ -25,28 +25,25 @@ namespace Squidex.Areas.Frontend.Middlewares
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.IsIndex())
+            if (context.IsIndex() && context.Response.StatusCode != 304)
             {
-                if (context.Response.StatusCode != 304)
+                using (var client = new HttpClient())
                 {
-                    using (var client = new HttpClient())
+                    var result = await client.GetAsync(WebpackUrl);
+
+                    context.Response.StatusCode = (int)result.StatusCode;
+
+                    if (result.IsSuccessStatusCode)
                     {
-                        var result = await client.GetAsync(WebpackUrl);
+                        var html = await result.Content.ReadAsStringAsync();
 
-                        context.Response.StatusCode = (int)result.StatusCode;
+                        html = html.AdjustHtml(context);
 
-                        if (result.IsSuccessStatusCode)
-                        {
-                            var html = await result.Content.ReadAsStringAsync();
-
-                            html = AdjustBase(html, context.Request.PathBase);
-
-                            await context.Response.WriteHtmlAsync(html);
-                        }
+                        await context.Response.WriteHtmlAsync(html);
                     }
                 }
             }
-            else if (context.IsHtmlPath())
+            else if (context.IsHtmlPath() && context.Response.StatusCode != 304)
             {
                 var responseBuffer = new MemoryStream();
                 var responseBody = context.Response.Body;
@@ -55,32 +52,23 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                 await next(context);
 
-                context.Response.Body = responseBody;
+                if (context.Response.StatusCode != 304)
+                {
+                    context.Response.Body = responseBody;
 
-                var html = Encoding.UTF8.GetString(responseBuffer.ToArray());
+                    var html = Encoding.UTF8.GetString(responseBuffer.ToArray());
 
-                html = AdjustBase(html, context.Request.PathBase);
+                    html = html.AdjustHtml(context);
 
-                context.Response.ContentLength = Encoding.UTF8.GetByteCount(html);
-                context.Response.Body = responseBody;
+                    context.Response.ContentLength = Encoding.UTF8.GetByteCount(html);
+                    context.Response.Body = responseBody;
 
-                await context.Response.WriteAsync(html);
+                    await context.Response.WriteAsync(html);
+                }
             }
             else
             {
                 await next(context);
-            }
-        }
-
-        private static string AdjustBase(string html, PathString baseUrl)
-        {
-            if (baseUrl.HasValue)
-            {
-                return html.Replace("<base href=\"/\">", $"<base href=\"{baseUrl}/\">");
-            }
-            else
-            {
-                return html;
             }
         }
     }

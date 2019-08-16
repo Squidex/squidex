@@ -71,7 +71,7 @@ namespace Squidex.Domain.Apps.Core.Model.Apps
         {
             var roles_1 = roles_0.Remove(role);
 
-            Assert.NotSame(roles_0, roles_1);
+            Assert.NotEmpty(roles_1);
         }
 
         [Fact]

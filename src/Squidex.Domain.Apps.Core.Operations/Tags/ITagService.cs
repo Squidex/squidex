@@ -19,11 +19,11 @@ namespace Squidex.Domain.Apps.Core.Tags
 
         Task<Dictionary<string, string>> DenormalizeTagsAsync(Guid appId, string group, HashSet<string> ids);
 
-        Task<Dictionary<string, int>> GetTagsAsync(Guid appId, string group);
+        Task<TagsSet> GetTagsAsync(Guid appId, string group);
 
-        Task<TagSet> GetExportableTagsAsync(Guid appId, string group);
+        Task<TagsExport> GetExportableTagsAsync(Guid appId, string group);
 
-        Task RebuildTagsAsync(Guid appId, string group, TagSet tags);
+        Task RebuildTagsAsync(Guid appId, string group, TagsExport tags);
 
         Task ClearAsync(Guid appId, string group);
     }

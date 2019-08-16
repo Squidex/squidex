@@ -66,5 +66,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates.Builders
 
             return this;
         }
+
+        public FieldBuilder ShowInReferences()
+        {
+            field.Properties.IsReferenceField = true;
+
+            return this;
+        }
     }
 }

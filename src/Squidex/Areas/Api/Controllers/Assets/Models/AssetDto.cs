@@ -8,15 +8,17 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 using NodaTime;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Shared;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Assets.Models
 {
-    public sealed class AssetDto : IGenerateETag
+    public sealed class AssetDto : Resource
     {
         /// <summary>
         /// The id of the asset.
@@ -32,7 +34,6 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// <summary>
         /// The file hash.
         /// </summary>
-        [Required]
         public string FileHash { get; set; }
 
         /// <summary>
@@ -110,9 +111,51 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
         /// </summary>
         public long Version { get; set; }
 
-        public static AssetDto FromAsset(IAssetEntity asset)
+        /// <summary>
+        /// The metadata.
+        /// </summary>
+        [JsonProperty("_meta")]
+        public AssetMetadata Metadata { get; set; }
+
+        public static AssetDto FromAsset(IEnrichedAssetEntity asset, ApiController controller, string app, bool isDuplicate = false)
         {
-            return SimpleMapper.Map(asset, new AssetDto { FileType = asset.FileName.FileType() });
+            var response = SimpleMapper.Map(asset, new AssetDto { FileType = asset.FileName.FileType() });
+
+            response.Tags = asset.TagNames;
+
+            if (isDuplicate)
+            {
+                response.Metadata = new AssetMetadata { IsDuplicate = "true" };
+            }
+
+            return CreateLinks(response, controller, app);
+        }
+
+        private static AssetDto CreateLinks(AssetDto response, ApiController controller, string app)
+        {
+            var values = new { app, id = response.Id };
+
+            response.AddSelfLink(controller.Url<AssetsController>(x => nameof(x.GetAsset), values));
+
+            if (controller.HasPermission(Permissions.AppAssetsUpdate))
+            {
+                response.AddPutLink("update", controller.Url<AssetsController>(x => nameof(x.PutAsset), values));
+                response.AddPutLink("upload", controller.Url<AssetsController>(x => nameof(x.PutAssetContent), values));
+            }
+
+            if (controller.HasPermission(Permissions.AppAssetsDelete))
+            {
+                response.AddDeleteLink("delete", controller.Url<AssetsController>(x => nameof(x.DeleteAsset), values));
+            }
+
+            response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContent), new { id = response.Id, version = response.FileVersion }));
+
+            if (!string.IsNullOrWhiteSpace(response.Slug))
+            {
+                response.AddGetLink("content/slug", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Slug, version = response.Version }));
+            }
+
+            return response;
         }
     }
 }

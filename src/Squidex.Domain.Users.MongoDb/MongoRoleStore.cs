@@ -43,7 +43,14 @@ namespace Squidex.Domain.Users.MongoDb
         protected override Task SetupCollectionAsync(IMongoCollection<IdentityRole> collection, CancellationToken ct = default)
         {
             return collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<IdentityRole>(Index.Ascending(x => x.NormalizedName), new CreateIndexOptions { Unique = true }), cancellationToken: ct);
+                new CreateIndexModel<IdentityRole>(
+                    Index
+                        .Ascending(x => x.NormalizedName),
+                    new CreateIndexOptions
+                    {
+                        Unique = true
+                    }),
+                cancellationToken: ct);
         }
 
         protected override MongoCollectionSettings CollectionSettings()

@@ -15,7 +15,8 @@ export type FieldType =
     'Number' |
     'References' |
     'String' |
-    'Tags';
+    'Tags' |
+    'UI';
 
 export const fieldTypes: { type: FieldType, description: string }[] = [
     {
@@ -48,6 +49,9 @@ export const fieldTypes: { type: FieldType, description: string }[] = [
     }, {
         type: 'Array',
         description: 'List of embedded objects.'
+    }, {
+        type: 'UI',
+        description: 'Separator for editing UI.'
     }
 ];
 
@@ -87,6 +91,12 @@ export function createProperties(fieldType: FieldType, values: Object | null = n
         case 'Tags':
             properties = new TagsFieldPropertiesDto('Tags');
             break;
+        case 'Tags':
+            properties = new TagsFieldPropertiesDto('Tags');
+            break;
+        case 'UI':
+            properties = new UIFieldPropertiesDto();
+            break;
         default:
             throw 'Invalid properties type';
     }
@@ -118,6 +128,8 @@ export interface FieldPropertiesVisitor<T> {
     visitString(properties: StringFieldPropertiesDto): T;
 
     visitTags(properties: TagsFieldPropertiesDto): T;
+
+    visitUI(properties: UIFieldPropertiesDto): T;
 }
 
 export abstract class FieldPropertiesDto {
@@ -129,6 +141,7 @@ export abstract class FieldPropertiesDto {
     public readonly placeholder?: string;
     public readonly isRequired: boolean = false;
     public readonly isListField: boolean = false;
+    public readonly isReferenceField: boolean = false;
 
     constructor(public readonly editor: string,
         props?: Partial<FieldPropertiesDto>
@@ -143,6 +156,10 @@ export abstract class FieldPropertiesDto {
     }
 
     public get isSortable() {
+        return true;
+    }
+
+    public get isContentField() {
         return true;
     }
 
@@ -310,6 +327,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto {
     public readonly maxItems?: number;
     public readonly editor: string;
     public readonly schemaId?: string;
+    public readonly resolveReference?: boolean;
     public readonly allowDuplicates?: boolean;
 
     public get isSortable() {
@@ -377,5 +395,31 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto {
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
         return visitor.visitTags(this);
+    }
+}
+
+export class UIFieldPropertiesDto extends FieldPropertiesDto {
+    public readonly fieldType = 'UI';
+
+    public get isComplexUI() {
+        return false;
+    }
+
+    public get isSortable() {
+        return false;
+    }
+
+    public get isContentField() {
+        return false;
+    }
+
+    constructor(
+        props?: Partial<TagsFieldPropertiesDto>
+    ) {
+        super('Separator', props);
+    }
+
+    public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
+        return visitor.visitUI(this);
     }
 }

@@ -1,6 +1,6 @@
 <div class="btn-group btn-group-{{size}}" *ngIf="isSmallMode">
     <button type="button" class="btn btn-secondary" *ngFor="let language of languages; trackBy: trackByLanguage" title="{{language.englishName}}" [class.active]="language == selectedLanguage" (click)="selectLanguage(language)" tabindex="-1">
-        <span class="iso-code">{{language.iso2Code}}</span>
+        {{language.iso2Code}}
     </button>
 </div>
 
@@ -8,9 +8,12 @@
     <button type="button" class="btn btn-secondary dropdown-toggle" title="{{selectedLanguage.englishName}}" (click)="dropdown.toggle()" #button tabindex="-1">
         {{selectedLanguage.iso2Code}}
     </button>
-    <div class="dropdown-menu" *sqxModalView="dropdown;closeAlways:true" [sqxModalTarget]="button" @fade>
-        <div class="dropdown-item" *ngFor="let language of languages; trackBy: trackByLanguage" [class.active]="language == selectedLanguage" (click)="selectLanguage(language)">
-            <strong class="iso-code iso-code-dropdown">{{language.iso2Code}}</strong> ({{language.englishName}})
+
+    <ng-container *sqxModal="dropdown">
+        <div class="dropdown-menu" [sqxAnchoredTo]="button" @fade>
+            <div class="dropdown-item" *ngFor="let language of languages; trackBy: trackByLanguage" [class.active]="language == selectedLanguage" (click)="selectLanguage(language)">
+                <strong class="iso-code iso-code-dropdown">{{language.iso2Code}}</strong> ({{language.englishName}})
+            </div>
         </div>
-    </div>
+    </ng-container>
 </div>

@@ -23,21 +23,24 @@
             
             <ng-container *ngIf="contributorsState.contributors | async; let contributors">
                 <table class="table table-items table-fixed" *ngIf="rolesState.roles | async; let roles">
-                    <tbody *ngFor="let contributorInfo of contributors; trackBy: trackByContributor">
+                    <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor">
                         <tr>
                             <td class="cell-user">
-                                <img class="user-picture" title="{{contributorInfo.contributor.contributorId | sqxUserName}}" [attr.src]="contributorInfo.contributor.contributorId | sqxUserPicture" />
+                                <img class="user-picture" title="{{contributor.contributorId | sqxUserName}}" [attr.src]="contributor.contributorId | sqxUserPicture" />
                             </td>
                             <td class="cell-auto">
-                                <span class="user-name table-cell">{{contributorInfo.contributor.contributorId | sqxUserName}}</span>
+                                <span class="user-name table-cell">{{contributor.contributorId | sqxUserName}}</span>
                             </td>
                             <td class="cell-time">
-                                <select class="form-control" [ngModel]="contributorInfo.contributor.role" (ngModelChange)="changeRole(contributorInfo.contributor, $event)" [disabled]="contributorInfo.isCurrentUser">
+                                <select class="form-control" 
+                                    [ngModel]="contributor.role"
+                                    (ngModelChange)="changeRole(contributor, $event)"
+                                    [disabled]="!contributor.canUpdate">
                                     <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
                                 </select>
                             </td>
                             <td class="cell-actions">
-                                <button *ngIf="!contributorInfo.isCurrentUser" type="button" class="btn btn-text-danger" (click)="remove(contributorInfo.contributor)">
+                                <button type="button" class="btn btn-text-danger" [disabled]="!contributor.canRevoke" (click)="remove(contributor)">
                                     <i class="icon-bin2"></i>
                                 </button>
                             </td>
@@ -47,7 +50,7 @@
                 </table>
                 
                 <ng-container>
-                    <div class="table-items-footer" *ngIf="(contributorsState.isMaxReached | async) === false">
+                    <div class="table-items-footer" *ngIf="contributorsState.canCreate | async">
                         <form [formGroup]="assignContributorForm.form" (ngSubmit)="assignContributor()">
                             <div class="row no-gutters">
                                 <div class="col">

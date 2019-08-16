@@ -13,24 +13,42 @@ import { tap } from 'rxjs/operators';
 import {
     AnalyticsService,
     ApiUrlConfig,
+    hasAnyLink,
     HTTP,
     mapVersioned,
-    Model,
     pretifyError,
+    Resource,
+    ResourceLinks,
     Version,
     Versioned
 } from '@app/framework';
 
-export type PatternsDto = Versioned<PatternDto[]>;
+export type PatternsDto = Versioned<PatternsPayload>;
+export type PatternsPayload = {
+    readonly items: PatternDto[],
 
-export class PatternDto extends Model<PatternDto> {
+    readonly canCreate: boolean;
+} & Resource;
+
+export class PatternDto {
+    public readonly _links: ResourceLinks = {};
+
+    public readonly canDelete: boolean;
+    public readonly canUpdate: boolean;
+
     constructor(
+        links: ResourceLinks,
         public readonly id: string,
         public readonly name: string,
         public readonly pattern: string,
         public readonly message?: string
     ) {
-        super();
+        this._links = links;
+
+        this.canDelete = hasAnyLink(links, 'delete');
+        this.canUpdate = hasAnyLink(links, 'update');
+
+        Object.freeze(this);
     }
 }
 
@@ -52,35 +70,19 @@ export class PatternsService {
     public getPatterns(appName: string): Observable<PatternsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
-        return HTTP.getVersioned<any>(this.http, url).pipe(
+        return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {
-                const items: any[] = body;
-
-                const patterns =
-                    items.map(item =>
-                        new PatternDto(
-                            item.patternId,
-                            item.name,
-                            item.pattern,
-                            item.message));
-
-                return patterns;
+                return parsePatterns(body);
             }),
             pretifyError('Failed to add pattern. Please reload.'));
     }
 
-    public postPattern(appName: string, dto: EditPatternDto, version: Version): Observable<Versioned<PatternDto>> {
+    public postPattern(appName: string, dto: EditPatternDto, version: Version): Observable<PatternsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns`);
 
-        return HTTP.postVersioned<any>(this.http, url, dto, version).pipe(
+        return HTTP.postVersioned(this.http, url, dto, version).pipe(
             mapVersioned(({ body }) => {
-                const pattern = new PatternDto(
-                    body.patternId,
-                    body.name,
-                    body.pattern,
-                    body.message);
-
-                return pattern;
+                return parsePatterns(body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Patterns', 'Created', appName);
@@ -88,23 +90,48 @@ export class PatternsService {
             pretifyError('Failed to add pattern. Please reload.'));
     }
 
-    public putPattern(appName: string, id: string, dto: EditPatternDto, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
+    public putPattern(appName: string, resource: Resource, dto: EditPatternDto, version: Version): Observable<PatternsDto> {
+        const link = resource._links['update'];
 
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            mapVersioned(({ body }) => {
+                return parsePatterns(body);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Patterns', 'Updated', appName);
             }),
             pretifyError('Failed to update pattern. Please reload.'));
     }
 
-    public deletePattern(appName: string, id: string, version: Version): Observable<Versioned<any>> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/patterns/${id}`);
+    public deletePattern(appName: string, resource: Resource, version: Version): Observable<PatternsDto> {
+        const link = resource._links['delete'];
 
-        return HTTP.deleteVersioned(this.http, url, version).pipe(
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            mapVersioned(({ body }) => {
+                return parsePatterns(body);
+            }),
             tap(() => {
                 this.analytics.trackEvent('Patterns', 'Configured', appName);
             }),
             pretifyError('Failed to remove pattern. Please reload.'));
     }
+}
+
+function parsePatterns(response: any) {
+    const raw: any[] = response.items;
+
+    const items = raw.map(item =>
+        new PatternDto(item._links,
+            item.id,
+            item.name,
+            item.pattern,
+            item.message));
+
+    const _links = response._links;
+
+    return { items, _links, canCreate: hasAnyLink(_links, 'create') };
 }

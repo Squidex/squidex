@@ -5,15 +5,17 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import {
     DialogModel,
-    FilterState,
-    ModalModel,
+    fadeAnimation,
+    hasFilter,
     Queries,
+    Query,
+    QueryModel,
     SaveQueryForm
 } from '@app/shared/internal';
 
@@ -21,35 +23,28 @@ import {
     selector: 'sqx-search-form',
     styleUrls: ['./search-form.component.scss'],
     templateUrl: './search-form.component.html',
+    animations: [
+        fadeAnimation
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchFormComponent implements OnInit {
-    @Input()
-    public queries: Queries;
+export class SearchFormComponent implements OnChanges {
+    public readonly standalone = { standalone: true };
 
     @Input()
     public placeholder = '';
 
     @Input()
-    public fieldExample = '[MY_FIELD]';
+    public queryModel: QueryModel;
 
     @Input()
-    public expandable = false;
-
-    @Input()
-    public filter: FilterState;
-
-    @Input()
-    public statuses: { [status: string]: string };
-
-    @Input()
-    public status: string;
+    public query: Query;
 
     @Output()
-    public statusChange = new EventEmitter<string>();
+    public queryChange = new EventEmitter<Query>();
 
     @Input()
-    public schemaName = '';
+    public queries: Queries;
 
     @Input()
     public enableShortcut = false;
@@ -57,23 +52,34 @@ export class SearchFormComponent implements OnInit {
     @Input()
     public formClass = 'form-inline search-form';
 
-    @Output()
-    public querySubmit = new EventEmitter();
-
     public saveKey: Observable<string | undefined>;
     public saveQueryDialog = new DialogModel();
     public saveQueryForm = new SaveQueryForm(this.formBuilder);
 
-    public searchModal = new ModalModel();
+    public searchDialog = new DialogModel();
+
+    public hasFilter: boolean;
 
     constructor(
         private readonly formBuilder: FormBuilder
     ) {
     }
 
-    public ngOnInit() {
-        if (this.queries) {
-            this.saveKey = this.queries.getSaveKey(this.filter.query);
+    public ngOnChanges(changes: SimpleChanges) {
+        if (changes['query'] || changes['queries']) {
+            this.updateSaveKey();
+
+            this.hasFilter = hasFilter(this.query);
+        }
+    }
+
+    public search(close = false) {
+        this.hasFilter = hasFilter(this.query);
+
+        this.queryChange.emit(this.query);
+
+        if (close) {
+            this.searchDialog.hide();
         }
     }
 
@@ -86,8 +92,8 @@ export class SearchFormComponent implements OnInit {
         const value = this.saveQueryForm.submit();
 
         if (value) {
-            if (this.queries) {
-                this.queries.add(value.name, this.filter.apiFilter!);
+            if (this.queries && this.query) {
+                this.queries.add(value.name, this.query);
             }
 
             this.saveQueryForm.submitCompleted();
@@ -96,7 +102,21 @@ export class SearchFormComponent implements OnInit {
         this.saveQueryDialog.hide();
     }
 
-    public search() {
-        this.querySubmit.emit();
+    public changeQueryFullText(fullText: string) {
+        this.query = { ...this.query, fullText };
+
+        this.updateSaveKey();
+    }
+
+    public changeQuery(query: Query) {
+        this.query = query;
+
+        this.updateSaveKey();
+    }
+
+    private updateSaveKey() {
+        if (this.queries && this.query) {
+            this.saveKey = this.queries.getSaveKey(this.query);
+        }
     }
 }

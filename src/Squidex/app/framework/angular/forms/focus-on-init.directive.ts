@@ -17,7 +17,7 @@ export class FocusOnInitDirective implements AfterViewInit {
     public select: boolean;
 
     constructor(
-        private readonly element: ElementRef
+        private readonly element: ElementRef<HTMLElement>
     ) {
     }
 
@@ -28,8 +28,10 @@ export class FocusOnInitDirective implements AfterViewInit {
             }
 
             if (this.select) {
-                if (Types.isFunction(this.element.nativeElement.select)) {
-                    this.element.nativeElement.select();
+                const input: HTMLInputElement = <any>this.element.nativeElement;
+
+                if (Types.isFunction(input.select)) {
+                    input.select();
                 }
             }
         }, 100);

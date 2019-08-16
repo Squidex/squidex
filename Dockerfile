@@ -3,12 +3,23 @@
 #
 FROM squidex/dotnet:2.2-sdk-chromium-phantomjs-node as builder
 
+ARG SQUIDEX__VERSION=1.0.0
+
 WORKDIR /src
 
+# Copy Node project files.
 COPY src/Squidex/package*.json /tmp/
 
 # Install Node packages 
 RUN cd /tmp && npm install --loglevel=error
+
+# Copy nuget project files.
+COPY /**/**/*.csproj /tmp/
+# Copy nuget.config for package sources.
+COPY NuGet.Config /tmp/
+
+# Install nuget packages
+RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p --verbosity quiet; true; done; popd'
 
 COPY . .
 
@@ -19,15 +30,14 @@ RUN cp -a /tmp/node_modules src/Squidex/ \
  && npm run build
  
 # Test Backend
-RUN dotnet restore \
- && dotnet test --filter Category!=Dependencies tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj \ 
+RUN dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj --filter Category!=Dependencies \ 
  && dotnet test tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj \ 
  && dotnet test tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj \
  && dotnet test tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj \
  && dotnet test tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj
 
 # Publish
-RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64
+RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64 -p:version=$SQUIDEX__VERSION
 
 #
 # Stage 2, Build runtime

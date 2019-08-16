@@ -28,17 +28,17 @@ import {
     ContentFieldComponent,
     ContentHistoryPageComponent,
     ContentItemComponent,
-    ContentItemEditorComponent,
     ContentPageComponent,
     ContentsFiltersPageComponent,
     ContentsPageComponent,
     ContentsSelectorComponent,
     ContentStatusComponent,
+    ContentValueComponent,
+    ContentValueEditorComponent,
     DueTimeSelectorComponent,
     FieldEditorComponent,
     FieldLanguagesComponent,
     PreviewButtonComponent,
-    ReferencesDropdownComponent,
     ReferencesEditorComponent,
     SchemasPageComponent
 } from './declarations';
@@ -113,19 +113,19 @@ const routes: Routes = [
         ContentFieldComponent,
         ContentHistoryPageComponent,
         ContentItemComponent,
-        ContentItemEditorComponent,
         ContentPageComponent,
         ContentsFiltersPageComponent,
-        ContentStatusComponent,
         ContentsPageComponent,
         ContentsSelectorComponent,
+        ContentStatusComponent,
+        ContentValueComponent,
+        ContentValueEditorComponent,
         DueTimeSelectorComponent,
         FieldEditorComponent,
         FieldLanguagesComponent,
         PreviewButtonComponent,
-        ReferencesDropdownComponent,
         ReferencesEditorComponent,
         SchemasPageComponent
     ]
 })
-export class SqxFeatureContentModule { }
+export class SqxFeatureContentModule {}

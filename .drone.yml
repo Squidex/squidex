@@ -20,7 +20,7 @@ steps:
     image: docker
     commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker build -t squidex/squidex:dev -t squidex/squidex:dev-$${DRONE_BUILD_NUMBER} .
+      - docker build -t squidex/squidex:dev -t squidex/squidex:dev-$${DRONE_BUILD_NUMBER} --build-arg SQUIDEX__VERSION=3.0.0-dev-$${DRONE_BUILD_NUMBER} .
       - docker push squidex/squidex:dev
       - docker push squidex/squidex:dev-$${DRONE_BUILD_NUMBER}
     volumes:
@@ -43,7 +43,7 @@ steps:
     image: docker
     commands:
       - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker build -t squidex/squidex:latest -t squidex/squidex:$${DRONE_TAG} .
+      - docker build -t squidex/squidex:latest -t squidex/squidex:$${DRONE_TAG} --build-arg SQUIDEX__VERSION=$${DRONE_TAG} .
       - docker push squidex/squidex:latest
       - docker push squidex/squidex:$${DRONE_TAG}
     volumes:
@@ -63,7 +63,7 @@ steps:
   - name: build_binaries
     image: docker
     commands:
-      - docker build . -t squidex-build-image -f Dockerfile.build
+      - docker build -t squidex-build-image -f Dockerfile.build --build-arg SQUIDEX__VERSION=$${DRONE_TAG} .
       - docker create --name squidex-build-container squidex-build-image
       - docker cp squidex-build-container:/out /build
     volumes:

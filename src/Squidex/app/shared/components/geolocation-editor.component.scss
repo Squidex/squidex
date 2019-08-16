@@ -15,6 +15,12 @@
     width: 40%;
 }
 
-.form-inline {
-    margin-top: .5rem;
+.compact {
+    .form-group {
+        max-width: 40%;
+    }
+
+    .form-control {
+        max-width: 100%;
+    }
 }

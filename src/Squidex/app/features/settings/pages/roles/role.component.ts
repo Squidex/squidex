@@ -18,13 +18,6 @@ import {
     RolesState
 } from '@app/shared';
 
-const DEFAULT_ROLES = [
-    'Owner',
-    'Developer',
-    'Editor',
-    'Reader'
-];
-
 @Component({
     selector: 'sqx-role',
     styleUrls: ['./role.component.scss'],
@@ -40,11 +33,11 @@ export class RoleComponent implements OnChanges {
     @Input()
     public allPermissions: AutocompleteSource;
 
-    @ViewChild('addInput')
+    @ViewChild('addInput', { static: false })
     public addPermissionInput: AutocompleteComponent;
 
     public isEditing = false;
-    public isDefaultRole = false;
+    public isEditable = false;
 
     public addPermissionForm = new AddPermissionForm(this.formBuilder);
 
@@ -57,13 +50,10 @@ export class RoleComponent implements OnChanges {
     }
 
     public ngOnChanges() {
-        this.isDefaultRole = DEFAULT_ROLES.indexOf(this.role.name) >= 0;
+        this.isEditable = this.role.canUpdate;
 
         this.editForm.load(this.role.permissions);
-
-        if (this.isDefaultRole) {
-            this.editForm.form.disable();
-        }
+        this.editForm.setEnabled(this.isEditable);
     }
 
     public toggleEditing() {
