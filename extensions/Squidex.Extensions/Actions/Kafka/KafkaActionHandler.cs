@@ -8,10 +8,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Confluent.Kafka;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Extensions.SelfHosted.Kafka;
 
 namespace Squidex.Extensions.Actions.Kafka
 {
@@ -31,8 +29,8 @@ namespace Squidex.Extensions.Actions.Kafka
             var ruleJob = new KafkaJob
             {
                 TopicName = action.TopicName,
-                Key = @event.Name,
-                Message = ToEnvelopeJson(@event)
+                MessageKey = @event.Name,
+                MessageValue = ToEnvelopeJson(@event)
             };
 
             return (Description, ruleJob);
@@ -42,12 +40,13 @@ namespace Squidex.Extensions.Actions.Kafka
         {
             try
             {
-                await kafkaProducer.Send(job.TopicName, job.Key, job.Message);
-                return Result.Success("Event pushed to Kafka");
+                await kafkaProducer.Send(job.TopicName, job.MessageKey, job.MessageValue);
+
+                return Result.Success($"Event pushed to {job.TopicName} kafka topic.");
             }
             catch (Exception ex)
             {
-                return Result.Failed(ex, "Push to Kafka failed");
+                return Result.Failed(ex, "Push to Kafka failed.");
             }
         }
     }
@@ -56,8 +55,8 @@ namespace Squidex.Extensions.Actions.Kafka
     {
         public string TopicName { get; set; }
 
-        public string Key { get; set; }
+        public string MessageKey { get; set; }
 
-        public string Message { get; set; }
+        public string MessageValue { get; set; }
     }
 }

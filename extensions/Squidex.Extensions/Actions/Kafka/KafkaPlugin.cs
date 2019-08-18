@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Extensions.Actions.Kafka
@@ -15,7 +16,15 @@ namespace Squidex.Extensions.Actions.Kafka
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
         {
-            services.AddRuleAction<KafkaAction, KafkaActionHandler>();
+            var kafkaOptions = config.GetSection("kafka").Get<KafkaProducerOptions>();
+
+            if (kafkaOptions.IsProducerConfigured())
+            {
+                services.AddRuleAction<KafkaAction, KafkaActionHandler>();
+
+                services.AddSingleton<KafkaProducer>();
+                services.AddSingleton(Options.Create(kafkaOptions));
+            }
         }
     }
 }
