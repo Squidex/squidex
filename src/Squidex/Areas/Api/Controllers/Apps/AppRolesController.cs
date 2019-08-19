@@ -94,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/roles/")]
-        [ProducesResponseType(typeof(RolesDto), 200)]
+        [ProducesResponseType(typeof(RolesDto), 201)]
         [ApiPermission(Permissions.AppRolesCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostRole(string app, [FromBody] AddRoleDto request)

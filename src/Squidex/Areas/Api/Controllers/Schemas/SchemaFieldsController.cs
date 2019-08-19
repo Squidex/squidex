@@ -41,7 +41,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 201)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostField(string app, string name, [FromBody] AddFieldDto request)
@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = await InvokeCommandAsync(app, command);
 
-            return StatusCode(201, response);
+            return CreatedAtAction(nameof(SchemasController.GetSchema), new { name = request.Name }, response);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/schemas/{name}/fields/{parentId:long}/nested/")]
-        [ProducesResponseType(typeof(SchemaDetailsDto), 200)]
+        [ProducesResponseType(typeof(SchemaDetailsDto), 201)]
         [ApiPermission(Permissions.AppSchemasUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostNestedField(string app, string name, long parentId, [FromBody] AddFieldDto request)
@@ -77,7 +77,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = await InvokeCommandAsync(app, command);
 
-            return StatusCode(201, response);
+            return CreatedAtAction(nameof(SchemasController.GetSchema), new { name = request.Name }, response);
         }
 
         /// <summary>
