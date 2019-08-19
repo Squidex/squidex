@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_give_access_if_any_permission_gives_permission_to_requested()
+        public void Should_give_permission_if_any_permission_allows()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
@@ -45,7 +45,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_not_give_access_if_none_permission_gives_permission_to_requested()
+        public void Should_not_give_permission_if_none_permission_allows()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
@@ -55,7 +55,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_not_give_access_if_permission_to_request_is_null()
+        public void Should_not_give_permission_if_requested_is_null()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
@@ -65,7 +65,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_include_access_if_any_permission_includes_parent_given()
+        public void Should_include_permission_if_any_permission_includes_parent_given()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_include_access_if_any_permission_includes_child_given()
+        public void Should_include_permission_if_any_permission_includes_child_given()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
@@ -85,7 +85,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_include_access_even_if_negation_exists()
+        public void Should_include_permission_even_if_negation_exists()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
@@ -95,7 +95,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_not_include_access_if_none_permission_includes_given()
+        public void Should_not_include_permission_if_none_permission_includes_given()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
@@ -105,7 +105,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_not_include_access_if_permission_to_include_is_null()
+        public void Should_not_include_permission_if_permission_to_include_is_null()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
