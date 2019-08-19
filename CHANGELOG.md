@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.2.1 - 2019-08-19
+
+### Bugfixes
+
+* **MongoDB**: Fix index creation for Orleans tables.
+* **MongoDB**: Fixes in OpenAPI definition.
+
 ## 3.2.0 - 2019-08-19
 
 ### Features
@@ -14,7 +21,7 @@
 * **Assets**: Pass in time to cache to asset API.
 * **Assets**: Shorter asset fields and asset migration.
 * **Rules**: Kafka rule action, thanks to https://github.com/sauravvijay
-* **DB**: Removed support for CosmosDB and DocumentDB due to high costs.
+* **MongoDB**: Removed support for CosmosDB and DocumentDB due to high costs.
 
 ## 3.1.0 - 2019-07-25
 

@@ -69,14 +69,14 @@
     <PackageReference Include="MongoDB.Driver" Version="2.9.0" />
     <PackageReference Include="Namotion.Reflection" Version="1.0.6" />
     <PackageReference Include="NJsonSchema" Version="10.0.22" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.0.4" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.0.5" />
     <PackageReference Include="OpenCover" Version="4.7.922" PrivateAssets="all" />
-    <PackageReference Include="Orleans.Providers.MongoDB" Version="2.5.0" />
+    <PackageReference Include="Orleans.Providers.MongoDB" Version="2.7.0" />
     <PackageReference Include="Orleans.WebHostCompatibilityLayer" Version="2.3.1" />
-    <PackageReference Include="OrleansDashboard" Version="2.4.1" />
+    <PackageReference Include="OrleansDashboard" Version="2.4.3" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="4.2.15" PrivateAssets="all" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="3.7.0" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="3.9.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
