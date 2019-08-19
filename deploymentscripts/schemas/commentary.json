@@ -48,7 +48,7 @@
           "properties":{
              "label":"Body",
              "isRequired":false,
-             "isListField":false,
+             "isListField":true,
              "fieldType":"String",
              "editor":"RichText",
              "isUnique":false

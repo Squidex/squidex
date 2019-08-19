@@ -1,7 +1,7 @@
-import { BrowserUtil } from "./../utils/Browser.util";
-import { LoginData } from "../data/LoginData";
-import { browser, element, by } from "protractor";
-import { config } from "../config";
+import { browser, by, element } from 'protractor';
+import { config } from '../config';
+import { LoginData } from '../data/LoginData';
+import { BrowserUtil } from './../utils/Browser.util';
 
 /**
  * Class representing login page.
@@ -13,15 +13,13 @@ export class LoginPage extends BrowserUtil {
    */
   public async login(loginData: LoginData) {
     await this.waitForAngularDisabledOnCurrentWindow();
-    // browser.refresh();
     await this.navigateTo();
-    const usernameInput = element(by.id("userNameInput"));
-    const passwordInput = element(by.id("passwordInput"));
-    const submitButton = element(by.id("submitButton"));
+    const usernameInput = element(by.id('userNameInput'));
+    const passwordInput = element(by.id('passwordInput'));
+    const submitButton = element(by.id('submitButton'));
     await usernameInput.sendKeys(loginData.username);
     await passwordInput.sendKeys(loginData.password);
     await submitButton.click();
-    // this.waitForAngularEnabledOnCurrentWindow(true);
   }
 
 

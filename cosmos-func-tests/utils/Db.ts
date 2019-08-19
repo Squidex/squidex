@@ -1,12 +1,13 @@
-const { MongoMemoryServer } = require("mongodb-memory-server");
+const { MongoMemoryServer } = require('mongodb-memory-server');
 const mydbcon = new MongoMemoryServer({
   instance: {
-    storageEngine: "wiredTiger",
-    dbPath: "../cosmos-func-tests/database",
+    storageEngine: 'wiredTiger',
+    dbPath: '../cosmos-func-tests/database',
     port: 27017
   }
 });
-console.log("connected");
+// tslint:disable-next-line: no-console
+console.log('connected');
 
-export {mydbcon};
+export { mydbcon };
 
