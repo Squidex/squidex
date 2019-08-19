@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_return_true_if_any_permission_gives_permission_to_requested()
+        public void Should_give_access_if_any_permission_gives_permission_to_requested()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
@@ -45,27 +45,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_return_true_if_any_permission_includes_parent_given()
-        {
-            var sut = new PermissionSet(
-                new Permission("app.contents"),
-                new Permission("app.assets"));
-
-            Assert.True(sut.Includes(new Permission("app")));
-        }
-
-        [Fact]
-        public void Should_return_true_if_any_permission_includes_child_given()
-        {
-            var sut = new PermissionSet(
-                new Permission("app.contents"),
-                new Permission("app.assets"));
-
-            Assert.True(sut.Includes(new Permission("app.contents.read")));
-        }
-
-        [Fact]
-        public void Should_return_false_if_none_permission_gives_permission_to_requested()
+        public void Should_not_give_access_if_none_permission_gives_permission_to_requested()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
@@ -75,17 +55,7 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_return_false_if_none_permission_includes_given()
-        {
-            var sut = new PermissionSet(
-                new Permission("app.contents"),
-                new Permission("app.assets"));
-
-            Assert.False(sut.Includes(new Permission("other")));
-        }
-
-        [Fact]
-        public void Should_return_false_if_permission_to_request_is_null()
+        public void Should_not_give_access_if_permission_to_request_is_null()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
@@ -95,7 +65,47 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_return_false_if_permission_to_include_is_null()
+        public void Should_include_access_if_any_permission_includes_parent_given()
+        {
+            var sut = new PermissionSet(
+                new Permission("app.contents"),
+                new Permission("app.assets"));
+
+            Assert.True(sut.Includes(new Permission("app")));
+        }
+
+        [Fact]
+        public void Should_include_access_if_any_permission_includes_child_given()
+        {
+            var sut = new PermissionSet(
+                new Permission("app.contents"),
+                new Permission("app.assets"));
+
+            Assert.True(sut.Includes(new Permission("app.contents.read")));
+        }
+
+        [Fact]
+        public void Should_include_access_even_if_negation_exists()
+        {
+            var sut = new PermissionSet(
+                new Permission("app.contents"),
+                new Permission("app.assets"));
+
+            Assert.True(sut.Includes(new Permission("app.contents.read")));
+        }
+
+        [Fact]
+        public void Should_not_include_access_if_none_permission_includes_given()
+        {
+            var sut = new PermissionSet(
+                new Permission("app.contents"),
+                new Permission("app.assets"));
+
+            Assert.False(sut.Includes(new Permission("other")));
+        }
+
+        [Fact]
+        public void Should_not_include_access_if_permission_to_include_is_null()
         {
             var sut = new PermissionSet(
                 new Permission("app.contents"),
