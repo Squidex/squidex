@@ -4,6 +4,7 @@ Param(
 	[switch]$appsEntities,
 	[switch]$users,
 	[switch]$web,
+	[switch]$icis,
 	[switch]$all
 )
 
@@ -73,6 +74,17 @@ if ($all -Or $web) {
 	-filter:"+[Squidex]Squidex.Web*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Web.xml" `
+	-oldStyle
+}
+
+if ($all -Or $icis) {
+	&"$folderHome\.nuget\packages\OpenCover\4.7.922\tools\OpenCover.Console.exe" `
+	-register:user `
+	-target:"C:\Program Files\dotnet\dotnet.exe" `
+	-targetargs:"test $folderWorking\Squidex.ICIS.Test\Squidex.ICIS.Test.csproj" `
+	-filter:"+[Squidex.*]*" `
+	-skipautoprops `
+	-output:"$folderWorking\$folderReports\Icis.xml" `
 	-oldStyle
 }
 
