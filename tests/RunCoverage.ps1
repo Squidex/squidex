@@ -82,7 +82,7 @@ if ($all -Or $icis) {
 	-register:user `
 	-target:"C:\Program Files\dotnet\dotnet.exe" `
 	-targetargs:"test $folderWorking\Squidex.ICIS.Test\Squidex.ICIS.Test.csproj" `
-	-filter:"+[Squidex.*]*" `
+	-filter:"+[Squidex.ICIS.*]*" `
 	-skipautoprops `
 	-output:"$folderWorking\$folderReports\Icis.xml" `
 	-oldStyle
