@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.2.2 - 2019-08-20
+
+### Bugfixes
+
+* **API**: Fixed a bug that prevented json response for field endpoint to be serialized correctly.
+* **UI**: Layout fix for clients page.
+
 ## 3.2.1 - 2019-08-19
 
 ### Bugfixes
