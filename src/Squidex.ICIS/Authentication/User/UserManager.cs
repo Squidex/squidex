@@ -12,12 +12,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Users;
-using Squidex.ICIS.Extensions;
-using Squidex.ICIS.Interfaces;
-using Squidex.ICIS.Models;
 using Squidex.Infrastructure.Log;
 
-namespace Squidex.ICIS
+namespace Squidex.ICIS.Authentication.User
 {
     public sealed class UserManager: IUserManager
     {

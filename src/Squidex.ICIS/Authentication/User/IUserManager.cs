@@ -6,9 +6,8 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using Squidex.ICIS.Models;
 
-namespace Squidex.ICIS.Interfaces
+namespace Squidex.ICIS.Authentication.User
 {
     public interface IUserManager
     {
