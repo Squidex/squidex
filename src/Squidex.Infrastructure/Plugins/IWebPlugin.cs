@@ -11,6 +11,8 @@ namespace Squidex.Infrastructure.Plugins
 {
     public interface IWebPlugin : IPlugin
     {
-        void Configure(IApplicationBuilder app);
+        void ConfigureBefore(IApplicationBuilder app);
+
+        void ConfigureAfter(IApplicationBuilder app);
     }
 }

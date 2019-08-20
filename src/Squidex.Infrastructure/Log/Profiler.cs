@@ -12,6 +12,8 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Log
 {
+    public delegate void ProfilerStarted(ProfilerSpan span);
+
     public static class Profiler
     {
         private static readonly AsyncLocal<ProfilerSession> LocalSession = new AsyncLocal<ProfilerSession>();
@@ -21,6 +23,8 @@ namespace Squidex.Infrastructure.Log
         {
             get { return LocalSession.Value; }
         }
+
+        public static event ProfilerStarted SpanStarted;
 
         static Profiler()
         {
@@ -60,14 +64,11 @@ namespace Squidex.Infrastructure.Log
                 return NoopDisposable.Instance;
             }
 
-            var watch = ValueStopwatch.StartNew();
+            var span = new ProfilerSpan(session, key);
 
-            return new DelegateDisposable(() =>
-            {
-                var elapsedMs = watch.Stop();
+            SpanStarted?.Invoke(span);
 
-                session.Measured(key, elapsedMs);
-            });
+            return span;
         }
     }
 }
