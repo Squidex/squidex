@@ -1,4 +1,4 @@
-﻿namespace Squidex.ICIS.Extensions
+﻿namespace Squidex.ICIS.Authentication
 {
     public class MyIdentityOptionsExtension
     {

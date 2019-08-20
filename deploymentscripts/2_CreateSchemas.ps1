@@ -51,6 +51,9 @@ function CreateSchemas {
     $commentaryObj.fields[0].properties | Add-Member -Name "schemaId" -value $commoditySchemaResponse.id -MemberType NoteProperty
     $commentaryObj.fields[1].properties | Add-Member -Name "schemaId" -value $commentaryTypeResponse.id -MemberType NoteProperty
     $commentaryObj.fields[2].properties | Add-Member -Name "schemaId" -value $regionResponse.id -MemberType NoteProperty
+
+    $editorUrl = $apiBaseUrl.Replace('/api','') + '/editors/toastui/md-editor.html'
+    $commentaryObj.fields[3].properties | Add-Member -Name "editorUrl" -value $editorUrl -MemberType NoteProperty
     
     $commentary = $commentaryObj | ConvertTo-Json -Depth 32
     $commentarySchemaResponse = CreateSchema 'commentary'  $commentary

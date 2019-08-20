@@ -13,31 +13,39 @@ import {
  * not require new instance of class to use.
  */
 export class BrowserUtil {
+
   constructor() {}
 
-  //waits for element to be present on the DOM
-  waitForElementPresent(elementLocator: ElementFinder) {
+  // waits for element to be present on the DOM
+  public waitForElementPresent(locator: ElementFinder) {
     const until = protractor.ExpectedConditions;
-    browser.wait(until.presenceOf(elementLocator), 100000);
+    browser.wait(until.visibilityOf(locator), 100000);
   }
 
-  //switching between windows
-  switchToChildWindow() {
+  // waits for the element to be clickable
+  public waitForElementToBeClickable(locator: ElementFinder){
+    const until = protractor.ExpectedConditions;
+    browser.wait(until.elementToBeClickable(locator), 100000).then(function(){
+      locator.click();
+    });
+  }
+  // switching between windows
+  public switchToChildWindow() {
     browser.getAllWindowHandles().then(function(handles) {
-      var count = handles.length;
-      var newWindow = handles[count - 1];
+      const count = handles.length;
+      const newWindow = handles[count - 1];
       browser.switchTo().window(newWindow);
     });
   }
 
-  switchToParentWindow() {
+  public switchToParentWindow() {
     browser.getAllWindowHandles().then(function(handles) {
       browser.switchTo().window(handles[0]);
       browser.driver.executeScript("window.focus();");
     });
   }
-  //waits for the page to load before performing any further operations. waits until the document.ready state becomes interactive or complete and returns the same.
-  async getReadyState() {
+  // waits for the page to load before performing any further operations. waits until the document.ready state becomes interactive or complete and returns the same.
+  public async getReadyState() {
     let states;
     const until = protractor.ExpectedConditions;
     await browser.wait(() => {
@@ -51,20 +59,37 @@ export class BrowserUtil {
     return states;
   }
 
-  //get current url of the page
+  // get current url of the page
   public async getCurrentURL() {
     return await browser.getCurrentUrl().then(url => url);
-    //alternatively we can use : return window.location.href;
-  }
+    }
 
-  //wait for angular enabled
-  waitForAngularEnabledOnCurrentWindow() {
+  // wait for angular enabled
+  public waitForAngularEnabledOnCurrentWindow() {
     return browser.waitForAngularEnabled(true).then(async () => {
       browser.waitForAngular();
     });
   }
 
-  waitForAngularDisabledOnCurrentWindow() {
+  public waitForAngularDisabledOnCurrentWindow() {
     return browser.waitForAngularEnabled(false);
   }
+
+  public scrollIntoView(webelement: ElementFinder) {
+    browser
+      .executeScript("arguments[0].scrollIntoView()", webelement)
+      .then(() => {
+        webelement.click();
+      });
+  }
+
+  public selectAllContent(){
+    browser
+        .actions()
+        .keyDown(protractor.Key.ALT)
+        .sendKeys("a")
+        .keyUp(protractor.Key.ALT)
+        .perform();
+  }
+
 }

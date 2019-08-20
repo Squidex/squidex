@@ -60,6 +60,7 @@ namespace Squidex
             services.AddOptions();
 
             services.AddMyAssetServices(config);
+
             services.AddIcisServices(config);
 
             services.AddMyMvcWithPlugins(config);

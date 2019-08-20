@@ -3,23 +3,23 @@ import { allure } from "jasmine-allure-reporter";
 
 declare const allure: any;
 export let config: Config = {
-  //to auto start Selenium server every time before test through config, we can use the below command instead of the above one
+  // to auto start Selenium server every time before test through config, we can use the below command instead of the above one
   directConnect: true,
-  //seleniumAddress: "http://localhost:4444/wd/hub/",
+  // seleniumAddress: "http://localhost:4444/wd/hub/",
   framework: "jasmine2",
   capabilities: {
     maxInstances: 1,
     browserName: "chrome",
-    //for running in headless mode
-    chromeOptions: {
-      args: ["--headless", "--disable-gpu", "--window-size=800,600"]
-    }
+    // for running in headless mode
+    // chromeOptions: {
+    //   args: ["--headless", "--disable-gpu", "--window-size=800,600"]
+    // }
   },
 
-  //options for Jasmine
+  // options for Jasmine
   jasmineNodeOpts: {
     showColors: true,
-    //Jasmine assertions timeout
+    // Jasmine assertions timeout
     defaultTimeoutInterval: 150000
   },
 
@@ -35,14 +35,14 @@ export let config: Config = {
       })
     );
     const addScreenShots = new (function() {
-      this.specDone = function(result) {
+      this.specDone = (result) => {
         if (result.status === "failed") {
           browser
             .takeScreenshot()
-            .then(function(png) {
+            .then((png) => {
               allure.createAttachment(
                 "Screenshot",
-                function() {
+                () => {
                   return new Buffer(png, "base64");
                 },
                 "image/png"
@@ -52,7 +52,7 @@ export let config: Config = {
         }
       };
     })();
-    //generate a screen shot after each failed test
+    // generate a screen shot after each failed test
     jasmine.getEnv().addReporter(addScreenShots);
 
     browser.driver
@@ -64,7 +64,7 @@ export let config: Config = {
     baseUrl: "https://localhost:5000",
     expectedUrlAfterNavigation: "https://localhost:5000/app"
   },
-  //protractor timeouts
+  // protractor timeouts
   getPageTimeout: 50000,
   allScriptsTimeout: 50000,
   plugins: [],
