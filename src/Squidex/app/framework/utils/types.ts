@@ -101,4 +101,30 @@ export module Types {
 
         return true;
     }
+
+    export function isEmpty(value: any): boolean {
+        if (Types.isArray(value)) {
+            for (let v of value) {
+                if (!isEmpty(v)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        if (Types.isObject(value)) {
+            for (let key in value) {
+                if (value.hasOwnProperty(key)) {
+                    if (!isEmpty(value[key])) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        return Types.isUndefined(value) === true || Types.isNull(value) === true;
+    }
 }

@@ -5,16 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
-import { Sorting } from '@app/shared/internal';
+import {
+    LanguageDto,
+    Query,
+    RootFieldDto,
+    SortMode,
+    Types
+} from '@app/shared/internal';
+
+type Field = string | RootFieldDto;
 
 @Component({
     selector: 'sqx-table-header',
     template: `
         <a *ngIf="sortable; else notSortable" (click)="sort()" class="pointer truncate">
-            <i *ngIf="sorting === 'Ascending'" class="icon-caret-down"></i>
-            <i *ngIf="sorting === 'Descending'" class="icon-caret-up"></i>
+            <i *ngIf="order === 'ascending'" class="icon-caret-down"></i>
+            <i *ngIf="order === 'descending'" class="icon-caret-up"></i>
 
             {{text}}
         </a>
@@ -24,28 +32,72 @@ import { Sorting } from '@app/shared/internal';
         </ng-template>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TableHeaderComponent {
+export class TableHeaderComponent implements OnChanges {
+    private fieldPath: string;
+
     @Input()
     public text: string;
+
+    @Input()
+    public field: Field;
+
+    @Input()
+    public language: LanguageDto;
 
     @Input()
     public sortable = false;
 
     @Input()
-    public sorting: Sorting;
+    public query: Query;
 
     @Output()
-    public sortingChange = new EventEmitter<Sorting>();
+    public queryChange = new EventEmitter<Query>();
 
-    public sort() {
+    public order: SortMode | null;
+
+    public ngOnChanges(changes: SimpleChanges) {
         if (this.sortable) {
-            if (!this.sorting || this.sorting !== 'Ascending') {
-                this.sorting = 'Ascending';
-            } else {
-                this.sorting = 'Descending';
+            if (changes['language'] || changes['field']) {
+                this.fieldPath = getFieldPath(this.language, this.field);
             }
 
-            this.sortingChange.emit(this.sorting);
+            if (changes['query'] && this.fieldPath) {
+                this.order = getSortMode(this.query, this.fieldPath);
+            }
         }
+    }
+
+    public sort() {
+        if (this.sortable && this.fieldPath) {
+            if (!this.order || this.order !== 'ascending') {
+                this.order = 'ascending';
+            } else {
+                this.order = 'descending';
+            }
+
+            this.queryChange.emit(this.newQuery());
+        }
+    }
+
+    private newQuery() {
+        return {...this.query, sort: [{ path: this.fieldPath, order: this.order! }] };
+    }
+}
+
+function getSortMode(query: Query, path: string) {
+    if (path && query && query.sort && query.sort.length === 1 && query.sort[0].path === path) {
+        return query.sort[0].order;
+    }
+
+    return null;
+}
+
+function getFieldPath(language: LanguageDto | undefined, field: Field) {
+    if (Types.isString(field)) {
+        return field;
+    } else if (field.isLocalizable && language) {
+        return `data.${field.name}.${language.iso2Code}`;
+    } else {
+        return `data.${field.name}.iv`;
     }
 }

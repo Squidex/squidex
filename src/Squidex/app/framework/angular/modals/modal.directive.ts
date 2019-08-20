@@ -121,6 +121,10 @@ export class ModalDirective implements OnDestroy {
     }
 
     private subscribeToView() {
+        if (Types.is(this.model, DialogModel)) {
+            return;
+        }
+
         if (this.closeAuto) {
             document.addEventListener('mousedown', this.documentClickListener, true);
 

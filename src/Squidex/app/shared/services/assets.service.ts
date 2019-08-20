@@ -27,6 +27,8 @@ import {
     Versioned
 } from '@app/framework';
 
+import { encodeQuery, Query } from './../state/query';
+
 export class AssetsDto extends ResultSet<AssetDto> {
     public get canCreate() {
         return hasAnyLink(this._links, 'create');
@@ -107,36 +109,41 @@ export class AssetsService {
         return this.http.get<{ [name: string]: number }>(url);
     }
 
-    public getAssets(appName: string, take: number, skip: number, query?: string, tags?: string[], ids?: string[]): Observable<AssetsDto> {
+    public getAssets(appName: string, take: number, skip: number, query?: Query, tags?: string[], ids?: string[]): Observable<AssetsDto> {
         let fullQuery = '';
 
         if (ids) {
             fullQuery = `ids=${ids.join(',')}`;
         } else {
-            const queries: string[] = [];
+            const queryObj: Query = {};
 
-            const filters: string[] = [];
+            const filters: any[] = [];
 
-            if (query && query.length > 0) {
-                filters.push(`contains(fileName,'${encodeURIComponent(query)}')`);
+            if (query && query.fullText && query.fullText.length > 0) {
+                filters.push({ path: 'fileName', op: 'contains', value: query.fullText });
             }
 
             if (tags) {
                 for (let tag of tags) {
                     if (tag && tag.length > 0) {
-                        filters.push(`tags eq '${encodeURIComponent(tag)}'`);
+                        filters.push({ path: 'tags', op: 'eq', value: tag });
                     }
                 }
             }
 
             if (filters.length > 0) {
-                queries.push(`$filter=${filters.join(' and ')}`);
+                queryObj.filter = { and: filters };
             }
 
-            queries.push(`$top=${take}`);
-            queries.push(`$skip=${skip}`);
+            if (take > 0) {
+                queryObj.take = take;
+            }
 
-            fullQuery = queries.join('&');
+            if (skip > 0) {
+                queryObj.skip = skip;
+            }
+
+            fullQuery = `q=${encodeQuery(queryObj)}`;
         }
 
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets?${fullQuery}`);

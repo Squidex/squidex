@@ -21,7 +21,7 @@ import {
     SchemasService,
     StatefulControlComponent,
     Types
-} from '@app/shared';
+} from '@app/shared/internal';
 
 export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesDropdownComponent), multi: true
@@ -38,6 +38,8 @@ interface State {
 
 type ContentName = { name: string, id?: string };
 
+const NO_EMIT = { emitEvent: false };
+
 @Component({
     selector: 'sqx-references-dropdown',
     template: `
@@ -52,12 +54,15 @@ type ContentName = { name: string, id?: string };
     providers: [SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReferencesDropdownComponent extends StatefulControlComponent<State, string[]> implements OnInit {
+export class ReferencesDropdownComponent extends StatefulControlComponent<State, string[] | string> implements OnInit {
     private languageField: AppLanguageDto;
     private selectedId: string | undefined;
 
     @Input()
     public schemaId: string;
+
+    @Input()
+    public mode: 'Array' | 'Single';
 
     @Input()
     public set language(value: AppLanguageDto) {
@@ -84,10 +89,20 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
                 .subscribe((value: ContentName) => {
                     if (value && value.id) {
                         this.callTouched();
-                        this.callChange([value.id]);
+
+                        if (this.mode === 'Single') {
+                            this.callChange(value.id);
+                        } else {
+                            this.callChange([value.id]);
+                        }
                     } else {
                         this.callTouched();
-                        this.callChange([]);
+
+                        if (this.mode === 'Single') {
+                            this.callChange(null);
+                        } else {
+                            this.callChange([]);
+                        }
                     }
                 }));
     }
@@ -119,7 +134,11 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     }
 
     public writeValue(obj: any) {
-        if (Types.isArrayOfString(obj)) {
+        if (Types.isString(obj)) {
+            this.selectedId = obj;
+
+            this.selectContent();
+        } if (Types.isArrayOfString(obj)) {
             this.selectedId = obj[0];
 
             this.selectContent();
@@ -131,11 +150,11 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
     }
 
     private selectContent() {
-        this.selectionControl.setValue(this.snapshot.contentNames.find(x => x.id === this.selectedId), { emitEvent: false });
+        this.selectionControl.setValue(this.snapshot.contentNames.find(x => x.id === this.selectedId), NO_EMIT);
     }
 
     private unselectContent() {
-        this.selectionControl.setValue(undefined, { emitEvent: false });
+        this.selectionControl.setValue(undefined, NO_EMIT);
     }
 
     private createContentNames(schema: SchemaDetailsDto | undefined | null, contents: ContentDto[]): ContentName[] {

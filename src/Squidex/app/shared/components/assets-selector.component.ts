@@ -11,8 +11,8 @@ import {
     AssetDto,
     AssetsState,
     fadeAnimation,
-    FilterState,
     LocalStoreService,
+    Query,
     StatefulComponent
 } from '@app/shared/internal';
 
@@ -36,8 +36,6 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     @Output()
     public select = new EventEmitter<AssetDto[]>();
 
-    public filter = new FilterState();
-
     constructor(changeDector: ChangeDetectorRef,
         public readonly assetsState: AssetsState,
         public readonly localStore: LocalStoreService
@@ -50,12 +48,6 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
     }
 
     public ngOnInit() {
-        this.own(
-            this.assetsState.assetsQuery
-                .subscribe(query => {
-                    this.filter.setQuery(query);
-                }));
-
         this.assetsState.load();
     }
 
@@ -63,8 +55,8 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
         this.assetsState.load(true);
     }
 
-    public search() {
-        this.assetsState.search(this.filter.apiFilter);
+    public search(query: Query) {
+        this.assetsState.search(query);
     }
 
     public emitComplete() {

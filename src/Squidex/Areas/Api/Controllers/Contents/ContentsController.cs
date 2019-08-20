@@ -272,7 +272,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), 201)]
         [ApiPermission(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)

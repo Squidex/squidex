@@ -17,8 +17,19 @@
     </style>
 </head>
 <body>
-    <redoc spec-url="@Url.Content(Model.Specification)"></redoc>
+    <div id="redoc-container"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>
+    <script>
+        Redoc.init('@Url.Content(Model.Specification)', {
+            theme: {
+                colors: {
+                    primary: {
+                        main: '#3f83df'
+                    }
+                }
+            },
+        }, document.getElementById('redoc-container'))
+    </script>
 </body>
 </html>

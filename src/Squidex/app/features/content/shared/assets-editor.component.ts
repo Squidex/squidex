@@ -48,10 +48,10 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsEditorComponent extends StatefulControlComponent<State, string[]> implements OnInit {
-    public assetsDialog = new DialogModel();
-
     @Input()
     public isCompact = false;
+
+    public assetsDialog = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly appsState: AppsState,

@@ -17,7 +17,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 17;
+        private const int CurrentVersion = 18;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -113,6 +113,12 @@ namespace Migrate_01
             if (version < 17)
             {
                 yield return serviceProvider.GetService<RenameSlugField>();
+            }
+
+            // Version 18: Rebuild assets.
+            if (version < 18)
+            {
+                yield return serviceProvider.GetService<RebuildAssets>();
             }
 
             yield return serviceProvider.GetRequiredService<StartEventConsumers>();

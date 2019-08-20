@@ -4,9 +4,9 @@
     </ng-container>
 
     <ng-container content>
-        <a class="sidebar-item" *ngFor="let query of schemaQueries.defaultQueries; trackBy: trackByTag" (click)="search(query.filter)"
-            [class.active]="isSelectedQuery(query.filter)">
-            {{query.name}}
+        <a class="sidebar-item" *ngFor="let default of schemaQueries.defaultQueries; trackBy: trackByTag" (click)="search(default.query)"
+            [class.active]="isSelectedQuery(default)">
+            {{default.name}}
         </a>
 
         <hr />
@@ -14,10 +14,10 @@
         <div class="sidebar-section">
             <h3>Status Queries</h3>
 
-            <a class="sidebar-item status" *ngFor="let query of contentsState.statusQueries | async; trackBy: trackByQuery" (click)="search(query.filter)"
-                [class.active]="isSelectedQuery(query.filter)">
+            <a class="sidebar-item status" *ngFor="let status of contentsState.statusQueries | async; trackBy: trackByQuery" (click)="search(status.query)"
+                [class.active]="isSelectedQuery(status)">
                 
-                <i class="icon-circle" [style.color]="query.color"></i> {{query.name}}
+                <i class="icon-circle" [style.color]="status.color"></i> {{status.name}}
             </a>
         </div>
 
@@ -28,12 +28,12 @@
 
             <ng-container *ngIf="schemaQueries.queries | async; let queries">
                 <ng-container *ngIf="queries.length > 0; else noQuery">
-                    <a class="sidebar-item" *ngFor="let query of queries; trackBy: trackByQuery" (click)="search(query.filter)"
-                        [class.active]="isSelectedQuery(query.filter)">
+                    <a class="sidebar-item" *ngFor="let saved of queries; trackBy: trackByQuery" (click)="search(saved.query)"
+                        [class.active]="isSelectedQuery(saved)">
                         
-                        {{query.name}}
+                        {{saved.name}}
                         
-                        <a class="sidebar-item-remove float-right" (click)="schemaQueries.remove(query.name)">
+                        <a class="sidebar-item-remove float-right" (click)="schemaQueries.remove(saved)" sqxStopClick>
                             <i class="icon-close"></i>
                         </a>
                     </a>

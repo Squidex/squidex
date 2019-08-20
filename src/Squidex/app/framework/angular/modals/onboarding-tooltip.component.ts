@@ -9,8 +9,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy
 import { timer } from 'rxjs';
 
 import {
+    DialogModel,
     fadeAnimation,
-    ModalModel,
     OnboardingService,
     StatefulComponent,
     Types
@@ -38,7 +38,7 @@ export class OnboardingTooltipComponent extends StatefulComponent implements OnD
     @Input()
     public position = 'left';
 
-    public tooltipModal = new ModalModel();
+    public tooltipModal = new DialogModel();
 
     constructor(changeDetector: ChangeDetectorRef,
         private readonly onboardingService: OnboardingService,
