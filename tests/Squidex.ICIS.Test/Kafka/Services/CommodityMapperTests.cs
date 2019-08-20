@@ -27,7 +27,7 @@ namespace Squidex.ICIS.Test.Kafka.Services
                 Data = data
             };
 
-            var result = new CommodityMapper().ToAvro(@event);
+            var result = CommodityMapper.ToAvro(@event);
 
             result.Should().BeEquivalentTo(new Commodity
             {
@@ -50,7 +50,7 @@ namespace Squidex.ICIS.Test.Kafka.Services
                 Data = data
             };
 
-            Assert.Throws<ArgumentException>(() => new CommodityMapper().ToAvro(@event));
+            Assert.Throws<ArgumentException>(() => CommodityMapper.ToAvro(@event));
         }
     }
 }

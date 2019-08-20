@@ -27,7 +27,7 @@ namespace Squidex.ICIS.Test.Kafka.Services
                 Data = data
             };
 
-            var result = new RegionMapper().ToAvro(@event);
+            var result = RegionMapper.ToAvro(@event);
 
             result.Should().BeEquivalentTo(new Region
             {
@@ -50,7 +50,7 @@ namespace Squidex.ICIS.Test.Kafka.Services
                 Data = data
             };
 
-            Assert.Throws<ArgumentException>(() => new RegionMapper().ToAvro(@event));
+            Assert.Throws<ArgumentException>(() => RegionMapper.ToAvro(@event));
         }
     }
 }

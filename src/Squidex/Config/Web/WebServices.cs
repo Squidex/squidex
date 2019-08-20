@@ -12,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
 using Squidex.Domain.Apps.Entities;
-using Squidex.ICIS;
 using Squidex.Pipeline.Plugins;
 using Squidex.Pipeline.Robots;
 using Squidex.Web;

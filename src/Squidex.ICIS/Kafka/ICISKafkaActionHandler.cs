@@ -6,13 +6,11 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.ICIS.Kafka.Entities;
 using Squidex.ICIS.Kafka.Producer;
@@ -28,7 +26,6 @@ namespace Squidex.ICIS.Kafka
         private readonly KafkaProducer<Commodity> kafkaCommodityProducer;
         private readonly KafkaProducer<Region> kafkaRegionProducer;
         private readonly IAppProvider appProvider;
-        private readonly ConcurrentDictionary<string, IAppEntity> commentaryAppDic = new ConcurrentDictionary<string, IAppEntity>();
         private readonly IContentRepository contentRepository;
 
         public ICISKafkaActionHandler(RuleEventFormatter formatter, 
@@ -73,29 +70,24 @@ namespace Squidex.ICIS.Kafka
             
             try
             {
-                if (!commentaryAppDic.ContainsKey("commentary"))
-                {
-                    var app = await appProvider.GetAppAsync("commentary");
-
-                    commentaryAppDic["commentary"] = app;
-                }
+                var app = await appProvider.GetAppAsync(job.Message.AppId.Id);
 
                 switch (job.Message.SchemaId.Name)
                 {
                     case "commentary":
-                        var commentaryData = (Commentary)KafkaMessageFactory.GetKafkaMessage(job.Message.SchemaId.Name, job.Message, commentaryAppDic["commentary"], contentRepository);
+                        var commentaryData = await CommentaryMapper.ToAvroAsync(job.Message, app, contentRepository);
                         await kafkaCommentaryProducer.Send(job.TopicName, commentaryData.Id, commentaryData);
                         break;
                     case "commentary-type":
-                        var commentaryTypeData = (CommentaryType)KafkaMessageFactory.GetKafkaMessage(job.Message.SchemaId.Name, job.Message, commentaryAppDic["commentary"], contentRepository);
+                        var commentaryTypeData = CommentaryTypeMapper.ToAvro(job.Message);
                         await kafkaCommentaryTypeProducer.Send(job.TopicName, commentaryTypeData.Id, commentaryTypeData);
                         break;
                     case "commodity":
-                        var commodityData = (Commodity)KafkaMessageFactory.GetKafkaMessage(job.Message.SchemaId.Name, job.Message, commentaryAppDic["commentary"], contentRepository);
+                        var commodityData = CommodityMapper.ToAvro(job.Message);
                         await kafkaCommodityProducer.Send(job.TopicName, commodityData.Id, commodityData);
                         break;
                     case "region":
-                        var regionData = (Region)KafkaMessageFactory.GetKafkaMessage(job.Message.SchemaId.Name, job.Message, commentaryAppDic["commentary"], contentRepository);
+                        var regionData = RegionMapper.ToAvro(job.Message);
                         await kafkaRegionProducer.Send(job.TopicName, regionData.Id, regionData);
                         break;
                     default:

@@ -27,7 +27,7 @@ namespace Squidex.ICIS.Test.Kafka.Services
                 Data = data
             };
 
-            var result = new CommentaryTypeMapper().ToAvro(@event);
+            var result = CommentaryTypeMapper.ToAvro(@event);
 
             result.Should().BeEquivalentTo(new CommentaryType
             {
@@ -50,7 +50,7 @@ namespace Squidex.ICIS.Test.Kafka.Services
                 Data = data
             };
 
-            Assert.Throws<ArgumentException>(() => new CommentaryTypeMapper().ToAvro(@event));
+            Assert.Throws<ArgumentException>(() => CommentaryTypeMapper.ToAvro(@event));
         }
     }
 }

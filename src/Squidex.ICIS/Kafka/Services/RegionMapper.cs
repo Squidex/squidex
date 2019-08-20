@@ -5,22 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Avro.Specific;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.ICIS.Kafka.Entities;
 
 namespace Squidex.ICIS.Kafka.Services
 {
-    public class RegionMapper : IKafkaMessageMapper
+    public static class RegionMapper
     {
-        public ISpecificRecord ToAvro(EnrichedContentEvent contentEvent)
+        public static Region ToAvro(EnrichedContentEvent contentEvent)
         {
             var data = contentEvent.Data;
 
             var commentaryType = new Region
             {
-                Id = data.GetInvariantString("id"),
-                Name = data.GetInvariantString("name")
+                Id = data.GetString("id"),
+                Name = data.GetString("name")
             };
 
             return commentaryType;

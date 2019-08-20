@@ -7,114 +7,65 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using Avro.Specific;
-using NodaTime.Extensions;
+using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
-using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.ICIS.Kafka.Entities;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.ICIS.Kafka.Services
 {
-    public class CommentaryMapper : IKafkaMessageMapper
+    public static class CommentaryMapper
     {
-        private readonly IContentRepository contentRepository;
-        private readonly IAppEntity commentaryApp;
+        private static readonly Status[] PublishedOnly = new Status[] { Status.Published };
 
-        public CommentaryMapper(IAppEntity commentaryApp, IContentRepository contentRepository)
+        public static async Task<Commentary> ToAvroAsync(EnrichedContentEvent contentEvent, IAppEntity commentaryApp, IContentRepository contentRepository)
         {
-            this.commentaryApp = commentaryApp;
-            this.contentRepository = contentRepository;
-        }
+            var data = contentEvent.Data;
 
-        public ISpecificRecord ToAvro(EnrichedContentEvent contentEvent)
-        {
+            var commentaryTypeDbId = data.GetFirstReference("commentarytype");
+            var commodityDbId = data.GetFirstReference("commodity");
+            var regionDbId = data.GetFirstReference("region");
+
+            var referenced = await contentRepository.QueryAsync(commentaryApp, PublishedOnly, new HashSet<Guid> { commentaryTypeDbId, commodityDbId, regionDbId }, true);
+
+            var commentaryType = referenced.Find(x => x.Content.Id == commentaryTypeDbId).Content;
+            var commentaryTypeId = commentaryType?.Data.GetString("id");
+
+            var commodity = referenced.Find(x => x.Content.Id == commodityDbId).Content;
+            var commodityId = commodity?.Data.GetString("id");
+
+            var region = referenced.Find(x => x.Content.Id == regionDbId).Content;
+            var regionId = region?.Data.GetString("id");
+
+            if (commentaryTypeId == null)
+            {
+                throw new InvalidOperationException("Unable to resolve commentaryType.");
+            }
+
+            if (commodityId == null)
+            {
+                throw new InvalidOperationException("Unable to resolve commodity.");
+            }
+
+            if (region == null)
+            {
+                throw new InvalidOperationException("Unable to resolve region.");
+            }
+
             var commentary = new Commentary
             {
                 Id = contentEvent.Id.ToString(),
-                LastModified = contentEvent.LastModified.ToUnixTimeSeconds()
+                LastModified = contentEvent.LastModified.ToUnixTimeSeconds(),
+                Body = data.GetString("body", "en"),
+                CreatedFor = data.GetTimestamp("createdfor"),
+                CommentaryTypeId = commentaryTypeId,
+                CommodityId = commodityId,
+                RegionId = regionId
             };
 
-            if (!contentEvent.Data.TryGetValue("createdfor", out var createdForData))
-            {
-                throw new Exception("Unable to find Created For field.");
-            }
-
-            commentary.CreatedFor = GetCreatedForTime(createdForData);
-
-            if (!contentEvent.Data.TryGetValue("body", out var bodyData))
-            {
-                throw new Exception("Unable to find Body field.");
-            }
-
-            commentary.Body = bodyData["en"]?.ToString();
-
-            if (!contentEvent.Data.TryGetValue("commentarytype", out var commentaryTypeData))
-            {
-                throw new Exception("Unable to find CommentaryType field.");
-            }
-
-            if (!contentEvent.Data.TryGetValue("commodity", out var commodityData))
-            {
-                throw new Exception("Unable to find Commodity field.");
-            }
-
-            if (!contentEvent.Data.TryGetValue("region", out var regionData))
-            {
-                throw new Exception("Unable to find Region field.");
-            }
-
-            var commentaryTypeDBId = ((Collection<IJsonValue>)commentaryTypeData["iv"])[0].ToString();
-            var commodityDBId = ((Collection<IJsonValue>)commodityData["iv"])[0].ToString();
-            var regionDBId = ((Collection<IJsonValue>)regionData["iv"])[0].ToString();
-
-            var publishedEntities = GetPublishedEntities(string.Join(',', new[] { commentaryTypeDBId, commodityDBId, regionDBId }));
-
-            var commentaryType = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("commentary-type")).Item1;
-            var commodity = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("commodity")).Item1;
-            var region = publishedEntities.Find(x => x.Item2.SchemaDef.Name.Equals("region")).Item1;
-
-            if (!commentaryType.Data.TryGetValue("id", out var commentaryTypeIdData))
-            {
-                throw new Exception("Unable to find commentary-type Id field.");
-            }
-
-            if (!commodity.Data.TryGetValue("id", out var commodityIdData))
-            {
-                throw new Exception("Unable to find commodity Id field.");
-            }
-
-            if (!region.Data.TryGetValue("id", out var regionIdData))
-            {
-                throw new Exception("Unable to find commodity Id field.");
-            }
-
-            commentary.CommentaryTypeId = commentaryTypeIdData["iv"].ToString();
-            commentary.CommodityId = commodityIdData["iv"].ToString();
-            commentary.RegionId = regionIdData["iv"].ToString();
-
             return commentary;
-        }
-
-        private List<(IContentEntity, ISchemaEntity)> GetPublishedEntities(string entityIds)
-        {
-            var entity = this.contentRepository.QueryAsync(this.commentaryApp, new Status[] { Status.Published }, new HashSet<Guid>(Q.Empty.WithIds(entityIds).Ids), false);
-            entity.Wait();
-
-            return entity.Result;
-        }
-
-        private static long GetCreatedForTime(ContentFieldData createdForData)
-        {
-            var time = createdForData["iv"].ToString();
-            return DateTime.Parse(time).ToUniversalTime().ToInstant().ToUnixTimeSeconds();
         }
     }
 }
