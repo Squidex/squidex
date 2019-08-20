@@ -23,9 +23,9 @@ class ScreenshotMaker implements jasmine.CustomReporter {
 
 export let config: Config = {
     // to auto start Selenium server every time before test through config, we can use the below command instead of the above one
-    // directConnect: true,
+    directConnect: true,
     SELENIUM_PROMISE_MANAGER: false,
-    seleniumAddress: 'http://localhost:4444/wd/hub/',
+    // seleniumAddress: 'http://localhost:4444/wd/hub/',
     framework: 'jasmine2',
     capabilities: {
         maxInstances: 1,

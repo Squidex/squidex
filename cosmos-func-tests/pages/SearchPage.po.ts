@@ -1,4 +1,4 @@
-import {  by, element } from 'protractor';
+import { by, element } from 'protractor';
 import { ContentPage } from './ContentPage.po';
 
 export class SearchPage extends ContentPage {
@@ -31,13 +31,11 @@ export class SearchPage extends ContentPage {
         return await element(by.xpath('//div[@class=\'alert alert-dismissible alert-info ng-trigger ng-trigger-fade ng-star-inserted\']/span')).getText();
     }
 
-    public async verifyCommentaryCreation() {
-        let value = null;
-        this.getContent('content');
-        return value = await this.getCommentary(await this.getCommentaryEditorInput());
+    public async getCommentaryCreationFailureMessageText() {
+        return await element(by.xpath('//div[@class=\'alert alert-dismissible alert-danger ng-trigger ng-trigger-fade ng-star-inserted\']/span')).getText();
     }
 
-    public async getContent(contentBody: string) {
+    public async selectContentByText(contentBody: string) {
         await this.getContentsList().then(async (contents) => {
             await contents.filter(async (content) => {
                 await content.getText().then(async (text) => {
@@ -48,30 +46,30 @@ export class SearchPage extends ContentPage {
         });
     }
 
+    public async verifyCommentaryCreation() {
+        this.selectContentByText('content');
+        return await this.getCommentary(await this.getCommentaryEditorInput());
+    }
 
     public async verifyBoldCommentaryCreation() {
-        let value = null;
-        this.getContent('Bold');
-        return value = await this.getCommentary(await this.getBoldContentText());
+        this.selectContentByText('Bold');
+        return await this.getCommentary(await this.getBoldContentText());
     }
 
 
     public async verifyItalicCommentaryCreation() {
-        let value = null;
-        this.getContent('Italic');
-        return value = await this.getCommentary(await this.getItalicContentText());
+        this.selectContentByText('Italic');
+        return await this.getCommentary(await this.getItalicContentText());
     }
 
 
     public async verifyNumberedCommentaryCreation() {
-        let value = null;
-        this.getContent('Numbered');
-        return value = await this.getCommentary(await this.getItalicContentText());
+        this.selectContentByText('Numbered');
+        return await this.getCommentary(await this.getItalicContentText());
     }
 
     public async verifyBulletPointsCommentaryCreation() {
-        let value = null;
-        this.getContent('Bullet');
-        return value = await this.getCommentary(await this.getItalicContentText());
+        this.selectContentByText('Bullet');
+        return await this.getCommentary(await this.getItalicContentText());
     }
 }

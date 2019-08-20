@@ -12,9 +12,10 @@ import {
 export class BrowserUtil {
 
   // waits for element to be present on the DOM - angular
-  public waitForElementToBePresent(locator: ElementFinder, timeout = 100000) {
+  public async waitForElementToBePresent(locator: ElementFinder, timeout = 100000) {
     const until = protractor.ExpectedConditions;
-    return browser.wait(until.visibilityOf(locator), timeout);
+    await browser.wait(until.visibilityOf(locator), timeout);
+    return await locator;
   }
 
   // waits for the element to be clickable and clicks
@@ -53,7 +54,7 @@ export class BrowserUtil {
   }
 
   public async switchToParentWindow() {
-    const handles = await browser.getAllWindowHandles()
+    const handles = await browser.getAllWindowHandles();
     browser.switchTo().window(handles[0]);
     await browser.driver.executeScript('window.focus();');
   }
