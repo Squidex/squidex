@@ -5,13 +5,15 @@ import {
     element,
     protractor
 } from 'protractor';
-
 import { BrowserUtil } from '../utils/Browser.util';
+
 
 export class ContentPage extends BrowserUtil {
 
     // Create Commentary after Navigating to Commentary Page under Content
     public searchResult = element.all(by.xpath('//span[@class=\'truncate ng-star-inserted\']/b'));
+
+    public calendar = element(by.buttonText('Today'));
 
     public async getSearchBar() {
         return await element(by.xpath('//input[@placeholder=\'Search\']'));
@@ -50,11 +52,11 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async getCalender() {
-        return await this.waitForElementToBeVisibleAndClick(element(by.xpath('//input[@aria-label=\'Use the arrow keys to pick a date\']')));
+        return await element(by.xpath('//input[@placeholder=\'Date\']'));
     }
 
-    public async getNewButton() {
-        return await element(by.className('btn btn-success'));
+    public async clickOnNewButton() {
+        return await this.waitForElementToBeVisibleAndClick(await element(by.className('btn btn-success')));
     }
 
     public async saveContent() {
@@ -62,7 +64,11 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async picktodaysDate() {
-        return await this.waitForElementToBeVisibleAndClick(element(by.xpath('//td[@class=\'is-today is-selected\']/button')));
+        return await element(by.buttonText('Today'));
+    }
+
+    public async captureContentValidationMessage() {
+        return await element(by.xpath('//div[@class=\'alert alert-dismissible alert-danger ng-trigger ng-trigger-fade ng-star-inserted\']/span')).getText();
     }
 
     public async navigateToCommentaryAppPage() {
@@ -72,7 +78,7 @@ export class ContentPage extends BrowserUtil {
         await this.waitForElementToBeVisibleAndClick(commentaryApp);
         await this.waitForElementToBeVisibleAndClick(content);
         await this.waitForElementToBeVisibleAndClick(commentarySchema);
-        await this.waitForElementToBeVisibleAndClick(await this.getNewButton());
+        await this.clickOnNewButton();
     }
 
     public async selectRandomReferences() {
@@ -101,8 +107,10 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async selectDate() {
-        await this.getCalender();
-        await this.picktodaysDate();
+        const modelName = '';
+        const modelValue = '2019-09-09';
+        const script = 'angular.element(arguments[0]).scope()' + '.$apply(function(scope){scope[arguments[1]] = arguments[2]})';
+        browser.executeScript(script, this.calendar.getWebElement(), modelName, modelValue);
     }
 
     public async selectCommodity(commodity: string) {
@@ -151,7 +159,7 @@ export class ContentPage extends BrowserUtil {
 
     public async commentaryEditorTest(commentary: string) {
         await this.navigateToCommentaryAppPage();
-        await this.waitForElementToBeVisibleAndClick(await this.getNewButton());
+        await this.clickOnNewButton();
         await this.selectRandomReferences();
         await this.writeCommentary(commentary);
         await this.selectAllContent();

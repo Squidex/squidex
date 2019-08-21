@@ -35,7 +35,7 @@ describe('Create Commentary', () => {
     homePage.userLogout();
   });
 
-  xit('Login with Vega Editor credentials', async () => {
+  it('Login with Vega Editor credentials', async () => {
     await expect(browserPage.getCurrentURL()).toBe(
       config.params.expectedUrlAfterNavigation
     );
@@ -45,7 +45,7 @@ describe('Create Commentary', () => {
 
   using([{ commodityValue: constants.partialCommodityText, commentaryTypeValue: constants.partialCommentaryTypeText, regionValue: constants.partialRegionText },
   { commodityValue: constants.commodity, commentaryTypeValue: constants.commentaryType, regionValue: constants.region }], (data: any) => {
-    xit('should allow the user to search and filter ref data with partial text', async () => {
+    it('should allow the user to search and filter ref data with partial text', async () => {
       await loginPage.navigateToApp();
       await contentPage.navigateToCommentaryAppPage();
       await contentPage.selectDate();
@@ -60,6 +60,23 @@ describe('Create Commentary', () => {
     });
   });
 
+  it('should throw error for duplicate commentaries with same ref data', async () => {
+    await loginPage.navigateToApp();
+    await contentPage.navigateToCommentaryAppPage();
+    await contentPage.selectDate();
+    await contentPage.selectCommodity(constants.duplicateTestCommodity);
+    await contentPage.selectCommentaryType(constants.duplicateTestCommentaryType);
+    await contentPage.selectRegion(constants.duplicateTestRegion);
+    await contentPage.createCommentary(constants.duplicateTestContentBody);
+    await contentPage.clickOnNewButton();
+    await contentPage.selectCommodity(constants.duplicateTestCommodity);
+    await contentPage.selectCommentaryType(constants.duplicateTestCommentaryType);
+    await contentPage.selectRegion(constants.duplicateTestRegion);
+    await contentPage.createCommentary(constants.duplicateTestContentBody);
+    const message = contentPage.captureContentValidationMessage();
+    await expect(message.toString()).toBe(constants.validationErrorMessage);
+  });
+
   it('should throw error for invalid ref data', async () => {
     await loginPage.navigateToApp();
     await contentPage.navigateToCommentaryAppPage();
@@ -72,7 +89,7 @@ describe('Create Commentary', () => {
     await expect(alertMessage).toBe(constants.failureMessage);
   });
 
-  xit('should support Bold text', async () => {
+  it('should support Bold text', async () => {
     await loginPage.navigateToApp();
     await contentPage.navigateToCommentaryAppPage();
     contentPage.createCommentaryWithBoldLetters(constants.boldCommentary);
@@ -80,7 +97,7 @@ describe('Create Commentary', () => {
     await expect(commentaryText).toBe(constants.boldCommentary);
   });
 
-  xit('should support Italic text', async () => {
+  it('should support Italic text', async () => {
     await loginPage.navigateToApp();
     await contentPage.navigateToCommentaryAppPage();
     contentPage.createCommentaryWithItalicFont(constants.italicCommentary);
@@ -88,14 +105,14 @@ describe('Create Commentary', () => {
     await expect(commentaryText).toBe(constants.italicCommentary);
   });
 
-  xit('should support Numbered list', async () => {
+  it('should support Numbered list', async () => {
     await loginPage.navigateToApp();
     contentPage.createNumberedCommentary(constants.numberedList);
     const commentaryText = await searchPage.verifyNumberedCommentaryCreation();
     await expect(commentaryText).toBe(constants.italicCommentary);
   });
 
-  xit('should support Bulleted list', async () => {
+  it('should support Bulleted list', async () => {
     await loginPage.navigateToApp();
     contentPage.createBulletPointsCommentary(constants.bulletPoints);
     const commentaryText = await searchPage.verifyBulletPointsCommentaryCreation();

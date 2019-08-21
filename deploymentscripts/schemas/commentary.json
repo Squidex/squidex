@@ -1,5 +1,19 @@
 {
     "fields":[
+      {
+         "name":"createdfor",
+         "partitioning":"invariant",
+         "properties":{
+            "label":"Created For Date",
+            "isRequired":false,
+            "isListField":false,
+            "isReferenceField":false,
+            "fieldType":"DateTime",
+            "editor":"Date",
+            "isUnique":false,
+            "calculatedDefaultValue":"Today"
+         }
+      },
        {
           "name":"commodity",
           "partitioning":"invariant",
@@ -9,6 +23,7 @@
              "isListField":true,
              "fieldType":"References",
              "editor":"Dropdown",
+             "resolveReference":true,
              "isUnique":true,
              "minItems":1,
              "maxItems":1
@@ -23,6 +38,7 @@
              "isListField":true,
              "fieldType":"References",
              "editor":"Dropdown",
+             "resolveReference":true,
              "isUnique":true,
              "minItems":1,
              "maxItems":1
@@ -37,6 +53,7 @@
             "isListField":true,
             "fieldType":"References",
             "editor":"Dropdown",
+            "resolveReference":true,
             "isUnique":true,
             "minItems":1,
             "maxItems":1

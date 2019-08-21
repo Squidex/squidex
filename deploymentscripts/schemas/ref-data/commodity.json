@@ -19,6 +19,7 @@
         "label": "Name",
         "isRequired": true,
         "isListField": true,
+        "isReferenceField":true,
         "fieldType": "String",
         "editor": "Input"
       }

@@ -11,11 +11,17 @@ const constants = {
   numberedList: 'Numbered List Test',
   alertSuccessMessage: 'Contents created successfully.',
   partialCommentaryTypeText: 'Price',
-  partialCommodityText: 'Sty',
-  partialRegionText: 'Asi',
+  partialCommodityText: 'Tolu',
+  partialRegionText: 'Latin',
   invalidCommentaryTypeText: 'jbiggsgsg',
   invalidpartialCommodityText: 'jbiggsgsg',
   invalidRegionText: 'jbiggsgsg',
-  failureMessage: 'Content element not valid, please check the field with the red bar on the left in all languages (if localizable).'
+  failureMessage: 'Content element not valid, please check the field with the red bar on the left in all languages (if localizable).',
+  date: '2019-09-09',
+  validationErrorMessage: 'A content item with these values already exists.',
+  duplicateTestCommodity: 'Acetone',
+  duplicateTestCommentaryType: 'Analyst Commentary',
+  duplicateTestRegion: 'South East Asia & Pacific',
+  duplicateTestContentBody: 'This is duplicate creation test'
 };
 export default constants;
