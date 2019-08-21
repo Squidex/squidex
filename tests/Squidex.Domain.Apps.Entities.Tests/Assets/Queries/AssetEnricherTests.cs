@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Assets
+namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
     public class AssetEnricherTests
     {

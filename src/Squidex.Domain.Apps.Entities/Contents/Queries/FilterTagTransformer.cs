@@ -31,6 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         public static FilterNode<ClrValue> Transform(FilterNode<ClrValue> nodeIn, Guid appId, ISchemaEntity schema, ITagService tagService)
         {
+            Guard.NotNull(nodeIn, nameof(nodeIn));
             Guard.NotNull(tagService, nameof(tagService));
             Guard.NotNull(schema, nameof(schema));
 
@@ -59,9 +60,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private bool IsTagField(IReadOnlyList<string> path)
         {
-            return schema.SchemaDef.FieldsByName.TryGetValue(path[1], out var field) &&
-                field is IField<TagsFieldProperties> fieldTags &&
-                fieldTags.Properties.Normalization == TagsFieldNormalization.Schema;
+            return schema.SchemaDef.FieldsByName.TryGetValue(path[1], out var field) && IsTagField(field);
+        }
+
+        private bool IsTagField(IField field)
+        {
+            return field is IField<TagsFieldProperties> tags && tags.Properties.Normalization == TagsFieldNormalization.Schema;
         }
     }
 }

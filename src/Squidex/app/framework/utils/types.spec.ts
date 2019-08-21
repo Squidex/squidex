@@ -108,6 +108,50 @@ describe('Types', () => {
 
         expect(Types.jsJsonEquals({ a: 1, b: 2 }, { b: 2, a: 1 })).toBeFalsy();
     });
+
+    it('should not treat zero as empty', () => {
+        expect(Types.isEmpty(0)).toBeFalsy();
+    });
+
+    it('should not treat empty string as empty', () => {
+        expect(Types.isEmpty('')).toBeFalsy();
+    });
+
+    it('should not treat false as empty', () => {
+        expect(Types.isEmpty(false)).toBeFalsy();
+    });
+
+    it('should not treat array with at least one non-empty value as empty', () => {
+        expect(Types.isEmpty([null, 0])).toBeFalsy();
+    });
+
+    it('should not treat array with at least one non-empty value as empty', () => {
+        expect(Types.isEmpty({ a: null, b: 0 })).toBeFalsy();
+    });
+
+    it('should treat empty object as empty', () => {
+        expect(Types.isEmpty({})).toBeTruthy();
+    });
+
+    it('should treat array object as empty', () => {
+        expect(Types.isEmpty([])).toBeTruthy();
+    });
+
+    it('should treat null as empty', () => {
+        expect(Types.isEmpty(null)).toBeTruthy();
+    });
+
+    it('should treat undefined as empty', () => {
+        expect(Types.isEmpty(undefined)).toBeTruthy();
+    });
+
+    it('should treat array of empty values as empty', () => {
+        expect(Types.isEmpty([])).toBeTruthy();
+    });
+
+    it('should treat object of empty values as empty', () => {
+        expect(Types.isEmpty({ a: null, b: null })).toBeTruthy();
+    });
 });
 
 class MyClass {

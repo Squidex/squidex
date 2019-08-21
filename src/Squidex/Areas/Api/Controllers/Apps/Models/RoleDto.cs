@@ -68,7 +68,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             {
                 if (controller.HasPermission(AllPermissions.AppRolesUpdate, app) && NumClients == 0 && NumContributors == 0)
                 {
-                    AddPutLink("update", controller.Url<AppRolesController>(x => nameof(x.UpdateRole), values));
+                    AddPutLink("update", controller.Url<AppRolesController>(x => nameof(x.PutRole), values));
                 }
 
                 if (controller.HasPermission(AllPermissions.AppRolesDelete, app))

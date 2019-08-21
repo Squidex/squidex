@@ -109,7 +109,7 @@ export class ModalDirective implements OnDestroy {
     }
 
     private subscribeToModel(value: Model) {
-        if (isModalModel(value)) {
+        if (isModel(value)) {
             this.currentModel = value;
 
             this.eventsModel.own(value.isOpen.subscribe(update => {
@@ -121,6 +121,10 @@ export class ModalDirective implements OnDestroy {
     }
 
     private subscribeToView() {
+        if (Types.is(this.currentModel, DialogModel)) {
+            return;
+        }
+
         if (this.closeAuto) {
             document.addEventListener('mousedown', this.documentClickListener, true);
 
@@ -171,7 +175,7 @@ export class ModalDirective implements OnDestroy {
     }
 
     private hideModal(model: Model) {
-        if (model && isModalModel(model)) {
+        if (model && isModel(model)) {
             model.hide();
 
             this.eventsView.unsubscribeAll();
@@ -179,6 +183,6 @@ export class ModalDirective implements OnDestroy {
     }
 }
 
-function isModalModel(model: Model): model is DialogModel | ModalModel {
+function isModel(model: Model): model is DialogModel | ModalModel {
     return Types.is(model, DialogModel) || Types.is(model, ModalModel);
 }

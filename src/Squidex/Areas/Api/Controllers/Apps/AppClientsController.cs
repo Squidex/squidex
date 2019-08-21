@@ -72,7 +72,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/clients/")]
-        [ProducesResponseType(typeof(ClientsDto), 200)]
+        [ProducesResponseType(typeof(ClientsDto), 201)]
         [ApiPermission(Permissions.AppClientsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostClient(string app, [FromBody] CreateClientDto request)

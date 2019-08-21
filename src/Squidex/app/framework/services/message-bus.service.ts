@@ -23,7 +23,7 @@ export class MessageBus {
     private message$ = new Subject<Message>();
 
     public emit<T>(message: T): void {
-        const channel = (<any>message.constructor).name;
+        const channel = ((<any>message)['constructor']).name;
 
         this.message$.next({ channel: channel, data: message });
     }

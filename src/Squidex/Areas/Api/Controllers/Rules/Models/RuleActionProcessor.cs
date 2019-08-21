@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Namotion.Reflection;
 using NJsonSchema;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
@@ -47,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
 
                     foreach (var action in ruleRegistry.Actions)
                     {
-                        var derivedSchema = context.SchemaGenerator.Generate(action.Value.Type);
+                        var derivedSchema = context.SchemaGenerator.Generate<JsonSchema>(action.Value.Type.ToContextualType(), context.SchemaResolver);
 
                         var oldName = context.Document.Definitions.FirstOrDefault(x => x.Value == derivedSchema).Key;
 

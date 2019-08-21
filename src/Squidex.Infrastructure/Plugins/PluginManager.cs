@@ -70,13 +70,23 @@ namespace Squidex.Infrastructure.Plugins
             }
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void ConfigureBefore(IApplicationBuilder app)
         {
             Guard.NotNull(app, nameof(app));
 
             foreach (var plugin in loadedPlugins.OfType<IWebPlugin>())
             {
-                plugin.Configure(app);
+                plugin.ConfigureBefore(app);
+            }
+        }
+
+        public void ConfigureAfter(IApplicationBuilder app)
+        {
+            Guard.NotNull(app, nameof(app));
+
+            foreach (var plugin in loadedPlugins.OfType<IWebPlugin>())
+            {
+                plugin.ConfigureAfter(app);
             }
         }
 

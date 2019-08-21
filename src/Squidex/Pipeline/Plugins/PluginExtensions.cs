@@ -57,11 +57,24 @@ namespace Squidex.Pipeline.Plugins
             return mvcBuilder;
         }
 
+        public static void UsePluginsBefore(this IApplicationBuilder app)
+        {
+            var pluginManager = app.ApplicationServices.GetRequiredService<PluginManager>();
+
+            pluginManager.ConfigureBefore(app);
+        }
+
+        public static void UsePluginsAfter(this IApplicationBuilder app)
+        {
+            var pluginManager = app.ApplicationServices.GetRequiredService<PluginManager>();
+
+            pluginManager.ConfigureAfter(app);
+        }
+
         public static void UsePlugins(this IApplicationBuilder app)
         {
             var pluginManager = app.ApplicationServices.GetRequiredService<PluginManager>();
 
-            pluginManager.Configure(app);
             pluginManager.Log(app.ApplicationServices.GetService<ISemanticLog>());
         }
     }

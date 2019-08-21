@@ -34,21 +34,28 @@ namespace Squidex.Areas.Api.Config.OpenApi
             security.TokenUrl = tokenUrl;
 
             SetupDescription(security, tokenUrl);
-
-            security.Flow = OpenApiOAuth2Flow.Application;
-
-            security.Scopes = new Dictionary<string, string>
-            {
-                [Constants.ApiScope] = "Read and write access to the API"
-            };
+            SetupFlow(security);
+            SetupScopes(security);
 
             return security;
         }
 
+        private static void SetupFlow(OpenApiSecurityScheme security)
+        {
+            security.Flow = OpenApiOAuth2Flow.Application;
+        }
+
+        private static void SetupScopes(OpenApiSecurityScheme security)
+        {
+            security.Scopes = new Dictionary<string, string>
+            {
+                [Constants.ApiScope] = "Read and write access to the API"
+            };
+        }
+
         private static void SetupDescription(OpenApiSecurityScheme securityScheme, string tokenUrl)
         {
-            var securityDocs = NSwagHelper.LoadDocs("security");
-            var securityText = securityDocs.Replace("<TOKEN_URL>", tokenUrl);
+            var securityText = NSwagHelper.SecurityDocs.Replace("<TOKEN_URL>", tokenUrl);
 
             securityScheme.Description = securityText;
         }

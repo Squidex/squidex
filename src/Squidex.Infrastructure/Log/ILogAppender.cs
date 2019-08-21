@@ -9,6 +9,6 @@ namespace Squidex.Infrastructure.Log
 {
     public interface ILogAppender
     {
-        void Append(IObjectWriter writer);
+        void Append(IObjectWriter writer, SemanticLogLevel logLevel);
     }
 }
