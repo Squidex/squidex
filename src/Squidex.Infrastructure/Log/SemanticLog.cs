@@ -79,7 +79,7 @@ namespace Squidex.Infrastructure.Log
 
                 for (var i = 0; i < appenders.Length; i++)
                 {
-                    appenders[i].Append(writer);
+                    appenders[i].Append(writer, logLevel);
                 }
 
                 return writer.ToString();

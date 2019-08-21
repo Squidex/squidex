@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = await InvokeCommandAsync(app, command);
 
-            return CreatedAtAction(nameof(SchemasController.GetSchema), new { name = request.Name }, response);
+            return CreatedAtAction(nameof(SchemasController.GetSchema), "Schemas", new { app, name = request.Name }, response);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = await InvokeCommandAsync(app, command);
 
-            return CreatedAtAction(nameof(SchemasController.GetSchema), new { name = request.Name }, response);
+            return CreatedAtAction(nameof(SchemasController.GetSchema), "Schemas", new { app, name = request.Name }, response);
         }
 
         /// <summary>

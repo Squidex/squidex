@@ -123,7 +123,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas
 
             var response = await InvokeCommandAsync(app, command);
 
-            return CreatedAtAction(nameof(GetSchema), new { name = request.Name }, response);
+            return CreatedAtAction(nameof(GetSchema), new { app, name = request.Name }, response);
         }
 
         /// <summary>
