@@ -5,31 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Avro.Specific;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.ICIS.Kafka.Entities;
 
 namespace Squidex.ICIS.Kafka.Services
 {
-    public class CommentaryTypeMapper : IKafkaMessageMapper
+    public static class CommentaryTypeMapper
     {
-        public ISpecificRecord ToAvro(EnrichedContentEvent contentEvent)
+        public static CommentaryType ToAvro(EnrichedContentEvent contentEvent)
         {
-            var commentaryType = new CommentaryType();
+            var data = contentEvent.Data;
 
-            if (!contentEvent.Data.TryGetValue("id", out var idData))
+            var commentaryType = new CommentaryType
             {
-                throw new System.Exception("Unable to find Id field.");
-            }
+                Id = data.GetString("id"),
+                Name = data.GetString("name")
+            };
 
-            commentaryType.Id = idData["iv"].ToString();
-
-            if (!contentEvent.Data.TryGetValue("name", out var nameData))
-            {
-                throw new System.Exception("Unable to find Name field.");
-            }
-
-            commentaryType.Name = nameData["iv"].ToString();
             return commentaryType;
         }
     }
