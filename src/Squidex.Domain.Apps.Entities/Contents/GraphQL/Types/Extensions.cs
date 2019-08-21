@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         public static async Task<IReadOnlyList<T>> LoadManyAsync<TKey, T>(this IDataLoader<TKey, T> dataLoader, ICollection<TKey> keys) where T : class
         {
-            var contents = await Task.WhenAll(keys.Select(x => dataLoader.LoadAsync(x)));
+            var contents = await Task.WhenAll(keys.Select(dataLoader.LoadAsync));
 
             return contents.Where(x => x != null).ToList();
         }

@@ -90,7 +90,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
 
             var response = CommentDto.FromCommand(command);
 
-            return CreatedAtAction(nameof(GetComments), new { commentsId }, response);
+            return CreatedAtAction(nameof(GetComments), new { app, commentsId }, response);
         }
 
         /// <summary>

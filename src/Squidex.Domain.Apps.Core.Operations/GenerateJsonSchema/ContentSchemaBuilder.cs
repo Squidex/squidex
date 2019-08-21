@@ -31,7 +31,8 @@ namespace Squidex.Domain.Apps.Core.GenerateJsonSchema
                     ["created"] = Builder.DateTimeProperty($"The date and time when the {schemaName} content has been created.", true),
                     ["createdBy"] = Builder.StringProperty($"The user that has created the {schemaName} content.", true),
                     ["lastModified"] = Builder.DateTimeProperty($"The date and time when the {schemaName} content has been modified last.", true),
-                    ["lastModifiedBy"] = Builder.StringProperty($"The user that has updated the {schemaName} content last.", true)
+                    ["lastModifiedBy"] = Builder.StringProperty($"The user that has updated the {schemaName} content last.", true),
+                    ["status"] = Builder.StringProperty($"The status of the content.", true)
                 },
                 Type = JsonObjectType.Object
             };

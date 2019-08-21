@@ -10,4 +10,8 @@ To retrieve an access token, the client id must make a request to the token url.
             client_secret=[CLIENT_SECRET]&
 			scope=squidex-api'
 
-[APP_NAME] is the name of your app. You have to create a client to generate an access token.
+`[APP_NAME]` is the name of your app. You have to create a client to generate an access token.
+
+You must send this token in the `Authorization` header when making requests to the API:
+
+     Authorization: Bearer <token>

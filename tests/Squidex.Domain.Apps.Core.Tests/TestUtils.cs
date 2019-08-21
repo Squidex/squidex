@@ -20,6 +20,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
+using Squidex.Infrastructure.Queries.Json;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core
@@ -46,6 +47,7 @@ namespace Squidex.Domain.Apps.Core
                     new AppPatternsConverter(),
                     new ClaimsPrincipalConverter(),
                     new EnvelopeHeadersConverter(),
+                    new FilterConverter(),
                     new InstantConverter(),
                     new JsonValueConverter(),
                     new LanguageConverter(),
@@ -53,6 +55,7 @@ namespace Squidex.Domain.Apps.Core
                     new NamedGuidIdConverter(),
                     new NamedLongIdConverter(),
                     new NamedStringIdConverter(),
+                    new PropertyPathConverter(),
                     new RefTokenConverter(),
                     new RolesConverter(),
                     new RuleConverter(),

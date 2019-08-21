@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public sealed class SynchronizeSchemaDto : UpsertDto
+    public sealed class SynchronizeSchemaDto : UpsertSchemaDto
     {
         /// <summary>
         /// True, when fields should not be deleted.

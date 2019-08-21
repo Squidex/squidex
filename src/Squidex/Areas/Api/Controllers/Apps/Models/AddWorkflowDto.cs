@@ -7,7 +7,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
-using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -19,7 +18,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [Required]
         public string Name { get; set; }
 
-        public ICommand ToCommand()
+        public AddWorkflow ToCommand()
         {
             return new AddWorkflow { Name = Name };
         }

@@ -5,12 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+
 import { BehaviorSubject } from 'rxjs';
 import { IMock,  Mock, Times } from 'typemoq';
 
 import {
+    encodeQuery,
     Queries,
-    Query,
+    SavedQuery,
     UIState
 } from '@app/shared/internal';
 
@@ -18,7 +20,7 @@ describe('Queries', () => {
     const prefix = 'schemas.my-schema';
 
     let uiState: IMock<UIState>;
-    let filter = new BehaviorSubject('');
+
     let queries$ = new BehaviorSubject({});
     let queries: Queries;
 
@@ -29,15 +31,16 @@ describe('Queries', () => {
             .returns(() => queries$);
 
         queries$.next({
-            key1: 'query1',
-            key2: 'query2'
+            key1: '{ "fullText": "text1" }',
+            key2: 'text2',
+            key3: undefined
         });
 
         queries = new Queries(uiState.object, prefix);
     });
 
     it('should load queries', () => {
-        let converted: Query[];
+        let converted: SavedQuery[];
 
         queries.queries.subscribe(x => {
             converted = x;
@@ -46,12 +49,16 @@ describe('Queries', () => {
         expect(converted!).toEqual([
             {
                 name: 'key1',
-                nameSortable: 'KEY1',
-                filter: 'query1'
+                query: { fullText: 'text1' },
+                queryJson: encodeQuery({ fullText: 'text1' })
             }, {
                 name: 'key2',
-                nameSortable: 'KEY2',
-                filter: 'query2'
+                query: { fullText: 'text2' },
+                queryJson: encodeQuery({ fullText: 'text2' })
+            }, {
+                name: 'key3',
+                query: undefined,
+                queryJson: ''
             }
         ]);
     });
@@ -59,25 +66,23 @@ describe('Queries', () => {
     it('should provide key', () => {
         let key: string;
 
-        queries.getSaveKey(filter).subscribe(x => {
+        queries.getSaveKey({}).subscribe(x => {
             key = x!;
         });
 
-        filter.next('query2');
-
-        expect(key!).toEqual('key2');
+        expect(key!).toEqual('key3');
     });
 
     it('should forward add call to state', () => {
-        queries.add('key3', 'filter3');
+        queries.add('key3', { fullText: 'text3' });
 
         expect(true).toBeTruthy();
 
-        uiState.verify(x => x.set('schemas.my-schema.queries.key3', 'filter3'), Times.once());
+        uiState.verify(x => x.set('schemas.my-schema.queries.key3', '{"fullText":"text3"}'), Times.once());
     });
 
     it('should forward remove call to state', () => {
-        queries.remove('key3');
+        queries.remove({ name: 'key3' });
 
         expect(true).toBeTruthy();
 

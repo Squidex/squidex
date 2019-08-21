@@ -19,6 +19,8 @@ export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true
 };
 
+const NO_EMIT = { emitEvent: false };
+
 @Component({
     selector: 'sqx-date-time-editor',
     styleUrls: ['./date-time-editor.component.scss'],
@@ -33,7 +35,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     private suppressEvents = false;
 
     @Input()
-    public mode: string;
+    public mode: 'DateTime' | 'Date';
 
     @Input()
     public enforceTime: boolean;
@@ -104,11 +106,11 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         super.setDisabledState(isDisabled);
 
         if (isDisabled) {
-            this.dateControl.disable({ emitEvent: false });
-            this.timeControl.disable({ emitEvent: false });
+            this.dateControl.disable(NO_EMIT);
+            this.timeControl.disable(NO_EMIT);
         } else {
-            this.dateControl.enable({ emitEvent: false });
-            this.timeControl.enable({ emitEvent: false });
+            this.dateControl.enable(NO_EMIT);
+            this.timeControl.enable(NO_EMIT);
         }
     }
 
@@ -147,8 +149,8 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
     }
 
     public reset() {
-        this.timeControl.setValue(null, { emitEvent: false });
-        this.dateControl.setValue(null, { emitEvent: false });
+        this.timeControl.setValue(null, NO_EMIT);
+        this.dateControl.setValue(null, NO_EMIT);
 
         this.dateValue = null;
 
@@ -188,20 +190,20 @@ export class DateTimeEditorComponent extends StatefulControlComponent<{}, string
         this.suppressEvents = true;
 
         if (this.timeValue && this.timeValue.isValid()) {
-            this.timeControl.setValue(this.timeValue.format('HH:mm:ss'), { emitEvent: false });
+            this.timeControl.setValue(this.timeValue.format('HH:mm:ss'), NO_EMIT);
         } else {
-            this.timeControl.setValue(null, { emitEvent: false });
+            this.timeControl.setValue(null, NO_EMIT);
         }
 
         if (this.dateValue && this.dateValue.isValid() && this.picker) {
             const dateString = this.dateValue.format('YYYY-MM-DD');
             const dateLocal = moment(dateString);
 
-            this.dateControl.setValue(dateString, { emitEvent: false });
+            this.dateControl.setValue(dateString, NO_EMIT);
 
             this.picker.setMoment(dateLocal);
         } else {
-            this.dateControl.setValue(null, { emitEvent: false });
+            this.dateControl.setValue(null, NO_EMIT);
         }
 
         this.suppressEvents = false;

@@ -69,12 +69,13 @@ namespace Squidex.Extensions.Actions.Discourse
         {
             using (var httpClient = httpClientFactory.CreateClient())
             {
-                var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
+                using (var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
                 {
                     Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
-                };
-
-                return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
+                })
+                {
+                    return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
+                }
             }
         }
     }

@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
+using Squidex.Infrastructure.Queries.Json;
 
 namespace Squidex.Config.Domain
 {
@@ -34,6 +35,7 @@ namespace Squidex.Config.Domain
                 new AppPatternsConverter(),
                 new ClaimsPrincipalConverter(),
                 new EnvelopeHeadersConverter(),
+                new FilterConverter(),
                 new InstantConverter(),
                 new JsonValueConverter(),
                 new LanguageConverter(),
@@ -41,6 +43,7 @@ namespace Squidex.Config.Domain
                 new NamedGuidIdConverter(),
                 new NamedLongIdConverter(),
                 new NamedStringIdConverter(),
+                new PropertyPathConverter(),
                 new RefTokenConverter(),
                 new RolesConverter(),
                 new RuleConverter(),

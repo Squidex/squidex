@@ -16,7 +16,7 @@ Please join our community forum: https://support.squidex.io
 
 ## Status
 
-Current Version 3.0.0. Roadmap: https://trello.com/b/KakM4F3S/squidex-roadmap
+Current Version ![GitHub release](https://img.shields.io/github/release/squidex/squidex) Roadmap: https://trello.com/b/KakM4F3S/squidex-roadmap
 
 ## Prerequisites
 
@@ -39,6 +39,7 @@ Current Version 3.0.0. Roadmap: https://trello.com/b/KakM4F3S/squidex-roadmap
 * [guohai](https://github.com/seamys): FTP asset store support, Email rule support, custom editors and bug fixes.
 * [pushrbx](https://pushrbx.net/): Azure Store support.
 * [razims](https://github.com/razims): GridFS support.
+* [sauravvijay](ttps://github.com/sauravvijay): Kafka Rule action.
 
 ## Contributing
 

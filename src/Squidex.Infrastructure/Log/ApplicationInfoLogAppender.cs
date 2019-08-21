@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.Log
             applicationSessionId = applicationSession.ToString();
         }
 
-        public void Append(IObjectWriter writer)
+        public void Append(IObjectWriter writer, SemanticLogLevel logLevel)
         {
             writer.WriteObject("app", w => w
                 .WriteProperty("name", applicationName)

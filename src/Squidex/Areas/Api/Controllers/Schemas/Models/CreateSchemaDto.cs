@@ -10,7 +10,7 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public sealed class CreateSchemaDto : UpsertDto
+    public sealed class CreateSchemaDto : UpsertSchemaDto
     {
         /// <summary>
         /// The name of the schema.
