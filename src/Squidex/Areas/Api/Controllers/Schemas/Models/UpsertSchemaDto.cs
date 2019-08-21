@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Schemas.Models
 {
-    public abstract class UpsertDto
+    public abstract class UpsertSchemaDto
     {
         /// <summary>
         /// The optional properties.
@@ -44,7 +44,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public bool IsPublished { get; set; }
 
-        public static TCommand ToCommand<TCommand, TDto>(TDto dto, TCommand command) where TCommand : UpsertCommand where TDto : UpsertDto
+        public static TCommand ToCommand<TCommand, TDto>(TDto dto, TCommand command) where TCommand : UpsertCommand where TDto : UpsertSchemaDto
         {
             SimpleMapper.Map(dto, command);
 
@@ -68,18 +68,18 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
 
                 foreach (var rootFieldDto in dto.Fields)
                 {
-                    var rootProps = rootFieldDto?.Properties.ToProperties();
+                    var rootProps = rootFieldDto?.Properties?.ToProperties();
                     var rootField = new UpsertSchemaField { Properties = rootProps };
 
                     SimpleMapper.Map(rootFieldDto, rootField);
 
-                    if (rootFieldDto.Nested?.Count > 0)
+                    if (rootFieldDto?.Nested?.Count > 0)
                     {
                         rootField.Nested = new List<UpsertSchemaNestedField>();
 
                         foreach (var nestedFieldDto in rootFieldDto.Nested)
                         {
-                            var nestedProps = nestedFieldDto?.Properties.ToProperties();
+                            var nestedProps = nestedFieldDto?.Properties?.ToProperties();
                             var nestedField = new UpsertSchemaNestedField { Properties = nestedProps };
 
                             SimpleMapper.Map(nestedFieldDto, nestedField);

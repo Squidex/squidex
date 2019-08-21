@@ -14,7 +14,7 @@ namespace Squidex.Infrastructure.Security
     public class PermissionTests
     {
         [Fact]
-        public void Should_generate_permissions()
+        public void Should_generate_permission()
         {
             var sut = new Permission("app.contents");
 
@@ -23,112 +23,133 @@ namespace Squidex.Infrastructure.Security
         }
 
         [Fact]
-        public void Should_check_when_permissions_are_not_equal()
+        public void Should_allow_and_include_when_permissions_are_equal()
+        {
+            var g = new Permission("app.contents");
+            var r = new Permission("app.contents");
+
+            Assert.True(g.Allows(r));
+            Assert.True(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_not_allow_and_include_when_permissions_are_not_equal()
         {
             var g = new Permission("app.contents");
             var r = new Permission("app.assets");
 
             Assert.False(g.Allows(r));
-
             Assert.False(g.Includes(r));
         }
 
         [Fact]
-        public void Should_check_when_permissions_are_equal_with_wildcards()
+        public void Should_allow_and_include_when_permissions_have_same_wildcards()
         {
             var g = new Permission("app.*");
             var r = new Permission("app.*");
 
             Assert.True(g.Allows(r));
-
             Assert.True(g.Includes(r));
         }
 
         [Fact]
-        public void Should_check_when_equal_permissions()
-        {
-            var g = new Permission("app.contents");
-            var r = new Permission("app.contents");
-
-            Assert.True(g.Allows(r));
-
-            Assert.True(g.Includes(r));
-        }
-
-        [Fact]
-        public void Should_check_when_given_is_parent_of_requested()
+        public void Should_allow_and_include_when_given_is_parent_of_requested()
         {
             var g = new Permission("app");
             var r = new Permission("app.contents");
 
             Assert.True(g.Allows(r));
-
             Assert.True(g.Includes(r));
         }
 
         [Fact]
-        public void Should_check_when_requested_is_parent_of_given()
+        public void Should_not_allow_but_include_when_requested_is_parent_of_given()
         {
             var g = new Permission("app.contents");
             var r = new Permission("app");
 
             Assert.False(g.Allows(r));
-
             Assert.True(g.Includes(r));
         }
 
         [Fact]
-        public void Should_check_when_given_is_wildcard_of_requested()
+        public void Should_allow_and_include_when_given_is_wildcard_of_requested()
         {
             var g = new Permission("app.*");
             var r = new Permission("app.contents");
 
             Assert.True(g.Allows(r));
-
             Assert.True(g.Includes(r));
         }
 
         [Fact]
-        public void Should_check_when_requested_is_wildcard_of_given()
+        public void Should_not_allow_but_include_when_given_is_wildcard_of_requested()
         {
             var g = new Permission("app.contents");
             var r = new Permission("app.*");
 
             Assert.False(g.Allows(r));
-
             Assert.True(g.Includes(r));
         }
 
         [Fact]
-        public void Should_check_when_given_is_has_alternatives_of_requested()
+        public void Should_allow_and_include_when_given_has_alternatives_of_requested()
         {
             var g = new Permission("app.contents|schemas");
             var r = new Permission("app.contents");
 
             Assert.True(g.Allows(r));
-
             Assert.True(g.Includes(r));
         }
 
         [Fact]
-        public void Should_check_when_requested_is_has_alternatives_of_given()
+        public void Should_allow_and_include_when_given_has_not_excluded_requested()
+        {
+            var g = new Permission("app.^schemas");
+            var r = new Permission("app.contents");
+
+            Assert.True(g.Allows(r));
+            Assert.True(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_allow_and_include_when_requested_has_not_excluded_given()
+        {
+            var g = new Permission("app.contents");
+            var r = new Permission("app.^schemas");
+
+            Assert.True(g.Allows(r));
+            Assert.True(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_not_allow_and_include_when_given_has_excluded_requested()
+        {
+            var g = new Permission("app.^contents");
+            var r = new Permission("app.contents");
+
+            Assert.False(g.Allows(r));
+            Assert.False(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_not_allow_and_include_when_given_and_requested_have_same_exclusion()
+        {
+            var g = new Permission("app.^contents");
+            var r = new Permission("app.^contents");
+
+            Assert.True(g.Allows(r));
+            Assert.True(g.Includes(r));
+        }
+
+        [Fact]
+        public void Should_allow_and_include_when_requested_is_has_alternatives_of_given()
         {
             var g = new Permission("app.contents");
             var r = new Permission("app.contents|schemas");
 
             Assert.True(g.Allows(r));
-
             Assert.True(g.Includes(r));
-        }
-
-        [Fact]
-        public void Should_check_when_requested_is_null()
-        {
-            var g = new Permission("app.contents");
-
-            Assert.False(g.Allows(null));
-
-            Assert.False(g.Includes(null));
         }
 
         [Fact]

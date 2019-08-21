@@ -28,7 +28,7 @@
     </div>
 </div>
 
-<ng-container *sqxModal="selectorDialog">
+<ng-container *sqxModal="selectorDialog;closeAuto:false">
     <sqx-contents-selector 
         [allowDuplicates]="allowDuplicates"
         [alreadySelected]="snapshot.contentItems"

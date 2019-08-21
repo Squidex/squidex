@@ -38,7 +38,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         protected readonly IAppEntity app;
         protected readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
         protected readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-        protected readonly IDependencyResolver dependencyResolver;
         protected readonly IJsonSerializer serializer = TestUtils.CreateSerializer(TypeNameHandling.None);
         protected readonly ISchemaEntity schema;
         protected readonly Context requestContext;
@@ -219,6 +218,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                 [typeof(IContentQueryService)] = contentQuery,
                 [typeof(IDataLoaderContextAccessor)] = dataLoaderContext,
                 [typeof(IGraphQLUrlGenerator)] = new FakeUrlGenerator(),
+                [typeof(IOptions<AssetOptions>)] = Options.Create(new AssetOptions()),
+                [typeof(IOptions<ContentOptions>)] = Options.Create(new ContentOptions()),
                 [typeof(ISemanticLog)] = A.Fake<ISemanticLog>(),
                 [typeof(DataLoaderDocumentListener)] = new DataLoaderDocumentListener(dataLoaderContext)
             };

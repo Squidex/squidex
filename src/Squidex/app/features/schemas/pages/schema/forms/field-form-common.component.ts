@@ -18,7 +18,7 @@ import { FieldDto } from '@app/shared';
                 <label class="col-3 col-form-label" for="{{field.fieldId}}_fieldName">Name</label>
 
                 <div class="col-6">
-                    <input type="text" class="form-control" id="{{field.fieldId}}_fieldName" readonly [ngModel]="field.name" [ngModelOptions]="{standalone: true}" />
+                    <input type="text" class="form-control" id="{{field.fieldId}}_fieldName" readonly [ngModel]="field.name" [ngModelOptions]="standalone" />
 
                     <sqx-form-hint>
                         The name of the field in the API response.
@@ -87,6 +87,8 @@ import { FieldDto } from '@app/shared';
     `
 })
 export class FieldFormCommonComponent implements OnInit {
+    public readonly standalone = { standalone: true };
+
     @Input()
     public editForm: FormGroup;
 

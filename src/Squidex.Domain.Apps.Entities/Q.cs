@@ -20,9 +20,16 @@ namespace Squidex.Domain.Apps.Entities
 
         public string ODataQuery { get; private set; }
 
+        public string JsonQuery { get; private set; }
+
         public Q WithODataQuery(string odataQuery)
         {
             return Clone(c => c.ODataQuery = odataQuery);
+        }
+
+        public Q WithJsonQuery(string jsonQuery)
+        {
+            return Clone(c => c.JsonQuery = jsonQuery);
         }
 
         public Q WithIds(params Guid[] ids)

@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.MongoDb.Queries
         {
             var propertyName = string.Join(".", sort.Path);
 
-            if (sort.SortOrder == SortOrder.Ascending)
+            if (sort.Order == SortOrder.Ascending)
             {
                 return Builders<T>.Sort.Ascending(propertyName);
             }

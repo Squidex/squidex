@@ -11,14 +11,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Contents.Edm;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -32,7 +29,7 @@ using Xunit;
 
 #pragma warning disable SA1401 // Fields must be private
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
     public class ContentQueryServiceTests
     {
@@ -51,8 +48,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly NamedContentData contentTransformed = new NamedContentData();
         private readonly ClaimsPrincipal user;
         private readonly ClaimsIdentity identity = new ClaimsIdentity();
-        private readonly EdmModelBuilder modelBuilder = new EdmModelBuilder(new MemoryCache(Options.Create(new MemoryCacheOptions())));
         private readonly Context requestContext;
+        private readonly ContentQueryParser queryParser = A.Fake<ContentQueryParser>();
         private readonly ContentQueryService sut;
 
         public static IEnumerable<object[]> ApiStatusTests = new[]
@@ -77,7 +74,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             SetupEnricher();
 
-            var options = Options.Create(new ContentOptions { DefaultPageSize = 30 });
+            A.CallTo(() => queryParser.ParseQuery(requestContext, schema, A<Q>.Ignored))
+                .Returns(new ClrQuery());
 
             sut = new ContentQueryService(
                 appProvider,
@@ -86,16 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
                 contentRepository,
                 contentVersionLoader,
                 scriptEngine,
-                options,
-                modelBuilder);
-        }
-
-        [Fact]
-        public void Should_provide_default_page_size()
-        {
-            var result = sut.DefaultPageSizeGraphQl;
-
-            Assert.Equal(20, result);
+                queryParser);
         }
 
         [Fact]
@@ -136,38 +125,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
             var ctx = requestContext;
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetSchemaOrThrowAsync(ctx, schemaId.Name));
-        }
-
-        [Fact]
-        public async Task Should_apply_default_page_size()
-        {
-            SetupUser(isFrontend: false);
-            SetupSchemaFound();
-
-            var query = Q.Empty;
-
-            await sut.QueryAsync(requestContext, schemaId.Name, query);
-
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(Status.Published), false,
-                    A<ClrQuery>.That.Is("Take: 30; Sort: lastModified Descending"), false))
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_limit_number_of_contents()
-        {
-            var status = new[] { Status.Published };
-
-            SetupUser(isFrontend: false);
-            SetupSchemaFound();
-
-            var query = Q.Empty.WithODataQuery("$top=300&$skip=20");
-
-            await sut.QueryAsync(requestContext, schemaId.Name, query);
-
-            A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), false,
-                    A<ClrQuery>.That.Is("Skip: 20; Take: 200; Sort: lastModified Descending"), false))
-                .MustHaveHappened();
         }
 
         [Fact]
@@ -318,17 +275,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             A.CallTo(() => scriptEngine.Transform(A<ScriptContext>.Ignored, A<string>.Ignored))
                 .MustHaveHappened(count, Times.Exactly);
-        }
-
-        [Fact]
-        public async Task Should_throw_if_query_is_invalid()
-        {
-            SetupUser(isFrontend: false);
-            SetupSchemaFound();
-
-            var query = Q.Empty.WithODataQuery("$filter=invalid");
-
-            await Assert.ThrowsAsync<ValidationException>(() => sut.QueryAsync(requestContext, schemaId.Name, query));
         }
 
         [Fact]
@@ -489,7 +435,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private void SetupContents(Status[] status, int total, List<Guid> ids, bool includeDraft)
         {
             A.CallTo(() => contentRepository.QueryAsync(app, schema, A<Status[]>.That.Is(status), A<HashSet<Guid>>.Ignored, includeDraft))
-                .Returns(ResultList.Create(total, ids.Select(x => CreateContent(x)).Shuffle()));
+                .Returns(ResultList.Create(total, ids.Select(CreateContent).Shuffle()));
         }
 
         private void SetupContents(Status[] status, List<Guid> ids, bool includeDraft)

@@ -2,13 +2,11 @@
     <div class="card-header">
         <div class="row no-gutters">
             <div class="col col-name">
-                <div class="row">
-                    <sqx-editable-title 
-                        [name]="client.name"
-                        (nameChanged)="rename($event)"
-                        [disabled]="!client.canUpdate">
-                    </sqx-editable-title>
-                </div>
+                <sqx-editable-title 
+                    [name]="client.name"
+                    (nameChanged)="rename($event)"
+                    [disabled]="!client.canUpdate">
+                </sqx-editable-title>
             </div>
             <div class="col-auto">
                 <button type="button" class="btn btn-primary" (click)="connect()">Connect</button>

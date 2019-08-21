@@ -26,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 .Returns(new Dictionary<string, string> { ["name1"] = "id1" });
 
             var source = ClrFilter.Eq("tags", "name1");
+
             var result = FilterTagTransformer.Transform(source, appId, tagService);
 
             Assert.Equal("tags == 'id1'", result.ToString());
@@ -38,6 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
                 .Returns(new Dictionary<string, string>());
 
             var source = ClrFilter.Eq("tags", "name1");
+
             var result = FilterTagTransformer.Transform(source, appId, tagService);
 
             Assert.Equal("tags == 'name1'", result.ToString());
@@ -47,6 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
         public void Should_not_normalize_other_field()
         {
             var source = ClrFilter.Eq("other", "value");
+
             var result = FilterTagTransformer.Transform(source, appId, tagService);
 
             Assert.Equal("other == 'value'", result.ToString());

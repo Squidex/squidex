@@ -39,19 +39,13 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
             {
                 new CreateIndexModel<MongoAssetEntity>(
                     Index
-                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.IndexedAppId)
                         .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.FileName)
                         .Ascending(x => x.Tags)
                         .Descending(x => x.LastModified)),
                 new CreateIndexModel<MongoAssetEntity>(
                     Index
-                        .Ascending(x => x.AppId)
-                        .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.FileHash)),
-                new CreateIndexModel<MongoAssetEntity>(
-                    Index
-                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.IndexedAppId)
                         .Ascending(x => x.IsDeleted)
                         .Ascending(x => x.Slug))
             }, ct);
