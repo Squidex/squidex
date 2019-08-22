@@ -15,6 +15,8 @@ export class ContentPage extends BrowserUtil {
 
     public calendar = element(by.xpath('//div[@class=\'input-group\']/input'));
 
+    public getCommentaryEditor = element(by.xpath('//iframe[@src=\'https://localhost:5000/editors/toastui/md-editor.html\']'));
+
     public async getSearchBar() {
         return await element(by.xpath('//input[@placeholder=\'Search\']'));
     }
@@ -47,9 +49,9 @@ export class ContentPage extends BrowserUtil {
         );
     }
 
-    public async getCommentaryEditor() {
-        return await element(by.xpath('//iframe[@src=\'https://localhost:5000/editors/toastui/md-editor.html\']')).getWebElement();
-    }
+    // public async getCommentaryEditor() {
+    //     return await element(by.xpath('//iframe[@src=\'https://localhost:5000/editors/toastui/md-editor.html\']'));
+    // }
 
     public async getEditorToolBarOptions(option: string) {
         return await element(by.className(option));
@@ -137,8 +139,8 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async getCommentary(contentEntryPlaceHolder: ElementFinder) {
-        browser.sleep(5000);
-        const editorFrame = await this.getCommentaryEditor();
+        await this.waitForElementToBePresent(await this.getCommentaryEditor);
+        const editorFrame = await this.getCommentaryEditor.getWebElement();
         try {
             await browser.switchTo().frame(editorFrame);
             return await contentEntryPlaceHolder.getText();
@@ -149,7 +151,7 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async writeCommentary(commentaryText: string) {
-        const editorFrame = await this.getCommentaryEditor();
+        const editorFrame = await this.getCommentaryEditor;
         try {
             await browser.switchTo().frame(editorFrame);
             const editor = await this.getCommentaryEditorInput();

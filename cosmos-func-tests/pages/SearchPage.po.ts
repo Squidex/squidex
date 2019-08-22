@@ -1,4 +1,4 @@
-import { browser, by, element } from 'protractor';
+import { by, element } from 'protractor';
 import { ContentPage } from './ContentPage.po';
 
 export class SearchPage extends ContentPage {
@@ -52,7 +52,7 @@ export class SearchPage extends ContentPage {
 
     public async verifyCommentaryCreation() {
         await this.selectContentByText('content');
-        await browser.sleep(6000);
+        await this.waitForElementToBePresent(await this.getCommentaryEditor);
         return await this.getCommentary(await this.getCommentaryEditorInput());
     }
 
