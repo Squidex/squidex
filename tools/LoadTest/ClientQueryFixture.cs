@@ -36,13 +36,13 @@ namespace LoadTest
                     {
                         Name = TestClient.TestSchemaName,
                         Fields = new List<UpsertSchemaFieldDto>
-                    {
-                        new UpsertSchemaFieldDto
                         {
-                            Name = TestClient.TestSchemaName,
-                            Properties = new NumberFieldPropertiesDto()
-                        }
-                    },
+                            new UpsertSchemaFieldDto
+                            {
+                                Name = TestClient.TestSchemaField,
+                                Properties = new NumberFieldPropertiesDto()
+                            }
+                        },
                         IsPublished = true
                     });
                 }

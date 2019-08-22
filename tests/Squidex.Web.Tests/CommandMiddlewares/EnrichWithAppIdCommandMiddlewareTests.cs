@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Entities;
@@ -23,7 +24,7 @@ namespace Squidex.Web.CommandMiddlewares
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly Context appContext = new Context();
+        private readonly Context appContext = new Context(new ClaimsPrincipal());
         private readonly EnrichWithAppIdCommandMiddleware sut;
 
         public EnrichWithAppIdCommandMiddlewareTests()

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Claims;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Squidex.Domain.Apps.Entities;
@@ -25,7 +26,7 @@ namespace Squidex.Web
                 {
                     if (asyncLocal.Value == null)
                     {
-                        asyncLocal.Value = new Context();
+                        asyncLocal.Value = new Context(new ClaimsPrincipal(new ClaimsIdentity()));
                     }
 
                     return asyncLocal.Value;

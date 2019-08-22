@@ -19,7 +19,7 @@ namespace Squidex.Web
 
             if (context == null)
             {
-                context = new Context { User = httpContext.User };
+                context = new Context(httpContext.User);
 
                 foreach (var header in httpContext.Request.Headers)
                 {

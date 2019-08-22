@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
@@ -21,27 +22,32 @@ namespace Squidex.Domain.Apps.Entities
 
         public IAppEntity App { get; set; }
 
-        public ClaimsPrincipal User { get; set; }
+        public ClaimsPrincipal User { get; }
 
-        public PermissionSet Permissions
-        {
-            get { return User?.Permissions() ?? PermissionSet.Empty; }
-        }
+        public PermissionSet Permissions { get; private set; } = PermissionSet.Empty;
 
-        public bool IsFrontendClient
-        {
-            get { return User != null && User.IsInClient(DefaultClients.Frontend); }
-        }
+        public bool IsFrontendClient { get; private set; }
 
-        public Context()
+        public Context(ClaimsPrincipal user)
         {
+            Guard.NotNull(user, nameof(user));
+
+            User = user;
+
+            UpdatePermissions();
         }
 
         public Context(ClaimsPrincipal user, IAppEntity app)
+            : this(user)
         {
-            User = user;
-
             App = app;
+        }
+
+        public void UpdatePermissions()
+        {
+            Permissions = User.Permissions();
+
+            IsFrontendClient = User.IsInClient(DefaultClients.Frontend);
         }
 
         public Context Clone()

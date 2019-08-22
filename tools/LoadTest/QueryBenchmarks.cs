@@ -133,14 +133,13 @@ namespace LoadTest
 
             var avg = elapsedMs.Average();
 
+            Assert.Equal(0, errors);
+            Assert.Equal(count, numUsers * numIterationsPerUser);
+
             Assert.InRange(max, 0, expectedAvg * 10);
             Assert.InRange(min, 0, expectedAvg);
 
             Assert.InRange(avg, 0, expectedAvg);
-
-            Assert.Equal(0, errors);
-
-            Assert.Equal(count, numUsers * numIterationsPerUser);
         }
     }
 }
