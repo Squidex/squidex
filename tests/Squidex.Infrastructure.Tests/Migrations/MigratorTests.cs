@@ -152,9 +152,9 @@ namespace Squidex.Infrastructure.Migrations
 
             var sut = new Migrator(status, path, log);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.MigrateAsync());
+            await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync());
 
-            A.CallTo(() => log.Log<None>(SemanticLogLevel.Fatal, default, A<Action<None, IObjectWriter>>.Ignored))
+            A.CallTo(() => log.Log(SemanticLogLevel.Fatal, default, A<Action<None, IObjectWriter>>.Ignored))
                 .MustHaveHappened();
 
             A.CallTo(() => migrator_1_2.UpdateAsync())

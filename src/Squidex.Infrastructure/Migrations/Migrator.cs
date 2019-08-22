@@ -84,7 +84,7 @@ namespace Squidex.Infrastructure.Migrations
                                 .WriteProperty("status", "Failed")
                                 .WriteProperty("migrator", name));
 
-                            throw;
+                            throw new MigrationFailedException(name, ex);
                         }
                     }
 
