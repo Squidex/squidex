@@ -89,11 +89,15 @@ namespace Squidex.Infrastructure.Migrations
 
             await sut.MigrateAsync();
 
-            A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened();
-            A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened();
-            A.CallTo(() => migrator_2_3.UpdateAsync()).MustHaveHappened();
+            A.CallTo(() => migrator_0_1.UpdateAsync())
+                .MustHaveHappened();
+            A.CallTo(() => migrator_1_2.UpdateAsync())
+                .MustHaveHappened();
+            A.CallTo(() => migrator_2_3.UpdateAsync())
+                .MustHaveHappened();
 
-            A.CallTo(() => status.UnlockAsync(3)).MustHaveHappened();
+            A.CallTo(() => status.UnlockAsync(3))
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -109,9 +113,12 @@ namespace Squidex.Infrastructure.Migrations
 
             await Assert.ThrowsAsync<ArgumentException>(sut.MigrateAsync);
 
-            A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened();
-            A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened();
-            A.CallTo(() => migrator_2_3.UpdateAsync()).MustNotHaveHappened();
+            A.CallTo(() => migrator_0_1.UpdateAsync())
+                .MustHaveHappened();
+            A.CallTo(() => migrator_1_2.UpdateAsync())
+                .MustHaveHappened();
+            A.CallTo(() => migrator_2_3.UpdateAsync())
+                .MustNotHaveHappened();
 
             A.CallTo(() => status.UnlockAsync(0)).MustHaveHappened();
         }
@@ -126,8 +133,32 @@ namespace Squidex.Infrastructure.Migrations
 
             await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(sut.MigrateAsync)));
 
-            A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened(1, Times.Exactly);
-            A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened(1, Times.Exactly);
+            A.CallTo(() => migrator_0_1.UpdateAsync())
+                .MustHaveHappened(1, Times.Exactly);
+            A.CallTo(() => migrator_1_2.UpdateAsync())
+                .MustHaveHappened(1, Times.Exactly);
+        }
+
+        [Fact]
+        public async Task Should_log_exception_when_migration_failed()
+        {
+            var migrator_0_1 = BuildMigration(0, 1);
+            var migrator_1_2 = BuildMigration(1, 2);
+
+            var ex = new InvalidOperationException();
+
+            A.CallTo(() => migrator_0_1.UpdateAsync())
+                .Throws(ex);
+
+            var sut = new Migrator(status, path, log);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sut.MigrateAsync());
+
+            A.CallTo(() => log.Log<None>(SemanticLogLevel.Fatal, default, A<Action<None, IObjectWriter>>.Ignored))
+                .MustHaveHappened();
+
+            A.CallTo(() => migrator_1_2.UpdateAsync())
+                .MustNotHaveHappened();
         }
 
         private IMigration BuildMigration(int fromVersion, int toVersion)
