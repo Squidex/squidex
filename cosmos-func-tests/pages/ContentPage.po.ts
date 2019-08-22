@@ -25,7 +25,7 @@ export class ContentPage extends BrowserUtil {
         );
     }
 
-    public async selectTodaysDate(){
+    public async selectTodaysDate() {
         return await this.waitForElementToBeVisibleAndClick(await element(by.buttonText('Today')));
     }
 
