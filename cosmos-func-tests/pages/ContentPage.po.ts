@@ -48,7 +48,7 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async getCommentaryEditor() {
-        return await element(by.xpath('//iframe[@src=\'http://localhost:5000/editors/toastui/md-editor.html\']')).getWebElement();
+        return await element(by.xpath('//iframe[@src=\'https://localhost:5000/editors/toastui/md-editor.html\']')).getWebElement();
     }
 
     public async getEditorToolBarOptions(option: string) {

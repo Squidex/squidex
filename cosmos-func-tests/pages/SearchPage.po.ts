@@ -1,4 +1,4 @@
-import { browser, by, element  } from 'protractor';
+import { browser, by, element } from 'protractor';
 import { ContentPage } from './ContentPage.po';
 
 export class SearchPage extends ContentPage {
@@ -33,6 +33,10 @@ export class SearchPage extends ContentPage {
 
     public async getCommentaryCreationFailureMessageText() {
         return await element(by.xpath('//div[@class=\'alert alert-dismissible alert-danger ng-trigger ng-trigger-fade ng-star-inserted\']/span')).getText();
+    }
+
+    public async verifyRefDataSelection(referenceName: string) {
+        return await element(by.xpath('//label[contains(text(),\'' + referenceName + '\')]/following-sibling::div/sqx-references-dropdown/sqx-dropdown/span/div[@class=\'selection\']/div/span')).getText();
     }
 
     public async selectContentByText(contentBody: string) {
