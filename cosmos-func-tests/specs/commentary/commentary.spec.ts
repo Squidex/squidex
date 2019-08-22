@@ -35,6 +35,12 @@ describe('Create Commentary', () => {
     homePage.userLogout();
   });
 
+  beforeEach(async () => {
+    await loginPage.navigateToApp();
+    await contentPage.navigateToCommentaryAppPage();
+  });
+
+
   xit('Login with Vega Editor credentials', async () => {
     await expect(browserPage.getCurrentURL()).toBe(
       config.params.expectedUrlAfterNavigation
@@ -46,8 +52,6 @@ describe('Create Commentary', () => {
   using([{ commodityValue: constants.partialCommodityText, commentaryTypeValue: constants.partialCommentaryTypeText, regionValue: constants.partialRegionText },
   { commodityValue: constants.commodity, commentaryTypeValue: constants.commentaryType, regionValue: constants.region }], (data: any) => {
     xit('should allow the user to search and filter ref data with partial text', async () => {
-      await loginPage.navigateToApp();
-      await contentPage.navigateToCommentaryAppPage();
       await contentPage.selectDate(3);
       await contentPage.selectContentFromDropDown(constants.contentCommodity, data.commodityValue);
       await contentPage.selectContentFromDropDown(constants.contentCommentaryType, data.commentaryTypeValue);
@@ -61,8 +65,6 @@ describe('Create Commentary', () => {
   });
 
   xit('should throw error for duplicate commentaries with same ref data', async () => {
-    await loginPage.navigateToApp();
-    await contentPage.navigateToCommentaryAppPage();
     await contentPage.selectDate(3);
     await contentPage.selectContentFromDropDown(constants.contentCommodity, constants.duplicateTestCommodity);
     await contentPage.selectContentFromDropDown(constants.contentCommentaryType, constants.duplicateTestCommentaryType);
@@ -79,8 +81,6 @@ describe('Create Commentary', () => {
   });
 
   it('should throw error for invalid ref data', async () => {
-    await loginPage.navigateToApp();
-    await contentPage.navigateToCommentaryAppPage();
     await contentPage.selectDate(3);
     await contentPage.selectContentFromDropDown(constants.contentCommodity, constants.invalidRefDataText);
     await contentPage.selectContentFromDropDown(constants.contentCommentaryType, constants.invalidRefDataText);
@@ -91,32 +91,24 @@ describe('Create Commentary', () => {
   });
 
   xit('should support Bold text', async () => {
-    await loginPage.navigateToApp();
-    await contentPage.navigateToCommentaryAppPage();
     await contentPage.createCommentaryAndApplyEditorOptions(constants.boldCommentary, constants.editorOptionsBold);
     const commentaryText = await searchPage.verifyBoldCommentaryCreation();
     await expect(commentaryText).toBe(constants.boldCommentary);
   });
 
   xit('should support Italic text', async () => {
-    await loginPage.navigateToApp();
-    await contentPage.navigateToCommentaryAppPage();
     await contentPage.createCommentaryAndApplyEditorOptions(constants.boldCommentary, constants.editorOptionsItalic);
     const commentaryText = await searchPage.verifyItalicCommentaryCreation();
     await expect(commentaryText).toBe(constants.italicCommentary);
   });
 
   xit('should support Numbered list', async () => {
-    await loginPage.navigateToApp();
-    await contentPage.navigateToCommentaryAppPage();
     await contentPage.createCommentaryAndApplyEditorOptions(constants.boldCommentary, constants.editorOptionsNumberedList);
     const commentaryText = await searchPage.verifyNumberedCommentaryCreation();
     await expect(commentaryText).toBe(constants.italicCommentary);
   });
 
   it('should support Bulleted list', async () => {
-    await loginPage.navigateToApp();
-    await contentPage.navigateToCommentaryAppPage();
     await contentPage.createCommentaryAndApplyEditorOptions(constants.boldCommentary, constants.editorOptionsBulletPointList);
     const commentaryText = await searchPage.verifyBulletPointsCommentaryCreation();
     await expect(commentaryText).toBe(constants.italicCommentary);
