@@ -70,8 +70,8 @@ export let config: Config = {
             .maximize();
     },
     params: {
-        baseUrl: 'http://localhost:5000',
-        expectedUrlAfterNavigation: 'http://localhost:5000/app'
+        baseUrl: 'https://localhost:5000',
+        expectedUrlAfterNavigation: 'https://localhost:5000/app'
     },
     // protractor timeouts
     getPageTimeout: 50000,
