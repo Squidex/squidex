@@ -48,7 +48,7 @@ export let config: Config = {
         defaultTimeoutInterval: 150000
     },
 
-    specs: ['../JSFiles/utils/customConfig.js', '../JSFiles/specs/login/*.spec.js'],
+    specs: ['../JSFiles/specs/commentary/*.spec.js'],
 
     onPrepare: () => {
         browser.manage().timeouts().implicitlyWait(5000);

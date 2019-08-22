@@ -6,7 +6,7 @@
          "properties":{
             "label":"Created For Date",
             "isRequired":false,
-            "isListField":false,
+            "isListField":true,
             "isReferenceField":false,
             "fieldType":"DateTime",
             "editor":"Date",

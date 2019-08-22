@@ -1,4 +1,4 @@
-import { by, element } from 'protractor';
+import { browser, by, element  } from 'protractor';
 import { ContentPage } from './ContentPage.po';
 
 export class SearchPage extends ContentPage {
@@ -47,29 +47,30 @@ export class SearchPage extends ContentPage {
     }
 
     public async verifyCommentaryCreation() {
-        this.selectContentByText('content');
+        await this.selectContentByText('content');
+        await browser.sleep(6000);
         return await this.getCommentary(await this.getCommentaryEditorInput());
     }
 
     public async verifyBoldCommentaryCreation() {
-        this.selectContentByText('Bold');
+        await this.selectContentByText('Bold');
         return await this.getCommentary(await this.getBoldContentText());
     }
 
 
     public async verifyItalicCommentaryCreation() {
-        this.selectContentByText('Italic');
+        await this.selectContentByText('Italic');
         return await this.getCommentary(await this.getItalicContentText());
     }
 
 
     public async verifyNumberedCommentaryCreation() {
-        this.selectContentByText('Numbered');
-        return await this.getCommentary(await this.getItalicContentText());
+        await this.selectContentByText('Numbered');
+        return await this.getCommentary(await this.getNumberedContentText());
     }
 
     public async verifyBulletPointsCommentaryCreation() {
-        this.selectContentByText('Bullet');
-        return await this.getCommentary(await this.getItalicContentText());
+        await this.selectContentByText('Bullet');
+        return await this.getCommentary(await this.getBulletPointContentTest());
     }
 }

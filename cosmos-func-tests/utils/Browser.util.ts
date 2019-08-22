@@ -26,9 +26,9 @@ export class BrowserUtil {
   }
 
   // waits for the element to be present and writes
-  public async waitForElementToBePresentAndWrite(locator: ElementFinder, text: string) {
+  public async waitForElementToBePresentAndWrite(locator: ElementFinder, text: string, timeout = 100000) {
     const until = protractor.ExpectedConditions;
-    await browser.wait(until.presenceOf(locator), 100000);
+    await browser.wait(until.presenceOf(locator), timeout);
     await locator.clear();
     await locator.sendKeys(text);
   }

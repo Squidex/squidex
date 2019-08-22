@@ -13,7 +13,7 @@ export class ContentPage extends BrowserUtil {
     // Create Commentary after Navigating to Commentary Page under Content
     public searchResult = element.all(by.xpath('//span[@class=\'truncate ng-star-inserted\']/b'));
 
-    public calendar = element(by.buttonText('Today'));
+    public calendar = element(by.xpath('//div[@class=\'input-group\']/input'));
 
     public async getSearchBar() {
         return await element(by.xpath('//input[@placeholder=\'Search\']'));
@@ -23,6 +23,10 @@ export class ContentPage extends BrowserUtil {
         return await element.all(
             by.xpath('//div[@class=\'control-dropdown-items\']/div/span')
         );
+    }
+
+    public async selectTodaysDate(){
+        return await this.waitForElementToBeVisibleAndClick(await element(by.buttonText('Today')));
     }
 
     public async getRefData() {
@@ -52,11 +56,11 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async getCalender() {
-        return await element(by.xpath('//input[@placeholder=\'Date\']'));
+        return await element(by.xpath('//div[@class=\'input-group\']/input'));
     }
 
     public async clickOnNewButton() {
-        return await this.waitForElementToBeVisibleAndClick(await element(by.className('btn btn-success')));
+        return await this.waitForElementToBeVisibleAndClick(await element(by.xpath('//button[@routerlink=\'new\']')));
     }
 
     public async saveContent() {
@@ -82,6 +86,8 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async selectRandomReferences() {
+        await this.scrollIntoViewAndClick(await this.getCalender());
+        await this.selectRandomDate(new Date());
         await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(' Commodity  '));
         await this.randomSelection();
         await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(' Commentary Type  '));
@@ -90,7 +96,7 @@ export class ContentPage extends BrowserUtil {
         await this.randomSelection();
     }
 
-    public async selectContent(content: string) {
+    public async selectContentValue(content: string) {
         await this.waitForElementToBePresentAndWrite(await this.getSearchBar(), content);
         if (this.searchResult.isPresent() && (await this.searchResult.getText()).indexOf(content) !== -1) {
             await browser.actions().sendKeys(protractor.Key.ARROW_DOWN).perform();
@@ -98,34 +104,36 @@ export class ContentPage extends BrowserUtil {
         await browser.actions().sendKeys(protractor.Key.ENTER).perform();
     }
 
+    public async selectRandomDate(createdForDate: Date) {
+        return new Date(createdForDate.getDate() + (Math.random() * createdForDate.getDate()));
+    }
+
     public async randomSelection() {
-        this.getRefData().then(selection => {
-            const randomItem = selection[Math.floor(Math.random() * selection.length)];
-            randomItem.getWebElement().click();
+        await this.getRefData().then(async selection => {
+            const randomItem = await selection[Math.floor(Math.random() * selection.length)];
+            await randomItem.getWebElement().click();
             return;
         });
     }
 
-    public async selectDate() {
-        const modelName = '';
-        const modelValue = '2019-09-09';
-        const script = 'angular.element(arguments[0]).scope()' + '.$apply(function(scope){scope[arguments[1]] = arguments[2]})';
-        browser.executeScript(script, this.calendar.getWebElement(), modelName, modelValue);
+    public async datePicker(addDays: number) {
+        await expect(this.calendar);
+        let today = await new Date();
+        let date = await today.getDate() + addDays;
+        let month = await today.getMonth() + 1; // By default January counts as 0
+        let year = await today.getFullYear();
+        return await year + '-' + month + '-' + date;
     }
 
-    public async selectCommodity(commodity: string) {
-        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(' Commodity  '));
-        await this.selectContent(commodity);
+    public async selectDate(number: number) {
+        await this.waitForElementToBeVisibleAndClick(this.calendar);
+        await this.calendar.clear();
+        await this.calendar.sendKeys(await this.datePicker(number));
     }
 
-    public async selectCommentaryType(commentaryType: string) {
-        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(' Commentary Type  '));
-        await this.selectContent(commentaryType);
-    }
-
-    public async selectRegion(region: string) {
-        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(' Region  '));
-        await this.selectContent(region);
+    public async selectContentFromDropDown(contentType: string, region: string) {
+        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(contentType));
+        await this.selectContentValue(region);
     }
 
     public async getCommentary(contentEntryPlaceHolder: ElementFinder) {
@@ -164,27 +172,10 @@ export class ContentPage extends BrowserUtil {
         await this.writeCommentary(commentary);
         await this.selectAllContent();
     }
-    public async createCommentaryWithBoldLetters(commentary: string) {
-        await this.commentaryEditorTest(commentary);
-        await this.waitForElementToBeVisibleAndClick(await this.getEditorToolBarOptions('tui-bold tui-toolbar-icons'));
-        await this.saveContent();
-    }
 
-    public async createCommentaryWithItalicFont(commentary: string) {
+    public async createCommentaryAndApplyEditorOptions(commentary: string, editorToolBarOption: string) {
         await this.commentaryEditorTest(commentary);
-        await this.waitForElementToBeVisibleAndClick(await this.getEditorToolBarOptions('tui-italic tui-toolbar-icons'));
-        await this.saveContent();
-    }
-
-    public async createBulletPointsCommentary(commentary: string) {
-        await this.commentaryEditorTest(commentary);
-        await this.waitForElementToBeVisibleAndClick(await this.getEditorToolBarOptions('tui-ul tui-toolbar-icons'));
-        await this.saveContent();
-    }
-
-    public async createNumberedCommentary(commentary: string) {
-        await this.commentaryEditorTest(commentary);
-        await this.waitForElementToBeVisibleAndClick(await this.getEditorToolBarOptions('tui-ol tui-toolbar-icons'));
+        await this.waitForElementToBeVisibleAndClick(await this.getEditorToolBarOptions(editorToolBarOption));
         await this.saveContent();
     }
 }
