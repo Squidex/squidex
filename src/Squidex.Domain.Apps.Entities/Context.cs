@@ -43,6 +43,11 @@ namespace Squidex.Domain.Apps.Entities
             App = app;
         }
 
+        public static Context Anonymous()
+        {
+            return new Context(new ClaimsPrincipal());
+        }
+
         public void UpdatePermissions()
         {
             Permissions = User.Permissions();

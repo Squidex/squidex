@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
@@ -22,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly Guid contentId = Guid.NewGuid();
-        private readonly Context requestContext = new Context(new ClaimsPrincipal());
+        private readonly Context requestContext = Context.Anonymous();
         private readonly ContentCommandMiddleware sut;
 
         public sealed class MyCommand : SquidexCommand
