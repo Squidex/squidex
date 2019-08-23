@@ -26,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 {
     public sealed class AssetGrain : SquidexDomainObjectGrainLogSnapshots<AssetState>, IAssetGrain
     {
+        private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
         private readonly ITagService tagService;
 
         public AssetGrain(IStore<Guid> store, ITagService tagService, ISemanticLog log)
@@ -34,6 +35,13 @@ namespace Squidex.Domain.Apps.Entities.Assets
             Guard.NotNull(tagService, nameof(tagService));
 
             this.tagService = tagService;
+        }
+
+        public override Task OnActivateAsync()
+        {
+            DelayDeactivation(Lifetime);
+
+            return base.OnActivateAsync();
         }
 
         protected override Task<object> ExecuteAsync(IAggregateCommand command)

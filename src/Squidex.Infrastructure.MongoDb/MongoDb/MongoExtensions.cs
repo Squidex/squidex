@@ -161,9 +161,10 @@ namespace Squidex.Infrastructure.MongoDb
 
         public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursorSource<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default)
         {
-            var cursor = await source.ToCursorAsync(cancellationToken);
-
-            await cursor.ForEachPipelineAsync(processor, cancellationToken);
+            using (var cursor = await source.ToCursorAsync(cancellationToken))
+            {
+                await cursor.ForEachPipelineAsync(processor, cancellationToken);
+            }
         }
 
         public static async Task ForEachPipelineAsync<TDocument>(this IAsyncCursor<TDocument> source, Func<TDocument, Task> processor, CancellationToken cancellationToken = default)
@@ -184,12 +185,14 @@ namespace Squidex.Infrastructure.MongoDb
                             {
                                 MaxDegreeOfParallelism = 1,
                                 MaxMessagesPerTask = 1,
-                                BoundedCapacity = 100
+                                BoundedCapacity = Batching.BufferSize
                             });
                     try
                     {
                         await source.ForEachAsync(async i =>
                         {
+                            var t = source;
+
                             if (!await actionBlock.SendAsync(i, combined.Token))
                             {
                                 selfToken.Cancel();

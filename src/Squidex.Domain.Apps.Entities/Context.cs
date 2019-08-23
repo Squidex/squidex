@@ -13,6 +13,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
+using ClaimsPermissions = Squidex.Infrastructure.Security.PermissionSet;
 
 namespace Squidex.Domain.Apps.Entities
 {
@@ -24,7 +25,7 @@ namespace Squidex.Domain.Apps.Entities
 
         public ClaimsPrincipal User { get; }
 
-        public PermissionSet Permissions { get; private set; } = PermissionSet.Empty;
+        public ClaimsPermissions Permissions { get; private set; } = ClaimsPermissions.Empty;
 
         public bool IsFrontendClient { get; private set; }
 

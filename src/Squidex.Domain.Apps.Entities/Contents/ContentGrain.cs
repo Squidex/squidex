@@ -28,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 {
     public sealed class ContentGrain : SquidexDomainObjectGrainLogSnapshots<ContentState>, IContentGrain
     {
+        private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;
         private readonly IContentRepository contentRepository;
@@ -55,6 +56,13 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.assetRepository = assetRepository;
             this.contentWorkflow = contentWorkflow;
             this.contentRepository = contentRepository;
+        }
+
+        public override Task OnActivateAsync()
+        {
+            DelayDeactivation(Lifetime);
+
+            return base.OnActivateAsync();
         }
 
         protected override Task<object> ExecuteAsync(IAggregateCommand command)
