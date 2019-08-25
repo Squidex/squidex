@@ -24,8 +24,24 @@ namespace LoadTest
 
         public static IEnumerable<object[]> Loads()
         {
-            int[] users = { 1, 5, 10, 20, 50, 100 };
-            int[] loads = { 5, 10, 20, 50, 100 };
+            int[] users =
+            {
+                1,
+                5,
+                10,
+                20,
+                50,
+                100
+            };
+
+            int[] loads =
+            {
+                5,
+                10,
+                20,
+                50,
+                100
+            };
 
             foreach (var user in users)
             {

@@ -35,6 +35,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
         private readonly IScriptEngine scriptEngine;
         private readonly IContentWorkflow contentWorkflow;
 
+        public override (int MaxActivations, Type Interface) Limitations => (5000, typeof(IContentGrain));
+
         public ContentGrain(
             IStore<Guid> store,
             ISemanticLog log,
@@ -58,16 +60,18 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.contentRepository = contentRepository;
         }
 
-        public override Task OnActivateAsync()
+        protected override Task OnActivateAsync(Guid key)
         {
             DelayDeactivation(Lifetime);
 
-            return base.OnActivateAsync();
+            return base.OnActivateAsync(key);
         }
 
         protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
+
+            ReportIAmAlive();
 
             switch (command)
             {
@@ -375,6 +379,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Task<J<IContentEntity>> GetStateAsync(long version = EtagVersion.Any)
         {
+            ReportIAmAlive();
+
             return J.AsTask<IContentEntity>(GetSnapshot(version));
         }
     }

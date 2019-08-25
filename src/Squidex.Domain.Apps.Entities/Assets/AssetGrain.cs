@@ -29,6 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
         private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
         private readonly ITagService tagService;
 
+        public override (int MaxActivations, Type Interface) Limitations => (5000, typeof(IAssetGrain));
+
         public AssetGrain(IStore<Guid> store, ITagService tagService, ISemanticLog log)
             : base(store, log)
         {
@@ -37,16 +39,18 @@ namespace Squidex.Domain.Apps.Entities.Assets
             this.tagService = tagService;
         }
 
-        public override Task OnActivateAsync()
+        protected override Task OnActivateAsync(Guid key)
         {
             DelayDeactivation(Lifetime);
 
-            return base.OnActivateAsync();
+            return base.OnActivateAsync(key);
         }
 
         protected override Task<object> ExecuteAsync(IAggregateCommand command)
         {
             VerifyNotDeleted();
+
+            ReportIAmAlive();
 
             switch (command)
             {
@@ -175,6 +179,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any)
         {
+            ReportIAmAlive();
+
             return J.AsTask<IAssetEntity>(GetSnapshot(version));
         }
     }

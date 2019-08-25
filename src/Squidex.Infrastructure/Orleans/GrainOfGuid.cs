@@ -12,20 +12,26 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public abstract class GrainOfGuid : Grain
+    public abstract class GrainOfGuid : GrainBase
     {
         public Guid Key { get; private set; }
 
-        public override Task OnActivateAsync()
+        public sealed override Task OnActivateAsync()
         {
             return ActivateAsync(this.GetPrimaryKey());
         }
 
-        public Task ActivateAsync(Guid key)
+        public async Task ActivateAsync(Guid key)
         {
             Key = key;
 
-            return OnActivateAsync(key);
+            await OnLoadAsync(key);
+            await OnActivateAsync(key);
+        }
+
+        protected virtual Task OnLoadAsync(Guid key)
+        {
+            return TaskHelper.Done;
         }
 
         protected virtual Task OnActivateAsync(Guid key)

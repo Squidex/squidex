@@ -6,18 +6,14 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Orleans;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public abstract class GrainOfString<T> : Grain where T : class, new()
+    public abstract class GrainOfString<T> : GrainOfString where T : class, new()
     {
         private readonly IStore<string> store;
         private IPersistence<T> persistence;
-
-        public string Key { get; set; }
 
         protected T State { get; set; } = new T();
 
@@ -33,25 +29,11 @@ namespace Squidex.Infrastructure.Orleans
             this.store = store;
         }
 
-        public sealed override Task OnActivateAsync()
+        protected sealed override Task OnLoadAsync(string key)
         {
-            return ActivateAsync(this.GetPrimaryKeyString());
-        }
-
-        public async Task ActivateAsync(string key)
-        {
-            Key = key;
-
             persistence = store.WithSnapshots(GetType(), key, new HandleSnapshot<T>(ApplyState));
 
-            await persistence.ReadAsync();
-
-            await OnActivateAsync(key);
-        }
-
-        protected virtual Task OnActivateAsync(string key)
-        {
-            return TaskHelper.Done;
+            return persistence.ReadAsync();
         }
 
         private void ApplyState(T state)

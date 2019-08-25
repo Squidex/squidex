@@ -7,20 +7,16 @@
 
 using System;
 using System.Threading.Tasks;
-using Orleans;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public abstract class GrainOfGuid<T> : Grain where T : class, new()
+    public abstract class GrainOfGuid<T> : GrainOfGuid where T : class, new()
     {
         private readonly IStore<Guid> store;
         private IPersistence<T> persistence;
 
         protected T State { get; set; } = new T();
-
-        public Guid Key { get; private set; }
 
         protected IPersistence<T> Persistence
         {
@@ -34,25 +30,11 @@ namespace Squidex.Infrastructure.Orleans
             this.store = store;
         }
 
-        public sealed override Task OnActivateAsync()
+        protected sealed override Task OnLoadAsync(Guid key)
         {
-            return ActivateAsync(this.GetPrimaryKey());
-        }
-
-        public async Task ActivateAsync(Guid key)
-        {
-            Key = key;
-
             persistence = store.WithSnapshots(GetType(), key, new HandleSnapshot<T>(ApplyState));
 
-            await persistence.ReadAsync();
-
-            await OnActivateAsync(key);
-        }
-
-        protected virtual Task OnActivateAsync(Guid key)
-        {
-            return TaskHelper.Done;
+            return persistence.ReadAsync();
         }
 
         private void ApplyState(T state)

@@ -6,13 +6,11 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Orleans;
-using Squidex.Infrastructure.Orleans;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Orleans
 {
-    public interface IDomainObjectGrain : IGrainWithGuidKey, IDeactivatableGrain
+    public interface IDeactivatableGrain
     {
-        Task<J<object>> ExecuteAsync(J<IAggregateCommand> command);
+        Task DeactivateAsync();
     }
 }

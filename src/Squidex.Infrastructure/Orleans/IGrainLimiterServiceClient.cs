@@ -5,14 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Orleans;
-using Squidex.Infrastructure.Orleans;
+using Orleans.Services;
 
-namespace Squidex.Infrastructure.Commands
+namespace Squidex.Infrastructure.Orleans
 {
-    public interface IDomainObjectGrain : IGrainWithGuidKey, IDeactivatableGrain
+    public interface IGrainLimiterServiceClient : IGrainServiceClient<IGrainLimiterService>, IGrainLimiterService
     {
-        Task<J<object>> ExecuteAsync(J<IAggregateCommand> command);
     }
 }

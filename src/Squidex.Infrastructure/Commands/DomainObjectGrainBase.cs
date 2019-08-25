@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Commands
             this.log = log;
         }
 
-        protected sealed override async Task OnActivateAsync(Guid key)
+        protected sealed override async Task OnLoadAsync(Guid key)
         {
             var logContext = (key: key.ToString(), name: GetType().Name);
 
