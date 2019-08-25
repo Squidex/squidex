@@ -7,16 +7,17 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using LoadTest.Utils;
 using Squidex.ClientLibrary;
 using Xunit;
 
 namespace LoadTest
 {
-    public class ContentQueryBenchmarks : IClassFixture<ClientQueryFixture>
+    public class ReadingBenchmarks : IClassFixture<ReadingFixture>
     {
-        public ClientQueryFixture Fixture { get; }
+        public ReadingFixture Fixture { get; }
 
-        public ContentQueryBenchmarks(ClientQueryFixture fixture)
+        public ReadingBenchmarks(ReadingFixture fixture)
         {
             Fixture = fixture;
         }
@@ -33,6 +34,8 @@ namespace LoadTest
                     yield return new object[] { user, load };
                 }
             }
+
+            yield return new object[] { 1, 20000 };
         }
 
         [Theory]

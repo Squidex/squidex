@@ -207,7 +207,7 @@ namespace Squidex.Infrastructure.Commands
             }
             finally
             {
-                uncomittedEvents.Clear();
+                ClearUncommittedEvents();
             }
         }
 

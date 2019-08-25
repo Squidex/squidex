@@ -8,7 +8,7 @@
 using Newtonsoft.Json;
 using Squidex.ClientLibrary;
 
-namespace LoadTest
+namespace LoadTest.Model
 {
     public sealed class TestEntity : SquidexEntityBase<TestEntityData>
     {

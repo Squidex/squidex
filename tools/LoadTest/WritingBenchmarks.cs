@@ -8,15 +8,17 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using LoadTest.Model;
+using LoadTest.Utils;
 using Xunit;
 
 namespace LoadTest
 {
-    public class ContentCreationBenchmarks : IClassFixture<ClientQueryFixture>
+    public class WritingBenchmarks : IClassFixture<WritingFixture>
     {
-        public ClientQueryFixture Fixture { get; }
+        public WritingFixture Fixture { get; }
 
-        public ContentCreationBenchmarks(ClientQueryFixture fixture)
+        public WritingBenchmarks(WritingFixture fixture)
         {
             Fixture = fixture;
         }
@@ -33,6 +35,8 @@ namespace LoadTest
                     yield return new object[] { user, load };
                 }
             }
+
+            yield return new object[] { 1, 50000 };
         }
 
         [Theory]

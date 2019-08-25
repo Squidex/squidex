@@ -14,7 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace LoadTest
+namespace LoadTest.Utils
 {
     public static class Run
     {
