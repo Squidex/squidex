@@ -23,12 +23,18 @@ namespace Squidex.Infrastructure.Orleans
 
             public void Register(IActivationLimiter limiter, Grain grain)
             {
-                limiter.Register<T>(GetKey(grain), limit);
+                if (limiter != null)
+                {
+                    limiter.Register<T>(GetKey(grain), limit);
+                }
             }
 
             public void Unregister(IActivationLimiter limiter, Grain grain)
             {
-                limiter.Unregister<T>(GetKey(grain));
+                if (limiter != null)
+                {
+                    limiter.Unregister<T>(GetKey(grain));
+                }
             }
 
             private Guid GetKey(Grain grain)
@@ -53,12 +59,18 @@ namespace Squidex.Infrastructure.Orleans
 
             public void Register(IActivationLimiter limiter, Grain grain)
             {
-                limiter.Register<T>(GetKey(grain), limit);
+                if (limiter != null)
+                {
+                    limiter.Register<T>(GetKey(grain), limit);
+                }
             }
 
             public void Unregister(IActivationLimiter limiter, Grain grain)
             {
-                limiter.Unregister<T>(GetKey(grain));
+                if (limiter != null)
+                {
+                    limiter.Unregister<T>(GetKey(grain));
+                }
             }
 
             private string GetKey(Grain grain)

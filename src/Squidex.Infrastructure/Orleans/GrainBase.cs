@@ -41,7 +41,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             if (Limit != null)
             {
-                grainLimiter = ServiceProvider.GetRequiredService<IActivationLimiter>();
+                grainLimiter = ServiceProvider.GetService<IActivationLimiter>();
 
                 lifecycle?.Subscribe("Limiter", GrainLifecycleStage.Activate,
                     ct =>

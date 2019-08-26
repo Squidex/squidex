@@ -14,12 +14,12 @@ using Xunit;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public class GrainLimiterTests
+    public class ActivationLimiterTests
     {
         private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
         private readonly IGrainRuntime grainRuntime = A.Fake<IGrainRuntime>();
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly GrainLimiter sut;
+        private readonly ActivationLimiter sut;
 
         public interface IGuidGrain : IGrainWithGuidKey, IDeactivatableGrain
         {
@@ -59,7 +59,7 @@ namespace Squidex.Infrastructure.Orleans
             }
         }
 
-        public GrainLimiterTests()
+        public ActivationLimiterTests()
         {
             A.CallTo(() => serviceProvider.GetService(typeof(IActivationLimiter)))
                 .ReturnsLazily(() => sut);
@@ -67,7 +67,7 @@ namespace Squidex.Infrastructure.Orleans
             A.CallTo(() => grainRuntime.ServiceProvider)
                 .Returns(serviceProvider);
 
-            sut = new GrainLimiter(grainFactory);
+            sut = new ActivationLimiter(grainFactory);
         }
 
         [Fact]

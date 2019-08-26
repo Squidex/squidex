@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public sealed class GrainLimiter : DisposableObjectBase, IActivationLimiter
+    public sealed class ActivationLimiter : DisposableObjectBase, IActivationLimiter
     {
         private readonly IGrainFactory grainFactory;
         private readonly ConcurrentDictionary<Type, LastUsedIds<Guid>> registrationsGuid = new ConcurrentDictionary<Type, LastUsedIds<Guid>>();
@@ -101,7 +101,7 @@ namespace Squidex.Infrastructure.Orleans
             }
         }
 
-        public GrainLimiter(IGrainFactory grainFactory)
+        public ActivationLimiter(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
 

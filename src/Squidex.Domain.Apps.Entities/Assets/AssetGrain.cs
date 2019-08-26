@@ -51,8 +51,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             VerifyNotDeleted();
 
-            ReportIAmAlive();
-
             switch (command)
             {
                 case CreateAsset createRule:
@@ -180,8 +178,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public Task<J<IAssetEntity>> GetStateAsync(long version = EtagVersion.Any)
         {
-            ReportIAmAlive();
-
             return J.AsTask<IAssetEntity>(GetSnapshot(version));
         }
     }

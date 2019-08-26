@@ -72,8 +72,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
         {
             VerifyNotDeleted();
 
-            ReportIAmAlive();
-
             switch (command)
             {
                 case CreateContent createContent:
@@ -380,8 +378,6 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
         public Task<J<IContentEntity>> GetStateAsync(long version = EtagVersion.Any)
         {
-            ReportIAmAlive();
-
             return J.AsTask<IContentEntity>(GetSnapshot(version));
         }
     }

@@ -30,7 +30,7 @@ namespace Squidex.Config.Orleans
             {
                 builder.ConfigureServices(siloServices =>
                 {
-                    siloServices.AddSingleton<IActivationLimiter, GrainLimiter>();
+                    siloServices.AddSingleton<IActivationLimiter, ActivationLimiter>();
                 });
 
                 builder.ConfigureApplicationParts(parts =>
@@ -59,6 +59,7 @@ namespace Squidex.Config.Orleans
                     options.HostSelf = false;
                 });
 
+                builder.AddIncomingGrainCallFilter<ActivationLimiterFilter>();
                 builder.AddIncomingGrainCallFilter<LocalCacheFilter>();
                 builder.AddIncomingGrainCallFilter<LoggingFilter>();
 
