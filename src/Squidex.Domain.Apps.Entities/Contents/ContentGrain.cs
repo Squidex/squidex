@@ -29,13 +29,14 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class ContentGrain : SquidexDomainObjectGrainLogSnapshots<ContentState>, IContentGrain
     {
         private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
+        private static readonly IActivationLimit LimitConfig = ActivationLimit.ForGuidKey<IContentGrain>(5000);
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;
         private readonly IContentRepository contentRepository;
         private readonly IScriptEngine scriptEngine;
         private readonly IContentWorkflow contentWorkflow;
 
-        public override (int MaxActivations, Type Interface) Limitations => (5000, typeof(IContentGrain));
+        public override IActivationLimit Limit => LimitConfig;
 
         public ContentGrain(
             IStore<Guid> store,

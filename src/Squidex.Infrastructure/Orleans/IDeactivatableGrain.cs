@@ -6,11 +6,14 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
+using Orleans.Concurrency;
 
 namespace Squidex.Infrastructure.Orleans
 {
     public interface IDeactivatableGrain
     {
+        [AlwaysInterleave]
+        [OneWay]
         Task DeactivateAsync();
     }
 }

@@ -27,9 +27,10 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public sealed class AssetGrain : SquidexDomainObjectGrainLogSnapshots<AssetState>, IAssetGrain
     {
         private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
+        private static readonly IActivationLimit LimitConfig = ActivationLimit.ForGuidKey<IAssetGrain>(5000);
         private readonly ITagService tagService;
 
-        public override (int MaxActivations, Type Interface) Limitations => (5000, typeof(IAssetGrain));
+        public override IActivationLimit Limit => LimitConfig;
 
         public AssetGrain(IStore<Guid> store, ITagService tagService, ISemanticLog log)
             : base(store, log)

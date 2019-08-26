@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
+using Orleans.Core;
 using Orleans.Runtime;
 using Squidex.Infrastructure.Tasks;
 
@@ -17,9 +17,18 @@ namespace Squidex.Infrastructure.Orleans
 {
     public abstract class GrainBase : Grain, IDeactivatableGrain
     {
-        private IGrainLimiterServiceClient grainLimiterServiceClient;
+        private IActivationLimiter grainLimiter;
 
-        public virtual (int MaxActivations, Type Interface) Limitations { get => (-1, null); }
+        public virtual IActivationLimit Limit { get; }
+
+        protected GrainBase()
+        {
+        }
+
+        protected GrainBase(IGrainIdentity identity, IGrainRuntime runtime)
+            : base(identity, runtime)
+        {
+        }
 
         public Task DeactivateAsync()
         {
@@ -30,57 +39,39 @@ namespace Squidex.Infrastructure.Orleans
 
         public override void Participate(IGrainLifecycle lifecycle)
         {
-            if (Limitations.MaxActivations > 0 && Limitations.Interface != null)
+            if (Limit != null)
             {
-                grainLimiterServiceClient = ServiceProvider.GetRequiredService<IGrainLimiterServiceClient>();
+                grainLimiter = ServiceProvider.GetRequiredService<IActivationLimiter>();
 
-                lifecycle.Subscribe("Limiter", GrainLifecycleStage.Activate, RegisterAsync, UnregisterAsync);
+                lifecycle?.Subscribe("Limiter", GrainLifecycleStage.Activate,
+                    ct =>
+                    {
+                        ReportIAmAlive();
+
+                        return TaskHelper.Done;
+                    },
+                    ct =>
+                    {
+                        ReportIamDead();
+
+                        return TaskHelper.Done;
+                    });
             }
 
-            base.Participate(lifecycle);
+            if (lifecycle != null)
+            {
+                base.Participate(lifecycle);
+            }
         }
 
         public void ReportIAmAlive()
         {
-            RegisterAsync().Forget();
+            Limit?.Register(grainLimiter, this);
         }
 
-        private async Task RegisterAsync(CancellationToken ct = default)
+        public void ReportIamDead()
         {
-            if (grainLimiterServiceClient == null || this.IsPrimaryKeyBasedOnLong())
-            {
-                return;
-            }
-
-            var keyAsString = this.GetPrimaryKeyString();
-
-            if (keyAsString != null)
-            {
-                await grainLimiterServiceClient.RegisterAsync(Limitations.Interface, keyAsString, Limitations.MaxActivations);
-            }
-            else
-            {
-                await grainLimiterServiceClient.RegisterAsync(Limitations.Interface, this.GetPrimaryKey(), Limitations.MaxActivations);
-            }
-        }
-
-        private async Task UnregisterAsync(CancellationToken ct = default)
-        {
-            if (grainLimiterServiceClient == null || this.IsPrimaryKeyBasedOnLong())
-            {
-                return;
-            }
-
-            var keyAsString = this.GetPrimaryKeyString();
-
-            if (keyAsString != null)
-            {
-                await grainLimiterServiceClient.UnregisterAsync(Limitations.Interface, keyAsString);
-            }
-            else
-            {
-                await grainLimiterServiceClient.UnregisterAsync(Limitations.Interface, this.GetPrimaryKey());
-            }
+            Limit?.Unregister(grainLimiter, this);
         }
     }
 }

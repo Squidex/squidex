@@ -5,20 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-using Orleans.Services;
+using Orleans;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public interface IGrainLimiterService : IGrainService
+    public interface IActivationLimit
     {
-        Task RegisterAsync(Type type, Guid id, int limit);
+        void Register(IActivationLimiter limiter, Grain grain);
 
-        Task RegisterAsync(Type type, string id, int limit);
-
-        Task UnregisterAsync(Type type, Guid id);
-
-        Task UnregisterAsync(Type type, string id);
+        void Unregister(IActivationLimiter limiter, Grain grain);
     }
 }

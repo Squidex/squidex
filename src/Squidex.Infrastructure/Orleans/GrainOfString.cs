@@ -7,6 +7,8 @@
 
 using System.Threading.Tasks;
 using Orleans;
+using Orleans.Core;
+using Orleans.Runtime;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Orleans
@@ -14,6 +16,15 @@ namespace Squidex.Infrastructure.Orleans
     public abstract class GrainOfString : GrainBase
     {
         public string Key { get; private set; }
+
+        protected GrainOfString()
+        {
+        }
+
+        protected GrainOfString(IGrainIdentity identity, IGrainRuntime runtime)
+            : base(identity, runtime)
+        {
+        }
 
         public sealed override Task OnActivateAsync()
         {
