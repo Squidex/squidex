@@ -29,7 +29,10 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public sealed class ContentGrain : SquidexDomainObjectGrainLogSnapshots<ContentState>, IContentGrain
     {
         private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
+<<<<<<< HEAD
         private static readonly IActivationLimit LimitConfig = ActivationLimit.ForGuidKey<IContentGrain>(5000);
+=======
+>>>>>>> 74f4e58fa003fb514be2e1410c2367f13e4213a2
         private readonly IAppProvider appProvider;
         private readonly IAssetRepository assetRepository;
         private readonly IContentRepository contentRepository;
