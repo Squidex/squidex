@@ -11,25 +11,20 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
     public class AppsByNameIndexGrainTests
     {
-        private readonly IStore<string> store = A.Fake<IStore<string>>();
-        private readonly IPersistence<AppsByNameIndexGrain.GrainState> persistence = A.Fake<IPersistence<AppsByNameIndexGrain.GrainState>>();
+        private readonly IGrainState<AppsByNameIndexGrain.GrainState> grainState = A.Fake<IGrainState<AppsByNameIndexGrain.GrainState>>();
         private readonly NamedId<Guid> appId1 = NamedId.Of(Guid.NewGuid(), "my-app1");
         private readonly NamedId<Guid> appId2 = NamedId.Of(Guid.NewGuid(), "my-app2");
         private readonly AppsByNameIndexGrain sut;
 
         public AppsByNameIndexGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(typeof(AppsByNameIndexGrain), SingleGrain.Id, A<HandleSnapshot<AppsByNameIndexGrain.GrainState>>.Ignored))
-                .Returns(persistence);
-
-            sut = new AppsByNameIndexGrain(store);
+            sut = new AppsByNameIndexGrain(grainState);
             sut.ActivateAsync(SingleGrain.Id).Wait();
         }
 
@@ -42,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             Assert.Equal(appId1.Id, result);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByNameIndexGrain.GrainState>.Ignored))
+            A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened();
         }
 
@@ -125,7 +120,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             Assert.Equal(Guid.Empty, result);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByNameIndexGrain.GrainState>.Ignored))
+            A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedTwiceExactly();
         }
 
@@ -147,7 +142,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             Assert.Equal(2, await sut.CountAsync());
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<AppsByNameIndexGrain.GrainState>.Ignored))
+            A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened();
         }
     }

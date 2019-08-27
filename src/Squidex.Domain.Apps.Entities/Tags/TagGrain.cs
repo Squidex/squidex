@@ -10,34 +10,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Tags;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Tags
 {
-    public sealed class TagGrain : GrainOfString<TagGrain.GrainState>, ITagGrain
+    public sealed class TagGrain : GrainOfString, ITagGrain
     {
+        private readonly IGrainState<GrainState> state;
+
         [CollectionName("Index_Tags")]
         public sealed class GrainState
         {
             public TagsExport Tags { get; set; } = new TagsExport();
         }
 
-        public TagGrain(IStore<string> store)
-            : base(store)
+        public TagGrain(IGrainState<GrainState> state)
         {
+            Guard.NotNull(state, nameof(state));
+
+            this.state = state;
         }
 
         public Task ClearAsync()
         {
-            return ClearStateAsync();
+            return state.ClearAsync();
         }
 
         public Task RebuildAsync(TagsExport tags)
         {
-            State.Tags = tags;
+            state.Value.Tags = tags;
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public async Task<Dictionary<string, string>> NormalizeTagsAsync(HashSet<string> names, HashSet<string> ids)
@@ -53,7 +58,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
                         var tagName = tag.ToLowerInvariant();
                         var tagId = string.Empty;
 
-                        var found = State.Tags.FirstOrDefault(x => string.Equals(x.Value.Name, tagName, StringComparison.OrdinalIgnoreCase));
+                        var found = state.Value.Tags.FirstOrDefault(x => string.Equals(x.Value.Name, tagName, StringComparison.OrdinalIgnoreCase));
 
                         if (found.Value != null)
                         {
@@ -68,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
                         {
                             tagId = Guid.NewGuid().ToString();
 
-                            State.Tags.Add(tagId, new Tag { Name = tagName });
+                            state.Value.Tags.Add(tagId, new Tag { Name = tagName });
                         }
 
                         result.Add(tagName, tagId);
@@ -82,20 +87,20 @@ namespace Squidex.Domain.Apps.Entities.Tags
                 {
                     if (!result.ContainsValue(id))
                     {
-                        if (State.Tags.TryGetValue(id, out var tagInfo))
+                        if (state.Value.Tags.TryGetValue(id, out var tagInfo))
                         {
                             tagInfo.Count--;
 
                             if (tagInfo.Count <= 0)
                             {
-                                State.Tags.Remove(id);
+                                state.Value.Tags.Remove(id);
                             }
                         }
                     }
                 }
             }
 
-            await WriteStateAsync();
+            await state.WriteAsync();
 
             return result;
         }
@@ -106,7 +111,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             foreach (var name in names)
             {
-                var id = State.Tags.FirstOrDefault(x => string.Equals(x.Value.Name, name, StringComparison.OrdinalIgnoreCase)).Key;
+                var id = state.Value.Tags.FirstOrDefault(x => string.Equals(x.Value.Name, name, StringComparison.OrdinalIgnoreCase)).Key;
 
                 if (!string.IsNullOrWhiteSpace(id))
                 {
@@ -123,7 +128,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             foreach (var id in ids)
             {
-                if (State.Tags.TryGetValue(id, out var tagInfo))
+                if (state.Value.Tags.TryGetValue(id, out var tagInfo))
                 {
                     result[id] = tagInfo.Name;
                 }
@@ -134,14 +139,14 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
         public Task<TagsSet> GetTagsAsync()
         {
-            var tags = State.Tags.Values.ToDictionary(x => x.Name, x => x.Count);
+            var tags = state.Value.Tags.Values.ToDictionary(x => x.Name, x => x.Count);
 
-            return Task.FromResult(new TagsSet(tags, Persistence.Version));
+            return Task.FromResult(new TagsSet(tags, state.Version));
         }
 
         public Task<TagsExport> GetExportableTagsAsync()
         {
-            return Task.FromResult(State.Tags);
+            return Task.FromResult(state.Value.Tags);
         }
     }
 }

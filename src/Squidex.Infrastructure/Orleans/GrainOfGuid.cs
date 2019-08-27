@@ -36,13 +36,7 @@ namespace Squidex.Infrastructure.Orleans
         {
             Key = key;
 
-            await OnLoadAsync(key);
             await OnActivateAsync(key);
-        }
-
-        protected virtual Task OnLoadAsync(Guid key)
-        {
-            return TaskHelper.Done;
         }
 
         protected virtual Task OnActivateAsync(Guid key)

@@ -31,6 +31,8 @@ namespace Squidex.Config.Orleans
                 builder.ConfigureServices(siloServices =>
                 {
                     siloServices.AddSingleton<IActivationLimiter, ActivationLimiter>();
+
+                    siloServices.AddScoped(typeof(IGrainState<>), typeof(GrainState<>));
                 });
 
                 builder.ConfigureApplicationParts(parts =>

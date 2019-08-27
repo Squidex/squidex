@@ -11,24 +11,23 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Tags
 {
     public class TagGrainTests
     {
-        private readonly IStore<string> store = A.Fake<IStore<string>>();
-        private readonly IPersistence<TagGrain.GrainState> persistence = A.Fake<IPersistence<TagGrain.GrainState>>();
+        private readonly IGrainState<TagGrain.GrainState> grainState = A.Fake<IGrainState<TagGrain.GrainState>>();
         private readonly string id = Guid.NewGuid().ToString();
         private readonly TagGrain sut;
 
         public TagGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(typeof(TagGrain), id, A<HandleSnapshot<TagGrain.GrainState>>.Ignored))
-                .Returns(persistence);
+            A.CallTo(() => grainState.ClearAsync())
+                .Invokes(() => grainState.Value = new TagGrain.GrainState());
 
-            sut = new TagGrain(store);
+            sut = new TagGrain(grainState);
             sut.ActivateAsync(id).Wait();
         }
 
@@ -43,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Tags
 
             Assert.Empty(allTags);
 
-            A.CallTo(() => persistence.DeleteAsync())
+            A.CallTo(() => grainState.ClearAsync())
                 .MustHaveHappened();
         }
 
