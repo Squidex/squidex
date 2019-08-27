@@ -49,10 +49,6 @@ export class ContentPage extends BrowserUtil {
         );
     }
 
-    // public async getCommentaryEditor() {
-    //     return await element(by.xpath('//iframe[@src=\'https://localhost:5000/editors/toastui/md-editor.html\']'));
-    // }
-
     public async getEditorToolBarOptions(option: string) {
         return await element(by.className(option));
     }
