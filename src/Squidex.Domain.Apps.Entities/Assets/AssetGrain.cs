@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         protected override Task OnActivateAsync(Guid key)
         {
-            DelayDeactivation(Lifetime);
+            TryDelayDeactivation(Lifetime);
 
             return base.OnActivateAsync(key);
         }

@@ -159,13 +159,7 @@ namespace Squidex.Infrastructure.Commands
 
             if (mode == Mode.Update && Version < 0)
             {
-                try
-                {
-                    DeactivateOnIdle();
-                }
-                catch (InvalidOperationException)
-                {
-                }
+                TryDeactivateOnIdle();
 
                 throw new DomainObjectNotFoundException(id.ToString(), GetType());
             }

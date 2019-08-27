@@ -32,9 +32,31 @@ namespace Squidex.Infrastructure.Orleans
 
         public Task DeactivateAsync()
         {
-            DeactivateOnIdle();
+            TryDeactivateOnIdle();
 
             return Task.CompletedTask;
+        }
+
+        protected void TryDelayDeactivation(TimeSpan timeSpan)
+        {
+            try
+            {
+                DelayDeactivation(timeSpan);
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        }
+
+        protected void TryDeactivateOnIdle()
+        {
+            try
+            {
+                DeactivateOnIdle();
+            }
+            catch (InvalidOperationException)
+            {
+            }
         }
 
         public override void Participate(IGrainLifecycle lifecycle)
