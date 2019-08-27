@@ -6,9 +6,9 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
+using Orleans.Core;
 using Orleans.Runtime;
 using Xunit;
 
@@ -16,161 +16,80 @@ namespace Squidex.Infrastructure.Orleans
 {
     public class ActivationLimiterTests
     {
-        private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
+        private readonly IGrainIdentity grainIdentity = A.Fake<IGrainIdentity>();
         private readonly IGrainRuntime grainRuntime = A.Fake<IGrainRuntime>();
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
         private readonly ActivationLimiter sut;
 
-        public interface IGuidGrain : IGrainWithGuidKey, IDeactivatableGrain
+        private class MyGrain : GrainBase
         {
-        }
-
-        public interface IStringGrain : IGrainWithStringKey, IDeactivatableGrain
-        {
-        }
-
-        private class GuidGrain : GrainOfGuid, IGuidGrain
-        {
-            public override IActivationLimit Limit => ActivationLimit.ForGuidKey<IGuidGrain>(3);
-
-            public GuidGrain(IGrainRuntime runtime)
-                : base(null, runtime)
+            public MyGrain(IGrainIdentity identity, IGrainRuntime runtime, IActivationLimit limit)
+                : base(identity, runtime)
             {
+                limit.SetLimit(3, TimeSpan.FromMinutes(3));
+                Limit = limit;
             }
 
-            public override Task OnDeactivateAsync()
-            {
-                return base.OnDeactivateAsync();
-            }
-        }
-
-        private class StringGrain : GrainOfString, IGuidGrain
-        {
-            public override IActivationLimit Limit => ActivationLimit.ForStringKey<IStringGrain>(3);
-
-            public StringGrain(IGrainRuntime runtime)
-                : base(null, runtime)
-            {
-            }
-
-            public override Task OnDeactivateAsync()
-            {
-                return base.OnDeactivateAsync();
-            }
+            public IActivationLimit Limit { get; }
         }
 
         public ActivationLimiterTests()
         {
-            A.CallTo(() => serviceProvider.GetService(typeof(IActivationLimiter)))
-                .ReturnsLazily(() => sut);
+            sut = new ActivationLimiter();
+        }
+
+        [Fact]
+        public void Should_deactivate_last_grain()
+        {
+            var grain1 = CreateGuidGrain();
+
+            CreateGuidGrain();
+            CreateGuidGrain();
+            CreateGuidGrain();
+
+            A.CallTo(() => grainRuntime.DeactivateOnIdle(grain1))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public void Should_not_deactivate_last_grain_if_other_died()
+        {
+            CreateGuidGrain();
+            CreateGuidGrain().ReportIAmDead();
+            CreateGuidGrain();
+            CreateGuidGrain();
+
+            A.CallTo(() => grainRuntime.DeactivateOnIdle(A<Grain>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        private MyGrain CreateGuidGrain()
+        {
+            var context = A.Fake<IGrainActivationContext>();
+
+            var limit = new ActivationLimit(context, sut);
+
+            var serviceProvider = A.Fake<IServiceProvider>();
 
             A.CallTo(() => grainRuntime.ServiceProvider)
                 .Returns(serviceProvider);
 
-            sut = new ActivationLimiter(grainFactory);
-        }
+            A.CallTo(() => context.ActivationServices)
+                .Returns(serviceProvider);
 
-        [Fact]
-        public void Should_deactivate_last_guid_grain()
-        {
-            var grain1 = CreateGuidGrain();
-            var grain1Ref = A.Fake<IGuidGrain>();
+            A.CallTo(() => serviceProvider.GetService(typeof(IActivationLimit)))
+                .Returns(limit);
 
-            A.CallTo(() => grainFactory.GetGrain<IGuidGrain>(grain1.Key, null))
-                .Returns(grain1Ref);
+            A.CallTo(() => serviceProvider.GetService(typeof(IGrainRuntime)))
+                .Returns(grainRuntime);
 
-            CreateGuidGrain();
-            CreateGuidGrain();
-            CreateGuidGrain();
+            var grain = new MyGrain(grainIdentity, grainRuntime, limit);
 
-            sut.Dispose();
+            A.CallTo(() => context.GrainInstance)
+                .Returns(grain);
 
-            A.CallTo(() => grain1Ref.DeactivateAsync())
-                .MustHaveHappened();
-        }
+            A.CallTo(() => context.GrainType)
+                .Returns(typeof(MyGrain));
 
-        [Fact]
-        public void Should_not_deactivate_last_guid_grain_if_other_died()
-        {
-            var grain1 = CreateGuidGrain();
-            var grain2 = CreateGuidGrain();
-            var grain1Ref = A.Fake<IGuidGrain>();
-
-            A.CallTo(() => grainFactory.GetGrain<IGuidGrain>(grain1.Key, null))
-                .Returns(grain1Ref);
-
-            grain2.ReportIamDead();
-
-            CreateGuidGrain();
-            CreateGuidGrain();
-
-            sut.Dispose();
-
-            A.CallTo(() => grain1Ref.DeactivateAsync())
-                .MustNotHaveHappened();
-        }
-
-        [Fact]
-        public void Should_deactivate_last_string_grain()
-        {
-            var grain1 = CreateStringGrain();
-            var grain1Ref = A.Fake<IStringGrain>();
-
-            A.CallTo(() => grainFactory.GetGrain<IStringGrain>(grain1.Key, null))
-                .Returns(grain1Ref);
-
-            CreateStringGrain();
-            CreateStringGrain();
-            CreateStringGrain();
-
-            sut.Dispose();
-
-            A.CallTo(() => grain1Ref.DeactivateAsync())
-                .MustHaveHappened();
-        }
-
-        [Fact]
-        public void Should_not_deactivate_last_string_grain_if_other_died()
-        {
-            var grain1 = CreateStringGrain();
-            var grain2 = CreateStringGrain();
-            var grain1Ref = A.Fake<IStringGrain>();
-
-            A.CallTo(() => grainFactory.GetGrain<IStringGrain>(grain1.Key, null))
-                .Returns(grain1Ref);
-
-            grain2.ReportIamDead();
-
-            CreateStringGrain();
-            CreateStringGrain();
-
-            sut.Dispose();
-
-            A.CallTo(() => grain1Ref.DeactivateAsync())
-                .MustNotHaveHappened();
-        }
-
-        private GuidGrain CreateGuidGrain()
-        {
-            var key = Guid.NewGuid();
-
-            var grain = new GuidGrain(grainRuntime);
-
-            grain.ActivateAsync(key).Wait();
-            grain.Participate(null);
-            grain.ReportIAmAlive();
-
-            return grain;
-        }
-
-        private StringGrain CreateStringGrain()
-        {
-            var key = Guid.NewGuid().ToString();
-
-            var grain = new StringGrain(grainRuntime);
-
-            grain.ActivateAsync(key).Wait();
-            grain.Participate(null);
             grain.ReportIAmAlive();
 
             return grain;

@@ -5,14 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Orleans;
+using System;
 
 namespace Squidex.Infrastructure.Orleans
 {
     public interface IActivationLimit
     {
-        void Register(IActivationLimiter limiter, Grain grain);
+        void SetLimit(int maxActivations, TimeSpan lifetime);
 
-        void Unregister(IActivationLimiter limiter, Grain grain);
+        void ReportIAmAlive();
+
+        void ReportIAmDead();
     }
 }

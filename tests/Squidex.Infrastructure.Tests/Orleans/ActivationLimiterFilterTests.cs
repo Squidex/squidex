@@ -5,9 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Orleans;
+using Orleans.Runtime;
 using Xunit;
 
 namespace Squidex.Infrastructure.Orleans
@@ -24,22 +26,40 @@ namespace Squidex.Infrastructure.Orleans
 
         public sealed class MyGrain : GrainBase
         {
-            private readonly IActivationLimit limit = A.Fake<IActivationLimit>();
+            public MyGrain(IActivationLimit limit)
+                : base(null, CreateRuntime(limit))
+            {
+            }
 
-            public override IActivationLimit Limit => limit;
+            private static IGrainRuntime CreateRuntime(IActivationLimit limit)
+            {
+                var serviceProvider = A.Fake<IServiceProvider>();
+
+                var grainRuntime = A.Fake<IGrainRuntime>();
+
+                A.CallTo(() => grainRuntime.ServiceProvider)
+                    .Returns(serviceProvider);
+
+                A.CallTo(() => serviceProvider.GetService(typeof(IActivationLimit)))
+                    .Returns(limit);
+
+                return grainRuntime;
+            }
         }
 
         [Fact]
         public async Task Should_update_iam_alive_for_grain_base()
         {
-            var grain = new MyGrain();
+            var limit = A.Fake<IActivationLimit>();
+
+            var grain = new MyGrain(limit);
 
             A.CallTo(() => context.Grain)
                 .Returns(grain);
 
             await sut.Invoke(context);
 
-            A.CallTo(() => grain.Limit.Register(A<IActivationLimiter>.Ignored, grain))
+            A.CallTo(() => limit.ReportIAmAlive())
                 .MustHaveHappened();
 
             A.CallTo(() => context.Invoke())

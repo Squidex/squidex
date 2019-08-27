@@ -6,21 +6,15 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 using Orleans.Core;
 using Orleans.Runtime;
-using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public abstract class GrainBase : Grain, IDeactivatableGrain
+    public abstract class GrainBase : Grain
     {
-        private IActivationLimiter grainLimiter;
-
-        public virtual IActivationLimit Limit { get; }
-
         protected GrainBase()
         {
         }
@@ -30,11 +24,18 @@ namespace Squidex.Infrastructure.Orleans
         {
         }
 
-        public Task DeactivateAsync()
+        public void ReportIAmAlive()
         {
-            TryDeactivateOnIdle();
+            var limit = ServiceProvider.GetService<IActivationLimit>();
 
-            return Task.CompletedTask;
+            limit?.ReportIAmAlive();
+        }
+
+        public void ReportIAmDead()
+        {
+            var limit = ServiceProvider.GetService<IActivationLimit>();
+
+            limit?.ReportIAmDead();
         }
 
         protected void TryDelayDeactivation(TimeSpan timeSpan)
@@ -57,43 +58,6 @@ namespace Squidex.Infrastructure.Orleans
             catch (InvalidOperationException)
             {
             }
-        }
-
-        public override void Participate(IGrainLifecycle lifecycle)
-        {
-            if (Limit != null)
-            {
-                grainLimiter = ServiceProvider.GetService<IActivationLimiter>();
-
-                lifecycle?.Subscribe("Limiter", GrainLifecycleStage.Activate,
-                    ct =>
-                    {
-                        ReportIAmAlive();
-
-                        return TaskHelper.Done;
-                    },
-                    ct =>
-                    {
-                        ReportIamDead();
-
-                        return TaskHelper.Done;
-                    });
-            }
-
-            if (lifecycle != null)
-            {
-                base.Participate(lifecycle);
-            }
-        }
-
-        public void ReportIAmAlive()
-        {
-            Limit?.Register(grainLimiter, this);
-        }
-
-        public void ReportIamDead()
-        {
-            Limit?.Unregister(grainLimiter, this);
         }
     }
 }

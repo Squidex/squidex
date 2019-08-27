@@ -6,92 +6,72 @@
 // ==========================================================================
 
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Orleans;
+using Orleans.Runtime;
+using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public static class ActivationLimit
+    public sealed class ActivationLimit : IActivationLimit, IDeactivater
     {
-        private sealed class GuidActivationLimit<T> : IActivationLimit where T : IGrainWithGuidKey, IDeactivatableGrain
+        private readonly IGrainActivationContext context;
+        private readonly IActivationLimiter limiter;
+        private Action register;
+        private Action unregister;
+
+        public ActivationLimit(IGrainActivationContext context, IActivationLimiter limiter)
         {
-            private readonly int limit;
+            this.context = context;
+            this.limiter = limiter;
 
-            public GuidActivationLimit(int limit)
+            context.ObservableLifecycle?.Subscribe("Limiter", GrainLifecycleStage.Activate,
+            ct =>
             {
-                this.limit = limit;
-            }
+                ReportIAmAlive();
 
-            public void Register(IActivationLimiter limiter, Grain grain)
+                return TaskHelper.Done;
+            },
+            ct =>
             {
-                if (limiter != null)
-                {
-                    limiter.Register<T>(GetKey(grain), limit);
-                }
-            }
+                ReportIAmDead();
 
-            public void Unregister(IActivationLimiter limiter, Grain grain)
-            {
-                if (limiter != null)
-                {
-                    limiter.Unregister<T>(GetKey(grain));
-                }
-            }
-
-            private Guid GetKey(Grain grain)
-            {
-                if (grain is GrainOfGuid guidGrain)
-                {
-                    return guidGrain.Key;
-                }
-
-                return grain.GetPrimaryKey();
-            }
+                return TaskHelper.Done;
+            });
         }
 
-        private sealed class StringActivationLimit<T> : IActivationLimit where T : IGrainWithStringKey, IDeactivatableGrain
+        public void ReportIAmAlive()
         {
-            private readonly int limit;
-
-            public StringActivationLimit(int limit)
-            {
-                this.limit = limit;
-            }
-
-            public void Register(IActivationLimiter limiter, Grain grain)
-            {
-                if (limiter != null)
-                {
-                    limiter.Register<T>(GetKey(grain), limit);
-                }
-            }
-
-            public void Unregister(IActivationLimiter limiter, Grain grain)
-            {
-                if (limiter != null)
-                {
-                    limiter.Unregister<T>(GetKey(grain));
-                }
-            }
-
-            private string GetKey(Grain grain)
-            {
-                if (grain is GrainOfString stringGrain)
-                {
-                    return stringGrain.Key;
-                }
-
-                return grain.GetPrimaryKeyString();
-            }
+            register?.Invoke();
         }
 
-        public static IActivationLimit ForGuidKey<T>(int limit) where T : IGrainWithGuidKey, IDeactivatableGrain
+        public void ReportIAmDead()
         {
-            return new GuidActivationLimit<T>(limit);
+            unregister?.Invoke();
         }
 
-        public static IActivationLimit ForStringKey<T>(int limit) where T : IGrainWithStringKey, IDeactivatableGrain
+        public void SetLimit(int maxActivations, TimeSpan lifetime)
         {
-            return new StringActivationLimit<T>(limit);
+            register = () =>
+            {
+                limiter.Register(context.GrainType, this, maxActivations);
+            };
+
+            unregister = () =>
+            {
+                limiter.Unregister(context.GrainType, this);
+            };
+
+            var runtime = context.ActivationServices.GetRequiredService<IGrainRuntime>();
+
+            runtime.DelayDeactivation(context.GrainInstance, lifetime);
+        }
+
+        void IDeactivater.Deactivate()
+        {
+            var runtime = context.ActivationServices.GetRequiredService<IGrainRuntime>();
+
+            runtime.DeactivateOnIdle(context.GrainInstance);
         }
     }
 }

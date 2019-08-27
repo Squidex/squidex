@@ -7,78 +7,32 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
-using Orleans;
 using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Infrastructure.Orleans
 {
-    public sealed class ActivationLimiter : DisposableObjectBase, IActivationLimiter
+    public sealed class ActivationLimiter : IActivationLimiter
     {
-        private readonly IGrainFactory grainFactory;
-        private readonly ConcurrentDictionary<Type, LastUsedIds<Guid>> registrationsGuid = new ConcurrentDictionary<Type, LastUsedIds<Guid>>();
-        private readonly ConcurrentDictionary<Type, LastUsedIds<string>> registrationsString = new ConcurrentDictionary<Type, LastUsedIds<string>>();
-        private readonly ActionBlock<IDeactivater> deactivaterQueue;
+        private readonly ConcurrentDictionary<Type, LastUsedInstances> instances = new ConcurrentDictionary<Type, LastUsedInstances>();
 
-        private interface IDeactivater
+        private sealed class LastUsedInstances
         {
-            Task DeactivateAsync(IGrainFactory grainFactory);
-        }
-
-        private class GuidDeactivater<T> : IDeactivater where T : IGrainWithGuidKey, IDeactivatableGrain
-        {
-            private readonly Guid key;
-
-            public GuidDeactivater(Guid key)
-            {
-                this.key = key;
-            }
-
-            public Task DeactivateAsync(IGrainFactory grainFactory)
-            {
-                var grain = grainFactory.GetGrain<T>(key);
-
-                return grain.DeactivateAsync();
-            }
-        }
-
-        private class StringDeactivater<T> : IDeactivater where T : IGrainWithStringKey, IDeactivatableGrain
-        {
-            private readonly string key;
-
-            public StringDeactivater(string key)
-            {
-                this.key = key;
-            }
-
-            public Task DeactivateAsync(IGrainFactory grainFactory)
-            {
-                var grain = grainFactory.GetGrain<T>(key);
-
-                return grain.DeactivateAsync();
-            }
-        }
-
-        private sealed class LastUsedIds<T>
-        {
-            private readonly LRUCache<T, T> recentUsedGrains;
+            private readonly LRUCache<IDeactivater, IDeactivater> recentUsedGrains;
             private readonly ReaderWriterLockSlim lockSlim = new ReaderWriterLockSlim();
 
-            public LastUsedIds(int capacity, Action<T, T> evicted)
+            public LastUsedInstances(int limit)
             {
-                recentUsedGrains = new LRUCache<T, T>(capacity, evicted);
+                recentUsedGrains = new LRUCache<IDeactivater, IDeactivater>(limit, (key, _) => key.Deactivate());
             }
 
-            public void Register(T id)
+            public void Register(IDeactivater instance)
             {
                 try
                 {
                     lockSlim.EnterWriteLock();
 
-                    recentUsedGrains.Set(id, id);
+                    recentUsedGrains.Set(instance, instance);
                 }
                 finally
                 {
@@ -86,13 +40,13 @@ namespace Squidex.Infrastructure.Orleans
                 }
             }
 
-            public void Unregister(T id)
+            public void Unregister(IDeactivater instance)
             {
                 try
                 {
                     lockSlim.EnterWriteLock();
 
-                    recentUsedGrains.Remove(id);
+                    recentUsedGrains.Remove(instance);
                 }
                 finally
                 {
@@ -101,110 +55,18 @@ namespace Squidex.Infrastructure.Orleans
             }
         }
 
-        public ActivationLimiter(IGrainFactory grainFactory)
+        public void Register(Type grainType, IDeactivater deactivater, int maxActivations)
         {
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            var byType = instances.GetOrAdd(grainType, t => new LastUsedInstances(maxActivations));
 
-            this.grainFactory = grainFactory;
-
-            deactivaterQueue = new ActionBlock<IDeactivater>(DeactivateAsync);
+            byType.Register(deactivater);
         }
 
-        public void Register<T>(Guid id, int limit) where T : IGrainWithGuidKey, IDeactivatableGrain
+        public void Unregister(Type grainType, IDeactivater deactivater)
         {
-            var registration = GetGuidIds<T>(true, limit);
+            instances.TryGetValue(grainType, out var byType);
 
-            registration.Register(id);
-        }
-
-        public void Register<T>(string id, int limit) where T : IGrainWithStringKey, IDeactivatableGrain
-        {
-            var registration = GetStringIds<T>(true, limit);
-
-            registration?.Register(id);
-        }
-
-        public void Unregister<T>(Guid id) where T : IGrainWithGuidKey, IDeactivatableGrain
-        {
-            var registration = GetGuidIds<T>();
-
-            registration?.Unregister(id);
-        }
-
-        public void Unregister<T>(string id) where T : IGrainWithStringKey, IDeactivatableGrain
-        {
-            var registration = GetStringIds<T>();
-
-            registration?.Unregister(id);
-        }
-
-        private LastUsedIds<Guid> GetGuidIds<T>(bool create = false, int limit = 0) where T : IGrainWithGuidKey, IDeactivatableGrain
-        {
-            var type = typeof(T);
-
-            if (!registrationsGuid.TryGetValue(type, out var result) && create)
-            {
-                result = new LastUsedIds<Guid>(limit, (key, _) =>
-                {
-                    deactivaterQueue.Post(new GuidDeactivater<T>(key));
-                });
-
-                if (!registrationsGuid.TryAdd(type, result))
-                {
-                    result = registrationsGuid[type];
-                }
-            }
-
-            return result;
-        }
-
-        private LastUsedIds<string> GetStringIds<T>(bool create = false, int limit = 0) where T : IGrainWithStringKey, IDeactivatableGrain
-        {
-            var type = typeof(T);
-
-            if (!registrationsString.TryGetValue(type, out var result) && create)
-            {
-                result = new LastUsedIds<string>(limit, (key, _) =>
-                {
-                    deactivaterQueue.Post(new StringDeactivater<T>(key));
-                });
-
-                if (!registrationsString.TryAdd(type, result))
-                {
-                    result = registrationsString[type];
-                }
-            }
-
-            return result;
-        }
-
-        protected override void DisposeObject(bool disposing)
-        {
-            if (disposing)
-            {
-                deactivaterQueue.Complete();
-
-                try
-                {
-                    deactivaterQueue.Completion.Wait(1500);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Failed to wait for graceful shutdown {ex}.");
-                }
-            }
-        }
-
-        private async Task DeactivateAsync(IDeactivater deactivater)
-        {
-            try
-            {
-                await deactivater.DeactivateAsync(grainFactory);
-            }
-            catch
-            {
-                return;
-            }
+            byType?.Unregister(deactivater);
         }
     }
 }
