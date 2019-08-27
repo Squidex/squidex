@@ -26,7 +26,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentGrain : SquidexDomainObjectGrainLogSnapshots<ContentState>, IContentGrain
+    public sealed class ContentGrain : LogSnapshotDomainObjectGrain<ContentState>, IContentGrain
     {
         private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
         private readonly IAppProvider appProvider;

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
@@ -26,6 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public SchemasByAppIndexGrain(IGrainState<GrainState> state)
         {
+            Guard.NotNull(state, nameof(state));
+
             this.state = state;
         }
 

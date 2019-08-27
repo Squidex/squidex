@@ -29,6 +29,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         public AppsByNameIndexGrain(IGrainState<GrainState> state)
         {
+            Guard.NotNull(state, nameof(state));
+
             this.state = state;
         }
 

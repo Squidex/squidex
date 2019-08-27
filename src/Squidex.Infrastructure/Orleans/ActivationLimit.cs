@@ -17,54 +17,54 @@ namespace Squidex.Infrastructure.Orleans
     {
         private readonly IGrainActivationContext context;
         private readonly IActivationLimiter limiter;
-        private Action register;
-        private Action unregister;
+        private int maxActivations;
 
         public ActivationLimit(IGrainActivationContext context, IActivationLimiter limiter)
         {
+            Guard.NotNull(context, nameof(context));
+            Guard.NotNull(limiter, nameof(limiter));
+
             this.context = context;
             this.limiter = limiter;
-
-            context.ObservableLifecycle?.Subscribe("Limiter", GrainLifecycleStage.Activate,
-            ct =>
-            {
-                ReportIAmAlive();
-
-                return TaskHelper.Done;
-            },
-            ct =>
-            {
-                ReportIAmDead();
-
-                return TaskHelper.Done;
-            });
         }
 
         public void ReportIAmAlive()
         {
-            register?.Invoke();
+            if (maxActivations > 0)
+            {
+                limiter.Register(context.GrainType, this, maxActivations);
+            }
         }
 
         public void ReportIAmDead()
         {
-            unregister?.Invoke();
+            if (maxActivations > 0)
+            {
+                limiter.Unregister(context.GrainType, this);
+            }
         }
 
         public void SetLimit(int maxActivations, TimeSpan lifetime)
         {
-            register = () =>
-            {
-                limiter.Register(context.GrainType, this, maxActivations);
-            };
+            this.maxActivations = maxActivations;
 
-            unregister = () =>
-            {
-                limiter.Unregister(context.GrainType, this);
-            };
+            context.ObservableLifecycle?.Subscribe("Limiter", GrainLifecycleStage.Activate,
+                ct =>
+                {
+                    var runtime = context.ActivationServices.GetRequiredService<IGrainRuntime>();
 
-            var runtime = context.ActivationServices.GetRequiredService<IGrainRuntime>();
+                    runtime.DelayDeactivation(context.GrainInstance, lifetime);
 
-            runtime.DelayDeactivation(context.GrainInstance, lifetime);
+                    ReportIAmAlive();
+
+                    return TaskHelper.Done;
+                },
+                ct =>
+                {
+                    ReportIAmDead();
+
+                    return TaskHelper.Done;
+                });
         }
 
         void IDeactivater.Deactivate()

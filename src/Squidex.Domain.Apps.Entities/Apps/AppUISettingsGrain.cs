@@ -27,6 +27,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public AppUISettingsGrain(IGrainState<GrainState> state)
         {
+            Guard.NotNull(state, nameof(state));
+
             this.state = state;
         }
 

@@ -7,25 +7,16 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using LoadTest.Utils;
 using Squidex.ClientLibrary;
 using Xunit;
 
 namespace LoadTest
 {
-<<<<<<< HEAD:tools/LoadTest/ReadingBenchmarks.cs
     public class ReadingBenchmarks : IClassFixture<ReadingFixture>
-=======
-    public class ContentQueryBenchmarks : IClassFixture<ClientQueryFixture>
->>>>>>> 74f4e58fa003fb514be2e1410c2367f13e4213a2:tools/LoadTest/ContentQueryBenchmarks.cs
-    {
+{
         public ReadingFixture Fixture { get; }
 
-<<<<<<< HEAD:tools/LoadTest/ReadingBenchmarks.cs
         public ReadingBenchmarks(ReadingFixture fixture)
-=======
-        public ContentQueryBenchmarks(ClientQueryFixture fixture)
->>>>>>> 74f4e58fa003fb514be2e1410c2367f13e4213a2:tools/LoadTest/ContentQueryBenchmarks.cs
         {
             Fixture = fixture;
         }

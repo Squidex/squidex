@@ -71,8 +71,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.eventDataFormatter = eventDataFormatter;
             this.serializer = serializer;
             this.serviceProvider = serviceProvider;
-            this.log = log;
             this.state = state;
+            this.log = log;
         }
 
         protected override Task OnActivateAsync(Guid key)
