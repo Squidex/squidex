@@ -6,7 +6,9 @@
     "moduleResolution": "node",
     "inlineSourceMap": true,
     "declaration": false,
-    "noImplicitAny": false,       
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,   
     "removeComments": false,             
     "preserveConstEnums": true,    
     "outDir": "JSFiles",                     
@@ -16,6 +18,12 @@
   "exclude": [
     "node_modules",
     "asyncAwait",
+  ],
+  "include":[
+    "specs/**/*.ts",
+    "pages/*.ts",
+    "utils/*.ts",
+    "data/*.ts"
   ],
   "compileOnSave": false
 }

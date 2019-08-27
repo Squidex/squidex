@@ -1,5 +1,19 @@
 {
     "fields":[
+      {
+         "name":"createdfor",
+         "partitioning":"invariant",
+         "properties":{
+            "label":"Created For Date",
+            "isRequired":false,
+            "isListField":true,
+            "isReferenceField":false,
+            "fieldType":"DateTime",
+            "editor":"Date",
+            "isUnique":false,
+            "calculatedDefaultValue":"Today"
+         }
+      },
        {
           "name":"commodity",
           "partitioning":"invariant",
@@ -8,7 +22,8 @@
              "isRequired":true,
              "isListField":true,
              "fieldType":"References",
-             "editor":"List",
+             "editor":"Dropdown",
+             "resolveReference":true,
              "isUnique":true,
              "minItems":1,
              "maxItems":1
@@ -22,7 +37,8 @@
              "isRequired":true,
              "isListField":true,
              "fieldType":"References",
-             "editor":"List",
+             "editor":"Dropdown",
+             "resolveReference":true,
              "isUnique":true,
              "minItems":1,
              "maxItems":1
@@ -36,7 +52,8 @@
             "isRequired":true,
             "isListField":true,
             "fieldType":"References",
-            "editor":"List",
+            "editor":"Dropdown",
+            "resolveReference":true,
             "isUnique":true,
             "minItems":1,
             "maxItems":1
@@ -48,7 +65,7 @@
           "properties":{
              "label":"Body",
              "isRequired":false,
-             "isListField":false,
+             "isListField":true,
              "fieldType":"String",
              "editor":"RichText",
              "isUnique":false

@@ -23,6 +23,45 @@
             "name": {
                 "iv": "Toluene"
             }
+        },
+        {
+            "id": {
+                "iv": "http://iddn.icis.com/ref-data/commodity-group/300"
+            },
+            "name": {
+                "iv": "Acetone"
+            }
+        },
+        {
+            "id": {
+                "iv": "http://iddn.icis.com/ref-data/commodity-group/296"
+            },
+            "name": {
+                "iv": "Ployethylene"
+            }
+        },
+        {
+            "id": {
+                "iv": "http://iddn.icis.com/ref-data/commodity-group/290"
+            },
+            "name": {
+                "iv": "Polyols"
+            }
+        },        {
+            "id": {
+                "iv": "http://iddn.icis.com/ref-data/commodity-group/285"
+            },
+            "name": {
+                "iv": "Propylene"
+            }
+        },
+        {
+            "id": {
+                "iv": "http://iddn.icis.com/ref-data/commodity-group/295"
+            },
+            "name": {
+                "iv": "Ethylene Glycol"
+            }
         }
     ]
     

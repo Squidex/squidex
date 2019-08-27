@@ -6,10 +6,10 @@
         "properties": {
           "label": "Id",
           "isRequired": true,
-          "isListField": true,
+          "isListField": false,
           "fieldType": "String",
           "editor": "Input",
-              "isUnique": true
+          "isUnique": true
         }
       },
       {
@@ -19,6 +19,7 @@
           "label": "Name",
           "isRequired": true,
           "isListField": true,
+          "isReferenceField":true,
           "fieldType": "String",
           "editor": "Input"
         }
