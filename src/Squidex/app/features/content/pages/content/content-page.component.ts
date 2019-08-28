@@ -124,7 +124,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
                             .subscribe(shouldLoad => {
                                 if (shouldLoad) {
-                                    this.loadContent(autosaved, true);
+                                    this.loadContent(autosaved);
                                 } else {
                                     this.autoSaveService.remove(this.autoSaveKey);
                                 }
@@ -227,16 +227,31 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.router.navigate([this.schema.name], { relativeTo: this.route.parent!.parent, replaceUrl: true });
     }
 
-    private loadContent(data: any, dirty = false) {
+    private loadContent(data: any) {
         this.isLoadingContent = true;
 
         this.autoSaveService.remove(this.autoSaveKey);
 
         try {
-            this.contentForm.loadContent(data, dirty);
+            this.contentForm.loadContent(data);
             this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
         } finally {
             this.isLoadingContent = false;
+        }
+    }
+
+    private loadContentToCompare(data: any | null) {
+        if (data !== null) {
+            if (this.contentFormCompare === null) {
+                this.contentFormCompare = new EditContentForm(this.schema, this.languages);
+            }
+
+            this.contentFormCompare.loadContent(data);
+            this.contentFormCompare.setEnabled(false);
+        } else {
+            if (this.contentFormCompare) {
+                this.contentFormCompare = null;
+            }
         }
     }
 
@@ -272,19 +287,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.contentsState.loadVersion(this.content, version)
                 .subscribe(dto => {
                     if (compare) {
-                        if (this.contentFormCompare === null) {
-                            this.contentFormCompare = new EditContentForm(this.schema, this.languages);
-                        }
-
-                        this.contentFormCompare.loadContent(dto.payload);
-                        this.contentFormCompare.setEnabled(false);
-
+                        this.loadContentToCompare(dto.payload);
                         this.loadContent(this.content.dataDraft);
                     } else {
-                        if (this.contentFormCompare) {
-                            this.contentFormCompare = null;
-                        }
-
+                        this.loadContentToCompare(null);
                         this.loadContent(dto.payload);
                     }
 

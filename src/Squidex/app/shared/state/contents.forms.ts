@@ -482,7 +482,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         }
     }
 
-    public loadContent(value: any, dirty = false) {
+    public loadContent(value: any) {
         for (let field of this.schema.fields) {
             if (field.isArray && field.nested.length > 0) {
                 const fieldForm = <FormGroup>this.form.get(field.name);
@@ -519,10 +519,6 @@ export class EditContentForm extends Form<FormGroup, any> {
         }
 
         super.load(value);
-
-        if (dirty) {
-            this.form.markAsDirty();
-        }
     }
 
     public disable() {
