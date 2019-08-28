@@ -22,7 +22,6 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
 using Squidex.Domain.Apps.Entities.Apps.Invitation;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
@@ -284,6 +283,8 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<UsageTrackerCommandMiddleware>()
                 .As<ICommandMiddleware>();
+
+            services.AddSingleton(typeof(IEventEnricher<>), typeof(SquidexEventEnricher<>));
         }
 
         private static void AddBackupHandlers(this IServiceCollection services)

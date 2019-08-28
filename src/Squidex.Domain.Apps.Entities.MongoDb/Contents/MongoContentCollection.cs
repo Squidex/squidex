@@ -209,7 +209,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public Task ReadAllAsync(Func<ContentState, long, Task> callback, Func<Guid, Guid, Task<ISchemaEntity>> getSchema, CancellationToken ct = default)
         {
-            return Collection.Find(new BsonDocument()).ForEachPipelineAsync(async contentEntity =>
+            return Collection.Find(new BsonDocument(), options: Batching.Options).ForEachPipelineAsync(async contentEntity =>
             {
                 var schema = await getSchema(contentEntity.IndexedAppId, contentEntity.IndexedSchemaId);
 

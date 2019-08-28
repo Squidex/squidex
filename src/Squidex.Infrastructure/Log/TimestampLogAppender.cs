@@ -18,7 +18,7 @@ namespace Squidex.Infrastructure.Log
             this.clock = clock ?? SystemClock.Instance;
         }
 
-        public void Append(IObjectWriter writer)
+        public void Append(IObjectWriter writer, SemanticLogLevel logLevel)
         {
             writer.WriteProperty("timestamp", clock.GetCurrentInstant());
         }

@@ -6,13 +6,6 @@
         line-height: 2.8rem;
     }
 
-    .color-circle {
-        @include circle(12px);
-        border: 1px solid $color-border-dark;
-        background: $color-border;
-        display: inline-block;
-    }
-
     .col-label {
         padding: 0 .5rem;
     }

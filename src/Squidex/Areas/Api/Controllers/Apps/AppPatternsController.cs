@@ -69,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/patterns/")]
-        [ProducesResponseType(typeof(PatternsDto), 200)]
+        [ProducesResponseType(typeof(PatternsDto), 201)]
         [ApiPermission(Permissions.AppPatternsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostPattern(string app, [FromBody] UpdatePatternDto request)

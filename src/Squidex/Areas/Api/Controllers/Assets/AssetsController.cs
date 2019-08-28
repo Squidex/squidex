@@ -178,7 +178,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// </remarks>
         [HttpPost]
         [Route("apps/{app}/assets/")]
-        [ProducesResponseType(typeof(AssetDto), 200)]
+        [ProducesResponseType(typeof(AssetDto), 201)]
         [AssetRequestSizeLimit]
         [ApiPermission(Permissions.AppAssetsCreate)]
         [ApiCosts(1)]

@@ -30,8 +30,10 @@ namespace Squidex.Config.Orleans
             {
                 builder.ConfigureServices(siloServices =>
                 {
-                    siloServices.AddSingleton<IIncomingGrainCallFilter, LocalCacheFilter>();
-                    siloServices.AddSingleton<IIncomingGrainCallFilter, LoggingFilter>();
+                    siloServices.AddSingleton<IActivationLimiter, ActivationLimiter>();
+                    siloServices.AddScoped<IActivationLimit, ActivationLimit>();
+
+                    siloServices.AddScoped(typeof(IGrainState<>), typeof(GrainState<>));
                 });
 
                 builder.ConfigureApplicationParts(parts =>
@@ -59,6 +61,10 @@ namespace Squidex.Config.Orleans
                 {
                     options.HostSelf = false;
                 });
+
+                builder.AddIncomingGrainCallFilter<ActivationLimiterFilter>();
+                builder.AddIncomingGrainCallFilter<LocalCacheFilter>();
+                builder.AddIncomingGrainCallFilter<LoggingFilter>();
 
                 var orleansPortSilo = config.GetOptionalValue("orleans:siloPort", 11111);
                 var orleansPortGateway = config.GetOptionalValue("orleans:gatewayPort", 40000);

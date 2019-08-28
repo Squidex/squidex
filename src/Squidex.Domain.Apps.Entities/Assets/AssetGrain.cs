@@ -24,16 +24,26 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public sealed class AssetGrain : SquidexDomainObjectGrainLogSnapshots<AssetState>, IAssetGrain
+    public sealed class AssetGrain : LogSnapshotDomainObjectGrain<AssetState>, IAssetGrain
     {
+        private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
         private readonly ITagService tagService;
 
-        public AssetGrain(IStore<Guid> store, ITagService tagService, ISemanticLog log)
+        public AssetGrain(IStore<Guid> store, ITagService tagService, IActivationLimit limit, ISemanticLog log)
             : base(store, log)
         {
             Guard.NotNull(tagService, nameof(tagService));
 
             this.tagService = tagService;
+
+            limit?.SetLimit(5000, Lifetime);
+        }
+
+        protected override Task OnActivateAsync(Guid key)
+        {
+            TryDelayDeactivation(Lifetime);
+
+            return base.OnActivateAsync(key);
         }
 
         protected override Task<object> ExecuteAsync(IAggregateCommand command)

@@ -17,7 +17,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 17;
+        private const int CurrentVersion = 18;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -103,16 +103,22 @@ namespace Migrate_01
                 yield return serviceProvider.GetRequiredService<RestructureContentCollection>();
             }
 
+            // Version 17: Rename slug field.
+            if (version < 17)
+            {
+                yield return serviceProvider.GetService<RenameAssetSlugField>();
+            }
+
+            // Version 18: Rebuild assets.
+            if (version < 18)
+            {
+                yield return serviceProvider.GetService<RebuildAssets>();
+            }
+
             // Version 16: Introduce file name slugs for assets.
             if (version < 16)
             {
                 yield return serviceProvider.GetRequiredService<CreateAssetSlugs>();
-            }
-
-            // Version 17: Rename slug field.
-            if (version < 17)
-            {
-                yield return serviceProvider.GetService<RenameSlugField>();
             }
 
             yield return serviceProvider.GetRequiredService<StartEventConsumers>();

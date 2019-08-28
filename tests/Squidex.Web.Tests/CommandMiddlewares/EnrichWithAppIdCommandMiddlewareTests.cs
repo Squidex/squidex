@@ -23,7 +23,7 @@ namespace Squidex.Web.CommandMiddlewares
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
-        private readonly Context appContext = new Context();
+        private readonly Context appContext = Context.Anonymous();
         private readonly EnrichWithAppIdCommandMiddleware sut;
 
         public EnrichWithAppIdCommandMiddlewareTests()

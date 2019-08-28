@@ -47,7 +47,7 @@ namespace Squidex.Infrastructure.Commands
             this.log = log;
         }
 
-        protected sealed override async Task OnActivateAsync(Guid key)
+        protected override async Task OnActivateAsync(Guid key)
         {
             var logContext = (key: key.ToString(), name: GetType().Name);
 
@@ -159,13 +159,7 @@ namespace Squidex.Infrastructure.Commands
 
             if (mode == Mode.Update && Version < 0)
             {
-                try
-                {
-                    DeactivateOnIdle();
-                }
-                catch (InvalidOperationException)
-                {
-                }
+                TryDeactivateOnIdle();
 
                 throw new DomainObjectNotFoundException(id.ToString(), GetType());
             }
@@ -207,7 +201,7 @@ namespace Squidex.Infrastructure.Commands
             }
             finally
             {
-                uncomittedEvents.Clear();
+                ClearUncommittedEvents();
             }
         }
 

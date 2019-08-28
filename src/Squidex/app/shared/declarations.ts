@@ -21,10 +21,17 @@ export * from './components/history-list.component';
 export * from './components/language-selector.component';
 export * from './components/markdown-editor.component';
 export * from './components/pipes';
+export * from './components/references-dropdown.component';
 export * from './components/rich-editor.component';
 export * from './components/schema-category.component';
 export * from './components/search-form.component';
 export * from './components/table-header.component';
+
+export * from './components/queries/filter-comparison.component';
+export * from './components/queries/filter-logical.component';
+export * from './components/queries/filter-node.component';
+export * from './components/queries/query.component';
+export * from './components/queries/sorting.component';
 
 export * from './guards/app-must-exist.guard';
 export * from './guards/content-must-exist.guard';

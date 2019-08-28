@@ -18,6 +18,13 @@ namespace Squidex.Infrastructure.Queries.Json
     {
         private delegate bool Parser<T>(List<string> errors, PropertyPath path, IJsonValue value, out T result);
 
+        private static readonly InstantPattern[] InstantPatterns =
+        {
+            InstantPattern.General,
+            InstantPattern.ExtendedIso,
+            InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd")
+        };
+
         public static ClrValue Convert(JsonSchema schema, IJsonValue value, PropertyPath path, List<string> errors)
         {
             ClrValue result = null;
@@ -196,13 +203,16 @@ namespace Squidex.Infrastructure.Queries.Json
 
             if (value is JsonString jsonString)
             {
-                var parsed = InstantPattern.General.Parse(jsonString.Value);
-
-                if (parsed.Success)
+                foreach (var pattern in InstantPatterns)
                 {
-                    result = parsed.Value;
+                    var parsed = pattern.Parse(jsonString.Value);
 
-                    return true;
+                    if (parsed.Success)
+                    {
+                        result = parsed.Value;
+
+                        return true;
+                    }
                 }
 
                 errors.Add($"Expected ISO8601 DateTime String for path '{path}', but got invalid String.");

@@ -13,16 +13,16 @@ import {
     AppsState,
     ContentDto,
     ContentsState,
-    FilterState,
     ImmutableArray,
     LanguagesState,
     ModalModel,
     Queries,
+    Query,
+    QueryModel,
+    queryModelFromSchema,
     ResourceOwner,
-    RootFieldDto,
     SchemaDetailsDto,
     SchemasState,
-    Sorting,
     UIState
 } from '@app/shared';
 
@@ -35,11 +35,11 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
 })
 export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public schema: SchemaDetailsDto;
-    public schemaQueries: Queries;
 
     public searchModal = new ModalModel();
 
     public selectedItems:  { [id: string]: boolean; } = {};
+    public selectedAll = false;
     public selectionCount = 0;
     public selectionCanDelete = false;
 
@@ -48,9 +48,8 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
 
-    public filter = new FilterState();
-
-    public isAllSelected = false;
+    public queryModel: QueryModel;
+    public queries: Queries;
 
     public minWidth: string;
 
@@ -71,23 +70,22 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
-                    this.filter = new FilterState();
-                    this.filter.setLanguage(this.language);
-
                     this.resetSelection();
 
                     this.schema = schema!;
-                    this.schemaQueries = new Queries(this.uiState, `schemas.${this.schema.name}`);
 
                     this.minWidth = `${300 + (200 * this.schema.listFields.length)}px`;
 
                     this.contentsState.load();
+
+                    this.updateQueries();
+                    this.updateModel();
                 }));
 
         this.own(
-            this.contentsState.contentsQuery
-                .subscribe(query => {
-                    this.filter.setQuery(query);
+            this.contentsState.statuses
+                .subscribe(() => {
+                    this.updateModel();
                 }));
 
         this.own(
@@ -102,7 +100,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.languages = languages.map(x => x.language);
                     this.language = this.languages.at(0);
 
-                    this.filter.setLanguage(this.language);
+                    this.updateModel();
                 }));
     }
 
@@ -152,14 +150,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.contentsState.goNext();
     }
 
-    public search() {
-        this.contentsState.search(this.filter.apiFilter);
+    public search(query: Query) {
+        this.contentsState.search(query);
     }
 
     public selectLanguage(language: AppLanguageDto) {
         this.language = language;
-
-        this.filter.setLanguage(language);
     }
 
     public isItemSelected(content: ContentDto): boolean {
@@ -194,19 +190,12 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         this.updateSelectionSummary();
     }
 
-    public sort(field: string | RootFieldDto, sorting: Sorting) {
-        this.filter.setOrderField(field, sorting);
-
-        this.search();
-    }
-
-    public trackByContent(index: number, content: ContentDto): string {
+    public trackByContent(content: ContentDto): string {
         return content.id;
     }
 
     private updateSelectionSummary() {
-        this.isAllSelected = this.contentsState.snapshot.contents.length > 0;
-
+        this.selectedAll = this.contentsState.snapshot.contents.length > 0;
         this.selectionCount = 0;
         this.selectionCanDelete = true;
 
@@ -232,11 +221,23 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                     this.selectionCanDelete = false;
                 }
             } else {
-                this.isAllSelected = false;
+                this.selectedAll = false;
             }
         }
 
         this.nextStatuses = Object.keys(allActions);
+    }
+
+    private updateQueries() {
+        if (this.schema) {
+            this.queries = new Queries(this.uiState, `schemas.${this.schema.name}`);
+        }
+    }
+
+    private updateModel() {
+        if (this.schema && this.languages) {
+            this.queryModel = queryModelFromSchema(this.schema, this.languages.values, this.contentsState.snapshot.statuses);
+        }
     }
 }
 

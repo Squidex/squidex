@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPost]
         [Route("apps/{app}/contributors/")]
-        [ProducesResponseType(typeof(ContributorsDto), 200)]
+        [ProducesResponseType(typeof(ContributorsDto), 201)]
         [ApiPermission(Permissions.AppContributorsAssign)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContributor(string app, [FromBody] AssignContributorDto request)

@@ -137,7 +137,7 @@ namespace Squidex.Areas.Api.Controllers.Rules
         /// </remarks>
         [HttpPut]
         [Route("apps/{app}/rules/{id}/")]
-        [ProducesResponseType(typeof(RuleDto), 400)]
+        [ProducesResponseType(typeof(RuleDto), 200)]
         [ApiPermission(Permissions.AppRulesUpdate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PutRule(string app, Guid id, [FromBody] UpdateRuleDto request)

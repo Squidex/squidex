@@ -19,6 +19,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets
@@ -26,6 +27,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class AssetGrainTests : HandlerTestBase<AssetState>
     {
         private readonly ITagService tagService = A.Fake<ITagService>();
+        private readonly IActivationLimit limit = A.Fake<IActivationLimit>();
         private readonly ImageInfo image = new ImageInfo(2048, 2048);
         private readonly AssetFile file = new AssetFile("my-image.png", "image/png", 1024, () => new MemoryStream());
         private readonly Guid assetId = Guid.NewGuid();
@@ -42,8 +44,15 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => tagService.NormalizeTagsAsync(AppId, TagGroups.Assets, A<HashSet<string>>.Ignored, A<HashSet<string>>.Ignored))
                 .Returns(new Dictionary<string, string>());
 
-            sut = new AssetGrain(Store, tagService, A.Dummy<ISemanticLog>());
+            sut = new AssetGrain(Store, tagService, limit, A.Dummy<ISemanticLog>());
             sut.ActivateAsync(Id).Wait();
+        }
+
+        [Fact]
+        public void Should_set_limit()
+        {
+            A.CallTo(() => limit.SetLimit(5000, TimeSpan.FromMinutes(5)))
+                .MustHaveHappened();
         }
 
         [Fact]

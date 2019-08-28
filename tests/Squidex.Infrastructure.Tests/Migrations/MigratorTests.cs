@@ -93,11 +93,12 @@ namespace Squidex.Infrastructure.Migrations
             A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened();
             A.CallTo(() => migrator_2_3.UpdateAsync()).MustHaveHappened();
 
-            A.CallTo(() => status.UnlockAsync(3)).MustHaveHappened();
+            A.CallTo(() => status.UnlockAsync(3))
+                .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_unlock_when_failed()
+        public async Task Should_unlock_when_migration_failed()
         {
             var migrator_0_1 = BuildMigration(0, 1);
             var migrator_1_2 = BuildMigration(1, 2);
@@ -107,13 +108,35 @@ namespace Squidex.Infrastructure.Migrations
 
             A.CallTo(() => migrator_1_2.UpdateAsync()).Throws(new ArgumentException());
 
-            await Assert.ThrowsAsync<ArgumentException>(sut.MigrateAsync);
+            await Assert.ThrowsAsync<MigrationFailedException>(sut.MigrateAsync);
 
             A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened();
             A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened();
             A.CallTo(() => migrator_2_3.UpdateAsync()).MustNotHaveHappened();
 
             A.CallTo(() => status.UnlockAsync(0)).MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_log_exception_when_migration_failed()
+        {
+            var migrator_0_1 = BuildMigration(0, 1);
+            var migrator_1_2 = BuildMigration(1, 2);
+
+            var ex = new InvalidOperationException();
+
+            A.CallTo(() => migrator_0_1.UpdateAsync())
+                .Throws(ex);
+
+            var sut = new Migrator(status, path, log);
+
+            await Assert.ThrowsAsync<MigrationFailedException>(() => sut.MigrateAsync());
+
+            A.CallTo(() => log.Log(SemanticLogLevel.Fatal, default, A<Action<None, IObjectWriter>>.Ignored))
+                .MustHaveHappened();
+
+            A.CallTo(() => migrator_1_2.UpdateAsync())
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -126,8 +149,10 @@ namespace Squidex.Infrastructure.Migrations
 
             await Task.WhenAll(Enumerable.Repeat(0, 10).Select(x => Task.Run(sut.MigrateAsync)));
 
-            A.CallTo(() => migrator_0_1.UpdateAsync()).MustHaveHappened(1, Times.Exactly);
-            A.CallTo(() => migrator_1_2.UpdateAsync()).MustHaveHappened(1, Times.Exactly);
+            A.CallTo(() => migrator_0_1.UpdateAsync())
+                .MustHaveHappened(1, Times.Exactly);
+            A.CallTo(() => migrator_1_2.UpdateAsync())
+                .MustHaveHappened(1, Times.Exactly);
         }
 
         private IMigration BuildMigration(int fromVersion, int toVersion)

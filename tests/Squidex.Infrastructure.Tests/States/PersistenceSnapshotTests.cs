@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => services.GetService(typeof(ISnapshotStore<int, string>)))
                 .Returns(snapshotStore);
 
-            sut = new Store<string>(eventStore, eventDataFormatter, services, streamNameResolver);
+            sut = new Store<string>(eventStore, new DefaultEventEnricher<string>(), eventDataFormatter, services, streamNameResolver);
         }
 
         [Fact]

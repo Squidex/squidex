@@ -24,6 +24,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents
@@ -31,6 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
     public class ContentGrainTests : HandlerTestBase<ContentState>
     {
         private readonly Guid contentId = Guid.NewGuid();
+        private readonly IActivationLimit limit = A.Fake<IActivationLimit>();
         private readonly IAppEntity app;
         private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly IContentRepository contentRepository = A.Dummy<IContentRepository>();
@@ -105,8 +107,15 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             patched = patch.MergeInto(data);
 
-            sut = new ContentGrain(Store, A.Dummy<ISemanticLog>(), appProvider, A.Dummy<IAssetRepository>(), scriptEngine, contentWorkflow, contentRepository);
+            sut = new ContentGrain(Store, A.Dummy<ISemanticLog>(), appProvider, A.Dummy<IAssetRepository>(), scriptEngine, contentWorkflow, contentRepository, limit);
             sut.ActivateAsync(Id).Wait();
+        }
+
+        [Fact]
+        public void Should_set_limit()
+        {
+            A.CallTo(() => limit.SetLimit(5000, TimeSpan.FromMinutes(5)))
+                .MustHaveHappened();
         }
 
         [Fact]

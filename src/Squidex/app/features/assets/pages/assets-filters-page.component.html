@@ -31,14 +31,14 @@
         <div class="sidebar-section">
             <h3>Saved queries</h3>
 
-            <ng-container *ngIf="queries.queries | async; let queries">
-                <ng-container *ngIf="queries.length > 0; else noQuery">
-                    <a class="sidebar-item" *ngFor="let query of queries; trackBy: trackByQuery" (click)="search(query.filter)"
-                        [class.active]="isSelectedQuery(query.filter)">
+            <ng-container *ngIf="queries.queries | async; let assetQueries">
+                <ng-container *ngIf="assetQueries.length > 0; else noQuery">
+                    <a class="sidebar-item" *ngFor="let saved of assetQueries; trackBy: trackByQuery" (click)="search(saved.query)"
+                        [class.active]="isSelectedQuery(saved)">
                         
-                        {{query.name}}
+                        {{saved.name}}
                         
-                        <a class="sidebar-item-remove float-right" (click)="queries.remove(query.name)">
+                        <a class="sidebar-item-remove float-right" (click)="queries.remove(saved)" sqxStopClick>
                             <i class="icon-close"></i>
                         </a>
                     </a>

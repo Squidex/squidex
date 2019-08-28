@@ -9,60 +9,65 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
-    public sealed class SchemasByAppIndexGrain : GrainOfGuid<SchemasByAppIndexGrain.GrainState>, ISchemasByAppIndex
+    public sealed class SchemasByAppIndexGrain : GrainOfGuid, ISchemasByAppIndex
     {
+        private readonly IGrainState<GrainState> state;
+
         [CollectionName("Index_SchemasByApp")]
         public sealed class GrainState
         {
             public Dictionary<string, Guid> Schemas { get; set; } = new Dictionary<string, Guid>();
         }
 
-        public SchemasByAppIndexGrain(IStore<Guid> store)
-            : base(store)
+        public SchemasByAppIndexGrain(IGrainState<GrainState> state)
         {
+            Guard.NotNull(state, nameof(state));
+
+            this.state = state;
         }
 
         public Task ClearAsync()
         {
-            return ClearStateAsync();
+            return state.ClearAsync();
         }
 
         public Task RebuildAsync(Dictionary<string, Guid> schemas)
         {
-            State = new GrainState { Schemas = schemas };
+            state.Value = new GrainState { Schemas = schemas };
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task AddSchemaAsync(Guid schemaId, string name)
         {
-            State.Schemas[name] = schemaId;
+            state.Value.Schemas[name] = schemaId;
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task RemoveSchemaAsync(Guid schemaId)
         {
-            State.Schemas.Remove(State.Schemas.FirstOrDefault(x => x.Value == schemaId).Key ?? string.Empty);
+            state.Value.Schemas.Remove(state.Value.Schemas.FirstOrDefault(x => x.Value == schemaId).Key ?? string.Empty);
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task<Guid> GetSchemaIdAsync(string name)
         {
-            State.Schemas.TryGetValue(name, out var schemaId);
+            state.Value.Schemas.TryGetValue(name, out var schemaId);
 
             return Task.FromResult(schemaId);
         }
 
         public Task<List<Guid>> GetSchemaIdsAsync()
         {
-            return Task.FromResult(State.Schemas.Values.ToList());
+            return Task.FromResult(state.Value.Schemas.Values.ToList());
         }
     }
 }

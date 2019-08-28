@@ -42,7 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_lastModified()
         {
             var i = F(ClrFilter.Eq("lastModified", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
-            var o = C("{ 'LastModified' : ISODate('1988-01-19T12:00:00Z') }");
+            var o = C("{ 'mt' : ISODate('1988-01-19T12:00:00Z') }");
 
             Assert.Equal(o, i);
         }
@@ -51,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_lastModifiedBy()
         {
             var i = F(ClrFilter.Eq("lastModifiedBy", "Me"));
-            var o = C("{ 'LastModifiedBy' : 'Me' }");
+            var o = C("{ 'mb' : 'Me' }");
 
             Assert.Equal(o, i);
         }
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_created()
         {
             var i = F(ClrFilter.Eq("created", InstantPattern.General.Parse("1988-01-19T12:00:00Z").Value));
-            var o = C("{ 'Created' : ISODate('1988-01-19T12:00:00Z') }");
+            var o = C("{ 'ct' : ISODate('1988-01-19T12:00:00Z') }");
 
             Assert.Equal(o, i);
         }
@@ -69,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_createdBy()
         {
             var i = F(ClrFilter.Eq("createdBy", "Me"));
-            var o = C("{ 'CreatedBy' : 'Me' }");
+            var o = C("{ 'cb' : 'Me' }");
 
             Assert.Equal(o, i);
         }
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_version()
         {
             var i = F(ClrFilter.Eq("version", 0));
-            var o = C("{ 'Version' : NumberLong(0) }");
+            var o = C("{ 'vs' : NumberLong(0) }");
 
             Assert.Equal(o, i);
         }
@@ -87,7 +87,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_fileVersion()
         {
             var i = F(ClrFilter.Eq("fileVersion", 2));
-            var o = C("{ 'FileVersion' : NumberLong(2) }");
+            var o = C("{ 'fv' : NumberLong(2) }");
 
             Assert.Equal(o, i);
         }
@@ -96,7 +96,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_tags()
         {
             var i = F(ClrFilter.Eq("tags", "tag1"));
-            var o = C("{ 'Tags' : 'tag1' }");
+            var o = C("{ 'td' : 'tag1' }");
 
             Assert.Equal(o, i);
         }
@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_fileName()
         {
             var i = F(ClrFilter.Eq("fileName", "Logo.png"));
-            var o = C("{ 'FileName' : 'Logo.png' }");
+            var o = C("{ 'fn' : 'Logo.png' }");
 
             Assert.Equal(o, i);
         }
@@ -114,7 +114,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_isImage()
         {
             var i = F(ClrFilter.Eq("isImage", true));
-            var o = C("{ 'IsImage' : true }");
+            var o = C("{ 'im' : true }");
 
             Assert.Equal(o, i);
         }
@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_mimeType()
         {
             var i = F(ClrFilter.Eq("mimeType", "text/json"));
-            var o = C("{ 'MimeType' : 'text/json' }");
+            var o = C("{ 'mm' : 'text/json' }");
 
             Assert.Equal(o, i);
         }
@@ -132,7 +132,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_fileSize()
         {
             var i = F(ClrFilter.Eq("fileSize", 1024));
-            var o = C("{ 'FileSize' : NumberLong(1024) }");
+            var o = C("{ 'fs' : NumberLong(1024) }");
 
             Assert.Equal(o, i);
         }
@@ -141,7 +141,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_pixelHeight()
         {
             var i = F(ClrFilter.Eq("pixelHeight", 600));
-            var o = C("{ 'PixelHeight' : 600 }");
+            var o = C("{ 'ph' : 600 }");
 
             Assert.Equal(o, i);
         }
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_query_with_pixelWidth()
         {
             var i = F(ClrFilter.Eq("pixelWidth", 800));
-            var o = C("{ 'PixelWidth' : 800 }");
+            var o = C("{ 'pw' : 800 }");
 
             Assert.Equal(o, i);
         }
@@ -159,7 +159,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_orderby_with_single_field()
         {
             var i = S(SortBuilder.Descending("lastModified"));
-            var o = C("{ 'LastModified' : -1 }");
+            var o = C("{ 'mt' : -1 }");
 
             Assert.Equal(o, i);
         }
@@ -168,7 +168,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.MongoDb
         public void Should_make_orderby_with_multiple_fields()
         {
             var i = S(SortBuilder.Ascending("lastModified"), SortBuilder.Descending("lastModifiedBy"));
-            var o = C("{ 'LastModified' : 1, 'LastModifiedBy' : -1 }");
+            var o = C("{ 'mt' : 1, 'mb' : -1 }");
 
             Assert.Equal(o, i);
         }

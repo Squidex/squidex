@@ -105,7 +105,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         {
             var cacheKey = BuildJsonCacheKey(context.App, schema, context.IsFrontendClient);
 
-            var result = Cache.GetOrCreate<JsonSchema>(cacheKey, entry =>
+            var result = Cache.GetOrCreate(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = CacheTime;
 

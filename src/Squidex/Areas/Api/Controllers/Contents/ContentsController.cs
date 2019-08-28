@@ -272,7 +272,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
         /// </remarks>
         [HttpPost]
         [Route("content/{app}/{name}/")]
-        [ProducesResponseType(typeof(ContentsDto), 200)]
+        [ProducesResponseType(typeof(ContentsDto), 201)]
         [ApiPermission(Permissions.AppContentsCreate)]
         [ApiCosts(1)]
         public async Task<IActionResult> PostContent(string app, string name, [FromBody] NamedContentData request, [FromQuery] bool publish = false)
@@ -283,7 +283,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var response = await InvokeCommandAsync(app, name, command);
 
-            return CreatedAtAction(nameof(GetContent), new { id = command.ContentId }, response);
+            return CreatedAtAction(nameof(GetContent), new { app, id = command.ContentId }, response);
         }
 
         /// <summary>

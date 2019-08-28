@@ -125,6 +125,8 @@ namespace Squidex
         {
             app.ApplicationServices.LogConfiguration();
 
+            app.UsePluginsBefore();
+
             app.UseMyHealthCheck();
             app.UseMyRobotsTxt();
             app.UseMyTracking();
@@ -138,6 +140,7 @@ namespace Squidex
             app.ConfigureIdentityServer();
             app.ConfigureFrontend();
 
+            app.UsePluginsAfter();
             app.UsePlugins();
         }
     }

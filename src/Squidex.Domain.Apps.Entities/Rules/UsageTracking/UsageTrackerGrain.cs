@@ -22,8 +22,9 @@ using Squidex.Infrastructure.UsageTracking;
 namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 {
     [Reentrant]
-    public sealed class UsageTrackerGrain : GrainOfString<UsageTrackerGrain.GrainState>, IRemindable, IUsageTrackerGrain
+    public sealed class UsageTrackerGrain : GrainOfString, IRemindable, IUsageTrackerGrain
     {
+        private readonly IGrainState<GrainState> state;
         private readonly IUsageTracker usageTracker;
 
         public sealed class Target
@@ -43,10 +44,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
             public Dictionary<Guid, Target> Targets { get; set; } = new Dictionary<Guid, Target>();
         }
 
-        public UsageTrackerGrain(IStore<string> store, IUsageTracker usageTracker)
-            : base(store)
+        public UsageTrackerGrain(IGrainState<GrainState> state, IUsageTracker usageTracker)
         {
+            Guard.NotNull(state, nameof(state));
             Guard.NotNull(usageTracker, nameof(usageTracker));
+
+            this.state = state;
 
             this.usageTracker = usageTracker;
         }
@@ -75,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         {
             var today = DateTime.Today;
 
-            foreach (var kvp in State.Targets)
+            foreach (var kvp in state.Value.Targets)
             {
                 var target = kvp.Value;
 
@@ -99,12 +102,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
                             RuleId = kvp.Key
                         };
 
-                        await Persistence.WriteEventAsync(Envelope.Create<IEvent>(@event));
+                        await state.WriteEventAsync(Envelope.Create<IEvent>(@event));
                     }
                 }
             }
 
-            await WriteStateAsync();
+            await state.WriteAsync();
         }
 
         private static DateTime GetFromDate(DateTime today, int? numDays)
@@ -123,33 +126,33 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
         {
             UpdateTarget(ruleId, t => { t.Limits = limits; t.AppId = appId; t.NumDays = numDays; });
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task UpdateTargetAsync(Guid ruleId, int limits, int? numDays)
         {
             UpdateTarget(ruleId, t => { t.Limits = limits; t.NumDays = numDays; });
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task AddTargetAsync(Guid ruleId, int limits)
         {
             UpdateTarget(ruleId, t => t.Limits = limits);
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task RemoveTargetAsync(Guid ruleId)
         {
-            State.Targets.Remove(ruleId);
+            state.Value.Targets.Remove(ruleId);
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         private void UpdateTarget(Guid ruleId, Action<Target> updater)
         {
-            updater(State.Targets.GetOrAddNew(ruleId));
+            updater(state.Value.Targets.GetOrAddNew(ruleId));
         }
     }
 }

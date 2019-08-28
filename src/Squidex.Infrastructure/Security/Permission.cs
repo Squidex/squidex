@@ -6,23 +6,33 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Squidex.Infrastructure.Security
 {
-    public sealed class Permission : IComparable<Permission>, IEquatable<Permission>
+    public sealed partial class Permission : IComparable<Permission>, IEquatable<Permission>
     {
         public const string Any = "*";
+        public const string Exclude = "^";
 
-        private static readonly char[] MainSeparators = { '.' };
-        private static readonly char[] AlternativeSeparators = { '|' };
         private readonly string id;
-        private readonly Lazy<HashSet<string>[]> idParts;
+        private Part[] path;
 
         public string Id
         {
             get { return id; }
+        }
+
+        private Part[] Path
+        {
+            get
+            {
+                if (path == null)
+                {
+                    path = Part.ParsePath(id);
+                }
+
+                return path;
+            }
         }
 
         public Permission(string id)
@@ -30,21 +40,6 @@ namespace Squidex.Infrastructure.Security
             Guard.NotNullOrEmpty(id, nameof(id));
 
             this.id = id;
-
-            idParts = new Lazy<HashSet<string>[]>(() => id
-                .Split(MainSeparators, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x =>
-                {
-                    if (x == Any)
-                    {
-                        return null;
-                    }
-
-                    var alternatives = x.Split(AlternativeSeparators, StringSplitOptions.RemoveEmptyEntries);
-
-                    return new HashSet<string>(alternatives, StringComparer.OrdinalIgnoreCase);
-                })
-                .ToArray());
         }
 
         public bool Allows(Permission permission)
@@ -54,26 +49,7 @@ namespace Squidex.Infrastructure.Security
                 return false;
             }
 
-            var lhs = idParts.Value;
-            var rhs = permission.idParts.Value;
-
-            if (lhs.Length > rhs.Length)
-            {
-                return false;
-            }
-
-            for (var i = 0; i < lhs.Length; i++)
-            {
-                var l = lhs[i];
-                var r = rhs[i];
-
-                if (l != null && (r == null || !l.Intersect(r).Any()))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return Covers(Path, permission.Path);
         }
 
         public bool Includes(Permission permission)
@@ -83,15 +59,32 @@ namespace Squidex.Infrastructure.Security
                 return false;
             }
 
-            var lhs = idParts.Value;
-            var rhs = permission.idParts.Value;
+            return PartialCovers(Path, permission.Path);
+        }
 
-            for (var i = 0; i < Math.Min(lhs.Length, rhs.Length); i++)
+        private static bool Covers(Part[] given, Part[] requested)
+        {
+            if (given.Length > requested.Length)
             {
-                var l = lhs[i];
-                var r = rhs[i];
+                return false;
+            }
 
-                if (l != null && r != null && !l.Intersect(r).Any())
+            for (var i = 0; i < given.Length; i++)
+            {
+                if (!Part.Intersects(ref given[i], ref requested[i], false))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool PartialCovers(Part[] given, Part[] requested)
+        {
+            for (var i = 0; i < Math.Min(given.Length, requested.Length); i++)
+            {
+                if (!Part.Intersects(ref given[i], ref requested[i], true))
                 {
                     return false;
                 }

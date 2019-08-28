@@ -5,30 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities
 {
-    public abstract class SquidexDomainObjectGrainLogSnapshots<T> : LogSnapshotDomainObjectGrain<T> where T : IDomainState<T>, new()
+    public sealed class SquidexEventEnricher<T> : DefaultEventEnricher<T>
     {
-        protected SquidexDomainObjectGrainLogSnapshots(IStore<Guid> store, ISemanticLog log)
-            : base(store, log)
-        {
-        }
-
-        public override void RaiseEvent(Envelope<IEvent> @event)
+        public override void Enrich(Envelope<IEvent> @event, T id)
         {
             if (@event.Payload is AppEvent appEvent)
             {
                 @event.SetAppId(appEvent.AppId.Id);
             }
 
-            base.RaiseEvent(@event);
+            base.Enrich(@event, id);
         }
     }
 }

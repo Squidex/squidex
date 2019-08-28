@@ -43,12 +43,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 Initial,
                 Steps?.ToDictionary(
                     x => x.Key,
-                    x => new WorkflowStep(
-                        x.Value?.Transitions.ToDictionary(
-                            y => y.Key,
-                            y => new WorkflowTransition(y.Value.Expression, y.Value.Role)),
-                        x.Value.Color,
-                        x.Value.NoUpdate)),
+                    x => x.Value?.ToStep()),
                 SchemaIds,
                 Name);
 

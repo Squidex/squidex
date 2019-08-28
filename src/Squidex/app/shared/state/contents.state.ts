@@ -20,11 +20,12 @@ import {
     Versioned
 } from '@app/framework';
 
+import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
 import { SchemaDto } from './../services/schemas.service';
 import { AppsState } from './apps.state';
+import { SavedQuery } from './queries';
+import { encodeQuery, Query } from './query';
 import { SchemasState } from './schemas.state';
-
-import { ContentDto, ContentsService, StatusInfo } from './../services/contents.service';
 
 interface Snapshot {
     // The current comments.
@@ -34,7 +35,10 @@ interface Snapshot {
     contentsPager: Pager;
 
     // The query to filter and sort contents.
-    contentsQuery?: string;
+    contentsQuery?: Query;
+
+    // The raw content query.
+    contentsQueryJson: string;
 
     // Indicates if the contents are loaded.
     isLoaded?: boolean;
@@ -81,6 +85,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public canCreateAny =
         this.project(x => !!x.canCreate || !!x.canCreateAndPublish);
 
+    public statuses =
+        this.project(x => x.statuses);
+
     public statusQueries =
         this.project2(x => x.statuses, x => buildQueries(x));
 
@@ -89,7 +96,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService
     ) {
-        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0) });
+        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0), contentsQueryJson: '' });
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
@@ -169,6 +176,11 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     };
                 });
             }));
+    }
+
+    public loadVersion(content: ContentDto, version: Version): Observable<Versioned<any>> {
+        return this.contentsService.getVersionData(this.appName, this.schemaName, content.id, version).pipe(
+            shareSubscribed(this.dialogs));
     }
 
     public create(request: any, publish: boolean): Observable<ContentDto> {
@@ -282,24 +294,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    private replaceContent(content: ContentDto, oldVersion?: Version) {
-        if (!oldVersion || !oldVersion.eq(content.version)) {
-            return this.next(s => {
-                const contents = s.contents.replaceBy('id', content);
-
-                const selectedContent =
-                    s.selectedContent &&
-                    s.selectedContent.id === content.id ?
-                    content :
-                    s.selectedContent;
-
-                return { ...s, contents, selectedContent };
-            });
-        }
-    }
-
-    public search(contentsQuery?: string): Observable<any> {
-        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery }));
+    public search(contentsQuery?: Query): Observable<any> {
+        this.next(s => ({ ...s, contentsPager: new Pager(0), contentsQuery, contentsQueryJson: encodeQuery(contentsQuery) }));
 
         return this.loadInternal();
     }
@@ -316,13 +312,28 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return this.loadInternal();
     }
 
-    public loadVersion(content: ContentDto, version: Version): Observable<Versioned<any>> {
-        return this.contentsService.getVersionData(this.appName, this.schemaName, content.id, version).pipe(
-            shareSubscribed(this.dialogs));
+    public isQueryUsed(saved: SavedQuery) {
+        return this.snapshot.contentsQueryJson === saved.queryJson;
     }
 
     private get appName() {
         return this.appsState.appName;
+    }
+
+    private replaceContent(content: ContentDto, oldVersion?: Version) {
+        if (!oldVersion || !oldVersion.eq(content.version)) {
+            return this.next(s => {
+                const contents = s.contents.replaceBy('id', content);
+
+                const selectedContent =
+                    s.selectedContent &&
+                    s.selectedContent.id === content.id ?
+                    content :
+                    s.selectedContent;
+
+                return { ...s, contents, selectedContent };
+            });
+        }
     }
 
     protected abstract get schemaName(): string;
@@ -356,12 +367,20 @@ export class ManualContentsState extends ContentsStateBase {
     }
 }
 
-export type ContentQuery =  { color: string; name: string; filter: string; };
+export type ContentQuery =  { color: string; } & SavedQuery;
 
 function buildQueries(statuses: StatusInfo[] | undefined): ContentQuery[] {
     return statuses ? statuses.map(s => buildQuery(s)) : [];
 }
 
 function buildQuery(s: StatusInfo) {
-    return ({ name: s.status, color: s.color, filter: `$filter=status eq '${s.status}'` });
+    const query = {
+        filter: {
+            and: [
+                { path: 'status', op: 'eq', value: s.status }
+            ]
+        }
+    };
+
+    return ({ name: s.status, color: s.color, query, queryJson: encodeQuery(query) });
 }

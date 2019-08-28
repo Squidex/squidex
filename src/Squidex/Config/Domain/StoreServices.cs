@@ -73,7 +73,7 @@ namespace Squidex.Config.Domain
                     services.AddTransientAs<ConvertRuleEventsJson>()
                         .As<IMigration>();
 
-                    services.AddTransientAs<RenameSlugField>()
+                    services.AddTransientAs<RenameAssetSlugField>()
                         .As<IMigration>();
 
                     services.AddHealthChecks()

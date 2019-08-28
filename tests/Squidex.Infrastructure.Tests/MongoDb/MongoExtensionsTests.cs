@@ -36,9 +36,12 @@ namespace Squidex.Infrastructure.MongoDb
                 }
             }
 
-            public Cursor<T> Add(T item)
+            public Cursor<T> Add(params T[] newItems)
             {
-                items.Add(item);
+                foreach (var item in newItems)
+                {
+                    items.Add(item);
+                }
 
                 return this;
             }
@@ -74,7 +77,7 @@ namespace Squidex.Infrastructure.MongoDb
         {
             var result = new List<int>();
 
-            var cursor = new Cursor<int>().Add(0).Add(1).Add(1).Add(2).Add(3).Add(5);
+            var cursor = new Cursor<int>().Add(0, 1, 2, 3, 4, 5);
 
             await cursor.ForEachPipelineAsync(x =>
             {
@@ -82,7 +85,7 @@ namespace Squidex.Infrastructure.MongoDb
                 return TaskHelper.Done;
             });
 
-            Assert.Equal(new List<int> { 0, 1, 1, 2, 3, 5 }, result);
+            Assert.Equal(new List<int> { 0, 1, 2, 3, 4, 5 }, result);
         }
 
         [Fact]
@@ -92,18 +95,19 @@ namespace Squidex.Infrastructure.MongoDb
 
             var result = new List<int>();
 
-            var cursor = new Cursor<int>().Add(0).Add(1).Add(1).Add(ex).Add(2).Add(3).Add(5);
-
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            using (var cursor = new Cursor<int>().Add(0, 1, 2).Add(ex).Add(3, 4, 5))
             {
-                return cursor.ForEachPipelineAsync(x =>
+                await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 {
-                    result.Add(x);
-                    return TaskHelper.Done;
+                    return cursor.ForEachPipelineAsync(x =>
+                    {
+                        result.Add(x);
+                        return TaskHelper.Done;
+                    });
                 });
-            });
+            }
 
-            Assert.Equal(new List<int> { 0, 1, 1 }, result);
+            Assert.Equal(new List<int> { 0, 1, 2 }, result);
         }
 
         [Fact]
@@ -113,50 +117,53 @@ namespace Squidex.Infrastructure.MongoDb
 
             var result = new List<int>();
 
-            var cursor = new Cursor<int>().Add(0).Add(1).Add(1).Add(2).Add(3).Add(5);
-
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            using (var cursor = new Cursor<int>().Add(0, 1, 2, 3, 4, 5))
             {
-                return cursor.ForEachPipelineAsync(x =>
+                await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 {
-                    if (x == 2)
+                    return cursor.ForEachPipelineAsync(x =>
                     {
-                        throw ex;
-                    }
+                        if (x == 2)
+                        {
+                            throw ex;
+                        }
 
-                    result.Add(x);
-                    return TaskHelper.Done;
+                        result.Add(x);
+                        return TaskHelper.Done;
+                    });
                 });
-            });
+            }
 
-            Assert.Equal(new List<int> { 0, 1, 1 }, result);
+            Assert.Equal(new List<int> { 0, 1 }, result);
         }
 
         [Fact]
         public async Task Should_stop_when_cancelled1()
         {
-            var cts = new CancellationTokenSource();
-
-            var result = new List<int>();
-
-            var cursor = new Cursor<int>().Add(0).Add(1).Add(1).Add(2).Add(3).Add(5);
-
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            using (var cts = new CancellationTokenSource())
             {
-                return cursor.ForEachPipelineAsync(x =>
+                var result = new List<int>();
+
+                using (var cursor = new Cursor<int>().Add(0, 1, 2, 3, 4, 5))
                 {
-                    if (x == 2)
+                    await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
                     {
-                        cts.Cancel();
-                    }
+                        return cursor.ForEachPipelineAsync(x =>
+                        {
+                            if (x == 2)
+                            {
+                                cts.Cancel();
+                            }
 
-                    result.Add(x);
+                            result.Add(x);
 
-                    return TaskHelper.Done;
-                }, cts.Token);
-            });
+                            return TaskHelper.Done;
+                        }, cts.Token);
+                    });
+                }
 
-            Assert.Equal(new List<int> { 0, 1, 1, 2 }, result);
+                Assert.Equal(new List<int> { 0, 1, 2 }, result);
+            }
         }
     }
 }
