@@ -227,13 +227,13 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.router.navigate([this.schema.name], { relativeTo: this.route.parent!.parent, replaceUrl: true });
     }
 
-    private loadContent(data: any) {
+    private loadContent(data: any, dirty = false) {
         this.isLoadingContent = true;
 
         this.autoSaveService.remove(this.autoSaveKey);
 
         try {
-            this.contentForm.loadContent(data);
+            this.contentForm.loadContent(data, dirty);
             this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
         } finally {
             this.isLoadingContent = false;
