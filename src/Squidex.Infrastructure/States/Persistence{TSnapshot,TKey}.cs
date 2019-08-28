@@ -22,6 +22,7 @@ namespace Squidex.Infrastructure.States
         private readonly ISnapshotStore<TSnapshot, TKey> snapshotStore;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
+        private readonly IEventEnricher<TKey> eventEnricher;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly PersistenceMode persistenceMode;
         private readonly HandleSnapshot<TSnapshot> applyState;
@@ -37,6 +38,7 @@ namespace Squidex.Infrastructure.States
 
         public Persistence(TKey ownerKey, Type ownerType,
             IEventStore eventStore,
+            IEventEnricher<TKey> eventEnricher,
             IEventDataFormatter eventDataFormatter,
             ISnapshotStore<TSnapshot, TKey> snapshotStore,
             IStreamNameResolver streamNameResolver,
@@ -49,6 +51,7 @@ namespace Squidex.Infrastructure.States
             this.applyState = applyState;
             this.applyEvent = applyEvent;
             this.eventStore = eventStore;
+            this.eventEnricher = eventEnricher;
             this.eventDataFormatter = eventDataFormatter;
             this.persistenceMode = persistenceMode;
             this.snapshotStore = snapshotStore;
@@ -156,6 +159,11 @@ namespace Squidex.Infrastructure.States
                 var expectedVersion = UseEventSourcing() ? version : EtagVersion.Any;
 
                 var commitId = Guid.NewGuid();
+
+                foreach (var @event in eventArray)
+                {
+                    eventEnricher.Enrich(@event, ownerKey);
+                }
 
                 var eventStream = GetStreamName();
                 var eventData = GetEventData(eventArray, commitId);

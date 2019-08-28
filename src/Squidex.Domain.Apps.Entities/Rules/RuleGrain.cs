@@ -22,7 +22,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules
 {
-    public sealed class RuleGrain : SquidexDomainObjectGrain<RuleState>, IRuleGrain
+    public sealed class RuleGrain : DomainObjectGrain<RuleState>, IRuleGrain
     {
         private readonly IAppProvider appProvider;
 

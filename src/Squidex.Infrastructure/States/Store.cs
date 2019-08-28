@@ -16,15 +16,18 @@ namespace Squidex.Infrastructure.States
         private readonly IServiceProvider services;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
+        private readonly IEventEnricher<TKey> eventEnricher;
         private readonly IEventDataFormatter eventDataFormatter;
 
         public Store(
             IEventStore eventStore,
+            IEventEnricher<TKey> eventEnricher,
             IEventDataFormatter eventDataFormatter,
             IServiceProvider services,
             IStreamNameResolver streamNameResolver)
         {
             this.eventStore = eventStore;
+            this.eventEnricher = eventEnricher;
             this.eventDataFormatter = eventDataFormatter;
             this.services = services;
             this.streamNameResolver = streamNameResolver;
@@ -51,7 +54,7 @@ namespace Squidex.Infrastructure.States
 
             var snapshotStore = GetSnapshotStore<None>();
 
-            return new Persistence<TKey>(key, owner, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, applyEvent);
+            return new Persistence<TKey>(key, owner, eventStore, eventEnricher, eventDataFormatter, snapshotStore, streamNameResolver, applyEvent);
         }
 
         private IPersistence<TState> CreatePersistence<TState>(Type owner, TKey key, PersistenceMode mode, HandleSnapshot<TState> applySnapshot, HandleEvent applyEvent)
@@ -60,7 +63,7 @@ namespace Squidex.Infrastructure.States
 
             var snapshotStore = GetSnapshotStore<TState>();
 
-            return new Persistence<TState, TKey>(key, owner, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
+            return new Persistence<TState, TKey>(key, owner, eventStore, eventEnricher, eventDataFormatter, snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
         }
 
         public Task ClearSnapshotsAsync<TState>()

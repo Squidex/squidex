@@ -10,15 +10,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
     public class SchemasByAppIndexGrainTests
     {
-        private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
-        private readonly IPersistence<SchemasByAppIndexGrain.GrainState> persistence = A.Fake<IPersistence<SchemasByAppIndexGrain.GrainState>>();
+        private readonly IGrainState<SchemasByAppIndexGrain.GrainState> grainState = A.Fake<IGrainState<SchemasByAppIndexGrain.GrainState>>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly NamedId<Guid> schemaId1 = NamedId.Of(Guid.NewGuid(), "my-schema1");
         private readonly NamedId<Guid> schemaId2 = NamedId.Of(Guid.NewGuid(), "my-schema2");
@@ -26,10 +25,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         public SchemasByAppIndexGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(typeof(SchemasByAppIndexGrain), appId.Id, A<HandleSnapshot<SchemasByAppIndexGrain.GrainState>>.Ignored))
-                .Returns(persistence);
+            A.CallTo(() => grainState.ClearAsync())
+                .Invokes(() => grainState.Value = new SchemasByAppIndexGrain.GrainState());
 
-            sut = new SchemasByAppIndexGrain(store);
+            sut = new SchemasByAppIndexGrain(grainState);
             sut.ActivateAsync(appId.Id).Wait();
         }
 
@@ -42,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             Assert.Equal(schemaId1.Id, result);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<SchemasByAppIndexGrain.GrainState>.Ignored))
+            A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened();
         }
 
@@ -56,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             Assert.Equal(id, Guid.Empty);
 
-            A.CallTo(() => persistence.DeleteAsync())
+            A.CallTo(() => grainState.ClearAsync())
                 .MustHaveHappened();
         }
 
@@ -70,7 +69,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             Assert.Equal(Guid.Empty, result);
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<SchemasByAppIndexGrain.GrainState>.Ignored))
+            A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappenedTwiceExactly();
         }
 
@@ -90,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             Assert.Equal(new List<Guid> { schemaId1.Id, schemaId2.Id }, await sut.GetSchemaIdsAsync());
 
-            A.CallTo(() => persistence.WriteSnapshotAsync(A<SchemasByAppIndexGrain.GrainState>.Ignored))
+            A.CallTo(() => grainState.WriteAsync())
                 .MustHaveHappened();
         }
     }

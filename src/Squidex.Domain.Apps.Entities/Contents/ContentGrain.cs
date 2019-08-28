@@ -26,7 +26,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
-    public sealed class ContentGrain : SquidexDomainObjectGrainLogSnapshots<ContentState>, IContentGrain
+    public sealed class ContentGrain : LogSnapshotDomainObjectGrain<ContentState>, IContentGrain
     {
         private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(5);
         private readonly IAppProvider appProvider;
@@ -42,7 +42,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             IAssetRepository assetRepository,
             IScriptEngine scriptEngine,
             IContentWorkflow contentWorkflow,
-            IContentRepository contentRepository)
+            IContentRepository contentRepository,
+            IActivationLimit limit)
             : base(store, log)
         {
             Guard.NotNull(appProvider, nameof(appProvider));
@@ -56,13 +57,8 @@ namespace Squidex.Domain.Apps.Entities.Contents
             this.assetRepository = assetRepository;
             this.contentWorkflow = contentWorkflow;
             this.contentRepository = contentRepository;
-        }
 
-        public override Task OnActivateAsync()
-        {
-            DelayDeactivation(Lifetime);
-
-            return base.OnActivateAsync();
+            limit?.SetLimit(5000, Lifetime);
         }
 
         protected override Task<object> ExecuteAsync(IAggregateCommand command)

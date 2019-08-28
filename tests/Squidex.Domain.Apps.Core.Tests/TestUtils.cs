@@ -46,6 +46,7 @@ namespace Squidex.Domain.Apps.Core
                     new AppContributorsConverter(),
                     new AppPatternsConverter(),
                     new ClaimsPrincipalConverter(),
+                    new ContentFieldDataConverter(),
                     new EnvelopeHeadersConverter(),
                     new FilterConverter(),
                     new InstantConverter(),

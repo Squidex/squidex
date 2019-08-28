@@ -12,19 +12,35 @@ using Xunit;
 
 namespace LoadTest
 {
-    public class ContentQueryBenchmarks : IClassFixture<ClientQueryFixture>
-    {
-        public ClientQueryFixture Fixture { get; }
+    public class ReadingBenchmarks : IClassFixture<ReadingFixture>
+{
+        public ReadingFixture Fixture { get; }
 
-        public ContentQueryBenchmarks(ClientQueryFixture fixture)
+        public ReadingBenchmarks(ReadingFixture fixture)
         {
             Fixture = fixture;
         }
 
         public static IEnumerable<object[]> Loads()
         {
-            int[] users = { 1, 5, 10, 20, 50, 100 };
-            int[] loads = { 5, 10, 20, 50, 100 };
+            int[] users =
+            {
+                1,
+                5,
+                10,
+                20,
+                50,
+                100
+            };
+
+            int[] loads =
+            {
+                5,
+                10,
+                20,
+                50,
+                100
+            };
 
             foreach (var user in users)
             {
@@ -33,6 +49,8 @@ namespace LoadTest
                     yield return new object[] { user, load };
                 }
             }
+
+            yield return new object[] { 1, 20000 };
         }
 
         [Theory]

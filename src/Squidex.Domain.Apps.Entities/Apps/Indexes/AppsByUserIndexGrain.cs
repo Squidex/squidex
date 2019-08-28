@@ -9,48 +9,53 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public sealed class AppsByUserIndexGrain : GrainOfString<AppsByUserIndexGrain.GrainState>, IAppsByUserIndex
+    public sealed class AppsByUserIndexGrain : GrainOfString, IAppsByUserIndex
     {
+        private readonly IGrainState<GrainState> state;
+
         [CollectionName("Index_AppsByUser")]
         public sealed class GrainState
         {
             public HashSet<Guid> Apps { get; set; } = new HashSet<Guid>();
         }
 
-        public AppsByUserIndexGrain(IStore<string> store)
-            : base(store)
+        public AppsByUserIndexGrain(IGrainState<GrainState> state)
         {
+            Guard.NotNull(state, nameof(state));
+
+            this.state = state;
         }
 
         public Task RebuildAsync(HashSet<Guid> apps)
         {
-            State = new GrainState { Apps = apps };
+            state.Value = new GrainState { Apps = apps };
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task AddAppAsync(Guid appId)
         {
-            State.Apps.Add(appId);
+            state.Value.Apps.Add(appId);
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task RemoveAppAsync(Guid appId)
         {
-            State.Apps.Remove(appId);
+            state.Value.Apps.Remove(appId);
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task<List<Guid>> GetAppIdsAsync()
         {
-            return Task.FromResult(State.Apps.ToList());
+            return Task.FromResult(state.Value.Apps.ToList());
         }
     }
 }

@@ -10,23 +10,18 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.States;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
     public sealed class AppUISettingsGrainTests
     {
-        private readonly IStore<Guid> store = A.Fake<IStore<Guid>>();
-        private readonly IPersistence<AppUISettingsGrain.GrainState> persistence = A.Fake<IPersistence<AppUISettingsGrain.GrainState>>();
+        private readonly IGrainState<AppUISettingsGrain.GrainState> grainState = A.Fake<IGrainState<AppUISettingsGrain.GrainState>>();
         private readonly AppUISettingsGrain sut;
 
         public AppUISettingsGrainTests()
         {
-            A.CallTo(() => store.WithSnapshots(typeof(AppUISettingsGrain), Guid.Empty, A<HandleSnapshot<AppUISettingsGrain.GrainState>>.Ignored))
-                .Returns(persistence);
-
-            sut = new AppUISettingsGrain(store);
+            sut = new AppUISettingsGrain(grainState);
             sut.ActivateAsync(Guid.Empty).Wait();
         }
 
