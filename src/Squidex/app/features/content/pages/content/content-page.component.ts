@@ -106,7 +106,11 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.own(
             this.contentsState.selectedContent
                 .subscribe(content => {
-                    this.autoSaveKey = { schemaId: this.schema.id, schemaVersion: this.schema.version, contentId: content ? content.id : undefined };
+                    this.autoSaveKey = {
+                        schemaId: this.schema.id,
+                        schemaVersion: this.schema.version,
+                        contentId: content ? content.id : undefined
+                    };
 
                     const autosaved = this.autoSaveService.get(this.autoSaveKey);
 
@@ -120,7 +124,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
                             .subscribe(shouldLoad => {
                                 if (shouldLoad) {
-                                    this.loadContent(autosaved);
+                                    this.loadContent(autosaved, true);
                                 } else {
                                     this.autoSaveService.remove(this.autoSaveKey);
                                 }
