@@ -240,21 +240,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         }
     }
 
-    private loadContentToCompare(data: any | null) {
-        if (data !== null) {
-            if (this.contentFormCompare === null) {
-                this.contentFormCompare = new EditContentForm(this.schema, this.languages);
-            }
-
-            this.contentFormCompare.loadContent(data);
-            this.contentFormCompare.setEnabled(false);
-        } else {
-            if (this.contentFormCompare) {
-                this.contentFormCompare = null;
-            }
-        }
-    }
-
     public discardChanges() {
         this.contentsState.discardDraft(this.content);
     }
@@ -287,10 +272,19 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.contentsState.loadVersion(this.content, version)
                 .subscribe(dto => {
                     if (compare) {
-                        this.loadContentToCompare(dto.payload);
+                        if (this.contentFormCompare === null) {
+                            this.contentFormCompare = new EditContentForm(this.schema, this.languages);
+                        }
+
+                        this.contentFormCompare.loadContent(dto.payload);
+                        this.contentFormCompare.setEnabled(false);
+
                         this.loadContent(this.content.dataDraft);
                     } else {
-                        this.loadContentToCompare(null);
+                        if (this.contentFormCompare) {
+                            this.contentFormCompare = null;
+                        }
+
                         this.loadContent(dto.payload);
                     }
 
