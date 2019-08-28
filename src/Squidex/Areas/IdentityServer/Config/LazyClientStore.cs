@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
@@ -88,7 +89,11 @@ namespace Squidex.Areas.IdentityServer.Config
             {
                 ClientId = user.Id,
                 ClientName = $"{user.Email} Client",
-                ClientSecrets = new List<Secret> { new Secret(user.ClientSecret().Sha256()) },
+                ClientClaimsPrefix = null,
+                ClientSecrets = new List<Secret>
+                {
+                    new Secret(user.ClientSecret().Sha256())
+                },
                 AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 AllowedScopes = new List<string>
@@ -96,6 +101,10 @@ namespace Squidex.Areas.IdentityServer.Config
                     Constants.ApiScope,
                     Constants.RoleScope,
                     Constants.PermissionsScope
+                },
+                Claims = new List<Claim>
+                {
+                    new Claim(OpenIdClaims.Subject, user.Id)
                 }
             };
         }
@@ -106,7 +115,10 @@ namespace Squidex.Areas.IdentityServer.Config
             {
                 ClientId = id,
                 ClientName = id,
-                ClientSecrets = new List<Secret> { new Secret(appClient.Secret.Sha256()) },
+                ClientSecrets = new List<Secret>
+                {
+                    new Secret(appClient.Secret.Sha256())
+                },
                 AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 AllowedScopes = new List<string>
@@ -165,7 +177,10 @@ namespace Squidex.Areas.IdentityServer.Config
             {
                 ClientId = internalClient,
                 ClientName = internalClient,
-                ClientSecrets = new List<Secret> { new Secret(Constants.InternalClientSecret) },
+                ClientSecrets = new List<Secret>
+                {
+                    new Secret(Constants.InternalClientSecret)
+                },
                 RedirectUris = new List<string>
                 {
                     urlsOptions.BuildUrl($"{Constants.PortalPrefix}/signin-internal", false),
@@ -194,7 +209,10 @@ namespace Squidex.Areas.IdentityServer.Config
                 {
                     ClientId = id,
                     ClientName = id,
-                    ClientSecrets = new List<Secret> { new Secret(identityOptions.AdminClientSecret.Sha256()) },
+                    ClientSecrets = new List<Secret>
+                    {
+                        new Secret(identityOptions.AdminClientSecret.Sha256())
+                    },
                     AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds,
                     AllowedGrantTypes = GrantTypes.ClientCredentials,
                     AllowedScopes = new List<string>
