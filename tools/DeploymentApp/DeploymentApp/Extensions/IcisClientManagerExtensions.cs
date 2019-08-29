@@ -291,7 +291,7 @@ namespace DeploymentApp.Extensions
                 var items = await client.GetAsync(new ODataQuery
                 {
                     Filter = $"data/id/iv eq '{id}'"
-                });
+                }, context: QueryContext.Default.Unpublished(true));
 
                 if (items.Total > 0)
                 {

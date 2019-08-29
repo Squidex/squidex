@@ -2,17 +2,25 @@ import { ChildProcess, exec } from 'child_process';
 
 let squidex: ChildProcess;
 
-export function startSquidex() {
+export function startSquidex(silent = true) {
     console.log('[Squidex] Starting');
 
     squidex = exec('cd ../src/squidex && dotnet run');
 
     squidex.stdout.on('data', (data) => {
-        console.log(data.toString());
+        const text = data.toString();
+
+        if (!silent || text.indexOf('exception') >= 0) {
+            console.log(text);
+        }
     });
 
     squidex.stderr.on('data', (data) => {
-        console.error(data.toString());
+        const text = data.toString();
+
+        if (!silent || text.indexOf('exception') >= 0) {
+            console.error(text);
+        }
     });
 
     squidex.on('exit', (code) => {
@@ -30,7 +38,7 @@ export function startSquidex() {
 
 export function stopSquidex() {
     if (squidex) {
-        squidex.kill();
+        squidex.kill('SIGKILL');
 
         console.log('[Squidex] Stopped');
     }

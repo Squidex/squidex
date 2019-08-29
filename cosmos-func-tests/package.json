@@ -4,12 +4,11 @@
   "description": "Automation framework for Cosmos",
   "main": "index.js",
   "scripts": {
-    "pretest": "npm-run-all -s tsc",
-    "compile": "tsc",
+    "prepare": "webdriver-manager update --versions.standalone=3.141.59 --versions.chrome=76.0.3809.68 && start webdriver-manager start --versions.standalone=3.141.59",
+    "pretest": "tsc",
     "test": "protractor ./_out/config.js",
     "test-local": "protractor ./_out/config.js",
-    "protractor": "./node_modules/protractor/built/cli.js",
-    "webdriver-update": "node ./node_modules/protractor/node_modules/webdriver-manager update --versions.standalone=3.141.59 --versions.chrome=76.0.3809.68 && start webdriver-manager start --versions.standalone=3.141.59"
+    "protractor": "./node_modules/protractor/built/cli.js"
   },
   "author": "Pavani",
   "license": "ISC",

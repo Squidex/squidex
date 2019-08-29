@@ -1,12 +1,16 @@
 import { exec } from 'child_process';
 import waitOn from 'wait-on';
 
-function runCommand(text: string) {
+function runCommand(text: string, silent = false) {
+    console.log(`Running command ${text}`);
+
     return new Promise((resolve, reject) => {
         const command = exec(text);
 
         command.stdout.on('data', (data) => {
-            console.log(data.toString());
+            if (!silent) {
+                console.log(data.toString());
+            }
         });
 
         command.stderr.on('data', (data) => {
@@ -35,7 +39,7 @@ export async function runDeployment(baseUrl: string) {
 
     console.log('[Deployment] Starting');
 
-    await runCommand(`cd ../tools/DeploymentApp/DeploymentApp && dotnet run --url ${baseUrl} --skip-rules`);
+    await runCommand(`cd ../tools/DeploymentApp/DeploymentApp && dotnet run --url ${baseUrl} --skip-rules --create-test-data`, false);
 
     console.log('[Deployment] Completed');
 }

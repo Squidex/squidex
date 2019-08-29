@@ -3,7 +3,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 let mongoDbServer: MongoMemoryServer;
 
 export function startMongoDb() {
-    console.log('[MONGODB] Starting in-memory server');
+    console.log('[MongoDb] Starting in-memory server');
 
     mongoDbServer = new MongoMemoryServer({
         instance: {
@@ -11,13 +11,13 @@ export function startMongoDb() {
         }
     });
 
-    console.log('[MONGODB] Started in-memory server');
+    console.log('[MongoDb] Started in-memory server');
 }
 
 export function stopMongoDB() {
     if (mongoDbServer) {
         mongoDbServer.stop();
 
-        console.log('[MONGODB] Stopped');
+        console.log('[MongoDb] Stopped');
     }
 }
