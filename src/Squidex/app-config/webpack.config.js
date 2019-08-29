@@ -303,7 +303,7 @@ module.exports = function (env) {
         config.module.rules.push({
             test: /\.ts$/,
             use: [{
-                loader: 'istanbul-instrumenter-loader'
+                loader: 'istanbul-instrumenter-loader?esModules=true'
             }, {
                 loader: 'ts-loader'
             }],
