@@ -434,6 +434,12 @@ export class EditContentForm extends Form<FormGroup, any> {
         this.enable();
     }
 
+    public hasChanged(content?: ContentDto) {
+        const data = content ? content.dataDraft : {};
+
+        return !Types.jsJsonEquals(this.form.value, data);
+    }
+
     public removeArrayItem(field: RootFieldDto, language: AppLanguageDto, index: number) {
         this.findArrayItemForm(field, language).removeAt(index);
     }

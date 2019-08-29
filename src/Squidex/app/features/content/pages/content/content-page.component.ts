@@ -149,7 +149,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public canDeactivate(): Observable<boolean> {
-        if (!this.contentForm.form.dirty) {
+        if (!this.contentForm.hasChanged(this.content)) {
             return of(true);
         } else {
             return this.dialogs.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view and discard your changes?').pipe(
