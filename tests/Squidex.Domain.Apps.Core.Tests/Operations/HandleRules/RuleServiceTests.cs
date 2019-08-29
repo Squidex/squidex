@@ -9,6 +9,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
@@ -84,7 +85,10 @@ namespace Squidex.Domain.Apps.Core.Operations.HandleRules
 
             var log = A.Fake<ISemanticLog>();
 
-            sut = new RuleService(new[] { ruleTriggerHandler }, new[] { ruleActionHandler }, eventEnricher, TestUtils.DefaultSerializer, clock, log, typeNameRegistry);
+            sut = new RuleService(Options.Create(new RuleOptions()),
+                new[] { ruleTriggerHandler },
+                new[] { ruleActionHandler },
+                eventEnricher, TestUtils.DefaultSerializer, clock, log, typeNameRegistry);
         }
 
         [Fact]
