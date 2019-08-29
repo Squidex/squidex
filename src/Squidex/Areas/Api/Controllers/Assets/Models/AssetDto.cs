@@ -148,11 +148,17 @@ namespace Squidex.Areas.Api.Controllers.Assets.Models
                 response.AddDeleteLink("delete", controller.Url<AssetsController>(x => nameof(x.DeleteAsset), values));
             }
 
-            response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContent), new { id = response.Id, version = response.FileVersion }));
+            var version = response.FileVersion;
 
             if (!string.IsNullOrWhiteSpace(response.Slug))
             {
-                response.AddGetLink("content/slug", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Slug, version = response.Version }));
+                response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Id, version, more = response.Slug }));
+
+                response.AddGetLink("content/slug", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, idOrSlug = response.Slug, version }));
+            }
+            else
+            {
+                response.AddGetLink("content", controller.Url<AssetContentController>(x => nameof(x.GetAssetContentBySlug), new { app, id = response.Id, version }));
             }
 
             return response;
