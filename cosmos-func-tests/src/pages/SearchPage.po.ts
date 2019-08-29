@@ -1,8 +1,8 @@
 import { by, element } from 'protractor';
+
 import { ContentPage } from './ContentPage.po';
 
 export class SearchPage extends ContentPage {
-
     public async getContentsList() {
         return await element.all(by.xpath('//table[@class=\'table table-items table-fixed\']/tbody/tr[@ng-reflect-can-clone=\'true\']/td[7]/sqx-content-value/span')).getWebElements();
     }

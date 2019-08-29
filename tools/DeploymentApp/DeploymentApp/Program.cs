@@ -48,8 +48,13 @@ namespace DeploymentApp
 
             var clientSecretOption =
                 consoleApp.Option("-s|--secret <optionvalue>",
-                    "p@55w0rd",
+                    "Client secret",
                     CommandOptionType.SingleValue);
+
+            var skipRuleOption =
+                consoleApp.Option("--skip-rules",
+                    "Skips the rule option",
+                    CommandOptionType.NoValue);
 
             consoleApp.OnExecute(async () =>
             {
@@ -114,9 +119,12 @@ namespace DeploymentApp
                     await clientManager.UpsertWorkflow(workflow);
                 }
 
-                foreach (var rule in Rules.AllKafkaRules)
+                if (!skipRuleOption.HasValue())
                 {
-                    await clientManager.UpsertKafkaRule(rule);
+                    foreach (var rule in Rules.AllKafkaRules)
+                    {
+                        await clientManager.UpsertKafkaRule(rule);
+                    }
                 }
 
                 return 0;

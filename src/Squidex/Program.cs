@@ -47,13 +47,6 @@ namespace Squidex
 
                     builder.AddCommandLine(args);
                 })
-                .ConfigureKestrel((hostContext, options) =>
-                {
-                    options.Listen(
-                        IPAddress.Any,
-                        hostContext.Configuration.GetValue<int>("hostings:devPort"),
-                        listenOptions => listenOptions.UseHttps("localhost.pfx", "password"));
-                })
                 .Build();
         }
     }
