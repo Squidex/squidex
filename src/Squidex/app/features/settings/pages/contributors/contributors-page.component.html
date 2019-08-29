@@ -49,8 +49,12 @@
                     </tbody>
                 </table>
                 
-                <ng-container>
-                    <div class="table-items-footer" *ngIf="contributorsState.canCreate | async">
+                <ng-container *ngIf="contributorsState.canCreate | async">
+                    <div class="table-items-footer">
+                        <sqx-form-alert marginTop="0" marginBottom="2" white="true">
+                            Just enter the email address to invite someone with no account to the app.
+                        </sqx-form-alert>
+
                         <form [formGroup]="assignContributorForm.form" (ngSubmit)="assignContributor()">
                             <div class="row no-gutters">
                                 <div class="col">
