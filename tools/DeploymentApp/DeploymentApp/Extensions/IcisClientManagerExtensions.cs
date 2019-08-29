@@ -207,7 +207,7 @@ namespace DeploymentApp.Extensions
 
                 ConsoleHelper.Success();
             }
-            catch(SquidexManagementException e)
+            catch (SquidexManagementException e)
             {
                 if (e.StatusCode.Equals(400))
                 {
@@ -219,7 +219,7 @@ namespace DeploymentApp.Extensions
                     throw;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 ConsoleHelper.Failed(e);
                 throw;
@@ -278,6 +278,51 @@ namespace DeploymentApp.Extensions
                 ConsoleHelper.Failed(e);
                 throw;
             }
+        }
+
+        public static async Task CreateContentAsync(this SquidexClientManager clientManager, string schema, string id, string name)
+        {
+            var client = clientManager.GetClient<TestData, object>(schema);
+
+            try
+            {
+                ConsoleHelper.Start($"Creating item for {schema} with id '{id}'");
+
+                var items = await client.GetAsync(new ODataQuery
+                {
+                    Filter = $"data/id/iv eq '{id}'"
+                });
+
+                if (items.Total > 0)
+                {
+                    ConsoleHelper.Skipped("Exists");
+                }
+                else
+                {
+                    await client.CreateAsync(new
+                    {
+                        id = new
+                        {
+                            iv = id
+                        },
+                        name = new
+                        {
+                            iv = name
+                        }
+                    });
+
+                    ConsoleHelper.Success();
+                }
+            }
+            catch (Exception e)
+            {
+                ConsoleHelper.Failed(e);
+                throw;
+            }
+        }
+
+        class TestData : SquidexEntityBase<object>
+        {
         }
     }
 }

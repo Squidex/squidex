@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using System.Threading.Tasks;
 using DeploymentApp.Entities;
 using DeploymentApp.Extensions;
 using Microsoft.Extensions.Caching.Memory;
@@ -53,7 +52,12 @@ namespace DeploymentApp
 
             var skipRuleOption =
                 consoleApp.Option("--skip-rules",
-                    "Skips the rule option",
+                    "Set, to skip generating rules",
+                    CommandOptionType.NoValue);
+
+            var createTestDataOption =
+                consoleApp.Option("--create-test-data",
+                    "Set, to create test data.",
                     CommandOptionType.NoValue);
 
             consoleApp.OnExecute(async () =>
@@ -124,6 +128,24 @@ namespace DeploymentApp
                     foreach (var rule in Rules.AllKafkaRules)
                     {
                         await clientManager.UpsertKafkaRule(rule);
+                    }
+                }
+
+                if (createTestDataOption.HasValue())
+                {
+                    foreach (var (id, name) in TestData.CommentaryTypes)
+                    {
+                        await clientManager.CreateContentAsync("commentary-type", id, name);
+                    }
+
+                    foreach (var (id, name) in TestData.Regions)
+                    {
+                        await clientManager.CreateContentAsync("region", id, name);
+                    }
+
+                    foreach (var (id, name) in TestData.Commodities)
+                    {
+                        await clientManager.CreateContentAsync("commodity", id, name);
                     }
                 }
 
