@@ -1,3 +1,5 @@
+import { browser } from 'protractor';
+
 import {
     BrowserUtil,
     constants,
@@ -10,8 +12,6 @@ import {
     LoginPage,
     SearchPage
 } from './../../pages';
-
-import { config } from '../../config';
 
 describe('Create Commentary', () => {
   const authors = Users;
@@ -47,7 +47,7 @@ describe('Create Commentary', () => {
 
   it('Login with Vega Editor credentials', async () => {
     expect(await browserPage.getCurrentURL()).toBe(
-      `${config.params.baseUrl}/app`
+      `${browser.params.baseUrl}/app`
     );
     const text = await homePage.userNameDisplay();
 

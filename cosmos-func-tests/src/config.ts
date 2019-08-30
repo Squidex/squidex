@@ -10,7 +10,7 @@ import {
 
 declare const allure: any;
 
-export function buildConfig(url: string): Config {
+export function buildConfig(options: { url: string, setup: boolean }): Config {
     function addAllure() {
         const AllureReporter = require('jasmine-allure-reporter');
 
@@ -55,10 +55,12 @@ export function buildConfig(url: string): Config {
             try {
                 addAllure();
 
-                startMongoDb();
-                startSquidex();
+                if (options.setup) {
+                    startMongoDb();
+                    startSquidex();
 
-                await runDeployment(url);
+                    await runDeployment(options.url);
+                }
 
                 browser.manage().timeouts().implicitlyWait(5000);
                 browser.driver
@@ -68,14 +70,16 @@ export function buildConfig(url: string): Config {
             } catch (ex) {
                 browser.close();
 
-                stopSquidex();
-                stopMongoDB();
+                if (options.setup) {
+                    stopSquidex();
+                    stopMongoDB();
+                }
 
                 throw ex;
             }
         },
         params: {
-            baseUrl: url
+            baseUrl: options.url
         },
 
         // When navigating to a new page using browser.get, Protractor waits for the page to be loaded and the new URL to appear before continuing.
@@ -87,10 +91,10 @@ export function buildConfig(url: string): Config {
         onCleanup: () => {
             browser.close();
 
-            stopSquidex();
-            stopMongoDB();
+            if (options.setup) {
+                stopSquidex();
+                stopMongoDB();
+            }
         }
     };
 }
-
-export const config = buildConfig(process.env.SQUIDEX_URL || 'http://localhost:5000');
