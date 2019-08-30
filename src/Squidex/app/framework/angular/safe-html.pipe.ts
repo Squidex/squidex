@@ -22,3 +22,18 @@ export class SafeHtmlPipe implements PipeTransform {
         return this.domSanitizer.bypassSecurityTrustHtml(html);
     }
 }
+
+@Pipe({
+    name: 'sqxSafeUrl',
+    pure: true
+})
+export class SafeUrlPipe implements PipeTransform {
+    constructor(
+        public readonly domSanitizer: DomSanitizer
+    ) {
+    }
+
+    public transform(url: string): SafeHtml {
+        return this.domSanitizer.bypassSecurityTrustUrl(url);
+    }
+}
