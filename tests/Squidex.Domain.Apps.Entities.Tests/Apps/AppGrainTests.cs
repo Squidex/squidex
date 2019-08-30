@@ -101,6 +101,64 @@ namespace Squidex.Domain.Apps.Entities.Apps
         }
 
         [Fact]
+        public async Task Update_should_create_events_and_update_state()
+        {
+            var command = new UpdateApp { Label = "my-label", Description = "my-description" };
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.Equal("my-label", sut.Snapshot.Label);
+            Assert.Equal("my-description", sut.Snapshot.Description);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppUpdated { Label = "my-label", Description = "my-description" })
+                );
+        }
+
+        [Fact]
+        public async Task UploadImage_should_create_events_and_update_state()
+        {
+            var command = new UploadAppImage();
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.True(sut.Snapshot.HasImage);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppImageUploaded())
+                );
+        }
+
+        [Fact]
+        public async Task RemoveImage_should_create_events_and_update_state()
+        {
+            var command = new RemoveAppImage();
+
+            await ExecuteCreateAsync();
+
+            var result = await sut.ExecuteAsync(CreateCommand(command));
+
+            result.ShouldBeEquivalent(sut.Snapshot);
+
+            Assert.False(sut.Snapshot.HasImage);
+
+            LastEvents
+                .ShouldHaveSameEvents(
+                    CreateEvent(new AppImageRemoved())
+                );
+        }
+
+        [Fact]
         public async Task ChangePlan_should_create_events_and_update_state()
         {
             var command = new ChangePlan { PlanId = planIdPaid };

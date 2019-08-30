@@ -75,15 +75,17 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
             }
         }
 
-        let control: AbstractControl | null;
+        let control: AbstractControl | null = null;
 
         if (Types.isString(this.for)) {
-            control = this.formGroupDirective.form.controls[this.for];
+            if (this.formGroupDirective && this.formGroupDirective.form) {
+                control = this.formGroupDirective.form.controls[this.for];
+            }
         } else {
             control = this.for;
         }
 
-        if (this.control !== control) {
+        if (this.control !== control && control) {
             this.unsubscribeAll();
             this.unsetCustomMarkAsTouchedFunction();
 

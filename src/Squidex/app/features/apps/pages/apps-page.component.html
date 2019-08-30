@@ -21,9 +21,9 @@
                         <sqx-avatar [identifier]="app.name"></sqx-avatar>
                     </div>
                     <div class="col">
-                        <h4 class="card-title">{{app.name}}</h4>
+                        <h4 class="card-title">{{app.displayName}}</h4>
 
-                        <div class="card-text">
+                        <div class="card-text card-links">
                             <a [routerLink]="['/app', app.name]" sqxStopClick>Edit</a>
 
                             <span class="deeplinks">
@@ -32,6 +32,10 @@
                                 <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>Assets</a> &middot;
                                 <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>Settings</a>
                             </span>
+                        </div>
+
+                        <div class="card-text">
+                            {{app.description}}
                         </div>
                     </div>
                 </div>

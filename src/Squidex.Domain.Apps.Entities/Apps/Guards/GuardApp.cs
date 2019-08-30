@@ -28,6 +28,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
+        public static void CanUpdate(UpdateApp command)
+        {
+            Guard.NotNull(command, nameof(command));
+        }
+
+        public static void CanUploadImage(UploadAppImage command)
+        {
+            Guard.NotNull(command, nameof(command));
+        }
+
+        public static void CanRemoveImage(RemoveAppImage command)
+        {
+            Guard.NotNull(command, nameof(command));
+        }
+
         public static void CanChangePlan(ChangePlan command, AppPlan plan, IAppPlansProvider appPlans)
         {
             Guard.NotNull(command, nameof(command));

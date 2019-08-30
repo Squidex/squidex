@@ -1,4 +1,4 @@
-<sqx-title message="{app} | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
+<sqx-title message="{app} | Settings" parameter1="app" [value1]="appsState.appDisplayName"></sqx-title>
 
 <sqx-panel theme="dark" desiredWidth="16rem">
     <ng-container title>
@@ -52,12 +52,6 @@
             <li class="nav-item" *ngIf="selectedApp.canReadPlans">
                 <a class="nav-link" routerLink="plans" routerLinkActive="active">
                     Subscription
-                    <i class="icon-angle-right"></i>
-                </a>
-            </li>
-            <li class="nav-item" *ngIf="selectedApp.canDelete">
-                <a class="nav-link" routerLink="more" routerLinkActive="active">
-                    More
                     <i class="icon-angle-right"></i>
                 </a>
             </li>

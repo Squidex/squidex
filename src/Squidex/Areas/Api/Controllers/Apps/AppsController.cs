@@ -91,13 +91,28 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(1)]
         public async Task<IActionResult> PostApp([FromBody] CreateAppDto request)
         {
-            var context = await CommandBus.PublishAsync(request.ToCommand());
+            var response = await InvokeCommandAsync(request.ToCommand());
 
-            var userOrClientId = HttpContext.User.UserOrClientId();
-            var userPermissions = HttpContext.Permissions();
+            return CreatedAtAction(nameof(GetApps), response);
+        }
 
-            var result = context.Result<IAppEntity>();
-            var response = AppDto.FromApp(result, userOrClientId, userPermissions, appPlansProvider, this);
+        /// <summary>
+        /// Archive the app.
+        /// </summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <param name="request">The values to update.</param>
+        /// <returns>
+        /// 200 => App updated.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/")]
+        [ProducesResponseType(typeof(AppDto), 201)]
+        [ApiPermission(Permissions.AppUpdate)]
+        [ApiCosts(1)]
+        public async Task<IActionResult> UpdateApp(string app, [FromBody] UpdateAppDto request)
+        {
+            var response = await InvokeCommandAsync(request.ToCommand());
 
             return CreatedAtAction(nameof(GetApps), response);
         }
@@ -119,6 +134,19 @@ namespace Squidex.Areas.Api.Controllers.Apps
             await CommandBus.PublishAsync(new ArchiveApp());
 
             return NoContent();
+        }
+
+        private async Task<AppDto> InvokeCommandAsync(AppCommand command)
+        {
+            var context = await CommandBus.PublishAsync(command);
+
+            var userOrClientId = HttpContext.User.UserOrClientId();
+            var userPermissions = HttpContext.Permissions();
+
+            var result = context.Result<IAppEntity>();
+            var response = AppDto.FromApp(result, userOrClientId, userPermissions, appPlansProvider, this);
+
+            return response;
         }
     }
 }

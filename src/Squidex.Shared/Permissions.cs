@@ -53,6 +53,7 @@ namespace Squidex.Shared
         public const string AppCommon = "squidex.apps.{app}.common";
 
         public const string AppDelete = "squidex.apps.{app}.delete";
+        public const string AppUpdate = "squidex.apps.{app}.update";
 
         public const string AppClients = "squidex.apps.{app}.clients";
         public const string AppClientsRead = "squidex.apps.{app}.clients.read";

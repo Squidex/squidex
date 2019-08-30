@@ -1,11 +1,41 @@
-<sqx-title message="{app} | More | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
+<sqx-title message="{app} | More | Settings" parameter1="app" [value1]="appsState.appDisplayName"></sqx-title>
 
 <sqx-panel desiredWidth="50rem">
     <ng-container title>
-        More
+        General settings
     </ng-container>
 
     <ng-container content>
+        <div class="card mb-4">
+            <h3 class="card-header">Settings</h3>
+
+            <div class="card-body">
+                <form [formGroup]="updateForm.form" (ngSubmit)="save()">
+                    <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
+
+                    <div class="form-group">
+                        <label for="email">Label</label>
+        
+                        <sqx-control-errors for="label"></sqx-control-errors>
+        
+                        <input type="text" class="form-control" id="label" maxlength="100" formControlName="label" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+        
+                        <sqx-control-errors for="description"></sqx-control-errors>
+        
+                        <input type="text" class="form-control" id="description" maxlength="100" formControlName="description" />
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <div class="card">
             <h3 class="card-header">Danger Zone</h3>
 
@@ -19,7 +49,7 @@
                         </sqx-form-hint>
                     </div>
                     <div class="col-auto">
-                        <button type="button" class="btn btn-danger"
+                        <button type="button" class="btn btn-danger" [disabled]="!isDeletable"
                             (sqxConfirmClick)="archiveApp()"
                             confirmTitle="Archive App" 
                             confirmText="Do you really want to archive this app?">

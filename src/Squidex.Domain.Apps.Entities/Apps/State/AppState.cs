@@ -26,6 +26,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         public string Name { get; set; }
 
         [DataMember]
+        public string Label { get; set; }
+
+        [DataMember]
+        public string Description { get; set; }
+
+        [DataMember]
         public Roles Roles { get; set; } = Roles.Empty;
 
         [DataMember]
@@ -47,6 +53,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         public Workflows Workflows { get; set; } = Workflows.Empty;
 
         [DataMember]
+        public bool HasImage { get; set; }
+
+        [DataMember]
         public bool IsArchived { get; set; }
 
         protected void On(AppCreated @event)
@@ -54,6 +63,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
             Roles = Roles.CreateDefaults(@event.Name);
 
             SimpleMapper.Map(@event, this);
+        }
+
+        protected void On(AppUpdated @event)
+        {
+            SimpleMapper.Map(@event, this);
+        }
+
+        protected void On(AppImageUploaded @event)
+        {
+            HasImage = true;
+        }
+
+        protected void On(AppImageRemoved @event)
+        {
+            HasImage = false;
         }
 
         protected void On(AppPlanChanged @event)

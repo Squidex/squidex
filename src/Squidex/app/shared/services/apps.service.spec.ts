@@ -15,10 +15,13 @@ import {
     AppsService,
     DateTime,
     Resource,
-    ResourceLinks
+    ResourceLinks,
+    Version
 } from '@app/shared/internal';
 
 describe('AppsService', () => {
+    const version = new Version('1');
+
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
@@ -79,6 +82,31 @@ describe('AppsService', () => {
         expect(app!).toEqual(createApp(12));
     }));
 
+    it('should make put request to update app',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                update: { method: 'PUT', href: '/api/apps/my-app' }
+            }
+        };
+
+        let app: AppDto;
+
+        appsService.putApp(resource, { }, version).subscribe(result => {
+            app = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(appResponse(12));
+
+        expect(app!).toEqual(createApp(12));
+    }));
+
     it('should make delete request to archive app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
 
@@ -101,7 +129,9 @@ describe('AppsService', () => {
     function appResponse(id: number, suffix = '') {
         return {
             id: `id${id}`,
-            name: `name${id}${suffix}`,
+            name: `my-name${id}${suffix}`,
+            label: `my-label${id}${suffix}`,
+            description: `my-description${id}${suffix}`,
             permissions: ['Owner'],
             created: `${id % 1000 + 2000}-12-12T10:10:00`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00`,
@@ -109,6 +139,7 @@ describe('AppsService', () => {
             canAccessContent: id % 2 === 0,
             planName: 'Free',
             planUpgrade: 'Basic',
+            version: id,
             _links: {
                 schemas: { method: 'GET', href: '/schemas' }
             }
@@ -122,12 +153,15 @@ export function createApp(id: number, suffix = '') {
     };
 
     return new AppDto(links,
-        `id${id}`, `name${id}${suffix}`,
+        `id${id}`,
+        `my-name${id}${suffix}`,
+        `my-label${id}${suffix}`,
+        `my-description${id}${suffix}`,
         ['Owner'],
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`),
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`),
         id % 2 === 0,
         id % 2 === 0,
-        'Free',
-        'Basic');
+        'Free', 'Basic',
+        new Version(`${id}`));
 }

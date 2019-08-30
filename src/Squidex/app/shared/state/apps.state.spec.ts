@@ -21,7 +21,9 @@ describe('AppsState', () => {
     const app1 = createApp(1);
     const app2 = createApp(2);
 
-    const newApp = createApp(3);
+    const newApp1 = createApp(1, 'new');
+    const newApp2 = createApp(2, 'new');
+    const newApp3 = createApp(3, 'new');
 
     let dialogs: IMock<DialogService>;
     let appsService: IMock<AppsService>;
@@ -81,49 +83,55 @@ describe('AppsState', () => {
     });
 
     it('should add app to snapshot when created', () => {
-        const request = { ...newApp };
+        const request = { ...newApp3 };
 
         appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp)).verifiable();
+            .returns(() => of(newApp3)).verifiable();
 
         appsState.create(request).subscribe();
 
-        expect(appsState.snapshot.apps.values).toEqual([app1, app2, newApp]);
+        expect(appsState.snapshot.apps.values).toEqual([app1, app2, newApp3]);
+    });
+
+    it('should update app in snapshot when updated', () => {
+        appsService.setup(x => x.putApp(app2, {}, app2.version))
+            .returns(() => of(newApp2)).verifiable();
+
+        appsState.select(app1.name).subscribe();
+        appsState.update(app2, {}).subscribe();
+
+        expect(appsState.snapshot.apps.values).toEqual([app1, newApp2]);
+        expect(appsState.snapshot.selectedApp).toEqual(app1);
+    });
+
+    it('should update selected app in snapshot when updated', () => {
+        appsService.setup(x => x.putApp(app1, {}, app1.version))
+            .returns(() => of(newApp1)).verifiable();
+
+        appsState.select(app1.name).subscribe();
+        appsState.update(app1, {}).subscribe();
+
+        expect(appsState.snapshot.apps.values).toEqual([newApp1, app2]);
+        expect(appsState.snapshot.selectedApp).toEqual(newApp1);
     });
 
     it('should remove app from snapshot when archived', () => {
-        const request = { ...newApp };
-
-        appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp)).verifiable();
-
-        appsService.setup(x => x.deleteApp(newApp))
+        appsService.setup(x => x.deleteApp(app2))
             .returns(() => of({})).verifiable();
 
-        appsState.create(request).subscribe();
+        appsState.select(app1.name).subscribe();
+        appsState.delete(app2).subscribe();
 
-        const appsAfterCreate = appsState.snapshot.apps.values;
-
-        appsState.delete(newApp).subscribe();
-
-        const appsAfterDelete = appsState.snapshot.apps.values;
-
-        expect(appsAfterCreate).toEqual([app1, app2, newApp]);
-        expect(appsAfterDelete).toEqual([app1, app2]);
+        expect(appsState.snapshot.apps.values).toEqual([app1]);
+        expect(appsState.snapshot.selectedApp).toEqual(app1);
     });
 
     it('should remove selected app from snapshot when archived', () => {
-        const request = { ...newApp };
-
-        appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp)).verifiable();
-
-        appsService.setup(x => x.deleteApp(newApp))
+        appsService.setup(x => x.deleteApp(app1))
             .returns(() => of({})).verifiable();
 
-        appsState.create(request).subscribe();
-        appsState.select(newApp.name).subscribe();
-        appsState.delete(newApp).subscribe();
+        appsState.select(app1.name).subscribe();
+        appsState.delete(app1).subscribe();
 
         expect(appsState.snapshot.selectedApp).toBeNull();
     });

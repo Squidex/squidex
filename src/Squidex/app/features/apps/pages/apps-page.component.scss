@@ -29,6 +29,10 @@
         width: 33rem;
     }
 
+    &-links {
+        margin-top: .5rem;
+    }
+
     &-left {
         padding-right: .75rem;
     }
@@ -41,6 +45,7 @@
         color: $color-text-decent;
         font-weight: normal;
         font-size: .9rem;
+        margin-top: .5rem;
     }
 
     &-more {
@@ -55,11 +60,18 @@
         color: $color-title;
         font-weight: light;
         font-size: 1.2rem;
+        margin-top: 0;
+        margin-bottom: 0;
     }
 
     &-template {
         .card-body {
             min-height: 15.5rem;
+        }
+
+        .card-title {
+            margin-top: .5rem;
+            margin-bottom: .75rem;
         }
     }
 

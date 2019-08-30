@@ -2,7 +2,7 @@
     <li class="nav-item dropdown">
         <span class="nav-link dropdown-toggle" id="app-name" (click)="appsMenu.toggle()">
             <ng-container *ngIf="appsState.selectedApp | async; let selectedApp; else noApp">
-                {{selectedApp.name}}
+                {{selectedApp.displayName}}
             </ng-container>
 
             <ng-template #noApp>
@@ -22,7 +22,7 @@
                         <div class="dropdown-divider"></div>
 
                         <div class="apps-list">
-                            <a class="dropdown-item" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.name}}</a>
+                            <a class="dropdown-item" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.displayName}}</a>
                         </div>
                     </ng-container>
 

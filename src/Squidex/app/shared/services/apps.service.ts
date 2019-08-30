@@ -15,9 +15,12 @@ import {
     ApiUrlConfig,
     DateTime,
     hasAnyLink,
+    HTTP,
     pretifyError,
     Resource,
-    ResourceLinks
+    ResourceLinks,
+    StringHelper,
+    Version
 } from '@app/framework';
 
 export class AppDto {
@@ -36,18 +39,26 @@ export class AppDto {
     public readonly canReadRules: boolean;
     public readonly canReadSchemas: boolean;
     public readonly canReadWorkflows: boolean;
+    public readonly canUpdate: boolean;
     public readonly canUploadAssets: boolean;
+
+    public get displayName() {
+        return StringHelper.firstNonEmpty(this.label, this.name);
+    }
 
     constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly name: string,
+        public readonly label: string | undefined,
+        public readonly description: string | undefined,
         public readonly permissions: string[],
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
         public readonly canAccessApi: boolean,
         public readonly canAccessContent: boolean,
-        public readonly planName?: string,
-        public readonly planUpgrade?: string
+        public readonly planName: string | undefined,
+        public readonly planUpgrade: string | undefined,
+        public readonly version: Version
     ) {
         this._links = links;
 
@@ -64,6 +75,7 @@ export class AppDto {
         this.canReadRules = hasAnyLink(links, 'rules');
         this.canReadSchemas = hasAnyLink(links, 'schemas');
         this.canReadWorkflows = hasAnyLink(links, 'workflows');
+        this.canUpdate = hasAnyLink(links, 'update');
         this.canUploadAssets = hasAnyLink(links, 'assets/create');
     }
 }
@@ -71,6 +83,11 @@ export class AppDto {
 export interface CreateAppDto {
     readonly name: string;
     readonly template?: string;
+}
+
+export interface UpdateAppDto {
+    readonly label?: string;
+    readonly description?: string;
 }
 
 @Injectable()
@@ -107,6 +124,21 @@ export class AppsService {
             pretifyError('Failed to create app. Please reload.'));
     }
 
+    public putApp(resource: Resource, dto: UpdateAppDto, version: Version): Observable<AppDto> {
+        const link = resource._links['update'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ payload }) => {
+                return parseApp(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('App', 'Updated');
+            }),
+            pretifyError('Failed to update app. Please reload.'));
+    }
+
     public deleteApp(resource: Resource): Observable<any> {
         const link = resource._links['delete'];
 
@@ -124,11 +156,14 @@ function parseApp(response: any) {
     return new AppDto(response._links,
         response.id,
         response.name,
+        response.label,
+        response.description,
         response.permissions,
         DateTime.parseISO_UTC(response.created),
         DateTime.parseISO_UTC(response.lastModified),
         response.canAccessApi,
         response.canAccessContent,
         response.planName,
-        response.planUpgrade);
+        response.planUpgrade,
+        new Version(response.version.toString()));
 }

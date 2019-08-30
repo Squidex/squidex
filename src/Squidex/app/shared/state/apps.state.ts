@@ -19,7 +19,8 @@ import {
 import {
     AppDto,
     AppsService,
-    CreateAppDto
+    CreateAppDto,
+    UpdateAppDto
 } from './../services/apps.service';
 
 interface Snapshot {
@@ -30,14 +31,14 @@ interface Snapshot {
     selectedApp: AppDto | null;
 }
 
-function sameApp(lhs: AppDto, rhs?: AppDto): boolean {
-    return lhs === rhs || (!!lhs && !!rhs && lhs.id === rhs.id);
-}
-
 @Injectable()
 export class AppsState extends State<Snapshot> {
     public get appName() {
         return this.snapshot.selectedApp ? this.snapshot.selectedApp.name : '';
+    }
+
+    public get appDisplayName() {
+        return this.snapshot.selectedApp ? this.snapshot.selectedApp.displayName : '';
     }
 
     public get selectedAppState() {
@@ -48,7 +49,7 @@ export class AppsState extends State<Snapshot> {
         this.project(s => s.apps);
 
     public selectedApp =
-        this.project(s => s.selectedApp, sameApp);
+        this.project(s => s.selectedApp);
 
     public selectedValidApp =
         this.selectedApp.pipe(filter(x => !!x), map(x => <AppDto>x),
@@ -97,6 +98,25 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
+    public update(app: AppDto, request: UpdateAppDto): Observable<AppDto> {
+        return this.appsService.putApp(app, request, app.version).pipe(
+            tap(updated => {
+                this.next(s => {
+                    const apps = s.apps.replaceBy('id', updated);
+
+                    const selectedApp =
+                        s.selectedApp &&
+                        s.selectedApp.id === app.id ?
+                        updated :
+                        s.selectedApp;
+
+                    return { ...s, apps, selectedApp };
+                });
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
+
+    }
+
     public delete(app: AppDto): Observable<any> {
         return this.appsService.deleteApp(app).pipe(
             tap(() => {
@@ -105,7 +125,7 @@ export class AppsState extends State<Snapshot> {
 
                     const selectedApp =
                         s.selectedApp &&
-                        s.selectedApp.name === app.name ?
+                        s.selectedApp.id === app.id ?
                         null :
                         s.selectedApp;
 

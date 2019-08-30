@@ -37,6 +37,16 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public string Name { get; set; }
 
         /// <summary>
+        /// The optional label of the app.
+        /// </summary>
+        public string Label { get; set; }
+
+        /// <summary>
+        /// The optional description of the app.
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
         /// The version of the app.
         /// </summary>
         public long Version { get; set; }
@@ -134,6 +144,11 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             if (controller.HasPermission(AllPermissions.AppDelete, Name, additional: permissions))
             {
                 AddDeleteLink("delete", controller.Url<AppsController>(x => nameof(x.DeleteApp), values));
+            }
+
+            if (controller.HasPermission(AllPermissions.AppUpdate, Name, additional: permissions))
+            {
+                AddPutLink("update", controller.Url<AppsController>(x => nameof(x.UpdateApp), values));
             }
 
             if (controller.HasPermission(AllPermissions.AppAssetsRead, Name, additional: permissions))
