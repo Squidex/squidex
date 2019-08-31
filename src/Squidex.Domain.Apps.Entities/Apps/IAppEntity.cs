@@ -26,6 +26,8 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         AppPlan Plan { get; }
 
+        AppImage Image { get; }
+
         AppClients Clients { get; }
 
         AppPatterns Patterns { get; }
@@ -35,8 +37,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         LanguagesConfig LanguagesConfig { get; }
 
         Workflows Workflows { get; }
-
-        bool HasImage { get; }
 
         bool IsArchived { get; }
     }

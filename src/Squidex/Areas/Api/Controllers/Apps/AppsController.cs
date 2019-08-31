@@ -10,17 +10,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Apps.Models;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
@@ -33,14 +37,20 @@ namespace Squidex.Areas.Api.Controllers.Apps
     [ApiExplorerSettings(GroupName = nameof(Apps))]
     public sealed class AppsController : ApiController
     {
+        private readonly IAssetStore assetStore;
+        private readonly IAssetThumbnailGenerator assetThumbnailGenerator;
         private readonly IAppProvider appProvider;
         private readonly IAppPlansProvider appPlansProvider;
 
         public AppsController(ICommandBus commandBus,
+            IAssetStore assetStore,
+            IAssetThumbnailGenerator assetThumbnailGenerator,
             IAppProvider appProvider,
             IAppPlansProvider appPlansProvider)
             : base(commandBus)
         {
+            this.assetStore = assetStore;
+            this.assetThumbnailGenerator = assetThumbnailGenerator;
             this.appProvider = appProvider;
             this.appPlansProvider = appPlansProvider;
         }
@@ -114,7 +124,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPut]
         [Route("apps/{app}/")]
         [ProducesResponseType(typeof(AppDto), 200)]
-        [ApiPermission(Permissions.AppUpdate)]
+        [ApiPermission(Permissions.AppUpdateGeneral)]
         [ApiCosts(0)]
         public async Task<IActionResult> UpdateApp(string app, [FromBody] UpdateAppDto request)
         {
@@ -124,7 +134,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Upload the app image.
+        /// Get the app image.
         /// </summary>
         /// <param name="app">The name of the app to update.</param>
         /// <param name="file">The file to upload.</param>
@@ -135,13 +145,82 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpPost]
         [Route("apps/{app}/image")]
         [ProducesResponseType(typeof(AppDto), 201)]
-        [ApiPermission(Permissions.AppUpdate)]
+        [ApiPermission(Permissions.AppUpdateImage)]
         [ApiCosts(0)]
         public async Task<IActionResult> UploadImage(string app, [OpenApiIgnore] List<IFormFile> file)
         {
-            var response = await InvokeCommandAsync(new UploadAppImage { File = CheckFile(file) });
+            var response = await InvokeCommandAsync(CreateCommand(file));
 
             return Ok(response);
+        }
+
+        /// <summary>
+        /// Get the app image.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => App image found and content or (resized) image returned.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/{app}/image")]
+        [ProducesResponseType(typeof(FileResult), 200)]
+        [AllowAnonymous]
+        [ApiCosts(0)]
+        public IActionResult GetImage(string app)
+        {
+            if (App.Image == null)
+            {
+                return NotFound();
+            }
+
+            var etag = App.Image.Etag;
+
+            Response.Headers[HeaderNames.ETag] = etag;
+
+            var handler = new Func<Stream, Task>(async bodyStream =>
+            {
+                var assetId = App.Id.ToString();
+                var assetResizedId = $"{assetId}_{etag}_Resized";
+
+                try
+                {
+                    await assetStore.DownloadAsync(assetResizedId, bodyStream);
+                }
+                catch (AssetNotFoundException)
+                {
+                    using (Profiler.Trace("Resize"))
+                    {
+                        using (var sourceStream = GetTempStream())
+                        {
+                            using (var destinationStream = GetTempStream())
+                            {
+                                using (Profiler.Trace("ResizeDownload"))
+                                {
+                                    await assetStore.DownloadAsync(assetId, sourceStream);
+                                    sourceStream.Position = 0;
+                                }
+
+                                using (Profiler.Trace("ResizeImage"))
+                                {
+                                    await assetThumbnailGenerator.CreateThumbnailAsync(sourceStream, destinationStream, 150, 150, "Crop");
+                                    destinationStream.Position = 0;
+                                }
+
+                                using (Profiler.Trace("ResizeUpload"))
+                                {
+                                    await assetStore.UploadAsync(assetResizedId, destinationStream);
+                                    destinationStream.Position = 0;
+                                }
+
+                                await destinationStream.CopyToAsync(bodyStream);
+                            }
+                        }
+                    }
+                }
+            });
+
+            return new FileCallbackResult(App.Image.MimeType, null, true, handler);
         }
 
         /// <summary>
@@ -196,7 +275,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             return response;
         }
 
-        private Func<Stream> CheckFile(IReadOnlyList<IFormFile> file)
+        private UploadAppImage CreateCommand(IReadOnlyList<IFormFile> file)
         {
             if (file.Count != 1)
             {
@@ -205,7 +284,20 @@ namespace Squidex.Areas.Api.Controllers.Apps
                 throw new ValidationException("Cannot create asset.", error);
             }
 
-            return file[0].OpenReadStream;
+            return new UploadAppImage { File = file[0].OpenReadStream, Image = new AppImage(file[0].ContentType) };
+        }
+
+        private static FileStream GetTempStream()
+        {
+            var tempFileName = Path.GetTempFileName();
+
+            return new FileStream(tempFileName,
+                FileMode.Create,
+                FileAccess.ReadWrite,
+                FileShare.Delete, 1024 * 16,
+                FileOptions.Asynchronous |
+                FileOptions.DeleteOnClose |
+                FileOptions.SequentialScan);
         }
     }
 }

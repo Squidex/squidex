@@ -38,6 +38,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         public AppPlan Plan { get; set; }
 
         [DataMember]
+        public AppImage Image { get; set; }
+
+        [DataMember]
         public AppClients Clients { get; set; } = AppClients.Empty;
 
         [DataMember]
@@ -51,9 +54,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         [DataMember]
         public Workflows Workflows { get; set; } = Workflows.Empty;
-
-        [DataMember]
-        public bool HasImage { get; set; }
 
         [DataMember]
         public bool IsArchived { get; set; }
@@ -72,12 +72,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
 
         protected void On(AppImageUploaded @event)
         {
-            HasImage = true;
+            Image = @event.Image;
         }
 
         protected void On(AppImageRemoved @event)
         {
-            HasImage = false;
+            Image = null;
         }
 
         protected void On(AppPlanChanged @event)

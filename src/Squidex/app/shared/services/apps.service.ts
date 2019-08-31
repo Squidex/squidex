@@ -15,6 +15,7 @@ import {
     ApiUrlConfig,
     DateTime,
     ErrorDto,
+    getLinkUrl,
     hasAnyLink,
     HTTP,
     pretifyError,
@@ -41,8 +42,10 @@ export class AppDto {
     public readonly canReadRules: boolean;
     public readonly canReadSchemas: boolean;
     public readonly canReadWorkflows: boolean;
-    public readonly canUpdate: boolean;
+    public readonly canUpdateGeneral: boolean;
+    public readonly canUpdateImage: boolean;
     public readonly canUploadAssets: boolean;
+    public readonly image: string;
 
     public get displayName() {
         return StringHelper.firstNonEmpty(this.label, this.name);
@@ -77,8 +80,11 @@ export class AppDto {
         this.canReadRules = hasAnyLink(links, 'rules');
         this.canReadSchemas = hasAnyLink(links, 'schemas');
         this.canReadWorkflows = hasAnyLink(links, 'workflows');
-        this.canUpdate = hasAnyLink(links, 'update');
+        this.canUpdateGeneral = hasAnyLink(links, 'update');
+        this.canUpdateImage = hasAnyLink(links, 'image/upload');
         this.canUploadAssets = hasAnyLink(links, 'assets/create');
+
+        this.image = getLinkUrl(links, 'image');
     }
 }
 

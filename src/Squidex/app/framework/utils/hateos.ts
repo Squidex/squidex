@@ -17,7 +17,7 @@ export type ResourceLink = { href: string; method: ResourceMethod; metadata?: st
 
 export type Metadata = { [rel: string]: string };
 
-export function hasAnyLink(value: Resource | ResourceLinks,  ...rels: string[]) {
+export function getLinkUrl(value: Resource | ResourceLinks,  ...rels: string[]) {
     if (!value) {
         return false;
     }
@@ -28,11 +28,15 @@ export function hasAnyLink(value: Resource | ResourceLinks,  ...rels: string[]) 
         const link = links[rel];
 
         if (link && link.method && link.href) {
-            return true;
+            return link.href;
         }
     }
 
-    return false;
+    return undefined;
+}
+
+export function hasAnyLink(value: Resource | ResourceLinks,  ...rels: string[]) {
+    return !!getLinkUrl(value, ...rels);
 }
 
 export type ResourceMethod =

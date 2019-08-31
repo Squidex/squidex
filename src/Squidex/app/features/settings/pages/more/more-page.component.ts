@@ -13,6 +13,7 @@ import {
     AppDto,
     AppsState,
     ResourceOwner,
+    Types,
     UpdateAppForm
 } from '@app/shared';
 
@@ -25,6 +26,7 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
     public app: AppDto;
 
     public isEditable: boolean;
+    public isImageEditable: boolean;
     public isDeletable: boolean;
 
     public uploading = false;
@@ -47,8 +49,9 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
                     if (app) {
                         this.app = app;
 
-                        this.isEditable = app.canUpdate;
                         this.isDeletable = app.canDelete;
+                        this.isEditable = app.canUpdateGeneral;
+                        this.isImageEditable = app.canUpdateImage;
 
                         this.updateForm.load(app);
                         this.updateForm.setEnabled(this.isEditable);
@@ -74,11 +77,39 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
     }
 
     public uploadImage(file: File[]) {
-        alert('Foo');
+        if (!this.isImageEditable) {
+            return;
+        }
+
+        this.uploading = true;
+        this.uploadProgress = 0;
+
+        this.appsState.uploadImage(this.app, file[0])
+            .subscribe(value => {
+                if (Types.isNumber(value)) {
+                    this.uploadProgress = value;
+                }
+            }, () => {
+                this.uploading = false;
+            }, () => {
+                this.uploading = false;
+            });
+    }
+
+    public removeImage() {
+        if (!this.isImageEditable) {
+            return;
+        }
+
+        this.appsState.removeImage(this.app);
     }
 
     public archiveApp() {
-        this.appsState.delete(this.appsState.selectedAppState!)
+        if (!this.isDeletable) {
+            return;
+        }
+
+        this.appsState.delete(this.app)
             .subscribe(() => {
                 this.router.navigate(['/app']);
             });

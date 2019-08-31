@@ -42,10 +42,6 @@ export class AppsState extends State<Snapshot> {
         return this.snapshot.selectedApp ? this.snapshot.selectedApp.displayName : '';
     }
 
-    public get selectedAppState() {
-        return this.snapshot.selectedApp;
-    }
-
     public apps =
         this.project(s => s.apps);
 

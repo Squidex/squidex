@@ -49,7 +49,7 @@
                     <div class="col-auto">
                         <div class="app-image"
                             (sqxDropFile)="uploadImage($event)"
-                            [sqxDropDisabled]="uploading || !isEditable"
+                            [sqxDropDisabled]="uploading || !isImageEditable"
                             [noDrop]="true">
                             <div class="app-progress" *ngIf="uploading; else notUploading">
                                 <sqx-progress-bar mode="Circle" [value]="uploadProgress"></sqx-progress-bar>
@@ -57,7 +57,13 @@
 
                             <ng-template #notUploading>
                                 <div>
-                                    <sqx-avatar [identifier]="app.name" [size]="150"></sqx-avatar>
+                                    <sqx-avatar [image]="app.image" [identifier]="app.name" [size]="150"></sqx-avatar>
+
+                                    <ng-container *ngIf="isImageEditable && app.image">
+                                        <button class="btn btn-danger btn-sm app-image-remove" title="Remove image" (click)="removeImage()">
+                                            <i class="icon-bin2"></i>
+                                        </button>
+                                    </ng-container>
                                 </div>
         
                                 <div class="drop-overlay align-items-center justify-content-center">
@@ -68,15 +74,13 @@
                         </div>
                     </div>
                     <div class="auto align-self-center pl-4">
-                        <sqx-form-hint>Drop an file to replace the app image.</sqx-form-hint>
+                        <sqx-form-hint>Drop an file to replace the app image. Use a square size.</sqx-form-hint>
 
-                        <fieldset [disabled]="!isEditable">
-                            <span class="btn btn-success upload-button" [class.disabled]="!isEditable" (click)="fileInput.click()">
-                                <span>Upload File</span>
-                    
-                                <input type="file" (change)="uploadImage($event.target.files)" #fileInput single accept="image/x-png,image/gif,image/jpeg" />
-                            </span>
-                        </fieldset>
+                        <span class="btn btn-success upload-button" [class.disabled]="!isImageEditable" (click)="fileInput.click()">
+                            <span>Upload File</span>
+                
+                            <input type="file" (change)="uploadImage($event.target.files)" #fileInput single accept="image/x-png,image/gif,image/jpeg" />
+                        </span>
                     </div>
                 </div>
             </div>

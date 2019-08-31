@@ -123,7 +123,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task UploadImage_should_create_events_and_update_state()
         {
-            var command = new UploadAppImage();
+            var command = new UploadAppImage { Image = new AppImage("image/png") };
 
             await ExecuteCreateAsync();
 
@@ -131,11 +131,11 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.True(sut.Snapshot.HasImage);
+            Assert.Equal("image/png", sut.Snapshot.Image.MimeType);
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppImageUploaded())
+                    CreateEvent(new AppImageUploaded { Image = new AppImage("image/png") })
                 );
         }
 
@@ -150,7 +150,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             result.ShouldBeEquivalent(sut.Snapshot);
 
-            Assert.False(sut.Snapshot.HasImage);
+            Assert.Null(sut.Snapshot.Image);
 
             LastEvents
                 .ShouldHaveSameEvents(
