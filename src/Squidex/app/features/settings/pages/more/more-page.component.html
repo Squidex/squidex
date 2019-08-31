@@ -1,20 +1,26 @@
 <sqx-title message="{app} | More | Settings" parameter1="app" [value1]="appsState.appDisplayName"></sqx-title>
 
-<sqx-panel desiredWidth="50rem">
+<sqx-panel desiredWidth="46rem">
     <ng-container title>
-        General settings
+        Settings
     </ng-container>
 
     <ng-container content>
         <div class="card mb-4">
-            <h3 class="card-header">Settings</h3>
+            <h3 class="card-header">General</h3>
 
             <div class="card-body">
                 <form [formGroup]="updateForm.form" (ngSubmit)="save()">
                     <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
 
                     <div class="form-group">
-                        <label for="email">Label</label>
+                        <label for="email">Name</label>
+        
+                        <input type="text" class="form-control" readonly [value]="app.name" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="label">Label</label>
         
                         <sqx-control-errors for="label"></sqx-control-errors>
         
@@ -33,6 +39,46 @@
                         <button type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </form>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <h3 class="card-header">Image</h3>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-auto">
+                        <div class="app-image"
+                            (sqxDropFile)="uploadImage($event)"
+                            [sqxDropDisabled]="uploading || !isEditable"
+                            [noDrop]="true">
+                            <div class="app-progress" *ngIf="uploading; else notUploading">
+                                <sqx-progress-bar mode="Circle" [value]="uploadProgress"></sqx-progress-bar>
+                            </div>
+
+                            <ng-template #notUploading>
+                                <div>
+                                    <sqx-avatar [identifier]="app.name" [size]="150"></sqx-avatar>
+                                </div>
+        
+                                <div class="drop-overlay align-items-center justify-content-center">
+                                    <div class="drop-overlay-background"></div>
+                                    <div class="drop-overlay-text">Drop to update</div>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                    <div class="auto align-self-center pl-4">
+                        <sqx-form-hint>Drop an file to replace the app image.</sqx-form-hint>
+
+                        <fieldset [disabled]="!isEditable">
+                            <span class="btn btn-success upload-button" [class.disabled]="!isEditable" (click)="fileInput.click()">
+                                <span>Upload File</span>
+                    
+                                <input type="file" (change)="uploadImage($event.target.files)" #fileInput single accept="image/x-png,image/gif,image/jpeg" />
+                            </span>
+                        </fieldset>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -90,7 +90,7 @@ export class AppsState extends State<Snapshot> {
         return this.appsService.postApp(request).pipe(
             tap(created => {
                 this.next(s => {
-                    const apps = s.apps.push(created).sortByStringAsc(x => x.name);
+                    const apps = s.apps.push(created).sortByStringAsc(x => x.displayName);
 
                     return { ...s, apps };
                 });

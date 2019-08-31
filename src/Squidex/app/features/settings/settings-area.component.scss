@@ -7,6 +7,16 @@
     padding-bottom: .6rem;
 }
 
+.header-link {
+    & {
+        color: inherit;
+    }
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
 .icon-angle-right {
     @include absolute(14px, 2rem, auto, auto);
 }

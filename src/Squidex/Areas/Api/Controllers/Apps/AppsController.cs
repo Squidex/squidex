@@ -5,15 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
@@ -63,7 +69,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             var response = Deferred.Response(() =>
             {
-                return apps.Select(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this)).ToArray();
+                return apps.OrderBy(x => x.Name).Select(a => AppDto.FromApp(a, userOrClientId, userPermissions, appPlansProvider, this)).ToArray();
             });
 
             Response.Headers[HeaderNames.ETag] = apps.ToEtag();
@@ -88,7 +94,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [Route("apps/")]
         [ProducesResponseType(typeof(AppDto), 201)]
         [ApiPermission]
-        [ApiCosts(1)]
+        [ApiCosts(0)]
         public async Task<IActionResult> PostApp([FromBody] CreateAppDto request)
         {
             var response = await InvokeCommandAsync(request.ToCommand());
@@ -97,7 +103,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         }
 
         /// <summary>
-        /// Archive the app.
+        /// Update the app.
         /// </summary>
         /// <param name="app">The name of the app to update.</param>
         /// <param name="request">The values to update.</param>
@@ -107,14 +113,55 @@ namespace Squidex.Areas.Api.Controllers.Apps
         /// </returns>
         [HttpPut]
         [Route("apps/{app}/")]
-        [ProducesResponseType(typeof(AppDto), 201)]
+        [ProducesResponseType(typeof(AppDto), 200)]
         [ApiPermission(Permissions.AppUpdate)]
-        [ApiCosts(1)]
+        [ApiCosts(0)]
         public async Task<IActionResult> UpdateApp(string app, [FromBody] UpdateAppDto request)
         {
             var response = await InvokeCommandAsync(request.ToCommand());
 
-            return CreatedAtAction(nameof(GetApps), response);
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Upload the app image.
+        /// </summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <param name="file">The file to upload.</param>
+        /// <returns>
+        /// 200 => App image uploaded.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpPost]
+        [Route("apps/{app}/image")]
+        [ProducesResponseType(typeof(AppDto), 201)]
+        [ApiPermission(Permissions.AppUpdate)]
+        [ApiCosts(0)]
+        public async Task<IActionResult> UploadImage(string app, [OpenApiIgnore] List<IFormFile> file)
+        {
+            var response = await InvokeCommandAsync(new UploadAppImage { File = CheckFile(file) });
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Remove the app image.
+        /// </summary>
+        /// <param name="app">The name of the app to update.</param>
+        /// <returns>
+        /// 200 => App image removed.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/image")]
+        [ProducesResponseType(typeof(AppDto), 201)]
+        [ApiPermission(Permissions.AppUpdate)]
+        [ApiCosts(0)]
+        public async Task<IActionResult> DeleteImage(string app)
+        {
+            var response = await InvokeCommandAsync(new RemoveAppImage());
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -128,7 +175,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [HttpDelete]
         [Route("apps/{app}/")]
         [ApiPermission(Permissions.AppDelete)]
-        [ApiCosts(1)]
+        [ApiCosts(0)]
         public async Task<IActionResult> DeleteApp(string app)
         {
             await CommandBus.PublishAsync(new ArchiveApp());
@@ -147,6 +194,18 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var response = AppDto.FromApp(result, userOrClientId, userPermissions, appPlansProvider, this);
 
             return response;
+        }
+
+        private Func<Stream> CheckFile(IReadOnlyList<IFormFile> file)
+        {
+            if (file.Count != 1)
+            {
+                var error = new ValidationError($"Can only upload one file, found {file.Count} files.");
+
+                throw new ValidationException("Cannot create asset.", error);
+            }
+
+            return file[0].OpenReadStream;
         }
     }
 }

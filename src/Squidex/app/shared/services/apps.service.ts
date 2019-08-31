@@ -5,21 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, filter, map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
+    ErrorDto,
     hasAnyLink,
     HTTP,
     pretifyError,
     Resource,
     ResourceLinks,
     StringHelper,
+    Types,
     Version
 } from '@app/framework';
 
@@ -137,6 +139,56 @@ export class AppsService {
                 this.analytics.trackEvent('App', 'Updated');
             }),
             pretifyError('Failed to update app. Please reload.'));
+    }
+
+    public postAppImage(resource: Resource, file: File, version: Version): Observable<number | AppDto> {
+        const link = resource._links['image/upload'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.upload(this.http, link.method, url, file, version).pipe(
+            filter(event =>
+                event.type === HttpEventType.UploadProgress ||
+                event.type === HttpEventType.Response),
+            map(event => {
+                if (event.type === HttpEventType.UploadProgress) {
+                    const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
+
+                    return percentDone;
+                } else if (Types.is(event, HttpResponse)) {
+                    return parseApp(event.body);
+                } else {
+                    throw 'Invalid';
+                }
+            }),
+            catchError(error => {
+                if (Types.is(error, HttpErrorResponse) && error.status === 413) {
+                    return throwError(new ErrorDto(413, 'App image is too big.'));
+                } else {
+                    return throwError(error);
+                }
+            }),
+            tap(value => {
+                if (!Types.isNumber(value)) {
+                    this.analytics.trackEvent('AppImage', 'Uploaded');
+                }
+            }),
+            pretifyError('Failed to upload image. Please reload.'));
+    }
+
+    public deleteAppImage(resource: Resource, version: Version): Observable<any> {
+        const link = resource._links['image/delete'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            map(({ payload }) => {
+                return parseApp(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('AppImage', 'Removed');
+            }),
+            pretifyError('Failed to remove app image. Please reload.'));
     }
 
     public deleteApp(resource: Resource): Observable<any> {

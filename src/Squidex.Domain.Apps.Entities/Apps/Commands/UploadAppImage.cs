@@ -5,12 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.FileProviders;
+using System;
+using System.IO;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Commands
 {
     public sealed class UploadAppImage : AppCommand
     {
-        public IFileInfo File { get; }
+        public Func<Stream> File { get; set; }
     }
 }

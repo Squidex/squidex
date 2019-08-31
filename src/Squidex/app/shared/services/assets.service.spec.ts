@@ -159,7 +159,7 @@ describe('AssetsService', () => {
 
         let asset: AssetDto;
 
-        assetsService.uploadFile('my-app', null!).subscribe(result => {
+        assetsService.postAssetFile('my-app', null!).subscribe(result => {
             asset = <AssetDto>result;
         });
 
@@ -179,7 +179,7 @@ describe('AssetsService', () => {
         let asset: AssetDto;
         let error: ErrorDto;
 
-        assetsService.uploadFile('my-app', null!).subscribe(result => {
+        assetsService.postAssetFile('my-app', null!).subscribe(result => {
             asset = <AssetDto>result;
         }, e => {
             error = e;
@@ -207,7 +207,7 @@ describe('AssetsService', () => {
 
         let asset: AssetDto;
 
-        assetsService.replaceFile('my-app', resource, null!, version).subscribe(result => {
+        assetsService.putAssetFile('my-app', resource, null!, version).subscribe(result => {
             asset = <AssetDto>result;
         });
 
@@ -216,16 +216,12 @@ describe('AssetsService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush(assetResponse(123), {
-            headers: {
-                etag: '1'
-            }
-        });
+        req.flush(assetResponse(123));
 
         expect(asset!).toEqual(createAsset(123));
     }));
 
-    it('should return proper error when replace failed with 413',
+    it('should return proper error when replacing asset content failed with 413',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
 
         const resource: Resource = {
@@ -237,7 +233,7 @@ describe('AssetsService', () => {
         let asset: AssetDto;
         let error: ErrorDto;
 
-        assetsService.replaceFile('my-app', resource, null!, version).subscribe(result => {
+        assetsService.putAssetFile('my-app', resource, null!, version).subscribe(result => {
             asset = <AssetDto>result;
         }, e => {
             error = e;
@@ -276,11 +272,7 @@ describe('AssetsService', () => {
         expect(req.request.method).toEqual('PUT');
         expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-        req.flush(assetResponse(123), {
-            headers: {
-                etag: '1'
-            }
-        });
+        req.flush(assetResponse(123));
 
         expect(asset!).toEqual(createAsset(123));
     }));

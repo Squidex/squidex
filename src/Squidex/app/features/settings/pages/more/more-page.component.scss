@@ -1,2 +1,63 @@
 @import '_vars';
 @import '_mixins';
+
+.app {
+    &-image {
+        position: relative;
+        width: 150px;
+        height: 150px;
+    }
+
+    &-progress {
+        @include absolute(1rem, 1rem, 1rem, 1rem);
+    }
+}
+
+@mixin overlay {
+    & {
+        @include transition(opacity .4s ease);
+        @include absolute(0, 0, 0, 0);
+        @include opacity(0);
+        @include flex-box;
+        color: $color-dark-foreground;
+    }
+
+    &-background {
+        @include absolute(0, 0, 0, 0);
+        @include opacity(.7);
+        background: $color-dark-black;
+    }
+}
+
+.upload-button {
+    & {
+        margin-top: 1rem;
+    }
+
+    input {
+        @include hidden;
+    }
+}
+
+.drop-overlay {
+    & {
+        @include overlay;
+        pointer-events: none;
+    }
+
+    &-text {
+        position: absolute;
+        font-size: 1.25rem;
+        font-weight: lighter;
+    }
+}
+
+.drag {
+    .drop-overlay {
+        @include opacity(1);
+    }
+}
+
+.disabled {
+    pointer-events: none;
+}

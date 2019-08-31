@@ -149,6 +149,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             if (controller.HasPermission(AllPermissions.AppUpdate, Name, additional: permissions))
             {
                 AddPutLink("update", controller.Url<AppsController>(x => nameof(x.UpdateApp), values));
+
+                AddPutLink("image/upload", controller.Url<AppsController>(x => nameof(x.UploadImage), values));
+                AddPutLink("image/delete", controller.Url<AppsController>(x => nameof(x.DeleteImage), values));
             }
 
             if (controller.HasPermission(AllPermissions.AppAssetsRead, Name, additional: permissions))

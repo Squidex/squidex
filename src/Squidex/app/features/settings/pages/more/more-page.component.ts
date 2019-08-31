@@ -27,6 +27,9 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
     public isEditable: boolean;
     public isDeletable: boolean;
 
+    public uploading = false;
+    public uploadProgress = 10;
+
     public updateForm = new UpdateAppForm(this.formBuilder);
 
     constructor(
@@ -68,6 +71,10 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
                     this.updateForm.submitFailed(error);
                 });
         }
+    }
+
+    public uploadImage(file: File[]) {
+        alert('Foo');
     }
 
     public archiveApp() {

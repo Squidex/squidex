@@ -14,6 +14,7 @@ import {
     AppDto,
     AppsService,
     DateTime,
+    ErrorDto,
     Resource,
     ResourceLinks,
     Version
@@ -100,6 +101,85 @@ describe('AppsService', () => {
         const req = httpMock.expectOne('http://service/p/api/apps/my-app');
 
         expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(appResponse(12));
+
+        expect(app!).toEqual(createApp(12));
+    }));
+
+    it('should make post request to upload app image',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                ['image/upload']: { method: 'POST', href: '/api/apps/my-app/image' }
+            }
+        };
+
+        let app: AppDto;
+
+        appsService.postAppImage(resource, null!, version).subscribe(result => {
+            app = <AppDto>result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/image');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBe(version.value);
+
+        req.flush(appResponse(12));
+
+        expect(app!).toEqual(createApp(12));
+    }));
+
+    it('should return proper error when uploading app image failed with 413',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                ['image/upload']: { method: 'POST', href: '/api/apps/my-app/image' }
+            }
+        };
+
+        let app: AppDto;
+        let error: ErrorDto;
+
+        appsService.postAppImage(resource, null!, version).subscribe(result => {
+            app = <AppDto>result;
+        }, e => {
+            error = e;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/image');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+        req.flush({}, { status: 413, statusText: 'Payload too large' });
+
+        expect(app!).toBeUndefined();
+        expect(error!).toEqual(new ErrorDto(413, 'App image is too big.'));
+    }));
+
+    it('should make delete request to remove app image',
+        inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+
+        const resource: Resource = {
+            _links: {
+                ['image/delete']: { method: 'DELETE', href: '/api/apps/my-app/image' }
+            }
+        };
+
+        let app: AppDto;
+
+        appsService.deleteAppImage(resource, version).subscribe(result => {
+            app = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/image');
+
+        expect(req.request.method).toEqual('DELETE');
         expect(req.request.headers.get('If-Match')).toBe(version.value);
 
         req.flush(appResponse(12));
