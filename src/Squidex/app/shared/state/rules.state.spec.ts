@@ -97,7 +97,7 @@ describe('RulesState', () => {
         it('should update rule when updated action', () => {
             const newAction = {};
 
-            const updated = createRule(1, 'new');
+            const updated = createRule(1, '_new');
 
             rulesService.setup(x => x.putRule(app, rule1, It.isAny(), version))
                 .returns(() => of(updated)).verifiable();
@@ -112,7 +112,7 @@ describe('RulesState', () => {
         it('should update rule when updated trigger', () => {
             const newTrigger = {};
 
-            const updated = createRule(1, 'new');
+            const updated = createRule(1, '_new');
 
             rulesService.setup(x => x.putRule(app, rule1, It.isAny(), version))
             .returns(() => of(updated)).verifiable();
@@ -125,7 +125,7 @@ describe('RulesState', () => {
         });
 
         it('should update rule when enabled', () => {
-            const updated = createRule(1, 'new');
+            const updated = createRule(1, '_new');
 
             rulesService.setup(x => x.enableRule(app, rule1, version))
             .returns(() => of(updated)).verifiable();
@@ -138,7 +138,7 @@ describe('RulesState', () => {
         });
 
         it('should update rule when disabled', () => {
-            const updated = createRule(1, 'new');
+            const updated = createRule(1, '_new');
 
             rulesService.setup(x => x.disableRule(app, rule1, version))
                 .returns(() => of(updated)).verifiable();

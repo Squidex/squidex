@@ -13,7 +13,8 @@ import {
     DialogService,
     ImmutableArray,
     shareSubscribed,
-    State
+    State,
+    Types
 } from '@app/framework';
 
 import {
@@ -101,20 +102,27 @@ export class AppsState extends State<Snapshot> {
     public update(app: AppDto, request: UpdateAppDto): Observable<AppDto> {
         return this.appsService.putApp(app, request, app.version).pipe(
             tap(updated => {
-                this.next(s => {
-                    const apps = s.apps.replaceBy('id', updated);
-
-                    const selectedApp =
-                        s.selectedApp &&
-                        s.selectedApp.id === app.id ?
-                        updated :
-                        s.selectedApp;
-
-                    return { ...s, apps, selectedApp };
-                });
+                this.replaceApp(updated, app);
             }),
             shareSubscribed(this.dialogs, { silent: true }));
+    }
 
+    public removeImage(app: AppDto): Observable<AppDto> {
+        return this.appsService.deleteAppImage(app, app.version).pipe(
+            tap(updated => {
+                this.replaceApp(updated, app);
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
+    }
+
+    public uploadImage(app: AppDto, file: File): Observable<number | AppDto> {
+        return this.appsService.postAppImage(app, file, app.version).pipe(
+            tap(updated => {
+                if (Types.is(updated, AppDto)) {
+                    this.replaceApp(updated, app);
+                }
+            }),
+            shareSubscribed(this.dialogs, { silent: true }));
     }
 
     public delete(app: AppDto): Observable<any> {
@@ -133,5 +141,16 @@ export class AppsState extends State<Snapshot> {
                 });
             }),
             shareSubscribed(this.dialogs));
+    }
+
+    private replaceApp(updated: AppDto, app: AppDto) {
+        this.next(s => {
+            const apps = s.apps.replaceBy('id', updated);
+            const selectedApp = s.selectedApp &&
+                s.selectedApp.id === app.id ?
+                updated :
+                s.selectedApp;
+            return { ...s, apps, selectedApp };
+        });
     }
 }
