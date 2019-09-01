@@ -31,6 +31,7 @@ export * from './utils/math-helper';
 export * from './utils/modal-positioner';
 export * from './utils/modal-view';
 export * from './utils/pager';
+export * from './utils/picasso';
 export * from './utils/rxjs-extensions';
 export * from './utils/string-helper';
 export * from './utils/types';

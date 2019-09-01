@@ -7,7 +7,7 @@
 
 import { Component, Input, OnChanges } from '@angular/core';
 
-import { picasso } from '@vechain/picasso';
+import { picasso } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-avatar',
