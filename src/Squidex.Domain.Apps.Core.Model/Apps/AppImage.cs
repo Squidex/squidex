@@ -24,7 +24,7 @@ namespace Squidex.Domain.Apps.Core.Apps
 
             if (string.IsNullOrWhiteSpace(etag))
             {
-                Etag = RandomHash.New();
+                Etag = RandomHash.Simple();
             }
             else
             {
