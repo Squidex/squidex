@@ -41,10 +41,13 @@ interface Snapshot {
     maxContributors: number;
 
     // The current page.
-    selectedPage: number;
+    page: number;
 
     // The search query.
-    selectedQuery?: string;
+    query?: string;
+
+    // Query regex.
+    queryRegex?: RegExp;
 
     // The app version.
     version: Version;
@@ -61,10 +64,13 @@ export class ContributorsState extends State<Snapshot> {
         this.project(x => x.contributors);
 
     public page =
-        this.project(x => x.selectedPage);
+        this.project(x => x.page);
 
     public query =
-        this.project(x => x.selectedQuery);
+        this.project(x => x.query);
+
+    public queryRegex =
+        this.project(x => x.queryRegex);
 
     public maxContributors =
         this.project(x => x.maxContributors);
@@ -76,7 +82,7 @@ export class ContributorsState extends State<Snapshot> {
         this.project(x => !!x.canCreate);
 
     public filtered =
-        combineLatest(this.query, this.contributors, (q, c) => getFilteredContributors(c, q));
+        combineLatest(this.queryRegex, this.contributors, (q, c) => getFilteredContributors(c, q));
 
     public contributorsPaged =
         combineLatest(this.page, this.filtered, (p, c) => getPagedContributors(c, p));
@@ -89,13 +95,7 @@ export class ContributorsState extends State<Snapshot> {
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({
-            contributors: ImmutableArray.empty(),
-            maxContributors: -1,
-            selectedPage: 0,
-            selectedQuery: '',
-            version: Version.EMPTY
-        });
+        super({ contributors: ImmutableArray.empty(), page: 0, maxContributors: -1, version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -115,15 +115,15 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public goNext() {
-        this.next(s => ({ ...s, selectedPage: s.selectedPage + 1 }));
+        this.next(s => ({ ...s, page: s.page + 1 }));
     }
 
     public goPrev() {
-        this.next(s => ({ ...s, selectedPage: s.selectedPage - 1 }));
+        this.next(s => ({ ...s, page: s.page - 1 }));
     }
 
     public search(query: string) {
-        this.next(s => ({ ...s, selectedQuery: query }));
+        this.next(s => ({ ...s, query, queryRegex: new RegExp(query) }));
     }
 
     public revoke(contributor: ContributorDto): Observable<any> {
@@ -156,13 +156,11 @@ export class ContributorsState extends State<Snapshot> {
             const contributors = ImmutableArray.of(items);
 
             return {
-                ...s,
                 canCreate,
                 contributors,
                 isLoaded: true,
                 maxContributors,
-                selectedPage: 0,
-                selectedQuery: '',
+                page: 0,
                 version
             };
         });
@@ -183,13 +181,11 @@ function getPagedContributors(contributors: ContributorsList, page: number) {
     return ImmutableArray.of(contributors.values.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE));
 }
 
-function getFilteredContributors(contributors: ContributorsList, query?: string) {
+function getFilteredContributors(contributors: ContributorsList, query?: RegExp) {
     let filtered = contributors;
 
     if (query) {
-        const regex = new RegExp(query, 'i');
-
-        filtered = filtered.filter(x => regex.test(x.contributorName));
+        filtered = filtered.filter(x => query.test(x.contributorName));
     }
 
     return filtered;

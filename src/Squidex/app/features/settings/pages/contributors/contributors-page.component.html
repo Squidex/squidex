@@ -36,7 +36,7 @@
                                     <img class="user-picture" title="{{contributor.contributorName}}" [attr.src]="contributor.contributorId | sqxUserPicture" />
                                 </td>
                                 <td class="cell-auto">
-                                    <span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight:contributorsState.snapshot.selectedQuery"></span>
+                                    <span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight:contributorsState.snapshot.queryRegex"></span>
                                 </td>
                                 <td class="cell-time">
                                     <select class="form-control" 
