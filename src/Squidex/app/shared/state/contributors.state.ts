@@ -123,7 +123,7 @@ export class ContributorsState extends State<Snapshot> {
     }
 
     public search(query: string) {
-        this.next(s => ({ ...s, query, queryRegex: new RegExp(query) }));
+        this.next(s => ({ ...s, query, queryRegex: new RegExp(query, 'i') }));
     }
 
     public revoke(contributor: ContributorDto): Observable<any> {
