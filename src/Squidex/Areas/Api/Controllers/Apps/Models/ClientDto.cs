@@ -38,14 +38,14 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public string Role { get; set; }
 
-        public static ClientDto FromClient(string id, AppClient client, ApiController controller, string app)
+        public static ClientDto FromClient(string id, AppClient client)
         {
             var result = SimpleMapper.Map(client, new ClientDto { Id = id });
 
-            return result.CreateLinks(controller, app);
+            return result;
         }
 
-        private ClientDto CreateLinks(ApiController controller, string app)
+        public ClientDto WithLinks(ApiController controller, string app)
         {
             var values = new { app, id = Id };
 

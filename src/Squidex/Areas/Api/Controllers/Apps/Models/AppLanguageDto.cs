@@ -46,7 +46,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public bool IsOptional { get; set; }
 
-        public static AppLanguageDto FromLanguage(LanguageConfig language, IAppEntity app, ApiController controller)
+        public static AppLanguageDto FromLanguage(LanguageConfig language, IAppEntity app)
         {
             var result = SimpleMapper.Map(language.Language,
                 new AppLanguageDto
@@ -56,10 +56,10 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                     Fallback = language.LanguageFallbacks.ToArray()
                 });
 
-            return result.CreateLinks(controller, app);
+            return result;
         }
 
-        private AppLanguageDto CreateLinks(ApiController controller, IAppEntity app)
+        public AppLanguageDto WithLinks(ApiController controller, IAppEntity app)
         {
             var values = new { app = app.Name, language = Iso2Code };
 

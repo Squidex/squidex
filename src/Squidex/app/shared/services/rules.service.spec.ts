@@ -359,9 +359,9 @@ describe('RulesService', () => {
         return {
             id: `id${id}`,
             created: `${id % 1000 + 2000}-12-12T10:10`,
-            createdBy: `creator-${id}`,
+            createdBy: `creator${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10`,
-            lastModifiedBy: `modifier-${id}`,
+            lastModifiedBy: `modifier${id}`,
             isEnabled: id % 2 === 0,
             trigger: {
                 param1: 1,
@@ -404,8 +404,8 @@ export function createRule(id: number, suffix = '') {
 
     return new RuleDto(links,
         `id${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier${id}`,
         new Version(`${id}`),
         id % 2 === 0,
         {

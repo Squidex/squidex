@@ -44,23 +44,33 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         [Required]
         public IEnumerable<string> Permissions { get; set; }
 
-        public static RoleDto FromRole(Role role, IAppEntity app, ApiController controller)
+        public static RoleDto FromRole(Role role, IAppEntity app)
         {
             var permissions = role.Permissions.WithoutApp(app.Name);
 
             var result = new RoleDto
             {
                 Name = role.Name,
-                NumClients = app.Clients.Count(x => Role.IsRole(x.Value.Role, role.Name)),
-                NumContributors = app.Contributors.Count(x => Role.IsRole(x.Value, role.Name)),
+                NumClients = GetNumClients(role, app),
+                NumContributors = GetNumContributors(role, app),
                 Permissions = permissions.ToIds(),
                 IsDefaultRole = Role.IsDefaultRole(role.Name)
             };
 
-            return result.CreateLinks(controller, app.Name);
+            return result;
         }
 
-        private RoleDto CreateLinks(ApiController controller, string app)
+        private static int GetNumContributors(Role role, IAppEntity app)
+        {
+            return app.Contributors.Count(x => Role.IsRole(x.Value, role.Name));
+        }
+
+        private static int GetNumClients(Role role, IAppEntity app)
+        {
+            return app.Clients.Count(x => Role.IsRole(x.Value.Role, role.Name));
+        }
+
+        public RoleDto WithLinks(ApiController controller, string app)
         {
             var values = new { app, name = Name };
 

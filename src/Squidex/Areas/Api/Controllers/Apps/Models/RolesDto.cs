@@ -23,12 +23,19 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static RolesDto FromApp(IAppEntity app, ApiController controller)
         {
+            var appName = app.Name;
+
             var result = new RolesDto
             {
-                Items = app.Roles.Values.Select(x => RoleDto.FromRole(x, app, controller)).OrderBy(x => x.Name).ToArray()
+                Items =
+                    app.Roles.Values
+                        .Select(x => RoleDto.FromRole(x, app))
+                        .Select(x => x.WithLinks(controller, appName))
+                        .OrderBy(x => x.Name)
+                        .ToArray()
             };
 
-            return result.CreateLinks(controller, app.Name);
+            return result.CreateLinks(controller, appName);
         }
 
         private RolesDto CreateLinks(ApiController controller, string app)

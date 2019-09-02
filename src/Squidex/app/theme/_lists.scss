@@ -144,11 +144,19 @@
     }
 
     // Footer that typically contains an add-item-form.
+    &-header,
     &-footer {
         padding: 1rem 1.25rem;
         background: $color-table-footer;
         border: 1px solid $color-border;
         border-bottom-width: 2px;
+    }
+
+    &-header {
+        margin-bottom: .8rem;
+    }
+
+    &-footer {
         margin-top: .8rem;
     }
 
