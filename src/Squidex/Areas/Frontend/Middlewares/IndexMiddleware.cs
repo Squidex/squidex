@@ -34,16 +34,19 @@ namespace Squidex.Areas.Frontend.Middlewares
 
                 await next(context);
 
-                context.Response.Body = responseBody;
+                if (context.Response.StatusCode != 304)
+                {
+                    context.Response.Body = responseBody;
 
-                var html = Encoding.UTF8.GetString(responseBuffer.ToArray());
+                    var html = Encoding.UTF8.GetString(responseBuffer.ToArray());
 
-                html = html.AdjustHtml(context);
+                    html = html.AdjustHtml(context);
 
-                context.Response.ContentLength = Encoding.UTF8.GetByteCount(html);
-                context.Response.Body = responseBody;
+                    context.Response.ContentLength = Encoding.UTF8.GetByteCount(html);
+                    context.Response.Body = responseBody;
 
-                await context.Response.WriteAsync(html);
+                    await context.Response.WriteAsync(html);
+                }
             }
             else
             {
