@@ -135,7 +135,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppImageUploaded { Image = new AppImage("image/png") })
+                    CreateEvent(new AppImageUploaded { Image = command.Image })
                 );
         }
 
