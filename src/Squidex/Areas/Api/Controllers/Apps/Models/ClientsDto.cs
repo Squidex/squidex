@@ -23,12 +23,18 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static ClientsDto FromApp(IAppEntity app, ApiController controller)
         {
+            var appName = app.Name;
+
             var result = new ClientsDto
             {
-                Items = app.Clients.Select(x => ClientDto.FromClient(x.Key, x.Value, controller, app.Name)).ToArray()
+                Items =
+                    app.Clients
+                        .Select(x => ClientDto.FromClient(x.Key, x.Value))
+                        .Select(x => x.WithLinks(controller, appName))
+                        .ToArray()
             };
 
-            return result.CreateLinks(controller, app.Name);
+            return result.CreateLinks(controller, appName);
         }
 
         private ClientsDto CreateLinks(ApiController controller, string app)

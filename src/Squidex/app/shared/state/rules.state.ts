@@ -76,7 +76,12 @@ export class RulesState extends State<Snapshot> {
                 this.next(s => {
                     const rules = ImmutableArray.of(items);
 
-                    return { ...s, rules, isLoaded: true, canCreate, canReadEvents };
+                    return { ...s,
+                        canCreate,
+                        canReadEvents,
+                        isLoaded: true,
+                        rules
+                    };
                 });
             }),
             shareSubscribed(this.dialogs));

@@ -110,7 +110,13 @@ export class ClientsState extends State<Snapshot> {
         const clients = ImmutableArray.of(items);
 
         this.next(s => {
-            return { ...s, clients, isLoaded: true, version, canCreate };
+            return {
+                ...s,
+                canCreate,
+                clients,
+                isLoaded: true,
+                version
+            };
         });
     }
 

@@ -85,6 +85,15 @@ namespace Squidex.Domain.Users
             return Task.FromResult(count);
         }
 
+        public static async Task<List<UserWithClaims>> QueryByIdsAync(this UserManager<IdentityUser> userManager, string[] ids)
+        {
+            var users = userManager.Users.Where(x => ids.Contains(x.Id)).ToList();
+
+            var result = await userManager.ResolveUsersAsync(users);
+
+            return result.ToList();
+        }
+
         public static async Task<List<UserWithClaims>> QueryByEmailAsync(this UserManager<IdentityUser> userManager, string email = null, int take = 10, int skip = 0)
         {
             var users = QueryUsers(userManager, email).Skip(skip).Take(take).ToList();

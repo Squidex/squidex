@@ -96,7 +96,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         private readonly contentsService: ContentsService,
         private readonly dialogs: DialogService
     ) {
-        super({ contents: ImmutableArray.of(), contentsPager: new Pager(0), contentsQueryJson: '' });
+        super({ contents: ImmutableArray.empty(), contentsPager: new Pager(0), contentsQueryJson: '' });
     }
 
     public select(id: string | null): Observable<ContentDto | null> {
