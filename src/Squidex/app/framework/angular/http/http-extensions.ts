@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -17,6 +17,12 @@ import {
 } from '@app/framework/internal';
 
 export module HTTP {
+    export function upload<T = any>(http: HttpClient, method: string, url: string, file: File, version?: Version): Observable<HttpEvent<T>> {
+        const req = new HttpRequest(method, url, getFormData(file), { headers: createHeaders(version), reportProgress: true });
+
+        return http.request<T>(req);
+    }
+
     export function getVersioned<T = any>(http: HttpClient, url: string, version?: Version): Observable<Versioned<HttpResponse<T>>> {
         const headers = createHeaders(version);
 
@@ -51,6 +57,14 @@ export module HTTP {
         const headers = createHeaders(version);
 
         return handleVersion(http.request<T>(method, url, { observe: 'response', headers, body }));
+    }
+
+    function getFormData(file: File) {
+        const formData = new FormData();
+
+        formData.append('file', file);
+
+        return formData;
     }
 
     function createHeaders(version?: Version): HttpHeaders {

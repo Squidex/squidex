@@ -31,3 +31,12 @@ export class CreateAppForm extends Form<FormGroup, { name: string }> {
         }));
     }
 }
+
+export class UpdateAppForm extends Form<FormGroup, { label?: string, description?: string }> {
+    constructor(formBuilder: FormBuilder) {
+        super(formBuilder.group({
+            label: '',
+            description: ''
+        }));
+    }
+}

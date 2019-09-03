@@ -91,7 +91,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
         [Route("assets/{id}/")]
         [ProducesResponseType(typeof(FileResult), 200)]
         [ApiCosts(0.5)]
-        public async Task<IActionResult> GetAssetContent(Guid id, string more, [FromQuery] AssetQuery query)
+        public async Task<IActionResult> GetAssetContent(Guid id, [FromQuery] AssetQuery query)
         {
             var asset = await assetRepository.FindAssetAsync(id);
 

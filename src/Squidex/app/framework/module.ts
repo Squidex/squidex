@@ -14,6 +14,7 @@ import { ColorPickerModule  } from 'ngx-color-picker';
 import {
     AnalyticsService,
     AutocompleteComponent,
+    AvatarComponent,
     CachingInterceptor,
     CanDeactivateGuard,
     CheckboxGroupComponent,
@@ -75,6 +76,7 @@ import {
     ResourceLoaderService,
     RootViewComponent,
     SafeHtmlPipe,
+    SafeUrlPipe,
     ScrollActiveDirective,
     ShortcutComponent,
     ShortcutService,
@@ -102,6 +104,7 @@ import {
     ],
     declarations: [
         AutocompleteComponent,
+        AvatarComponent,
         CheckboxGroupComponent,
         ColorPickerComponent,
         ConfirmClickDirective,
@@ -153,6 +156,7 @@ import {
         ProgressBarComponent,
         RootViewComponent,
         SafeHtmlPipe,
+        SafeUrlPipe,
         ScrollActiveDirective,
         ShortcutComponent,
         ShortDatePipe,
@@ -170,6 +174,7 @@ import {
     ],
     exports: [
         AutocompleteComponent,
+        AvatarComponent,
         CheckboxGroupComponent,
         CodeEditorComponent,
         CommonModule,
@@ -224,6 +229,7 @@ import {
         ReactiveFormsModule,
         RootViewComponent,
         SafeHtmlPipe,
+        SafeUrlPipe,
         ScrollActiveDirective,
         ShortcutComponent,
         ShortDatePipe,

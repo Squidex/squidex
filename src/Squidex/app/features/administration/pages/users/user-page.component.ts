@@ -42,9 +42,9 @@ export class UserPageComponent extends ResourceOwner implements OnInit {
         this.own(
             this.usersState.selectedUser
                 .subscribe(selectedUser => {
-                    this.user = selectedUser!;
-
                     if (selectedUser) {
+                        this.user = selectedUser;
+
                         this.isEditable = this.user.canUpdate;
 
                         this.userForm.load(selectedUser);

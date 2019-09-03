@@ -160,11 +160,7 @@ describe('RulesService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
 
-        req.flush(ruleResponse(12), {
-            headers: {
-                etag: '1'
-            }
-        });
+        req.flush(ruleResponse(12));
 
         expect(rule!).toEqual(createRule(12));
     }));

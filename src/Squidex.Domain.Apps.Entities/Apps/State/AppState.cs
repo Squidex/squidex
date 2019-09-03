@@ -26,10 +26,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         public string Name { get; set; }
 
         [DataMember]
+        public string Label { get; set; }
+
+        [DataMember]
+        public string Description { get; set; }
+
+        [DataMember]
         public Roles Roles { get; set; } = Roles.Empty;
 
         [DataMember]
         public AppPlan Plan { get; set; }
+
+        [DataMember]
+        public AppImage Image { get; set; }
 
         [DataMember]
         public AppClients Clients { get; set; } = AppClients.Empty;
@@ -54,6 +63,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
             Roles = Roles.CreateDefaults(@event.Name);
 
             SimpleMapper.Map(@event, this);
+        }
+
+        protected void On(AppUpdated @event)
+        {
+            SimpleMapper.Map(@event, this);
+        }
+
+        protected void On(AppImageUploaded @event)
+        {
+            Image = @event.Image;
+        }
+
+        protected void On(AppImageRemoved @event)
+        {
+            Image = null;
         }
 
         protected void On(AppPlanChanged @event)
