@@ -27,7 +27,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Backup
 {
-    public sealed class RestoreGrain : GrainOfString<RestoreState>, IRestoreGrain
+    public sealed class RestoreGrain : GrainOfString, IRestoreGrain
     {
         private readonly IBackupArchiveLocation backupArchiveLocation;
         private readonly IClock clock;
@@ -38,10 +38,11 @@ namespace Squidex.Domain.Apps.Entities.Backup
         private readonly ISemanticLog log;
         private readonly IServiceProvider serviceProvider;
         private readonly IStreamNameResolver streamNameResolver;
+        private readonly IGrainState<RestoreState> state;
 
         private RestoreStateJob CurrentJob
         {
-            get { return State.Job; }
+            get { return state.Value.Job; }
         }
 
         public RestoreGrain(IBackupArchiveLocation backupArchiveLocation,
@@ -53,8 +54,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             ISemanticLog log,
             IServiceProvider serviceProvider,
             IStreamNameResolver streamNameResolver,
-            IStore<string> store)
-            : base(store)
+            IGrainState<RestoreState> state)
         {
             Guard.NotNull(backupArchiveLocation, nameof(backupArchiveLocation));
             Guard.NotNull(clock, nameof(clock));
@@ -63,7 +63,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
             Guard.NotNull(serializer, nameof(serializer));
             Guard.NotNull(serviceProvider, nameof(serviceProvider));
-            Guard.NotNull(store, nameof(store));
+            Guard.NotNull(state, nameof(state));
             Guard.NotNull(streamNameResolver, nameof(streamNameResolver));
             Guard.NotNull(log, nameof(log));
 
@@ -75,6 +75,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.serializer = serializer;
             this.serviceProvider = serviceProvider;
             this.streamNameResolver = streamNameResolver;
+            this.state = state;
             this.log = log;
         }
 
@@ -96,7 +97,8 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 CurrentJob.Status = JobStatus.Failed;
 
                 await CleanupAsync(handlers);
-                await WriteStateAsync();
+
+                await state.WriteAsync();
             }
         }
 
@@ -115,7 +117,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 throw new DomainException("A restore operation is already running.");
             }
 
-            State.Job = new RestoreStateJob
+            state.Value.Job = new RestoreStateJob
             {
                 Id = Guid.NewGuid(),
                 NewAppName = newAppName,
@@ -125,7 +127,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 Url = url
             };
 
-            await WriteStateAsync();
+            await state.WriteAsync();
 
             Process();
         }
@@ -235,7 +237,7 @@ namespace Squidex.Domain.Apps.Entities.Backup
                 {
                     CurrentJob.Stopped = clock.GetCurrentInstant();
 
-                    await WriteStateAsync();
+                    await state.WriteAsync();
                 }
             }
         }

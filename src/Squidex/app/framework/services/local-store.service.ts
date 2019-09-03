@@ -14,7 +14,7 @@ export const LocalStoreServiceFactory = () => {
 @Injectable()
 export class LocalStoreService {
     private readonly fallback: { [key: string]: string } = {};
-    private store: any = localStorage;
+    private store = localStorage;
 
     public configureStore(store: any) {
         this.store = store;
@@ -58,5 +58,13 @@ export class LocalStoreService {
         const converted = `${value}`;
 
         this.store.setItem(key, converted);
+    }
+
+    public remove(key: string) {
+        try {
+            this.store.removeItem(key);
+        } catch (e) {
+            delete this.fallback[key];
+        }
     }
 }

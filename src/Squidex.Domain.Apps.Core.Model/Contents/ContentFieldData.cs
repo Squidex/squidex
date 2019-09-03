@@ -21,7 +21,7 @@ namespace Squidex.Domain.Apps.Core.Contents
 
         public ContentFieldData AddValue(object value)
         {
-            return AddJsonValue(InvariantPartitioning.Key, JsonValue.Create(value));
+            return AddJsonValue(JsonValue.Create(value));
         }
 
         public ContentFieldData AddValue(string key, object value)
@@ -29,11 +29,26 @@ namespace Squidex.Domain.Apps.Core.Contents
             return AddJsonValue(key, JsonValue.Create(value));
         }
 
+        public ContentFieldData AddJsonValue(IJsonValue value)
+        {
+            this[InvariantPartitioning.Key] = value;
+
+            return this;
+        }
+
         public ContentFieldData AddJsonValue(string key, IJsonValue value)
         {
             Guard.NotNullOrEmpty(key, nameof(key));
 
-            this[key] = value;
+            if (Language.IsValidLanguage(key))
+            {
+                this[key] = value;
+                // this[string.Intern(key)] = value;
+            }
+            else
+            {
+                this[key] = value;
+            }
 
             return this;
         }

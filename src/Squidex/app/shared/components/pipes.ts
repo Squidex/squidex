@@ -70,10 +70,11 @@ class UserAsyncPipe implements OnDestroy {
     private lastValue: string | null = null;
     private subscription: Subscription;
 
-    constructor(
+    constructor(loading: string,
         private readonly users: UsersProviderService,
         private readonly changeDetector: ChangeDetectorRef
     ) {
+        this.lastValue = loading;
     }
 
     public ngOnDestroy() {
@@ -107,7 +108,7 @@ class UserAsyncPipe implements OnDestroy {
 })
 export class UserNamePipe extends UserAsyncPipe implements PipeTransform {
     constructor(users: UsersProviderService, changeDetector: ChangeDetectorRef) {
-        super(users, changeDetector);
+        super('Loading...', users, changeDetector);
     }
 
     public transform(userId: string, placeholder = 'Me'): string | null {
@@ -121,7 +122,7 @@ export class UserNamePipe extends UserAsyncPipe implements PipeTransform {
 })
 export class UserNameRefPipe extends UserAsyncPipe implements PipeTransform {
     constructor(users: UsersProviderService, changeDetector: ChangeDetectorRef) {
-        super(users, changeDetector);
+        super('Loading...', users, changeDetector);
     }
 
     public transform(userId: string, placeholder: string | null = 'Me'): string | null {
@@ -179,7 +180,7 @@ export class UserPicturePipe extends UserAsyncPipe implements PipeTransform {
     constructor(users: UsersProviderService, changeDetector: ChangeDetectorRef,
         private readonly apiUrl: ApiUrlConfig
     ) {
-        super(users, changeDetector);
+        super('', users, changeDetector);
     }
 
     public transform(userId: string): string | null {
@@ -195,7 +196,7 @@ export class UserPictureRefPipe extends UserAsyncPipe implements PipeTransform {
     constructor(users: UsersProviderService, changeDetector: ChangeDetectorRef,
         private readonly apiUrl: ApiUrlConfig
     ) {
-        super(users, changeDetector);
+        super('', users, changeDetector);
     }
 
     public transform(userId: string): string | null {

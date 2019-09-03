@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using NJsonSchema;
 using NodaTime;
 using NodaTime.Text;

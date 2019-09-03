@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 
 namespace Squidex.Infrastructure.Caching
@@ -14,10 +15,15 @@ namespace Squidex.Infrastructure.Caching
         private readonly Dictionary<TKey, LinkedListNode<LRUCacheItem<TKey, TValue>>> cacheMap = new Dictionary<TKey, LinkedListNode<LRUCacheItem<TKey, TValue>>>();
         private readonly LinkedList<LRUCacheItem<TKey, TValue>> cacheHistory = new LinkedList<LRUCacheItem<TKey, TValue>>();
         private readonly int capacity;
+        private readonly Action<TKey, TValue> itemEvicted;
 
-        public LRUCache(int capacity)
+        public LRUCache(int capacity, Action<TKey, TValue> itemEvicted = null)
         {
+            Guard.GreaterThan(capacity, 0, nameof(capacity));
+
             this.capacity = capacity;
+
+            this.itemEvicted = itemEvicted ?? new Action<TKey, TValue>((key, value) => { });
         }
 
         public bool Set(TKey key, TValue value)
@@ -87,6 +93,8 @@ namespace Squidex.Infrastructure.Caching
         private void RemoveFirst()
         {
             var node = cacheHistory.First;
+
+            itemEvicted(node.Value.Key, node.Value.Value);
 
             cacheMap.Remove(node.Value.Key);
             cacheHistory.RemoveFirst();

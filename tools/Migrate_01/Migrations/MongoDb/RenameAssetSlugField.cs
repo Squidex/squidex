@@ -12,11 +12,11 @@ using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01.Migrations.MongoDb
 {
-    public sealed class RenameSlugField : IMigration
+    public sealed class RenameAssetSlugField : IMigration
     {
         private readonly IMongoDatabase database;
 
-        public RenameSlugField(IMongoDatabase database)
+        public RenameAssetSlugField(IMongoDatabase database)
         {
             this.database = database;
         }

@@ -82,14 +82,13 @@ namespace Squidex.Areas.Api.Controllers.Assets
         /// Get the asset content.
         /// </summary>
         /// <param name="id">The id of the asset.</param>
-        /// <param name="more">Optional suffix that can be used to seo-optimize the link to the image Has not effect.</param>
         /// <param name="query">The query string parameters.</param>
         /// <returns>
         /// 200 => Asset found and content or (resized) image returned.
         /// 404 => Asset or app not found.
         /// </returns>
         [HttpGet]
-        [Route("assets/{id}/{*more}")]
+        [Route("assets/{id}/")]
         [ProducesResponseType(typeof(FileResult), 200)]
         [ApiCosts(0.5)]
         public async Task<IActionResult> GetAssetContent(Guid id, string more, [FromQuery] AssetQuery query)

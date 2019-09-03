@@ -15,9 +15,13 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
             min-width: 100%;
             max-width: 100%;
         }
+
+        .white {
+            background: #fff;
+        }
     `],
     template: `
-        <div class="alert alert-hint mt-{{marginTop}} mb-{{marginBottom}} {{class}}">
+        <div class="alert alert-hint mt-{{marginTop}} mb-{{marginBottom}} {{class}}" [class.white]="white">
             <i class="icon-info-outline"></i> <ng-content></ng-content>
         </div>`,
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -31,4 +35,7 @@ export class FormAlertComponent {
 
     @Input()
     public marginBottom = 4;
+
+    @Input()
+    public white = false;
 }

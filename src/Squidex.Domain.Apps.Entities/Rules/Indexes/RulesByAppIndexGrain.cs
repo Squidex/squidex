@@ -9,53 +9,58 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
-    public sealed class RulesByAppIndexGrain : GrainOfGuid<RulesByAppIndexGrain.GrainState>, IRulesByAppIndex
+    public sealed class RulesByAppIndexGrain : GrainOfGuid, IRulesByAppIndex
     {
+        private readonly IGrainState<GrainState> state;
+
         [CollectionName("Index_RulesByApp")]
         public sealed class GrainState
         {
             public HashSet<Guid> Rules { get; set; } = new HashSet<Guid>();
         }
 
-        public RulesByAppIndexGrain(IStore<Guid> store)
-            : base(store)
+        public RulesByAppIndexGrain(IGrainState<GrainState> state)
         {
+            Guard.NotNull(state, nameof(state));
+
+            this.state = state;
         }
 
         public Task ClearAsync()
         {
-            return ClearStateAsync();
+            return state.ClearAsync();
         }
 
         public Task RebuildAsync(HashSet<Guid> rules)
         {
-            State = new GrainState { Rules = rules };
+            state.Value = new GrainState { Rules = rules };
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task AddRuleAsync(Guid ruleId)
         {
-            State.Rules.Add(ruleId);
+            state.Value.Rules.Add(ruleId);
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task RemoveRuleAsync(Guid ruleId)
         {
-            State.Rules.Remove(ruleId);
+            state.Value.Rules.Remove(ruleId);
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task<List<Guid>> GetRuleIdsAsync()
         {
-            return Task.FromResult(State.Rules.ToList());
+            return Task.FromResult(state.Value.Rules.ToList());
         }
     }
 }

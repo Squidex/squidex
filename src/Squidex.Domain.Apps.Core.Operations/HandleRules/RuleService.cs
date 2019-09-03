@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events;
@@ -23,16 +24,17 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 {
     public class RuleService
     {
-        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(3);
         private readonly Dictionary<Type, IRuleActionHandler> ruleActionHandlers;
         private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers;
         private readonly TypeNameRegistry typeNameRegistry;
+        private readonly RuleOptions ruleOptions;
         private readonly IEventEnricher eventEnricher;
         private readonly IJsonSerializer jsonSerializer;
         private readonly IClock clock;
         private readonly ISemanticLog log;
 
         public RuleService(
+            IOptions<RuleOptions> ruleOptions,
             IEnumerable<IRuleTriggerHandler> ruleTriggerHandlers,
             IEnumerable<IRuleActionHandler> ruleActionHandlers,
             IEventEnricher eventEnricher,
@@ -42,6 +44,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             TypeNameRegistry typeNameRegistry)
         {
             Guard.NotNull(jsonSerializer, nameof(jsonSerializer));
+            Guard.NotNull(ruleOptions, nameof(ruleOptions));
             Guard.NotNull(ruleTriggerHandlers, nameof(ruleTriggerHandlers));
             Guard.NotNull(ruleActionHandlers, nameof(ruleActionHandlers));
             Guard.NotNull(typeNameRegistry, nameof(typeNameRegistry));
@@ -51,14 +54,15 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
             this.typeNameRegistry = typeNameRegistry;
 
+            this.ruleOptions = ruleOptions.Value;
             this.ruleTriggerHandlers = ruleTriggerHandlers.ToDictionary(x => x.TriggerType);
             this.ruleActionHandlers = ruleActionHandlers.ToDictionary(x => x.ActionType);
-
             this.eventEnricher = eventEnricher;
 
             this.jsonSerializer = jsonSerializer;
 
             this.clock = clock;
+
             this.log = log;
         }
 
@@ -171,7 +175,7 @@ namespace Squidex.Domain.Apps.Core.HandleRules
 
                 var deserialized = jsonSerializer.Deserialize<object>(job, actionHandler.DataType);
 
-                using (var cts = new CancellationTokenSource(DefaultTimeout))
+                using (var cts = new CancellationTokenSource(GetTimeoutInMs()))
                 {
                     result = await actionHandler.ExecuteJobAsync(deserialized, cts.Token).WithCancellation(cts.Token);
                 }
@@ -186,6 +190,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules
             result.Enrich(elapsed);
 
             return (result, elapsed);
+        }
+
+        private int GetTimeoutInMs()
+        {
+            return ruleOptions.ExecutionTimeoutInSeconds * 1000;
         }
     }
 }

@@ -18,6 +18,8 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
 
         public string DisplayName { get; set; }
 
+        public string ClientSecret { get; set; }
+
         public string ErrorMessage { get; set; }
 
         public string SuccessMessage { get; set; }

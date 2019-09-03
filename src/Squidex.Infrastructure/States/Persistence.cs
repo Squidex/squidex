@@ -14,11 +14,12 @@ namespace Squidex.Infrastructure.States
     {
         public Persistence(TKey ownerKey, Type ownerType,
             IEventStore eventStore,
+            IEventEnricher<TKey> eventEnricher,
             IEventDataFormatter eventDataFormatter,
             ISnapshotStore<None, TKey> snapshotStore,
             IStreamNameResolver streamNameResolver,
             HandleEvent applyEvent)
-            : base(ownerKey, ownerType, eventStore, eventDataFormatter, snapshotStore, streamNameResolver, PersistenceMode.EventSourcing, null, applyEvent)
+            : base(ownerKey, ownerType, eventStore, eventEnricher, eventDataFormatter, snapshotStore, streamNameResolver, PersistenceMode.EventSourcing, null, applyEvent)
         {
         }
     }

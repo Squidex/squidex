@@ -19,6 +19,7 @@ namespace Squidex.Infrastructure.States
     public class PersistenceEventSourcingTests
     {
         private readonly string key = Guid.NewGuid().ToString();
+        private readonly IEventEnricher<string> eventEnricher = A.Fake<IEventEnricher<string>>();
         private readonly IEventDataFormatter eventDataFormatter = A.Fake<IEventDataFormatter>();
         private readonly IEventStore eventStore = A.Fake<IEventStore>();
         private readonly IServiceProvider services = A.Fake<IServiceProvider>();
@@ -37,7 +38,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => streamNameResolver.GetStreamName(None.Type, key))
                 .Returns(key);
 
-            sut = new Store<string>(eventStore, eventDataFormatter, services, streamNameResolver);
+            sut = new Store<string>(eventStore, eventEnricher, eventDataFormatter, services, streamNameResolver);
         }
 
         [Fact]
@@ -190,6 +191,8 @@ namespace Squidex.Infrastructure.States
                 .MustHaveHappened();
             A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 3, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .MustHaveHappened();
+            A.CallTo(() => eventEnricher.Enrich(A<Envelope<IEvent>>.Ignored, key))
+                .MustHaveHappenedTwiceExactly();
         }
 
         [Fact]

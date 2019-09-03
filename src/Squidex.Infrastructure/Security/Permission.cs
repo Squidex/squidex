@@ -15,11 +15,24 @@ namespace Squidex.Infrastructure.Security
         public const string Exclude = "^";
 
         private readonly string id;
-        private readonly Lazy<Part[]> idParts;
+        private Part[] path;
 
         public string Id
         {
             get { return id; }
+        }
+
+        private Part[] Path
+        {
+            get
+            {
+                if (path == null)
+                {
+                    path = Part.ParsePath(id);
+                }
+
+                return path;
+            }
         }
 
         public Permission(string id)
@@ -27,8 +40,6 @@ namespace Squidex.Infrastructure.Security
             Guard.NotNullOrEmpty(id, nameof(id));
 
             this.id = id;
-
-            idParts = new Lazy<Part[]>(() => Part.ParsePath(id));
         }
 
         public bool Allows(Permission permission)
@@ -38,7 +49,7 @@ namespace Squidex.Infrastructure.Security
                 return false;
             }
 
-            return Covers(idParts.Value, permission.idParts.Value);
+            return Covers(Path, permission.Path);
         }
 
         public bool Includes(Permission permission)
@@ -48,7 +59,7 @@ namespace Squidex.Infrastructure.Security
                 return false;
             }
 
-            return PartialCovers(idParts.Value, permission.idParts.Value);
+            return PartialCovers(Path, permission.Path);
         }
 
         private static bool Covers(Part[] given, Part[] requested)
