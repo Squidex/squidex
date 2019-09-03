@@ -27,9 +27,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             var result = new AppLanguagesDto
             {
                 Items = app.LanguagesConfig.OfType<LanguageConfig>()
-                    .Select(x => AppLanguageDto.FromLanguage(x, app, controller))
-                    .OrderByDescending(x => x.IsMaster)
-                    .ThenBy(x => x.Iso2Code)
+                    .Select(x => AppLanguageDto.FromLanguage(x, app))
+                    .Select(x => x.WithLinks(controller, app))
+                    .OrderByDescending(x => x.IsMaster).ThenBy(x => x.Iso2Code)
                     .ToArray()
             };
 

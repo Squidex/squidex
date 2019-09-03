@@ -6,13 +6,14 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { combineLatest, Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 import {
     DialogService,
     ErrorDto,
     ImmutableArray,
+    Pager,
     shareMapSubscribed,
     shareSubscribed,
     State,
@@ -39,6 +40,15 @@ interface Snapshot {
     // The maximum allowed users.
     maxContributors: number;
 
+    // The current page.
+    page: number;
+
+    // The search query.
+    query?: string;
+
+    // Query regex.
+    queryRegex?: RegExp;
+
     // The app version.
     version: Version;
 
@@ -53,21 +63,39 @@ export class ContributorsState extends State<Snapshot> {
     public contributors =
         this.project(x => x.contributors);
 
-    public isLoaded =
-        this.project(x => !!x.isLoaded);
+    public page =
+        this.project(x => x.page);
+
+    public query =
+        this.project(x => x.query);
+
+    public queryRegex =
+        this.project(x => x.queryRegex);
 
     public maxContributors =
         this.project(x => x.maxContributors);
 
+    public isLoaded =
+        this.project(x => !!x.isLoaded);
+
     public canCreate =
         this.project(x => !!x.canCreate);
+
+    public filtered =
+        combineLatest(this.queryRegex, this.contributors, (q, c) => getFilteredContributors(c, q));
+
+    public contributorsPaged =
+        combineLatest(this.page, this.filtered, (p, c) => getPagedContributors(c, p));
+
+    public contributorsPager =
+        combineLatest(this.page, this.filtered, (p, c) => new Pager(c.length, p, PAGE_SIZE));
 
     constructor(
         private readonly contributorsService: ContributorsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ contributors: ImmutableArray.empty(), version: Version.EMPTY, maxContributors: -1 });
+        super({ contributors: ImmutableArray.empty(), page: 0, maxContributors: -1, version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -84,6 +112,18 @@ export class ContributorsState extends State<Snapshot> {
                 this.replaceContributors(version, payload);
             }),
             shareSubscribed(this.dialogs));
+    }
+
+    public goNext() {
+        this.next(s => ({ ...s, page: s.page + 1 }));
+    }
+
+    public goPrev() {
+        this.next(s => ({ ...s, page: s.page - 1 }));
+    }
+
+    public search(query: string) {
+        this.next(s => ({ ...s, query, queryRegex: new RegExp(query, 'i') }));
     }
 
     public revoke(contributor: ContributorDto): Observable<any> {
@@ -115,7 +155,14 @@ export class ContributorsState extends State<Snapshot> {
 
             const contributors = ImmutableArray.of(items);
 
-            return { ...s, contributors, maxContributors, isLoaded: true, version, canCreate };
+            return {
+                canCreate,
+                contributors,
+                isLoaded: true,
+                maxContributors,
+                page: 0,
+                version
+            };
         });
     }
 
@@ -126,4 +173,20 @@ export class ContributorsState extends State<Snapshot> {
     private get version() {
         return this.snapshot.version;
     }
+}
+
+const PAGE_SIZE = 10;
+
+function getPagedContributors(contributors: ContributorsList, page: number) {
+    return ImmutableArray.of(contributors.values.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE));
+}
+
+function getFilteredContributors(contributors: ContributorsList, query?: RegExp) {
+    let filtered = contributors;
+
+    if (query) {
+        filtered = filtered.filter(x => query.test(x.contributorName));
+    }
+
+    return filtered;
 }

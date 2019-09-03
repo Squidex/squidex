@@ -31,16 +31,22 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public static async Task<WorkflowsDto> FromAppAsync(IWorkflowsValidator workflowsValidator, IAppEntity app, ApiController controller)
         {
+            var appName = app.Name;
+
             var result = new WorkflowsDto
             {
-                Items = app.Workflows.Select(x => WorkflowDto.FromWorkflow(x.Key, x.Value, controller, app.Name)).ToArray(),
+                Items =
+                    app.Workflows
+                        .Select(x => WorkflowDto.FromWorkflow(x.Key, x.Value))
+                        .Select(x => x.WithLinks(controller, appName))
+                        .ToArray()
             };
 
             var errors = await workflowsValidator.ValidateAsync(app.Id, app.Workflows);
 
             result.Errors = errors.ToArray();
 
-            return result.CreateLinks(controller, app.Name);
+            return result.CreateLinks(controller, appName);
         }
 
         private WorkflowsDto CreateLinks(ApiController controller, string app)
