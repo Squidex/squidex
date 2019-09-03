@@ -8,6 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Reflection;
+using Roles = Squidex.Domain.Apps.Core.Apps.Role;
 
 namespace Squidex.Areas.Api.Controllers.Apps.Models
 {
@@ -22,7 +23,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// <summary>
         /// The role of the contributor.
         /// </summary>
-        public string Role { get; set; }
+        public string Role { get; set; } = Roles.Developer;
 
         /// <summary>
         /// Set to true to invite the user if he does not exist.
@@ -31,7 +32,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
 
         public AssignContributor ToCommand()
         {
-            return SimpleMapper.Map(this, new AssignContributor { IsInviting = Invite });
+            return SimpleMapper.Map(this, new AssignContributor());
         }
     }
 }
