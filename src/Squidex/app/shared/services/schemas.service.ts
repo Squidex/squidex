@@ -312,8 +312,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${name}`);
 
         return HTTP.getVersioned(this.http, url).pipe(
-            map(({ version, payload }) => {
-                return parseSchemaWithDetails(payload.body, version);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             pretifyError('Failed to load schema. Please reload.'));
     }
@@ -322,8 +322,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
         return HTTP.postVersioned(this.http, url, dto).pipe(
-            map(({ version, payload }) => {
-                return parseSchemaWithDetails(payload.body, version);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Created', appName);
@@ -337,8 +337,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'ScriptsConfigured', appName);
@@ -352,8 +352,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Updated', appName);
@@ -367,8 +367,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'CategoryChanged', appName);
@@ -382,8 +382,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'PreviewUrlsConfigured', appName);
@@ -397,8 +397,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Published', appName);
@@ -412,8 +412,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'Unpublished', appName);
@@ -427,8 +427,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldCreated', appName);
@@ -442,8 +442,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, { fieldIds: dto }).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldsReordered', appName);
@@ -457,8 +457,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldUpdated', appName);
@@ -472,8 +472,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldLocked', appName);
@@ -487,8 +487,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldEnabled', appName);
@@ -502,8 +502,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldDisabled', appName);
@@ -517,8 +517,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldShown', appName);
@@ -532,8 +532,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldHidden', appName);
@@ -547,8 +547,8 @@ export class SchemasService {
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
-            map(({ version: newVersion, payload }) => {
-                return parseSchemaWithDetails(payload.body, newVersion);
+            map(({ payload }) => {
+                return parseSchemaWithDetails(payload.body);
             }),
             tap(() => {
                 this.analytics.trackEvent('Schema', 'FieldDeleted', appName);
@@ -589,7 +589,7 @@ function parseSchemas(response: any) {
     return { items, _links, canCreate: hasAnyLink(_links, 'create') };
 }
 
-function parseSchemaWithDetails(response: any, version: Version) {
+function parseSchemaWithDetails(response: any) {
     const fields = response.fields.map((item: any) => {
         const propertiesDto =
             createProperties(
@@ -638,7 +638,7 @@ function parseSchemaWithDetails(response: any, version: Version) {
         response.isPublished,
         DateTime.parseISO_UTC(response.created), response.createdBy,
         DateTime.parseISO_UTC(response.lastModified), response.lastModifiedBy,
-        version,
+        new Version(response.version.toString()),
         fields,
         response.scripts || {},
         response.previewUrls || {});

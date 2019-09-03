@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient, HttpErrorResponse, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map, tap } from 'rxjs/operators';
@@ -157,12 +157,10 @@ export class AssetsService {
             pretifyError('Failed to load assets. Please reload.'));
     }
 
-    public uploadFile(appName: string, file: File): Observable<number | AssetDto> {
+    public postAssetFile(appName: string, file: File): Observable<number | AssetDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets`);
 
-        const req = new HttpRequest('POST', url, getFormData(file), { reportProgress: true });
-
-        return this.http.request(req).pipe(
+        return HTTP.upload(this.http, 'POST', url, file).pipe(
             filter(event =>
                 event.type === HttpEventType.UploadProgress ||
                 event.type === HttpEventType.Response),
@@ -204,14 +202,12 @@ export class AssetsService {
             pretifyError('Failed to load assets. Please reload.'));
     }
 
-    public replaceFile(appName: string, asset: Resource, file: File, version: Version): Observable<number | AssetDto> {
-        const link = asset._links['upload'];
+    public putAssetFile(appName: string, resource: Resource, file: File, version: Version): Observable<number | AssetDto> {
+        const link = resource._links['upload'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        const req = new HttpRequest(link.method, url, getFormData(file), { headers: new HttpHeaders().set('If-Match', version.value), reportProgress: true });
-
-        return this.http.request(req).pipe(
+        return HTTP.upload(this.http, link.method, url, file, version).pipe(
             filter(event =>
                 event.type === HttpEventType.UploadProgress ||
                 event.type === HttpEventType.Response),
@@ -235,14 +231,14 @@ export class AssetsService {
             }),
             tap(value => {
                 if (!Types.isNumber(value)) {
-                    this.analytics.trackEvent('Analytics', 'Replaced', appName);
+                    this.analytics.trackEvent('Asset', 'Replaced', appName);
                 }
             }),
             pretifyError('Failed to replace asset. Please reload.'));
     }
 
-    public putAsset(appName: string, asset: Resource, dto: AnnotateAssetDto, version: Version): Observable<AssetDto> {
-        const link = asset._links['update'];
+    public putAsset(appName: string, resource: Resource, dto: AnnotateAssetDto, version: Version): Observable<AssetDto> {
+        const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
@@ -267,14 +263,6 @@ export class AssetsService {
             }),
             pretifyError('Failed to delete asset. Please reload.'));
     }
-}
-
-function getFormData(file: File) {
-    const formData = new FormData();
-
-    formData.append('file', file);
-
-    return formData;
 }
 
 function parseAsset(response: any) {

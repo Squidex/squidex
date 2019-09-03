@@ -43,10 +43,7 @@ const routes: Routes = [
         component: SettingsAreaComponent,
         children: [
             {
-                path: ''
-            },
-            {
-                path: 'more',
+                path: '',
                 component: MorePageComponent
             },
             {

@@ -1,11 +1,91 @@
-<sqx-title message="{app} | More | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
+<sqx-title message="{app} | More | Settings" parameter1="app" [value1]="appsState.appDisplayName"></sqx-title>
 
-<sqx-panel desiredWidth="50rem">
+<sqx-panel desiredWidth="46rem">
     <ng-container title>
-        More
+        Settings
     </ng-container>
 
     <ng-container content>
+        <div class="card mb-4">
+            <h3 class="card-header">General</h3>
+
+            <div class="card-body">
+                <form [formGroup]="updateForm.form" (ngSubmit)="save()">
+                    <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
+
+                    <div class="form-group">
+                        <label for="email">Name</label>
+        
+                        <input type="text" class="form-control" readonly [value]="app.name" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="label">Label</label>
+        
+                        <sqx-control-errors for="label"></sqx-control-errors>
+        
+                        <input type="text" class="form-control" id="label" maxlength="100" formControlName="label" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+        
+                        <sqx-control-errors for="description"></sqx-control-errors>
+        
+                        <input type="text" class="form-control" id="description" maxlength="100" formControlName="description" />
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <h3 class="card-header">Image</h3>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-auto">
+                        <div class="app-image"
+                            (sqxDropFile)="uploadImage($event)"
+                            [sqxDropDisabled]="uploading || !isImageEditable"
+                            [noDrop]="true">
+                            <div class="app-progress" *ngIf="uploading; else notUploading">
+                                <sqx-progress-bar mode="Circle" [value]="uploadProgress"></sqx-progress-bar>
+                            </div>
+
+                            <ng-template #notUploading>
+                                <div>
+                                    <sqx-avatar [image]="app.image" [identifier]="app.name" [size]="150"></sqx-avatar>
+
+                                    <ng-container *ngIf="isImageEditable && app.image">
+                                        <button class="btn btn-danger btn-sm app-image-remove" title="Remove image" (click)="removeImage()">
+                                            <i class="icon-bin2"></i>
+                                        </button>
+                                    </ng-container>
+                                </div>
+        
+                                <div class="drop-overlay align-items-center justify-content-center">
+                                    <div class="drop-overlay-background"></div>
+                                    <div class="drop-overlay-text">Drop to update</div>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                    <div class="auto align-self-center pl-4">
+                        <sqx-form-hint>Drop an file to replace the app image. Use a square size.</sqx-form-hint>
+
+                        <span class="btn btn-success upload-button" [class.disabled]="!isImageEditable" (click)="fileInput.click()">
+                            <span>Upload File</span>
+                
+                            <input type="file" (change)="uploadImage($event.target.files)" #fileInput single accept="image/x-png,image/gif,image/jpeg" />
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <h3 class="card-header">Danger Zone</h3>
 
@@ -19,7 +99,7 @@
                         </sqx-form-hint>
                     </div>
                     <div class="col-auto">
-                        <button type="button" class="btn btn-danger"
+                        <button type="button" class="btn btn-danger" [disabled]="!isDeletable"
                             (sqxConfirmClick)="archiveApp()"
                             confirmTitle="Archive App" 
                             confirmText="Do you really want to archive this app?">

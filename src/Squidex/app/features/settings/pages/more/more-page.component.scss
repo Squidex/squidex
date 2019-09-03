@@ -1,2 +1,71 @@
 @import '_vars';
 @import '_mixins';
+
+.app {
+    &-image {
+        position: relative;
+        min-width: 150px;
+        min-height: 150px;
+    }
+
+    &-image-remove {
+        @include absolute(auto, .5rem, .5rem, auto);
+    }
+
+    &-progress {
+        @include absolute(1rem, 1rem, 1rem, 1rem);
+    }
+}
+
+@mixin overlay {
+    & {
+        @include transition(opacity .4s ease);
+        @include absolute(0, 0, 0, 0);
+        @include opacity(0);
+        @include flex-box;
+        color: $color-dark-foreground;
+    }
+
+    &-background {
+        @include absolute(0, 0, 0, 0);
+        @include opacity(.7);
+        background: $color-dark-black;
+    }
+}
+
+.upload-button {
+    & {
+        margin-top: 1rem;
+    }
+
+    input {
+        @include hidden;
+    }
+}
+
+.drop-overlay {
+    & {
+        @include overlay;
+        pointer-events: none;
+    }
+
+    &-text {
+        position: absolute;
+        font-size: 1.25rem;
+        font-weight: lighter;
+    }
+}
+
+.drag {
+    .drop-overlay {
+        @include opacity(1);
+    }
+
+    .app-image-remove {
+        display: none;
+    }
+}
+
+.disabled {
+    pointer-events: none;
+}

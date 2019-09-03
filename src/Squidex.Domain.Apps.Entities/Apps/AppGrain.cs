@@ -69,6 +69,36 @@ namespace Squidex.Domain.Apps.Entities.Apps
                         return Snapshot;
                     });
 
+                case UpdateApp updateApp:
+                    return UpdateReturn(updateApp, c =>
+                    {
+                        GuardApp.CanUpdate(c);
+
+                        Update(c);
+
+                        return Snapshot;
+                    });
+
+                case UploadAppImage uploadImage:
+                    return UpdateReturn(uploadImage, c =>
+                    {
+                        GuardApp.CanUploadImage(c);
+
+                        UploadImage(c);
+
+                        return Snapshot;
+                    });
+
+                case RemoveAppImage removeImage:
+                    return UpdateReturn(removeImage, c =>
+                    {
+                        GuardApp.CanRemoveImage(c);
+
+                        RemoveImage(c);
+
+                        return Snapshot;
+                    });
+
                 case AssignContributor assignContributor:
                     return UpdateReturnAsync(assignContributor, async c =>
                     {
@@ -322,6 +352,21 @@ namespace Squidex.Domain.Apps.Entities.Apps
             {
                 RaiseEvent(SimpleMapper.Map(command, new AppClientUpdated { Role = command.Role }));
             }
+        }
+
+        public void Update(UpdateApp command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppUpdated()));
+        }
+
+        public void UploadImage(UploadAppImage command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppImageUploaded()));
+        }
+
+        public void RemoveImage(RemoveAppImage command)
+        {
+            RaiseEvent(SimpleMapper.Map(command, new AppImageRemoved()));
         }
 
         public void UpdateLanguage(UpdateLanguage command)

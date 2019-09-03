@@ -21,8 +21,6 @@ describe('AppsState', () => {
     const app1 = createApp(1);
     const app2 = createApp(2);
 
-    const newApp = createApp(3);
-
     let dialogs: IMock<DialogService>;
     let appsService: IMock<AppsService>;
     let appsState: AppsState;
@@ -81,49 +79,81 @@ describe('AppsState', () => {
     });
 
     it('should add app to snapshot when created', () => {
-        const request = { ...newApp };
+        const updated = createApp(3, '_new');
+
+        const request = { ...updated };
 
         appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp)).verifiable();
+            .returns(() => of(updated)).verifiable();
 
         appsState.create(request).subscribe();
 
-        expect(appsState.snapshot.apps.values).toEqual([app1, app2, newApp]);
+        expect(appsState.snapshot.apps.values).toEqual([app1, app2, updated]);
+    });
+
+    it('should update app in snapshot when updated', () => {
+        const updated = createApp(2, '_new');
+
+        appsService.setup(x => x.putApp(app2, {}, app2.version))
+            .returns(() => of(updated)).verifiable();
+
+        appsState.update(app2, {}).subscribe();
+
+        expect(appsState.snapshot.apps.values).toEqual([app1, updated]);
+    });
+
+    it('should update selected app in snapshot when updated', () => {
+        const updated = createApp(1, '_new');
+
+        appsService.setup(x => x.putApp(app1, {}, app1.version))
+            .returns(() => of(updated)).verifiable();
+
+        appsState.select(app1.name).subscribe();
+        appsState.update(app1, {}).subscribe();
+
+        expect(appsState.snapshot.apps.values).toEqual([updated, app2]);
+        expect(appsState.snapshot.selectedApp).toEqual(updated);
+    });
+
+    it('should update app in snapshot when image uploaded', () => {
+        const updated = createApp(2, '_new');
+
+        const file = <File>{};
+
+        appsService.setup(x => x.postAppImage(app2, file, app2.version))
+            .returns(() => of(50, 60, updated)).verifiable();
+
+        appsState.uploadImage(app2, file).subscribe();
+
+        expect(appsState.snapshot.apps.values).toEqual([app1, updated]);
+    });
+
+    it('should update app in snapshot when image removed', () => {
+        const updated = createApp(2, '_new');
+
+        appsService.setup(x => x.deleteAppImage(app2, app2.version))
+            .returns(() => of(updated)).verifiable();
+
+        appsState.removeImage(app2).subscribe();
+
+        expect(appsState.snapshot.apps.values).toEqual([app1, updated]);
     });
 
     it('should remove app from snapshot when archived', () => {
-        const request = { ...newApp };
-
-        appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp)).verifiable();
-
-        appsService.setup(x => x.deleteApp(newApp))
+        appsService.setup(x => x.deleteApp(app2))
             .returns(() => of({})).verifiable();
 
-        appsState.create(request).subscribe();
+        appsState.delete(app2).subscribe();
 
-        const appsAfterCreate = appsState.snapshot.apps.values;
-
-        appsState.delete(newApp).subscribe();
-
-        const appsAfterDelete = appsState.snapshot.apps.values;
-
-        expect(appsAfterCreate).toEqual([app1, app2, newApp]);
-        expect(appsAfterDelete).toEqual([app1, app2]);
+        expect(appsState.snapshot.apps.values).toEqual([app1]);
     });
 
     it('should remove selected app from snapshot when archived', () => {
-        const request = { ...newApp };
-
-        appsService.setup(x => x.postApp(request))
-            .returns(() => of(newApp)).verifiable();
-
-        appsService.setup(x => x.deleteApp(newApp))
+        appsService.setup(x => x.deleteApp(app1))
             .returns(() => of({})).verifiable();
 
-        appsState.create(request).subscribe();
-        appsState.select(newApp.name).subscribe();
-        appsState.delete(newApp).subscribe();
+        appsState.select(app1.name).subscribe();
+        appsState.delete(app1).subscribe();
 
         expect(appsState.snapshot.selectedApp).toBeNull();
     });

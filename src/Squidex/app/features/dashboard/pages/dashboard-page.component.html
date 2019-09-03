@@ -1,5 +1,5 @@
 <ng-container *ngIf="app | async; let app">
-    <sqx-title message="{app} | Dashboard" parameter1="app" [value1]="app.name"></sqx-title>
+    <sqx-title message="{app} | Dashboard" parameter1="app" [value1]="app.displayName"></sqx-title>
 
     <div class="dashboard" @fade>
         <div class="dashboard-inner">
@@ -7,7 +7,7 @@
                 <h1 class="dashboard-title">Hi {{authState.user?.displayName}}</h1>
 
                 <div class="subtext">
-                    Welcome to <span class="app-name">{{app.name}}</span> dashboard.
+                    Welcome to <span class="app-name">{{app.displayName}}</span> dashboard.
                 </div>
             </div>
 

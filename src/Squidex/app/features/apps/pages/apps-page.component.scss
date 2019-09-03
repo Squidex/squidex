@@ -21,12 +21,20 @@
     & {
         margin-right: 1rem;
         margin-bottom: 1rem;
-        width: 16rem;
+        width: 20rem;
         float: left;
     }
 
     &-lg {
         width: 33rem;
+    }
+
+    &-links {
+        margin-top: .5rem;
+    }
+
+    &-left {
+        padding-right: .75rem;
     }
 
     &-image {
@@ -37,6 +45,7 @@
         color: $color-text-decent;
         font-weight: normal;
         font-size: .9rem;
+        margin-top: .5rem;
     }
 
     &-more {
@@ -51,12 +60,18 @@
         color: $color-title;
         font-weight: light;
         font-size: 1.2rem;
-        margin-top: .4rem;
+        margin-top: 0;
+        margin-bottom: 0;
     }
 
     &-template {
         .card-body {
             min-height: 15.5rem;
+        }
+
+        .card-title {
+            margin-top: 1rem;
+            margin-bottom: .75rem;
         }
     }
 
