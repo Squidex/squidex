@@ -72,7 +72,7 @@ namespace Squidex.Web.CommandMiddlewares
             actionContext.RouteData.Values["name"] = "other-schema";
 
             var command = new CreateContent { AppId = appId };
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.HandleAsync(context));
         }
@@ -81,7 +81,7 @@ namespace Squidex.Web.CommandMiddlewares
         public async Task Should_do_nothing_when_route_has_no_parameter()
         {
             var command = new CreateContent();
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
@@ -94,7 +94,7 @@ namespace Squidex.Web.CommandMiddlewares
             actionContext.RouteData.Values["name"] = schemaId.Name;
 
             var command = new CreateContent { AppId = appId };
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
@@ -107,7 +107,7 @@ namespace Squidex.Web.CommandMiddlewares
             actionContext.RouteData.Values["name"] = schemaId.Id;
 
             var command = new CreateContent { AppId = appId };
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
@@ -120,7 +120,7 @@ namespace Squidex.Web.CommandMiddlewares
             actionContext.RouteData.Values["name"] = schemaId.Name;
 
             var command = new UpdateSchema();
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
@@ -131,7 +131,7 @@ namespace Squidex.Web.CommandMiddlewares
         public async Task Should_not_override_schema_id()
         {
             var command = new CreateSchema { SchemaId = Guid.NewGuid() };
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
@@ -142,11 +142,16 @@ namespace Squidex.Web.CommandMiddlewares
         public async Task Should_not_override_schema_id_and_name()
         {
             var command = new CreateContent { SchemaId = NamedId.Of(Guid.NewGuid(), "other-schema") };
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
             Assert.NotEqual(appId, command.AppId);
+        }
+
+        private CommandContext Ctx(ICommand command)
+        {
+            return new CommandContext(command, commandBus);
         }
     }
 }
