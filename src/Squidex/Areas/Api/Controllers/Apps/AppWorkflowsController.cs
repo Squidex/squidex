@@ -50,7 +50,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var response = Deferred.AsyncResponse(() =>
             {
-                return WorkflowsDto.FromAppAsync(workflowsValidator, App, this);
+                return GetResponse(App);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -135,9 +135,14 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<IAppEntity>();
-            var response = await WorkflowsDto.FromAppAsync(workflowsValidator, result, this);
+            var response = await GetResponse(result);
 
             return response;
+        }
+
+        private async Task<WorkflowsDto> GetResponse(IAppEntity result)
+        {
+            return await WorkflowsDto.FromAppAsync(workflowsValidator, result, this);
         }
     }
 }

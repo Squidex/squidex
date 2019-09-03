@@ -20,6 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
     public class InviteUserCommandMiddlewareTests
     {
         private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
+        private readonly IAppEntity app = Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"));
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly InviteUserCommandMiddleware sut;
 
@@ -31,19 +32,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         [Fact]
         public async Task Should_invite_user_and_change_result()
         {
-            var command = new AssignContributor { ContributorId = "me@email.com", IsInviting = true };
-            var context = new CommandContext(command, commandBus);
+            var context =
+                new CommandContext(new AssignContributor { ContributorId = "me@email.com", Invite = true }, commandBus)
+                    .Complete(app);
 
             A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .Returns(true);
 
-            var result = Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"));
-
-            context.Complete(result);
-
             await sut.HandleAsync(context);
 
-            Assert.Same(context.Result<InvitedResult>().App, result);
+            Assert.Same(context.Result<InvitedResult>().App, app);
 
             A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .MustHaveHappened();
@@ -52,34 +50,50 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
         [Fact]
         public async Task Should_invite_user_and_not_change_result_if_not_added()
         {
-            var command = new AssignContributor { ContributorId = "me@email.com", IsInviting = true };
-            var context = new CommandContext(command, commandBus);
+            var context =
+                new CommandContext(new AssignContributor { ContributorId = "me@email.com", Invite = true }, commandBus)
+                    .Complete(app);
 
             A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .Returns(false);
 
-            var result = Mocks.App(NamedId.Of(Guid.NewGuid(), "my-app"));
-
-            context.Complete(result);
-
             await sut.HandleAsync(context);
 
-            Assert.Same(context.Result<IAppEntity>(), result);
+            Assert.Same(context.Result<IAppEntity>(), app);
 
             A.CallTo(() => userResolver.CreateUserIfNotExists("me@email.com", true))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_not_calls_user_resolver_if_not_email()
+        public async Task Should_not_call_user_resolver_if_not_email()
         {
-            var command = new AssignContributor { ContributorId = "123", IsInviting = true };
-            var context = new CommandContext(command, commandBus);
+            var context =
+                new CommandContext(new AssignContributor { ContributorId = "123", Invite = true }, commandBus)
+                    .Complete(app);
 
             await sut.HandleAsync(context);
 
             A.CallTo(() => userResolver.CreateUserIfNotExists(A<string>.Ignored, A<bool>.Ignored))
                 .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_call_user_resolver_if_not_inviting()
+        {
+            var context =
+                new CommandContext(new AssignContributor { ContributorId = "123", Invite = false }, commandBus)
+                    .Complete(app);
+
+            await sut.HandleAsync(context);
+
+            A.CallTo(() => userResolver.CreateUserIfNotExists(A<string>.Ignored, A<bool>.Ignored))
+                .MustNotHaveHappened();
+        }
+
+        private CommandContext Context(AssignContributor command)
+        {
+            return new CommandContext(command, commandBus);
         }
     }
 }

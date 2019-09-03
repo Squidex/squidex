@@ -300,9 +300,9 @@ describe('AssetsService', () => {
         return {
             id: `id${id}`,
             created: `${id % 1000 + 2000}-12-12T10:10:00`,
-            createdBy: `creator-${id}`,
+            createdBy: `creator${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00`,
-            lastModifiedBy: `modifier-${id}`,
+            lastModifiedBy: `modifier${id}`,
             fileName: `My Name${id}${suffix}.png`,
             fileHash: `My Hash${id}${suffix}`,
             fileType: 'png',
@@ -336,8 +336,8 @@ export function createAsset(id: number, tags?: string[], suffix = '') {
 
     return new AssetDto(links, meta,
         `id${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier${id}`,
         `My Name${id}${suffix}.png`,
         `My Hash${id}${suffix}`,
         'png',

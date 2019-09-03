@@ -38,7 +38,7 @@ namespace Squidex.Web.CommandMiddlewares
                 .Returns(null);
 
             var command = new CreateContent();
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
@@ -51,7 +51,7 @@ namespace Squidex.Web.CommandMiddlewares
             httpContext.Request.Headers[HeaderNames.IfMatch] = "13";
 
             var command = new CreateContent();
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
@@ -64,7 +64,7 @@ namespace Squidex.Web.CommandMiddlewares
             httpContext.Request.Headers[HeaderNames.IfMatch] = "W/13";
 
             var command = new CreateContent();
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
@@ -75,13 +75,18 @@ namespace Squidex.Web.CommandMiddlewares
         public async Task Should_add_etag_header_to_response()
         {
             var command = new CreateContent();
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             context.Complete(new EntitySavedResult(17));
 
             await sut.HandleAsync(context);
 
             Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext.Response.Headers[HeaderNames.ETag]);
+        }
+
+        private CommandContext Ctx(ICommand command)
+        {
+            return new CommandContext(command, commandBus);
         }
     }
 }

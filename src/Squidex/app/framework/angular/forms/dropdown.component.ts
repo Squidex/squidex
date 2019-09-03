@@ -24,7 +24,7 @@ interface State {
     suggestedItems: any[];
     selectedItem: any;
     selectedIndex: number;
-    query?: string;
+    query?: RegExp;
 }
 
 @Component({
@@ -65,19 +65,17 @@ export class DropdownComponent extends StatefulControlComponent<State, any[]> im
     public ngOnInit() {
         this.own(
             this.queryInput.valueChanges.pipe(
-                    map((query: string) => {
-                        if (!this.items || !query) {
-                            return { query, items: this.items };
+                    map((queryText: string) => {
+                        if (!this.items || !queryText) {
+                            return { query: undefined, items: this.items };
                         } else {
-                            query = query.trim().toLocaleLowerCase();
+                            const query = new RegExp(queryText, 'i');
 
                             const items = this.items.filter(x => {
                                 if (Types.isString(x)) {
-                                    return x.toLocaleLowerCase().indexOf(query) >= 0;
+                                    return query.test(x);
                                 } else {
-                                    const value: string = x[this.searchProperty];
-
-                                    return value && value.toLocaleLowerCase().indexOf(query) >= 0;
+                                    return query.test(x[this.searchProperty]);
                                 }
                             });
 

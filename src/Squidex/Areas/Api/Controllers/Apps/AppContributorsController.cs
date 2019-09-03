@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Apps.Invitation;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
+using Squidex.Shared.Users;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Apps
@@ -26,11 +27,14 @@ namespace Squidex.Areas.Api.Controllers.Apps
     public sealed class AppContributorsController : ApiController
     {
         private readonly IAppPlansProvider appPlansProvider;
+        private readonly IUserResolver userResolver;
 
-        public AppContributorsController(ICommandBus commandBus, IAppPlansProvider appPlansProvider)
+        public AppContributorsController(ICommandBus commandBus, IAppPlansProvider appPlansProvider, IUserResolver userResolver)
             : base(commandBus)
         {
             this.appPlansProvider = appPlansProvider;
+
+            this.userResolver = userResolver;
         }
 
         /// <summary>
@@ -48,9 +52,9 @@ namespace Squidex.Areas.Api.Controllers.Apps
         [ApiCosts(0)]
         public IActionResult GetContributors(string app)
         {
-            var response = Deferred.Response(() =>
+            var response = Deferred.AsyncResponse(() =>
             {
-                return ContributorsDto.FromApp(App, appPlansProvider, this, false);
+                return GetResponseAsync(App, false);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -112,12 +116,17 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
             if (context.PlainResult is InvitedResult invited)
             {
-                return ContributorsDto.FromApp(invited.App, appPlansProvider, this, true);
+                return await GetResponseAsync(invited.App, true);
             }
             else
             {
-                return ContributorsDto.FromApp(context.Result<IAppEntity>(), appPlansProvider, this, false);
+                return await GetResponseAsync(context.Result<IAppEntity>(), false);
             }
+        }
+
+        private Task<ContributorsDto> GetResponseAsync(IAppEntity app, bool invited)
+        {
+            return ContributorsDto.FromAppAsync(app, this, userResolver, appPlansProvider, invited);
         }
     }
 }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -68,6 +69,13 @@ namespace Squidex.Domain.Users
             var result = await userManager.QueryByEmailAsync(email);
 
             return result.OfType<IUser>().ToList();
+        }
+
+        public async Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids)
+        {
+            var result = await userManager.QueryByIdsAync(ids);
+
+            return result.OfType<IUser>().ToDictionary(x => x.Id);
         }
     }
 }

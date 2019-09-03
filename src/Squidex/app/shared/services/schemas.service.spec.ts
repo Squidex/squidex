@@ -543,9 +543,9 @@ describe('SchemasService', () => {
             isSingleton: id % 2 === 0,
             isPublished: id % 3 === 0,
             created: `${id % 1000 + 2000}-12-12T10:10:00`,
-            createdBy: `creator-${id}`,
+            createdBy: `creator${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00`,
-            lastModifiedBy: `modifier-${id}`,
+            lastModifiedBy: `modifier${id}`,
             properties: {
                 label: `label${id}${suffix}`,
                 hints: `hints${id}${suffix}`
@@ -565,7 +565,7 @@ describe('SchemasService', () => {
             isSingleton: id % 2 === 0,
             isPublished: id % 3 === 0,
             created: `${id % 1000 + 2000}-12-12T10:10:00`,
-            createdBy: `creator-${id}`,
+            createdBy: `creator${id}`,
             lastModified: `${id % 1000 + 2000}-11-11T10:10:00`,
             lastModifiedBy: `modifier-${id}`,
             version: `${id}`,
@@ -748,8 +748,8 @@ export function createSchema(id: number, suffix = '') {
         new SchemaPropertiesDto(`label${id}${suffix}`, `hints${id}${suffix}`),
         id % 2 === 0,
         id % 3 === 0,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
-        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier${id}`,
         new Version(`${id}`));
 }
 
@@ -765,9 +765,15 @@ export function createSchemaDetails(id: number, suffix = '') {
         new SchemaPropertiesDto(`label${id}${suffix}`, `hints${id}${suffix}`),
         id % 2 === 0,
         id % 3 === 0,
+<<<<<<< HEAD
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator-${id}`,
         DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier-${id}`,
         new Version(`${id}`),
+=======
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-12-12T10:10:00`), `creator${id}`,
+        DateTime.parseISO_UTC(`${id % 1000 + 2000}-11-11T10:10:00`), `modifier${id}`,
+        version,
+>>>>>>> master
         [
             new RootFieldDto({}, 11, 'field11', createProperties('Array'), 'language', true, true, true, [
                 new NestedFieldDto({}, 101, 'field101', createProperties('String'), 11, true, true, true),

@@ -13,12 +13,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands
     {
         public string ContributorId { get; set; }
 
-        public string Role { get; set; } = Roles.Developer;
+        public string Role { get; set; } = Roles.Editor;
 
         public bool IsRestore { get; set; }
 
-        public bool IsInviting { get; set; }
-
-        public bool IsCreated { get; set; }
+        public bool Invite { get; set; }
     }
 }

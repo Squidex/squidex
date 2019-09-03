@@ -38,10 +38,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_add_schema_to_index_on_create()
         {
-            var command = new CreateSchema { SchemaId = schemaId.Id, Name = schemaId.Name, AppId = appId };
-            var context = new CommandContext(command, commandBus);
-
-            context.Complete();
+            var context =
+                new CommandContext(new CreateSchema { SchemaId = schemaId.Id, Name = schemaId.Name, AppId = appId }, commandBus)
+                    .Complete();
 
             await sut.HandleAsync(context);
 
