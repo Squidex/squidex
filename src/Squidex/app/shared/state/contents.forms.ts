@@ -395,8 +395,9 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
 }
 
 export class EditContentForm extends Form<FormGroup, any> {
-    public value =
-        value$(this.form);
+    private isLoaded = false;
+
+    public value = value$(this.form);
 
     constructor(
         private readonly schema: SchemaDetailsDto,
@@ -435,9 +436,15 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 
     public hasChanged(content?: ContentDto) {
-        const data = content ? content.dataDraft : {};
+        if (!this.isLoaded && !this.form.touched) {
+            return false;
+        }
 
-        return !Types.jsJsonEquals(this.form.value, data);
+        if (content) {
+            return !Types.jsJsonEquals(this.form.value, content.data);
+        } else {
+            return true;
+        }
     }
 
     public removeArrayItem(field: RootFieldDto, language: AppLanguageDto, index: number) {
@@ -489,6 +496,8 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 
     public loadContent(value: any) {
+        this.isLoaded = true;
+
         for (let field of this.schema.fields) {
             if (field.isArray && field.nested.length > 0) {
                 const fieldForm = <FormGroup>this.form.get(field.name);
