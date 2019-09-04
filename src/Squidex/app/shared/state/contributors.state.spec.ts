@@ -9,6 +9,7 @@ import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 
 import {
+    ContributorDto,
     ContributorsPayload,
     ContributorsService,
     ContributorsState,
@@ -28,7 +29,13 @@ describe('ContributorsState', () => {
         version
     } = TestValues;
 
-    const oldContributors = createContributors(1, 2, 3);
+    let allIds: number[] = [];
+
+    for (let i = 1; i <= 20; i++) {
+        allIds.push(i);
+    }
+
+    const oldContributors = createContributors(...allIds);
 
     let dialogs: IMock<DialogService>;
     let contributorsService: IMock<ContributorsService>;
@@ -39,6 +46,9 @@ describe('ContributorsState', () => {
 
         contributorsService = Mock.ofType<ContributorsService>();
         contributorsState = new ContributorsState(contributorsService.object, appsState.object, dialogs.object);
+
+        contributorsService.setup(x => x.getContributors(app))
+            .returns(() => of(versioned(version, oldContributors))).verifiable();
     });
 
     afterEach(() => {
@@ -47,9 +57,6 @@ describe('ContributorsState', () => {
 
     describe('Loading', () => {
         it('should load contributors', () => {
-            contributorsService.setup(x => x.getContributors(app))
-                .returns(() => of(versioned(version, oldContributors))).verifiable();
-
             contributorsState.load().subscribe();
 
             expect(contributorsState.snapshot.contributors.values).toEqual(oldContributors.items);
@@ -60,10 +67,63 @@ describe('ContributorsState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
-        it('should show notification on load when reload is true', () => {
-            contributorsService.setup(x => x.getContributors(app))
-                .returns(() => of(versioned(version, oldContributors))).verifiable();
+        it('should only current page of contributors', () => {
+            contributorsState.load().subscribe();
 
+            let contributors: ContributorDto[];
+
+            contributorsState.contributorsPaged.subscribe(result => {
+                contributors = result.values;
+            });
+
+            expect(contributors!).toEqual(oldContributors.items.slice(0, 10));
+            expect(contributorsState.snapshot.page).toEqual(0);
+        });
+
+        it('should show next of contributors when going next', () => {
+            contributorsState.load().subscribe();
+            contributorsState.goNext();
+
+            let contributors: ContributorDto[];
+
+            contributorsState.contributorsPaged.subscribe(result => {
+                contributors = result.values;
+            });
+
+            expect(contributors!).toEqual(oldContributors.items.slice(10, 20));
+            expect(contributorsState.snapshot.page).toEqual(1);
+        });
+
+        it('should show next of contributors when going prev', () => {
+            contributorsState.load().subscribe();
+            contributorsState.goNext();
+            contributorsState.goPrev();
+
+            let contributors: ContributorDto[];
+
+            contributorsState.contributorsPaged.subscribe(result => {
+                contributors = result.values;
+            });
+
+            expect(contributors!).toEqual(oldContributors.items.slice(0, 10));
+            expect(contributorsState.snapshot.page).toEqual(0);
+        });
+
+        it('should show filtered contributors when searching', () => {
+            contributorsState.load().subscribe();
+            contributorsState.search('4');
+
+            let contributors: ContributorDto[];
+
+            contributorsState.contributorsPaged.subscribe(result => {
+                contributors = result.values;
+            });
+
+            expect(contributors!).toEqual(createContributors(4, 14).items);
+            expect(contributorsState.snapshot.page).toEqual(0);
+        });
+
+        it('should show notification on load when reload is true', () => {
             contributorsState.load(true).subscribe();
 
             expect().nothing();
@@ -74,9 +134,6 @@ describe('ContributorsState', () => {
 
     describe('Updates', () => {
         beforeEach(() => {
-            contributorsService.setup(x => x.getContributors(app))
-                .returns(() => of(versioned(version, oldContributors))).verifiable();
-
             contributorsState.load().subscribe();
         });
 

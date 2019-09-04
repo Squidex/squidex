@@ -120,7 +120,9 @@ describe('ContributorsService', () => {
     function contributorsResponse(...ids: number[]) {
         return {
             items: ids.map(id => ({
-                contributorId: `id${id}`, role: id % 2 === 0 ? 'Owner' : 'Developer',
+                contributorId: `id${id}`,
+                contributorName: `name${id}`,
+                role: id % 2 === 0 ? 'Owner' : 'Developer',
                 _links: {
                     update: { method: 'PUT', href: `/contributors/id${id}` }
                 }
@@ -155,5 +157,5 @@ export function createContributor(id: number) {
         update: { method: 'PUT', href: `/contributors/id${id}` }
     };
 
-    return new ContributorDto(links, `id${id}`, id % 2 === 0 ? 'Owner' : 'Developer');
+    return new ContributorDto(links, `id${id}`, `name${id}`, id % 2 === 0 ? 'Owner' : 'Developer');
 }

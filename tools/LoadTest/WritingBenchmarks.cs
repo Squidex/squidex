@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using LoadTest.Model;
-using LoadTest.Utils;
 using Xunit;
 
 namespace LoadTest

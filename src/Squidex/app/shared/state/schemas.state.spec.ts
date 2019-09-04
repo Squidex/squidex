@@ -45,7 +45,7 @@ describe('SchemasState', () => {
         _links: {}
     };
 
-    const schema = createSchemaDetails(1, version);
+    const schema = createSchemaDetails(1);
 
     let dialogs: IMock<DialogService>;
     let schemasService: IMock<SchemasService>;
@@ -209,7 +209,7 @@ describe('SchemasState', () => {
         });
 
         it('should update schema when schema published', () => {
-            const updated = createSchemaDetails(1, newVersion, '-new');
+            const updated = createSchemaDetails(1, '_new');
 
             schemasService.setup(x => x.publishSchema(app, schema1, version))
                 .returns(() => of(updated)).verifiable();
@@ -222,7 +222,7 @@ describe('SchemasState', () => {
         });
 
         it('should update schema when schema unpublished', () => {
-            const updated = createSchemaDetails(1, newVersion, '-new');
+            const updated = createSchemaDetails(1, '_new');
 
             schemasService.setup(x => x.unpublishSchema(app, schema1, version))
                 .returns(() => of(updated)).verifiable();
@@ -237,7 +237,7 @@ describe('SchemasState', () => {
         it('should update schema when schema category changed', () => {
             const category = 'my-new-category';
 
-            const updated = createSchemaDetails(1, newVersion, '-new');
+            const updated = createSchemaDetails(1, '_new');
 
             schemasService.setup(x => x.putCategory(app, schema1, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
                 .returns(() => of(updated)).verifiable();
@@ -258,7 +258,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema when schema published', () => {
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.publishSchema(app, schema1, version))
                     .returns(() => of(updated)).verifiable();
@@ -274,7 +274,7 @@ describe('SchemasState', () => {
             it('should update schema and selected schema when schema category changed', () => {
                 const category = 'my-new-category';
 
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.putCategory(app, schema1, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
                     .returns(() => of(updated)).verifiable();
@@ -290,7 +290,7 @@ describe('SchemasState', () => {
             it('should update schema and selected schema when schema updated', () => {
                 const request = { label: 'name2_label', hints: 'name2_hints' };
 
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.putSchema(app, schema1, It.isAny(), version))
                     .returns(() => of(updated)).verifiable();
@@ -306,7 +306,7 @@ describe('SchemasState', () => {
             it('should update schema and selected schema when scripts configured', () => {
                 const request = { query: '<query-script>' };
 
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.putScripts(app, schema1, It.isAny(), version))
                     .returns(() => of(updated)).verifiable();
@@ -322,7 +322,7 @@ describe('SchemasState', () => {
             it('should update schema and selected schema when preview urls configured', () => {
                 const request = { web: 'url' };
 
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.putPreviewUrls(app, schema1, It.isAny(), version))
                     .returns(() => of(updated)).verifiable();
@@ -338,7 +338,7 @@ describe('SchemasState', () => {
             it('should add schema to snapshot when created', () => {
                 const request = { name: 'newName' };
 
-                const updated = createSchemaDetails(3, newVersion, '-new');
+                const updated = createSchemaDetails(3, '_new');
 
                 schemasService.setup(x => x.postSchema(app, request))
                     .returns(() => of(updated)).verifiable();
@@ -362,7 +362,7 @@ describe('SchemasState', () => {
             it('should update schema and selected schema when field added', () => {
                 const request = { ...schema.fields[0] };
 
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.postField(app, schema1, It.isAny(), version))
                     .returns(() => of(updated)).verifiable();
@@ -383,7 +383,7 @@ describe('SchemasState', () => {
             it('should update schema and selected schema when nested field added', () => {
                 const request = { ...schema.fields[0].nested[0] };
 
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.postField(app, schema.fields[0], It.isAny(), version))
                     .returns(() => of(updated)).verifiable();
@@ -402,7 +402,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema when field removed', () => {
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.deleteField(app, schema.fields[0], version))
                     .returns(() => of(updated)).verifiable();
@@ -416,7 +416,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema when fields sorted', () => {
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.putFieldOrdering(app, schema1, [schema.fields[1].fieldId, schema.fields[2].fieldId], version))
                     .returns(() => of(updated)).verifiable();
@@ -430,7 +430,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema when nested fields sorted', () => {
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.putFieldOrdering(app, schema.fields[0], [schema.fields[1].fieldId, schema.fields[2].fieldId], version))
                     .returns(() => of(updated)).verifiable();
@@ -444,7 +444,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema when field updated', () => {
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 const request = { ...schema.fields[0] };
 
@@ -460,7 +460,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema when field hidden', () => {
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.hideField(app, schema.fields[0], version))
                     .returns(() => of(updated)).verifiable();
@@ -474,7 +474,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema when field disabled', () => {
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.disableField(app, schema.fields[0], version))
                     .returns(() => of(updated));
@@ -488,7 +488,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema when field locked', () => {
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.lockField(app, schema.fields[0], version))
                     .returns(() => of(updated)).verifiable();
@@ -502,7 +502,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema when field shown', () => {
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.showField(app, schema.fields[0], version))
                     .returns(() => of(updated)).verifiable();
@@ -516,7 +516,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema when field enabled', () => {
-                const updated = createSchemaDetails(1, newVersion, '-new');
+                const updated = createSchemaDetails(1, '_new');
 
                 schemasService.setup(x => x.enableField(app, schema.fields[0], version))
                     .returns(() => of(updated)).verifiable();

@@ -21,6 +21,7 @@ import {
     ClientComponent,
     ClientsPageComponent,
     ContributorsPageComponent,
+    ImportContributorsDialogComponent,
     LanguageComponent,
     LanguagesPageComponent,
     MorePageComponent,
@@ -42,10 +43,7 @@ const routes: Routes = [
         component: SettingsAreaComponent,
         children: [
             {
-                path: ''
-            },
-            {
-                path: 'more',
+                path: '',
                 component: MorePageComponent
             },
             {
@@ -203,6 +201,7 @@ const routes: Routes = [
         ClientComponent,
         ClientsPageComponent,
         ContributorsPageComponent,
+        ImportContributorsDialogComponent,
         LanguageComponent,
         LanguagesPageComponent,
         MorePageComponent,

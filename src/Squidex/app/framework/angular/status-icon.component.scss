@@ -1,0 +1,41 @@
+@import '_mixins';
+@import '_vars';
+
+$circle-size-sm: 1.6rem;
+
+$circle-size-lg: 2.8rem;
+
+.status {
+    & {
+        text-align: center;
+        background: $color-border;
+        color: $color-dark-foreground;
+        vertical-align: middle;
+    }
+
+    &.sm {
+        @include circle($circle-size-sm);
+        line-height: $circle-size-sm + .1rem;
+        font-size: .5 * $circle-size-sm;
+        font-weight: normal;
+    }
+
+    &.lg {
+        @include circle($circle-size-lg);
+        line-height: $circle-size-lg + .1rem;
+        font-size: .5 * $circle-size-lg;
+        font-weight: normal;
+    }
+
+    &-pending {
+        color: inherit;
+    }
+
+    &-failed {
+        background: $color-theme-error;
+    }
+
+    &-success {
+        background: $color-theme-green;
+    }
+}

@@ -37,6 +37,16 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         public string Name { get; set; }
 
         /// <summary>
+        /// The optional label of the app.
+        /// </summary>
+        public string Label { get; set; }
+
+        /// <summary>
+        /// The optional description of the app.
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
         /// The version of the app.
         /// </summary>
         public long Version { get; set; }
@@ -88,7 +98,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             var result = SimpleMapper.Map(app, new AppDto());
 
             result.Permissions = permissions.ToIds();
-            result.PlanName = plans.GetPlanForApp(app)?.Name;
 
             if (controller.Includes(AllPermissions.ForApp(AllPermissions.AppApi, app.Name), permissions))
             {
@@ -100,10 +109,8 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 result.CanAccessContent = true;
             }
 
-            if (controller.HasPermission(AllPermissions.AppPlansChange, app.Name))
-            {
-                result.PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
-            }
+            result.SetPlan(app, plans, controller);
+            result.SetImage(app, controller);
 
             return result.CreateLinks(controller, permissions);
         }
@@ -125,6 +132,24 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return new PermissionSet(permissions);
         }
 
+        private void SetPlan(IAppEntity app, IAppPlansProvider plans, ApiController controller)
+        {
+            if (controller.HasPermission(AllPermissions.AppPlansChange, app.Name))
+            {
+                PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
+            }
+
+            PlanName = plans.GetPlanForApp(app)?.Name;
+        }
+
+        private void SetImage(IAppEntity app, ApiController controller)
+        {
+            if (app.Image != null)
+            {
+                AddGetLink("image", controller.Url<AppsController>(x => nameof(x.GetImage), new { app = app.Name }));
+            }
+        }
+
         private AppDto CreateLinks(ApiController controller, PermissionSet permissions)
         {
             var values = new { app = Name };
@@ -134,6 +159,18 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             if (controller.HasPermission(AllPermissions.AppDelete, Name, additional: permissions))
             {
                 AddDeleteLink("delete", controller.Url<AppsController>(x => nameof(x.DeleteApp), values));
+            }
+
+            if (controller.HasPermission(AllPermissions.AppUpdateGeneral, Name, additional: permissions))
+            {
+                AddPutLink("update", controller.Url<AppsController>(x => nameof(x.UpdateApp), values));
+            }
+
+            if (controller.HasPermission(AllPermissions.AppUpdateImage, Name, additional: permissions))
+            {
+                AddPostLink("image/upload", controller.Url<AppsController>(x => nameof(x.UploadImage), values));
+
+                AddDeleteLink("image/delete", controller.Url<AppsController>(x => nameof(x.DeleteImage), values));
             }
 
             if (controller.HasPermission(AllPermissions.AppAssetsRead, Name, additional: permissions))

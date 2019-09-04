@@ -5,19 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, filter, map, tap } from 'rxjs/operators';
 
 import {
     AnalyticsService,
     ApiUrlConfig,
     DateTime,
+    ErrorDto,
+    getLinkUrl,
     hasAnyLink,
+    HTTP,
     pretifyError,
     Resource,
-    ResourceLinks
+    ResourceLinks,
+    StringHelper,
+    Types,
+    Version
 } from '@app/framework';
 
 export class AppDto {
@@ -36,18 +42,28 @@ export class AppDto {
     public readonly canReadRules: boolean;
     public readonly canReadSchemas: boolean;
     public readonly canReadWorkflows: boolean;
+    public readonly canUpdateGeneral: boolean;
+    public readonly canUpdateImage: boolean;
     public readonly canUploadAssets: boolean;
+    public readonly image: string;
+
+    public get displayName() {
+        return StringHelper.firstNonEmpty(this.label, this.name);
+    }
 
     constructor(links: ResourceLinks,
         public readonly id: string,
         public readonly name: string,
+        public readonly label: string | undefined,
+        public readonly description: string | undefined,
         public readonly permissions: string[],
         public readonly created: DateTime,
         public readonly lastModified: DateTime,
         public readonly canAccessApi: boolean,
         public readonly canAccessContent: boolean,
-        public readonly planName?: string,
-        public readonly planUpgrade?: string
+        public readonly planName: string | undefined,
+        public readonly planUpgrade: string | undefined,
+        public readonly version: Version
     ) {
         this._links = links;
 
@@ -64,13 +80,22 @@ export class AppDto {
         this.canReadRules = hasAnyLink(links, 'rules');
         this.canReadSchemas = hasAnyLink(links, 'schemas');
         this.canReadWorkflows = hasAnyLink(links, 'workflows');
+        this.canUpdateGeneral = hasAnyLink(links, 'update');
+        this.canUpdateImage = hasAnyLink(links, 'image/upload');
         this.canUploadAssets = hasAnyLink(links, 'assets/create');
+
+        this.image = getLinkUrl(links, 'image');
     }
 }
 
 export interface CreateAppDto {
     readonly name: string;
     readonly template?: string;
+}
+
+export interface UpdateAppDto {
+    readonly label?: string;
+    readonly description?: string;
 }
 
 @Injectable()
@@ -107,6 +132,71 @@ export class AppsService {
             pretifyError('Failed to create app. Please reload.'));
     }
 
+    public putApp(resource: Resource, dto: UpdateAppDto, version: Version): Observable<AppDto> {
+        const link = resource._links['update'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+            map(({ payload }) => {
+                return parseApp(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('App', 'Updated');
+            }),
+            pretifyError('Failed to update app. Please reload.'));
+    }
+
+    public postAppImage(resource: Resource, file: File, version: Version): Observable<number | AppDto> {
+        const link = resource._links['image/upload'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.upload(this.http, link.method, url, file, version).pipe(
+            filter(event =>
+                event.type === HttpEventType.UploadProgress ||
+                event.type === HttpEventType.Response),
+            map(event => {
+                if (event.type === HttpEventType.UploadProgress) {
+                    const percentDone = event.total ? Math.round(100 * event.loaded / event.total) : 0;
+
+                    return percentDone;
+                } else if (Types.is(event, HttpResponse)) {
+                    return parseApp(event.body);
+                } else {
+                    throw 'Invalid';
+                }
+            }),
+            catchError(error => {
+                if (Types.is(error, HttpErrorResponse) && error.status === 413) {
+                    return throwError(new ErrorDto(413, 'App image is too big.'));
+                } else {
+                    return throwError(error);
+                }
+            }),
+            tap(value => {
+                if (!Types.isNumber(value)) {
+                    this.analytics.trackEvent('AppImage', 'Uploaded');
+                }
+            }),
+            pretifyError('Failed to upload image. Please reload.'));
+    }
+
+    public deleteAppImage(resource: Resource, version: Version): Observable<any> {
+        const link = resource._links['image/delete'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
+            map(({ payload }) => {
+                return parseApp(payload.body);
+            }),
+            tap(() => {
+                this.analytics.trackEvent('AppImage', 'Removed');
+            }),
+            pretifyError('Failed to remove app image. Please reload.'));
+    }
+
     public deleteApp(resource: Resource): Observable<any> {
         const link = resource._links['delete'];
 
@@ -124,11 +214,14 @@ function parseApp(response: any) {
     return new AppDto(response._links,
         response.id,
         response.name,
+        response.label,
+        response.description,
         response.permissions,
         DateTime.parseISO_UTC(response.created),
         DateTime.parseISO_UTC(response.lastModified),
         response.canAccessApi,
         response.canAccessContent,
         response.planName,
-        response.planUpgrade);
+        response.planUpgrade,
+        new Version(response.version.toString()));
 }

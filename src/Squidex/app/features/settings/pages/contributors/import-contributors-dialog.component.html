@@ -1,0 +1,43 @@
+<form [formGroup]="importForm.form" (ngSubmit)="import()">  
+    <sqx-modal-dialog (close)="emitClose()">
+        <ng-container title>
+            Import contributors
+        </ng-container>
+
+        <ng-container content>
+            <div class="content">
+                <ng-container *ngIf="importStatus; else noStatus">
+                    <div class="row pb-2" *ngFor="let status of importStatus">
+                        <div class="col truncate">
+                            {{status.email}}
+                        </div>
+
+                        <div class="col-auto">
+                            <sqx-status-icon size="sm"
+                                [status]="status.result"
+                                [statusText]="status.resultText">
+                            </sqx-status-icon>
+                        </div>
+                    </div>
+                </ng-container>
+
+            <ng-template #noStatus>
+                    <textarea class="form-control content" placeholder="user1@squidex.io;user2.squidex.io" formControlName="import"></textarea>
+            </ng-template>
+        </div>
+
+            <sqx-form-hint>
+                <ng-container *ngIf="importForm.numberOfEmails | async; let emails">
+                    Emails detected: {{emails}}
+                </ng-container>
+
+                &nbsp;
+            </sqx-form-hint>
+        </ng-container>
+
+        <ng-container footer>
+            <button type="reset" class="float-left btn btn-secondary" (click)="emitClose()">Cancel</button>
+            <button type="submit" class="float-right btn btn-success" [disabled]="importStatus || (importForm.hasNoUser | async)">Add Contributors</button>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>
