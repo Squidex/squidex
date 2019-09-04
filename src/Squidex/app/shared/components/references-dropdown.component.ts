@@ -20,7 +20,8 @@ import {
     SchemaDetailsDto,
     SchemasService,
     StatefulControlComponent,
-    Types
+    Types,
+    UIOptions
 } from '@app/shared/internal';
 
 export const SQX_REFERENCES_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
@@ -57,6 +58,7 @@ const NO_EMIT = { emitEvent: false };
 export class ReferencesDropdownComponent extends StatefulControlComponent<State, string[] | string> implements OnInit {
     private languageField: AppLanguageDto;
     private selectedId: string | undefined;
+    private itemCount: number;
 
     @Input()
     public schemaId: string;
@@ -73,7 +75,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
 
     public selectionControl = new FormControl('');
 
-    constructor(changeDetector: ChangeDetectorRef,
+    constructor(changeDetector: ChangeDetectorRef, uiOptions: UIOptions,
         private readonly appsState: AppsState,
         private readonly contentsService: ContentsService,
         private readonly schemasService: SchemasService
@@ -83,6 +85,8 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
             contentItems: [],
             contentNames: []
         });
+
+        this.itemCount = uiOptions.get('referencesDropdownItemCount');
 
         this.own(
             this.selectionControl.valueChanges
@@ -116,7 +120,7 @@ export class ReferencesDropdownComponent extends StatefulControlComponent<State,
         this.schemasService.getSchema(this.appsState.appName, this.schemaId).pipe(
                 switchMap(schema => {
                     if (schema) {
-                        return this.contentsService.getContents(this.appsState.appName, this.schemaId, 100, 0);
+                        return this.contentsService.getContents(this.appsState.appName, this.schemaId, this.itemCount, 0);
                     } else {
                         return throwError('Invalid schema');
                     }
