@@ -16,10 +16,9 @@ import {
     AutocompleteSource,
     ContributorDto,
     ContributorsState,
+    DialogModel,
     DialogService,
     RolesState,
-    Types,
-    UserDto,
     UsersService
 } from '@app/shared';
 
@@ -56,6 +55,8 @@ export class UsersDataSource implements AutocompleteSource {
 })
 export class ContributorsPageComponent implements OnInit {
     public assignContributorForm = new AssignContributorForm(this.formBuilder);
+
+    public importDialog = new DialogModel();
 
     constructor(
         public readonly appsState: AppsState,
@@ -101,15 +102,7 @@ export class ContributorsPageComponent implements OnInit {
         const value = this.assignContributorForm.submit();
 
         if (value) {
-            let user = value.user;
-
-            if (Types.is(user, UserDto)) {
-                user = user.id;
-            }
-
-            const requestDto = { contributorId: user, role: 'Editor', invite: true };
-
-            this.contributorsState.assign(requestDto)
+            this.contributorsState.assign(value)
                 .subscribe(isCreated => {
                     this.assignContributorForm.submitCompleted();
 

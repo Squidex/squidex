@@ -52,8 +52,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
             switch (command)
             {
-                case CreateAsset createRule:
-                    return CreateReturnAsync(createRule, async c =>
+                case CreateAsset createAsset:
+                    return CreateReturnAsync(createAsset, async c =>
                     {
                         GuardAsset.CanCreate(c);
 
@@ -63,8 +63,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                         return Snapshot;
                     });
-                case UpdateAsset updateRule:
-                    return UpdateReturn(updateRule, c =>
+                case UpdateAsset updateAsset:
+                    return UpdateReturn(updateAsset, c =>
                     {
                         GuardAsset.CanUpdate(c);
 

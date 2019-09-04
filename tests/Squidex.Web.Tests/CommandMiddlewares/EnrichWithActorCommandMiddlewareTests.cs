@@ -37,7 +37,7 @@ namespace Squidex.Web.CommandMiddlewares
         public async Task Should_throw_security_exception_when_no_subject_or_client_is_found()
         {
             var command = new CreateContent();
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await Assert.ThrowsAsync<SecurityException>(() => sut.HandleAsync(context));
         }
@@ -49,7 +49,7 @@ namespace Squidex.Web.CommandMiddlewares
                 .Returns(null);
 
             var command = new CreateContent();
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
@@ -62,7 +62,7 @@ namespace Squidex.Web.CommandMiddlewares
             httpContext.User = CreatePrincipal(OpenIdClaims.Subject, "me");
 
             var command = new CreateContent();
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
@@ -75,7 +75,7 @@ namespace Squidex.Web.CommandMiddlewares
             httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client");
 
             var command = new CreateContent();
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
@@ -88,11 +88,16 @@ namespace Squidex.Web.CommandMiddlewares
             httpContext.User = CreatePrincipal(OpenIdClaims.ClientId, "my-client");
 
             var command = new CreateContent { Actor = new RefToken("subject", "me") };
-            var context = new CommandContext(command, commandBus);
+            var context = Ctx(command);
 
             await sut.HandleAsync(context);
 
             Assert.Equal(new RefToken("subject", "me"), command.Actor);
+        }
+
+        private CommandContext Ctx(ICommand command)
+        {
+            return new CommandContext(command, commandBus);
         }
 
         private static ClaimsPrincipal CreatePrincipal(string claimType, string claimValue)

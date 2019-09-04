@@ -32,35 +32,39 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                 if (string.IsNullOrWhiteSpace(command.ContributorId))
                 {
                     e(Not.Defined("Contributor id"), nameof(command.ContributorId));
-                    return;
                 }
-
-                var user = await users.FindByIdOrEmailAsync(command.ContributorId);
-
-                if (user == null)
+                else
                 {
-                    throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(IAppEntity));
-                }
+                    var user = await users.FindByIdOrEmailAsync(command.ContributorId);
 
-                command.ContributorId = user.Id;
-
-                if (!command.IsRestore)
-                {
-                    if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase))
+                    if (user == null)
                     {
-                        throw new DomainForbiddenException("You cannot change your own role.");
+                        throw new DomainObjectNotFoundException(command.ContributorId, "Contributors", typeof(IAppEntity));
                     }
 
-                    if (contributors.TryGetValue(command.ContributorId, out var existing))
+                    command.ContributorId = user.Id;
+
+                    if (!command.IsRestore)
                     {
-                        if (existing == command.Role)
+                        if (string.Equals(command.ContributorId, command.Actor?.Identifier, StringComparison.OrdinalIgnoreCase))
                         {
-                            e(Not.New("Contributor", "role"), nameof(command.Role));
+                            throw new DomainForbiddenException("You cannot change your own role.");
                         }
-                    }
-                    else if (plan.MaxContributors > 0 && contributors.Count >= plan.MaxContributors)
-                    {
-                        e("You have reached the maximum number of contributors for your plan.");
+
+                        if (contributors.TryGetValue(command.ContributorId, out var role))
+                        {
+                            if (role == command.Role)
+                            {
+                                e(Not.New("Contributor", "role"), nameof(command.Role));
+                            }
+                        }
+                        else
+                        {
+                            if (plan.MaxContributors > 0 && contributors.Count >= plan.MaxContributors)
+                            {
+                                e("You have reached the maximum number of contributors for your plan.");
+                            }
+                        }
                     }
                 }
             });

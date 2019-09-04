@@ -90,6 +90,10 @@
                             </div>
                         </form>
                     </div>
+
+                    <sqx-form-hint class="text-right">
+                        Big team? <a class="force" (click)="importDialog.show()">Hide many contributors at once</a>
+                    </sqx-form-hint>
                 </ng-container>
             </ng-container>
         </ng-container>
@@ -107,5 +111,11 @@
         </div>
     </ng-container>
 </sqx-panel>
+
+<ng-container *sqxModal="importDialog">
+    <sqx-import-contributors-dialog 
+        (close)="importDialog.hide()">
+    </sqx-import-contributors-dialog>
+</ng-container>
 
 <router-outlet></router-outlet>

@@ -134,7 +134,7 @@ export class ContributorsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public assign(request: AssignContributorDto): Observable<boolean | undefined> {
+    public assign(request: AssignContributorDto, options?: { silent: boolean }): Observable<boolean | undefined> {
         return this.contributorsService.postContributor(this.appName, request, this.version).pipe(
             catchError(error => {
                 if (Types.is(error, ErrorDto) && error.statusCode === 404) {
@@ -146,7 +146,7 @@ export class ContributorsState extends State<Snapshot> {
             tap(({ version, payload }) => {
                 this.replaceContributors(version, payload);
             }),
-            shareMapSubscribed(this.dialogs, x => x.payload._meta && x.payload._meta['isInvited'] === '1'));
+            shareMapSubscribed(this.dialogs, x => x.payload._meta && x.payload._meta['isInvited'] === '1', options));
     }
 
     private replaceContributors(version: Version, payload: ContributorsPayload) {
