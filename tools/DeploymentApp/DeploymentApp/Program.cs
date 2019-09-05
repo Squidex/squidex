@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using DeploymentApp.Entities;
 using DeploymentApp.Extensions;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.CommandLineUtils;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Squidex.ClientLibrary;
 
@@ -12,87 +11,44 @@ namespace DeploymentApp
 {
     public static class Program
     {
-        public static int Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
-            var consoleApp = new CommandLineApplication
+            string envName = Environment.GetEnvironmentVariable("Environment");
+            string envConfigFile = $"./conf/appsettings.{envName}.json";
+            string envSecretsFile = $"./secrets/appsettings.secrets.json";
+
+            var configuration =
+                new ConfigurationBuilder()
+                    .AddJsonFile(envSecretsFile, true)
+                    .AddJsonFile(envConfigFile, true)
+                    .AddEnvironmentVariables()
+                    .AddCommandLine(args)
+                    .Build();
+
+            var options = configuration.Get<AppOptions>();
+
+            if (!options.Validate())
             {
-                Name = "DeploymentApp"
-            };
+                return -1;
+            }
 
-            consoleApp.HelpOption("-?|-h|--help");
-
-            consoleApp.VersionOption("-v|--version", () =>
+            try
             {
-                return string.Format("Version {0}", Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
-            });
-
-            var appOption =
-                consoleApp.Option("-a|--app <optionvalue>",
-                    "App name",
-                    CommandOptionType.SingleValue);
-
-            var urlOption =
-                consoleApp.Option("-u|--url <optionvalue>",
-                    "Cosmos URL",
-                    CommandOptionType.SingleValue);
-
-            var identityServerOption =
-                consoleApp.Option("-i|--identity <optionvalue>",
-                    "Identity server URL",
-                    CommandOptionType.SingleValue);
-
-            var clientOption =
-                consoleApp.Option("-c|--client <optionvalue>",
-                    "Client Name",
-                    CommandOptionType.SingleValue);
-
-            var clientSecretOption =
-                consoleApp.Option("-s|--secret <optionvalue>",
-                    "p@55w0rd",
-                    CommandOptionType.SingleValue);
-
-            consoleApp.OnExecute(async () =>
-            {
-                var app = 
-                    appOption.HasValue() ?
-                    appOption.Value() :
-                    "commentary";
-
-                var url =
-                    urlOption.HasValue() ?
-                    urlOption.Value() :
-                    "http://localhost:5000";
-
-                var identityServer =
-                    identityServerOption.HasValue() ?
-                    identityServerOption.Value() :
-                    "http://identityservice.systest.tesla.cha.rbxd.ds/connect/token";
-
-                var client =
-                    clientOption.HasValue() ?
-                    clientOption.Value() :
-                    "CMSDeployer";
-
-                var clientSecret =
-                    clientSecretOption.HasValue() ?
-                    clientSecretOption.Value() :
-                    "p@55w0rd";
-
                 var authenticator =
                     new CachingAuthenticator("TOKEN", new MemoryCache(Options.Create(new MemoryCacheOptions())),
                         new IcisAuthenticatorExtensions(
-                            identityServer,
-                            client,
-                            clientSecret));
+                            options.IdentityServer,
+                            options.ClientId,
+                            options.ClientSecret));
 
-                var clientManager = new SquidexClientManager(url, app, authenticator, true);
+                var clientManager = new SquidexClientManager(options.Url, options.App, authenticator, true);
 
                 await clientManager.CreateApp();
 
                 await clientManager.UpsertSchema(Schemas.Commodity);
                 await clientManager.UpsertSchema(Schemas.Region);
                 await clientManager.UpsertSchema(Schemas.CommentaryType);
-                await clientManager.UpsertSchema(Schemas.Commentary(url));
+                await clientManager.UpsertSchema(Schemas.Commentary(options.Url));
 
                 foreach (var role in Roles.All)
                 {
@@ -120,17 +76,6 @@ namespace DeploymentApp
                 }
 
                 return 0;
-            });
-
-            try
-            {
-
-                return consoleApp.Execute(args);
-            }
-            catch (CommandParsingException ex)
-            {
-                Console.WriteLine(ex.Message);
-                return -1;
             }
             catch (Exception ex)
             {
