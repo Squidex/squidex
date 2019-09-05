@@ -16,6 +16,8 @@ export function startMongoDb() {
 
 export function stopMongoDB() {
     if (mongoDbServer) {
+        console.log('[MongoDb] Stopping');
+
         mongoDbServer.stop();
 
         console.log('[MongoDb] Stopped');
