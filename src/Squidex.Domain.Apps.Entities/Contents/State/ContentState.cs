@@ -8,10 +8,8 @@
 using System;
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
@@ -45,67 +43,89 @@ namespace Squidex.Domain.Apps.Entities.Contents.State
         [DataMember]
         public Status Status { get; set; }
 
-        protected void On(ContentCreated @event)
+        public void ApplyEvent(IEvent @event)
         {
-            SimpleMapper.Map(@event, this);
-
-            UpdateData(null, @event.Data, false);
-        }
-
-        protected void On(ContentChangesPublished @event)
-        {
-            ScheduleJob = null;
-
-            UpdateData(DataDraft, null, false);
-        }
-
-        protected void On(ContentStatusChanged @event)
-        {
-            ScheduleJob = null;
-
-            SimpleMapper.Map(@event, this);
-
-            if (@event.Status == Status.Published)
+            switch (@event)
             {
-                UpdateData(DataDraft, null, false);
+                case ContentCreated e:
+                    {
+                        SimpleMapper.Map(e, this);
+
+                        UpdateData(null, e.Data, false);
+
+                        break;
+                    }
+
+                case ContentChangesPublished _:
+                    {
+                        ScheduleJob = null;
+
+                        UpdateData(DataDraft, null, false);
+
+                        break;
+                    }
+
+                case ContentStatusChanged e:
+                    {
+                        ScheduleJob = null;
+
+                        SimpleMapper.Map(e, this);
+
+                        if (e.Status == Status.Published)
+                        {
+                            UpdateData(DataDraft, null, false);
+                        }
+
+                        break;
+                    }
+
+                case ContentUpdated e:
+                    {
+                        UpdateData(e.Data, e.Data, false);
+
+                        break;
+                    }
+
+                case ContentUpdateProposed e:
+                    {
+                        UpdateData(null, e.Data, true);
+
+                        break;
+                    }
+
+                case ContentChangesDiscarded _:
+                    {
+                        UpdateData(null, Data, false);
+
+                        break;
+                    }
+
+                case ContentSchedulingCancelled _:
+                    {
+                        ScheduleJob = null;
+
+                        break;
+                    }
+
+                case ContentStatusScheduled e:
+                    {
+                        ScheduleJob = ScheduleJob.Build(e.Status, e.Actor, e.DueTime);
+
+                        break;
+                    }
+
+                case ContentDeleted _:
+                    {
+                        IsDeleted = true;
+
+                        break;
+                    }
             }
-        }
-
-        protected void On(ContentUpdated @event)
-        {
-            UpdateData(@event.Data, @event.Data, false);
-        }
-
-        protected void On(ContentUpdateProposed @event)
-        {
-            UpdateData(null, @event.Data, true);
-        }
-
-        protected void On(ContentChangesDiscarded @event)
-        {
-            UpdateData(null, Data, false);
-        }
-
-        protected void On(ContentSchedulingCancelled @event)
-        {
-            ScheduleJob = null;
-        }
-
-        protected void On(ContentStatusScheduled @event)
-        {
-            ScheduleJob = ScheduleJob.Build(@event.Status, @event.Actor, @event.DueTime);
-        }
-
-        protected void On(ContentDeleted @event)
-        {
-            IsDeleted = true;
         }
 
         public override ContentState Apply(Envelope<IEvent> @event)
         {
-            var payload = (SquidexEvent)@event.Payload;
-
-            return Clone().Update(payload, @event.Headers, r => r.DispatchAction(payload));
+            return Clone().Update(@event, (e, s) => s.ApplyEvent(e));
         }
 
         private void UpdateData(NamedContentData data, NamedContentData dataDraft, bool isPending)

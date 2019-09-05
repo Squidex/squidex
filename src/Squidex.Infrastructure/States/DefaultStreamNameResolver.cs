@@ -8,7 +8,7 @@
 using System;
 using Squidex.Infrastructure.Reflection;
 
- namespace Squidex.Infrastructure.States
+namespace Squidex.Infrastructure.States
 {
     public sealed class DefaultStreamNameResolver : IStreamNameResolver
     {

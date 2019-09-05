@@ -5,10 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Events.Apps;
-using Squidex.Infrastructure.Dispatching;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
@@ -74,166 +75,87 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 "updated role {[Name]}");
         }
 
-        protected Task<HistoryEvent> On(AppContributorRemoved @event)
+        private HistoryEvent CreateEvent(IEvent @event)
         {
-            const string channel = "settings.contributors";
+            switch (@event)
+            {
+                case AppContributorAssigned e:
+                    return CreateContributorsEvent(e, e.ContributorId, e.Role);
+                case AppContributorRemoved e:
+                    return CreateContributorsEvent(e, e.ContributorId);
+                case AppClientAttached e:
+                    return CreateClientsEvent(e, e.Id);
+                case AppClientRenamed e:
+                    return CreateClientsEvent(e, e.Id, ClientName(e));
+                case AppClientRevoked e:
+                    return CreateClientsEvent(e, e.Id);
+                case AppLanguageAdded e:
+                    return CreateLanguagesEvent(e, e.Language);
+                case AppLanguageUpdated e:
+                    return CreateLanguagesEvent(e, e.Language);
+                case AppMasterLanguageSet e:
+                    return CreateLanguagesEvent(e, e.Language);
+                case AppLanguageRemoved e:
+                    return CreateLanguagesEvent(e, e.Language);
+                case AppPatternAdded e:
+                    return CreatePatternsEvent(e, e.PatternId, e.Name);
+                case AppPatternUpdated e:
+                    return CreatePatternsEvent(e, e.PatternId, e.Name);
+                case AppPatternDeleted e:
+                    return CreatePatternsEvent(e, e.PatternId);
+                case AppRoleAdded e:
+                    return CreateRolesEvent(e, e.Name);
+                case AppRoleUpdated e:
+                    return CreateRolesEvent(e, e.Name);
+                case AppRoleDeleted e:
+                    return CreateRolesEvent(e, e.Name);
+                case AppPlanChanged e:
+                    return CreatePlansEvent(e, e.PlanId);
+                case AppPlanReset e:
+                    return CreatePlansEvent(e);
+            }
 
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Contributor", @event.ContributorId));
+            return null;
         }
 
-        protected Task<HistoryEvent> On(AppContributorAssigned @event)
+        private HistoryEvent CreateContributorsEvent(IEvent e, string contributor, string role = null)
         {
-            const string channel = "settings.contributors";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Contributor", @event.ContributorId).AddParameter("Role", @event.Role));
+            return ForEvent(e, "settings.contributors").Param("Contributor", contributor).Param("Role", role);
         }
 
-        protected Task<HistoryEvent> On(AppClientAttached @event)
+        private HistoryEvent CreateLanguagesEvent(IEvent e, Language language)
         {
-            const string channel = "settings.clients";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Id", @event.Id));
+            return ForEvent(e, "settings.languages").Param("Language", language);
         }
 
-        protected Task<HistoryEvent> On(AppClientRevoked @event)
+        private HistoryEvent CreateRolesEvent(IEvent e, string name)
         {
-            const string channel = "settings.clients";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Id", @event.Id));
+            return ForEvent(e, "settings.roles").Param("Name", name);
         }
 
-        protected Task<HistoryEvent> On(AppClientRenamed @event)
+        private HistoryEvent CreatePatternsEvent(IEvent e, Guid id, string name = null)
         {
-            const string channel = "settings.clients";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Id", @event.Id).AddParameter("Name", ClientName(@event)));
+            return ForEvent(e, "settings.patterns").Param("PatternId", id).Param("Name", name);
         }
 
-        protected Task<HistoryEvent> On(AppLanguageAdded @event)
+        private HistoryEvent CreateClientsEvent(IEvent e, string id, string name = null)
         {
-            const string channel = "settings.languages";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Language", @event.Language));
+            return ForEvent(e, "settings.clients").Param("Id", id).Param("Name", name);
         }
 
-        protected Task<HistoryEvent> On(AppLanguageRemoved @event)
+        private HistoryEvent CreatePlansEvent(IEvent e, string plan = null)
         {
-            const string channel = "settings.languages";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Language", @event.Language));
-        }
-
-        protected Task<HistoryEvent> On(AppLanguageUpdated @event)
-        {
-            const string channel = "settings.languages";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Language", @event.Language));
-        }
-
-        protected Task<HistoryEvent> On(AppMasterLanguageSet @event)
-        {
-            const string channel = "settings.languages";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Language", @event.Language));
-        }
-
-        protected Task<HistoryEvent> On(AppPatternAdded @event)
-        {
-            const string channel = "settings.patterns";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Name", @event.Name));
-        }
-
-        protected Task<HistoryEvent> On(AppPatternUpdated @event)
-        {
-            const string channel = "settings.patterns";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Name", @event.Name));
-        }
-
-        protected Task<HistoryEvent> On(AppPatternDeleted @event)
-        {
-            const string channel = "settings.patterns";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("PatternId", @event.PatternId));
-        }
-
-        protected Task<HistoryEvent> On(AppRoleAdded @event)
-        {
-            const string channel = "settings.roles";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Name", @event.Name));
-        }
-
-        protected Task<HistoryEvent> On(AppRoleUpdated @event)
-        {
-            const string channel = "settings.roles";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Name", @event.Name));
-        }
-
-        protected Task<HistoryEvent> On(AppRoleDeleted @event)
-        {
-            const string channel = "settings.roles";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Name", @event.Name));
-        }
-
-        protected Task<HistoryEvent> On(AppPlanChanged @event)
-        {
-            const string channel = "settings.plan";
-
-            return Task.FromResult(
-                ForEvent(@event, channel)
-                    .AddParameter("Plan", @event.PlanId));
-        }
-
-        protected Task<HistoryEvent> On(AppPlanReset @event)
-        {
-            const string channel = "settings.plan";
-
-            return Task.FromResult(
-                ForEvent(@event, channel));
+            return ForEvent(e, "settings.plan").Param("Plan", plan);
         }
 
         protected override Task<HistoryEvent> CreateEventCoreAsync(Envelope<IEvent> @event)
         {
-            return this.DispatchFuncAsync(@event.Payload, (HistoryEvent)null);
+            return Task.FromResult(CreateEvent(@event.Payload));
         }
 
-        private static string ClientName(AppClientRenamed @event)
+        private static string ClientName(AppClientRenamed e)
         {
-            return !string.IsNullOrWhiteSpace(@event.Name) ? @event.Name : @event.Id;
+            return !string.IsNullOrWhiteSpace(e.Name) ? e.Name : e.Id;
         }
     }
 }

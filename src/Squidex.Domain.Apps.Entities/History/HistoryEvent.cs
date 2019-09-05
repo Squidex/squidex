@@ -44,9 +44,12 @@ namespace Squidex.Domain.Apps.Entities.History
             Message = message;
         }
 
-        public HistoryEvent AddParameter(string key, object value)
+        public HistoryEvent Param<T>(string key, T value)
         {
-            Parameters[key] = value.ToString();
+            if (!Equals(value, default(T))
+            {
+                Parameters[key] = value.ToString();
+            }
 
             return this;
         }

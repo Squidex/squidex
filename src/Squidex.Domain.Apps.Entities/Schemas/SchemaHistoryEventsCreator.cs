@@ -77,11 +77,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas
             {
                 var channel = $"schemas.{schemaEvent.SchemaId.Name}";
 
-                var result = ForEvent(@event.Payload, channel).AddParameter("Name", schemaEvent.SchemaId.Name);
+                var result = ForEvent(@event.Payload, channel).Param("Name", schemaEvent.SchemaId.Name);
 
                 if (schemaEvent is FieldEvent fieldEvent)
                 {
-                    result.AddParameter("Field", fieldEvent.FieldId.Name);
+                    result.Param("Field", fieldEvent.FieldId.Name);
                 }
 
                 return Task.FromResult(result);
