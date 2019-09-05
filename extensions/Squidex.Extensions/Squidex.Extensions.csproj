@@ -4,10 +4,6 @@
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Squidex.Domain.Apps.Core.Operations\Squidex.Domain.Apps.Core.Operations.csproj" />
-    <ProjectReference Include="..\..\src\Squidex.Web\Squidex.Web.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Algolia.Search" Version="5.3.1" />
     <PackageReference Include="Confluent.Kafka" Version="1.1.0" />
     <PackageReference Include="CoreTweet" Version="1.0.0.483" />
@@ -28,5 +24,8 @@
   </PropertyGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Squidex.Extensions.Dependencies\Squidex.Extensions.Dependencies.csproj" />
   </ItemGroup>
 </Project>

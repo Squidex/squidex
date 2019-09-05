@@ -61,6 +61,13 @@ namespace Squidex.Pipeline.Plugins
 
             if (!Path.IsPathRooted(pluginPath))
             {
+                candidate = new FileInfo(Path.Combine(Path.GetFullPath("plugins"), pluginPath));
+
+                if (candidate.Exists)
+                {
+                    yield return candidate;
+                }
+
                 candidate = new FileInfo(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), pluginPath));
 
                 if (candidate.Exists)
