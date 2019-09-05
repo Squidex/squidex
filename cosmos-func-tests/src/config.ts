@@ -29,6 +29,29 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
         });
     }
 
+    let isCleanup = false;
+
+    function cleanup() {
+        if (isCleanup) {
+            return;
+        }
+
+        console.log('Cleaning');
+
+        browser.close();
+
+        if (options.setup) {
+            stopSquidex();
+            stopMongoDB();
+        }
+
+        console.log('Cleaned');
+    }
+
+    process.on('exit', () => {
+        cleanup();
+    });
+
     return {
         // to auto start Selenium server every time before test through config, we can use the below command instead of the above one
         directConnect: true,
@@ -52,6 +75,8 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
         specs: ['./../_out/specs/**/*.spec.js'],
 
         onPrepare: async () => {
+            console.log('Preparing');
+
             try {
                 addAllure();
 
@@ -70,13 +95,12 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
             } catch (ex) {
                 browser.close();
 
-                if (options.setup) {
-                    stopSquidex();
-                    stopMongoDB();
-                }
+                cleanup();
 
                 throw ex;
             }
+
+            console.log('Prepared');
         },
         params: {
             baseUrl: options.url
@@ -89,12 +113,7 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
         allScriptsTimeout: 50000,
 
         onCleanup: () => {
-            browser.close();
-
-            if (options.setup) {
-                stopSquidex();
-                stopMongoDB();
-            }
+            cleanup();
         }
     };
 }

@@ -23,7 +23,7 @@ export function startSquidex(silent = true) {
         }
     });
 
-    squidex.on('exit', (code) => {
+    squidex.on('close', (code) => {
         console.log(`Child exited with code ${code}`);
 
         if (code !== 0) {
@@ -38,6 +38,8 @@ export function startSquidex(silent = true) {
 
 export function stopSquidex() {
     if (squidex) {
+        console.log('[Squidex] Stopping');
+
         squidex.kill('SIGKILL');
 
         console.log('[Squidex] Stopped');
