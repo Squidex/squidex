@@ -19,11 +19,13 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Queries.OData;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {

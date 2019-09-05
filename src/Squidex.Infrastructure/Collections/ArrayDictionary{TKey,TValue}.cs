@@ -155,7 +155,7 @@ namespace Squidex.Infrastructure.Collections
             return items.GetEnumerator();
         }
 
-        private static IEnumerable<T2> GetEnumerable<T2>(T2[] array)
+        private static IEnumerable<T2> GetEnumerable<T2>(IEnumerable<T2> array)
         {
             return array;
         }

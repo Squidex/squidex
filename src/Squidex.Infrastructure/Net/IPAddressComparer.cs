@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using System.Net;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Net
 {
     public sealed class IPAddressComparer : IComparer<IPAddress>
     {

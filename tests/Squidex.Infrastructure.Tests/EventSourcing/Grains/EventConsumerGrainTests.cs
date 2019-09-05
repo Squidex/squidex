@@ -12,6 +12,7 @@ using FluentAssertions;
 using Orleans.Concurrency;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 

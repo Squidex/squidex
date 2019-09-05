@@ -6,13 +6,12 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.Tasks;
 using Xunit;
 
 #pragma warning disable IDE0060 // Remove unused parameter
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Dispatching
 {
     public class DispatchingTests
     {

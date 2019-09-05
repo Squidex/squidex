@@ -9,7 +9,7 @@ using System.Linq;
 using System.Net;
 using Xunit;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Net
 {
     public class IPAddressComparerTests
     {
@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure
                 IPAddress.Parse("127.0.0.255"),
                 IPAddress.Parse("129.0.0.1"),
                 IPAddress.Parse("127.0.0.1"),
-                IPAddress.Parse("127.0.0.200"),
+                IPAddress.Parse("127.0.0.200")
             };
 
             var sorted = source.OrderBy(x => x, IPAddressComparer.Instance);
@@ -35,7 +35,7 @@ namespace Squidex.Infrastructure
                 IPAddress.Parse("127.0.0.200"),
                 IPAddress.Parse("127.0.0.255"),
                 IPAddress.Parse("129.0.0.1"),
-                IPAddress.IPv6Loopback,
+                IPAddress.IPv6Loopback
             };
 
             Assert.Equal(expected, sorted);

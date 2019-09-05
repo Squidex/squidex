@@ -13,7 +13,7 @@ namespace Squidex.Extensions.Actions.Kafka
     {
         public bool IsProducerConfigured()
         {
-            return !string.IsNullOrWhiteSpace(this.BootstrapServers);
+            return !string.IsNullOrWhiteSpace(BootstrapServers);
         }
     }
 }

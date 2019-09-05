@@ -12,7 +12,7 @@ using Orleans;
 using Orleans.Concurrency;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains

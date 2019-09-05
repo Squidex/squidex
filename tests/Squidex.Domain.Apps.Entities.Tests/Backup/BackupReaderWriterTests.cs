@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 using Xunit;

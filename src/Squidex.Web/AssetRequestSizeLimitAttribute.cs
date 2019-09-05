@@ -14,7 +14,7 @@ using Squidex.Domain.Apps.Entities.Assets;
 
 namespace Squidex.Web
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public sealed class AssetRequestSizeLimitAttribute : Attribute, IFilterFactory, IOrderedFilter
     {
         public int Order { get; set; } = 900;

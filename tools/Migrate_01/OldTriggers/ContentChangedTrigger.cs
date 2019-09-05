@@ -11,6 +11,7 @@ using System.Linq;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Migrations;
 
 namespace Migrate_01.OldTriggers
 {

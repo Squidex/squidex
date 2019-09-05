@@ -154,7 +154,7 @@ namespace Squidex.Infrastructure.Assets
             await Sut.DeleteAsync(sourceFile);
         }
 
-        private async Task CheckEmpty(Func<string, Task> action)
+        private static async Task CheckEmpty(Func<string, Task> action)
         {
             await Assert.ThrowsAsync<ArgumentNullException>(() => action(null));
             await Assert.ThrowsAsync<ArgumentException>(() => action(string.Empty));

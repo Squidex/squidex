@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Reflection
 {
     public sealed class TypeNameRegistry
     {

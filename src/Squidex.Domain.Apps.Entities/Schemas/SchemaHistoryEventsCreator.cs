@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {

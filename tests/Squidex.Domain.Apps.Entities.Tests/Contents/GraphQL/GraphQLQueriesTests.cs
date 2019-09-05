@@ -94,7 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                             isImage = true,
                             pixelWidth = 800,
                             pixelHeight = 600,
-                            tags = new string[] { "tag1", "tag2" },
+                            tags = new[] { "tag1", "tag2" },
                             slug = "myfile.png"
                         }
                     }
@@ -170,7 +170,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                 isImage = true,
                                 pixelWidth = 800,
                                 pixelHeight = 600,
-                                tags = new string[] { "tag1", "tag2" },
+                                tags = new[] { "tag1", "tag2" },
                                 slug = "myfile.png"
                             }
                         }
@@ -240,7 +240,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         isImage = true,
                         pixelWidth = 800,
                         pixelHeight = 600,
-                        tags = new string[] { "tag1", "tag2" },
+                        tags = new[] { "tag1", "tag2" },
                         slug = "myfile.png"
                     }
                 }
@@ -576,12 +576,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                                     new
                                     {
                                         nestedNumber = 10,
-                                        nestedNumber2 = 11,
+                                        nestedNumber2 = 11
                                     },
                                     new
                                     {
                                         nestedNumber = 20,
-                                        nestedNumber2 = 21,
+                                        nestedNumber2 = 21
                                     }
                                 }
                             }

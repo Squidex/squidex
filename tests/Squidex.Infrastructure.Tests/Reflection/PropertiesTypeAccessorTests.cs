@@ -19,8 +19,14 @@ namespace Squidex.Infrastructure.Reflection
 
             public int ReadWrite
             {
-                get { return target; }
-                set { target = value; }
+                get
+                {
+                    return target;
+                }
+                set
+                {
+                    target = value;
+                }
             }
 
             public int Read

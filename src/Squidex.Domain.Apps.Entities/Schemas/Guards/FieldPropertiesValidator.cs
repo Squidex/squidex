@@ -7,7 +7,7 @@
 
 using System.Collections.Generic;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards
 {

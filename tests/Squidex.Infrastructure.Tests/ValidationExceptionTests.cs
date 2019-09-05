@@ -7,6 +7,7 @@
 
 using FluentAssertions;
 using Squidex.Infrastructure.TestHelpers;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Infrastructure

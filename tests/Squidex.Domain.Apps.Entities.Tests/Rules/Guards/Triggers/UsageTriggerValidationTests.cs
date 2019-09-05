@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers

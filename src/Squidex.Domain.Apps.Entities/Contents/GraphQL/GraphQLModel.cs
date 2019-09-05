@@ -145,18 +145,6 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return assetType;
         }
 
-        public IGraphType GetContentDataType(Guid schemaId)
-        {
-            var schema = schemasById.GetOrDefault(schemaId);
-
-            if (schema == null)
-            {
-                return null;
-            }
-
-            return contentDataTypes.GetOrAddNew(schema);
-        }
-
         public IGraphType GetContentType(Guid schemaId)
         {
             var schema = schemasById.GetOrDefault(schemaId);

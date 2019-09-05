@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Xunit;
 

@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 #pragma warning disable IDE0060 // Remove unused parameter
 

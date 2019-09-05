@@ -9,10 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Validation
 {
-    public delegate void AddValidation(string message, params string[] propertyNames);
-
     public static class Validate
     {
         public static void It(Func<string> message, Action<AddValidation> action)
@@ -59,4 +57,6 @@ namespace Squidex.Infrastructure
             }
         }
     }
+
+    public delegate void AddValidation(string message, params string[] propertyNames);
 }

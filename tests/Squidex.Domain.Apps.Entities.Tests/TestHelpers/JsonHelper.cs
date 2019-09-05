@@ -8,10 +8,10 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Queries.Json;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers
 {

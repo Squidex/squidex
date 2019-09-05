@@ -9,8 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text

@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 
-            Assert.Equal(errors, new string[] { "Multiple workflows cover all schemas." });
+            Assert.Equal(errors, new[] { "Multiple workflows cover all schemas." });
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             var errors = await sut.ValidateAsync(appId.Id, workflows);
 
-            Assert.Equal(errors, new string[] { "The schema `my-schema` is covered by multiple workflows." });
+            Assert.Equal(errors, new[] { "The schema `my-schema` is covered by multiple workflows." });
         }
 
         [Fact]

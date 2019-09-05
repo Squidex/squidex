@@ -8,8 +8,8 @@
 using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using ContentCreatedV2 = Squidex.Domain.Apps.Events.Contents.ContentCreated;
 

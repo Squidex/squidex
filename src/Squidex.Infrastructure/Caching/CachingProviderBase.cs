@@ -7,7 +7,7 @@
 
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Caching
 {
     public abstract class CachingProviderBase
     {

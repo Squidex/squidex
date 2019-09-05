@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text
 {

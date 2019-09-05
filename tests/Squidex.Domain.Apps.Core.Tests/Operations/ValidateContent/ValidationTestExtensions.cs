@@ -46,15 +46,6 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     CreateFormatter(errors));
         }
 
-        public static Task ValidateOptionalAsync(this IField field, object value, IList<string> errors, ValidationContext context = null)
-        {
-            return new FieldValidator(FieldValueValidatorsFactory.CreateValidators(field).ToArray(), field)
-                .ValidateAsync(
-                    value,
-                    CreateContext(context).Optional(true),
-                    CreateFormatter(errors));
-        }
-
         private static AddError CreateFormatter(IList<string> errors)
         {
             return (field, message) =>
