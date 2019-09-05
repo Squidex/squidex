@@ -117,14 +117,14 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     if (content) {
                         this.content = content;
 
-                        this.loadContent(this.content.dataDraft);
+                        this.loadContent(this.content.dataDraft, true);
                     }
 
                     if (autosaved) {
                         this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
                             .subscribe(shouldLoad => {
                                 if (shouldLoad) {
-                                    this.loadContent(autosaved);
+                                    this.loadContent(autosaved, false);
                                 } else {
                                     this.autoSaveService.remove(this.autoSaveKey);
                                 }
@@ -149,7 +149,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     }
 
     public canDeactivate(): Observable<boolean> {
-        if (!this.contentForm.hasChanged(this.content)) {
+        if (!this.contentForm.hasChanged()) {
             return of(true);
         } else {
             return this.dialogs.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view and discard your changes?').pipe(
@@ -227,13 +227,13 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.router.navigate([this.schema.name], { relativeTo: this.route.parent!.parent, replaceUrl: true });
     }
 
-    private loadContent(data: any) {
+    private loadContent(data: any, isInitial: boolean) {
         this.isLoadingContent = true;
 
         this.autoSaveService.remove(this.autoSaveKey);
 
         try {
-            this.contentForm.loadContent(data);
+            this.contentForm.load(data, isInitial);
             this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
         } finally {
             this.isLoadingContent = false;
@@ -267,7 +267,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         if (!this.content || version === null || version.eq(this.content.version)) {
             this.contentFormCompare = null;
             this.contentVersion = null;
-            this.loadContent(this.content.dataDraft);
+            this.loadContent(this.content.dataDraft, true);
         } else {
             this.contentsState.loadVersion(this.content, version)
                 .subscribe(dto => {
@@ -276,16 +276,16 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                             this.contentFormCompare = new EditContentForm(this.schema, this.languages);
                         }
 
-                        this.contentFormCompare.loadContent(dto.payload);
+                        this.contentFormCompare.load(dto.payload);
                         this.contentFormCompare.setEnabled(false);
 
-                        this.loadContent(this.content.dataDraft);
+                        this.loadContent(this.content.dataDraft, false);
                     } else {
                         if (this.contentFormCompare) {
                             this.contentFormCompare = null;
                         }
 
-                        this.loadContent(dto.payload);
+                        this.loadContent(dto.payload, false);
                     }
 
                     this.contentVersion = version;

@@ -395,7 +395,7 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
 }
 
 export class EditContentForm extends Form<FormGroup, any> {
-    private isLoaded = false;
+    private initialData: any;
 
     public value = value$(this.form);
 
@@ -432,26 +432,22 @@ export class EditContentForm extends Form<FormGroup, any> {
             }
         }
 
+        this.initialData = this.form.getRawValue();
+
         this.enable();
     }
 
-    public hasChanged(content?: ContentDto) {
-        if (!this.isLoaded && !this.form.touched) {
-            return false;
-        }
+    public hasChanged() {
+        const currentValue = this.form.getRawValue();
 
-        if (content) {
-            return !Types.jsJsonEquals(this.form.value, content.data);
-        } else {
-            return true;
-        }
+        return !Types.jsJsonEquals(this.initialData, currentValue);
     }
 
-    public removeArrayItem(field: RootFieldDto, language: AppLanguageDto, index: number) {
+    public arrayItemRemove(field: RootFieldDto, language: AppLanguageDto, index: number) {
         this.findArrayItemForm(field, language).removeAt(index);
     }
 
-    public insertArrayItem(field: RootFieldDto, language: AppLanguageDto, source?: FormGroup) {
+    public arrayItemInsert(field: RootFieldDto, language: AppLanguageDto, source?: FormGroup) {
         if (field.nested.length > 0) {
             const formControl = this.findArrayItemForm(field, language);
 
@@ -495,9 +491,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         }
     }
 
-    public loadContent(value: any) {
-        this.isLoaded = true;
-
+    public load(value: any, isInitial?: boolean) {
         for (let field of this.schema.fields) {
             if (field.isArray && field.nested.length > 0) {
                 const fieldForm = <FormGroup>this.form.get(field.name);
@@ -534,6 +528,10 @@ export class EditContentForm extends Form<FormGroup, any> {
         }
 
         super.load(value);
+
+        if (isInitial) {
+            this.initialData = this.form.getRawValue();
+        }
     }
 
     public disable() {

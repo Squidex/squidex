@@ -7,7 +7,7 @@
 
 import { Injectable } from '@angular/core';
 import { combineLatest, Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, share, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -82,7 +82,7 @@ export class ContributorsState extends State<Snapshot> {
         this.project(x => !!x.canCreate);
 
     public filtered =
-        combineLatest(this.queryRegex, this.contributors, (q, c) => getFilteredContributors(c, q));
+        combineLatest(this.queryRegex, this.contributors, (q, c) => getFilteredContributors(c, q)).pipe(share());
 
     public contributorsPaged =
         combineLatest(this.page, this.filtered, (p, c) => getPagedContributors(c, p));

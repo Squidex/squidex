@@ -9,13 +9,13 @@ import { AbstractControl } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
-import { ErrorDto } from './utils/error';
+import { ErrorDto, getDisplayMessage } from './utils/error';
 
 import { ResourceLinks } from './utils/hateos';
 
 import { Types } from './utils/types';
 
-import { fullValue } from './angular/forms/forms-helper';
+import { getRawValue } from './angular/forms/forms-helper';
 
 export interface FormState {
     submitted: boolean;
@@ -70,16 +70,16 @@ export class Form<T extends AbstractControl, V> {
     }
 
     public load(value: V | undefined) {
-        this.state.next(() => ({ submitted: false, error: null }));
+        this.state.next({ submitted: false, error: null });
 
         this.setValue(value);
     }
 
     public submit(): V | null {
-        this.state.next(() => ({ submitted: true }));
+        this.state.next({ submitted: true, error: null });
 
         if (this.form.valid) {
-            const value = this.transformSubmit(fullValue(this.form));
+            const value = this.transformSubmit(getRawValue(this.form));
 
             if (value) {
                 this.disable();
@@ -92,7 +92,7 @@ export class Form<T extends AbstractControl, V> {
     }
 
     public submitCompleted(options?: { newValue?: V, noReset?: boolean }) {
-        this.state.next(() => ({ submitted: false, error: null }));
+        this.state.next({ submitted: false, error: null });
 
         this.enable();
 
@@ -104,17 +104,9 @@ export class Form<T extends AbstractControl, V> {
     }
 
     public submitFailed(error?: string | ErrorDto) {
-        this.state.next(() => ({ submitted: false, error: this.getError(error) }));
+        this.state.next({ submitted: false, error: getDisplayMessage(error) });
 
         this.enable();
-    }
-
-    private getError(error?: string | ErrorDto) {
-        if (Types.is(error, ErrorDto)) {
-            return error.displayMessage;
-        } else {
-            return error;
-        }
     }
 }
 

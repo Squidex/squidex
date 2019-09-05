@@ -54,12 +54,12 @@ export class ArrayEditorComponent extends StatefulComponent<State> {
         this.next(s => ({ ...s, isHidden }));
     }
 
-    public removeItem(index: number) {
-        this.form.removeArrayItem(this.field, this.language, index);
+    public itemRemove(index: number) {
+        this.form.arrayItemRemove(this.field, this.language, index);
     }
 
-    public addItem(value?: FormGroup) {
-        this.form.insertArrayItem(this.field, this.language, value);
+    public itemAdd(value?: FormGroup) {
+        this.form.arrayItemInsert(this.field, this.language, value);
     }
 
     public sort(controls: AbstractControl[]) {

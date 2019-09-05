@@ -14,15 +14,15 @@
             [itemForm]="itemForm"
             [language]="language"
             [languages]="languages"
-            (clone)="addItem(itemForm)"
+            (clone)="itemAdd(itemForm)"
             (move)="move(itemForm, $event)"
-            (remove)="removeItem(i)"
+            (remove)="itemRemove(i)"
             (toggle)="hide($event)">
         </sqx-array-item>
     </div>
 </div>
 
-<button type="button" class="btn btn-success" [disabled]="field.nested.length === 0 || arrayControl.disabled" (click)="addItem(undefined)">
+<button type="button" class="btn btn-success" [disabled]="field.nested.length === 0 || arrayControl.disabled" (click)="itemAdd(undefined)">
     Add Item
 </button>
 
