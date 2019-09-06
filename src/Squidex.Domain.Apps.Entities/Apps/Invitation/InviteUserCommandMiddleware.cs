@@ -44,7 +44,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
             }
         }
 
-        private bool ShouldInvite(AssignContributor assignContributor)
+        private static bool ShouldInvite(AssignContributor assignContributor)
         {
             return assignContributor.Invite && assignContributor.ContributorId.IsEmail();
         }

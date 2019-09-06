@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Validation
 {
     [Serializable]
     public sealed class ValidationError

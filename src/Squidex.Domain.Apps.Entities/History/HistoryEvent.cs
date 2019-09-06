@@ -18,9 +18,9 @@ namespace Squidex.Domain.Apps.Entities.History
 
         public Guid AppId { get; set; }
 
-        public RefToken Actor { get; set; }
-
         public Instant Created { get; set; }
+
+        public RefToken Actor { get; set; }
 
         public long Version { get; set; }
 
@@ -44,9 +44,12 @@ namespace Squidex.Domain.Apps.Entities.History
             Message = message;
         }
 
-        public HistoryEvent AddParameter(string key, object value)
+        public HistoryEvent Param<T>(string key, T value)
         {
-            Parameters[key] = value.ToString();
+            if (!Equals(value, default(T)))
+            {
+                Parameters[key] = value.ToString();
+            }
 
             return this;
         }

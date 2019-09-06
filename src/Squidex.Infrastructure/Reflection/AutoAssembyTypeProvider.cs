@@ -1,14 +1,17 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Reflection
 {
-    public interface IMigrated<out T>
+    public sealed class AutoAssembyTypeProvider<T> : ITypeProvider
     {
-        T Migrate();
+        public void Map(TypeNameRegistry typeNameRegistry)
+        {
+            typeNameRegistry.MapUnmapped(typeof(T).Assembly);
+        }
     }
 }

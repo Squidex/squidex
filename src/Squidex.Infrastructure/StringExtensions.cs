@@ -778,7 +778,7 @@ namespace Squidex.Infrastructure
                 url.IndexOf("?", StringComparison.OrdinalIgnoreCase) < 0 &&
                 url.IndexOf(";", StringComparison.OrdinalIgnoreCase) < 0)
             {
-                url = url + "/";
+                url += "/";
             }
 
             return url;

@@ -18,6 +18,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.HandleRules

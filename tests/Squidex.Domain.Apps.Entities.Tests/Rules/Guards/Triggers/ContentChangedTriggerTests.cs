@@ -15,6 +15,7 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Guards.Triggers

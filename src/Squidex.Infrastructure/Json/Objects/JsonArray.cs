@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -23,8 +24,13 @@ namespace Squidex.Infrastructure.Json.Objects
         }
 
         internal JsonArray(params object[] values)
-            : base(values?.Select(JsonValue.Create).ToList())
+            : base(ToList(values))
         {
+        }
+
+        private static List<IJsonValue> ToList(IEnumerable<object> values)
+        {
+            return values?.Select(JsonValue.Create).ToList() ?? new List<IJsonValue>();
         }
 
         protected override void InsertItem(int index, IJsonValue item)

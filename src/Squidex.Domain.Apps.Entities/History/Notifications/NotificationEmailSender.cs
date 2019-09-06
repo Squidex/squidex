@@ -89,7 +89,7 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
                 .WriteProperty("reason", reason));
         }
 
-        private string Format(string text, IUser assigner, IUser assignee, string uiUrl, string appName)
+        private static string Format(string text, IUser assigner, IUser assignee, string uiUrl, string appName)
         {
             text = text.Replace("$APP_NAME", appName);
 

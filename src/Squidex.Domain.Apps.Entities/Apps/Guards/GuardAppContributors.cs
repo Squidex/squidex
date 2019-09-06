@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards

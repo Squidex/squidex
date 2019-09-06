@@ -235,7 +235,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
                 var assetUrls = context.AssetUrls();
 
-                if (assetUrls.Any() == true)
+                if (assetUrls.Any())
                 {
                     yield return FieldConverters.ResolveAssetUrls(assetUrls.ToList(), assetUrlGenerator);
                 }

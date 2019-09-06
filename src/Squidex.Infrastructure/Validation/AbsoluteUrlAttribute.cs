@@ -8,7 +8,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Validation
 {
     public sealed class AbsoluteUrlAttribute : ValidationAttribute
     {

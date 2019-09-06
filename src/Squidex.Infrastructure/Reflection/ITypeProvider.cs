@@ -5,13 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Reflection
 {
-    public sealed class AutoAssembyTypeProvider<T> : ITypeProvider
+    public interface ITypeProvider
     {
-        public void Map(TypeNameRegistry typeNameRegistry)
-        {
-            typeNameRegistry.MapUnmapped(typeof(T).Assembly);
-        }
+        void Map(TypeNameRegistry typeNameRegistry);
     }
 }

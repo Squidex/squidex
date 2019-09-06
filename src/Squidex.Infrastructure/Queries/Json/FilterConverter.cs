@@ -11,6 +11,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.Queries.Json
 {
@@ -50,7 +51,7 @@ namespace Squidex.Infrastructure.Queries.Json
                 switch (reader.TokenType)
                 {
                     case JsonToken.PropertyName:
-                        string propertyName = reader.Value.ToString();
+                        var propertyName = reader.Value.ToString();
 
                         if (!reader.Read())
                         {

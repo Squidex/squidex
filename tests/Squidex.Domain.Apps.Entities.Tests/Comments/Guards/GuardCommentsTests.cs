@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Comments.Guards

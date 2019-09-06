@@ -8,7 +8,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Reflection
 {
     [Serializable]
     public class TypeNameNotFoundException : Exception

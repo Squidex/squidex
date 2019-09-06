@@ -36,7 +36,7 @@ namespace Squidex.Extensions.Actions.Kafka
             return (Description, ruleJob);
         }
 
-        protected override async Task<Result> ExecuteJobAsync(KafkaJob job, CancellationToken ct)
+        protected override async Task<Result> ExecuteJobAsync(KafkaJob job, CancellationToken ct = default)
         {
             try
             {

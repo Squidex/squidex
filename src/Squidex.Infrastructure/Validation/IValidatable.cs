@@ -5,14 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
+using System.Collections.Generic;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Validation
 {
-    public interface IPubSub
+    public interface IValidatable
     {
-        void Publish<T>(T value, bool notifySelf);
-
-        IDisposable Subscribe<T>(Action<T> handler);
+        void Validate(IList<ValidationError> errors);
     }
 }

@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
 {
@@ -35,16 +34,6 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             lhs.Should().BeOfType(rhs.GetType());
 
             ((object)lhs).Should().BeEquivalentTo(rhs, o => o.IncludingAllRuntimeProperties().Excluding(x => x.SelectedMemberPath == "Properties.IsFrozen"));
-        }
-
-        public static void ShouldBeSameEventType(this IEvent lhs, IEvent rhs)
-        {
-            lhs.Should().BeOfType(rhs.GetType());
-        }
-
-        public static void ShouldBeEquivalent<T>(this J<T> lhs, T rhs)
-        {
-            lhs.Value.Should().BeEquivalentTo(rhs, o => o.IncludingProperties());
         }
     }
 }

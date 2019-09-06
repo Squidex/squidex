@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Entities.Comments.Commands;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Comments.Guards
 {

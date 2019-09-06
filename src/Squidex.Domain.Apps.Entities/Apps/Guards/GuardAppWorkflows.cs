@@ -9,6 +9,7 @@ using System;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {

@@ -5,10 +5,24 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Caching.Memory;
+
 namespace Squidex.Infrastructure.Caching
 {
-    public sealed class InvalidateMessage
+    public abstract class CachingProviderBase
     {
-        public string CacheKey { get; set; }
+        private readonly IMemoryCache cache;
+
+        protected IMemoryCache Cache
+        {
+            get { return cache; }
+        }
+
+        protected CachingProviderBase(IMemoryCache cache)
+        {
+            Guard.NotNull(cache, nameof(cache));
+
+            this.cache = cache;
+        }
     }
 }

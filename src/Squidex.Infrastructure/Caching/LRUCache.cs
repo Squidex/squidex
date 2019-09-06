@@ -23,7 +23,7 @@ namespace Squidex.Infrastructure.Caching
 
             this.capacity = capacity;
 
-            this.itemEvicted = itemEvicted ?? new Action<TKey, TValue>((key, value) => { });
+            this.itemEvicted = itemEvicted ?? ((key, value) => { });
         }
 
         public bool Set(TKey key, TValue value)

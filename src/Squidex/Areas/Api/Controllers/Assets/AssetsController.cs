@@ -23,6 +23,7 @@ using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
 

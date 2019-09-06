@@ -53,7 +53,7 @@ namespace Squidex.Infrastructure.Queries.OData
             }
         }
 
-        private static string UnescapeEdmField(IEdmProperty property)
+        private static string UnescapeEdmField(IEdmNamedElement property)
         {
             return property.Name;
         }

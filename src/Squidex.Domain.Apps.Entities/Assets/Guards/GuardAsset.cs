@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Guards
 {

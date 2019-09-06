@@ -129,7 +129,7 @@ namespace Squidex.Infrastructure.Assets
                 {
                     if (!IsNotFound(ex))
                     {
-                        throw ex;
+                        throw;
                     }
                 }
             }

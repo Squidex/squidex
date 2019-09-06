@@ -7,6 +7,7 @@
 
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.Queries.OData
 {

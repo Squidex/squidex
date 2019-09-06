@@ -12,6 +12,7 @@ using NJsonSchema;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.Queries.Json
 {

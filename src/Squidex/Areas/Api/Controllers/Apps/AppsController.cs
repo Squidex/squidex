@@ -21,11 +21,11 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -262,7 +262,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             return NoContent();
         }
 
-        private async Task<AppDto> InvokeCommandAsync(AppCommand command)
+        private async Task<AppDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 
@@ -275,7 +275,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             return response;
         }
 
-        private UploadAppImage CreateCommand(IReadOnlyList<IFormFile> file)
+        private static UploadAppImage CreateCommand(IReadOnlyList<IFormFile> file)
         {
             if (file.Count != 1)
             {

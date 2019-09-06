@@ -7,7 +7,7 @@
 
 namespace Squidex.Infrastructure.EventSourcing
 {
-    public interface IEventEnricher<T>
+    public interface IEventEnricher<in T>
     {
         void Enrich(Envelope<IEvent> @event, T id);
     }

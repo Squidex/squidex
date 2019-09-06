@@ -13,11 +13,6 @@ namespace Squidex.Web
 {
     public static class Extensions
     {
-        public static bool IsFrontendClient(this ClaimsPrincipal principal)
-        {
-            return principal.IsInClient(Constants.FrontendClient);
-        }
-
         public static string GetClientId(this ClaimsPrincipal principal)
         {
             var clientId = principal.FindFirst(OpenIdClaims.ClientId)?.Value;

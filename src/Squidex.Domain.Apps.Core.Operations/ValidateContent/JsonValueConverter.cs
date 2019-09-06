@@ -9,8 +9,8 @@ using System;
 using System.Collections.Generic;
 using NodaTime.Text;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent
 {

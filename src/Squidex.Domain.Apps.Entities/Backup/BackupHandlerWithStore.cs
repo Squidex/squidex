@@ -25,11 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Backup
             this.store = store;
         }
 
-        protected Task RemoveSnapshotAsync<TState>(Guid id)
-        {
-            return store.RemoveSnapshotAsync<Guid, TState>(id);
-        }
-
         protected async Task RebuildManyAsync(IEnumerable<Guid> ids, Func<Guid, Task> action)
         {
             foreach (var id in ids)

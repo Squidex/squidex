@@ -64,11 +64,12 @@ namespace Squidex.Infrastructure
 
             var d = (double)value;
             var u = 0;
-            var s = 1024;
 
-            while ((d >= s || -d >= s) && u < Extensions.Length - 1)
+            const int multiplier = 1024;
+
+            while ((d >= multiplier || -d >= multiplier) && u < Extensions.Length - 1)
             {
-                d /= s;
+                d /= multiplier;
                 u++;
             }
 

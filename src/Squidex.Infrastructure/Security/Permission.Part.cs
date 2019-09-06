@@ -75,7 +75,7 @@ namespace Squidex.Infrastructure.Security
                     return true;
                 }
 
-                bool shouldIntersect = !(lhs.Exclusion ^ rhs.Exclusion);
+                var shouldIntersect = !(lhs.Exclusion ^ rhs.Exclusion);
 
                 return rhs.Alternatives != null && lhs.Alternatives.Intersect(rhs.Alternatives).Any() == shouldIntersect;
             }

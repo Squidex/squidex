@@ -12,8 +12,8 @@ using FluentAssertions;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
@@ -77,7 +77,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                         .AddValue("iv", null));
 
             var validationContext = ValidationTestExtensions.ValidContext;
-            var validator = new ContentValidator(schema, new PartitionResolver(x => InvariantPartitioning.Instance), validationContext);
+            var validator = new ContentValidator(schema, x => InvariantPartitioning.Instance, validationContext);
 
             await validator.ValidateAsync(data);
 
@@ -112,7 +112,7 @@ namespace Squidex.Domain.Apps.Core.Operations.ValidateContent
                     (c, s) => null,
                     (c) => null);
 
-            var validator = new ContentValidator(schema, new PartitionResolver(x => InvariantPartitioning.Instance), validationContext);
+            var validator = new ContentValidator(schema, x => InvariantPartitioning.Instance, validationContext);
 
             await validator.ValidateAsync(data);
 

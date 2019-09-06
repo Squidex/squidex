@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Newtonsoft.Json;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Rules.Json

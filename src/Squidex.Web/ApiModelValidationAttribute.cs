@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Web
 {

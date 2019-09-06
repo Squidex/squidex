@@ -86,8 +86,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var source = new IContentEntity[]
             {
-                CreateContent(new Guid[] { ref1_1.Id }, new Guid[] { ref2_1.Id }),
-                CreateContent(new Guid[] { ref1_2.Id }, new Guid[] { ref2_2.Id })
+                CreateContent(new[] { ref1_1.Id }, new[] { ref2_1.Id }),
+                CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
             };
 
             A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
@@ -115,8 +115,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var source = new IContentEntity[]
             {
-                CreateContent(new Guid[] { ref1_1.Id }, new Guid[] { ref2_1.Id }),
-                CreateContent(new Guid[] { ref1_2.Id }, new Guid[] { ref2_2.Id })
+                CreateContent(new[] { ref1_1.Id }, new[] { ref2_1.Id }),
+                CreateContent(new[] { ref1_2.Id }, new[] { ref2_2.Id })
             };
 
             A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
@@ -167,8 +167,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
             var source = new IContentEntity[]
             {
-                CreateContent(new Guid[] { ref1_1.Id }, new Guid[] { ref2_1.Id, ref2_2.Id }),
-                CreateContent(new Guid[] { ref1_2.Id }, new Guid[] { ref2_1.Id, ref2_2.Id })
+                CreateContent(new[] { ref1_1.Id }, new[] { ref2_1.Id, ref2_2.Id }),
+                CreateContent(new[] { ref1_2.Id }, new[] { ref2_1.Id, ref2_2.Id })
             };
 
             A.CallTo(() => contentQuery.QueryAsync(A<Context>.Ignored, A<IReadOnlyList<Guid>>.That.Matches(x => x.Count == 4)))
@@ -225,7 +225,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             };
         }
 
-        private IEnrichedContentEntity CreateRefContent(Guid id, string name, int number)
+        private static IEnrichedContentEntity CreateRefContent(Guid id, string name, int number)
         {
             return new ContentEntity
             {

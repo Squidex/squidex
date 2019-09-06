@@ -20,7 +20,7 @@ namespace Squidex.Web
             {
                 ["name1"] = "config1",
                 ["name2"] = "config2",
-                ["name3"] = "config3",
+                ["name3"] = "config3"
             };
 
             var configuration = A.Fake<IConfiguration>();

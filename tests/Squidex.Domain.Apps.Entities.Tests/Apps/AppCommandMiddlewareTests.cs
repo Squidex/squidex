@@ -14,9 +14,9 @@ using Orleans;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 #pragma warning disable IDE0067 // Dispose objects before losing scope

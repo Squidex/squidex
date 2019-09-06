@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Infrastructure

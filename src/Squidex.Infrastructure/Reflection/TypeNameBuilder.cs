@@ -7,7 +7,7 @@
 
 using System;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Reflection
 {
     public static class TypeNameBuilder
     {

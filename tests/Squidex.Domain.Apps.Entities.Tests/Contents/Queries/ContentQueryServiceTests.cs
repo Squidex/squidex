@@ -494,7 +494,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 Data = contentData,
                 DataDraft = contentData,
                 SchemaId = schemaId,
-                Status = status,
+                Status = status
             };
 
             return content;

@@ -7,6 +7,7 @@
 
 using MongoDB.Driver;
 using Squidex.Infrastructure.Queries;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.MongoDb.Queries
 {
