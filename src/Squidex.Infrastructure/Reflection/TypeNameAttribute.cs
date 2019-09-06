@@ -7,7 +7,7 @@
 
 using System;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Reflection
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class TypeNameAttribute : Attribute

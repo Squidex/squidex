@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Events.Apps
 {

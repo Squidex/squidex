@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Collections.ObjectModel;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Rules.Triggers
 {
