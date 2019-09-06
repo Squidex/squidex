@@ -150,7 +150,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
 
         private ClientsDto GetResponse(IAppEntity app)
         {
-            return ClientsDto.FromApp(App, this);
+            return ClientsDto.FromApp(app, this);
         }
     }
 }

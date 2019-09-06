@@ -46,16 +46,16 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models
                         Type = JsonObjectType.String, IsRequired = true
                     };
 
-                    foreach (var action in ruleRegistry.Actions)
+                    foreach (var (key, value) in ruleRegistry.Actions)
                     {
-                        var derivedSchema = context.SchemaGenerator.Generate<JsonSchema>(action.Value.Type.ToContextualType(), context.SchemaResolver);
+                        var derivedSchema = context.SchemaGenerator.Generate<JsonSchema>(value.Type.ToContextualType(), context.SchemaResolver);
 
                         var oldName = context.Document.Definitions.FirstOrDefault(x => x.Value == derivedSchema).Key;
 
                         if (oldName != null)
                         {
                             context.Document.Definitions.Remove(oldName);
-                            context.Document.Definitions.Add($"{action.Key}RuleActionDto", derivedSchema);
+                            context.Document.Definitions.Add($"{key}RuleActionDto", derivedSchema);
                         }
                     }
 
