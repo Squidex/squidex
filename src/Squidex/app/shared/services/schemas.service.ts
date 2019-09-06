@@ -80,9 +80,9 @@ export class SchemaDto {
 }
 
 export class SchemaDetailsDto extends SchemaDto {
-    public listFields: RootFieldDto[];
-    public listFieldsEditable: RootFieldDto[];
-    public referenceFields: RootFieldDto[];
+    public readonly listFields: RootFieldDto[];
+    public readonly listFieldsEditable: RootFieldDto[];
+    public readonly referenceFields: RootFieldDto[];
 
     constructor(links: ResourceLinks, id: string, name: string, category: string,
         properties: SchemaPropertiesDto,

@@ -99,7 +99,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     if (schema) {
                         this.schema = schema!;
 
-                        this.contentForm = new EditContentForm(this.schema, this.languages);
+                        this.contentForm = new EditContentForm(this.languages, this.schema);
                     }
                 }));
 
@@ -272,18 +272,14 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
             this.contentsState.loadVersion(this.content, version)
                 .subscribe(dto => {
                     if (compare) {
-                        if (this.contentFormCompare === null) {
-                            this.contentFormCompare = new EditContentForm(this.schema, this.languages);
-                        }
+                        this.contentFormCompare = new EditContentForm(this.languages, this.schema);
 
                         this.contentFormCompare.load(dto.payload);
                         this.contentFormCompare.setEnabled(false);
 
                         this.loadContent(this.content.dataDraft, false);
                     } else {
-                        if (this.contentFormCompare) {
-                            this.contentFormCompare = null;
-                        }
+                        this.contentFormCompare = null;
 
                         this.loadContent(dto.payload, false);
                     }
