@@ -395,8 +395,9 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
 }
 
 export class EditContentForm extends Form<FormGroup, any> {
-    public value =
-        value$(this.form);
+    private initialData: any;
+
+    public value = value$(this.form);
 
     constructor(
         private readonly schema: SchemaDetailsDto,
@@ -431,20 +432,22 @@ export class EditContentForm extends Form<FormGroup, any> {
             }
         }
 
+        this.initialData = this.form.getRawValue();
+
         this.enable();
     }
 
-    public hasChanged(content?: ContentDto) {
-        const data = content ? content.dataDraft : {};
+    public hasChanged() {
+        const currentValue = this.form.getRawValue();
 
-        return !Types.jsJsonEquals(this.form.value, data);
+        return !Types.jsJsonEquals(this.initialData, currentValue);
     }
 
-    public removeArrayItem(field: RootFieldDto, language: AppLanguageDto, index: number) {
+    public arrayItemRemove(field: RootFieldDto, language: AppLanguageDto, index: number) {
         this.findArrayItemForm(field, language).removeAt(index);
     }
 
-    public insertArrayItem(field: RootFieldDto, language: AppLanguageDto, source?: FormGroup) {
+    public arrayItemInsert(field: RootFieldDto, language: AppLanguageDto, source?: FormGroup) {
         if (field.nested.length > 0) {
             const formControl = this.findArrayItemForm(field, language);
 
@@ -488,7 +491,7 @@ export class EditContentForm extends Form<FormGroup, any> {
         }
     }
 
-    public loadContent(value: any) {
+    public load(value: any, isInitial?: boolean) {
         for (let field of this.schema.fields) {
             if (field.isArray && field.nested.length > 0) {
                 const fieldForm = <FormGroup>this.form.get(field.name);
@@ -525,6 +528,10 @@ export class EditContentForm extends Form<FormGroup, any> {
         }
 
         super.load(value);
+
+        if (isInitial) {
+            this.initialData = this.form.getRawValue();
+        }
     }
 
     public disable() {

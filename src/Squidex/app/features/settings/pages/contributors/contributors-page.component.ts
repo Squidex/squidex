@@ -108,6 +108,8 @@ export class ContributorsPageComponent implements OnInit {
 
                     if (isCreated) {
                         this.dialogs.notifyInfo('A new user with the entered email address has been created and assigned as contributor.');
+                    } else {
+                        this.dialogs.notifyInfo('User has been added as contributor.');
                     }
                 }, error => {
                     this.assignContributorForm.submitFailed(error);

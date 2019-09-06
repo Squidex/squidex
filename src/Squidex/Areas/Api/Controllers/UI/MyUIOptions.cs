@@ -17,6 +17,8 @@ namespace Squidex.Areas.Api.Controllers.UI
 
         public MapOptions Map { get; set; }
 
+        public int ReferencesDropdownItemCount { get; set; } = 100;
+
         public bool ShowInfo { get; set; }
 
         public bool HideNews { get; set; }

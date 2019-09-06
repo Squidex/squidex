@@ -68,7 +68,7 @@ export class ModalDialogComponent extends StatefulComponent<State> implements Af
         const hasTabs = this.tabsElement.nativeElement.children.length > 0;
         const hasFooter = this.footerElement.nativeElement.children.length > 0;
 
-        this.next(() => ({ hasTabs, hasFooter }));
+        this.next({ hasTabs, hasFooter });
     }
 
     public emitClose() {

@@ -37,25 +37,11 @@ export function hasNoValue$(form: AbstractControl): Observable<boolean> {
     return value$(form).pipe(map(v => !v));
 }
 
-export function fullValue(form: AbstractControl): any {
+export function getRawValue(form: AbstractControl): any {
     if (Types.is(form, FormGroup)) {
-        const groupValue = {};
-
-        for (let key in form.controls) {
-            if (form.controls.hasOwnProperty(key)) {
-                groupValue[key] = fullValue(form.controls[key]);
-            }
-        }
-
-        return groupValue;
+        return form.getRawValue();
     } else if (Types.is(form, FormArray)) {
-        const arrayValue = [];
-
-        for (let child of form.controls) {
-            arrayValue.push(fullValue(child));
-        }
-
-        return arrayValue;
+        return form.getRawValue();
     } else {
         return form.value;
     }

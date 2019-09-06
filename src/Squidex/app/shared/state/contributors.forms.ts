@@ -32,12 +32,14 @@ export class AssignContributorForm extends Form<FormGroup, AssignContributorDto>
         }));
     }
 
-    protected transformSubmit(value: string | UserDto) {
-        if (Types.is(value, UserDto)) {
-            value = value.id;
+    protected transformSubmit(value: { user: string | UserDto }) {
+        let contributorId = value.user;
+
+        if (Types.is(contributorId, UserDto)) {
+            contributorId = contributorId.id;
         }
 
-        return { contributorId: value, role: 'Editor', invite: true };
+        return { contributorId, role: 'Editor', invite: true };
     }
 }
 
