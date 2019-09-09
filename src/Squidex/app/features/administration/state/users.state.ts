@@ -61,10 +61,10 @@ export class UsersState extends State<Snapshot> {
         this.project(x => x.selectedUser);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
 
     constructor(
         private readonly dialogs: DialogService,

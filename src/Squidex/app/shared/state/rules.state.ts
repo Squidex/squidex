@@ -46,13 +46,13 @@ export class RulesState extends State<Snapshot> {
         this.project(x => x.rules);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
 
     public canReadEvents =
-        this.project(x => !!x.canReadEvents);
+        this.project(x => x.canReadEvents === true);
 
     constructor(
         private readonly appsState: AppsState,

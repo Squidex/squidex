@@ -39,13 +39,13 @@ export class BackupsState extends State<Snapshot> {
         this.project(x => x.backups);
 
     public maxBackupsReached =
-        this.project(x => x.backups.length >= 10);
+        this.projectFrom(this.backups, x => x.length >= 10);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
 
     constructor(
         private readonly appsState: AppsState,

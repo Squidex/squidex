@@ -55,10 +55,10 @@ export class PlansState extends State<Snapshot> {
         this.project(x => x.plans);
 
     public isOwner =
-        this.project(x => !!x.isOwner);
+        this.project(x => x.isOwner === true);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public isDisabled =
         this.project(x => !x.isOwner);

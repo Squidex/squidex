@@ -6,8 +6,8 @@
  */
 
 import { AbstractControl } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
 
 import { ErrorDto, getDisplayMessage } from './utils/error';
 
@@ -167,15 +167,19 @@ export class State<T extends {}> {
         return this.state.value;
     }
 
-    public project<R1>(project1: (value: T) => R1, compare?: (x: R1, y: R1) => boolean) {
+    public project<M>(project1: (value: T) => M, compare?: (x: M, y: M) => boolean) {
         return this.changes.pipe(
-            map(x => project1(x)), distinctUntilChanged(compare));
+            map(x => project1(x)), distinctUntilChanged(compare), shareReplay());
     }
 
-    public project2<R1, R2>(project1: (value: T) => R1, project2: (value: R1) => R2, compare?: (x: R2, y: R2) => boolean) {
-        return this.changes.pipe(
-            map(x => project1(x)), distinctUntilChanged(),
-            map(x => project2(x)), distinctUntilChanged(compare));
+    public projectFrom<M, N>(source: Observable<M>, project: (value: M) => N, compare?: (x: N, y: N) => boolean) {
+        return source.pipe(
+            map(x => project(x)), distinctUntilChanged(compare), shareReplay());
+    }
+
+    public projectFrom2<M, N, O>(lhs: Observable<M>, rhs: Observable<N>, project: (l: M, r: N) => O, compare?: (x: O, y: O) => boolean) {
+        return combineLatest(lhs, rhs, (x, y) => project(x, y)).pipe(
+            distinctUntilChanged(compare), shareReplay());
     }
 
     constructor(state: Readonly<T>) {

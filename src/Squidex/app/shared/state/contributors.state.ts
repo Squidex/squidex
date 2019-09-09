@@ -6,8 +6,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { combineLatest, Observable, throwError } from 'rxjs';
-import { catchError, shareReplay, tap } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 import {
     DialogService,
@@ -76,19 +76,19 @@ export class ContributorsState extends State<Snapshot> {
         this.project(x => x.maxContributors);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
 
     public filtered =
-        combineLatest(this.queryRegex, this.contributors, (q, c) => getFilteredContributors(c, q)).pipe(shareReplay());
+        this.projectFrom2(this.queryRegex, this.contributors, (q, c) => getFilteredContributors(c, q));
 
     public contributorsPaged =
-        combineLatest(this.page, this.filtered, (p, c) => getPagedContributors(c, p));
+        this.projectFrom2(this.page, this.filtered, (p, c) => getPagedContributors(c, p));
 
     public contributorsPager =
-        combineLatest(this.page, this.filtered, (p, c) => new Pager(c.length, p, PAGE_SIZE));
+        this.projectFrom2(this.page, this.filtered, (p, c) => new Pager(c.length, p, PAGE_SIZE));
 
     constructor(
         private readonly contributorsService: ContributorsService,
