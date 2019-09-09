@@ -118,7 +118,7 @@ export class AppsState extends State<Snapshot> {
                     this.replaceApp(updated, app);
                 }
             }),
-            shareSubscribed(this.dialogs, { silent: true }));
+            shareSubscribed(this.dialogs));
     }
 
     public delete(app: AppDto): Observable<any> {
