@@ -9,8 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties

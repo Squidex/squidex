@@ -83,7 +83,7 @@ namespace Squidex.Areas.IdentityServer.Config
             return null;
         }
 
-        private Client CreateClientFromUser(UserWithClaims user)
+        private static Client CreateClientFromUser(UserWithClaims user)
         {
             return new Client
             {

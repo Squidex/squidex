@@ -95,7 +95,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types
 
         private (IGraphType ResolveType, ValueResolver Resolver) ResolveNested(IArrayField field)
         {
-            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedGraphType(model, schema, field, this.fieldName)));
+            var schemaFieldType = new ListGraphType(new NonNullGraphType(new NestedGraphType(model, schema, field, fieldName)));
 
             return (schemaFieldType, NoopResolver);
         }

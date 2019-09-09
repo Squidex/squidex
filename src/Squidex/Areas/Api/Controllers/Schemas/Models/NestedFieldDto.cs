@@ -70,7 +70,7 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
                 }
                 else
                 {
-                    AddPutLink("show", controller.Url<SchemaFieldsController>(x => nameof(x.DisableNestedField), values));
+                    AddPutLink("disable", controller.Url<SchemaFieldsController>(x => nameof(x.DisableNestedField), values));
                 }
 
                 AddPutLink("lock", controller.Url<SchemaFieldsController>(x => nameof(x.LockNestedField), values));

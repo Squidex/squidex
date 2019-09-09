@@ -11,6 +11,7 @@ using FluentAssertions;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Guards.FieldProperties

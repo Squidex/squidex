@@ -7,8 +7,8 @@
 
 using System;
 using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 
 namespace Migrate_01.OldEvents

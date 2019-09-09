@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Migrations;
 
 namespace Squidex.Domain.Apps.Events.Rules
 {

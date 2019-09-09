@@ -1,6 +1,6 @@
 <sqx-title message="{app} | More | Settings" parameter1="app" [value1]="appsState.appDisplayName"></sqx-title>
 
-<sqx-panel desiredWidth="46rem">
+<sqx-panel desiredWidth="46rem" [showClose]="false">
     <ng-container title>
         Settings
     </ng-container>
@@ -47,10 +47,9 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-auto">
-                        <div class="app-image"
+                        <div class="app-image" noDrop="true" onlyImages="true"
                             (sqxDropFile)="uploadImage($event)"
-                            [sqxDropDisabled]="uploading || !isImageEditable"
-                            [noDrop]="true">
+                            [sqxDropDisabled]="uploading || !isImageEditable">
                             <div class="app-progress" *ngIf="uploading; else notUploading">
                                 <sqx-progress-bar mode="Circle" [value]="uploadProgress"></sqx-progress-bar>
                             </div>

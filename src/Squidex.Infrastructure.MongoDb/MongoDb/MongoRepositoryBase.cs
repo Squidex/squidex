@@ -86,24 +86,6 @@ namespace Squidex.Infrastructure.MongoDb
             await SetupCollectionAsync(Collection);
         }
 
-        public async Task<bool> DropCollectionIfExistsAsync(CancellationToken ct = default)
-        {
-            try
-            {
-                await mongoDatabase.DropCollectionAsync(CollectionName(), ct);
-
-                mongoCollection = CreateCollection();
-
-                await SetupCollectionAsync(Collection, ct);
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
         public async Task InitializeAsync(CancellationToken ct = default)
         {
             try

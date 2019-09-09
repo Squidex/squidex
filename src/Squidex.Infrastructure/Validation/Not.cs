@@ -7,7 +7,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Validation
 {
     public static class Not
     {

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States
@@ -64,16 +63,6 @@ namespace Squidex.Infrastructure.States
             var snapshotStore = GetSnapshotStore<TState>();
 
             return new Persistence<TState, TKey>(key, owner, eventStore, eventEnricher, eventDataFormatter, snapshotStore, streamNameResolver, mode, applySnapshot, applyEvent);
-        }
-
-        public Task ClearSnapshotsAsync<TState>()
-        {
-            return GetSnapshotStore<TState>().ClearAsync();
-        }
-
-        public Task RemoveSnapshotAsync<TState>(TKey key)
-        {
-            return GetSnapshotStore<TState>().RemoveAsync(key);
         }
 
         public ISnapshotStore<TState, TKey> GetSnapshotStore<TState>()

@@ -26,10 +26,7 @@ namespace Squidex.Infrastructure.Orleans
                 : base(identity, runtime)
             {
                 limit.SetLimit(3, TimeSpan.FromMinutes(3));
-                Limit = limit;
             }
-
-            public IActivationLimit Limit { get; }
         }
 
         public ActivationLimiterTests()

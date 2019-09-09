@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {

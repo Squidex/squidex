@@ -73,11 +73,11 @@ namespace Squidex.Domain.Apps.Core.Operations.GenerateJsonSchema
                 {
                     if (current.Properties != null)
                     {
-                        foreach (var property in current.Properties)
+                        foreach (var (key, value) in current.Properties)
                         {
-                            result.Add(property.Key);
+                            result.Add(key);
 
-                            AddProperties(property.Value);
+                            AddProperties(value);
                         }
                     }
 

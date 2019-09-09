@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Shared;
 using Squidex.Web;

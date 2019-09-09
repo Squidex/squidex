@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 using Xunit;
 
 namespace Squidex.Infrastructure

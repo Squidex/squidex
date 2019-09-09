@@ -7,7 +7,7 @@
 
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Guards

@@ -7,6 +7,7 @@
 
 using System;
 using Newtonsoft.Json.Serialization;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.Json.Newtonsoft
 {

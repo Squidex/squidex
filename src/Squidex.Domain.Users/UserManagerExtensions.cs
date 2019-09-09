@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Users

@@ -110,7 +110,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
 }
 
 export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
-    constructor(
+    private constructor(
         private readonly value: any,
         private readonly allowHtml: boolean
     ) {
@@ -208,14 +208,14 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 }
 
-export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorFn[]> {
-    constructor(
+export class FieldsValidators implements FieldPropertiesVisitor<ValidatorFn[]> {
+    private constructor(
         private readonly isOptional: boolean
     ) {
     }
 
-    public static createValidators(field: FieldDto, isOptional: boolean) {
-        const validators = field.properties.accept(new FieldValidatorsFactory(isOptional));
+    public static create(field: FieldDto, isOptional: boolean) {
+        const validators = field.properties.accept(new FieldsValidators(isOptional));
 
         if (field.properties.isRequired && !isOptional) {
             validators.push(Validators.required);
@@ -332,9 +332,13 @@ export class FieldValidatorsFactory implements FieldPropertiesVisitor<ValidatorF
 }
 
 export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
-    constructor(
+    private constructor(
         private readonly now?: DateTime
     ) {
+    }
+
+    public static get(field: FieldDto, now?: DateTime) {
+        return field.properties.accept(new FieldDefaultValue(now));
     }
 
     public visitDateTime(properties: DateTimeFieldPropertiesDto): any {
@@ -347,10 +351,6 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
         } else {
             return properties.defaultValue;
         }
-    }
-
-    public static get(field: FieldDto, now?: DateTime) {
-        return field.properties.accept(new FieldDefaultValue(now));
     }
 
     public visitArray(_: ArrayFieldPropertiesDto): any {
@@ -394,46 +394,65 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     }
 }
 
+const NO_EMIT = { emitEvent: false };
+const NO_EMIT_SELF = { emitEvent: false, onlySelf: true };
+
+type Partition = { key: string, isOptional: boolean };
+
+export class PartitionConfig {
+    private readonly invariant: Partition[] = [{ key: fieldInvariant, isOptional: false }];
+    private readonly languages: Partition[];
+
+    constructor(languages: ImmutableArray<AppLanguageDto>) {
+        this.languages = languages.values.map(l => this.get(l));
+    }
+
+    public get(language?: AppLanguageDto) {
+        if (!language) {
+            return this.invariant[0];
+        }
+
+        return { key: language.iso2Code, isOptional: language.isOptional };
+    }
+
+    public getAll(field: RootFieldDto) {
+        return field.isLocalizable ? this.languages : this.invariant;
+    }
+}
+
 export class EditContentForm extends Form<FormGroup, any> {
+    private readonly partitions: PartitionConfig;
     private initialData: any;
 
     public value = value$(this.form);
 
-    constructor(
-        private readonly schema: SchemaDetailsDto,
-        private readonly languages: ImmutableArray<AppLanguageDto>
+    constructor(languages: ImmutableArray<AppLanguageDto>,
+        private readonly schema: SchemaDetailsDto
     ) {
         super(new FormGroup({}));
+
+        this.partitions = new PartitionConfig(languages);
 
         for (const field of schema.fields) {
             if (field.properties.isContentField) {
                 const fieldForm = new FormGroup({});
                 const fieldDefault = FieldDefaultValue.get(field);
 
-                const createControl = (isOptional: boolean) => {
-                    const validators = FieldValidatorsFactory.createValidators(field, isOptional);
+                for (let { key, isOptional } of this.partitions.getAll(field)) {
+                    const fieldValidators = FieldsValidators.create(field, isOptional);
 
                     if (field.isArray) {
-                        return new FormArray([], validators);
+                        fieldForm.setControl(key, new FormArray([], fieldValidators));
                     } else {
-                        return new FormControl(fieldDefault, validators);
+                        fieldForm.setControl(key, new FormControl(fieldDefault, fieldValidators));
                     }
-                };
-
-                if (field.isLocalizable) {
-                    for (let language of this.languages.values) {
-                        fieldForm.setControl(language.iso2Code, createControl(language.isOptional));
-                    }
-                } else {
-                    fieldForm.setControl(fieldInvariant, createControl(false));
                 }
 
                 this.form.setControl(field.name, fieldForm);
             }
         }
 
-        this.initialData = this.form.getRawValue();
-
+        this.extractPrevData();
         this.enable();
     }
 
@@ -444,85 +463,90 @@ export class EditContentForm extends Form<FormGroup, any> {
     }
 
     public arrayItemRemove(field: RootFieldDto, language: AppLanguageDto, index: number) {
-        this.findArrayItemForm(field, language).removeAt(index);
-    }
+        const partitionForm = this.findArrayItemForm(field, language);
 
-    public arrayItemInsert(field: RootFieldDto, language: AppLanguageDto, source?: FormGroup) {
-        if (field.nested.length > 0) {
-            const formControl = this.findArrayItemForm(field, language);
-
-            this.addArrayItem(field, language, formControl, source);
+        if (partitionForm) {
+            this.removeItem(partitionForm, index);
         }
     }
 
-    private addArrayItem(field: RootFieldDto, language: AppLanguageDto | null, partitionForm: FormArray, source?: FormGroup) {
+    public arrayItemInsert(field: RootFieldDto, language: AppLanguageDto, source?: FormGroup) {
+        const partitionForm = this.findArrayItemForm(field, language);
+
+        if (partitionForm && field.nested.length > 0) {
+            this.addArrayItem(partitionForm, field, this.partitions.get(language), source);
+        }
+    }
+
+    private removeItem(partitionForm: FormArray, index: number) {
+        partitionForm.removeAt(index);
+    }
+
+    private addArrayItem(partitionForm: FormArray, field: RootFieldDto, partition: Partition, source?: FormGroup) {
         const itemForm = new FormGroup({});
 
-        let isOptional = field.isLocalizable && !!language && language.isOptional;
-
-        for (let nested of field.nested) {
-            if (nested.properties.isContentField) {
-                const nestedValidators = FieldValidatorsFactory.createValidators(nested, isOptional);
-
-                let value = FieldDefaultValue.get(nested);
+        for (let nestedField of field.nested) {
+            if (nestedField.properties.isContentField) {
+                let value = FieldDefaultValue.get(nestedField);
 
                 if (source) {
-                    const sourceField = source.get(nested.name);
+                    const sourceField = source.get(nestedField.name);
 
                     if (sourceField) {
                         value = sourceField.value;
                     }
                 }
 
-                itemForm.setControl(nested.name, new FormControl(value, nestedValidators));
+                const nestedValidators = FieldsValidators.create(nestedField, partition.isOptional);
+                const nestedForm = new FormControl(value, nestedValidators);
+
+                if (nestedField.isDisabled) {
+                    nestedForm.disable(NO_EMIT);
+                }
+
+                itemForm.setControl(nestedField.name, nestedForm);
             }
         }
 
         partitionForm.push(itemForm);
     }
 
-    private findArrayItemForm(field: RootFieldDto, language: AppLanguageDto): FormArray {
-        const fieldForm = this.form.get(field.name)!;
+    private findArrayItemForm(field: RootFieldDto, language: AppLanguageDto): FormArray | null {
+        const fieldForm = this.form.get(field.name);
 
-        if (field.isLocalizable) {
-            return <FormArray>fieldForm.get(language.iso2Code)!;
+        if (!fieldForm) {
+            return null;
+        } else if (field.isLocalizable) {
+            return fieldForm.get(language.iso2Code) as FormArray;
         } else {
-            return <FormArray>fieldForm.get(fieldInvariant);
+            return fieldForm.get(fieldInvariant) as FormArray;
         }
     }
 
     public load(value: any, isInitial?: boolean) {
         for (let field of this.schema.fields) {
             if (field.isArray && field.nested.length > 0) {
-                const fieldForm = <FormGroup>this.form.get(field.name);
+                const fieldForm = this.form.get(field.name) as FormGroup;
 
-                if (!fieldForm) {
-                    continue;
-                }
+                if (fieldForm) {
+                    const fieldValue = value ? value[field.name] || {} : {};
 
-                const fieldValue = value ? value[field.name] || {} : {};
+                    for (let partition of this.partitions.getAll(field)) {
+                        const { key, isOptional } = partition;
 
-                const addControls = (key: string, language: AppLanguageDto | null) => {
-                    const partitionValidators = FieldValidatorsFactory.createValidators(field, !!language && language.isOptional);
-                    const partitionForm = new FormArray([], partitionValidators);
+                        const partitionValidators = FieldsValidators.create(field, isOptional);
+                        const partitionForm = new FormArray([], partitionValidators);
 
-                    const partitionValue = fieldValue[key];
+                        const partitionValue = fieldValue[key];
 
-                    if (Types.isArray(partitionValue)) {
-                        for (let i = 0; i < partitionValue.length; i++) {
-                            this.addArrayItem(field, language, partitionForm);
+                        if (Types.isArray(partitionValue)) {
+                            for (let i = 0; i < partitionValue.length; i++) {
+                                this.addArrayItem(partitionForm, field, partition);
+                            }
                         }
-                    }
 
-                    fieldForm.setControl(key, partitionForm);
-                };
-
-                if (field.isLocalizable) {
-                    for (let language of this.languages.values) {
-                        addControls(language.iso2Code, language);
+                        fieldForm.setControl(key, partitionForm);
                     }
-                } else {
-                    addControls(fieldInvariant, null);
                 }
             }
         }
@@ -530,53 +554,60 @@ export class EditContentForm extends Form<FormGroup, any> {
         super.load(value);
 
         if (isInitial) {
-            this.initialData = this.form.getRawValue();
+            this.extractPrevData();
         }
     }
 
-    public disable() {
-        this.form.disable({ emitEvent: false });
+    public submitCompleted(options?: { newValue?: any, noReset?: boolean }) {
+        super.submitCompleted(options);
+
+        this.extractPrevData();
+    }
+
+    protected disable() {
+        this.form.disable(NO_EMIT);
     }
 
     protected enable() {
-        if (this.schema.fields.length === 0) {
-            this.form.enable({ emitEvent: false });
-            return;
-        }
+        this.form.enable(NO_EMIT_SELF);
 
         for (const field of this.schema.fields) {
             const fieldForm = this.form.get(field.name);
 
-            if (!fieldForm) {
-                continue;
-            }
+            if (fieldForm) {
+                if (field.isArray) {
+                    fieldForm.enable(NO_EMIT_SELF);
 
-            if (field.isArray) {
-                fieldForm.enable({ emitEvent: false });
+                    for (let partitionForm of formControls(fieldForm)) {
+                        partitionForm.enable(NO_EMIT_SELF);
 
-                for (let partitionForm of formControls(fieldForm)) {
-                    for (let itemForm of formControls(partitionForm)) {
-                        for (let nested of field.nested) {
-                            const nestedForm = itemForm.get(nested.name);
+                        for (let itemForm of formControls(partitionForm)) {
+                            itemForm.enable(NO_EMIT_SELF);
 
-                            if (!nestedForm) {
-                                continue;
-                            }
+                            for (let nestedField of field.nested) {
+                                const nestedForm = itemForm.get(nestedField.name);
 
-                            if (nested.isDisabled) {
-                                nestedForm.disable({ emitEvent: false });
-                            } else {
-                                nestedForm.enable({ emitEvent: false });
+                                if (nestedForm) {
+                                    if (nestedField.isDisabled) {
+                                        nestedForm.disable(NO_EMIT);
+                                    } else {
+                                        nestedForm.enable(NO_EMIT);
+                                    }
+                                }
                             }
                         }
                     }
+                } else if (field.isDisabled) {
+                    fieldForm.disable(NO_EMIT);
+                } else {
+                    fieldForm.enable(NO_EMIT);
                 }
-            } else if (field.isDisabled) {
-                fieldForm.disable({ emitEvent: false });
-            } else {
-                fieldForm.enable({ emitEvent: false });
             }
         }
+    }
+
+    private extractPrevData() {
+        this.initialData = this.form.getRawValue();
     }
 }
 
@@ -588,7 +619,7 @@ export class PatchContentForm extends Form<FormGroup, any> {
         super(new FormGroup({}));
 
         for (let field of this.schema.listFieldsEditable) {
-            const validators = FieldValidatorsFactory.createValidators(field, this.language.isOptional);
+            const validators = FieldsValidators.create(field, this.language.isOptional);
 
             this.form.setControl(field.name, new FormControl(undefined, validators));
         }

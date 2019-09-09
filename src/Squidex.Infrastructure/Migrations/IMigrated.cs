@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Caching
+namespace Squidex.Infrastructure.Migrations
 {
-    public interface IInvalidatingCache
+    public interface IMigrated<out T>
     {
-        void Invalidate(object key);
+        T Migrate();
     }
 }

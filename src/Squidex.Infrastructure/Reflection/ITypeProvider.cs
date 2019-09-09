@@ -1,18 +1,14 @@
 ﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
-//  Copyright (c) Squidex UG (haftungsbeschränkt)
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Reflection
 {
-    public interface IPubSub
+    public interface ITypeProvider
     {
-        void Publish<T>(T value, bool notifySelf);
-
-        IDisposable Subscribe<T>(Action<T> handler);
+        void Map(TypeNameRegistry typeNameRegistry);
     }
 }

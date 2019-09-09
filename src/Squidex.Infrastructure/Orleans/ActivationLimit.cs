@@ -44,9 +44,9 @@ namespace Squidex.Infrastructure.Orleans
             }
         }
 
-        public void SetLimit(int maxActivations, TimeSpan lifetime)
+        public void SetLimit(int activations, TimeSpan lifetime)
         {
-            this.maxActivations = maxActivations;
+            maxActivations = activations;
 
             context.ObservableLifecycle?.Subscribe("Limiter", GrainLifecycleStage.Activate,
                 ct =>

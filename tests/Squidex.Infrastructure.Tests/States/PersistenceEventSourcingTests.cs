@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
 using Xunit;
 

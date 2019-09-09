@@ -34,7 +34,7 @@ namespace Squidex.Infrastructure.Assets
             }
         }
 
-        private byte[] GenerateTestData(int length = 1000)
+        private static byte[] GenerateTestData(int length = 1000)
         {
             var random = new Random();
             var result = new byte[length];

@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {

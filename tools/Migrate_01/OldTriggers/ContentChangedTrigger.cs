@@ -10,7 +10,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.Reflection;
 
 namespace Migrate_01.OldTriggers
 {

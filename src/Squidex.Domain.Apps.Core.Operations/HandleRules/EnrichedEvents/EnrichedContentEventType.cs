@@ -14,6 +14,6 @@ namespace Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents
         Published,
         StatusChanged,
         Updated,
-        Unpublished,
+        Unpublished
     }
 }

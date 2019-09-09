@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure
+using System.Collections.Generic;
+
+namespace Squidex.Infrastructure.Validation
 {
-    public interface IMigrated<out T>
+    public interface IValidatable
     {
-        T Migrate();
+        void Validate(IList<ValidationError> errors);
     }
 }

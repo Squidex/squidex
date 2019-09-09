@@ -11,7 +11,7 @@ namespace Squidex.Infrastructure.Orleans
 {
     public interface IActivationLimit
     {
-        void SetLimit(int maxActivations, TimeSpan lifetime);
+        void SetLimit(int activations, TimeSpan lifetime);
 
         void ReportIAmAlive();
 

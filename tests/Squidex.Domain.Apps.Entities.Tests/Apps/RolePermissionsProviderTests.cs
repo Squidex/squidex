@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 .Returns(new List<ISchemaEntity>
                 {
                     Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), "schema1")),
-                    Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), "schema2")),
+                    Mocks.Schema(appId, NamedId.Of(Guid.NewGuid(), "schema2"))
                 });
 
             var result = await sut.GetPermissionsAsync(app);

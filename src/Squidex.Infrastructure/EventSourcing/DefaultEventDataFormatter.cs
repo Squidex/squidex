@@ -8,6 +8,8 @@
 using System;
 using System.Diagnostics;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.EventSourcing
 {

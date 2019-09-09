@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Users.Models;
 using Squidex.Domain.Users;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
 

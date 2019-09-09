@@ -1,5 +1,26 @@
 # Changelog
 
+## 3.3.0 - 2019-09-08
+
+### Features
+
+* **UI**: Autosaving for content in local store.
+* **UI**: Labels, descriptions and icons for contents.
+* **UI**: Bulk import for contributors.
+* **UI**: Pagination and search for contributors.
+* **UI**: Improve file size for generated javascript bundles.
+* **Rules**: Configurable default timeout for rule execution.
+* **Assets**: Use asset url with slug when adding assets to rich text or markdown.
+* **API**: Client per user.
+* **API**: Limits for number of living content grains.
+
+### Bugfixes
+
+* **UI**: Fix for dynamic chunk loading.
+* **UI**: Styling fixes for date editor.
+* **UI**: Improvement and fixes for checking unsaving changes.
+* **API**: Fixes hateaos links for nested schema fields.
+
 ## 3.2.2 - 2019-08-20
 
 ### Bugfixes

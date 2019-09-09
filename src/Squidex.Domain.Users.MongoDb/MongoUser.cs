@@ -23,11 +23,6 @@ namespace Squidex.Domain.Users.MongoDb
 
         public HashSet<string> Roles { get; set; } = new HashSet<string>();
 
-        internal IdentityUserToken<string> FindTokenAsync(string loginProvider, string name)
-        {
-            return Tokens.FirstOrDefault(x => x.LoginProvider == loginProvider && x.Name == name);
-        }
-
         internal void AddLogin(UserLoginInfo login)
         {
             Logins.Add(new UserLoginInfo(login.LoginProvider, login.ProviderKey, login.ProviderDisplayName));

@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Guards
 {

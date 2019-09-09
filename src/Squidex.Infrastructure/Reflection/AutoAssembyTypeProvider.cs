@@ -5,15 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Threading.Tasks;
-using Orleans.Concurrency;
-
-namespace Squidex.Infrastructure.Orleans
+namespace Squidex.Infrastructure.Reflection
 {
-    public interface IDeactivatableGrain
+    public sealed class AutoAssembyTypeProvider<T> : ITypeProvider
     {
-        [AlwaysInterleave]
-        [OneWay]
-        Task DeactivateAsync();
+        public void Map(TypeNameRegistry typeNameRegistry)
+        {
+            typeNameRegistry.MapUnmapped(typeof(T).Assembly);
+        }
     }
 }

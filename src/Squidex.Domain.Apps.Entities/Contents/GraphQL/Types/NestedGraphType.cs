@@ -9,7 +9,6 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types

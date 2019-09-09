@@ -57,52 +57,45 @@ export const fieldTypes: { type: FieldType, description: string }[] = [
 
 export const fieldInvariant = 'iv';
 
-export function createProperties(fieldType: FieldType, values: Object | null = null): FieldPropertiesDto {
+export function createProperties(fieldType: FieldType, values?: any): FieldPropertiesDto {
     let properties: FieldPropertiesDto;
 
     switch (fieldType) {
         case 'Array':
-            properties = new ArrayFieldPropertiesDto();
+            properties = new ArrayFieldPropertiesDto(values);
             break;
         case 'Assets':
-            properties = new AssetsFieldPropertiesDto();
+            properties = new AssetsFieldPropertiesDto(values);
             break;
         case 'Boolean':
-            properties = new BooleanFieldPropertiesDto('Checkbox');
+            properties = new BooleanFieldPropertiesDto('Checkbox', values);
             break;
         case 'DateTime':
-            properties = new DateTimeFieldPropertiesDto('DateTime');
+            properties = new DateTimeFieldPropertiesDto('DateTime', values);
             break;
         case 'Geolocation':
-            properties = new GeolocationFieldPropertiesDto();
+            properties = new GeolocationFieldPropertiesDto(values);
             break;
         case 'Json':
-            properties = new JsonFieldPropertiesDto();
+            properties = new JsonFieldPropertiesDto(values);
             break;
         case 'Number':
-            properties = new NumberFieldPropertiesDto('Input');
+            properties = new NumberFieldPropertiesDto('Input', values);
             break;
         case 'References':
-            properties = new ReferencesFieldPropertiesDto('List');
+            properties = new ReferencesFieldPropertiesDto('List', values);
             break;
         case 'String':
-            properties = new StringFieldPropertiesDto('Input');
+            properties = new StringFieldPropertiesDto('Input', values);
             break;
         case 'Tags':
-            properties = new TagsFieldPropertiesDto('Tags');
-            break;
-        case 'Tags':
-            properties = new TagsFieldPropertiesDto('Tags');
+            properties = new TagsFieldPropertiesDto(values);
             break;
         case 'UI':
-            properties = new UIFieldPropertiesDto();
+            properties = new UIFieldPropertiesDto(values);
             break;
         default:
             throw 'Invalid properties type';
-    }
-
-    if (values) {
-        Object.assign(properties, values);
     }
 
     return properties;
@@ -387,7 +380,7 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto {
         return false;
     }
 
-    constructor(editor: string,
+    constructor(
         props?: Partial<TagsFieldPropertiesDto>
     ) {
         super('Tags', props);

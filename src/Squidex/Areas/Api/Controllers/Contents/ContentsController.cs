@@ -63,15 +63,15 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQL(string app, [FromBody] GraphQLQuery query)
         {
-            var result = await graphQl.QueryAsync(Context, query);
+            var (hasError, response) = await graphQl.QueryAsync(Context, query);
 
-            if (result.HasError)
+            if (hasError)
             {
-                return BadRequest(result.Response);
+                return BadRequest(response);
             }
             else
             {
-                return Ok(result.Response);
+                return Ok(response);
             }
         }
 
@@ -94,15 +94,15 @@ namespace Squidex.Areas.Api.Controllers.Contents
         [ApiCosts(2)]
         public async Task<IActionResult> PostGraphQLBatch(string app, [FromBody] GraphQLQuery[] batch)
         {
-            var result = await graphQl.QueryAsync(Context, batch);
+            var (hasError, response) = await graphQl.QueryAsync(Context, batch);
 
-            if (result.HasError)
+            if (hasError)
             {
-                return BadRequest(result.Response);
+                return BadRequest(response);
             }
             else
             {
-                return Ok(result.Response);
+                return Ok(response);
             }
         }
 
@@ -281,7 +281,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var command = new CreateContent { ContentId = Guid.NewGuid(), Data = request.ToCleaned(), Publish = publish };
 
-            var response = await InvokeCommandAsync(app, name, command);
+            var response = await InvokeCommandAsync(command);
 
             return CreatedAtAction(nameof(GetContent), new { app, id = command.ContentId }, response);
         }
@@ -313,7 +313,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var command = new UpdateContent { ContentId = id, Data = request.ToCleaned(), AsDraft = asDraft };
 
-            var response = await InvokeCommandAsync(app, name, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -345,7 +345,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var command = new PatchContent { ContentId = id, Data = request.ToCleaned(), AsDraft = asDraft };
 
-            var response = await InvokeCommandAsync(app, name, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -376,7 +376,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var command = request.ToCommand(id);
 
-            var response = await InvokeCommandAsync(app, name, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -406,7 +406,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
 
             var command = new DiscardChanges { ContentId = id };
 
-            var response = await InvokeCommandAsync(app, name, command);
+            var response = await InvokeCommandAsync(command);
 
             return Ok(response);
         }
@@ -439,7 +439,7 @@ namespace Squidex.Areas.Api.Controllers.Contents
             return NoContent();
         }
 
-        private async Task<ContentDto> InvokeCommandAsync(string app, string schema, ICommand command)
+        private async Task<ContentDto> InvokeCommandAsync(ICommand command)
         {
             var context = await CommandBus.PublishAsync(command);
 

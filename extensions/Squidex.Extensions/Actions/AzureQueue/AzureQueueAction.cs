@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.AzureQueue
 {

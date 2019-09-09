@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
         {
             Guard.NotNull(log, nameof(log));
 
-            return new Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>(next =>
+            return next =>
             {
                 return async context =>
                 {
@@ -37,12 +37,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         throw;
                     }
                 };
-            });
+            };
         }
 
         public static Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Errors()
         {
-            return new Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>(next =>
+            return next =>
             {
                 return async context =>
                 {
@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
                         throw new ExecutionError(ex.Message);
                     }
                 };
-            });
+            };
         }
     }
 }

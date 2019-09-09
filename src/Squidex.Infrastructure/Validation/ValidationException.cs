@@ -11,7 +11,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace Squidex.Infrastructure
+namespace Squidex.Infrastructure.Validation
 {
     [Serializable]
     public class ValidationException : DomainException

@@ -51,14 +51,14 @@ namespace Squidex.Infrastructure.Migrations
 
                 while (true)
                 {
-                    var migrationStep = migrationPath.GetNext(version);
+                    var (newVersion, migrations) = migrationPath.GetNext(version);
 
-                    if (migrationStep.Migrations == null || !migrationStep.Migrations.Any())
+                    if (migrations == null || !migrations.Any())
                     {
                         break;
                     }
 
-                    foreach (var migration in migrationStep.Migrations)
+                    foreach (var migration in migrations)
                     {
                         var name = migration.GetType().ToString();
 
@@ -88,7 +88,7 @@ namespace Squidex.Infrastructure.Migrations
                         }
                     }
 
-                    version = migrationStep.Version;
+                    version = newVersion;
                 }
             }
             finally

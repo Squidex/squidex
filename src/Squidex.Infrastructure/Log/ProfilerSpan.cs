@@ -12,9 +12,9 @@ namespace Squidex.Infrastructure.Log
 {
     public sealed class ProfilerSpan : IDisposable
     {
-        private readonly ValueStopwatch watch = ValueStopwatch.StartNew();
         private readonly ProfilerSession session;
         private readonly string key;
+        private ValueStopwatch watch = ValueStopwatch.StartNew();
         private List<IDisposable> hooks;
 
         public string Key

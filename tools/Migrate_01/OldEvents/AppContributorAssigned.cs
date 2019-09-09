@@ -8,8 +8,8 @@
 using System;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using AppContributorAssignedV2 = Squidex.Domain.Apps.Events.Apps.AppContributorAssigned;
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -58,14 +57,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return result.CreateLinks(controller, app.Name);
         }
 
-        private ContributorsDto WithPlan(IAppEntity app, IAppPlansProvider plans)
+        private void WithPlan(IAppEntity app, IAppPlansProvider plans)
         {
             MaxContributors = plans.GetPlanForApp(app).MaxContributors;
-
-            return this;
         }
 
-        private ContributorsDto WithInvited(bool isInvited)
+        private void WithInvited(bool isInvited)
         {
             if (isInvited)
             {
@@ -74,8 +71,6 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                     IsInvited = isInvited.ToString()
                 };
             }
-
-            return this;
         }
 
         private ContributorsDto CreateLinks(ApiController controller, string app)

@@ -11,6 +11,7 @@ using Newtonsoft.Json.Converters;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Queries.Json;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.TestHelpers
 {

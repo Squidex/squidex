@@ -8,7 +8,6 @@
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
 
@@ -33,17 +32,16 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents
 
         public Task On(Envelope<IEvent> @event)
         {
-            return this.DispatchActionAsync(@event.Payload);
-        }
+            switch (@event.Payload)
+            {
+                case AssetDeleted e:
+                    return contents.CleanupAsync(e.AssetId);
 
-        protected Task On(AssetDeleted @event)
-        {
-            return contents.CleanupAsync(@event.AssetId);
-        }
+                case ContentDeleted e:
+                    return contents.CleanupAsync(e.ContentId);
+            }
 
-        protected Task On(ContentDeleted @event)
-        {
-            return contents.CleanupAsync(@event.ContentId);
+            return TaskHelper.Done;
         }
 
         Task IEventConsumer.ClearAsync()

@@ -11,7 +11,8 @@ using System.Linq;
 using FluentAssertions;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.Reflection;
 using Xunit;
 
 #pragma warning disable SA1310 // Field names must not contain underscore

@@ -51,20 +51,10 @@ export class FileDropDirective {
             return;
         }
 
-        const result: File[] = [];
+        const files = this.getAllowedFiles(event.clipboardData);
 
-        if (event.clipboardData) {
-            for (let i = 0; i < event.clipboardData.items.length; i++) {
-                const file = event.clipboardData.items[i].getAsFile();
-
-                if (this.isAllowedFile(file)) {
-                    result.push(file!);
-                }
-            }
-        }
-
-        if (result.length > 0 && !this.disabled) {
-            this.drop.emit(result);
+        if (files && !this.disabled) {
+            this.drop.emit(files);
         }
 
         this.stopEvent(event);
@@ -73,48 +63,38 @@ export class FileDropDirective {
     @HostListener('dragend', ['$event'])
     @HostListener('dragleave', ['$event'])
     public onDragEnd(event: DragDropEvent) {
-        const hasFiles = this.hasFiles(event.dataTransfer.types);
+        const hasFile = this.hasAllowedFile(event.dataTransfer);
 
-        if (hasFiles) {
+        if (hasFile) {
             this.dragEnd();
         }
     }
 
     @HostListener('dragenter', ['$event'])
     public onDragEnter(event: DragDropEvent) {
-        const hasFiles = this.hasFiles(event.dataTransfer.types);
+        const hasFile = this.hasAllowedFile(event.dataTransfer);
 
-        if (hasFiles) {
+        if (hasFile) {
             this.dragStart();
         }
     }
 
     @HostListener('dragover', ['$event'])
     public onDragOver(event: DragDropEvent) {
-        const hasFiles = this.hasFiles(event.dataTransfer.types);
+        const isFiles = hasFiles(event.dataTransfer);
 
-        if (hasFiles) {
+        if (isFiles) {
             this.stopEvent(event);
         }
     }
 
     @HostListener('drop', ['$event'])
     public onDrop(event: DragDropEvent) {
-        const hasFiles = this.hasFiles(event.dataTransfer.types);
+        if (hasFiles(event.dataTransfer)) {
+            const files = this.getAllowedFiles(event.dataTransfer);
 
-        if (hasFiles) {
-            const result: File[] = [];
-
-            for (let i = 0; i < event.dataTransfer.files.length; i++) {
-                const file = event.dataTransfer.files.item(i);
-
-                if (this.isAllowedFile(file)) {
-                    result.push(file!);
-                }
-            }
-
-            if (result.length > 0) {
-                this.drop.emit(result);
+            if (files && !this.disabled) {
+                this.drop.emit(files);
             }
 
             this.dragEnd(0);
@@ -143,22 +123,84 @@ export class FileDropDirective {
         }
     }
 
-    private isAllowedFile(file: File | null) {
-        return file && (!this.allowedFiles || this.allowedFiles.indexOf(file.type) >= 0) && (!this.onlyImages || ImageTypes.indexOf(file.type) >= 0);
+    private getAllowedFiles(dataTransfer: DataTransfer | null) {
+        if (!dataTransfer || !hasFiles(dataTransfer)) {
+            return null;
+        }
+
+        let files: File[] = [];
+
+        for (let i = 0; i < dataTransfer.files.length; i++) {
+            const file = dataTransfer.files.item(i);
+
+            if (file && this.isAllowedFile(file)) {
+                files.push(file);
+            }
+        }
+
+        if (files.length === 0) {
+            for (let i = 0; i < dataTransfer.items.length; i++) {
+                const file = dataTransfer.items[i].getAsFile();
+
+                if (file && this.isAllowedFile(file)) {
+                    files.push(file);
+                }
+            }
+        }
+
+        return files.length > 0 ? files : null;
     }
 
-    private hasFiles(types: any): boolean {
-        if (!types) {
-            return false;
+    private hasAllowedFile(dataTransfer: DataTransfer | null) {
+        if (!dataTransfer || !hasFiles(dataTransfer)) {
+            return null;
         }
 
-        if (Types.isFunction(types.indexOf)) {
-            return types.indexOf('Files') !== -1;
-        } else if (Types.isFunction(types.contains)) {
-            return types.contains('Files');
-        } else {
-            return false;
+        for (let i = 0; i < dataTransfer.files.length; i++) {
+            const file = dataTransfer.files.item(i);
+
+            if (file && this.isAllowedFile(file)) {
+                return true;
+            }
         }
+
+        for (let i = 0; i < dataTransfer.items.length; i++) {
+            const file = dataTransfer.items[i];
+
+            if (file && this.isAllowedFile(file)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private isAllowedFile(file: { type: string }) {
+        return this.isAllowed(file) && this.isImage(file);
+    }
+
+    private isAllowed(file: { type: string }) {
+        return !this.allowedFiles || this.allowedFiles.indexOf(file.type) >= 0;
+    }
+
+    private isImage(file: { type: string }) {
+        return !this.onlyImages || ImageTypes.indexOf(file.type) >= 0;
+    }
+}
+
+function hasFiles(dataTransfer: DataTransfer): boolean {
+    if (!dataTransfer || !dataTransfer.types) {
+        return false;
+    }
+
+    const types: any = dataTransfer.types;
+
+    if (Types.isFunction(types.indexOf)) {
+        return types.indexOf('Files') !== -1;
+    } else if (Types.isFunction(types.contains)) {
+        return types.contains('Files');
+    } else {
+        return false;
     }
 }
 

@@ -177,7 +177,7 @@ namespace Squidex.Domain.Apps.Entities.History.Notifications
                 AppId = NamedId.Of(Guid.NewGuid(), appName),
                 ContributorId = assigneeId,
                 IsCreated = isNewUser,
-                IsAdded = isNewContributor,
+                IsAdded = isNewContributor
             };
 
             var envelope = Envelope.Create(@event);

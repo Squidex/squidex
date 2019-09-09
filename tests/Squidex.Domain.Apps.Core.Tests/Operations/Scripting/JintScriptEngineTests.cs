@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting
