@@ -29,13 +29,7 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
         });
     }
 
-    let isCleanup = false;
-
     function cleanup() {
-        if (isCleanup) {
-            return;
-        }
-
         console.log('Cleaning');
 
         browser.close();
@@ -77,28 +71,20 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
         onPrepare: async () => {
             console.log('Preparing');
 
-            try {
-                addAllure();
+            addAllure();
 
-                if (options.setup) {
-                    startMongoDb();
-                    startSquidex();
+            if (options.setup) {
+                startMongoDb();
+                startSquidex();
 
-                    await runDeployment(options.url);
-                }
-
-                browser.manage().timeouts().implicitlyWait(5000);
-                browser.driver
-                    .manage()
-                    .window()
-                    .maximize();
-            } catch (ex) {
-                browser.close();
-
-                cleanup();
-
-                throw ex;
+                await runDeployment(options.url);
             }
+
+            browser.manage().timeouts().implicitlyWait(5000);
+            browser.driver
+                .manage()
+                .window()
+                .maximize();
 
             console.log('Prepared');
         },
@@ -110,10 +96,6 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
         getPageTimeout: 50000,
 
         // Before performing any action, Protractor waits until there are no pending asynchronous tasks in your Angular application.
-        allScriptsTimeout: 50000,
-
-        onCleanup: () => {
-            cleanup();
-        }
+        allScriptsTimeout: 50000
     };
 }

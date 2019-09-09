@@ -39,7 +39,7 @@ export async function runDeployment(baseUrl: string) {
 
     console.log('[Deployment] Starting');
 
-    await runCommand(`cd ../tools/DeploymentApp/DeploymentApp && dotnet run --url ${baseUrl} --skip-rules --create-test-data`, false);
+    await runCommand(`cd ../tools/DeploymentApp/DeploymentApp && dotnet run --url=${baseUrl} --skipRules=true --createTestData=true`, false);
 
     console.log('[Deployment] Completed');
 }

@@ -40,7 +40,7 @@ export function stopSquidex() {
     if (squidex) {
         console.log('[Squidex] Stopping');
 
-        squidex.kill('SIGKILL');
+        squidex.kill();
 
         console.log('[Squidex] Stopped');
     }
