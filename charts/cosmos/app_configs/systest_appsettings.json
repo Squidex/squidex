@@ -1,0 +1,46 @@
+{
+    "eventStore": {
+      "mongoDb": {
+        /*
+         * The connection string to your Mongo Server.
+         * 
+         * Read More: https://docs.mongodb.com/manual/reference/connection-string/
+         */
+        "configuration": "mongodb+srv://cosmos-systest-db-admin:fjYTXZzk6dqqDdl4@cha-pre-live-ak0n6.mongodb.net",
+        /*
+         * The name of the event store database.
+         */
+        "database": "cosmos-squidex-systest"
+      }
+    },
+  
+    "store": {
+      /*
+       * Define the type of the read store. 
+       * 
+       * Supported: MongoDb
+       */
+      "type": "MongoDb",
+      "mongoDb": {
+        /*
+         * The connection string to your Mongo Server.
+         * 
+         * Read More: https://docs.mongodb.com/manual/reference/connection-string/
+         */
+        "configuration": "mongodb+srv://cosmos-systest-db-admin:fjYTXZzk6dqqDdl4@cha-pre-live-ak0n6.mongodb.net",
+        /*
+         * The database for all your content collections (one collection per app).
+         */
+        "contentDatabase": "cosmos-squidexContent-systest",
+        /*
+         * The database for all your other read collections.
+         */
+        "database": "cosmos-squidex-systest"
+      }
+    },
+  
+    "identity": {
+      "icisAuthServer": "https://identityservice.systest.tesla.cha.rbxd.ds"
+    }
+  }
+  
