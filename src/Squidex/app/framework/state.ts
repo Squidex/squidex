@@ -167,19 +167,19 @@ export class State<T extends {}> {
         return this.state.value;
     }
 
-    public project<M>(project1: (value: T) => M, compare?: (x: M, y: M) => boolean) {
+    public project<M>(project: (value: T) => M, compare?: (x: M, y: M) => boolean) {
         return this.changes.pipe(
-            map(x => project1(x)), distinctUntilChanged(compare), shareReplay());
+            map(x => project(x)), distinctUntilChanged(compare), shareReplay(1));
     }
 
     public projectFrom<M, N>(source: Observable<M>, project: (value: M) => N, compare?: (x: N, y: N) => boolean) {
         return source.pipe(
-            map(x => project(x)), distinctUntilChanged(compare), shareReplay());
+            map(x => project(x)), distinctUntilChanged(compare), shareReplay(1));
     }
 
     public projectFrom2<M, N, O>(lhs: Observable<M>, rhs: Observable<N>, project: (l: M, r: N) => O, compare?: (x: O, y: O) => boolean) {
         return combineLatest(lhs, rhs, (x, y) => project(x, y)).pipe(
-            distinctUntilChanged(compare), shareReplay());
+            distinctUntilChanged(compare), shareReplay(1));
     }
 
     constructor(state: Readonly<T>) {

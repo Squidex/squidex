@@ -145,7 +145,7 @@ namespace Squidex.Infrastructure.States
             var persistedEvents = new List<IEvent>();
             var persistence = sut.WithEventSourcing(None.Type, key, x => persistedEvents.Add(x.Payload));
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.ReadAsync(1));
+            await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.ReadAsync(1));
         }
 
         [Fact]
@@ -160,7 +160,7 @@ namespace Squidex.Infrastructure.States
             var persistedEvents = new List<IEvent>();
             var persistence = sut.WithSnapshotsAndEventSourcing(None.Type, key, (int x) => persistedState = x, x => persistedEvents.Add(x.Payload));
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.ReadAsync(1));
+            await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.ReadAsync(1));
         }
 
         [Fact]
@@ -209,7 +209,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => eventStore.AppendAsync(A<Guid>.Ignored, key, 2, A<ICollection<EventData>>.That.Matches(x => x.Count == 1)))
                 .Throws(new WrongEventVersionException(1, 1));
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.WriteEventAsync(Envelope.Create(new MyEvent())));
+            await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.WriteEventAsync(Envelope.Create(new MyEvent())));
         }
 
         [Fact]

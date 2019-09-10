@@ -77,7 +77,7 @@ namespace Squidex.Infrastructure.States
                 }
                 else
                 {
-                    throw new DomainObjectVersionException(ownerKey.ToString(), ownerType, version, expectedVersion);
+                    throw new InconsistentStateException(version, expectedVersion);
                 }
             }
         }
@@ -134,14 +134,7 @@ namespace Squidex.Infrastructure.States
 
             if (newVersion != versionSnapshot)
             {
-                try
-                {
-                    await snapshotStore.WriteAsync(ownerKey, state, versionSnapshot, newVersion);
-                }
-                catch (InconsistentStateException ex)
-                {
-                    throw new DomainObjectVersionException(ownerKey.ToString(), ownerType, ex.CurrentVersion, ex.ExpectedVersion);
-                }
+                await snapshotStore.WriteAsync(ownerKey, state, versionSnapshot, newVersion);
 
                 versionSnapshot = newVersion;
             }
@@ -175,7 +168,7 @@ namespace Squidex.Infrastructure.States
                 }
                 catch (WrongEventVersionException ex)
                 {
-                    throw new DomainObjectVersionException(ownerKey.ToString(), ownerType, ex.CurrentVersion, ex.ExpectedVersion);
+                    throw new InconsistentStateException(ex.CurrentVersion, ex.ExpectedVersion, ex);
                 }
 
                 versionEvents += eventArray.Length;
