@@ -13,7 +13,11 @@ namespace DeploymentApp
 
         public string ClientId { get; set; } = "CMSDeployer";
 
-        public string ClientSecret { get; set; } = "55w0rd";
+        public string ClientSecret { get; set; } = "p@55w0rd";
+
+        public bool SkipRules { get; set; }
+
+        public bool GenerateTestData { get; set; }
 
         public bool Validate()
         {

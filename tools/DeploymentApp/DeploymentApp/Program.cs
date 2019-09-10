@@ -70,9 +70,30 @@ namespace DeploymentApp
                     await clientManager.UpsertWorkflow(workflow);
                 }
 
-                foreach (var rule in Rules.AllKafkaRules)
+                if (!options.SkipRules)
                 {
-                    await clientManager.UpsertKafkaRule(rule);
+                    foreach (var rule in Rules.AllKafkaRules)
+                    {
+                        await clientManager.UpsertKafkaRule(rule);
+                    }
+                }
+
+                if (options.GenerateTestData)
+                {
+                    foreach (var (id, name) in TestData.CommentaryTypes)
+                    {
+                        await clientManager.CreateContentAsync("commentary-type", id, name);
+                    }
+
+                    foreach (var (id, name) in TestData.Regions)
+                    {
+                        await clientManager.CreateContentAsync("region", id, name);
+                    }
+
+                    foreach (var (id, name) in TestData.Commodities)
+                    {
+                        await clientManager.CreateContentAsync("commodity", id, name);
+                    }
                 }
 
                 return 0;

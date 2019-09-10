@@ -30,6 +30,6 @@ appsettings.Development.json
 appsettings.Production.json
 launchSettings.json
 
-JSFiles
-allure-results
-database
+_database
+_out
+_screenshots

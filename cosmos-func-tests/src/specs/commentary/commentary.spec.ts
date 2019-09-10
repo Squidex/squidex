@@ -1,16 +1,20 @@
-import { config } from '../../config';
-import { ILoginData } from '../../data/ILoginData';
-import { ContentPage } from '../../pages/ContentPage.po';
-import { HomePage } from '../../pages/HomePage.po';
-import { LoginPage } from '../../pages/LoginPage.po';
-import { SearchPage } from '../../pages/SearchPage.po';
-import { BrowserUtil } from '../../utils/Browser.util';
-import constants from '../../utils/constants';
+import { browser } from 'protractor';
 
+import {
+    BrowserUtil,
+    constants,
+    Users
+} from './../../utils';
+
+import {
+    ContentPage,
+    HomePage,
+    LoginPage,
+    SearchPage
+} from './../../pages';
 
 describe('Create Commentary', () => {
-  const loginData = require('../../../data/login.json');
-  const authors: ILoginData[] = loginData.authors;
+  const authors = Users;
   let loginPage: LoginPage;
   let homePage: HomePage;
   let browserPage: BrowserUtil;
@@ -42,11 +46,12 @@ describe('Create Commentary', () => {
 
 
   it('Login with Vega Editor credentials', async () => {
-    await expect(browserPage.getCurrentURL()).toBe(
-      config.params.expectedUrlAfterNavigation
+    expect(await browserPage.getCurrentURL()).toBe(
+      `${browser.params.baseUrl}/app`
     );
     const text = await homePage.userNameDisplay();
-    await expect(text).toEqual(constants.editorWelcomeMessage);
+
+    expect(text).toEqual(constants.editorWelcomeMessage);
   });
 
   using([{ commodityValue: constants.partialCommodityText, commentaryTypeValue: constants.partialCommentaryTypeText, regionValue: constants.partialRegionText },

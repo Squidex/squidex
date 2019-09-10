@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    /* Basic Options */
     "target": "es6",                          
     "module": "commonjs",         
     "moduleResolution": "node",
@@ -11,19 +10,19 @@
     "noUnusedParameters": true,   
     "removeComments": false,             
     "preserveConstEnums": true,    
-    "outDir": "JSFiles",                     
-    "esModuleInterop": true    ,
-    "types": ["jasmine", "node", "jasmine-expect"],                   
+    "outDir": "_out",                     
+    "esModuleInterop": true,
+    "types": [
+      "jasmine", 
+      "jasmine-expect",
+      "node"
+    ],                   
   },
   "exclude": [
-    "node_modules",
-    "asyncAwait",
+    "node_modules"
   ],
   "include":[
-    "specs/**/*.ts",
-    "pages/*.ts",
-    "utils/*.ts",
-    "data/*.ts"
+    "src/**/*.ts",
   ],
   "compileOnSave": false
 }

@@ -1,21 +1,14 @@
-import { ElementFinder } from 'protractor';
-import {
-    browser,
-    by,
-    element,
-    protractor
-} from 'protractor';
-import { BrowserUtil } from '../utils/Browser.util';
+import { browser, by, element, ElementFinder, protractor } from 'protractor';
 
+import { BrowserUtil } from './../utils';
 
 export class ContentPage extends BrowserUtil {
-
     // Create Commentary after Navigating to Commentary Page under Content
     public searchResult = element.all(by.xpath('//span[@class=\'truncate ng-star-inserted\']/b'));
 
     public calendar = element(by.xpath('//div[@class=\'input-group\']/input'));
 
-    public getCommentaryEditor = element(by.xpath('//iframe[@src=\'https://localhost:5000/editors/toastui/md-editor.html\']'));
+    public getCommentaryEditor = element(by.xpath('//iframe[@src=\'http://localhost:5000/editors/toastui/md-editor.html\']'));
 
     public async getSearchBar() {
         return await element(by.xpath('//input[@placeholder=\'Search\']'));
