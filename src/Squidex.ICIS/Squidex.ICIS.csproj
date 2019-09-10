@@ -15,6 +15,7 @@
     <PackageReference Include="Confluent.SchemaRegistry" Version="1.0.1.1" />
     <PackageReference Include="Confluent.SchemaRegistry.Serdes" Version="1.0.1.1" />
     <PackageReference Include="FakeItEasy" Version="5.1.1" />
+    <PackageReference Include="Markdig" Version="0.17.1" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
