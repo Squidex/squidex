@@ -43,7 +43,7 @@ $color-apps-border: #65a6ff;
     }
 
     &-menu {
-        @include absolute($size-navbar-height, auto, auto, 9rem);
+        @include absolute($size-navbar-height - .5rem, auto, auto, 0);
         margin: 0;
     }
 
