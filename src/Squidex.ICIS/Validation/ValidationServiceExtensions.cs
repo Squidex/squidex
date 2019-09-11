@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Squidex.ICIS.Validation.Validators;
 using Squidex.Infrastructure.Commands;
 
 namespace Squidex.ICIS.Validation
@@ -12,7 +13,10 @@ namespace Squidex.ICIS.Validation
 
         private static void AddValidationCommandMiddleware(IServiceCollection services)
         {
-            services.AddSingleton<ICustomCommandMiddleware, CommentaryValidationCommand>();
+            services.AddSingleton<ICommentaryValidator, CommentaryUniquenessValidator>();
+            services.AddSingleton<ICommentaryValidator, CommentaryCharacterCountValidator>();
+
+            services.AddSingleton<ICustomCommandMiddleware, CommentaryCommandMiddleware>();
         }
     }
 }

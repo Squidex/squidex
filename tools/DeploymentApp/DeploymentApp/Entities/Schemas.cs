@@ -125,6 +125,17 @@ namespace DeploymentApp.Entities
                                 IsUnique = true,
                                 Label = "Name"
                             }
+                        },
+
+                        new UpsertSchemaFieldDto
+                        {
+                            Name = "character-limit",
+                            Properties = new NumberFieldPropertiesDto
+                            {
+                                Editor = NumberFieldEditor.Input,
+                                IsListField = true,
+                                Label = "Character Limit"
+                            }
                         }
                     };
 

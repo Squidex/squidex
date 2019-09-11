@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.IO;
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
@@ -24,6 +25,10 @@ namespace Squidex
 
         public static IWebHost BuildWebHost(string[] args)
         {
+            string envName = Environment.GetEnvironmentVariable("Environment");
+            string envConfigFile = $"./conf/appsettings.{envName}.json";
+            string envSecretsFile = $"./secrets/appsettings.secrets.json";
+
             return new WebHostBuilder()
                 .UseKestrel(k => { k.AddServerHeader = false; })
                 .UseContentRoot(Directory.GetCurrentDirectory())
@@ -42,17 +47,12 @@ namespace Squidex
                     builder.AddJsonFile($"appsettings.json", true);
                     builder.AddJsonFile($"appsettings.Custom.json", true);
                     builder.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true);
+                    builder.AddJsonFile(envSecretsFile, true, true);
+                    builder.AddJsonFile(envConfigFile, true, true);
 
                     builder.AddEnvironmentVariables();
 
                     builder.AddCommandLine(args);
-                })
-                .ConfigureKestrel((hostContext, options) =>
-                {
-                    options.Listen(
-                        IPAddress.Any,
-                        hostContext.Configuration.GetValue<int>("hostings:devPort"),
-                        listenOptions => listenOptions.UseHttps("localhost.pfx", "password"));
                 })
                 .Build();
         }
