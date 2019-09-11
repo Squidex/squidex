@@ -462,6 +462,12 @@ export class EditContentForm extends Form<FormGroup, any> {
         return !Types.jsJsonEquals(this.initialData, currentValue);
     }
 
+    public hasChanges(changes: any) {
+        const currentValue = this.form.getRawValue();
+
+        return !Types.jsJsonEquals(changes, currentValue);
+    }
+
     public arrayItemRemove(field: RootFieldDto, language: AppLanguageDto, index: number) {
         const partitionForm = this.findArrayItemForm(field, language);
 

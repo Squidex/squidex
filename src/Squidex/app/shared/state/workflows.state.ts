@@ -53,10 +53,10 @@ export class WorkflowsState extends State<Snapshot> {
         this.project(x => x.errors);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
 
     constructor(
         private readonly workflowsService: WorkflowsService,

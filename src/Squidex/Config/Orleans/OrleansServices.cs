@@ -65,6 +65,7 @@ namespace Squidex.Config.Orleans
                 builder.AddIncomingGrainCallFilter<ActivationLimiterFilter>();
                 builder.AddIncomingGrainCallFilter<LocalCacheFilter>();
                 builder.AddIncomingGrainCallFilter<LoggingFilter>();
+                builder.AddIncomingGrainCallFilter<StateFilter>();
 
                 var orleansPortSilo = config.GetOptionalValue("orleans:siloPort", 11111);
                 var orleansPortGateway = config.GetOptionalValue("orleans:gatewayPort", 40000);

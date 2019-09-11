@@ -38,7 +38,7 @@ export class CommentsState extends State<Snapshot> {
         this.project(x => x.comments);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     constructor(
         private readonly appsState: AppsState,

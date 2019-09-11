@@ -49,10 +49,10 @@ export class PatternsState extends State<Snapshot> {
         this.project(x => x.patterns);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
 
     constructor(
         private readonly patternsService: PatternsService,

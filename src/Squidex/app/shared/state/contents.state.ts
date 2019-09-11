@@ -74,22 +74,22 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         this.project(x => x.contentsQuery);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
 
     public canCreateAndPublish =
-        this.project(x => !!x.canCreateAndPublish);
+        this.project(x => x.canCreateAndPublish === true);
 
     public canCreateAny =
-        this.project(x => !!x.canCreate || !!x.canCreateAndPublish);
+        this.project(x => x.canCreate === true || x.canCreateAndPublish === true);
 
     public statuses =
         this.project(x => x.statuses);
 
     public statusQueries =
-        this.project2(x => x.statuses, x => buildQueries(x));
+        this.projectFrom(this.statuses, x => buildQueries(x));
 
     constructor(
         private readonly appsState: AppsState,

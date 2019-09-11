@@ -51,14 +51,20 @@ interface Snapshot {
 
 @Injectable()
 export class AssetsState extends State<Snapshot> {
+    public tagsUnsorted =
+        this.project(x => x.tags);
+
+    public tagsSelected =
+        this.project(x => x.tags);
+
     public tags =
-        this.project2(x => x.tags, x => sort(x));
+        this.projectFrom(this.tagsUnsorted, x => sort(x));
 
     public tagsNames =
-        this.project2(x => x.tags, x => Object.keys(x));
+        this.projectFrom(this.tagsUnsorted, x => Object.keys(x));
 
     public selectedTagNames =
-        this.project2(x => x.tagsSelected, x => Object.keys(x));
+        this.projectFrom(this.tagsSelected, x => Object.keys(x));
 
     public assets =
         this.project(x => x.assets);
@@ -70,10 +76,10 @@ export class AssetsState extends State<Snapshot> {
         this.project(x => x.assetsPager);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
 
     constructor(
         private readonly appsState: AppsState,
