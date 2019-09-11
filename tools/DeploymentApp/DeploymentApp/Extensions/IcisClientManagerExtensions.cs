@@ -280,7 +280,7 @@ namespace DeploymentApp.Extensions
             }
         }
 
-        public static async Task CreateContentAsync(this SquidexClientManager clientManager, string schema, string id, string name)
+        public static async Task CreateIdNameContentAsync(this SquidexClientManager clientManager, string schema, string id, string name)
         {
             var client = clientManager.GetClient<TestData, object>(schema);
 
@@ -318,6 +318,70 @@ namespace DeploymentApp.Extensions
             {
                 ConsoleHelper.Failed(e);
                 throw;
+            }
+        }
+
+        public static async Task CreateCommentaryAsync(this SquidexClientManager clientManager, string createFor, string commodity, string commentaryType, string region, string body)
+        {
+            var commentaries = clientManager.GetClient<TestData, object>("commentary");
+
+            try
+            {
+                ConsoleHelper.Start($"Creating commentary");
+
+                var commodityId = await GetReferenceAsync(clientManager, "commodity", commodity);
+                var commentaryTypeId = await GetReferenceAsync(clientManager, "commentary-type", commentaryType);
+                var regionId = await GetReferenceAsync(clientManager, "region", region);
+
+                await commentaries.CreateAsync(new
+                {
+                    createdfor = new
+                    {
+                        iv = createFor
+                    },
+                    commodity = new
+                    {
+                        iv = new[] { commodityId }
+                    },
+                    commentarytype = new
+                    {
+                        iv = new[] { commentaryTypeId }
+                    },
+                    region = new
+                    {
+                        iv = new[] { regionId }
+                    },
+                    body = new
+                    {
+                        en = body
+                    }
+                });
+
+                ConsoleHelper.Success();
+            }
+            catch (Exception e)
+            {
+                ConsoleHelper.Failed(e);
+                throw;
+            }
+        }
+
+        private static async Task<string> GetReferenceAsync(this SquidexClientManager clientManager, string schema, string id)
+        {
+            using (var client = clientManager.GetClient<TestData, object>(schema))
+            {
+                var items = await client.GetAsync(new ODataQuery
+                {
+                    Filter = $"data/id/iv eq '{id}'",
+                    Top = 1
+                }, context: QueryContext.Default.Unpublished(true));
+
+                if (items.Total == 0)
+                {
+                    throw new InvalidOperationException($"Cannot find entry for schema: {schema}");
+                }
+
+                return items.Items[0].Id;
             }
         }
 

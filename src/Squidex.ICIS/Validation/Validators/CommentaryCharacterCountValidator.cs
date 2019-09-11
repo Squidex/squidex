@@ -26,7 +26,7 @@ namespace Squidex.ICIS.Validation.Validators
         {
             if (data.TryGetGuid("commentarytype", out var commentaryTypeId))
             {
-                var validationContent = await contentQuery.FindContentAsync(context, "commentary-type", commentaryTypeId);
+                var validationContent = await contentQuery.FindContentAsync(context.WithUnpublished(true), "commentary-type", commentaryTypeId);
 
                 return ValidateContentFieldCharacterCount(validationContent, "character-limit", data, "body").ToList();
             }
