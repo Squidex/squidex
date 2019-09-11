@@ -37,7 +37,7 @@ RUN dotnet test tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.
  && dotnet test tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj
 
 # Publish
-RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.7-x64 -p:version=$SQUIDEX__VERSION
+RUN dotnet publish src/Squidex/Squidex.csproj --output /out/alpine --configuration Release -r alpine.3.8-x64 -p:version=$SQUIDEX__VERSION
 
 #
 # Stage 2, Build runtime
