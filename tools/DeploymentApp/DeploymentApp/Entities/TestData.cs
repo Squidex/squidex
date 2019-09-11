@@ -37,11 +37,12 @@
 
         public static (string CreateFor, string CommentaryType, string Commodity, string Region, string Body)[] Commentaries =
         {
-            ("2019-09-14T00:00:00Z",
-            "1",
-            "http://iddn.icis.com/ref-data/commodity-group/306",
-            "http://iddn.icis.com/ref-data/location/1",
-            "Body1"
+            (
+                "2019-09-14T00:00:00Z",
+                "1",
+                "http://iddn.icis.com/ref-data/commodity-group/306",
+                "http://iddn.icis.com/ref-data/location/1",
+                "Body1"
             )
         };
     }
