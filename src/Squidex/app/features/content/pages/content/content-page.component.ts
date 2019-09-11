@@ -120,7 +120,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                         this.loadContent(this.content.dataDraft, true);
                     }
 
-                    if (autosaved) {
+                    if (autosaved && this.isOtherContent(content) && this.contentForm.hasChanges(autosaved)) {
                         this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
                             .subscribe(shouldLoad => {
                                 if (shouldLoad) {
@@ -146,6 +146,10 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 .subscribe(message => {
                     this.loadVersion(message.version, message.compare);
                 }));
+    }
+
+    private isOtherContent(content: ContentDto | null | undefined) {
+        return !this.content || !content || content.id !== this.content.id;
     }
 
     public canDeactivate(): Observable<boolean> {

@@ -671,6 +671,26 @@ describe('ContentForm', () => {
         }
     });
 
+    it('should return true if new value is not equal to current value', () => {
+        const simpleForm = createForm([
+            createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' })
+        ]);
+
+        const hasChanged = simpleForm.hasChanges({ field1: { iv: 'other' }});
+
+        expect(hasChanged).toBeTruthy();
+    });
+
+    it('should return false if new value is same as current value', () => {
+        const simpleForm = createForm([
+            createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' })
+        ]);
+
+        const hasChanged = simpleForm.hasChanges({ field1: { iv: null }});
+
+        expect(hasChanged).toBeFalsy();
+    });
+
     describe('for new content', () => {
         let simpleForm: EditContentForm;
 
