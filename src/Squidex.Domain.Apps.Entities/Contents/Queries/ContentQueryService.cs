@@ -84,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                     content = await FindCoreAsync(context, id, schema);
                 }
 
-                if (content == null || (content.Status != Status.Published && !context.IsFrontendClient) || content.SchemaId.Id != schema.Id)
+                if (content == null || content.SchemaId.Id != schema.Id)
                 {
                     throw new DomainObjectNotFoundException(id.ToString(), typeof(IContentEntity));
                 }
