@@ -32,20 +32,27 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 switch (context.Command)
                 {
                     case CreateSchema createSchema:
-                        await Index(createSchema.AppId.Id).AddSchemaAsync(createSchema.SchemaId, createSchema.Name);
+                        await CreateSchemaAsync(createSchema);
                         break;
                     case DeleteSchema deleteSchema:
-                        {
-                            var schema = await grainFactory.GetGrain<ISchemaGrain>(deleteSchema.SchemaId).GetStateAsync();
-
-                            await Index(schema.Value.AppId.Id).RemoveSchemaAsync(deleteSchema.SchemaId);
-
-                            break;
-                        }
+                        await DeleteSchemaAsync(deleteSchema);
+                        break;
                 }
             }
 
             await next();
+        }
+
+        private async Task CreateSchemaAsync(CreateSchema createSchema)
+        {
+            await Index(createSchema.AppId.Id).AddSchemaAsync(createSchema.SchemaId, createSchema.Name);
+        }
+
+        private async Task DeleteSchemaAsync(DeleteSchema deleteSchema)
+        {
+            var schema = await grainFactory.GetGrain<ISchemaGrain>(deleteSchema.SchemaId).GetStateAsync();
+
+            await Index(schema.Value.AppId.Id).RemoveSchemaAsync(deleteSchema.SchemaId);
         }
 
         private ISchemasByAppIndex Index(Guid appId)

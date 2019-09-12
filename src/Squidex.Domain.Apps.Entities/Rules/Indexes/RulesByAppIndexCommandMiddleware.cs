@@ -36,9 +36,9 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
                         break;
                     case DeleteRule deleteRule:
                         {
-                            var schema = await grainFactory.GetGrain<IRuleGrain>(deleteRule.RuleId).GetStateAsync();
+                            var rule = await grainFactory.GetGrain<IRuleGrain>(deleteRule.RuleId).GetStateAsync();
 
-                            await Index(schema.Value.AppId.Id).RemoveRuleAsync(deleteRule.RuleId);
+                            await Index(rule.Value.AppId.Id).RemoveRuleAsync(deleteRule.RuleId);
 
                             break;
                         }

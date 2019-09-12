@@ -1,0 +1,147 @@
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
+
+using System;
+using System.Threading.Tasks;
+using Orleans;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure.Validation;
+
+namespace Squidex.Domain.Apps.Entities.Apps.Indexes
+{
+    public sealed class AppsIndex : IAppsIndex, ICommandMiddleware
+    {
+        private readonly IGrainFactory grainFactory;
+
+        public AppsIndex(IGrainFactory grainFactory)
+        {
+            Guard.NotNull(grainFactory, nameof(grainFactory));
+
+            this.grainFactory = grainFactory;
+        }
+
+        public async Task<IAppEntity> GetAppAsync(string name)
+        {
+            var appId = await Index().GetAppIdAsync(name);
+
+            if (appId == default)
+            {
+                return null;
+            }
+
+            return await GetAppAsync(appId);
+        }
+
+        public async Task<IAppEntity> GetAppAsync(Guid appId)
+        {
+            var app = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
+
+            if (IsFound(app.Value))
+            {
+                return app.Value;
+            }
+
+            await Index().RemoveAppAsync(appId);
+
+            return null;
+        }
+
+        public async Task HandleAsync(CommandContext context, Func<Task> next)
+        {
+            switch (context.Command)
+            {
+                case CreateApp createApp:
+                    await CreateAppAsync(createApp);
+                    break;
+
+                case AssignContributor assignContributor:
+                    await AssignContributorAsync(assignContributor);
+                    break;
+            }
+
+            await next();
+
+            if (context.IsCompleted)
+            {
+                switch (context.Command)
+                {
+                    case RemoveContributor removeContributor:
+                        await RemoveContributorAsync(removeContributor);
+                        break;
+
+                    case ArchiveApp archiveApp:
+                        await ArchiveAppAsync(archiveApp);
+                        break;
+                }
+            }
+        }
+
+        private async Task CreateAppAsync(CreateApp command)
+        {
+            var appId = command.AppId;
+            var appName = command.Name;
+
+            var appState = await GetAppAsync(appName);
+
+            if (appState != null)
+            {
+                var error = new ValidationError("An app with the same name already exists.", nameof(appName));
+
+                throw new ValidationException("Cannot create app.", error);
+            }
+
+            if (command.Actor.IsSubject)
+            {
+                await Index(command.Actor.Identifier).AddAppAsync(appId);
+            }
+
+            await Index().AddAppAsync(appId, appName);
+        }
+
+        private Task AssignContributorAsync(AssignContributor command)
+        {
+            return Index(command.ContributorId).AddAppAsync(command.AppId);
+        }
+
+        private Task RemoveContributorAsync(RemoveContributor command)
+        {
+            return Index(command.ContributorId).RemoveAppAsync(command.AppId);
+        }
+
+        private async Task ArchiveAppAsync(ArchiveApp command)
+        {
+            var appId = command.AppId;
+
+            var appState = await grainFactory.GetGrain<IAppGrain>(appId).GetStateAsync();
+
+            foreach (var contributorId in appState.Value.Contributors.Keys)
+            {
+                await Index(contributorId).RemoveAppAsync(appId);
+            }
+
+            await Index().RemoveAppAsync(appId);
+        }
+
+        private static bool IsFound(IAppEntity app)
+        {
+            return app.Version > EtagVersion.Empty && !app.IsArchived;
+        }
+
+        private IAppsByNameIndex Index()
+        {
+            return grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id);
+        }
+
+        private IAppsByUserIndex Index(string id)
+        {
+            return grainFactory.GetGrain<IAppsByUserIndex>(id);
+        }
+    }
+}

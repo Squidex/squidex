@@ -29,8 +29,9 @@ namespace Squidex.Domain.Apps.Entities
     {
         private readonly IGrainFactory grainFactory;
         private readonly ILocalCache localCache;
+        private readonly IRulesIndex rulesIndex;
 
-        public AppProvider(IGrainFactory grainFactory, ILocalCache localCache)
+        public AppProvider(IGrainFactory grainFactory, ILocalCache localCache, IRulesIndex rulesIndex)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
             Guard.NotNull(localCache, nameof(localCache));
@@ -38,6 +39,7 @@ namespace Squidex.Domain.Apps.Entities
             this.grainFactory = grainFactory;
 
             this.localCache = localCache;
+            this.rulesIndex = rulesIndex;
         }
 
         public Task<(IAppEntity, ISchemaEntity)> GetAppWithSchemaAsync(Guid appId, Guid id)
@@ -153,13 +155,7 @@ namespace Squidex.Domain.Apps.Entities
             {
                 using (Profiler.TraceMethod<AppProvider>())
                 {
-                    var ids = await grainFactory.GetGrain<IRulesByAppIndex>(appId).GetRuleIdsAsync();
-
-                    var rules =
-                        await Task.WhenAll(
-                            ids.Select(id => grainFactory.GetGrain<IRuleGrain>(id).GetStateAsync()));
-
-                    return rules.Where(r => IsFound(r.Value)).Select(r => r.Value).ToList();
+                    return await rulesIndex.GetRulesAsync(appId);
                 }
             });
         }
