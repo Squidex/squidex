@@ -116,21 +116,28 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private async Task CreateSchemaAsync(CreateSchema createSchema)
         {
-            var schemaName = createSchema.Name;
+            var name = createSchema.Name;
 
-            if (!schemaName.IsSlug())
+            if (!name.IsSlug())
             {
                 return;
             }
 
-            var schemaId = createSchema.SchemaId;
+            var id = createSchema.SchemaId;
 
-            if (!await Index(createSchema.AppId.Id).AddSchemaAsync(schemaId, schemaName))
+            var appId = createSchema.AppId.Id;
+
+            if (await HasSchemaAsync(name, appId) || !await AddSchemaAsync(appId, name, id))
             {
-                var error = new ValidationError("An schema with the same name already exists.", "name");
+                var error = new ValidationError("A schema with this name already exists.");
 
                 throw new ValidationException("Cannot create schema.", error);
             }
+        }
+
+        private Task<bool> AddSchemaAsync(Guid appId, string schemaName, Guid schemaId)
+        {
+            return Index(appId).AddSchemaAsync(schemaId, schemaName);
         }
 
         private async Task DeleteSchemaAsync(DeleteSchema deleteSchema)
@@ -143,6 +150,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             {
                 await Index(schema.Value.AppId.Id).RemoveSchemaAsync(schemaId);
             }
+        }
+
+        private async Task<bool> HasSchemaAsync(string schemaName, Guid appId)
+        {
+            return await GetSchemaAsync(appId, schemaName) != null;
         }
 
         private ISchemasByAppIndexGrain Index(Guid appId)

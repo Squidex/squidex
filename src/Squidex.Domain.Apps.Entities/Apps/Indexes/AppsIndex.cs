@@ -188,26 +188,31 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private async Task CreateAppAsync(CreateApp command)
         {
-            var appName = command.Name;
+            var name = command.Name;
 
-            if (!appName.IsSlug())
+            if (!name.IsSlug())
             {
                 return;
             }
 
-            var appId = command.AppId;
+            var id = command.AppId;
 
-            if (!await Index().AddAppAsync(appId, appName))
+            if (await HasAppAsync(name) || !await AddAppAsync(name, id))
             {
-                var error = new ValidationError("An app with the same name already exists.", "name");
+                var error = new ValidationError("An app with this already exists.");
 
                 throw new ValidationException("Cannot create app.", error);
             }
 
             if (command.Actor.IsSubject)
             {
-                await Index(command.Actor.Identifier).AddAppAsync(appId);
+                await Index(command.Actor.Identifier).AddAppAsync(id);
             }
+        }
+
+        private Task<bool> AddAppAsync(string appName, Guid appId)
+        {
+            return Index().AddAppAsync(appId, appName);
         }
 
         private Task AssignContributorAsync(AssignContributor command)
@@ -235,6 +240,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 await Index(contributorId).RemoveAppAsync(appId);
             }
+        }
+
+        private async Task<bool> HasAppAsync(string appName)
+        {
+            return await GetAppAsync(appName) != null;
         }
 
         private static bool IsFound(IAppEntity app)

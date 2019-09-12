@@ -237,7 +237,7 @@ namespace Squidex.Config.Domain
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<AppsIndex>()
-                .As<ICommandMiddleware>().As<IRulesIndex>();
+                .As<ICommandMiddleware>().As<IAppsIndex>();
 
             services.AddSingletonAs<RulesIndex>()
                 .As<ICommandMiddleware>().As<IRulesIndex>();
