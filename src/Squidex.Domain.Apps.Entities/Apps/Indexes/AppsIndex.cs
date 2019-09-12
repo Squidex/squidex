@@ -140,11 +140,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<List<Guid>> GetAppIdsAsync(IEnumerable<string> names)
+        private async Task<List<Guid>> GetAppIdsAsync(string[] names)
         {
             using (Profiler.TraceMethod<AppProvider>())
             {
-                return await grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id).GetAppIdsAsync(names.ToArray());
+                return await grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id).GetAppIdsAsync(names);
             }
         }
 

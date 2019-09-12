@@ -114,18 +114,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        private async Task CreateSchemaAsync(CreateSchema createSchema)
+        private async Task CreateSchemaAsync(CreateSchema commmand)
         {
-            var name = createSchema.Name;
+            var name = commmand.Name;
 
             if (!name.IsSlug())
             {
                 return;
             }
 
-            var id = createSchema.SchemaId;
+            var id = commmand.SchemaId;
 
-            var appId = createSchema.AppId.Id;
+            var appId = commmand.AppId.Id;
 
             if (await HasSchemaAsync(name, appId) || !await AddSchemaAsync(appId, name, id))
             {
@@ -140,9 +140,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return Index(appId).AddSchemaAsync(schemaId, schemaName);
         }
 
-        private async Task DeleteSchemaAsync(DeleteSchema deleteSchema)
+        private async Task DeleteSchemaAsync(DeleteSchema commmand)
         {
-            var schemaId = deleteSchema.SchemaId;
+            var schemaId = commmand.SchemaId;
 
             var schema = await grainFactory.GetGrain<ISchemaGrain>(schemaId).GetStateAsync();
 
