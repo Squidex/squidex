@@ -31,7 +31,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_add_app_id_to_index()
         {
-            await sut.AddAppAsync(appId1.Id, appId1.Name);
+            Assert.True(await sut.AddAppAsync(appId1.Id, appId1.Name));
 
             var result = await sut.GetAppIdAsync(appId1.Name);
 

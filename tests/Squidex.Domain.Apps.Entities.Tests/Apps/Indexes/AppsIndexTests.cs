@@ -144,7 +144,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 .Returns(true);
 
             var context =
-                new CommandContext(Create(), commandBus)
+                new CommandContext(Create(appId.Name), commandBus)
                     .Complete();
 
             await sut.HandleAsync(context);
@@ -154,6 +154,22 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             A.CallTo(() => byUser.AddAppAsync(appId.Id))
                 .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_add_to_name_index_on_create_if_name_invalid()
+        {
+            var context =
+                new CommandContext(Create("INVALID"), commandBus)
+                    .Complete();
+
+            await sut.HandleAsync(context);
+
+            A.CallTo(() => byName.AddAppAsync(appId.Id, A<string>.Ignored, A<bool>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => byUser.AddAppAsync(appId.Id))
+                .MustNotHaveHappened();
         }
 
         [Fact]
@@ -176,7 +192,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 .Returns(false);
 
             var context =
-                new CommandContext(Create(), commandBus)
+                new CommandContext(Create(appId.Name), commandBus)
                     .Complete();
 
             await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
@@ -288,9 +304,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return appEntity;
         }
 
-        private CreateApp Create()
+        private CreateApp Create(string name)
         {
-            return new CreateApp { AppId = appId.Id, Name = appId.Name, Actor = new RefToken(RefTokenType.Subject, userId) };
+            return new CreateApp { AppId = appId.Id, Name = name, Actor = Actor() };
+        }
+
+        private RefToken Actor()
+        {
+            return new RefToken(RefTokenType.Subject, userId);
         }
     }
 }

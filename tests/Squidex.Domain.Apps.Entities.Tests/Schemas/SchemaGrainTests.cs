@@ -25,7 +25,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public class SchemaGrainTests : HandlerTestBase<SchemaState>
     {
-        private readonly IAppProvider appProvider = A.Fake<IAppProvider>();
         private readonly string fieldName = "age";
         private readonly string arrayName = "array";
         private readonly NamedId<long> fieldId = NamedId.Of(1L, "age");
@@ -40,10 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 
         public SchemaGrainTests()
         {
-            A.CallTo(() => appProvider.GetSchemaAsync(AppId, SchemaName))
-                .Returns((ISchemaEntity)null);
-
-            sut = new SchemaGrain(Store, A.Dummy<ISemanticLog>(), appProvider, TestUtils.DefaultSerializer);
+            sut = new SchemaGrain(Store, A.Dummy<ISemanticLog>(), TestUtils.DefaultSerializer);
             sut.ActivateAsync(Id).Wait();
         }
 

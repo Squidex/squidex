@@ -39,11 +39,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             return state.WriteAsync();
         }
 
-        public Task AddSchemaAsync(Guid schemaId, string name)
+        public async Task<bool> AddSchemaAsync(Guid schemaId, string name)
         {
-            state.Value.Schemas[name] = schemaId;
+            var canAdd = !IsInUse(schemaId, name);
 
-            return state.WriteAsync();
+            if (canAdd)
+            {
+                state.Value.Schemas[name] = schemaId;
+
+                await state.WriteAsync();
+            }
+
+            return canAdd;
         }
 
         public Task RemoveSchemaAsync(Guid schemaId)
@@ -63,6 +70,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         public Task<List<Guid>> GetSchemaIdsAsync()
         {
             return Task.FromResult(state.Value.Schemas.Values.ToList());
+        }
+
+        private bool IsInUse(Guid schemaId, string name)
+        {
+            return state.Value.Schemas.ContainsKey(name) || state.Value.Schemas.Any(x => x.Value == schemaId);
         }
     }
 }

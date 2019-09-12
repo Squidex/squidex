@@ -14,7 +14,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
     public interface ISchemasByAppIndexGrain : IGrainWithGuidKey
     {
-        Task AddSchemaAsync(Guid schemaId, string name);
+        Task<bool> AddSchemaAsync(Guid schemaId, string name);
 
         Task RemoveSchemaAsync(Guid schemaId);
 

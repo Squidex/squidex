@@ -35,7 +35,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_add_schema_id_to_index()
         {
-            await sut.AddSchemaAsync(schemaId1.Id, schemaId1.Name);
+            Assert.True(await sut.AddSchemaAsync(schemaId1.Id, schemaId1.Name));
 
             var result = await sut.GetSchemaIdAsync(schemaId1.Name);
 
@@ -46,9 +46,18 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
+        public async Task Should_not_add_schema_if_already_added()
+        {
+            await sut.AddSchemaAsync(schemaId1.Id, schemaId1.Name);
+
+            Assert.False(await sut.AddSchemaAsync(schemaId2.Id, schemaId1.Name));
+        }
+
+        [Fact]
         public async Task Should_remove_schema_id_from_index()
         {
             await sut.AddSchemaAsync(schemaId1.Id, schemaId1.Name);
+
             await sut.RemoveSchemaAsync(schemaId1.Id);
 
             var result = await sut.GetSchemaIdAsync(schemaId1.Name);

@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
@@ -115,9 +116,21 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
         private async Task CreateSchemaAsync(CreateSchema createSchema)
         {
+            var schemaName = createSchema.Name;
+
+            if (!schemaName.IsSlug())
+            {
+                return;
+            }
+
             var schemaId = createSchema.SchemaId;
 
-            await Index(createSchema.AppId.Id).AddSchemaAsync(schemaId, createSchema.Name);
+            if (!await Index(createSchema.AppId.Id).AddSchemaAsync(schemaId, schemaName))
+            {
+                var error = new ValidationError("An schema with the same name already exists.", "name");
+
+                throw new ValidationException("Cannot create schema.", error);
+            }
         }
 
         private async Task DeleteSchemaAsync(DeleteSchema deleteSchema)
