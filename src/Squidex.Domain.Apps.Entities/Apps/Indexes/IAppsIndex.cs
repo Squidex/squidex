@@ -6,14 +6,30 @@
 // ==========================================================================
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
     public interface IAppsIndex
     {
+        Task<List<IAppEntity>> GetAppsAsync();
+
+        Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions);
+
         Task<IAppEntity> GetAppAsync(string name);
 
         Task<IAppEntity> GetAppAsync(Guid appId);
+
+        Task<bool> AddAppAsync(Guid appId, string name, bool reserve = false);
+
+        Task RemoveReservationAsync(Guid appId, string name);
+
+        Task RebuildByContributorsAsync(string contributorId, HashSet<Guid> apps);
+
+        Task RebuildAsync(Dictionary<string, Guid> apps);
+
+        Task RebuildByContributorsAsync(Guid appId, HashSet<string> contributors);
     }
 }

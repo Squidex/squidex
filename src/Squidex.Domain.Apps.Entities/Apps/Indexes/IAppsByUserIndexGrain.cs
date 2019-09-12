@@ -10,20 +10,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
+namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public interface ISchemasByAppIndex : IGrainWithGuidKey
+    public interface IAppsByUserIndexGrain : IGrainWithStringKey
     {
-        Task AddSchemaAsync(Guid schemaId, string name);
+        Task AddAppAsync(Guid appId);
 
-        Task RemoveSchemaAsync(Guid schemaId);
+        Task RemoveAppAsync(Guid appId);
 
-        Task RebuildAsync(Dictionary<string, Guid> schemas);
+        Task RebuildAsync(HashSet<Guid> apps);
 
-        Task ClearAsync();
-
-        Task<Guid> GetSchemaIdAsync(string name);
-
-        Task<List<Guid>> GetSchemaIdsAsync();
+        Task<List<Guid>> GetAppIdsAsync();
     }
 }

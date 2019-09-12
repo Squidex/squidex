@@ -46,21 +46,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         }
 
         [Fact]
-        public async Task Should_delete_and_reset_state_when_cleaning()
-        {
-            await sut.AddRuleAsync(ruleId1);
-            await sut.AddRuleAsync(ruleId2);
-            await sut.ClearAsync();
-
-            var ids = await sut.GetRuleIdsAsync();
-
-            Assert.Empty(ids);
-
-            A.CallTo(() => grainState.ClearAsync())
-                .MustHaveHappened();
-        }
-
-        [Fact]
         public async Task Should_remove_rule_id_from_index()
         {
             await sut.AddRuleAsync(ruleId1);

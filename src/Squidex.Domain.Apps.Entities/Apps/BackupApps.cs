@@ -16,7 +16,6 @@ using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps
@@ -27,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private const string SettingsFile = "Settings.json";
         private readonly IGrainFactory grainFactory;
         private readonly IUserResolver userResolver;
-        private readonly IAppsByNameIndex appsByNameIndex;
+        private readonly IAppsIndex indexForApps;
         private readonly HashSet<string> contributors = new HashSet<string>();
         private readonly Dictionary<string, RefToken> userMapping = new Dictionary<string, RefToken>();
         private Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
@@ -36,15 +35,15 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override string Name { get; } = "Apps";
 
-        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver)
+        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver, IAppsIndex indexForApps)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(indexForApps, nameof(indexForApps));
             Guard.NotNull(userResolver, nameof(userResolver));
 
             this.grainFactory = grainFactory;
+            this.indexForApps = indexForApps;
             this.userResolver = userResolver;
-
-            appsByNameIndex = grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id);
         }
 
         public override async Task BackupEventAsync(Envelope<IEvent> @event, Guid appId, BackupWriter writer)
@@ -125,7 +124,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private async Task ReserveAppAsync(Guid appId)
         {
-            if (!(isReserved = await appsByNameIndex.ReserveAppAsync(appId, appName)))
+            isReserved = await indexForApps.AddAppAsync(appId, appName, true);
+
+            if (isReserved == false)
             {
                 throw new BackupRestoreException("The app id or name is not available.");
             }
@@ -135,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             if (isReserved)
             {
-                await appsByNameIndex.RemoveReservationAsync(appId, appName);
+                await indexForApps.RemoveReservationAsync(appId, appName);
             }
         }
 
@@ -196,12 +197,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)
         {
-            await appsByNameIndex.AddAppAsync(appId, appName);
+            await indexForApps.AddAppAsync(appId, appName);
 
-            foreach (var user in contributors)
-            {
-                await grainFactory.GetGrain<IAppsByUserIndex>(user).AddAppAsync(appId);
-            }
+            await indexForApps.RebuildByContributorsAsync(appId, contributors);
         }
     }
 }

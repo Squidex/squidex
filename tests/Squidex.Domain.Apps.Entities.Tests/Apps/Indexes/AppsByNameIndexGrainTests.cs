@@ -46,15 +46,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             await sut.AddAppAsync(appId2.Id, appId1.Name);
 
-            Assert.False(await sut.ReserveAppAsync(appId1.Id, appId1.Name));
+            Assert.False(await sut.AddAppAsync(appId1.Id, appId1.Name, true));
         }
 
         [Fact]
         public async Task Should_not_be_able_to_reserve_if_name_reserved()
         {
-            await sut.ReserveAppAsync(appId2.Id, appId1.Name);
+            await sut.AddAppAsync(appId2.Id, appId1.Name, true);
 
-            Assert.False(await sut.ReserveAppAsync(appId1.Id, appId1.Name));
+            Assert.False(await sut.AddAppAsync(appId1.Id, appId1.Name, true));
         }
 
         [Fact]
@@ -62,41 +62,43 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             await sut.AddAppAsync(appId1.Id, appId1.Name);
 
-            Assert.False(await sut.ReserveAppAsync(appId1.Id, appId2.Name));
+            Assert.False(await sut.AddAppAsync(appId1.Id, appId2.Name, true));
         }
 
         [Fact]
         public async Task Should_not_be_able_to_reserve_if_id_reserved()
         {
-            await sut.ReserveAppAsync(appId1.Id, appId1.Name);
+            await sut.AddAppAsync(appId1.Id, appId1.Name, true);
 
-            Assert.False(await sut.ReserveAppAsync(appId1.Id, appId2.Name));
+            Assert.False(await sut.AddAppAsync(appId1.Id, appId2.Name, true));
         }
 
         [Fact]
         public async Task Should_be_able_to_reserve_if_id_and_name_not_reserved()
         {
-            await sut.ReserveAppAsync(appId1.Id, appId1.Name);
+            await sut.AddAppAsync(appId1.Id, appId1.Name);
 
-            Assert.True(await sut.ReserveAppAsync(appId2.Id, appId2.Name));
+            Assert.True(await sut.AddAppAsync(appId2.Id, appId2.Name, true));
         }
 
         [Fact]
         public async Task Should_be_able_to_reserve_after_app_removed()
         {
             await sut.AddAppAsync(appId1.Id, appId1.Name);
+
             await sut.RemoveAppAsync(appId1.Id);
 
-            Assert.True(await sut.ReserveAppAsync(appId1.Id, appId1.Name));
+            Assert.True(await sut.AddAppAsync(appId1.Id, appId1.Name, true));
         }
 
         [Fact]
         public async Task Should_be_able_to_reserve_after_reservation_removed()
         {
-            await sut.ReserveAppAsync(appId1.Id, appId1.Name);
+            await sut.AddAppAsync(appId1.Id, appId1.Name, true);
+
             await sut.RemoveReservationAsync(appId1.Id, appId1.Name);
 
-            Assert.True(await sut.ReserveAppAsync(appId1.Id, appId1.Name));
+            Assert.True(await sut.AddAppAsync(appId1.Id, appId1.Name, true));
         }
 
         [Fact]

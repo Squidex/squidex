@@ -8,18 +8,17 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Indexes
+namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
-    public interface IAppsByUserIndex : IGrainWithStringKey
+    public interface ISchemasIndex
     {
-        Task AddAppAsync(Guid appId);
+        Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false);
 
-        Task RemoveAppAsync(Guid appId);
+        Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name, bool allowDeleted = false);
 
-        Task RebuildAsync(HashSet<Guid> apps);
+        Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId, bool allowDeleted = false);
 
-        Task<List<Guid>> GetAppIdsAsync();
+        Task RebuildAsync(Guid appId, Dictionary<string, Guid> schemas);
     }
 }

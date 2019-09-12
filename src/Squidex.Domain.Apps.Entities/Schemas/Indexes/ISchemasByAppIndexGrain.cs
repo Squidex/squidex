@@ -10,18 +10,18 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Orleans;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Indexes
+namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
-    public interface IRulesByAppIndex : IGrainWithGuidKey
+    public interface ISchemasByAppIndexGrain : IGrainWithGuidKey
     {
-        Task AddRuleAsync(Guid ruleId);
+        Task AddSchemaAsync(Guid schemaId, string name);
 
-        Task RemoveRuleAsync(Guid ruleId);
+        Task RemoveSchemaAsync(Guid schemaId);
 
-        Task RebuildAsync(HashSet<Guid> rules);
+        Task RebuildAsync(Dictionary<string, Guid> schemas);
 
-        Task ClearAsync();
+        Task<Guid> GetSchemaIdAsync(string name);
 
-        Task<List<Guid>> GetRuleIdsAsync();
+        Task<List<Guid>> GetSchemaIdsAsync();
     }
 }

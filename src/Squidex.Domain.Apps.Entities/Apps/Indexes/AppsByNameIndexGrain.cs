@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public sealed class AppsByNameIndexGrain : GrainOfString, IAppsByNameIndex
+    public sealed class AppsByNameIndexGrain : GrainOfString, IAppsByNameIndexGrain
     {
         private readonly HashSet<Guid> reservedIds = new HashSet<Guid>();
         private readonly HashSet<string> reservedNames = new HashSet<string>();
@@ -42,29 +42,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return state.WriteAsync();
         }
 
-        public Task<bool> ReserveAppAsync(Guid appId, string name)
-        {
-            var canReserve = !IsInUse(appId, name) && !IsReserved(appId, name);
-
-            if (canReserve)
-            {
-                reservedIds.Add(appId);
-                reservedNames.Add(name);
-            }
-
-            return Task.FromResult(canReserve);
-        }
-
-        private bool IsInUse(Guid appId, string name)
-        {
-            return state.Value.Apps.ContainsKey(name) || state.Value.Apps.Any(x => x.Value == appId);
-        }
-
-        private bool IsReserved(Guid appId, string name)
-        {
-            return reservedIds.Contains(appId) || reservedNames.Contains(name);
-        }
-
         public Task RemoveReservationAsync(Guid appId, string name)
         {
             reservedIds.Remove(appId);
@@ -73,17 +50,29 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return TaskHelper.Done;
         }
 
-        public Task AddAppAsync(Guid appId, string name)
+        public async Task<bool> AddAppAsync(Guid appId, string name, bool reserve = false)
         {
-            state.Value.Apps[name] = appId;
+            var canAdd = !IsInUse(appId, name) && !IsReserved(appId, name);
 
-            reservedIds.Remove(appId);
-            reservedNames.Remove(name);
+            if (canAdd)
+            {
+                if (reserve)
+                {
+                    reservedIds.Add(appId);
+                    reservedNames.Add(name);
+                }
+                else
+                {
+                    state.Value.Apps[name] = appId;
 
-            return state.WriteAsync();
+                    await state.WriteAsync();
+                }
+            }
+
+            return canAdd;
         }
 
-        public Task RemoveAppAsync(Guid appId)
+        public async Task RemoveAppAsync(Guid appId)
         {
             var name = state.Value.Apps.FirstOrDefault(x => x.Value == appId).Key;
 
@@ -91,11 +80,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 state.Value.Apps.Remove(name);
 
-                reservedIds.Remove(appId);
-                reservedNames.Remove(name);
+                await RemoveReservationAsync(appId, name);
             }
 
-            return state.WriteAsync();
+            await state.WriteAsync();
         }
 
         public Task<List<Guid>> GetAppIdsAsync(params string[] names)
@@ -128,6 +116,16 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         public Task<long> CountAsync()
         {
             return Task.FromResult((long)state.Value.Apps.Count);
+        }
+
+        private bool IsInUse(Guid appId, string name)
+        {
+            return state.Value.Apps.ContainsKey(name) || state.Value.Apps.Any(x => x.Value == appId);
+        }
+
+        private bool IsReserved(Guid appId, string name)
+        {
+            return reservedIds.Contains(appId) || reservedNames.Contains(name);
         }
     }
 }

@@ -12,19 +12,17 @@ using Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public interface IAppsByNameIndex : IGrainWithStringKey
+    public interface IAppsByNameIndexGrain : IGrainWithStringKey
     {
         Task<long> CountAsync();
 
-        Task<bool> ReserveAppAsync(Guid appId, string name);
-
-        Task AddAppAsync(Guid appId, string name);
+        Task<bool> AddAppAsync(Guid appId, string name, bool reserve = false);
 
         Task RemoveAppAsync(Guid appId);
 
-        Task RebuildAsync(Dictionary<string, Guid> apps);
-
         Task RemoveReservationAsync(Guid appId, string name);
+
+        Task RebuildAsync(Dictionary<string, Guid> apps);
 
         Task<List<Guid>> GetAppIdsAsync();
 

@@ -15,7 +15,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
-    public sealed class RulesByAppIndexGrain : GrainOfGuid, IRulesByAppIndex
+    public sealed class RulesByAppIndexGrain : GrainOfGuid, IRulesByAppIndexGrain
     {
         private readonly IGrainState<GrainState> state;
 

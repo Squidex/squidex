@@ -46,20 +46,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_delete_and_reset_state_when_cleaning()
-        {
-            await sut.AddSchemaAsync(schemaId1.Id, schemaId1.Name);
-            await sut.ClearAsync();
-
-            var id = await sut.GetSchemaIdAsync(schemaId1.Name);
-
-            Assert.Equal(id, Guid.Empty);
-
-            A.CallTo(() => grainState.ClearAsync())
-                .MustHaveHappened();
-        }
-
-        [Fact]
         public async Task Should_remove_schema_id_from_index()
         {
             await sut.AddSchemaAsync(schemaId1.Id, schemaId1.Name);

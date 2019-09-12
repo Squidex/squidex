@@ -8,13 +8,18 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
-    public interface IRulesIndex
+    public interface IRulesByAppIndexGrain : IGrainWithGuidKey
     {
-        Task<List<IRuleEntity>> GetRulesAsync(Guid appId);
+        Task AddRuleAsync(Guid ruleId);
 
-        Task RebuildAsync(Guid appId, HashSet<Guid> rules);
+        Task RemoveRuleAsync(Guid ruleId);
+
+        Task RebuildAsync(HashSet<Guid> rules);
+
+        Task<List<Guid>> GetRuleIdsAsync();
     }
 }

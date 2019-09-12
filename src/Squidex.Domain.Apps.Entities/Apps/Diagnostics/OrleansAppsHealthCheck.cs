@@ -17,13 +17,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Diagnostics
 {
     public sealed class OrleansAppsHealthCheck : IHealthCheck
     {
-        private readonly IAppsByNameIndex index;
+        private readonly IAppsByNameIndexGrain index;
 
         public OrleansAppsHealthCheck(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
 
-            index = grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id);
+            index = grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id);
         }
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)

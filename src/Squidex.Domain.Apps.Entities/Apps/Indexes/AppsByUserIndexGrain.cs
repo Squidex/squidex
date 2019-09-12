@@ -15,7 +15,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public sealed class AppsByUserIndexGrain : GrainOfString, IAppsByUserIndex
+    public sealed class AppsByUserIndexGrain : GrainOfString, IAppsByUserIndexGrain
     {
         private readonly IGrainState<GrainState> state;
 

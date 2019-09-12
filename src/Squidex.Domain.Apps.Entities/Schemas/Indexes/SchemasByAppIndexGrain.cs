@@ -15,7 +15,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
-    public sealed class SchemasByAppIndexGrain : GrainOfGuid, ISchemasByAppIndex
+    public sealed class SchemasByAppIndexGrain : GrainOfGuid, ISchemasByAppIndexGrain
     {
         private readonly IGrainState<GrainState> state;
 
@@ -30,11 +30,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             Guard.NotNull(state, nameof(state));
 
             this.state = state;
-        }
-
-        public Task ClearAsync()
-        {
-            return state.ClearAsync();
         }
 
         public Task RebuildAsync(Dictionary<string, Guid> schemas)
