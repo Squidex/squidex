@@ -67,11 +67,11 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
-                var schemaEntity = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
+                var schema = await grainFactory.GetGrain<ISchemaGrain>(id).GetStateAsync();
 
-                if (IsFound(schemaEntity.Value, allowDeleted))
+                if (IsFound(schema.Value, allowDeleted))
                 {
-                    return schemaEntity.Value;
+                    return schema.Value;
                 }
 
                 await Index(appId).RemoveSchemaAsync(id);
@@ -127,17 +127,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             var appId = commmand.AppId.Id;
 
-            if (await HasSchemaAsync(name, appId) || !await AddSchemaAsync(appId, name, id))
+            if (await HasSchemaAsync(appId, name) || !await AddSchemaAsync(appId, id, name))
             {
                 var error = new ValidationError("A schema with this name already exists.");
 
                 throw new ValidationException("Cannot create schema.", error);
             }
-        }
-
-        private Task<bool> AddSchemaAsync(Guid appId, string schemaName, Guid schemaId)
-        {
-            return Index(appId).AddSchemaAsync(schemaId, schemaName);
         }
 
         private async Task DeleteSchemaAsync(DeleteSchema commmand)
@@ -152,9 +147,14 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
             }
         }
 
-        private async Task<bool> HasSchemaAsync(string schemaName, Guid appId)
+        private async Task<bool> AddSchemaAsync(Guid appId, Guid id, string name)
         {
-            return await GetSchemaAsync(appId, schemaName) != null;
+            return await Index(appId).AddSchemaAsync(id, name);
+        }
+
+        private async Task<bool> HasSchemaAsync(Guid appId, string name)
+        {
+            return await GetSchemaAsync(appId, name) != null;
         }
 
         private ISchemasByAppIndexGrain Index(Guid appId)

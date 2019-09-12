@@ -197,7 +197,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             var id = command.AppId;
 
-            if (await HasAppAsync(name) || !await AddAppAsync(name, id))
+            if (await HasAppAsync(name) || !await AddAppAsync(id, name))
             {
                 var error = new ValidationError("An app with this already exists.");
 
@@ -208,11 +208,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             {
                 await Index(command.Actor.Identifier).AddAppAsync(id);
             }
-        }
-
-        private Task<bool> AddAppAsync(string appName, Guid appId)
-        {
-            return Index().AddAppAsync(appId, appName);
         }
 
         private Task AssignContributorAsync(AssignContributor command)
@@ -242,9 +237,14 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             }
         }
 
-        private async Task<bool> HasAppAsync(string appName)
+        private async Task<bool> AddAppAsync(Guid id, string name)
         {
-            return await GetAppAsync(appName) != null;
+            return await Index().AddAppAsync(id, name);
+        }
+
+        private async Task<bool> HasAppAsync(string name)
+        {
+            return await GetAppAsync(name) != null;
         }
 
         private static bool IsFound(IAppEntity app)

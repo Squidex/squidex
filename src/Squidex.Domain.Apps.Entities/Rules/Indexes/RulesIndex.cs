@@ -97,13 +97,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
         private async Task DeleteRuleAsync(DeleteRule command)
         {
-            var ruleId = command.RuleId;
+            var id = command.RuleId;
 
-            var rule = await grainFactory.GetGrain<IRuleGrain>(ruleId).GetStateAsync();
+            var rule = await grainFactory.GetGrain<IRuleGrain>(id).GetStateAsync();
 
             if (IsFound(rule.Value))
             {
-                await Index(rule.Value.AppId.Id).RemoveRuleAsync(ruleId);
+                await Index(rule.Value.AppId.Id).RemoveRuleAsync(id);
             }
         }
 
