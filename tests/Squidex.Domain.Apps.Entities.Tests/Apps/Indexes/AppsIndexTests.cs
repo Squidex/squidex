@@ -153,6 +153,9 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             A.CallTo(() => byName.AddAsync(token))
                 .MustHaveHappened();
+
+            A.CallTo(() => byUser.AddAsync(appId.Id))
+                .MustHaveHappened();
         }
 
         [Fact]

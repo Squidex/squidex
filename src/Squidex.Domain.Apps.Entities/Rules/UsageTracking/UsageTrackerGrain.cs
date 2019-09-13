@@ -29,13 +29,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.UsageTracking
 
         public sealed class Target
         {
+            public NamedId<Guid> AppId { get; set; }
+
             public int Limits { get; set; }
 
             public int? NumDays { get; set; }
 
             public DateTime? Triggered { get; set; }
-
-            public NamedId<Guid> AppId { get; set; }
         }
 
         [CollectionName("UsageTracker")]
