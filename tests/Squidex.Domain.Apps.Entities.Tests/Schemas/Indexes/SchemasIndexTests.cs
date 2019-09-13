@@ -133,7 +133,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         [Fact]
         public async Task Should_throw_exception_when_app_already_exist()
         {
-            A.CallTo(() => index.ReserveAsync(appId.Id, appId.Name))
+            A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
                 .Returns((string)null);
 
             var context =

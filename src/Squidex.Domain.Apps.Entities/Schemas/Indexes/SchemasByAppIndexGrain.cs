@@ -12,7 +12,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
-    public sealed class SchemasByAppIndexGrain : UniqueNameIndexGrain<SchemasByAppIndexGrainState, Guid>, IUniqueNameIndexGrain<Guid>
+    public sealed class SchemasByAppIndexGrain : UniqueNameIndexGrain<SchemasByAppIndexGrainState, Guid>, ISchemasByAppIndexGrain
     {
         public SchemasByAppIndexGrain(IGrainState<SchemasByAppIndexGrainState> state)
             : base(state)
