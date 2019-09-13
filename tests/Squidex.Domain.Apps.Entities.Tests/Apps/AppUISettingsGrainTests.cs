@@ -36,6 +36,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 JsonValue.Object().Add("key", 15);
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
+
+            A.CallTo(() => grainState.WriteAsync())
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -49,6 +52,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 JsonValue.Object().Add("key", 123);
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
+
+            A.CallTo(() => grainState.WriteAsync())
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -62,6 +68,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
             var expected = JsonValue.Object();
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
+
+            A.CallTo(() => grainState.WriteAsync())
+                .MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
@@ -76,6 +85,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     JsonValue.Object().Add("nested", 123));
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
+
+            A.CallTo(() => grainState.WriteAsync())
+                .MustHaveHappened();
         }
 
         [Fact]
@@ -91,6 +103,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
                     JsonValue.Object());
 
             Assert.Equal(expected.ToString(), actual.Value.ToString());
+
+            A.CallTo(() => grainState.WriteAsync())
+                .MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
@@ -105,12 +120,18 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task Should_do_nothing_if_deleting_and_nested_not_found()
         {
             await sut.RemoveAsync("root.nested");
+
+            A.CallTo(() => grainState.WriteAsync())
+                .MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Should_do_nothing_if_deleting_and_key_not_found()
         {
             await sut.RemoveAsync("root");
+
+            A.CallTo(() => grainState.WriteAsync())
+                .MustNotHaveHappened();
         }
     }
 }

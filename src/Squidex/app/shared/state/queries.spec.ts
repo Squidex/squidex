@@ -74,11 +74,11 @@ describe('Queries', () => {
     });
 
     it('should forward add call to state', () => {
-        queries.add('key3', { fullText: 'text3' });
+        queries.add('key3', { fullText: 'text3' }, true);
 
         expect(true).toBeTruthy();
 
-        uiState.verify(x => x.set('schemas.my-schema.queries.key3', '{"fullText":"text3"}'), Times.once());
+        uiState.verify(x => x.set('schemas.my-schema.queries.key3', '{"fullText":"text3"}', true), Times.once());
     });
 
     it('should forward remove call to state', () => {

@@ -52,8 +52,8 @@ export class Queries {
         );
     }
 
-    public add(key: string, query: Query) {
-        this.uiState.set(`${this.prefix}.queries.${key}`, JSON.stringify(query));
+    public add(key: string, query: Query, user = false) {
+        this.uiState.set(`${this.prefix}.queries.${key}`, JSON.stringify(query), user);
     }
 
     public remove(saved: SavedQuery) {

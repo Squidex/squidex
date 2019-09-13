@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public interface IAppUISettingsGrain : IGrainWithGuidKey
+    public interface IAppUISettingsGrain : IGrainWithStringKey
     {
         Task<J<JsonObject>> GetAsync();
 
