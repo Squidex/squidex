@@ -128,23 +128,52 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             A.CallTo(() => index.AddAsync(token))
                 .MustHaveHappened();
+
+            A.CallTo(() => index.RemoveReservationAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_app_already_exist()
+        public async Task Should_clear_reservation_when_schema_creation_failed()
+        {
+            var token = RandomHash.Simple();
+
+            A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
+                .Returns(token);
+
+            var context =
+                new CommandContext(Create(schemaId.Name), commandBus);
+
+            await sut.HandleAsync(context);
+
+            A.CallTo(() => index.AddAsync(token))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => index.RemoveReservationAsync(token))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_add_to_index_on_create_if_name_taken()
         {
             A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
-                .Returns((string)null);
+                .Returns(Task.FromResult<string>(null));
 
             var context =
                 new CommandContext(Create(schemaId.Name), commandBus)
                     .Complete();
 
             await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+
+            A.CallTo(() => index.AddAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => index.RemoveReservationAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
         }
 
         [Fact]
-        public async Task Should_not_add_to_name_index_on_create_if_name_invalid()
+        public async Task Should_not_add_to_index_on_create_if_name_invalid()
         {
             var context =
                 new CommandContext(Create("INVALID"), commandBus)
@@ -152,7 +181,10 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.ReserveAsync(appId.Id, A<string>.Ignored))
+            A.CallTo(() => index.ReserveAsync(schemaId.Id, A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => index.RemoveReservationAsync(A<string>.Ignored))
                 .MustNotHaveHappened();
         }
 

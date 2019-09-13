@@ -108,13 +108,16 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                 }
                 finally
                 {
-                    if (context.IsCompleted)
+                    if (token != null)
                     {
-                        await index.AddAsync(token);
-                    }
-                    else
-                    {
-                        await index.RemoveReservationAsync(token);
+                        if (context.IsCompleted)
+                        {
+                            await index.AddAsync(token);
+                        }
+                        else
+                        {
+                            await index.RemoveReservationAsync(token);
+                        }
                     }
                 }
             }

@@ -24,8 +24,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
     public sealed class AppsIndexTests
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly IAppsByNameIndexGrain byName = A.Fake<IAppsByNameIndexGrain>();
-        private readonly IAppsByUserIndexGrain byUser = A.Fake<IAppsByUserIndexGrain>();
+        private readonly IAppsByNameIndexGrain indexByName = A.Fake<IAppsByNameIndexGrain>();
+        private readonly IAppsByUserIndexGrain indexByUser = A.Fake<IAppsByUserIndexGrain>();
         private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
         private readonly NamedId<Guid> appId = NamedId.Of(Guid.NewGuid(), "my-app");
         private readonly string userId = "user-1";
@@ -34,10 +34,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         public AppsIndexTests()
         {
             A.CallTo(() => grainFactory.GetGrain<IAppsByNameIndexGrain>(SingleGrain.Id, null))
-                .Returns(byName);
+                .Returns(indexByName);
 
             A.CallTo(() => grainFactory.GetGrain<IAppsByUserIndexGrain>(userId, null))
-                .Returns(byUser);
+                .Returns(indexByUser);
 
             sut = new AppsIndex(grainFactory);
         }
@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var expected = SetupApp(0, false);
 
-            A.CallTo(() => byName.GetIdsAsync(A<string[]>.That.IsSameSequenceAs(new string[] { appId.Name })))
+            A.CallTo(() => indexByName.GetIdsAsync(A<string[]>.That.IsSameSequenceAs(new string[] { appId.Name })))
                 .Returns(new List<Guid> { appId.Id });
 
             var actual = await sut.GetAppsForUserAsync(userId, new PermissionSet($"squidex.apps.{appId.Name}"));
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var expected = SetupApp(0, false);
 
-            A.CallTo(() => byUser.GetIdsAsync())
+            A.CallTo(() => indexByUser.GetIdsAsync())
                 .Returns(new List<Guid> { appId.Id });
 
             var actual = await sut.GetAppsForUserAsync(userId, PermissionSet.Empty);
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var expected = SetupApp(0, false);
 
-            A.CallTo(() => byName.GetIdsAsync())
+            A.CallTo(() => indexByName.GetIdsAsync())
                 .Returns(new List<Guid> { appId.Id });
 
             var actual = await sut.GetAppsAsync();
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var expected = SetupApp(0, false);
 
-            A.CallTo(() => byName.GetIdAsync(appId.Name))
+            A.CallTo(() => indexByName.GetIdAsync(appId.Name))
                 .Returns(appId.Id);
 
             var actual = await sut.GetAppAsync(appId.Name);
@@ -125,24 +125,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_clean_index_if_not_consistent()
-        {
-            SetupApp(-1, false);
-
-            A.CallTo(() => byName.GetIdAsync(appId.Name))
-                .Returns(appId.Id);
-
-            await sut.GetAppAsync(appId.Name);
-
-            A.CallTo(() => byName.RemoveAsync(appId.Id)).MustHaveHappened();
-        }
-
-        [Fact]
-        public async Task Should_add_app_to_index_on_create()
+        public async Task Should_add_app_to_indexes_on_create()
         {
             var token = RandomHash.Simple();
 
-            A.CallTo(() => byName.ReserveAsync(appId.Id, appId.Name))
+            A.CallTo(() => indexByName.ReserveAsync(appId.Id, appId.Name))
                 .Returns(token);
 
             var context =
@@ -151,15 +138,87 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => byName.AddAsync(token))
+            A.CallTo(() => indexByName.AddAsync(token))
                 .MustHaveHappened();
 
-            A.CallTo(() => byUser.AddAsync(appId.Id))
+            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => indexByUser.AddAsync(appId.Id))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_not_add_to_name_index_on_create_if_name_invalid()
+        public async Task Should_not_app_to_user_index_if_app_created_by_client()
+        {
+            var token = RandomHash.Simple();
+
+            A.CallTo(() => indexByName.ReserveAsync(appId.Id, appId.Name))
+                .Returns(token);
+
+            var context =
+                new CommandContext(CreateFromClient(appId.Name), commandBus)
+                    .Complete();
+
+            await sut.HandleAsync(context);
+
+            A.CallTo(() => indexByName.AddAsync(token))
+                .MustHaveHappened();
+
+            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => indexByUser.AddAsync(appId.Id))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_clear_reservation_when_app_creation_failed()
+        {
+            var token = RandomHash.Simple();
+
+            A.CallTo(() => indexByName.ReserveAsync(appId.Id, appId.Name))
+                .Returns(token);
+
+            var context =
+                new CommandContext(CreateFromClient(appId.Name), commandBus);
+
+            await sut.HandleAsync(context);
+
+            A.CallTo(() => indexByName.AddAsync(token))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => indexByName.RemoveReservationAsync(token))
+                .MustHaveHappened();
+
+            A.CallTo(() => indexByUser.AddAsync(appId.Id))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_add_to_indexes_on_create_if_name_taken()
+        {
+            A.CallTo(() => indexByName.ReserveAsync(appId.Id, appId.Name))
+                .Returns(Task.FromResult<string>(null));
+
+            var context =
+                new CommandContext(Create(appId.Name), commandBus)
+                    .Complete();
+
+            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
+
+            A.CallTo(() => indexByName.AddAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => indexByUser.AddAsync(appId.Id))
+                .MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_not_add_to_indexes_on_create_if_name_invalid()
         {
             var context =
                 new CommandContext(Create("INVALID"), commandBus)
@@ -167,10 +226,13 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => byName.ReserveAsync(appId.Id, A<string>.Ignored))
+            A.CallTo(() => indexByName.ReserveAsync(appId.Id, A<string>.Ignored))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => byUser.AddAsync(appId.Id))
+            A.CallTo(() => indexByName.RemoveReservationAsync(A<string>.Ignored))
+                .MustNotHaveHappened();
+
+            A.CallTo(() => indexByUser.AddAsync(appId.Id))
                 .MustNotHaveHappened();
         }
 
@@ -183,25 +245,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => byUser.AddAsync(appId.Id))
+            A.CallTo(() => indexByUser.AddAsync(appId.Id))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_throw_exception_when_app_already_exist()
-        {
-            A.CallTo(() => byName.ReserveAsync(appId.Id, appId.Name))
-                .Returns(Task.FromResult<string>(null));
-
-            var context =
-                new CommandContext(Create(appId.Name), commandBus)
-                    .Complete();
-
-            await Assert.ThrowsAsync<ValidationException>(() => sut.HandleAsync(context));
-        }
-
-        [Fact]
-        public async Task Should_remove_from_index_on_remove_of_contributor()
+        public async Task Should_remove_from_user_index_on_remove_of_contributor()
         {
             var context =
                 new CommandContext(new RemoveContributor { AppId = appId.Id, ContributorId = userId }, commandBus)
@@ -209,12 +258,12 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => byUser.RemoveAsync(appId.Id))
+            A.CallTo(() => indexByUser.RemoveAsync(appId.Id))
                 .MustHaveHappened();
         }
 
         [Fact]
-        public async Task Should_remove_app_from_name_index_on_archive()
+        public async Task Should_remove_app_from_indexes_on_archive()
         {
             var app = SetupApp(0, false);
 
@@ -224,10 +273,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => byName.RemoveAsync(appId.Id))
+            A.CallTo(() => indexByName.RemoveAsync(appId.Id))
                 .MustHaveHappened();
 
-            A.CallTo(() => byUser.RemoveAsync(appId.Id))
+            A.CallTo(() => indexByUser.RemoveAsync(appId.Id))
                 .MustHaveHappened();
         }
 
@@ -238,7 +287,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.RebuildByContributorsAsync(userId, apps);
 
-            A.CallTo(() => byUser.RebuildAsync(apps))
+            A.CallTo(() => indexByUser.RebuildAsync(apps))
                 .MustHaveHappened();
         }
 
@@ -249,7 +298,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.RebuildByContributorsAsync(appId.Id, users);
 
-            A.CallTo(() => byUser.AddAsync(appId.Id))
+            A.CallTo(() => indexByUser.AddAsync(appId.Id))
                 .MustHaveHappened();
         }
 
@@ -260,7 +309,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.RebuildAsync(apps);
 
-            A.CallTo(() => byName.RebuildAsync(apps))
+            A.CallTo(() => indexByName.RebuildAsync(apps))
                 .MustHaveHappened();
         }
 
@@ -269,7 +318,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             await sut.AddAsync("token");
 
-            A.CallTo(() => byName.AddAsync("token"))
+            A.CallTo(() => indexByName.AddAsync("token"))
                 .MustHaveHappened();
         }
 
@@ -278,7 +327,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             await sut.RemoveReservationAsync("token");
 
-            A.CallTo(() => byName.RemoveReservationAsync("token"))
+            A.CallTo(() => indexByName.RemoveReservationAsync("token"))
                 .MustHaveHappened();
         }
 
@@ -287,7 +336,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             await sut.GetIdsAsync();
 
-            A.CallTo(() => byName.GetIdsAsync())
+            A.CallTo(() => indexByName.GetIdsAsync())
                 .MustHaveHappened();
         }
 
@@ -317,12 +366,22 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         private CreateApp Create(string name)
         {
-            return new CreateApp { AppId = appId.Id, Name = name, Actor = Actor() };
+            return new CreateApp { AppId = appId.Id, Name = name, Actor = ActorSubject() };
         }
 
-        private RefToken Actor()
+        private CreateApp CreateFromClient(string name)
+        {
+            return new CreateApp { AppId = appId.Id, Name = name, Actor = ActorClient() };
+        }
+
+        private RefToken ActorSubject()
         {
             return new RefToken(RefTokenType.Subject, userId);
+        }
+
+        private RefToken ActorClient()
+        {
+            return new RefToken(RefTokenType.Client, userId);
         }
     }
 }

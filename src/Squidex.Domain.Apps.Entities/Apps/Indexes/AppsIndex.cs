@@ -128,8 +128,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                     return app.Value;
                 }
 
-                await Index().RemoveAsync(appId);
-
                 return null;
             }
         }
@@ -180,18 +178,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
                 }
                 finally
                 {
-                    if (context.IsCompleted)
+                    if (token != null)
                     {
-                        await index.AddAsync(token);
-
-                        if (createApp.Actor.IsSubject)
+                        if (context.IsCompleted)
                         {
-                            await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId);
+                            await index.AddAsync(token);
+
+                            if (createApp.Actor.IsSubject)
+                            {
+                                await Index(createApp.Actor.Identifier).AddAsync(createApp.AppId);
+                            }
                         }
-                    }
-                    else
-                    {
-                        await index.RemoveReservationAsync(token);
+                        else
+                        {
+                            await index.RemoveReservationAsync(token);
+                        }
                     }
                 }
             }
