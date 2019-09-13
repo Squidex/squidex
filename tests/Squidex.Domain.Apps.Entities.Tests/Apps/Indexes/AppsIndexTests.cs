@@ -271,11 +271,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         }
 
         [Fact]
-        public async Task Should_forward_reserveration_removed()
+        public async Task Should_forward_remove_reservation()
         {
             await sut.RemoveReservationAsync("token");
 
             A.CallTo(() => byName.RemoveReservationAsync("token"))
+                .MustHaveHappened();
+        }
+
+        [Fact]
+        public async Task Should_forward_request_for_ids()
+        {
+            await sut.GetIdsAsync();
+
+            A.CallTo(() => byName.GetIdsAsync())
                 .MustHaveHappened();
         }
 

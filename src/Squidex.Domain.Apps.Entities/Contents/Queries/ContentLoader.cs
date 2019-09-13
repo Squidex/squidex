@@ -13,20 +13,20 @@ using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries
 {
-    public sealed class ContentVersionLoader : IContentVersionLoader
+    public sealed class ContentLoader : IContentLoader
     {
         private readonly IGrainFactory grainFactory;
 
-        public ContentVersionLoader(IGrainFactory grainFactory)
+        public ContentLoader(IGrainFactory grainFactory)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
 
             this.grainFactory = grainFactory;
         }
 
-        public async Task<IContentEntity> LoadAsync(Guid id, long version)
+        public async Task<IContentEntity> GetAsync(Guid id, long version)
         {
-            using (Profiler.TraceMethod<ContentVersionLoader>())
+            using (Profiler.TraceMethod<ContentLoader>())
             {
                 var grain = grainFactory.GetGrain<IContentGrain>(id);
 

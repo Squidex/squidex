@@ -14,6 +14,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
     public interface IAppsIndex
     {
+        Task<List<Guid>> GetIdsAsync();
+
         Task<List<IAppEntity>> GetAppsAsync();
 
         Task<List<IAppEntity>> GetAppsForUserAsync(string userId, PermissionSet permissions);

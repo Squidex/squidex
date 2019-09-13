@@ -55,6 +55,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
             return Index().RemoveReservationAsync(token);
         }
 
+        public Task<List<Guid>> GetIdsAsync()
+        {
+            return Index().GetIdsAsync();
+        }
+
         public Task<bool> AddAsync(string token)
         {
             return Index().AddAsync(token);

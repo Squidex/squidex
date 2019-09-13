@@ -108,6 +108,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AssetQueryService>()
                 .As<IAssetQueryService>();
 
+            services.AddSingletonAs<AssetLoader>()
+                .As<IAssetLoader>();
+
             services.AddSingletonAs(c => new Lazy<IContentQueryService>(() => c.GetRequiredService<IContentQueryService>()))
                 .AsSelf();
 
@@ -117,8 +120,8 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentQueryService>()
                 .As<IContentQueryService>();
 
-            services.AddSingletonAs<ContentVersionLoader>()
-                .As<IContentVersionLoader>();
+            services.AddSingletonAs<ContentLoader>()
+                .As<IContentLoader>();
 
             services.AddSingletonAs<AppHistoryEventsCreator>()
                 .As<IHistoryEventsCreator>();
