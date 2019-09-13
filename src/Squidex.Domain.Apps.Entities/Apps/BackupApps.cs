@@ -26,23 +26,23 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private const string SettingsFile = "Settings.json";
         private readonly IGrainFactory grainFactory;
         private readonly IUserResolver userResolver;
-        private readonly IAppsIndex indexForApps;
+        private readonly IAppsIndex grainAppIndex;
         private readonly HashSet<string> contributors = new HashSet<string>();
         private readonly Dictionary<string, RefToken> userMapping = new Dictionary<string, RefToken>();
         private Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
-        private bool isReserved;
+        private string appReservation;
         private string appName;
 
         public override string Name { get; } = "Apps";
 
-        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver, IAppsIndex indexForApps)
+        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver, IAppsIndex grainAppIndex)
         {
+            Guard.NotNull(grainAppIndex, nameof(grainAppIndex));
             Guard.NotNull(grainFactory, nameof(grainFactory));
-            Guard.NotNull(indexForApps, nameof(indexForApps));
             Guard.NotNull(userResolver, nameof(userResolver));
 
+            this.grainAppIndex = grainAppIndex;
             this.grainFactory = grainFactory;
-            this.indexForApps = indexForApps;
             this.userResolver = userResolver;
         }
 
@@ -124,9 +124,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private async Task ReserveAppAsync(Guid appId)
         {
-            isReserved = await indexForApps.AddAppAsync(appId, appName, true);
+            appReservation = await grainAppIndex.ReserveAsync(appId, appName);
 
-            if (isReserved == false)
+            if (appReservation == null)
             {
                 throw new BackupRestoreException("The app id or name is not available.");
             }
@@ -134,10 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override async Task CleanupRestoreErrorAsync(Guid appId)
         {
-            if (isReserved)
-            {
-                await indexForApps.RemoveReservationAsync(appId, appName);
-            }
+            await grainAppIndex.RemoveReservationAsync(appReservation);
         }
 
         private RefToken MapUser(string userId, RefToken fallback)
@@ -197,9 +194,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)
         {
-            await indexForApps.AddAppAsync(appId, appName);
+            await grainAppIndex.AddAsync(appReservation);
 
-            await indexForApps.RebuildByContributorsAsync(appId, contributors);
+            await grainAppIndex.RebuildByContributorsAsync(appId, contributors);
         }
     }
 }

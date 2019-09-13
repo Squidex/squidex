@@ -47,7 +47,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var expected = SetupApp(0, false);
 
-            A.CallTo(() => byName.GetAppIdsAsync(A<string[]>.That.IsSameSequenceAs(new string[] { appId.Name })))
+            A.CallTo(() => byName.GetIdsAsync(A<string[]>.That.IsSameSequenceAs(new string[] { appId.Name })))
                 .Returns(new List<Guid> { appId.Id });
 
             var actual = await sut.GetAppsForUserAsync(userId, new PermissionSet($"squidex.apps.{appId.Name}"));
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var expected = SetupApp(0, false);
 
-            A.CallTo(() => byUser.GetAppIdsAsync())
+            A.CallTo(() => byUser.GetIdsAsync())
                 .Returns(new List<Guid> { appId.Id });
 
             var actual = await sut.GetAppsForUserAsync(userId, PermissionSet.Empty);
@@ -73,7 +73,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var expected = SetupApp(0, false);
 
-            A.CallTo(() => byName.GetAppIdsAsync())
+            A.CallTo(() => byName.GetIdsAsync())
                 .Returns(new List<Guid> { appId.Id });
 
             var actual = await sut.GetAppsAsync();
@@ -86,7 +86,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             var expected = SetupApp(0, false);
 
-            A.CallTo(() => byName.GetAppIdAsync(appId.Name))
+            A.CallTo(() => byName.GetIdAsync(appId.Name))
                 .Returns(appId.Id);
 
             var actual = await sut.GetAppAsync(appId.Name);
@@ -129,19 +129,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         {
             SetupApp(-1, false);
 
-            A.CallTo(() => byName.GetAppIdAsync(appId.Name))
+            A.CallTo(() => byName.GetIdAsync(appId.Name))
                 .Returns(appId.Id);
 
             await sut.GetAppAsync(appId.Name);
 
-            A.CallTo(() => byName.RemoveAppAsync(appId.Id)).MustHaveHappened();
+            A.CallTo(() => byName.RemoveAsync(appId.Id)).MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_add_app_to_index_on_create()
         {
-            A.CallTo(() => byName.AddAppAsync(appId.Id, appId.Name, false))
-                .Returns(true);
+            var token = RandomHash.Simple();
+
+            A.CallTo(() => byName.ReserveAsync(appId.Id, appId.Name))
+                .Returns(token);
 
             var context =
                 new CommandContext(Create(appId.Name), commandBus)
@@ -149,10 +151,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => byName.AddAppAsync(appId.Id, appId.Name, false))
-                .MustHaveHappened();
-
-            A.CallTo(() => byUser.AddAppAsync(appId.Id))
+            A.CallTo(() => byName.AddAsync(token))
                 .MustHaveHappened();
         }
 
@@ -165,10 +164,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => byName.AddAppAsync(appId.Id, A<string>.Ignored, A<bool>.Ignored))
+            A.CallTo(() => byName.ReserveAsync(appId.Id, A<string>.Ignored))
                 .MustNotHaveHappened();
 
-            A.CallTo(() => byUser.AddAppAsync(appId.Id))
+            A.CallTo(() => byUser.AddAsync(appId.Id))
                 .MustNotHaveHappened();
         }
 
@@ -181,15 +180,15 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => byUser.AddAppAsync(appId.Id))
+            A.CallTo(() => byUser.AddAsync(appId.Id))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_throw_exception_when_app_already_exist()
         {
-            A.CallTo(() => byName.AddAppAsync(appId.Id, appId.Name, false))
-                .Returns(false);
+            A.CallTo(() => byName.ReserveAsync(appId.Id, appId.Name))
+                .Returns(Task.FromResult<string>(null));
 
             var context =
                 new CommandContext(Create(appId.Name), commandBus)
@@ -207,7 +206,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => byUser.RemoveAppAsync(appId.Id))
+            A.CallTo(() => byUser.RemoveAsync(appId.Id))
                 .MustHaveHappened();
         }
 
@@ -222,10 +221,10 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => byName.RemoveAppAsync(appId.Id))
+            A.CallTo(() => byName.RemoveAsync(appId.Id))
                 .MustHaveHappened();
 
-            A.CallTo(() => byUser.RemoveAppAsync(appId.Id))
+            A.CallTo(() => byUser.RemoveAsync(appId.Id))
                 .MustHaveHappened();
         }
 
@@ -247,7 +246,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
             await sut.RebuildByContributorsAsync(appId.Id, users);
 
-            A.CallTo(() => byUser.AddAppAsync(appId.Id))
+            A.CallTo(() => byUser.AddAsync(appId.Id))
                 .MustHaveHappened();
         }
 
@@ -265,18 +264,18 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
         [Fact]
         public async Task Should_forward_reserveration()
         {
-            await sut.AddAppAsync(appId.Id, appId.Name, true);
+            await sut.AddAsync("token");
 
-            A.CallTo(() => byName.AddAppAsync(appId.Id, appId.Name, true))
+            A.CallTo(() => byName.AddAsync("token"))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_forward_reserveration_removed()
         {
-            await sut.RemoveReservationAsync(appId.Id, appId.Name);
+            await sut.RemoveReservationAsync("token");
 
-            A.CallTo(() => byName.RemoveReservationAsync(appId.Id, appId.Name))
+            A.CallTo(() => byName.RemoveReservationAsync("token"))
                 .MustHaveHappened();
         }
 

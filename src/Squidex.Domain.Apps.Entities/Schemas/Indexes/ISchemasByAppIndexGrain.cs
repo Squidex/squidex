@@ -6,22 +6,12 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Orleans;
+using Squidex.Infrastructure.Orleans.Indexes;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 {
-    public interface ISchemasByAppIndexGrain : IGrainWithGuidKey
+    public interface ISchemasByAppIndexGrain : IUniqueNameIndexGrain<Guid>, IGrainWithGuidKey
     {
-        Task<bool> AddSchemaAsync(Guid schemaId, string name);
-
-        Task RemoveSchemaAsync(Guid schemaId);
-
-        Task RebuildAsync(Dictionary<string, Guid> schemas);
-
-        Task<Guid> GetSchemaIdAsync(string name);
-
-        Task<List<Guid>> GetSchemaIdsAsync();
     }
 }

@@ -39,7 +39,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             var rule = SetupRule(0, false);
 
-            A.CallTo(() => index.GetRuleIdsAsync())
+            A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<Guid> { rule.Id });
 
             var actual = await sut.GetRulesAsync(appId.Id);
@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             var rule = SetupRule(-1, false);
 
-            A.CallTo(() => index.GetRuleIdsAsync())
+            A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<Guid> { rule.Id });
 
             var actual = await sut.GetRulesAsync(appId.Id);
@@ -65,26 +65,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             var rule = SetupRule(-1, false);
 
-            A.CallTo(() => index.GetRuleIdsAsync())
+            A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<Guid> { rule.Id });
 
             var actual = await sut.GetRulesAsync(appId.Id);
 
             Assert.Empty(actual);
-        }
-
-        [Fact]
-        public async Task Should_clean_index_if_not_consistent()
-        {
-            var rule = SetupRule(-1, false);
-
-            A.CallTo(() => index.GetRuleIdsAsync())
-                .Returns(new List<Guid> { rule.Id });
-
-            await sut.GetRulesAsync(appId.Id);
-
-            A.CallTo(() => index.RemoveRuleAsync(rule.Id))
-                .MustHaveHappened();
         }
 
         [Fact]
@@ -98,7 +84,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.AddRuleAsync(ruleId))
+            A.CallTo(() => index.AddAsync(ruleId))
                 .MustHaveHappened();
         }
 
@@ -113,7 +99,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.RemoveRuleAsync(rule.Id))
+            A.CallTo(() => index.RemoveAsync(rule.Id))
                 .MustHaveHappened();
         }
 

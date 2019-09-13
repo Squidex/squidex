@@ -6,20 +6,12 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Orleans;
+using Squidex.Infrastructure.Orleans.Indexes;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public interface IAppsByUserIndexGrain : IGrainWithStringKey
+    public interface IAppsByUserIndexGrain : IIdsIndexGrain<Guid>, IGrainWithStringKey
     {
-        Task AddAppAsync(Guid appId);
-
-        Task RemoveAppAsync(Guid appId);
-
-        Task RebuildAsync(HashSet<Guid> apps);
-
-        Task<List<Guid>> GetAppIdsAsync();
     }
 }

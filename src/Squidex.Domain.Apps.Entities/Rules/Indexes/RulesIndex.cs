@@ -41,13 +41,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
                 var rules =
                     await Task.WhenAll(
-                        ids.Select(id => GetRuleAsync(appId, id)));
+                        ids.Select(GetRuleAsync));
 
                 return rules.Where(x => x != null).ToList();
             }
         }
 
-        private async Task<IRuleEntity> GetRuleAsync(Guid appId, Guid id)
+        private async Task<IRuleEntity> GetRuleAsync(Guid id)
         {
             using (Profiler.TraceMethod<RulesIndex>())
             {
@@ -58,8 +58,6 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
                     return ruleEntity.Value;
                 }
 
-                await Index(appId).RemoveRuleAsync(id);
-
                 return null;
             }
         }
@@ -68,31 +66,31 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
         {
             using (Profiler.TraceMethod<RulesIndex>())
             {
-                return await Index(appId).GetRuleIdsAsync();
+                return await Index(appId).GetIdsAsync();
             }
         }
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (context.Command is CreateRule createRule)
-            {
-                await CreateRuleAsync(createRule);
-            }
-
             await next();
 
             if (context.IsCompleted)
             {
-                if (context.Command is DeleteRule deleteRule)
+                switch (context.Command)
                 {
-                    await DeleteRuleAsync(deleteRule);
+                    case CreateRule createRule:
+                        await CreateRuleAsync(createRule);
+                        break;
+                    case DeleteRule deleteRule:
+                        await DeleteRuleAsync(deleteRule);
+                        break;
                 }
             }
         }
 
         private async Task CreateRuleAsync(CreateRule command)
         {
-            await Index(command.AppId.Id).AddRuleAsync(command.RuleId);
+            await Index(command.AppId.Id).AddAsync(command.RuleId);
         }
 
         private async Task DeleteRuleAsync(DeleteRule command)
@@ -103,7 +101,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 
             if (IsFound(rule.Value))
             {
-                await Index(rule.Value.AppId.Id).RemoveRuleAsync(id);
+                await Index(rule.Value.AppId.Id).RemoveAsync(id);
             }
         }
 

@@ -74,8 +74,6 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
                     return schema.Value;
                 }
 
-                await Index(appId).RemoveSchemaAsync(id);
-
                 return null;
             }
         }
@@ -84,7 +82,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
-                return await Index(appId).GetSchemaIdAsync(name);
+                return await Index(appId).GetIdAsync(name);
             }
         }
 
@@ -92,7 +90,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             using (Profiler.TraceMethod<SchemasIndex>())
             {
-                return await Index(appId).GetSchemaIdsAsync();
+                return await Index(appId).GetIdsAsync();
             }
         }
 
@@ -100,39 +98,59 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             if (context.Command is CreateSchema createSchema)
             {
-                await CreateSchemaAsync(createSchema);
-            }
+                var index = Index(createSchema.AppId.Id);
 
-            await next();
+                string token = await CheckSchemaAsync(index, createSchema);
 
-            if (context.IsCompleted)
-            {
-                if (context.Command is DeleteSchema deleteSchema)
+                try
                 {
-                    await DeleteSchemaAsync(deleteSchema);
+                    await next();
+                }
+                finally
+                {
+                    if (context.IsCompleted)
+                    {
+                        await index.AddAsync(token);
+                    }
+                    else
+                    {
+                        await index.RemoveReservationAsync(token);
+                    }
+                }
+            }
+            else
+            {
+                await next();
+
+                if (context.IsCompleted)
+                {
+                     if (context.Command is DeleteSchema deleteSchema)
+                    {
+                        await DeleteSchemaAsync(deleteSchema);
+                    }
                 }
             }
         }
 
-        private async Task CreateSchemaAsync(CreateSchema commmand)
+        private async Task<string> CheckSchemaAsync(ISchemasByAppIndexGrain index, CreateSchema command)
         {
-            var name = commmand.Name;
+            var name = command.Name;
 
-            if (!name.IsSlug())
+            if (name.IsSlug())
             {
-                return;
+                var token = await index.ReserveAsync(command.SchemaId, name);
+
+                if (token == null)
+                {
+                    var error = new ValidationError("A schema with this name already exists.");
+
+                    throw new ValidationException("Cannot create schema.", error);
+                }
+
+                return token;
             }
 
-            var id = commmand.SchemaId;
-
-            var appId = commmand.AppId.Id;
-
-            if (await HasSchemaAsync(appId, name) || !await AddSchemaAsync(appId, id, name))
-            {
-                var error = new ValidationError("A schema with this name already exists.");
-
-                throw new ValidationException("Cannot create schema.", error);
-            }
+            return null;
         }
 
         private async Task DeleteSchemaAsync(DeleteSchema commmand)
@@ -143,18 +161,8 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             if (IsFound(schema.Value, true))
             {
-                await Index(schema.Value.AppId.Id).RemoveSchemaAsync(schemaId);
+                await Index(schema.Value.AppId.Id).RemoveAsync(schemaId);
             }
-        }
-
-        private async Task<bool> AddSchemaAsync(Guid appId, Guid id, string name)
-        {
-            return await Index(appId).AddSchemaAsync(id, name);
-        }
-
-        private async Task<bool> HasSchemaAsync(Guid appId, string name)
-        {
-            return await GetSchemaAsync(appId, name) != null;
         }
 
         private ISchemasByAppIndexGrain Index(Guid appId)

@@ -5,13 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using Orleans;
-using Squidex.Infrastructure.Orleans.Indexes;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Indexes
+namespace Squidex.Infrastructure.Orleans.Indexes
 {
-    public interface IAppsByNameIndexGrain : IUniqueNameIndexGrain<Guid>, IGrainWithStringKey
+    public interface IIdsIndexGrain<T>
     {
+        Task<long> CountAsync();
+
+        Task RebuildAsync(HashSet<T> ids);
+
+        Task AddAsync(T id);
+
+        Task RemoveAsync(T id);
+
+        Task ClearAsync();
+
+        Task<List<T>> GetIdsAsync();
     }
 }

@@ -22,9 +22,11 @@ namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 
         Task<IAppEntity> GetAppAsync(Guid appId);
 
-        Task<bool> AddAppAsync(Guid appId, string name, bool reserve = false);
+        Task<string> ReserveAsync(Guid id, string name);
 
-        Task RemoveReservationAsync(Guid appId, string name);
+        Task<bool> AddAsync(string token);
+
+        Task RemoveReservationAsync(string token);
 
         Task RebuildByContributorsAsync(string contributorId, HashSet<Guid> apps);
 

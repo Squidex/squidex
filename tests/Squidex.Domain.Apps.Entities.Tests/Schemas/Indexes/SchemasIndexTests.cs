@@ -52,7 +52,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var schema = SetupSchema(0, false);
 
-            A.CallTo(() => index.GetSchemaIdAsync(schema.SchemaDef.Name))
+            A.CallTo(() => index.GetIdAsync(schema.SchemaDef.Name))
                 .Returns(schema.Id);
 
             var actual = await sut.GetSchemaAsync(appId.Id, schema.SchemaDef.Name);
@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var schema = SetupSchema(0, false);
 
-            A.CallTo(() => index.GetSchemaIdsAsync())
+            A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<Guid> { schema.Id });
 
             var actual = await sut.GetSchemasAsync(appId.Id);
@@ -78,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var schema = SetupSchema(-1, false);
 
-            A.CallTo(() => index.GetSchemaIdsAsync())
+            A.CallTo(() => index.GetIdsAsync())
                 .Returns(new List<Guid> { schema.Id });
 
             var actual = await sut.GetSchemasAsync(appId.Id);
@@ -91,7 +91,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var schema = SetupSchema(0, true);
 
-            A.CallTo(() => index.GetSchemaIdAsync(schema.SchemaDef.Name))
+            A.CallTo(() => index.GetIdAsync(schema.SchemaDef.Name))
                 .Returns(schema.Id);
 
             var actual = await sut.GetSchemasAsync(appId.Id);
@@ -104,7 +104,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         {
             var schema = SetupSchema(-1, true);
 
-            A.CallTo(() => index.GetSchemaIdAsync(schema.SchemaDef.Name))
+            A.CallTo(() => index.GetIdAsync(schema.SchemaDef.Name))
                 .Returns(schema.Id);
 
             var actual = await sut.GetSchemasAsync(appId.Id, true);
@@ -113,24 +113,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
         }
 
         [Fact]
-        public async Task Should_clean_index_if_not_consistent()
-        {
-            var schema = SetupSchema(-1, false);
-
-            A.CallTo(() => index.GetSchemaIdsAsync())
-                .Returns(new List<Guid> { schema.Id });
-
-            await sut.GetSchemasAsync(appId.Id);
-
-            A.CallTo(() => index.RemoveSchemaAsync(schema.Id))
-                .MustHaveHappened();
-        }
-
-        [Fact]
         public async Task Should_add_schema_to_index_on_create()
         {
-            A.CallTo(() => index.AddSchemaAsync(schemaId.Id, schemaId.Name))
-                .Returns(true);
+            var token = RandomHash.Simple();
+
+            A.CallTo(() => index.ReserveAsync(schemaId.Id, schemaId.Name))
+                .Returns(token);
 
             var context =
                 new CommandContext(Create(schemaId.Name), commandBus)
@@ -138,15 +126,15 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.AddSchemaAsync(schemaId.Id, schemaId.Name))
+            A.CallTo(() => index.AddAsync(token))
                 .MustHaveHappened();
         }
 
         [Fact]
         public async Task Should_throw_exception_when_app_already_exist()
         {
-            A.CallTo(() => index.AddSchemaAsync(appId.Id, appId.Name))
-                .Returns(false);
+            A.CallTo(() => index.ReserveAsync(appId.Id, appId.Name))
+                .Returns((string)null);
 
             var context =
                 new CommandContext(Create(schemaId.Name), commandBus)
@@ -164,7 +152,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.AddSchemaAsync(appId.Id, A<string>.Ignored))
+            A.CallTo(() => index.ReserveAsync(appId.Id, A<string>.Ignored))
                 .MustNotHaveHappened();
         }
 
@@ -179,7 +167,7 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
 
             await sut.HandleAsync(context);
 
-            A.CallTo(() => index.RemoveSchemaAsync(schema.Id))
+            A.CallTo(() => index.RemoveAsync(schema.Id))
                 .MustHaveHappened();
         }
 
