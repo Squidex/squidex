@@ -47,10 +47,6 @@ export class BackupsPageComponent extends ResourceOwner implements OnInit {
         this.backupsState.start();
     }
 
-    public delete(backup: BackupDto) {
-        this.backupsState.delete(backup);
-    }
-
     public trackByBackup(index: number, item: BackupDto) {
         return item.id;
     }

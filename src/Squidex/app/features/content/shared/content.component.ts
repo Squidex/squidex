@@ -24,14 +24,14 @@ import {
 
 @Component({
     selector: '[sqxContent]',
-    styleUrls: ['./content-item.component.scss'],
-    templateUrl: './content-item.component.html',
+    styleUrls: ['./content.component.scss'],
+    templateUrl: './content.component.html',
     animations: [
         fadeAnimation
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContentItemComponent implements OnChanges {
+export class ContentComponent implements OnChanges {
     @Output()
     public clone = new EventEmitter();
 
@@ -70,6 +70,9 @@ export class ContentItemComponent implements OnChanges {
 
     @Input()
     public isCompact = false;
+
+    @Input()
+    public link: any = null;
 
     @Input('sqxContent')
     public content: ContentDto;

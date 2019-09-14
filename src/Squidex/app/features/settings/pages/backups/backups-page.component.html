@@ -32,7 +32,7 @@
             </div>
 
             <sqx-backup *ngFor="let backup of backups; trackBy: trackByBackup"
-                [backup]="backup" (delete)="delete(backup)">
+                [backup]="backup">
             </sqx-backup>
         </ng-container>
     </ng-container>

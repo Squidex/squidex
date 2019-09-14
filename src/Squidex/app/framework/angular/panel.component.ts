@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
 
 import { slideRightAnimation } from '@app/framework/internal';
 
@@ -23,9 +23,8 @@ import { PanelContainerDirective } from './panel-container.directive';
 export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     private styleWidth: string;
 
-    public renderWidth = 0;
-
-    public isViewInit = false;
+    @Output()
+    public close = new EventEmitter();
 
     @Input()
     public theme = 'light';
@@ -64,10 +63,17 @@ export class PanelComponent implements AfterViewInit, OnDestroy, OnInit {
     public contentClass = '';
 
     @Input()
+    public customClose = false;
+
+    @Input()
     public sidebarClass = '';
 
     @ViewChild('panel', { static: false })
     public panel: ElementRef<HTMLElement>;
+
+    public renderWidth = 0;
+
+    public isViewInit = false;
 
     constructor(
         private readonly container: PanelContainerDirective,

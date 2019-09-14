@@ -34,19 +34,16 @@ export class PlansPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.route.queryParams.subscribe(params => {
-            this.overridePlanId = params['planId'];
-        }).unsubscribe();
+        this.route.queryParams
+            .subscribe(params => {
+                this.overridePlanId = params['planId'];
+            }).unsubscribe();
 
         this.plansState.load(false, this.overridePlanId);
     }
 
     public reload() {
         this.plansState.load(true, this.overridePlanId);
-    }
-
-    public change(planId: string) {
-        this.plansState.change(planId);
     }
 
     public trackByPlan(index: number, planInfo: { plan: PlanDto }) {

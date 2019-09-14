@@ -17,7 +17,7 @@ export * from './pages/schemas/schemas-page.component';
 export * from './shared/array-editor.component';
 export * from './shared/array-item.component';
 export * from './shared/assets-editor.component';
-export * from './shared/content-item.component';
+export * from './shared/content.component';
 export * from './shared/content-status.component';
 export * from './shared/content-value.component';
 export * from './shared/content-value-editor.component';

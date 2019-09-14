@@ -9,7 +9,7 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { EventConsumerDto } from '@app/features/administration/internal';
+import { EventConsumerDto, EventConsumersState } from '@app/features/administration/internal';
 
 @Component({
     selector: '[sqxEventConsumer]',
@@ -26,13 +26,13 @@ import { EventConsumerDto } from '@app/features/administration/internal';
                 <span>{{eventConsumer.position}}</span>
             </td>
             <td class="cell-actions-lg">
-                <button type="button" class="btn btn-text" (click)="reset.emit()" *ngIf="eventConsumer.canReset" title="Reset Event Consumer">
+                <button type="button" class="btn btn-text" (click)="reset()" *ngIf="eventConsumer.canReset" title="Reset Event Consumer">
                     <i class="icon icon-reset"></i>
                 </button>
-                <button type="button" class="btn btn-text" (click)="start.emit()" *ngIf="eventConsumer.canStart" title="Start Event Consumer">
+                <button type="button" class="btn btn-text" (click)="start()" *ngIf="eventConsumer.canStart" title="Start Event Consumer">
                     <i class="icon icon-play"></i>
                 </button>
-                <button type="button" class="btn btn-text" (click)="stop.emit()" *ngIf="eventConsumer.canStop" title="Stop Event Consumer">
+                <button type="button" class="btn btn-text" (click)="stop()" *ngIf="eventConsumer.canStop" title="Stop Event Consumer">
                     <i class="icon icon-pause"></i>
                 </button>
             </td>
@@ -43,17 +43,25 @@ import { EventConsumerDto } from '@app/features/administration/internal';
 })
 export class EventConsumerComponent {
     @Output()
-    public start = new EventEmitter();
-
-    @Output()
-    public stop = new EventEmitter();
-
-    @Output()
-    public reset = new EventEmitter();
-
-    @Output()
     public error = new EventEmitter();
 
     @Input('sqxEventConsumer')
     public eventConsumer: EventConsumerDto;
+
+    constructor(
+        public readonly eventConsumersState: EventConsumersState
+    ) {
+    }
+
+    public start() {
+        this.eventConsumersState.start(this.eventConsumer);
+    }
+
+    public stop() {
+        this.eventConsumersState.stop(this.eventConsumer);
+    }
+
+    public reset() {
+        this.eventConsumersState.reset(this.eventConsumer);
+    }
 }

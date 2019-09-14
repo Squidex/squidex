@@ -5,9 +5,14 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { ApiUrlConfig, BackupDto, Duration } from '@app/shared';
+import {
+    ApiUrlConfig,
+    BackupDto,
+    BackupsState,
+    Duration
+} from '@app/shared';
 
 @Component({
     selector: 'sqx-backup',
@@ -53,7 +58,7 @@ import { ApiUrlConfig, BackupDto, Duration } from '@app/shared';
                 <div class="col-auto">
                     <button type="button" class="btn btn-text-danger mt-1"
                         [disabled]="!backup.canDelete"
-                        (sqxConfirmClick)="delete.emit()"
+                        (sqxConfirmClick)="delete()"
                         confirmTitle="Delete backup"
                         confirmText="Do you really want to delete the backup?">
                         <i class="icon-bin2"></i>
@@ -65,9 +70,6 @@ import { ApiUrlConfig, BackupDto, Duration } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BackupComponent {
-    @Output()
-    public delete = new EventEmitter();
-
     @Input()
     public backup: BackupDto;
 
@@ -76,7 +78,11 @@ export class BackupComponent {
     }
 
     constructor(
-        public readonly apiUrl: ApiUrlConfig
+        public readonly apiUrl: ApiUrlConfig, private readonly backupsState: BackupsState
     ) {
+    }
+
+    public delete() {
+        this.backupsState.delete(this.backup);
     }
 }

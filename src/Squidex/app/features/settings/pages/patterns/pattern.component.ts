@@ -5,11 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
     EditPatternForm,
+    fadeAnimation,
     PatternDto,
     PatternsState
 } from '@app/shared';
@@ -17,7 +18,11 @@ import {
 @Component({
     selector: 'sqx-pattern',
     styleUrls: ['./pattern.component.scss'],
-    templateUrl: './pattern.component.html'
+    templateUrl: './pattern.component.html',
+    animations: [
+        fadeAnimation
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PatternComponent implements OnChanges {
     @Input()

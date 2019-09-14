@@ -52,7 +52,7 @@
             <div sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed" *ngIf="usersState.users | async; let users">
                     <tbody *ngFor="let user of users; trackBy: trackByUser"
-                        [sqxUser]="user"(lock)="lock(user)" (unlock)="unlock(user)">
+                        [sqxUser]="user">
                     </tbody>
                 </table>
             </div>

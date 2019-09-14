@@ -1,0 +1,34 @@
+@import '_vars';
+@import '_mixins';
+
+.plan {
+    & {
+        min-width: 13rem;
+        max-width: 20rem;
+        margin: .5rem;
+    }
+
+    &-price {
+        color: $color-theme-blue;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    &-selected {
+        pointer-events: none;
+    }
+
+    &-fact {
+        line-height: 1.8rem;
+    }
+
+    .btn {
+        margin-top: 1rem;
+    }
+}
+
+.card-footer,
+.card-header,
+.card-body {
+    padding: 1rem;
+}

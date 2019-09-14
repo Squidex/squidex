@@ -90,14 +90,6 @@ export class ContributorsPageComponent implements OnInit {
         this.contributorsState.search(query);
     }
 
-    public remove(contributor: ContributorDto) {
-        this.contributorsState.revoke(contributor);
-    }
-
-    public changeRole(contributor: ContributorDto, role: string) {
-        this.contributorsState.assign({ contributorId: contributor.contributorId, role });
-    }
-
     public assignContributor() {
         const value = this.assignContributorForm.submit();
 

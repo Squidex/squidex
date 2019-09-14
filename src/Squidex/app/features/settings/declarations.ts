@@ -17,6 +17,7 @@ export * from './pages/languages/languages-page.component';
 export * from './pages/more/more-page.component';
 export * from './pages/patterns/pattern.component';
 export * from './pages/patterns/patterns-page.component';
+export * from './pages/plans/plan.component';
 export * from './pages/plans/plans-page.component';
 export * from './pages/roles/role.component';
 export * from './pages/roles/roles-page.component';

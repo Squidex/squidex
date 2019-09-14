@@ -43,14 +43,6 @@ export class UsersPageComponent implements OnInit {
         this.usersState.goNext();
     }
 
-    public lock(user: UserDto) {
-        this.usersState.lock(user);
-    }
-
-    public unlock(user: UserDto) {
-        this.usersState.unlock(user);
-    }
-
     public trackByUser(index: number, user: UserDto) {
         return user.id;
     }

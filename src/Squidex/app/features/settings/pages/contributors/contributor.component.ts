@@ -7,9 +7,13 @@
 
 // tslint:disable: component-selector
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { ContributorDto, RoleDto } from '@app/shared';
+import {
+    ContributorDto,
+    ContributorsState,
+    RoleDto
+} from '@app/shared';
 
 @Component({
     selector: '[sqxContributor]',
@@ -24,13 +28,13 @@ import { ContributorDto, RoleDto } from '@app/shared';
             <td class="cell-time">
                 <select class="form-control"
                     [ngModel]="contributor.role"
-                    (ngModelChange)="changeRole.emit($event)"
+                    (ngModelChange)="changeRole($event)"
                     [disabled]="!contributor.canUpdate">
                     <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
                 </select>
             </td>
             <td class="cell-actions">
-                <button type="button" class="btn btn-text-danger" [disabled]="!contributor.canRevoke" (click)="remove.emit()">
+                <button type="button" class="btn btn-text-danger" [disabled]="!contributor.canRevoke" (click)="remove()">
                     <i class="icon-bin2"></i>
                 </button>
             </td>
@@ -40,12 +44,6 @@ import { ContributorDto, RoleDto } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContributorComponent {
-    @Output()
-    public changeRole = new EventEmitter<string>();
-
-    @Output()
-    public remove = new EventEmitter();
-
     @Input()
     public roles: RoleDto[];
 
@@ -54,4 +52,17 @@ export class ContributorComponent {
 
     @Input('sqxContributor')
     public contributor: ContributorDto;
+
+    constructor(
+        private readonly contributorsState: ContributorsState
+    ) {
+    }
+
+    public remove() {
+        this.contributorsState.revoke(this.contributor);
+    }
+
+    public changeRole(role: string) {
+        this.contributorsState.assign({ contributorId: this.contributor.contributorId, role });
+    }
 }
