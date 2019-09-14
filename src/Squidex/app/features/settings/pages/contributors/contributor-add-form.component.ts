@@ -44,8 +44,9 @@ export class UsersDataSource implements AutocompleteSource {
 
 @Component({
     selector: 'sqx-contributor-add-form',
+    styleUrls: ['./contributor-add-form.component.scss'],
     template: `
-        <div class="table-items-header">
+        <div class="table-items-header" style="margin: 0">
             <sqx-form-alert marginTop="0" marginBottom="2" light="true">
                 Just enter the email address to invite someone with no account to the app.
             </sqx-form-alert>
