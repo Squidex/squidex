@@ -32,7 +32,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IAssetUrlGenerator assetUrlGenerator;
         private readonly IContentEnricher contentEnricher;
         private readonly IContentRepository contentRepository;
-        private readonly IContentVersionLoader contentVersionLoader;
+        private readonly IContentLoader contentVersionLoader;
         private readonly IScriptEngine scriptEngine;
         private readonly ContentQueryParser queryParser;
 
@@ -41,7 +41,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             IAssetUrlGenerator assetUrlGenerator,
             IContentEnricher contentEnricher,
             IContentRepository contentRepository,
-            IContentVersionLoader contentVersionLoader,
+            IContentLoader contentVersionLoader,
             IScriptEngine scriptEngine,
             ContentQueryParser queryParser)
         {
@@ -330,7 +330,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
 
         private Task<IContentEntity> FindByVersionAsync(Guid id, long version)
         {
-            return contentVersionLoader.LoadAsync(id, version);
+            return contentVersionLoader.GetAsync(id, version);
         }
 
         private static bool WithDraft(Context context)

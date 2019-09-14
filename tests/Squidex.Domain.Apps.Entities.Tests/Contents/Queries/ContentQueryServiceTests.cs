@@ -38,7 +38,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
         private readonly IAssetUrlGenerator urlGenerator = A.Fake<IAssetUrlGenerator>();
         private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
         private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
-        private readonly IContentVersionLoader contentVersionLoader = A.Fake<IContentVersionLoader>();
+        private readonly IContentLoader contentVersionLoader = A.Fake<IContentLoader>();
         private readonly ISchemaEntity schema;
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
         private readonly Guid contentId = Guid.NewGuid();
@@ -204,7 +204,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             SetupSchemaFound();
             SetupSchemaScripting(contentId);
 
-            A.CallTo(() => contentVersionLoader.LoadAsync(contentId, 10))
+            A.CallTo(() => contentVersionLoader.GetAsync(contentId, 10))
                 .Returns(content);
 
             var ctx = requestContext;

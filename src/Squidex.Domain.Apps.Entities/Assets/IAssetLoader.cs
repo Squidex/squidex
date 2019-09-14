@@ -7,11 +7,12 @@
 
 using System;
 using System.Threading.Tasks;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Contents
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public interface IContentVersionLoader
+    public interface IAssetLoader
     {
-        Task<IContentEntity> LoadAsync(Guid id, long version);
+        Task<IAssetEntity> GetAsync(Guid id, long version = EtagVersion.Any);
     }
 }
