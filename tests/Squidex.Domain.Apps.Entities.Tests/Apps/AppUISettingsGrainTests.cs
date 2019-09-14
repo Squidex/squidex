@@ -22,7 +22,6 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public AppUISettingsGrainTests()
         {
             sut = new AppUISettingsGrain(grainState);
-            sut.ActivateAsync(Guid.Empty).Wait();
         }
 
         [Fact]

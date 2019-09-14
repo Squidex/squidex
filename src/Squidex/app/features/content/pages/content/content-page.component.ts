@@ -64,6 +64,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public language: AppLanguageDto;
     public languages: ImmutableArray<AppLanguageDto>;
 
+    public trackByFieldFn: Function;
+
     @ViewChild('dueTimeSelector', { static: false })
     public dueTimeSelector: DueTimeSelectorComponent;
 
@@ -79,6 +81,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         private readonly schemasState: SchemasState
     ) {
         super();
+
+        this.trackByFieldFn = this.trackByField.bind(this);
 
         this.formContext = { user: authService.user, apiUrl: apiUrl.buildUrl('api') };
     }

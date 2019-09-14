@@ -28,28 +28,9 @@
 
         <hr />
 
-        <div class="sidebar-section">
-            <h3>Saved queries</h3>
-
-            <ng-container *ngIf="queries.queries | async; let assetQueries">
-                <ng-container *ngIf="assetQueries.length > 0; else noQuery">
-                    <a class="sidebar-item" *ngFor="let saved of assetQueries; trackBy: trackByQuery" (click)="search(saved.query)"
-                        [class.active]="isSelectedQuery(saved)">
-                        
-                        {{saved.name}}
-                        
-                        <a class="sidebar-item-remove float-right" (click)="queries.remove(saved)" sqxStopClick>
-                            <i class="icon-close"></i>
-                        </a>
-                    </a>
-                </ng-container>
-
-                <ng-template #noQuery>
-                    <div class="sidebar-item text-muted">
-                        Search for assets and use <i class="icon-star-empty"></i> icon in search form to save query for all contributors.
-                    </div>
-                </ng-template>
-            </ng-container>
-        </div>
+        <sqx-shared-queries types="contents"
+            [queries]="assetsQueries"
+            [queryUsed]="isQueryUsed">
+        </sqx-shared-queries>
     </ng-container>
 </sqx-panel>

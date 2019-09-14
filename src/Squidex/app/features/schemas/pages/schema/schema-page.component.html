@@ -79,7 +79,7 @@
                 [sqxSortDisabled]="!schema.canOrderFields"
                 [sqxSortModel]="schema.fields"
                 (sqxSort)="sortFields($event)">
-                <div *ngFor="let field of schema.fields; trackBy: trackByField.bind(this)">
+                <div *ngFor="let field of schema.fields; trackBy: trackByFieldFn">
                     <sqx-field [field]="field" [schema]="schema" [patterns]="patterns"></sqx-field>
                 </div>
             </div>

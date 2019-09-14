@@ -52,6 +52,12 @@ export class UIState extends State<Snapshot> {
     public settings =
         this.project(x => x.settings);
 
+    public settingsShared =
+        this.project(x => x.settingsShared);
+
+    public settingsUser =
+        this.project(x => x.settingsUser);
+
     public canReadEvents =
         this.project(x => x.canReadEvents === true);
 
@@ -66,6 +72,16 @@ export class UIState extends State<Snapshot> {
 
     public get<T>(path: string, defaultValue: T) {
         return this.settings.pipe(map(x => this.getValue(x, path, defaultValue)),
+            distinctUntilChanged());
+    }
+
+    public getShared<T>(path: string, defaultValue: T) {
+        return this.settingsShared.pipe(map(x => this.getValue(x, path, defaultValue)),
+            distinctUntilChanged());
+    }
+
+    public getUser<T>(path: string, defaultValue: T) {
+        return this.settingsUser.pipe(map(x => this.getValue(x, path, defaultValue)),
             distinctUntilChanged());
     }
 
@@ -157,7 +173,7 @@ export class UIState extends State<Snapshot> {
         return this.removeUser(path) || this.removeShared(path);
     }
 
-    private removeUser(path: string) {
+    public removeUser(path: string) {
         const { key, current, root } = getContainer(this.snapshot.settingsUser, path);
 
         if (current && key && current[key]) {
@@ -173,7 +189,7 @@ export class UIState extends State<Snapshot> {
         return false;
     }
 
-    private removeShared(path: string) {
+    public removeShared(path: string) {
         const { key, current, root } = getContainer(this.snapshot.settingsShared, path);
 
         if (current && key && current[key]) {

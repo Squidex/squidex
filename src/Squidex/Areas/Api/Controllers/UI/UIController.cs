@@ -5,17 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Orleans;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
@@ -26,14 +23,14 @@ namespace Squidex.Areas.Api.Controllers.UI
     {
         private static readonly Permission CreateAppPermission = new Permission(Permissions.AdminAppCreate);
         private readonly MyUIOptions uiOptions;
-        private readonly IGrainFactory grainFactory;
+        private readonly IAppUISettings appUISettings;
 
-        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IGrainFactory grainFactory)
+        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IAppUISettings appUISettings)
             : base(commandBus)
         {
             this.uiOptions = uiOptions.Value;
 
-            this.grainFactory = grainFactory;
+            this.appUISettings = appUISettings;
         }
 
         /// <summary>
@@ -70,9 +67,9 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> GetSettings(string app)
         {
-            var result = await GetSettingsGrain(AppKey()).GetAsync();
+            var result = await appUISettings.GetAsync(AppId, null);
 
-            return Ok(result.Value);
+            return Ok(result);
         }
 
         /// <summary>
@@ -89,9 +86,9 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> GetUserSettings(string app)
         {
-            var result = await GetSettingsGrain(UserKey()).GetAsync();
+            var result = await appUISettings.GetAsync(AppId, UserId());
 
-            return Ok(result.Value);
+            return Ok(result);
         }
 
         /// <summary>
@@ -109,7 +106,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> PutSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
-            await GetSettingsGrain(AppKey()).SetAsync(key, request.Value.AsJ());
+            await appUISettings.SetAsync(AppId, null, key, request.Value);
 
             return NoContent();
         }
@@ -129,7 +126,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> PutUserSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
-            await GetSettingsGrain(UserKey()).SetAsync(key, request.Value.AsJ());
+            await appUISettings.SetAsync(AppId, UserId(), key, request.Value);
 
             return NoContent();
         }
@@ -148,7 +145,7 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> DeleteSetting(string app, string key)
         {
-            await GetSettingsGrain(AppKey()).RemoveAsync(key);
+            await appUISettings.RemoveAsync(AppId, null, key);
 
             return NoContent();
         }
@@ -167,22 +164,12 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> DeleteUserSetting(string app, string key)
         {
-            await GetSettingsGrain(UserKey()).RemoveAsync(key);
+            await appUISettings.RemoveAsync(AppId, UserId(), key);
 
             return NoContent();
         }
 
-        private IAppUISettingsGrain GetSettingsGrain(string key)
-        {
-            return grainFactory.GetGrain<IAppUISettingsGrain>(key);
-        }
-
-        private string AppKey()
-        {
-            return $"{AppId}";
-        }
-
-        private string UserKey()
+        private string UserId()
         {
             var subject = User.OpenIdSubject();
 
@@ -191,7 +178,7 @@ namespace Squidex.Areas.Api.Controllers.UI
                 throw new DomainForbiddenException("Not allowed for clients.");
             }
 
-            return $"{AppId}_{subject}";
+            return subject;
         }
     }
 }

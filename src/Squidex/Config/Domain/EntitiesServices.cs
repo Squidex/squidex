@@ -96,6 +96,9 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
 
+            services.AddSingletonAs<AppUISettings>()
+                .As<IAppUISettings>();
+
             services.AddSingletonAs<AssetEnricher>()
                 .As<IAssetEnricher>();
 

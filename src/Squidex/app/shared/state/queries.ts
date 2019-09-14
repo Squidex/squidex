@@ -6,7 +6,7 @@
  */
 
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 
 import { compareStringsAsc, Types } from '@app/framework';
 
@@ -33,6 +33,8 @@ const OLDEST_FIRST: Query = {
 
 export class Queries {
     public queries: Observable<SavedQuery[]>;
+    public queriesShared: Observable<SavedQuery[]>;
+    public queriesUser: Observable<SavedQuery[]>;
 
     public defaultQueries: SavedQuery[] = [
         { name: 'All (newest first)', queryJson: '' },
@@ -43,21 +45,32 @@ export class Queries {
         private readonly uiState: UIState,
         private readonly prefix: string
     ) {
-        this.queries = this.uiState.get(`${this.prefix}.queries`, {}).pipe(
-            map(settings => {
-                let queries = Object.keys(settings).map(name => parseStored(name, settings[name]));
+        const path = `${prefix}.queries`;
 
-                return queries.sort((a, b) => compareStringsAsc(a.name, b.name));
-            })
-        );
+        this.queries = this.uiState.get(path, {}).pipe(
+            map(settings => parseQueries(settings)), shareReplay(1));
+
+        this.queriesShared = this.uiState.getShared(path, {}).pipe(
+            map(settings => parseQueries(settings)), shareReplay(1));
+
+        this.queriesUser = this.uiState.getUser(path, {}).pipe(
+            map(settings => parseQueries(settings)), shareReplay(1));
     }
 
     public add(key: string, query: Query, user = false) {
-        this.uiState.set(`${this.prefix}.queries.${key}`, JSON.stringify(query), user);
+        this.uiState.set(this.getPath(key), JSON.stringify(query), user);
     }
 
-    public remove(saved: SavedQuery) {
-        this.uiState.remove(`${this.prefix}.queries.${saved.name}`);
+    public removeShared(saved: SavedQuery) {
+        this.uiState.removeShared(this.getPath(saved.name));
+    }
+
+    public removeUser(saved: SavedQuery) {
+        this.uiState.removeUser(this.getPath(saved.name));
+    }
+
+    private getPath(key: string): string {
+        return `${this.prefix}.queries.${key}`;
     }
 
     public getSaveKey(query: Query): Observable<string | undefined> {
@@ -74,6 +87,12 @@ export class Queries {
                 return undefined;
             }));
     }
+}
+
+function parseQueries(settings: {}) {
+    let queries = Object.keys(settings).map(name => parseStored(name, settings[name]));
+
+    return queries.sort((a, b) => compareStringsAsc(a.name, b.name));
 }
 
 export function parseStored(name: string, raw?: string) {

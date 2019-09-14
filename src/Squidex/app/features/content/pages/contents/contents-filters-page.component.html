@@ -4,8 +4,8 @@
     </ng-container>
 
     <ng-container content>
-        <a class="sidebar-item" *ngFor="let default of schemaQueries.defaultQueries; trackBy: trackByTag" (click)="search(default.query)"
-            [class.active]="isSelectedQuery(default)">
+        <a class="sidebar-item" *ngFor="let default of schemaQueries.defaultQueries; trackBy: trackByQuery" (click)="search(default.query)"
+            [class.active]="isQueryUsed(default)">
             {{default.name}}
         </a>
 
@@ -15,7 +15,7 @@
             <h3>Status Queries</h3>
 
             <a class="sidebar-item status" *ngFor="let status of contentsState.statusQueries | async; trackBy: trackByQuery" (click)="search(status.query)"
-                [class.active]="isSelectedQuery(status)">
+                [class.active]="isQueryUsed(status)">
                 
                 <i class="icon-circle" [style.color]="status.color"></i> {{status.name}}
             </a>
@@ -23,28 +23,9 @@
 
         <hr />
 
-        <div class="sidebar-section">
-            <h3>Saved queries</h3>
-
-            <ng-container *ngIf="schemaQueries.queries | async; let queries">
-                <ng-container *ngIf="queries.length > 0; else noQuery">
-                    <a class="sidebar-item" *ngFor="let saved of queries; trackBy: trackByQuery" (click)="search(saved.query)"
-                        [class.active]="isSelectedQuery(saved)">
-                        
-                        {{saved.name}}
-                        
-                        <a class="sidebar-item-remove float-right" (click)="schemaQueries.remove(saved)" sqxStopClick>
-                            <i class="icon-close"></i>
-                        </a>
-                    </a>
-                </ng-container>
-
-                <ng-template #noQuery>
-                    <div class="sidebar-item text-muted">
-                        Search for contents and use <i class="icon-star-empty"></i> icon in search form to save query for all contributors.
-                    </div>
-                </ng-template>
-            </ng-container>
-        </div>
+        <sqx-shared-queries types="contents"
+            [queries]="schemaQueries"
+            [queryUsed]="isQueryUsed">
+        </sqx-shared-queries>
     </ng-container>
 </sqx-panel>

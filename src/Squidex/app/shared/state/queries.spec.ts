@@ -21,25 +21,38 @@ describe('Queries', () => {
 
     let uiState: IMock<UIState>;
 
-    let queries$ = new BehaviorSubject({});
     let queries: Queries;
 
     beforeEach(() => {
         uiState = Mock.ofType<UIState>();
 
-        uiState.setup(x => x.get('schemas.my-schema.queries', {}))
-            .returns(() => queries$);
+        const shared$ = new BehaviorSubject({
+            key1: '{ "fullText": "shared1" }'
+        });
 
-        queries$.next({
-            key1: '{ "fullText": "text1" }',
-            key2: 'text2',
+        const user$ = new BehaviorSubject({
+            key1: '{ "fullText": "user1" }'
+        });
+
+        const merged$ = new BehaviorSubject({
+            key1: '{ "fullText": "merged1" }',
+            key2: 'merged2',
             key3: undefined
         });
+
+        uiState.setup(x => x.get('schemas.my-schema.queries', {}))
+            .returns(() => merged$);
+
+        uiState.setup(x => x.getShared('schemas.my-schema.queries', {}))
+            .returns(() => shared$);
+
+        uiState.setup(x => x.getUser('schemas.my-schema.queries', {}))
+            .returns(() => user$);
 
         queries = new Queries(uiState.object, prefix);
     });
 
-    it('should load queries', () => {
+    it('should load merged queries', () => {
         let converted: SavedQuery[];
 
         queries.queries.subscribe(x => {
@@ -49,16 +62,48 @@ describe('Queries', () => {
         expect(converted!).toEqual([
             {
                 name: 'key1',
-                query: { fullText: 'text1' },
-                queryJson: encodeQuery({ fullText: 'text1' })
+                query: { fullText: 'merged1' },
+                queryJson: encodeQuery({ fullText: 'merged1' })
             }, {
                 name: 'key2',
-                query: { fullText: 'text2' },
-                queryJson: encodeQuery({ fullText: 'text2' })
+                query: { fullText: 'merged2' },
+                queryJson: encodeQuery({ fullText: 'merged2' })
             }, {
                 name: 'key3',
                 query: undefined,
                 queryJson: ''
+            }
+        ]);
+    });
+
+    it('should load shared queries', () => {
+        let converted: SavedQuery[];
+
+        queries.queriesShared.subscribe(x => {
+            converted = x;
+        });
+
+        expect(converted!).toEqual([
+            {
+                name: 'key1',
+                query: { fullText: 'shared1' },
+                queryJson: encodeQuery({ fullText: 'shared1' })
+            }
+        ]);
+    });
+
+    it('should load user queries', () => {
+        let converted: SavedQuery[];
+
+        queries.queriesUser.subscribe(x => {
+            converted = x;
+        });
+
+        expect(converted!).toEqual([
+            {
+                name: 'key1',
+                query: { fullText: 'user1' },
+                queryJson: encodeQuery({ fullText: 'user1' })
             }
         ]);
     });
@@ -81,11 +126,19 @@ describe('Queries', () => {
         uiState.verify(x => x.set('schemas.my-schema.queries.key3', '{"fullText":"text3"}', true), Times.once());
     });
 
-    it('should forward remove call to state', () => {
-        queries.remove({ name: 'key3' });
+    it('should forward remove shared call to state', () => {
+        queries.removeShared({ name: 'key3' });
 
         expect(true).toBeTruthy();
 
-        uiState.verify(x => x.remove('schemas.my-schema.queries.key3'), Times.once());
+        uiState.verify(x => x.removeShared('schemas.my-schema.queries.key3'), Times.once());
+    });
+
+    it('should forward remove user call to state', () => {
+        queries.removeUser({ name: 'key3' });
+
+        expect(true).toBeTruthy();
+
+        uiState.verify(x => x.removeUser('schemas.my-schema.queries.key3'), Times.once());
     });
 });
