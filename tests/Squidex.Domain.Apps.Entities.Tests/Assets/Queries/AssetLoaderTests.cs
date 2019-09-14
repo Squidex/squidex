@@ -13,52 +13,52 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Orleans;
 using Xunit;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Queries
+namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
-    public class ContentVersionLoaderTests
+    public class AssetLoaderTests
     {
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
-        private readonly IContentGrain grain = A.Fake<IContentGrain>();
+        private readonly IAssetGrain grain = A.Fake<IAssetGrain>();
         private readonly Guid id = Guid.NewGuid();
-        private readonly ContentVersionLoader sut;
+        private readonly AssetLoader sut;
 
-        public ContentVersionLoaderTests()
+        public AssetLoaderTests()
         {
-            A.CallTo(() => grainFactory.GetGrain<IContentGrain>(id, null))
+            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(id, null))
                 .Returns(grain);
 
-            sut = new ContentVersionLoader(grainFactory);
+            sut = new AssetLoader(grainFactory);
         }
 
         [Fact]
         public async Task Should_throw_exception_if_no_state_returned()
         {
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(null));
+                .Returns(J.Of<IAssetEntity>(null));
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.LoadAsync(id, 10));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(id, 10));
         }
 
         [Fact]
         public async Task Should_throw_exception_if_state_has_other_version()
         {
-            var content = new ContentEntity { Version = 5 };
+            var content = new AssetEntity { Version = 5 };
 
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(content));
+                .Returns(J.Of<IAssetEntity>(content));
 
-            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.LoadAsync(id, 10));
+            await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.GetAsync(id, 10));
         }
 
         [Fact]
         public async Task Should_return_content_from_state()
         {
-            var content = new ContentEntity { Version = 10 };
+            var content = new AssetEntity { Version = 10 };
 
             A.CallTo(() => grain.GetStateAsync(10))
-                .Returns(J.Of<IContentEntity>(content));
+                .Returns(J.Of<IAssetEntity>(content));
 
-            var result = await sut.LoadAsync(id, 10);
+            var result = await sut.GetAsync(id, 10);
 
             Assert.Same(content, result);
         }

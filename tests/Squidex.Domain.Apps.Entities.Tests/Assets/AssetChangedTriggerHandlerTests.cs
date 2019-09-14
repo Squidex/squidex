@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Orleans;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
@@ -18,7 +17,6 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Orleans;
 using Xunit;
 
 #pragma warning disable SA1401 // Fields must be private
@@ -28,7 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
     public class AssetChangedTriggerHandlerTests
     {
         private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
-        private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
+        private readonly IAssetLoader assetLoader = A.Fake<IAssetLoader>();
         private readonly IRuleTriggerHandler sut;
 
         public AssetChangedTriggerHandlerTests()
@@ -39,7 +37,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
             A.CallTo(() => scriptEngine.Evaluate("event", A<object>.Ignored, "false"))
                 .Returns(false);
 
-            sut = new AssetChangedTriggerHandler(scriptEngine, grainFactory);
+            sut = new AssetChangedTriggerHandler(scriptEngine, assetLoader);
         }
 
         public static IEnumerable<object[]> TestEvents = new[]
@@ -56,13 +54,8 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             var envelope = Envelope.Create<AppEvent>(@event).SetEventStreamNumber(12);
 
-            var assetGrain = A.Fake<IAssetGrain>();
-
-            A.CallTo(() => grainFactory.GetGrain<IAssetGrain>(@event.AssetId, null))
-                .Returns(assetGrain);
-
-            A.CallTo(() => assetGrain.GetStateAsync(12))
-                .Returns(J.Of<IAssetEntity>(new AssetEntity()));
+            A.CallTo(() => assetLoader.GetAsync(@event.AssetId, 12))
+                .Returns(new AssetEntity());
 
             var result = await sut.CreateEnrichedEventAsync(envelope);
 
