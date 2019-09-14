@@ -132,4 +132,3 @@ export class FieldComponent implements OnChanges {
         return field.fieldId + this.schema.id;
     }
 }
-

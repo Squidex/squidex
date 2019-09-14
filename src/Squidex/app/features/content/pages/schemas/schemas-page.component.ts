@@ -36,4 +36,3 @@ export class SchemasPageComponent implements OnInit {
         return category.name;
     }
 }
-

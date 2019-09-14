@@ -50,4 +50,3 @@ export class PlansPageComponent implements OnInit {
         return planInfo.plan.id;
     }
 }
-

@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
 import { of, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 

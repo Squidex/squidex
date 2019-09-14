@@ -216,4 +216,3 @@ function createLabels(dtos: { date: DateTime }[]): string[] {
 function createLabelsFromSet(dtos: { [category: string]: { date: DateTime }[] }): string[] {
     return createLabels(dtos[Object.keys(dtos)[0]]);
 }
-

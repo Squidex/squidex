@@ -47,4 +47,3 @@ export class FileSizePipe implements PipeTransform {
         return (u ? value.toFixed(1) + ' ' : value) + ' kMGTPEZY'[u] + 'B';
     }
 }
-

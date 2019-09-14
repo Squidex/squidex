@@ -137,4 +137,3 @@ export class PlansState extends State<Snapshot> {
         return this.snapshot.version;
     }
 }
-

@@ -59,4 +59,3 @@ export class RoleAddFormComponent {
         this.addRoleForm.submitCompleted();
     }
 }
-

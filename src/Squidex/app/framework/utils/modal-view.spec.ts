@@ -116,4 +116,3 @@ function checkValue(modal: Openable, expected: boolean) {
 
     expect(result!).toBe(expected);
 }
-

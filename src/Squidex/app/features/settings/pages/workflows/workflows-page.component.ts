@@ -5,11 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import {
     AppsState,
-    ResourceOwner,
     RolesState,
     SchemasState,
     WorkflowDto,
@@ -23,7 +22,7 @@ import { SchemaTagConverter } from './schema-tag-converter';
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html'
 })
-export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
+export class WorkflowsPageComponent implements OnInit, OnDestroy {
     public schemasSource: SchemaTagConverter;
 
     constructor(
@@ -32,21 +31,19 @@ export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
         public readonly schemasState: SchemasState,
         public readonly workflowsState: WorkflowsState
     ) {
-        super();
     }
 
     public ngOnInit() {
-        this.own(
-            this.schemasState.changes
-                .subscribe(state => {
-                    if (state.isLoaded) {
-                        this.schemasSource = new SchemaTagConverter(state.schemas.values);
-                    }
-                }));
-
         this.rolesState.load();
+
+        this.schemasSource = new SchemaTagConverter(this.schemasState);
         this.schemasState.load();
+
         this.workflowsState.load();
+    }
+
+    public ngOnDestroy() {
+        this.schemasSource.destroy();
     }
 
     public reload() {
@@ -57,4 +54,3 @@ export class WorkflowsPageComponent extends ResourceOwner implements OnInit {
         return workflow.id;
     }
 }
-

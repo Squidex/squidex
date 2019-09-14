@@ -55,4 +55,3 @@ export class RolesPageComponent implements OnInit {
         return role.name;
     }
 }
-

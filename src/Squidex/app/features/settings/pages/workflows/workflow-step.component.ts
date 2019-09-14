@@ -92,4 +92,3 @@ export class WorkflowStepComponent implements OnChanges {
         return transition.to;
     }
 }
-

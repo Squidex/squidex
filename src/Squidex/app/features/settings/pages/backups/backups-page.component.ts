@@ -51,4 +51,3 @@ export class BackupsPageComponent extends ResourceOwner implements OnInit {
         return item.id;
     }
 }
-

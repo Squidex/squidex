@@ -97,4 +97,3 @@ export class RoleComponent implements OnChanges {
         }
     }
 }
-

@@ -174,4 +174,3 @@ export class ContentComponent implements OnChanges {
         return field.fieldId + this.schema.id;
     }
 }
-

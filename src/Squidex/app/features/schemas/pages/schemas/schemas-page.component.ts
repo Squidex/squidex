@@ -99,4 +99,3 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
         return category.name;
     }
 }
-

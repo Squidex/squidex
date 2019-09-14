@@ -27,4 +27,3 @@ export class CommentsPageComponent implements OnInit {
         this.commentsId = allParams(this.route)['contentId'];
     }
 }
-

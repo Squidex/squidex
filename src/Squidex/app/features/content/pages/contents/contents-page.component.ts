@@ -240,4 +240,3 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         }
     }
 }
-

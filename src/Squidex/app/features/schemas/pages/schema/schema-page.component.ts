@@ -106,4 +106,3 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
         this.router.navigate(['../'], { relativeTo: this.route });
     }
 }
-

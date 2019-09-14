@@ -59,4 +59,3 @@ export class RuleEventsPageComponent implements OnInit {
         return ruleEvent.id;
     }
 }
-

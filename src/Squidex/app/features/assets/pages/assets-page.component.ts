@@ -75,4 +75,3 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
         this.localStore.setBoolean('squidex.assets.list-view', isListView);
     }
 }
-

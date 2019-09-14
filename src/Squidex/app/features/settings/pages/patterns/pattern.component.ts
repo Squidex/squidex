@@ -83,4 +83,3 @@ export class PatternComponent implements OnChanges {
         }
     }
 }
-

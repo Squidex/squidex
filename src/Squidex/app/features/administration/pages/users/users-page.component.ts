@@ -47,4 +47,3 @@ export class UsersPageComponent implements OnInit {
         return user.id;
     }
 }
-

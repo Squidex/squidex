@@ -196,4 +196,3 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
         return `squidex.schemas.${this.schema.id}.fields.${this.field.fieldId}.show-all`;
     }
 }
-

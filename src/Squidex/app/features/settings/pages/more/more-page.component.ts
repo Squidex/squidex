@@ -115,4 +115,3 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
             });
     }
 }
-

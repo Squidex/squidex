@@ -143,4 +143,3 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
         return content.id;
     }
 }
-

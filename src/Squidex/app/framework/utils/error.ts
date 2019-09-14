@@ -34,7 +34,6 @@ export function getDisplayMessage(error?: string | ErrorDto) {
     }
 }
 
-
 function formatMessage(message: string, details?: string[]) {
     const appendLast = (row: string, char: string) => {
         const last = row[row.length - 1];

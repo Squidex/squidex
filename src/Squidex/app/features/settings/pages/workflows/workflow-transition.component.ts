@@ -48,4 +48,3 @@ export class WorkflowTransitionComponent {
         return role.name;
     }
 }
-

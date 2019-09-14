@@ -37,4 +37,3 @@ export class LanguagesPageComponent implements OnInit {
         return language.language.iso2Code;
     }
 }
-
