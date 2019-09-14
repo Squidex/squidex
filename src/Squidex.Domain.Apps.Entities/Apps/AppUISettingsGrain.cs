@@ -62,7 +62,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var container = GetContainer(path, false, out var key);
 
-            if (container?.ContainsKey(path) == true)
+            if (container?.ContainsKey(key) == true)
             {
                 container.Remove(key);
 

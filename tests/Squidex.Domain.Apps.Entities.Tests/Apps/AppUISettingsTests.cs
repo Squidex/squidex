@@ -49,7 +49,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.SetAsync(Guid.NewGuid(), "user", "the.path", value);
 
-            A.CallTo(() => grain.SetAsync("the.path", A<J<IJsonValue>>.That.IsSameAs(value)))
+            A.CallTo(() => grain.SetAsync("the.path", A<J<IJsonValue>>.That.Matches(x => x.Value == value)))
                 .MustHaveHappened();
         }
 
@@ -60,7 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             await sut.SetAsync(Guid.NewGuid(), "user", value);
 
-            A.CallTo(() => grain.SetAsync(A<J<JsonObject>>.That.IsSameAs(value)))
+            A.CallTo(() => grain.SetAsync(A<J<JsonObject>>.That.Matches(x => x.Value == value)))
                 .MustHaveHappened();
         }
 

@@ -60,6 +60,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task Should_remove_root_value()
         {
             await sut.SetAsync("key", JsonValue.Create(123).AsJ());
+
             await sut.RemoveAsync("key");
 
             var actual = await sut.GetAsync();
@@ -93,6 +94,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         public async Task Should_remove_nested_value()
         {
             await sut.SetAsync("root.nested", JsonValue.Create(123).AsJ());
+
             await sut.RemoveAsync("root.nested");
 
             var actual = await sut.GetAsync();
