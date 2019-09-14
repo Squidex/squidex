@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Comments
 {
-    public interface ICommentGrain : IDomainObjectGrain
+    public interface ICommentsGrain : IDomainObjectGrain
     {
         Task<CommentsResult> GetCommentsAsync(long version = EtagVersion.Any);
     }
