@@ -25,7 +25,8 @@
 
         <sqx-shared-queries types="contents"
             [queries]="schemaQueries"
-            [queryUsed]="isQueryUsed">
+            [queryUsed]="isQueryUsed"
+            (search)="search($event.query)">
         </sqx-shared-queries>
     </ng-container>
 </sqx-panel>

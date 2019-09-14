@@ -69,6 +69,10 @@ export class Queries {
         this.uiState.removeUser(this.getPath(saved.name));
     }
 
+    public remove(saved: SavedQuery) {
+        this.uiState.remove(this.getPath(saved.name));
+    }
+
     private getPath(key: string): string {
         return `${this.prefix}.queries.${key}`;
     }

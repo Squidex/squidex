@@ -16,14 +16,14 @@ import { SavedQuery } from '../state/queries';
         <div class="sidebar-section">
             <h3>Shared queries</h3>
 
-            <ng-container *ngIf="queries.queriesShared | async; let queries">
-                <ng-container *ngIf="queries.length > 0; else noQuery">
-                    <a class="sidebar-item" *ngFor="let saved of queries; trackBy: trackByQuery" (click)="search.emit(saved)"
+            <ng-container *ngIf="queries.queriesShared | async; let queryList">
+                <ng-container *ngIf="queryList.length > 0; else noQuery">
+                    <a class="sidebar-item" *ngFor="let saved of queryList; trackBy: trackByQuery" (click)="search.emit(saved)"
                         [class.active]="isSelectedQuery(saved)">
 
                         {{saved.name}}
 
-                        <a class="sidebar-item-remove float-right" (click)="queries.remove(saved)" sqxStopClick>
+                        <a class="sidebar-item-remove float-right" (click)="queries.removeShared(saved)" sqxStopClick>
                             <i class="icon-close"></i>
                         </a>
                     </a>
@@ -42,9 +42,9 @@ import { SavedQuery } from '../state/queries';
         <div class="sidebar-section">
             <h3>My queries</h3>
 
-            <ng-container *ngIf="queries.queriesUser | async; let queries">
-                <ng-container *ngIf="queries.length > 0; else noQuery">
-                    <a class="sidebar-item" *ngFor="let saved of queries; trackBy: trackByQuery" (click)="search.emit(saved)"
+            <ng-container *ngIf="queries.queriesUser | async; let queryList">
+                <ng-container *ngIf="queryList.length > 0; else noQuery">
+                    <a class="sidebar-item" *ngFor="let saved of queryList; trackBy: trackByQuery" (click)="search.emit(saved)"
                         [class.active]="isSelectedQuery(saved)">
 
                         {{saved.name}}
@@ -66,13 +66,13 @@ import { SavedQuery } from '../state/queries';
 })
 export class SavedQueriesComponent {
     @Input()
+    public queryUsed: (saved: SavedQuery) => boolean;
+
+    @Input()
     public queries: Queries;
 
     @Input()
     public types: string;
-
-    @Input()
-    public queryUsed: (saved: SavedQuery) => boolean;
 
     @Output()
     public search = new EventEmitter<SavedQuery>();
