@@ -23,14 +23,6 @@ import {
 } from '@app/framework';
 
 export class BackupsDto extends ResultSet<BackupDto> {
-    public readonly _links: ResourceLinks;
-
-    constructor(items: BackupDto[], links?: {}) {
-        super(items.length, items);
-
-        this._links = links || {};
-    }
-
     public get canCreate() {
         return hasAnyLink(this._links, 'create');
     }
@@ -42,6 +34,10 @@ export class BackupDto {
     public readonly canDelete: boolean;
 
     public readonly downloadUrl: string;
+
+    public get isFailed() {
+        return this.status === 'Failed';
+    }
 
     constructor(
         links: ResourceLinks,
@@ -92,7 +88,7 @@ export class BackupsService {
             map(({ items, _links }) => {
                 const backups = items.map(item => parseBackup(item));
 
-                return new BackupsDto(backups, _links);
+                return new BackupsDto(backups.length, backups, _links);
             }),
             pretifyError('Failed to load backups.'));
     }

@@ -6,11 +6,9 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 
 import {
-    AddRoleForm,
     AppsState,
     AutocompleteSource,
     RoleDto,
@@ -36,15 +34,12 @@ class PermissionsAutocomplete implements AutocompleteSource {
     templateUrl: './roles-page.component.html'
 })
 export class RolesPageComponent implements OnInit {
-    public addRoleForm = new AddRoleForm(this.formBuilder);
-
     public allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);
 
     constructor(
         public readonly appsState: AppsState,
         public readonly rolesService: RolesService,
-        public readonly rolesState: RolesState,
-        private readonly formBuilder: FormBuilder
+        public readonly rolesState: RolesState
     ) {
     }
 
@@ -56,24 +51,7 @@ export class RolesPageComponent implements OnInit {
         this.rolesState.load(true);
     }
 
-    public cancelAddRole() {
-        this.addRoleForm.submitCompleted();
-    }
-
-    public addRole() {
-        const value = this.addRoleForm.submit();
-
-        if (value) {
-            this.rolesState.add(value)
-                .subscribe(() => {
-                    this.addRoleForm.submitCompleted();
-                }, error => {
-                    this.addRoleForm.submitFailed(error);
-                });
-        }
-    }
-
-    public trackByRole(index: number, role: RoleDto) {
+    public trackByRole(role: RoleDto) {
         return role.name;
     }
 }

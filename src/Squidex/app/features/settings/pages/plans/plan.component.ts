@@ -27,7 +27,7 @@ export class PlanComponent {
     public planInfo: PlanInfo;
 
     constructor(
-        private readonly plansState: PlansState
+        public readonly plansState: PlansState
     ) {
     }
 
