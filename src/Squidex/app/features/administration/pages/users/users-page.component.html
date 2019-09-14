@@ -51,27 +51,8 @@
         <div class="grid-content">
             <div sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed" *ngIf="usersState.users | async; let users">
-                    <tbody *ngFor="let user of users; trackBy: trackByUser">
-                        <tr [routerLink]="user.id" routerLinkActive="active">
-                            <td class="cell-user">
-                                <img class="user-picture" title="{{user.name}}" [attr.src]="user | sqxUserDtoPicture" />
-                            </td>
-                            <td class="cell-auto">
-                                <span class="user-name table-cell">{{user.displayName}}</span>
-                            </td>
-                            <td class="cell-auto">
-                                <span class="user-email table-cell">{{user.email}}</span>
-                            </td>
-                            <td class="cell-actions">
-                                <button type="button" class="btn btn-text" (click)="lock(user)" sqxStopClick *ngIf="user.canLock" title="Lock User">
-                                    <i class="icon icon-unlocked"></i>
-                                </button>
-                                <button type="button" class="btn btn-text" (click)="unlock(user)" sqxStopClick *ngIf="user.canUnlock" title="Unlock User">
-                                    <i class="icon icon-lock"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="spacer"></tr>
+                    <tbody *ngFor="let user of users; trackBy: trackByUser"
+                        [sqxUser]="user"(lock)="lock(user)" (unlock)="unlock(user)">
                     </tbody>
                 </table>
             </div>

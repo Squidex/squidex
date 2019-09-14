@@ -16,10 +16,11 @@ import {
 } from '@app/shared';
 
 import {
-    BackupDurationPipe,
+    BackupComponent,
     BackupsPageComponent,
     ClientComponent,
     ClientsPageComponent,
+    ContributorComponent,
     ContributorsPageComponent,
     ImportContributorsDialogComponent,
     LanguageComponent,
@@ -196,10 +197,11 @@ const routes: Routes = [
         RouterModule.forChild(routes)
     ],
     declarations: [
-        BackupDurationPipe,
+        BackupComponent,
         BackupsPageComponent,
         ClientComponent,
         ClientsPageComponent,
+        ContributorComponent,
         ContributorsPageComponent,
         ImportContributorsDialogComponent,
         LanguageComponent,

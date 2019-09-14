@@ -5,10 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+export * from './pages/backups/backup.component';
 export * from './pages/backups/backups-page.component';
-export * from './pages/backups/pipes';
 export * from './pages/clients/client.component';
 export * from './pages/clients/clients-page.component';
+export * from './pages/contributors/contributor.component';
 export * from './pages/contributors/contributors-page.component';
 export * from './pages/contributors/import-contributors-dialog.component';
 export * from './pages/languages/language.component';

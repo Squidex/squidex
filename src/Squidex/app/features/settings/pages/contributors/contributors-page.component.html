@@ -15,7 +15,8 @@
         <div class="form-inline">
             <input class="form-control" placeholder="Search"
                 [ngModel]="contributorsState.query | async"
-                (ngModelChange)="search($event)" />
+                (ngModelChange)="search($event)"
+            />
         </div>
     </ng-container>
 
@@ -63,33 +64,16 @@
             
                 <ng-container *ngIf="contributors.length > 0; else noContributors">
                     <table class="table table-items table-fixed" *ngIf="rolesState.roles | async; let roles">
-                        <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor">
-                            <tr>
-                                <td class="cell-user">
-                                    <img class="user-picture" title="{{contributor.contributorName}}" [attr.src]="contributor.contributorId | sqxUserPicture" />
-                                </td>
-                                <td class="cell-auto">
-                                    <span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight:contributorsState.snapshot.queryRegex"></span>
-                                </td>
-                                <td class="cell-time">
-                                    <select class="form-control" 
-                                        [ngModel]="contributor.role"
-                                        (ngModelChange)="changeRole(contributor, $event)"
-                                        [disabled]="!contributor.canUpdate">
-                                        <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
-                                    </select>
-                                </td>
-                                <td class="cell-actions">
-                                    <button type="button" class="btn btn-text-danger" [disabled]="!contributor.canRevoke" (click)="remove(contributor)">
-                                        <i class="icon-bin2"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="spacer"></tr>
+                        <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor"
+                            [sqxContributor]="contributor"
+                            [search]="contributorsState.snapshot.queryRegex"
+                            [roles]="roles"
+                            (remove)="remove(contributor)"
+                            (changeRole)="changeRole(contributor, $event)">
                         </tbody>
                     </table>
 
-                    <sqx-pager [pager]="contributorsState.contributorsPager | async" [hideWhenButtonsDisabled]="true" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
+                    <sqx-pager [pager]="contributorsState.contributorsPager | async" [autoHide]="true" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
                 </ng-container>
 
                 <ng-template #noContributors>
