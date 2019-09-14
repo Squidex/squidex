@@ -24,9 +24,9 @@ namespace Squidex.Domain.Apps.Entities.Apps
     {
         private const string UsersFile = "Users.json";
         private const string SettingsFile = "Settings.json";
-        private readonly IGrainFactory grainFactory;
+        private readonly IAppUISettings appUISettings;
+        private readonly IAppsIndex appsIndex;
         private readonly IUserResolver userResolver;
-        private readonly IAppsIndex grainAppIndex;
         private readonly HashSet<string> contributors = new HashSet<string>();
         private readonly Dictionary<string, RefToken> userMapping = new Dictionary<string, RefToken>();
         private Dictionary<string, string> usersWithEmail = new Dictionary<string, string>();
@@ -35,14 +35,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override string Name { get; } = "Apps";
 
-        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver, IAppsIndex grainAppIndex)
+        public BackupApps(IAppUISettings appUISettings, IAppsIndex appsIndex, IUserResolver userResolver)
         {
-            Guard.NotNull(grainAppIndex, nameof(grainAppIndex));
-            Guard.NotNull(grainFactory, nameof(grainFactory));
+            Guard.NotNull(appsIndex, nameof(appsIndex));
             Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(appUISettings, nameof(appUISettings));
 
-            this.grainAppIndex = grainAppIndex;
-            this.grainFactory = grainFactory;
+            this.appsIndex = appsIndex;
+            this.appUISettings = appUISettings;
             this.userResolver = userResolver;
         }
 
@@ -124,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private async Task ReserveAppAsync(Guid appId)
         {
-            appReservation = await grainAppIndex.ReserveAsync(appId, appName);
+            appReservation = await appsIndex.ReserveAsync(appId, appName);
 
             if (appReservation == null)
             {
@@ -134,7 +134,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override async Task CleanupRestoreErrorAsync(Guid appId)
         {
-            await grainAppIndex.RemoveReservationAsync(appReservation);
+            await appsIndex.RemoveReservationAsync(appReservation);
         }
 
         private RefToken MapUser(string userId, RefToken fallback)
@@ -180,7 +180,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private async Task WriteSettingsAsync(BackupWriter writer, Guid appId)
         {
-            var json = await grainFactory.GetGrain<IAppUISettingsGrain>(appId).GetAsync();
+            var json = await appUISettings.GetAsync(appId, null);
 
             await writer.WriteJsonAsync(SettingsFile, json);
         }
@@ -189,14 +189,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var json = await reader.ReadJsonAttachmentAsync<JsonObject>(SettingsFile);
 
-            await grainFactory.GetGrain<IAppUISettingsGrain>(appId).SetAsync(json);
+            await appUISettings.SetAsync(appId, null, json);
         }
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)
         {
-            await grainAppIndex.AddAsync(appReservation);
+            await appsIndex.AddAsync(appReservation);
 
-            await grainAppIndex.RebuildByContributorsAsync(appId, contributors);
+            await appsIndex.RebuildByContributorsAsync(appId, contributors);
         }
     }
 }

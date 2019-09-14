@@ -74,6 +74,8 @@ export class ContentItemComponent implements OnChanges {
     @Input('sqxContent')
     public content: ContentDto;
 
+    public trackByFieldFn: Function;
+
     public patchForm: PatchContentForm;
     public patchAllowed = false;
 
@@ -89,6 +91,7 @@ export class ContentItemComponent implements OnChanges {
         private readonly changeDetector: ChangeDetectorRef,
         private readonly contentsState: ContentsState
     ) {
+        this.trackByFieldFn = this.trackByField.bind(this);
     }
 
     public ngOnChanges(changes: SimpleChanges) {

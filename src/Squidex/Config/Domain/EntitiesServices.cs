@@ -93,8 +93,14 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<TempFolderBackupArchiveLocation>()
                 .As<IBackupArchiveLocation>();
 
+            services.AddSingletonAs<CommentsLoader>()
+                .As<ICommentsLoader>();
+
             services.AddSingletonAs<AppProvider>()
                 .As<IAppProvider>();
+
+            services.AddSingletonAs<AppUISettings>()
+                .As<IAppUISettings>();
 
             services.AddSingletonAs<AssetEnricher>()
                 .As<IAssetEnricher>();
@@ -257,7 +263,7 @@ namespace Squidex.Config.Domain
             services.AddSingletonAs<ContentCommandMiddleware>()
                 .As<ICommandMiddleware>();
 
-            services.AddSingletonAs<GrainCommandMiddleware<CommentsCommand, ICommentGrain>>()
+            services.AddSingletonAs<GrainCommandMiddleware<CommentsCommand, ICommentsGrain>>()
                 .As<ICommandMiddleware>();
 
             services.AddSingletonAs<GrainCommandMiddleware<SchemaCommand, ISchemaGrain>>()

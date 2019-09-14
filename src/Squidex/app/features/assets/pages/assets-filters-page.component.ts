@@ -21,12 +21,16 @@ import {
     templateUrl: './assets-filters-page.component.html'
 })
 export class AssetsFiltersPageComponent {
-    public queries = new Queries(this.uiState, 'assets');
+    public assetsQueries = new Queries(this.uiState, 'assets');
 
     constructor(
         public readonly assetsState: AssetsState,
         private readonly uiState: UIState
     ) {
+    }
+
+    public isQueryUsed = (query: SavedQuery) => {
+        return this.assetsState.isQueryUsed(query);
     }
 
     public search(query: Query) {
@@ -45,15 +49,7 @@ export class AssetsFiltersPageComponent {
         this.assetsState.resetTags();
     }
 
-    public isSelectedQuery(saved: SavedQuery) {
-        return this.assetsState.isQueryUsed(saved);
-    }
-
-    public trackByTag(index: number, tag: { name: string }) {
+    public trackByTag(tag: { name: string }) {
         return tag.name;
-    }
-
-    public trackByQuery(index: number, query: { name: string }) {
-        return query.name;
     }
 }

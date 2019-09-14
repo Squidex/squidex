@@ -21,7 +21,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Comments
 {
-    public sealed class CommentsGrain : DomainObjectGrainBase<CommentsState>, ICommentGrain
+    public sealed class CommentsGrain : DomainObjectGrainBase<CommentsState>, ICommentsGrain
     {
         private readonly IStore<Guid> store;
         private readonly List<Envelope<CommentsEvent>> events = new List<Envelope<CommentsEvent>>();

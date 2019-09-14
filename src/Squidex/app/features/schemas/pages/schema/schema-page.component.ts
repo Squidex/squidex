@@ -48,6 +48,8 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
     public editSchemaDialog = new DialogModel();
     public exportDialog = new DialogModel();
 
+    public trackByFieldFn: Function;
+
     constructor(
         public readonly appsState: AppsState,
         public readonly schemasState: SchemasState,
@@ -57,6 +59,8 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
         private readonly messageBus: MessageBus
     ) {
         super();
+
+        this.trackByFieldFn = this.trackByField.bind(this);
     }
 
     public ngOnInit() {

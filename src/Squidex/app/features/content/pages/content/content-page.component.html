@@ -100,7 +100,7 @@
                 Viewing <strong>version {{version.value}}</strong>.
             </div>
 
-            <ng-container *ngFor="let field of schema.fields; trackBy: trackByField.bind(this)">
+            <ng-container *ngFor="let field of schema.fields; trackBy: trackByFieldFn">
                 <sqx-content-field 
                     [form]="contentForm"
                     [formContext]="formContext"

@@ -43,16 +43,12 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
                 }));
     }
 
+    public isQueryUsed = (query: SavedQuery) => {
+        return this.contentsState.isQueryUsed(query);
+    }
+
     public search(query: Query) {
         this.contentsState.search(query);
-    }
-
-    public isSelectedQuery(saved: SavedQuery) {
-        return this.contentsState.isQueryUsed(saved);
-    }
-
-    public trackByTag(index: number, tag: { name: string }) {
-        return tag.name;
     }
 
     public trackByQuery(index: number, query: { name: string }) {

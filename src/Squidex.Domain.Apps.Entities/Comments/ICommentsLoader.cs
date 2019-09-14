@@ -5,21 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
-using Orleans;
-using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Orleans;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Apps
+namespace Squidex.Domain.Apps.Entities.Comments
 {
-    public interface IAppUISettingsGrain : IGrainWithStringKey
+    public interface ICommentsLoader
     {
-        Task<J<JsonObject>> GetAsync();
-
-        Task SetAsync(string path, J<IJsonValue> value);
-
-        Task SetAsync(J<JsonObject> settings);
-
-        Task RemoveAsync(string path);
+        Task<CommentsResult> GetCommentsAsync(Guid id, long version = EtagVersion.Any);
     }
 }

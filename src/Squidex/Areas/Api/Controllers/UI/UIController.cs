@@ -9,11 +9,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Orleans;
 using Squidex.Areas.Api.Controllers.UI.Models;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
@@ -24,14 +23,14 @@ namespace Squidex.Areas.Api.Controllers.UI
     {
         private static readonly Permission CreateAppPermission = new Permission(Permissions.AdminAppCreate);
         private readonly MyUIOptions uiOptions;
-        private readonly IGrainFactory grainFactory;
+        private readonly IAppUISettings appUISettings;
 
-        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IGrainFactory grainFactory)
+        public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IAppUISettings appUISettings)
             : base(commandBus)
         {
             this.uiOptions = uiOptions.Value;
 
-            this.grainFactory = grainFactory;
+            this.appUISettings = appUISettings;
         }
 
         /// <summary>
@@ -68,9 +67,28 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> GetSettings(string app)
         {
-            var result = await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).GetAsync();
+            var result = await appUISettings.GetAsync(AppId, null);
 
-            return Ok(result.Value);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get my ui settings.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <returns>
+        /// 200 => UI settings returned.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpGet]
+        [Route("apps/{app}/ui/settings/me")]
+        [ProducesResponseType(typeof(Dictionary<string, string>), 200)]
+        [ApiPermission]
+        public async Task<IActionResult> GetUserSettings(string app)
+        {
+            var result = await appUISettings.GetAsync(AppId, UserId());
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -88,7 +106,27 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> PutSetting(string app, string key, [FromBody] UpdateSettingDto request)
         {
-            await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).SetAsync(key, request.Value.AsJ());
+            await appUISettings.SetAsync(AppId, null, key, request.Value);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Set my ui settings.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="key">The name of the setting.</param>
+        /// <param name="request">The request with the value to update.</param>
+        /// <returns>
+        /// 200 => UI setting set.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpPut]
+        [Route("apps/{app}/ui/settings/me/{key}")]
+        [ApiPermission]
+        public async Task<IActionResult> PutUserSetting(string app, string key, [FromBody] UpdateSettingDto request)
+        {
+            await appUISettings.SetAsync(AppId, UserId(), key, request.Value);
 
             return NoContent();
         }
@@ -107,9 +145,40 @@ namespace Squidex.Areas.Api.Controllers.UI
         [ApiPermission]
         public async Task<IActionResult> DeleteSetting(string app, string key)
         {
-            await grainFactory.GetGrain<IAppUISettingsGrain>(AppId).RemoveAsync(key);
+            await appUISettings.RemoveAsync(AppId, null, key);
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Remove my ui settings.
+        /// </summary>
+        /// <param name="app">The name of the app.</param>
+        /// <param name="key">The name of the setting.</param>
+        /// <returns>
+        /// 200 => UI setting removed.
+        /// 404 => App not found.
+        /// </returns>
+        [HttpDelete]
+        [Route("apps/{app}/ui/settings/me/{key}")]
+        [ApiPermission]
+        public async Task<IActionResult> DeleteUserSetting(string app, string key)
+        {
+            await appUISettings.RemoveAsync(AppId, UserId(), key);
+
+            return NoContent();
+        }
+
+        private string UserId()
+        {
+            var subject = User.OpenIdSubject();
+
+            if (string.IsNullOrWhiteSpace(subject))
+            {
+                throw new DomainForbiddenException("Not allowed for clients.");
+            }
+
+            return subject;
         }
     }
 }
