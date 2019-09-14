@@ -5,21 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
-using Orleans;
 using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Orleans;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public interface IAppUISettingsGrain : IGrainWithStringKey
+    public interface IAppUISettings
     {
-        Task<J<JsonObject>> GetAsync();
+        Task<JsonObject> GetAsync(Guid appId, string userId);
 
-        Task SetAsync(string path, J<IJsonValue> value);
+        Task SetAsync(Guid appId, string userId, string path, IJsonValue value);
 
-        Task SetAsync(J<JsonObject> settings);
+        Task SetAsync(Guid appId, string userId, JsonObject settings);
 
-        Task RemoveAsync(string path);
+        Task RemoveAsync(Guid appId, string userId, string path);
     }
 }

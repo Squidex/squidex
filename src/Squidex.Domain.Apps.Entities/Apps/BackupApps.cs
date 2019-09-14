@@ -26,6 +26,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         private const string UsersFile = "Users.json";
         private const string SettingsFile = "Settings.json";
         private readonly IGrainFactory grainFactory;
+        private readonly IAppUISettings appUISettings;
         private readonly IUserResolver userResolver;
         private readonly IAppsByNameIndex appsByNameIndex;
         private readonly HashSet<string> contributors = new HashSet<string>();
@@ -36,12 +37,14 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public override string Name { get; } = "Apps";
 
-        public BackupApps(IGrainFactory grainFactory, IUserResolver userResolver)
+        public BackupApps(IGrainFactory grainFactory, IAppUISettings appUISettings, IUserResolver userResolver)
         {
             Guard.NotNull(grainFactory, nameof(grainFactory));
             Guard.NotNull(userResolver, nameof(userResolver));
+            Guard.NotNull(appUISettings, nameof(appUISettings));
 
             this.grainFactory = grainFactory;
+            this.appUISettings = appUISettings;
             this.userResolver = userResolver;
 
             appsByNameIndex = grainFactory.GetGrain<IAppsByNameIndex>(SingleGrain.Id);
@@ -182,7 +185,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         private async Task WriteSettingsAsync(BackupWriter writer, Guid appId)
         {
-            var json = await grainFactory.GetGrain<IAppUISettingsGrain>(appId).GetAsync();
+            var json = await appUISettings.GetAsync(appId, null);
 
             await writer.WriteJsonAsync(SettingsFile, json);
         }
@@ -191,7 +194,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             var json = await reader.ReadJsonAttachmentAsync<JsonObject>(SettingsFile);
 
-            await grainFactory.GetGrain<IAppUISettingsGrain>(appId).SetAsync(json);
+            await appUISettings.SetAsync(appId, null, json);
         }
 
         public override async Task CompleteRestoreAsync(Guid appId, BackupReader reader)

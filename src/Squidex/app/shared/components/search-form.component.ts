@@ -93,7 +93,7 @@ export class SearchFormComponent implements OnChanges {
 
         if (value) {
             if (this.queries && this.query) {
-                this.queries.add(value.name, this.query);
+                this.queries.add(value.name, this.query, value.user);
             }
 
             this.saveQueryForm.submitCompleted();

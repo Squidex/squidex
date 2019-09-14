@@ -53,7 +53,8 @@ export class SaveQueryForm extends Form<FormGroup, any> {
                 [
                     Validators.required
                 ]
-            ]
+            ],
+            user: false
         }));
     }
 }
