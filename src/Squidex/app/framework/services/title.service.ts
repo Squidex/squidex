@@ -9,9 +9,9 @@ import { Injectable } from '@angular/core';
 
 export class TitlesConfig {
     constructor(
-        public readonly value: { [key: string]: string },
         public readonly prefix?: string,
-        public readonly suffix?: string
+        public readonly suffix?: string,
+        public readonly separator?: string
     ) {
     }
 }
@@ -22,31 +22,54 @@ export const TitleServiceFactory = (titles: TitlesConfig) => {
 
 @Injectable()
 export class TitleService {
-    constructor(private readonly titles: TitlesConfig) {}
+    private readonly stack: any[] = [];
 
-    public setTitle(key: string, parameters?: { [key: string]: string }) {
-        let title = this.titles.value[key] || key;
+    constructor(private readonly titles: TitlesConfig) {
+        this.updateTitle();
+    }
 
-        if (!title) {
-            return;
+    public push(value: any, previous?: any) {
+        const lastIndex = this.stack.length - 1;
+
+        if (previous && this.stack[lastIndex] === previous) {
+            this.stack[lastIndex] = value;
+        } else {
+            this.stack.push(value);
         }
 
-        if (parameters) {
-            for (let parameter in parameters) {
-                if (parameters.hasOwnProperty(parameter)) {
-                    title = title.replace(`{${parameter}}`, parameters[parameter]);
-                }
+        this.updateTitle();
+    }
+
+    public pop() {
+        this.stack.pop();
+
+        this.updateTitle();
+    }
+
+    private updateTitle() {
+        const { prefix, separator, suffix } = this.titles;
+
+        let title = '';
+
+        if (this.stack.length > 0) {
+            title = this.stack.join(separator || ' | ');
+        }
+
+        if (title) {
+            if (prefix) {
+                title = `${prefix} - ${title}`;
             }
-        }
 
-        if (this.titles.prefix) {
-            title = this.titles.prefix + ' - ' + title;
-        }
-
-        if (this.titles.suffix) {
-            title = title + ' - ' + this.titles.suffix;
+            if (suffix) {
+                title = `${title} - ${suffix}`;
+            }
+        } else if (suffix) {
+            title = suffix;
+        } else if (prefix) {
+            title = prefix;
         }
 
         document.title = title;
+
     }
 }

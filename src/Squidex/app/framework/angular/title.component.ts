@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy } from '@angular/core';
 
 import { TitleService } from '@app/framework/internal';
 
@@ -14,46 +14,24 @@ import { TitleService } from '@app/framework/internal';
     template: '',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TitleComponent implements OnChanges {
-    @Input()
-    public message: any;
+export class TitleComponent implements OnDestroy {
+    private previous: any;
 
     @Input()
-    public parameter1: string;
+    public set message(value: any) {
+        this.titleService.push(value, this.previous);
 
-    @Input()
-    public parameter2: string;
-
-    @Input()
-    public value1: any;
-
-    @Input()
-    public value2: any;
+        this.previous = value;
+    }
 
     constructor(
         private readonly titleService: TitleService
     ) {
     }
 
-    public ngOnChanges() {
-        const parameters = {};
-
-        if (this.parameter1) {
-            if (!this.value1) {
-                return;
-            }
-
-            parameters[this.parameter1] = this.value1;
+    public ngOnDestroy() {
+        if (this.previous) {
+            this.titleService.pop();
         }
-
-        if (this.parameter2) {
-            if (!this.value2) {
-                return;
-            }
-
-            parameters[this.parameter2] = this.value2;
-        }
-
-        this.titleService.setTitle(this.message, parameters);
     }
 }

@@ -17,70 +17,82 @@ describe('TitleService', () => {
     });
 
     it('should instantiate from factory', () => {
-        const titleService = TitleServiceFactory(new TitlesConfig({}));
+        const titleService = TitleServiceFactory(new TitlesConfig());
 
         expect(titleService).toBeDefined();
     });
 
     it('should instantiate', () => {
-        const titleService = new TitleService(new TitlesConfig({}));
+        const titleService = new TitleService(new TitlesConfig());
 
         expect(titleService).toBeDefined();
     });
 
-    it('should use key when title key is not found in configuration', () => {
-        const titleService = new TitleService(new TitlesConfig({}));
+    it('should use single part when title element is pushed', () => {
+        const titleService = new TitleService(new TitlesConfig());
 
-        titleService.setTitle('my-title', {});
+        titleService.push('my-title');
 
         expect(document.title).toBe('my-title');
     });
 
+    it('should concatenate multiple parts when title elements are pushed', () => {
+        const titleService = new TitleService(new TitlesConfig());
+
+        titleService.push('my-title1');
+        titleService.push('my-title2');
+
+        expect(document.title).toBe('my-title1 | my-title2');
+    });
+
+    it('should replace previous element when found', () => {
+        const titleService = new TitleService(new TitlesConfig());
+
+        titleService.push('my-title1');
+        titleService.push('my-title2');
+        titleService.push('my-title3', 'my-title2');
+
+        expect(document.title).toBe('my-title1 | my-title3');
+    });
+
+    it('should concatenate remainging parts when title elements are popped', () => {
+        const titleService = new TitleService(new TitlesConfig());
+
+        titleService.push('my-title1');
+        titleService.pop();
+
+        expect(document.title).toBe('my-title2');
+    });
+
     it('should prepand prefix to title', () => {
-        const titleService = new TitleService(new TitlesConfig({}, 'myapp'));
+        const titleService = new TitleService(new TitlesConfig('prefix'));
 
-        titleService.setTitle('my-title', {});
+        titleService.push('my-title');
 
-        expect(document.title).toBe('myapp - my-title');
+        expect(document.title).toBe('prefix - my-title');
     });
 
     it('should append suffix to title', () => {
-        const titleService = new TitleService(new TitlesConfig({}, undefined, 'myapp'));
+        const titleService = new TitleService(new TitlesConfig( undefined, 'suffix'));
 
-        titleService.setTitle('my-title', {});
+        titleService.push('my-title');
 
-        expect(document.title).toBe('my-title - myapp');
+        expect(document.title).toBe('my-title - suffix');
     });
 
-    it('should do nothing if title is null', () => {
-        const titleService = new TitleService(new TitlesConfig({}, undefined, 'myapp'));
+    it('should use suffix when stack is empty', () => {
+        const titleService = new TitleService(new TitlesConfig('prefix', 'suffix'));
 
-        titleService.setTitle(null!, {});
+        titleService.pop();
 
-        expect(document.title).toBe('');
+        expect(document.title).toBe('suffix');
     });
 
-    it('should set document title when title key is found in configuration', () => {
-        const titles: { [key: string]: string } = {
-            found: 'found-title'
-        };
+    it('should use suffix when stack is empty and no suffix is set', () => {
+        const titleService = new TitleService(new TitlesConfig('prefix'));
 
-        const titleService = new TitleService(new TitlesConfig(titles));
+        titleService.pop();
 
-        titleService.setTitle('found', {});
-
-        expect(document.title).toBe('found-title');
-    });
-
-    it('should set document title to formatted string when title key found in configuration', () => {
-        const titles: { [key: string]: string } = {
-            found: 'my {value} in title'
-        };
-
-        const titleService = new TitleService(new TitlesConfig(titles));
-
-        titleService.setTitle('found', { value: 'secret' });
-
-        expect(document.title).toBe('my secret in title');
+        expect(document.title).toBe('prefix');
     });
 });

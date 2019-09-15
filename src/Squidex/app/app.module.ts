@@ -55,7 +55,7 @@ export function configUIOptions() {
 }
 
 export function configTitles() {
-    return new TitlesConfig({}, undefined, 'Squidex Headless CMS');
+    return new TitlesConfig(undefined, 'Squidex Headless CMS');
 }
 
 export function configAnalyticsId() {
