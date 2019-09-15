@@ -11,7 +11,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import {
-    AppsState,
     DialogModel,
     fadeAnimation,
     FieldDto,
@@ -51,7 +50,6 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
     public trackByFieldFn: Function;
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly schemasState: SchemasState,
         public readonly patternsState: PatternsState,
         private readonly route: ActivatedRoute,

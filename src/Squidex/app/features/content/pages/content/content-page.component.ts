@@ -15,7 +15,6 @@ import { ContentVersionSelected } from './../messages';
 import {
     ApiUrlConfig,
     AppLanguageDto,
-    AppsState,
     AuthService,
     AutoSaveKey,
     AutoSaveService,
@@ -70,7 +69,6 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,
-        public readonly appsState: AppsState,
         public readonly contentsState: ContentsState,
         private readonly autoSaveService: AutoSaveService,
         private readonly dialogs: DialogService,

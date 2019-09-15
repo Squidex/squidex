@@ -96,7 +96,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
     public callsMax = 0;
 
     constructor(
-        public readonly appsState: AppsState,
+        private readonly appsState: AppsState,
         public readonly authState: AuthService,
         private readonly historyService: HistoryService,
         private readonly usagesService: UsagesService

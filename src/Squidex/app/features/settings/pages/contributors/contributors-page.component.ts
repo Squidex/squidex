@@ -8,7 +8,6 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
-    AppsState,
     ContributorDto,
     ContributorsState,
     DialogModel,
@@ -24,7 +23,6 @@ export class ContributorsPageComponent implements OnInit {
     public importDialog = new DialogModel();
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly contributorsState: ContributorsState,
         public readonly rolesState: RolesState
     ) {

@@ -10,7 +10,6 @@ import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
-    AppsState,
     ContentDto,
     ContentsState,
     ImmutableArray,
@@ -57,7 +56,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly contentsState: ContentsState,
         private readonly languagesState: LanguagesState,
         private readonly schemasState: SchemasState,

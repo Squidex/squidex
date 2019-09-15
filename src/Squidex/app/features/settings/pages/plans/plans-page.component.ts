@@ -10,7 +10,6 @@ import { ActivatedRoute } from '@angular/router';
 
 import {
     ApiUrlConfig,
-    AppsState,
     PlanDto,
     PlansState
 } from '@app/shared';
@@ -26,7 +25,6 @@ export class PlansPageComponent implements OnInit {
     public portalUrl = this.apiUrl.buildUrl('/portal/');
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly plansState: PlansState,
         private readonly apiUrl: ApiUrlConfig,
         private readonly route: ActivatedRoute

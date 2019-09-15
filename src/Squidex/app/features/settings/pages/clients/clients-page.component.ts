@@ -8,7 +8,6 @@
 import { Component, OnInit } from '@angular/core';
 
 import {
-    AppsState,
     ClientDto,
     ClientsState,
     RolesState
@@ -21,7 +20,6 @@ import {
 })
 export class ClientsPageComponent implements OnInit {
     constructor(
-        public readonly appsState: AppsState,
         public readonly clientsState: ClientsState,
         public readonly rolesState: RolesState
     ) {

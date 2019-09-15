@@ -7,11 +7,7 @@
 
 import { Component, OnInit } from '@angular/core';
 
-import {
-    AppLanguageDto,
-    AppsState,
-    LanguagesState
-} from '@app/shared';
+import { AppLanguageDto, LanguagesState } from '@app/shared';
 
 @Component({
     selector: 'sqx-languages-page',
@@ -20,7 +16,6 @@ import {
 })
 export class LanguagesPageComponent implements OnInit {
     constructor(
-        public readonly appsState: AppsState,
         public readonly languagesState: LanguagesState
     ) {
     }

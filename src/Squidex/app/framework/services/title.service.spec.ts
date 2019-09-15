@@ -61,7 +61,7 @@ describe('TitleService', () => {
         titleService.push('my-title1');
         titleService.pop();
 
-        expect(document.title).toBe('my-title2');
+        expect(document.title).toBe('');
     });
 
     it('should prepand prefix to title', () => {

@@ -8,11 +8,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import {
-    AppsState,
-    SchemaCategory,
-    SchemasState
-} from '@app/shared';
+import { SchemaCategory, SchemasState } from '@app/shared';
 
 @Component({
     selector: 'sqx-schemas-page',
@@ -23,7 +19,6 @@ export class SchemasPageComponent implements OnInit {
     public schemasFilter = new FormControl();
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly schemasState: SchemasState
     ) {
     }

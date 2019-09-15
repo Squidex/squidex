@@ -29,15 +29,17 @@ export class TitleService {
     }
 
     public push(value: any, previous?: any) {
-        const lastIndex = this.stack.length - 1;
+        if (value) {
+            const lastIndex = this.stack.length - 1;
 
-        if (previous && this.stack[lastIndex] === previous) {
-            this.stack[lastIndex] = value;
-        } else {
-            this.stack.push(value);
+            if (previous && this.stack[lastIndex] === previous) {
+                this.stack[lastIndex] = value;
+            } else {
+                this.stack.push(value);
+            }
+
+            this.updateTitle();
         }
-
-        this.updateTitle();
     }
 
     public pop() {

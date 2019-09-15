@@ -35,7 +35,7 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
     public updateForm = new UpdateAppForm(this.formBuilder);
 
     constructor(
-        public readonly appsState: AppsState,
+        private readonly appsState: AppsState,
         private readonly formBuilder: FormBuilder,
         private readonly router: Router
     ) {

@@ -26,7 +26,7 @@ export class GraphQLPageComponent implements AfterViewInit {
     public graphiQLContainer: ElementRef;
 
     constructor(
-        public readonly appsState: AppsState,
+        private readonly appsState: AppsState,
         private readonly graphQlService: GraphQlService
     ) {
     }

@@ -37,7 +37,7 @@ export class RolesPageComponent implements OnInit {
     public allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);
 
     constructor(
-        public readonly appsState: AppsState,
+        private readonly appsState: AppsState,
         public readonly rolesService: RolesService,
         public readonly rolesState: RolesState
     ) {

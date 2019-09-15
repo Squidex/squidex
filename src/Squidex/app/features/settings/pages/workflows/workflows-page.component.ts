@@ -8,7 +8,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import {
-    AppsState,
     RolesState,
     SchemasState,
     WorkflowDto,
@@ -26,7 +25,6 @@ export class WorkflowsPageComponent implements OnInit, OnDestroy {
     public schemasSource: SchemaTagConverter;
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly rolesState: RolesState,
         public readonly schemasState: SchemasState,
         public readonly workflowsState: WorkflowsState

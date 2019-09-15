@@ -11,7 +11,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 
 import {
-    AppsState,
     CreateCategoryForm,
     DialogModel,
     MessageBus,
@@ -37,7 +36,6 @@ export class SchemasPageComponent extends ResourceOwner implements OnInit {
     public import: any;
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly schemasState: SchemasState,
         private readonly formBuilder: FormBuilder,
         private readonly messageBus: MessageBus,
