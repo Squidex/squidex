@@ -7,9 +7,10 @@
 
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import {
+    defined,
     DialogService,
     ImmutableArray,
     shareSubscribed,
@@ -45,12 +46,11 @@ export class AppsState extends State<Snapshot> {
     public apps =
         this.project(s => s.apps);
 
-    public selectedApp =
+    public selectedAppOrNull =
         this.project(s => s.selectedApp);
 
-    public selectedValidApp =
-        this.selectedApp.pipe(filter(x => !!x), map(x => <AppDto>x),
-            distinctUntilChanged());
+    public selectedApp =
+        this.selectedAppOrNull.pipe(defined());
 
     constructor(
         private readonly appsService: AppsService,
@@ -142,10 +142,12 @@ export class AppsState extends State<Snapshot> {
     private replaceApp(updated: AppDto, app: AppDto) {
         this.next(s => {
             const apps = s.apps.replaceBy('id', updated);
+
             const selectedApp = s.selectedApp &&
                 s.selectedApp.id === app.id ?
                 updated :
                 s.selectedApp;
+
             return { ...s, apps, selectedApp };
         });
     }

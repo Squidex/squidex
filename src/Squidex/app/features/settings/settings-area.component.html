@@ -8,50 +8,50 @@
     </ng-container>
     
     <ng-container content>
-        <ul class="nav nav-panel nav-dark flex-column" *ngIf="appsState.selectedValidApp | async; let selectedApp">
-            <li class="nav-item" *ngIf="selectedApp.canReadBackups">
+        <ul class="nav nav-panel nav-dark flex-column" *ngIf="appsState.selectedApp | async; let app">
+            <li class="nav-item" *ngIf="app.canReadBackups">
                 <a class="nav-link" routerLink="backups" routerLinkActive="active">
                     Backups
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="selectedApp.canReadClients">
+            <li class="nav-item" *ngIf="app.canReadClients">
                 <a class="nav-link" routerLink="clients" routerLinkActive="active">
                     Clients
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="selectedApp.canReadContributors">
+            <li class="nav-item" *ngIf="app.canReadContributors">
                 <a class="nav-link" routerLink="contributors" routerLinkActive="active">
                     Contributors
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="selectedApp.canReadRoles">
+            <li class="nav-item" *ngIf="app.canReadRoles">
                 <a class="nav-link" routerLink="roles" routerLinkActive="active">
                     Roles
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="selectedApp.canReadLanguages">
+            <li class="nav-item" *ngIf="app.canReadLanguages">
                 <a class="nav-link" routerLink="languages" routerLinkActive="active">
                     Languages
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="selectedApp.canReadPatterns">
+            <li class="nav-item" *ngIf="app.canReadPatterns">
                 <a class="nav-link" routerLink="patterns" routerLinkActive="active">
                     Patterns
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="selectedApp.canReadWorkflows">
+            <li class="nav-item" *ngIf="app.canReadWorkflows">
                 <a class="nav-link" routerLink="workflows" routerLinkActive="active">
                     Workflows
                     <i class="icon-angle-right"></i>
                 </a>
             </li>
-            <li class="nav-item" *ngIf="selectedApp.canReadPlans">
+            <li class="nav-item" *ngIf="app.canReadPlans">
                 <a class="nav-link" routerLink="plans" routerLinkActive="active">
                     Subscription
                     <i class="icon-angle-right"></i>

@@ -51,8 +51,6 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
 
     public isPerformanceStacked = false;
 
-    public app = this.appsState.selectedValidApp;
-
     public chartOptions = {
         responsive: true,
         scales: {
@@ -96,7 +94,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
     public callsMax = 0;
 
     constructor(
-        private readonly appsState: AppsState,
+        public readonly appsState: AppsState,
         public readonly authState: AuthService,
         private readonly historyService: HistoryService,
         private readonly usagesService: UsagesService
@@ -106,7 +104,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
 
     public ngOnInit() {
         this.own(
-            this.app.pipe(
+            this.appsState.selectedApp.pipe(
                     switchMap(app => this.usagesService.getTodayStorage(app.name)))
                 .subscribe(dto => {
                     this.assetsCurrent = dto.size;
@@ -114,7 +112,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
                 }));
 
         this.own(
-            this.app.pipe(
+            this.appsState.selectedApp.pipe(
                     switchMap(app => this.usagesService.getMonthCalls(app.name)))
                 .subscribe(dto => {
                     this.callsCurrent = dto.count;
@@ -122,14 +120,14 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
                 }));
 
         this.own(
-            this.app.pipe(
+            this.appsState.selectedApp.pipe(
                     switchMap(app => this.historyService.getHistory(app.name, '')))
                 .subscribe(dto => {
                     this.history = dto;
                 }));
 
         this.own(
-            this.app.pipe(
+            this.appsState.selectedApp.pipe(
                     switchMap(app => this.usagesService.getStorageUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {
                     const labels = createLabels(dtos);
@@ -166,7 +164,7 @@ export class DashboardPageComponent extends ResourceOwner implements OnInit {
                 }));
 
         this.own(
-            this.app.pipe(
+            this.appsState.selectedApp.pipe(
                     switchMap(app => this.usagesService.getCallsUsages(app.name, DateTime.today().addDays(-20), DateTime.today())))
                 .subscribe(dtos => {
                     const labels = createLabelsFromSet(dtos);

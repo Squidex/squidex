@@ -67,9 +67,7 @@ export class SchemaPageComponent extends ResourceOwner implements OnInit {
         this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
-                    if (schema) {
-                        this.schema = schema;
-                    }
+                    this.schema = schema;
                 }));
     }
 

@@ -46,16 +46,14 @@ export class MorePageComponent extends ResourceOwner implements OnInit {
         this.own(
             this.appsState.selectedApp
                 .subscribe(app => {
-                    if (app) {
-                        this.app = app;
+                    this.app = app;
 
-                        this.isDeletable = app.canDelete;
-                        this.isEditable = app.canUpdateGeneral;
-                        this.isImageEditable = app.canUpdateImage;
+                    this.isDeletable = app.canDelete;
+                    this.isEditable = app.canUpdateGeneral;
+                    this.isImageEditable = app.canUpdateImage;
 
-                        this.updateForm.load(app);
-                        this.updateForm.setEnabled(this.isEditable);
-                    }
+                    this.updateForm.load(app);
+                    this.updateForm.setEnabled(this.isEditable);
                 }));
     }
 

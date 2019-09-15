@@ -70,7 +70,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 .subscribe(schema => {
                     this.resetSelection();
 
-                    this.schema = schema!;
+                    this.schema = schema;
 
                     this.minWidth = `${300 + (200 * this.schema.listFields.length)}px`;
 

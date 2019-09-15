@@ -98,11 +98,9 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
-                    if (schema) {
-                        this.schema = schema!;
+                    this.schema = schema;
 
-                        this.contentForm = new EditContentForm(this.languages, this.schema);
-                    }
+                    this.contentForm = new EditContentForm(this.languages, this.schema);
                 }));
 
         this.own(
