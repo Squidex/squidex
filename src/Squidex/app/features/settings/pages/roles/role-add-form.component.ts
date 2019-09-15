@@ -29,8 +29,7 @@ import { AddRoleForm, RolesState } from '@app/shared';
                     </div>
                 </div>
             </form>
-        </div>
-    `,
+        </div>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RoleAddFormComponent {

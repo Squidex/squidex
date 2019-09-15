@@ -15,11 +15,11 @@ import { FeatureDto } from '@app/shared';
     templateUrl: './news-dialog.component.html'
 })
 export class NewsDialogComponent {
-    @Input()
-    public features: FeatureDto[];
-
     @Output()
     public close = new EventEmitter();
+
+    @Input()
+    public features: FeatureDto[];
 
     public emitClose() {
         this.close.emit();

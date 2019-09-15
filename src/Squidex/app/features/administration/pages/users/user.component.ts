@@ -33,8 +33,7 @@ import { UserDto, UsersState } from '@app/features/administration/internal';
                 </button>
             </td>
         </tr>
-        <tr class="spacer"></tr>
-    `,
+        <tr class="spacer"></tr>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserComponent {

@@ -45,7 +45,10 @@ export class UsersDataSource implements AutocompleteSource {
 @Component({
     selector: 'sqx-contributor-add-form',
     styleUrls: ['./contributor-add-form.component.scss'],
-    templateUrl: './contributor-add-form.component.html'
+    templateUrl: './contributor-add-form.component.html',
+    providers: [
+        UsersDataSource
+    ]
 })
 export class ContributorAddFormComponent {
     public assignContributorForm = new AssignContributorForm(this.formBuilder);

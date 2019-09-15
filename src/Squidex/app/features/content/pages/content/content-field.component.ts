@@ -30,6 +30,9 @@ import {
     templateUrl: './content-field.component.html'
 })
 export class ContentFieldComponent implements DoCheck, OnChanges {
+    @Output()
+    public languageChange = new EventEmitter<AppLanguageDto>();
+
     @Input()
     public form: EditContentForm;
 
@@ -53,9 +56,6 @@ export class ContentFieldComponent implements DoCheck, OnChanges {
 
     @Input()
     public languages: AppLanguageDto[];
-
-    @Output()
-    public languageChange = new EventEmitter<AppLanguageDto>();
 
     public selectedFormControl: AbstractControl;
     public selectedFormControlCompare?: AbstractControl;

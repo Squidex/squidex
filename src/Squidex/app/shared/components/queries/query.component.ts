@@ -27,13 +27,10 @@ import {
             <button class="btn btn-outline-success btn-sm mr-2" (click)="addSorting()">
                 Add Sorting
             </button>
-        </div>
-    `,
+        </div>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QueryComponent {
-    public queryValue: Query;
-
     @Output()
     public queryChange = new EventEmitter<Query>();
 
@@ -60,6 +57,8 @@ export class QueryComponent {
             this.queryValue = query;
         }
     }
+
+    public queryValue: Query;
 
     constructor() {
         this.query = {};

@@ -49,8 +49,7 @@ import {
                 </button>
             </td>
         </tr>
-        <tr class="spacer"></tr>
-    `,
+        <tr class="spacer"></tr>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RuleComponent {

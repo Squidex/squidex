@@ -31,8 +31,7 @@ import {
                     </div>
                 </div>
             </form>
-        </div>
-    `,
+        </div>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LanguageAddFormComponent implements OnChanges {

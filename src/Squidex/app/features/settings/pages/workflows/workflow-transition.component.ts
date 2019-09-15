@@ -19,6 +19,12 @@ import {
     templateUrl: './workflow-transition.component.html'
 })
 export class WorkflowTransitionComponent {
+    @Output()
+    public update = new EventEmitter<WorkflowTransitionValues>();
+
+    @Output()
+    public remove = new EventEmitter();
+
     @Input()
     public transition: WorkflowTransitionView;
 
@@ -28,12 +34,6 @@ export class WorkflowTransitionComponent {
     @Input()
     public disabled: boolean;
 
-    @Output()
-    public update = new EventEmitter<WorkflowTransitionValues>();
-
-    @Output()
-    public remove = new EventEmitter();
-
     public onBlur = { updateOn: 'blur' };
 
     public changeExpression(expression: string) {
@@ -42,6 +42,10 @@ export class WorkflowTransitionComponent {
 
     public changeRole(role: string) {
         this.update.emit({ role: role || '' });
+    }
+
+    public emitRemove() {
+        this.remove.emit();
     }
 
     public trackByRole(index: number, role: RoleDto) {

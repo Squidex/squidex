@@ -32,6 +32,12 @@ import { AppLanguageDto, RootFieldDto } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FieldLanguagesComponent {
+    @Output()
+    public languageChange = new EventEmitter<AppLanguageDto>();
+
+    @Output()
+    public showAllControlsChange = new EventEmitter<boolean>();
+
     @Input()
     public field: RootFieldDto;
 
@@ -43,10 +49,4 @@ export class FieldLanguagesComponent {
 
     @Input()
     public languages: AppLanguageDto[];
-
-    @Output()
-    public languageChange = new EventEmitter<AppLanguageDto>();
-
-    @Output()
-    public showAllControlsChange = new EventEmitter<boolean>();
 }

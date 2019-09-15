@@ -23,17 +23,17 @@ import {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetDialogComponent extends StatefulComponent implements OnInit {
-    @Input()
-    public asset: AssetDto;
-
-    @Input()
-    public allTags: string[];
-
     @Output()
     public cancel = new EventEmitter();
 
     @Output()
     public complete = new EventEmitter<AssetDto>();
+
+    @Input()
+    public asset: AssetDto;
+
+    @Input()
+    public allTags: string[];
 
     public isEditable = false;
 

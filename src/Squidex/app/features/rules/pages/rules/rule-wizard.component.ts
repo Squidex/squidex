@@ -27,18 +27,6 @@ export const MODE_EDIT_ACTION  = 'EditAction';
     templateUrl: './rule-wizard.component.html'
 })
 export class RuleWizardComponent implements AfterViewInit, OnInit {
-    public actionForm = new Form<FormGroup, any>(new FormGroup({}));
-    public actionType: string;
-    public action: any = {};
-
-    public triggerForm = new Form<FormGroup, any>(new FormGroup({}));
-    public triggerType: string;
-    public trigger: any = {};
-
-    public isEditable: boolean;
-
-    public step = 1;
-
     @Output()
     public complete = new EventEmitter();
 
@@ -56,6 +44,18 @@ export class RuleWizardComponent implements AfterViewInit, OnInit {
 
     @Input()
     public mode = MODE_WIZARD;
+
+    public actionForm = new Form<FormGroup, any>(new FormGroup({}));
+    public actionType: string;
+    public action: any = {};
+
+    public triggerForm = new Form<FormGroup, any>(new FormGroup({}));
+    public triggerType: string;
+    public trigger: any = {};
+
+    public isEditable: boolean;
+
+    public step = 1;
 
     constructor(
         private readonly rulesState: RulesState
