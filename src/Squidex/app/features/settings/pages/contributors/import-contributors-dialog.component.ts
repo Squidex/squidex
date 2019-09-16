@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { empty, of } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
@@ -13,13 +13,16 @@ import { catchError, mergeMap, tap } from 'rxjs/operators';
 import {
     ContributorsState,
     ErrorDto,
-    ImportContributorsForm
+    ImmutableArray,
+    ImportContributorsForm,
+    RoleDto
 } from '@app/shared';
 
 interface ImportStatus {
     email: string;
     result: 'Pending' | 'Failed' | 'Success';
     resultText: string;
+    role: string;
 }
 
 @Component({
@@ -28,11 +31,17 @@ interface ImportStatus {
     templateUrl: './import-contributors-dialog.component.html'
 })
 export class ImportContributorsDialogComponent {
+    public readonly standalone = { standalone: true };
+
     @Output()
     public close = new EventEmitter();
 
+    @Input()
+    public roles: ImmutableArray<RoleDto>;
+
     public importForm = new ImportContributorsForm(this.formBuilder);
-    public importStatus: ImportStatus[];
+    public importStatus: ImportStatus[] = [];
+    public importStage: 'Start' | 'Change' | 'Wait' = 'Start';
 
     constructor(
         private readonly formBuilder: FormBuilder,
@@ -40,49 +49,58 @@ export class ImportContributorsDialogComponent {
     ) {
     }
 
-    public import() {
+    public detect() {
+        this.importStage = 'Change';
+
         const contributors = this.importForm.submit();
 
         if (contributors && contributors.length > 0) {
-            this.importStatus = [];
-
             for (let contributor of contributors) {
                 this.importStatus.push({
                     email: contributor.contributorId,
                     result: 'Pending',
-                    resultText: 'Pending'
+                    resultText: 'Pending',
+                    role: 'Developer'
                 });
             }
-
-            of(...contributors).pipe(
-                mergeMap(c =>
-                    this.contributorsState.assign(c, { silent: true }).pipe(
-                        tap(created => {
-                            let status = this.importStatus.find(x => x.email === c.contributorId);
-
-                            if (status) {
-                                status.resultText = getSuccess(created);
-                                status.result = 'Success';
-                            }
-                        }),
-                        catchError((error: ErrorDto) => {
-                            let status = this.importStatus.find(x => x.email === c.contributorId);
-
-                            if (status) {
-                                status.resultText = getError(error);
-                                status.result = 'Failed';
-                            }
-
-                            return empty();
-                        })
-                    ), 1)
-            ).subscribe();
         }
+    }
+
+    public import() {
+        this.importStage = 'Wait';
+
+        of(...this.importStatus).pipe(
+            mergeMap(s =>
+                this.contributorsState.assign(createRequest(s), { silent: true }).pipe(
+                    tap(created => {
+                        let status = this.importStatus.find(x => x.email === s.email);
+
+                        if (status) {
+                            status.resultText = getSuccess(created);
+                            status.result = 'Success';
+                        }
+                    }),
+                    catchError((error: ErrorDto) => {
+                        let status = this.importStatus.find(x => x.email === s.email);
+
+                        if (status) {
+                            status.resultText = getError(error);
+                            status.result = 'Failed';
+                        }
+
+                        return empty();
+                    })
+                ), 1)
+        ).subscribe();
     }
 
     public emitClose() {
         this.close.emit();
     }
+}
+
+function createRequest(status: ImportStatus) {
+    return { contributorId: status.email, role: status.role, invite: true };
 }
 
 function getError(error: ErrorDto): string {

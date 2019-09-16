@@ -8,7 +8,9 @@ $circle-size-lg: 2.8rem;
 .status {
     & {
         text-align: center;
+        display: inline-block;
         background: $color-border;
+        border: 0;
         color: $color-dark-foreground;
         vertical-align: middle;
     }

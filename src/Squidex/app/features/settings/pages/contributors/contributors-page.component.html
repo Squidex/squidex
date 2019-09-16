@@ -78,7 +78,7 @@
 </sqx-panel>
 
 <ng-container *sqxModal="importDialog">
-    <sqx-import-contributors-dialog 
+    <sqx-import-contributors-dialog [roles]="rolesState.roles | async"
         (close)="importDialog.hide()">
     </sqx-import-contributors-dialog>
 </ng-container>

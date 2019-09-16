@@ -44,7 +44,7 @@ export class AssignContributorForm extends Form<FormGroup, AssignContributorDto>
             contributorId = contributorId.id;
         }
 
-        return { contributorId, role: value.string, invite: true };
+        return { contributorId, role: value.role, invite: true };
     }
 }
 
@@ -69,14 +69,20 @@ export class ImportContributorsForm extends Form<FormGroup, AssignContributorDto
 }
 
 function extractEmails(value: string) {
-    let result: AssignContributorDto[] = [];
+    const result: AssignContributorDto[] = [];
 
     if (value) {
-        let emails = value.match(EMAIL_REGEX);
+        const added: { [email: string]: boolean } = {};
+
+        const emails = value.match(EMAIL_REGEX);
 
         if (emails) {
             for (let match of emails) {
-                result.push({ contributorId: match, role: 'Editor', invite: true });
+                if (!added[match]) {
+                    result.push({ contributorId: match, role: 'Editor', invite: true });
+
+                    added[match] = true;
+                }
             }
         }
     }
