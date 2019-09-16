@@ -5,15 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Apps;
+using Microsoft.AspNetCore.Http;
 using Squidex.Infrastructure.Assets;
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands
+namespace Squidex.Web
 {
-    public sealed class UploadAppImage : AppCommand
+    public static class FileExtensions
     {
-        public AppImage Image { get; set; }
-
-        public AssetFile File { get; set; }
+        public static AssetFile ToAssetFile(this IFormFile formFile)
+        {
+            return new AssetFile(formFile.FileName, formFile.ContentType, formFile.Length, formFile.OpenReadStream);
+        }
     }
 }

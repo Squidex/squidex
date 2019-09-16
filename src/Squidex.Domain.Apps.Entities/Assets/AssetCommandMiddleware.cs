@@ -50,17 +50,14 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public override async Task HandleAsync(CommandContext context, Func<Task> next)
         {
+            var tempFile = context.ContextId.ToString();
+
             switch (context.Command)
             {
                 case CreateAsset createAsset:
                     {
-                        if (createAsset.Tags == null)
-                        {
-                            createAsset.Tags = new HashSet<string>();
-                        }
-
                         await EnrichWithImageInfosAsync(createAsset);
-                        await EnrichWithHashAndUploadAsync(createAsset, context);
+                        await EnrichWithHashAndUploadAsync(createAsset, tempFile);
 
                         try
                         {
@@ -68,32 +65,30 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                             foreach (var existing in existings)
                             {
-                                if (IsDuplicate(createAsset, existing))
+                                if (IsDuplicate(existing, createAsset.File))
                                 {
                                     var result = new AssetCreatedResult(existing, true);
 
                                     context.Complete(result);
+
                                     await next();
                                     return;
                                 }
                             }
 
-                            foreach (var tagGenerator in tagGenerators)
-                            {
-                                tagGenerator.GenerateTags(createAsset, createAsset.Tags);
-                            }
+                            GenerateTags(createAsset);
 
                             await HandleCoreAsync(context, next);
 
-                            var asset = context.PlainResult as IEnrichedAssetEntity;
+                            var asset = context.Result<IEnrichedAssetEntity>();
 
                             context.Complete(new AssetCreatedResult(asset, false));
 
-                            await assetStore.CopyAsync(context.ContextId.ToString(), createAsset.AssetId.ToString(), asset.FileVersion, null);
+                            await assetStore.CopyAsync(tempFile, createAsset.AssetId.ToString(), asset.FileVersion, null);
                         }
                         finally
                         {
-                            await assetStore.DeleteAsync(context.ContextId.ToString());
+                            await assetStore.DeleteAsync(tempFile);
                         }
 
                         break;
@@ -102,19 +97,19 @@ namespace Squidex.Domain.Apps.Entities.Assets
                 case UpdateAsset updateAsset:
                     {
                         await EnrichWithImageInfosAsync(updateAsset);
-                        await EnrichWithHashAndUploadAsync(updateAsset, context);
+                        await EnrichWithHashAndUploadAsync(updateAsset, tempFile);
 
                         try
                         {
                             await HandleCoreAsync(context, next);
 
-                            var asset = context.PlainResult as IAssetEntity;
+                            var asset = context.Result<IEnrichedAssetEntity>();
 
-                            await assetStore.CopyAsync(context.ContextId.ToString(), updateAsset.AssetId.ToString(), asset.FileVersion, null);
+                            await assetStore.CopyAsync(tempFile, updateAsset.AssetId.ToString(), asset.FileVersion, null);
                         }
                         finally
                         {
-                            await assetStore.DeleteAsync(context.ContextId.ToString());
+                            await assetStore.DeleteAsync(tempFile);
                         }
 
                         break;
@@ -122,7 +117,6 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
                 default:
                     await HandleCoreAsync(context, next);
-
                     break;
             }
         }
@@ -139,9 +133,9 @@ namespace Squidex.Domain.Apps.Entities.Assets
             }
         }
 
-        private static bool IsDuplicate(CreateAsset createAsset, IAssetEntity asset)
+        private static bool IsDuplicate(IAssetEntity asset, AssetFile file)
         {
-            return asset != null && asset.FileName == createAsset.File.FileName && asset.FileSize == createAsset.File.FileSize;
+            return asset?.FileName == file.FileName && asset.FileSize == file.FileSize;
         }
 
         private async Task EnrichWithImageInfosAsync(UploadAssetCommand command)
@@ -149,13 +143,26 @@ namespace Squidex.Domain.Apps.Entities.Assets
             command.ImageInfo = await assetThumbnailGenerator.GetImageInfoAsync(command.File.OpenRead());
         }
 
-        private async Task EnrichWithHashAndUploadAsync(UploadAssetCommand command, CommandContext context)
+        private async Task EnrichWithHashAndUploadAsync(UploadAssetCommand command, string tempFile)
         {
             using (var hashStream = new HasherStream(command.File.OpenRead(), HashAlgorithmName.SHA256))
             {
-                await assetStore.UploadAsync(context.ContextId.ToString(), hashStream);
+                await assetStore.UploadAsync(tempFile, hashStream);
 
                 command.FileHash = $"{hashStream.GetHashStringAndReset()}{command.File.FileName}{command.File.FileSize}".Sha256Base64();
+            }
+        }
+
+        private void GenerateTags(CreateAsset createAsset)
+        {
+            if (createAsset.Tags == null)
+            {
+                createAsset.Tags = new HashSet<string>();
+            }
+
+            foreach (var tagGenerator in tagGenerators)
+            {
+                tagGenerator.GenerateTags(createAsset, createAsset.Tags);
             }
         }
     }

@@ -42,14 +42,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         {
             if (context.Command is UploadAppImage uploadImage)
             {
-                var image = await assetThumbnailGenerator.GetImageInfoAsync(uploadImage.File());
-
-                if (image == null)
-                {
-                    throw new ValidationException("File is not an image.");
-                }
-
-                await assetStore.UploadAsync(uploadImage.AppId.ToString(), uploadImage.File(), true);
+                await UploadAsync(uploadImage);
             }
 
             await ExecuteCommandAsync(context);
@@ -60,6 +53,20 @@ namespace Squidex.Domain.Apps.Entities.Apps
             }
 
             await next();
+        }
+
+        private async Task UploadAsync(UploadAppImage uploadImage)
+        {
+            var file = uploadImage.File;
+
+            var image = await assetThumbnailGenerator.GetImageInfoAsync(file.OpenRead());
+
+            if (image == null)
+            {
+                throw new ValidationException("File is not an image.");
+            }
+
+            await assetStore.UploadAsync(uploadImage.AppId.ToString(), file.OpenRead(), true);
         }
     }
 }

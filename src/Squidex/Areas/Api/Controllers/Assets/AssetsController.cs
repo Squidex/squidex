@@ -313,9 +313,7 @@ namespace Squidex.Areas.Api.Controllers.Assets
                 throw new ValidationException("Cannot create asset.", error);
             }
 
-            var assetFile = new AssetFile(formFile.FileName, formFile.ContentType, formFile.Length, formFile.OpenReadStream);
-
-            return assetFile;
+            return formFile.ToAssetFile();
         }
     }
 }
