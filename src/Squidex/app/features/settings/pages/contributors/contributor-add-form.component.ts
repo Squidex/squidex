@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Injectable } from '@angular/core';
+import { Component, Injectable, Input, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { withLatestFrom } from 'rxjs/operators';
@@ -16,6 +16,8 @@ import {
     ContributorsState,
     DialogModel,
     DialogService,
+    ImmutableArray,
+    RoleDto,
     UsersService
 } from '@app/shared';
 
@@ -50,7 +52,12 @@ export class UsersDataSource implements AutocompleteSource {
         UsersDataSource
     ]
 })
-export class ContributorAddFormComponent {
+export class ContributorAddFormComponent implements OnInit {
+    private defaultValue: any;
+
+    @Input()
+    public roles: ImmutableArray<RoleDto>;
+
     public assignContributorForm = new AssignContributorForm(this.formBuilder);
 
     public importDialog = new DialogModel();
@@ -63,13 +70,19 @@ export class ContributorAddFormComponent {
     ) {
     }
 
+    public ngOnInit() {
+        this.defaultValue = { role: this.roles.at(0).name, contributorId: '' };
+
+        this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });
+    }
+
     public assignContributor() {
         const value = this.assignContributorForm.submit();
 
         if (value) {
             this.contributorsState.assign(value)
                 .subscribe(isCreated => {
-                    this.assignContributorForm.submitCompleted();
+                    this.assignContributorForm.submitCompleted({ newValue: this.defaultValue });
 
                     if (isCreated) {
                         this.dialogs.notifyInfo('A new user with the entered email address has been created and assigned as contributor.');
