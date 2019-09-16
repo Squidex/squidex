@@ -6,11 +6,8 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 
 import {
-    AddClientForm,
-    AppsState,
     ClientDto,
     ClientsState,
     RolesState
@@ -22,13 +19,9 @@ import {
     templateUrl: './clients-page.component.html'
 })
 export class ClientsPageComponent implements OnInit {
-    public addClientForm = new AddClientForm(this.formBuilder);
-
     constructor(
-        public readonly appsState: AppsState,
         public readonly clientsState: ClientsState,
-        public readonly rolesState: RolesState,
-        private readonly formBuilder: FormBuilder
+        public readonly rolesState: RolesState
     ) {
     }
 
@@ -42,24 +35,7 @@ export class ClientsPageComponent implements OnInit {
         this.clientsState.load(true);
     }
 
-    public attachClient() {
-        const value = this.addClientForm.submit();
-
-        if (value) {
-            this.clientsState.attach({ id: value.name })
-                .subscribe(() => {
-                    this.addClientForm.submitCompleted();
-                }, error => {
-                    this.addClientForm.submitFailed(error);
-                });
-        }
-    }
-
-    public cancelAttachClient() {
-        this.addClientForm.submitCompleted();
-    }
-
-    public trackByClient(index: number, item: ClientDto) {
+    public trackByClient(item: ClientDto) {
         return item.id;
     }
 }

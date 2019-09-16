@@ -47,11 +47,11 @@ export class RichEditorComponent extends StatefulControlComponent<undefined, str
     private value: string;
     private isDisabled = false;
 
-    @ViewChild('editor', { static: false })
-    public editor: ElementRef;
-
     @Output()
     public assetPluginClick = new EventEmitter<any>();
+
+    @ViewChild('editor', { static: false })
+    public editor: ElementRef;
 
     public assetsDialog = new DialogModel();
 

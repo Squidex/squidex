@@ -103,4 +103,3 @@ export class LanguageComponent implements OnChanges {
         return language.iso2Code;
     }
 }
-

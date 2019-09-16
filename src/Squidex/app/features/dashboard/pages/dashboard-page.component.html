@@ -1,6 +1,6 @@
-<ng-container *ngIf="app | async; let app">
-    <sqx-title message="{app} | Dashboard" parameter1="app" [value1]="app.displayName"></sqx-title>
+<sqx-title message="Dashboard"></sqx-title>
 
+<ng-container *ngIf="appsState.selectedApp | async; let app">
     <div class="dashboard" @fade>
         <div class="dashboard-inner">
             <div>

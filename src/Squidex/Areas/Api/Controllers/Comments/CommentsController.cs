@@ -9,7 +9,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using Orleans;
 using Squidex.Areas.Api.Controllers.Comments.Models;
 using Squidex.Domain.Apps.Entities.Comments;
 using Squidex.Domain.Apps.Entities.Comments.Commands;
@@ -26,12 +25,12 @@ namespace Squidex.Areas.Api.Controllers.Comments
     [ApiExplorerSettings(GroupName = nameof(Comments))]
     public sealed class CommentsController : ApiController
     {
-        private readonly IGrainFactory grainFactory;
+        private readonly ICommentsLoader commentsLoader;
 
-        public CommentsController(ICommandBus commandBus, IGrainFactory grainFactory)
+        public CommentsController(ICommandBus commandBus, ICommentsLoader commentsLoader)
             : base(commandBus)
         {
-            this.grainFactory = grainFactory;
+            this.commentsLoader = commentsLoader;
         }
 
         /// <summary>
@@ -54,7 +53,7 @@ namespace Squidex.Areas.Api.Controllers.Comments
         [ApiCosts(0)]
         public async Task<IActionResult> GetComments(string app, Guid commentsId, [FromQuery] long version = EtagVersion.Any)
         {
-            var result = await grainFactory.GetGrain<ICommentGrain>(commentsId).GetCommentsAsync(version);
+            var result = await commentsLoader.GetCommentsAsync(commentsId, version);
 
             var response = Deferred.Response(() =>
             {

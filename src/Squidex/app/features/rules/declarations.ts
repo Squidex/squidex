@@ -12,6 +12,7 @@ export * from './pages/rules/triggers/content-changed-trigger.component';
 export * from './pages/rules/triggers/schema-changed-trigger.component';
 export * from './pages/rules/triggers/usage-trigger.component';
 
+export * from './pages/rules/rule.component';
 export * from './pages/rules/rule-element.component';
 export * from './pages/rules/rule-wizard.component';
 export * from './pages/rules/rules-page.component';

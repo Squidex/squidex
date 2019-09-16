@@ -65,6 +65,9 @@ import { SavedQuery } from '../state/queries';
     `
 })
 export class SavedQueriesComponent {
+    @Output()
+    public search = new EventEmitter<SavedQuery>();
+
     @Input()
     public queryUsed: (saved: SavedQuery) => boolean;
 
@@ -73,9 +76,6 @@ export class SavedQueriesComponent {
 
     @Input()
     public types: string;
-
-    @Output()
-    public search = new EventEmitter<SavedQuery>();
 
     public isSelectedQuery(saved: SavedQuery) {
         return this.queryUsed && this.queryUsed(saved);

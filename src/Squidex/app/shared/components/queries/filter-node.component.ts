@@ -27,14 +27,11 @@ import {
             <sqx-filter-comparison [model]="model" [filter]="comparison"
                 (remove)="remove.emit()" (change)="change.emit()">
             </sqx-filter-comparison>
-        </ng-container>
-    `,
+        </ng-container>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterNodeComponent {
     public comparison: FilterComparison;
-
-    public logical: FilterLogical;
 
     @Output()
     public change = new EventEmitter();
@@ -56,4 +53,6 @@ export class FilterNodeComponent {
             this.comparison = <FilterComparison>value;
         }
     }
+
+    public logical: FilterLogical;
 }

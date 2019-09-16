@@ -27,8 +27,8 @@
                     (load)="addAsset(file, $event)">
                 </sqx-asset>
                 <sqx-asset *ngFor="let asset of snapshot.assets; trackBy: trackByAsset" [asset]="asset" [isCompact]="isCompact" removeMode="true"
-                    (update)="notifyOthers($event)"
-                    (remove)="removeLoadedAsset($event)">
+                    (update)="notifyOthers(asset)"
+                    (remove)="removeLoadedAsset(asset)">
                 </sqx-asset>
             </div>
         </ng-container>
@@ -48,8 +48,8 @@
                         <sqx-asset [asset]="asset" removeMode="true" 
                             [isListView]="true"
                             [isCompact]="isCompact"
-                            (update)="notifyOthers($event)"
-                            (remove)="removeLoadedAsset($event)">
+                            (update)="notifyOthers(asset)"
+                            (remove)="removeLoadedAsset(asset)">
                         </sqx-asset>
                     </div>
                 </div>

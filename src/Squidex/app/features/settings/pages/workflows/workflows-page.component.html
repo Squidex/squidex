@@ -1,4 +1,4 @@
-<sqx-title message="{app} | Workflows | Settings" parameter1="app" [value1]="appsState.appDisplayName"></sqx-title>
+<sqx-title message="Workflows"></sqx-title>
 
 <sqx-panel desiredWidth="60rem" [showSidebar]="true" [isLazyLoaded]="false">
     <ng-container title>
@@ -35,23 +35,7 @@
                     [workflow]="workflow" [roles]="roles" [schemasSource]="schemasSource">
                 </sqx-workflow>
 
-                <div class="table-items-footer" *ngIf="workflowsState.canCreate | async">
-                    <form [formGroup]="addWorkflowForm.form" (ngSubmit)="addWorkflow()">
-                        <div class="row no-gutters">
-                            <div class="col">
-                                <sqx-control-errors for="name" [submitted]="addWorkflowForm.submitted | async"></sqx-control-errors>
-                                    
-                                <input type="text" class="form-control" formControlName="name" maxlength="40" placeholder="Enter workflow name" autocomplete="off" />
-                            </div>
-                            <div class="col-auto pl-1">
-                                <button type="submit" class="btn btn-success" [disabled]="addWorkflowForm.hasNoName | async">Add Workflow</button>
-                            </div>
-                            <div class="col-auto pl-1">
-                                <button type="reset" class="btn btn-secondary" (click)="cancelAddWorkflow()">Cancel</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                <sqx-workflow-add-form *ngIf="workflowsState.canCreate | async"></sqx-workflow-add-form>
             </ng-container>
         </ng-container>
     </ng-container>

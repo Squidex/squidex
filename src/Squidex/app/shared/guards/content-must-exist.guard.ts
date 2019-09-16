@@ -27,12 +27,12 @@ export class ContentMustExistGuard implements CanActivate {
 
         const result =
             this.contentsState.select(contentId).pipe(
-                tap(dto => {
-                    if (!dto) {
+                tap(content => {
+                    if (!content) {
                         this.router.navigate(['/404']);
                     }
                 }),
-                map(u => !!u));
+                map(content => !!content));
 
         return result;
     }

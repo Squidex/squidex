@@ -75,7 +75,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var userOrClientId = HttpContext.User.UserOrClientId();
             var userPermissions = HttpContext.Permissions();
 
-            var apps = await appProvider.GetUserApps(userOrClientId, userPermissions);
+            var apps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions);
 
             var response = Deferred.Response(() =>
             {

@@ -60,10 +60,10 @@ describe('BackupsService', () => {
         });
 
         expect(backups!).toEqual(
-            new BackupsDto([
+            new BackupsDto(2, [
                 createBackup(12),
                 createBackup(13)
-            ]));
+            ], {}));
     }));
 
     it('should make get request to get restore',

@@ -20,5 +20,7 @@ namespace Squidex.Domain.Apps.Entities.Rules
         NamedId<Guid> AppId { get; set; }
 
         Rule RuleDef { get; }
+
+        bool IsDeleted { get; }
     }
 }

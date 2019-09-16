@@ -100,7 +100,7 @@ export class UIState extends State<Snapshot> {
         this.loadResources();
         this.loadCommon();
 
-        appsState.selectedValidApp.subscribe(app => {
+        appsState.selectedApp.subscribe(app => {
             this.load(app.name);
         });
     }

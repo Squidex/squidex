@@ -30,8 +30,7 @@ import { QueryModel, QuerySorting } from '@app/shared/internal';
                     <i class="icon-bin2"></i>
                 </button>
             </div>
-        </div>
-     `,
+        </div>`,
      changeDetection: ChangeDetectionStrategy.OnPush
  })
 export class SortingComponent {

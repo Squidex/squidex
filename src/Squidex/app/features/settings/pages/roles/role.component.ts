@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input, OnChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import {
@@ -24,7 +24,8 @@ import {
     templateUrl: './role.component.html',
     animations: [
         fadeAnimation
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RoleComponent implements OnChanges {
     @Input()
@@ -60,12 +61,12 @@ export class RoleComponent implements OnChanges {
         this.isEditing = !this.isEditing;
     }
 
-    public removePermission(index: number) {
-        this.editForm.remove(index);
+    public delete() {
+        this.rolesState.delete(this.role);
     }
 
-    public remove() {
-        this.rolesState.delete(this.role);
+    public removePermission(index: number) {
+        this.editForm.remove(index);
     }
 
     public addPermission() {
@@ -96,4 +97,3 @@ export class RoleComponent implements OnChanges {
         }
     }
 }
-

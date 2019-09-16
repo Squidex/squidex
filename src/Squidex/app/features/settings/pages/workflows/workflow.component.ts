@@ -126,4 +126,3 @@ export class WorkflowComponent implements OnChanges {
         return step.name;
     }
 }
-

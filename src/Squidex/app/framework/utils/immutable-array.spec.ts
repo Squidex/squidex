@@ -213,4 +213,3 @@ describe('ImmutableArray', () => {
         expect(values).toEqual([3, 1, 4, 2]);
     });
 });
-

@@ -32,6 +32,24 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetComponent extends StatefulComponent<State> implements OnInit {
+    @Output()
+    public load = new EventEmitter<AssetDto>();
+
+    @Output()
+    public loadError = new EventEmitter();
+
+    @Output()
+    public remove = new EventEmitter();
+
+    @Output()
+    public update = new EventEmitter();
+
+    @Output()
+    public delete = new EventEmitter();
+
+    @Output()
+    public select = new EventEmitter();
+
     @Input()
     public initFile: File;
 
@@ -58,24 +76,6 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
 
     @Input()
     public allTags: string[];
-
-    @Output()
-    public load = new EventEmitter<AssetDto>();
-
-    @Output()
-    public loadError = new EventEmitter();
-
-    @Output()
-    public remove = new EventEmitter<AssetDto>();
-
-    @Output()
-    public update = new EventEmitter<AssetDto>();
-
-    @Output()
-    public delete = new EventEmitter<AssetDto>();
-
-    @Output()
-    public select = new EventEmitter<AssetDto>();
 
     public editDialog = new DialogModel();
 
@@ -159,11 +159,11 @@ export class AssetComponent extends StatefulComponent<State> implements OnInit {
     }
 
     public emitUpdate() {
-        this.update.emit(this.asset);
+        this.update.emit();
     }
 
     public emitRemove() {
-        this.remove.emit(this.asset);
+        this.remove.emit();
     }
 
     private setProgress(progress: number) {

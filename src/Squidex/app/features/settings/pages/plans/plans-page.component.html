@@ -1,8 +1,8 @@
-<sqx-title message="{app} | Plans | Settings" parameter1="app" [value1]="appsState.appDisplayName"></sqx-title>
+<sqx-title message="Subscription"></sqx-title>
 
 <sqx-panel desiredWidth="64rem" [showSidebar]="true" [scrollX]="true">
     <ng-container title>
-        Update Plan
+        Subscription
     </ng-container>
 
     <ng-container menu>
@@ -24,50 +24,9 @@
             </div>
 
             <div class="clearfix">
-                <div class="card plan float-left" *ngFor="let planInfo of plans; trackBy: trackByPlan">
-                    <div class="card-header text-center">
-                        <h4 class="card-title">{{planInfo.plan.name}}</h4>
-                        <h5 class="plan-price">{{planInfo.plan.costs}}</h5>
-
-                        <small class="text-muted">Per Month</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="plan-fact text-center">
-                            <div>
-                                <strong>{{planInfo.plan.maxApiCalls | sqxKNumber}}</strong> API Calls
-                            </div>
-                            <div>
-                                {{planInfo.plan.maxAssetSize | sqxFileSize}} Storage
-                            </div>
-                            <div>
-                                {{planInfo.plan.maxContributors}} Contributors
-                            </div>
-                        </div>
-                    
-                        <button *ngIf="planInfo.isSelected" class="btn btn-block btn-text-success plan-selected">
-                            &#10003; Selected
-                        </button>
-                        
-                        <button *ngIf="!planInfo.isSelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async" (click)="change(planInfo.plan.id)">
-                            Change
-                        </button>
-                    </div>
-                    <div class="card-footer" *ngIf="planInfo.plan.yearlyId">
-                        <div class="text-center">
-                            <h5 class="plan-price">{{planInfo.plan.yearlyCosts}}</h5>
-
-                            <small class="text-muted">Per Year</small>
-                        </div>
-
-                        <button *ngIf="planInfo.isYearlySelected" class="btn btn-block btn-text-success plan-selected">
-                            &#10003; Selected
-                        </button>
-                        
-                        <button *ngIf="!planInfo.isYearlySelected" class="btn btn-block btn-success" [disabled]="plansState.isDisabled | async" (click)="change(planInfo.plan.yearlyId)">
-                            Change
-                        </button>
-                    </div>
-                </div>
+                <sqx-plan *ngFor="let planInfo of plans; trackBy: trackByPlan"
+                    [planInfo]="planInfo">
+                </sqx-plan>
             </div>
 
             <div *ngIf="plansState.hasPortal | async" class="billing-portal-link">

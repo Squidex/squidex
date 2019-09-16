@@ -33,7 +33,7 @@ export class EventConsumerDto {
 
     public readonly canStop: boolean;
     public readonly canStart: boolean;
-    public readonly canRestart: boolean;
+    public readonly canReset: boolean;
 
     constructor(links: ResourceLinks,
         public readonly name: string,
@@ -46,7 +46,7 @@ export class EventConsumerDto {
 
         this.canStop = hasAnyLink(links, 'stop');
         this.canStart = hasAnyLink(links, 'start');
-        this.canRestart = hasAnyLink(links, 'canReset');
+        this.canReset = hasAnyLink(links, 'reset');
     }
 }
 

@@ -24,6 +24,9 @@ interface State {
     changeDetection: ChangeDetectionStrategy.Default
 })
 export class ModalDialogComponent extends StatefulComponent<State> implements AfterViewInit {
+    @Output()
+    public close = new EventEmitter();
+
     @Input()
     public showClose = true;
 
@@ -47,9 +50,6 @@ export class ModalDialogComponent extends StatefulComponent<State> implements Af
 
     @Input()
     public contentClass = '';
-
-    @Output()
-    public close = new EventEmitter();
 
     @ViewChild('tabsElement', { static: false })
     public tabsElement: ElementRef<ParentNode>;

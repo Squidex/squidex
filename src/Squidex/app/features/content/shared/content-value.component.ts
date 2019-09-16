@@ -17,8 +17,7 @@ import { HtmlValue, Types } from '@app/shared';
         </ng-container>
         <ng-template #html>
             <span class="truncate" [innerHTML]="value.html"></span>
-        </ng-template>
-    `,
+        </ng-template>`,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContentValueComponent {

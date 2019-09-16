@@ -27,6 +27,9 @@ import {
     ]
 })
 export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
+    @Output()
+    public select = new EventEmitter<ContentDto[]>();
+
     @Input()
     public language: LanguageDto;
 
@@ -41,9 +44,6 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
 
     @Input()
     public schema: SchemaDetailsDto;
-
-    @Output()
-    public select = new EventEmitter<ContentDto[]>();
 
     public queryModel: QueryModel;
 
@@ -143,4 +143,3 @@ export class ContentsSelectorComponent extends ResourceOwner implements OnInit {
         return content.id;
     }
 }
-
