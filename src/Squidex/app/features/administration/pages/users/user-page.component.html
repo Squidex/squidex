@@ -1,4 +1,3 @@
-<sqx-title message="User Management"></sqx-title>
 
 <form [formGroup]="userForm.form" (ngSubmit)="save()">
     <input style="display:none" type="password" name="foilautofill"/>
@@ -6,10 +5,14 @@
     <sqx-panel desiredWidth="26rem" isBlank="true" [isLazyLoaded]="false">
         <ng-container title>
             <ng-container *ngIf="usersState.selectedUser | async; else noUserTitle">
+                <sqx-title message="Edit User"></sqx-title>
+
                 Edit User
             </ng-container>
 
             <ng-template #noUserTitle>
+                <sqx-title message="New User"></sqx-title>
+
                 New User
             </ng-template>
         </ng-container>

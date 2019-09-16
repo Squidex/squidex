@@ -1,4 +1,4 @@
-<sqx-title message="{app} | Rules" parameter1="app" [value1]="appsState.appDisplayName"></sqx-title>
+<sqx-title message="Rules"></sqx-title>
 
 <sqx-panel desiredWidth="54rem" showSidebar="true">
     <ng-container title>
@@ -32,38 +32,14 @@
             </div>
 
             <table class="table table-items table-fixed">
-                <tbody *ngFor="let rule of rules; trackBy: trackByRule">
-                    <tr>
-                        <td class="cell-separator">
-                            <h3>If</h3>
-                        </td>
-                        <td class="cell-auto">
-                            <span (click)="editTrigger(rule)">
-                                <sqx-rule-element [type]="rule.triggerType" [element]="ruleTriggers[rule.triggerType]"></sqx-rule-element>
-                            </span>
-                        </td>
-                        <td class="cell-separator">
-                            <h3>then</h3>
-                        </td>
-                        <td class="cell-auto">
-                            <span (click)="editAction(rule)">
-                                <sqx-rule-element [type]="rule.actionType" [element]="ruleActions[rule.actionType]"></sqx-rule-element>
-                            </span>
-                        </td>
-                        <td class="cell-actions">
-                            <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle(rule)"></sqx-toggle>
-                        </td>
-                        <td class="cell-actions">
-                            <button type="button" class="btn btn-text-danger"
-                                [disabled]="!rule.canDelete"
-                                (sqxConfirmClick)="delete(rule)"
-                                confirmTitle="Delete rule" 
-                                confirmText="Do you really want to delete the rule?">
-                                <i class="icon-bin2"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr class="spacer"></tr>
+                <tbody *ngFor="let rule of rules; trackBy: trackByRule"
+                    [sqxRule]="rule"
+                    [ruleActions]="ruleActions"
+                    [ruleTriggers]="ruleTriggers"
+                    (delete)="delete(rule)"
+                    (editAction)="editAction(rule)"
+                    (editTrigger)="editTrigger(rule)"
+                    (toggle)="toggle(rule)">
                 </tbody>
             </table>
 

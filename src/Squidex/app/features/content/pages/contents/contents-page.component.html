@@ -1,4 +1,4 @@
-<sqx-title message="{app} | {schema} | Contents" parameter1="app" parameter2="schema" [value1]="appsState.appDisplayName" [value2]="schema.displayName"></sqx-title>
+<sqx-title [message]="schema.displayName"></sqx-title>
 
 <sqx-panel desiredWidth="*" minWidth="50rem" contentClass="grid" showSidebar="true">
     <ng-container title>
@@ -91,21 +91,18 @@
         <div class="grid-content" [sqxSyncScrolling]="header">
             <div class="table-container" sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed" [style.minWidth]="minWidth">
-                    <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent">
-                        <tr [sqxContent]="content"
-                            (delete)="delete(content)"
-                            [selected]="isItemSelected(content)"
-                            (selectedChange)="selectItem(content, $event)"
-                            (statusChange)="changeStatus(content, $event)"
-                            (clone)="clone(content)"
-                            [language]="language"
-                            [canClone]="contentsState.snapshot.canCreate"
-                            [routerLink]="[content.id]"
-                            [routerLinkActive]="'active'"
-                            [schema]="schema"
-                            [schemaFields]="schema.listFields">
-                        </tr>
-                        <tr class="spacer"></tr>
+                    <tbody *ngFor="let content of contentsState.contents | async; trackBy: trackByContent"
+                        [sqxContent]="content"
+                        (delete)="delete(content)"
+                        [selected]="isItemSelected(content)"
+                        (selectedChange)="selectItem(content, $event)"
+                        (statusChange)="changeStatus(content, $event)"
+                        (clone)="clone(content)"
+                        [link]="[content.id]"
+                        [language]="language"
+                        [canClone]="contentsState.snapshot.canCreate"
+                        [schema]="schema"
+                        [schemaFields]="schema.listFields">
                     </tbody>
                 </table>
             </div>

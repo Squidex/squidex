@@ -125,7 +125,11 @@ module.exports = function (env) {
                 use: [{
                     loader: 'raw-loader'
                 }, {
-                    loader: 'sass-loader', options: { includePaths: [root('app', 'theme')] }
+                    loader: 'sass-loader', options: {
+                        sassOptions: {
+                            includePaths: [root('app', 'theme')]
+                        }
+                    }
                 }],
                 exclude: root('app', 'theme')
             }]

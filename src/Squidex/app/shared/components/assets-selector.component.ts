@@ -93,4 +93,3 @@ export class AssetsSelectorComponent extends StatefulComponent<State> implements
         this.localStore.setBoolean('squidex.assets.list-view', isListView);
     }
 }
-

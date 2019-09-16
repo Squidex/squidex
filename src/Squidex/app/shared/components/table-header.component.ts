@@ -35,6 +35,9 @@ type Field = string | RootFieldDto;
 export class TableHeaderComponent implements OnChanges {
     private fieldPath: string;
 
+    @Output()
+    public queryChange = new EventEmitter<Query>();
+
     @Input()
     public text: string;
 
@@ -49,9 +52,6 @@ export class TableHeaderComponent implements OnChanges {
 
     @Input()
     public query: Query;
-
-    @Output()
-    public queryChange = new EventEmitter<Query>();
 
     public order: SortMode | null;
 

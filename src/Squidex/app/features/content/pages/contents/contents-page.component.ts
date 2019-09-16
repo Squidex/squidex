@@ -10,7 +10,6 @@ import { onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 
 import {
     AppLanguageDto,
-    AppsState,
     ContentDto,
     ContentsState,
     ImmutableArray,
@@ -57,7 +56,6 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
     public dueTimeSelector: DueTimeSelectorComponent;
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly contentsState: ContentsState,
         private readonly languagesState: LanguagesState,
         private readonly schemasState: SchemasState,
@@ -72,7 +70,7 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
                 .subscribe(schema => {
                     this.resetSelection();
 
-                    this.schema = schema!;
+                    this.schema = schema;
 
                     this.minWidth = `${300 + (200 * this.schema.listFields.length)}px`;
 
@@ -240,4 +238,3 @@ export class ContentsPageComponent extends ResourceOwner implements OnInit {
         }
     }
 }
-

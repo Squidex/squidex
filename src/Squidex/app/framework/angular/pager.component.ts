@@ -26,7 +26,7 @@ export class PagerComponent {
     public pager: Pager;
 
     @Input()
-    public hideWhenButtonsDisabled = false;
+    public autoHide = false;
 
     public emitNext() {
         this.nextPage.emit();

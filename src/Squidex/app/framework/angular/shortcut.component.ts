@@ -16,14 +16,14 @@ import { ShortcutService, StatefulComponent } from '@app/framework/internal';
 export class ShortcutComponent extends StatefulComponent implements OnDestroy, OnInit {
     private lastKeys: string;
 
+    @Output()
+    public trigger = new EventEmitter();
+
     @Input()
     public keys: string;
 
     @Input()
     public disabled: boolean;
-
-    @Output()
-    public trigger = new EventEmitter();
 
     constructor(
         changeDetector: ChangeDetectorRef,

@@ -1,4 +1,4 @@
-<sqx-title message="{app} | {schema} | Content" parameter1="app" parameter2="schema" [value1]="appsState.appDisplayName" [value2]="schema.displayName"></sqx-title>
+<sqx-title [message]="schema.displayName"></sqx-title>
 
 <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
     <sqx-panel desiredWidth="*" minWidth="60rem" [showSidebar]="content">
@@ -7,11 +7,15 @@
                 <i class="icon-angle-left"></i>
             </a>
 
-            <ng-container *ngIf="!content else notNewTitle">
-                New Content
+            <ng-container *ngIf="content else noContentTitle">
+                <sqx-title message="Edit Content"></sqx-title>
+
+                Edit Content
             </ng-container>
-            <ng-template #notNewTitle>
-                Content
+            <ng-template #noContentTitle>
+                <sqx-title message="New Content"></sqx-title>
+
+                New Content
             </ng-template>
         </ng-container>
 

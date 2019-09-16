@@ -28,11 +28,11 @@
             [isSelectable]="selectedIds"
             [isSelected]="isSelected(asset)"
             [allTags]="tags"
-            (update)="update($event)"
-            (select)="emitSelect($event)"
-            (delete)="delete($event)">
+            (update)="update(asset)"
+            (select)="emitSelect(asset)"
+            (delete)="delete(asset)">
         </sqx-asset>
     </ng-container>
 </div>
 
-<sqx-pager [hideWhenButtonsDisabled]="true" [pager]="state.assetsPager | async" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
+<sqx-pager [autoHide]="true" [pager]="state.assetsPager | async" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>

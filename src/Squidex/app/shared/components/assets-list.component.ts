@@ -21,7 +21,8 @@ import {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AssetsListComponent {
-    public newFiles = ImmutableArray.empty<File>();
+    @Output()
+    public select = new EventEmitter<AssetDto>();
 
     @Input()
     public state: AssetsState;
@@ -35,8 +36,7 @@ export class AssetsListComponent {
     @Input()
     public selectedIds: object;
 
-    @Output()
-    public select = new EventEmitter<AssetDto>();
+    public newFiles = ImmutableArray.empty<File>();
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef

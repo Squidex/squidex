@@ -22,7 +22,8 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LanguageSelectorComponent implements OnChanges, OnInit {
-    public dropdown = new ModalModel();
+    @Output()
+    public selectedLanguageChange = new EventEmitter<Language>();
 
     @Input()
     public size: string;
@@ -33,8 +34,7 @@ export class LanguageSelectorComponent implements OnChanges, OnInit {
     @Input()
     public selectedLanguage: Language;
 
-    @Output()
-    public selectedLanguageChange = new EventEmitter<Language>();
+    public dropdown = new ModalModel();
 
     public get isSmallMode(): boolean {
         return this.languages && this.languages.length > 0 && this.languages.length <= 3;

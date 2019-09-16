@@ -15,11 +15,13 @@ import {
 
 import {
     AdministrationAreaComponent,
+    EventConsumerComponent,
     EventConsumersPageComponent,
     EventConsumersService,
     EventConsumersState,
     RestorePageComponent,
     UnsetUserGuard,
+    UserComponent,
     UserMustExistGuard,
     UserPageComponent,
     UsersPageComponent,
@@ -73,8 +75,10 @@ const routes: Routes = [
     ],
     declarations: [
         AdministrationAreaComponent,
+        EventConsumerComponent,
         EventConsumersPageComponent,
         RestorePageComponent,
+        UserComponent,
         UserPageComponent,
         UsersPageComponent
     ],

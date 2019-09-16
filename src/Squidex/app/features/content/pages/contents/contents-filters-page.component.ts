@@ -37,9 +37,7 @@ export class ContentsFiltersPageComponent extends ResourceOwner implements OnIni
         this.own(
             this.schemasState.selectedSchema
                 .subscribe(schema => {
-                    if (schema) {
-                        this.schemaQueries = new Queries(this.uiState, `schemas.${schema.name}`);
-                    }
+                    this.schemaQueries = new Queries(this.uiState, `schemas.${schema.name}`);
                 }));
     }
 

@@ -62,16 +62,15 @@
         <div class="grid-content" [sqxSyncScrolling]="header">
             <div class="table-container" sqxIgnoreScrollbar>
                 <table class="table table-items table-fixed" [style.minWidth]="minWidth" *ngIf="contentsState.contents | async; let contents">
-                    <tbody *ngFor="let content of contents; trackBy: trackByContent">
-                        <tr [sqxContent]="content"
-                            [selectable]="!isItemAlreadySelected(content)"
-                            [selected]="isItemSelected(content)"
-                            (selectedChange)="selectContent(content)"
-                            [language]="language"
-                            [schema]="schema"
-                            [schemaFields]="schema.referenceFields"
-                            isReadOnly="true"></tr>
-                        <tr class="spacer"></tr>
+                    <tbody *ngFor="let content of contents; trackBy: trackByContent"
+                        [sqxContent]="content"
+                        [selectable]="!isItemAlreadySelected(content)"
+                        [selected]="isItemSelected(content)"
+                        (selectedChange)="selectContent(content)"
+                        [language]="language"
+                        [schema]="schema"
+                        [schemaFields]="schema.referenceFields"
+                        isReadOnly="true">
                     </tbody>
                 </table>
             </div>

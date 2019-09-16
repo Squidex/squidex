@@ -10,7 +10,6 @@ import { ActivatedRoute } from '@angular/router';
 
 import {
     ApiUrlConfig,
-    AppsState,
     PlanDto,
     PlansState
 } from '@app/shared';
@@ -26,7 +25,6 @@ export class PlansPageComponent implements OnInit {
     public portalUrl = this.apiUrl.buildUrl('/portal/');
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly plansState: PlansState,
         private readonly apiUrl: ApiUrlConfig,
         private readonly route: ActivatedRoute
@@ -34,9 +32,10 @@ export class PlansPageComponent implements OnInit {
     }
 
     public ngOnInit() {
-        this.route.queryParams.subscribe(params => {
-            this.overridePlanId = params['planId'];
-        }).unsubscribe();
+        this.route.queryParams
+            .subscribe(params => {
+                this.overridePlanId = params['planId'];
+            }).unsubscribe();
 
         this.plansState.load(false, this.overridePlanId);
     }
@@ -45,12 +44,7 @@ export class PlansPageComponent implements OnInit {
         this.plansState.load(true, this.overridePlanId);
     }
 
-    public change(planId: string) {
-        this.plansState.change(planId);
-    }
-
     public trackByPlan(index: number, planInfo: { plan: PlanDto }) {
         return planInfo.plan.id;
     }
 }
-

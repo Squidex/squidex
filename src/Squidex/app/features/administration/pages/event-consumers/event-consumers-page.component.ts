@@ -38,18 +38,6 @@ export class EventConsumersPageComponent extends ResourceOwner implements OnInit
         this.eventConsumersState.load(true, false);
     }
 
-    public start(eventConsumer: EventConsumerDto) {
-        this.eventConsumersState.start(eventConsumer);
-    }
-
-    public stop(eventConsumer: EventConsumerDto) {
-        this.eventConsumersState.stop(eventConsumer);
-    }
-
-    public reset(eventConsumer: EventConsumerDto) {
-        this.eventConsumersState.reset(eventConsumer);
-    }
-
     public trackByEventConsumer(index: number, es: EventConsumerDto) {
         return es.name;
     }

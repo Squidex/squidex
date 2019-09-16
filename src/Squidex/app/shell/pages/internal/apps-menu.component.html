@@ -1,8 +1,8 @@
 <ul class="nav navbar-nav">
     <li class="nav-item dropdown">
         <span class="nav-link dropdown-toggle" id="app-name" (click)="appsMenu.toggle()">
-            <ng-container *ngIf="appsState.selectedApp | async; let selectedApp; else noApp">
-                {{selectedApp.displayName}}
+            <ng-container *ngIf="appsState.selectedAppOrNull | async; let app; else noApp">
+                {{app.displayName}}
             </ng-container>
 
             <ng-template #noApp>
@@ -40,13 +40,13 @@
         </ng-container>
     </li>
 
-    <ng-container *ngIf="appsState.selectedValidApp | async; let selectedApp">
-        <li class="nav-item" *ngIf="selectedApp.planUpgrade && selectedApp.planName">
+    <ng-container *ngIf="appsState.selectedApp | async; let app">
+        <li class="nav-item" *ngIf="app.planUpgrade && app.planName">
             <div class="btn-group app-upgrade">
                 <button type="button" class="btn btn-primary btn-plan">
-                    You are on the <strong>{{selectedApp.planName}}</strong> plan.
+                    You are on the <strong>{{app.planName}}</strong> plan.
                 </button>
-                <button type="button" class="btn btn-warning" [routerLink]="['/app', selectedApp.name, 'settings', 'plans']">
+                <button type="button" class="btn btn-warning" [routerLink]="['/app', app.name, 'settings', 'plans']">
                     Upgrade!
                 </button>
             </div>

@@ -1,4 +1,4 @@
-<div class="clearfix" *ngIf="pager && (!hideWhenButtonsDisabled || pager.canGoPrev || pager.canGoNext)">
+<div class="clearfix" *ngIf="pager && (!autoHide || pager.canGoPrev || pager.canGoNext)">
     <div class="float-right pagination">
         <span *ngIf="pager.numberOfItems > 0" class="pagination-text">{{pager.itemFirst}}-{{pager.itemLast}} of {{pager.numberOfItems}}</span>
 

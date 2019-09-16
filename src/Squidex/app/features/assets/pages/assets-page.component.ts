@@ -9,7 +9,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import {
-    AppsState,
     AssetsState,
     LocalStoreService,
     Queries,
@@ -31,7 +30,6 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
     public isListView: boolean;
 
     constructor(
-        public readonly appsState: AppsState,
         public readonly assetsState: AssetsState,
         private readonly localStore: LocalStoreService,
         private readonly uiState: UIState
@@ -75,4 +73,3 @@ export class AssetsPageComponent extends ResourceOwner implements OnInit {
         this.localStore.setBoolean('squidex.assets.list-view', isListView);
     }
 }
-

@@ -24,18 +24,18 @@ export class SchemaMustNotBeSingletonGuard implements CanActivate {
         const result =
             this.schemasState.selectedSchema.pipe(
                 take(1),
-                tap(dto => {
-                    if (dto && dto.isSingleton) {
+                tap(schema => {
+                    if (schema.isSingleton) {
                         if (state.url.indexOf('/new') >= 0) {
                             const parentUrl = state.url.slice(0, state.url.indexOf(route.url[route.url.length - 1].path));
 
-                            this.router.navigate([parentUrl, dto.id]);
+                            this.router.navigate([parentUrl, schema.id]);
                         } else {
-                            this.router.navigate([state.url, dto.id]);
+                            this.router.navigate([state.url, schema.id]);
                         }
                     }
                 }),
-                map(s => !!s && !s.isSingleton));
+                map(schema => !schema.isSingleton));
 
         return result;
     }

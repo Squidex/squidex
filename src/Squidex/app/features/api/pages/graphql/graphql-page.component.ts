@@ -26,7 +26,7 @@ export class GraphQLPageComponent implements AfterViewInit {
     public graphiQLContainer: ElementRef;
 
     constructor(
-        public readonly appsState: AppsState,
+        private readonly appsState: AppsState,
         private readonly graphQlService: GraphQlService
     ) {
     }
@@ -46,4 +46,3 @@ export class GraphQLPageComponent implements AfterViewInit {
         return this.graphQlService.query(this.appsState.appName, params).pipe(catchError(response => of(response.error))).toPromise();
     }
 }
-

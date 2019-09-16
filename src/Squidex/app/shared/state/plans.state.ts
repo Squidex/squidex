@@ -21,7 +21,7 @@ import { AuthService } from './../services/auth.service';
 import { PlanDto, PlansService } from './../services/plans.service';
 import { AppsState } from './apps.state';
 
-interface PlanInfo {
+export interface PlanInfo {
     // The plan.
     plan: PlanDto;
 
@@ -137,4 +137,3 @@ export class PlansState extends State<Snapshot> {
         return this.snapshot.version;
     }
 }
-

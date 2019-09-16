@@ -8,13 +8,13 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import {
-    AppsState,
     AssetsState,
     AssetUploaderState,
     DialogModel,
     fadeAnimation,
     Upload
 } from '@app/shared/internal';
+import { AppsState } from '../state/apps.state';
 
 @Component({
     selector: 'sqx-asset-uploader',
