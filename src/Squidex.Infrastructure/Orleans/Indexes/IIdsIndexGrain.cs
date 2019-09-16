@@ -5,25 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Orleans;
 
-namespace Squidex.Domain.Apps.Entities.Schemas.Indexes
+namespace Squidex.Infrastructure.Orleans.Indexes
 {
-    public interface ISchemasByAppIndex : IGrainWithGuidKey
+    public interface IIdsIndexGrain<T>
     {
-        Task AddSchemaAsync(Guid schemaId, string name);
+        Task<long> CountAsync();
 
-        Task RemoveSchemaAsync(Guid schemaId);
+        Task RebuildAsync(HashSet<T> ids);
 
-        Task RebuildAsync(Dictionary<string, Guid> schemas);
+        Task AddAsync(T id);
+
+        Task RemoveAsync(T id);
 
         Task ClearAsync();
 
-        Task<Guid> GetSchemaIdAsync(string name);
-
-        Task<List<Guid>> GetSchemaIdsAsync();
+        Task<List<T>> GetIdsAsync();
     }
 }

@@ -11,13 +11,13 @@
             <i class="icon-drag2 drag-handle"></i>
         </ng-template>
     </td>
-
+    
     <td class="cell-actions cell-actions-left" *ngIf="!isReadOnly && !isDirty" sqxStopClick>
         <div class="dropdown dropdown-options" *ngIf="content">
             <button type="button" class="btn btn-text-secondary" (click)="dropdown.toggle()" [class.active]="dropdown.isOpen | async" #buttonOptions>
                 <i class="icon-dots"></i>
             </button>
-
+    
             <ng-container *sqxModal="dropdown;closeAlways:true">
                 <div class="dropdown-menu" [sqxAnchoredTo]="buttonOptions" position="bottom-left" @fade>
                     <a class="dropdown-item" *ngFor="let info of content.statusUpdates" (click)="emitChangeStatus(info.status)">
@@ -39,35 +39,35 @@
             </ng-container>
         </div>
     </td>
-
+    
     <ng-container *ngIf="isDirty">
         <td class="cell-actions" >
             <button type="button" class="btn btn-text-secondary btn-cancel" (click)="cancel()" sqxStopClick>
                 <i class="icon-close"></i>
             </button>
         </td>
-
+    
         <td class="cell-user" >
             <button type="button" class="btn btn-success" (click)="save()" sqxStopClick>
                 <i class="icon-checkmark"></i>
             </button>
         </td>
     </ng-container>
-
+    
     <td class="cell-user" *ngIf="!isCompact && !isDirty" [sqxStopClick]="isDirty">
         <img class="user-picture" title="{{content.lastModifiedBy | sqxUserNameRef}}" [attr.src]="content.lastModifiedBy | sqxUserPictureRef" />
     </td>
-
+    
     <td class="cell-auto cell-content" *ngFor="let field of schemaFields; let i = index; trackBy: trackByFieldFn" [sqxStopClick]="isDirty || (field.isInlineEditable && patchAllowed)">
         <ng-container *ngIf="field.isInlineEditable && patchAllowed; else displayTemplate">
             <sqx-content-value-editor [form]="patchForm.form" [field]="field"></sqx-content-value-editor>
         </ng-container>
-
+    
         <ng-template #displayTemplate>
             <sqx-content-value [value]="values[i]"></sqx-content-value>
         </ng-template>
     </td>
-
+    
     <td class="cell-time" *ngIf="!isCompact" [sqxStopClick]="isDirty">
         <sqx-content-status 
             [status]="content.status"
@@ -79,18 +79,18 @@
         
         <small class="item-modified">{{content.lastModified | sqxFromNow}}</small>
     </td>
-
+    
     <td class="cell-actions" *ngIf="isReference" [sqxStopClick]="isDirty">
         <div class="reference-edit">
             <button type="button" class="btn btn-text-secondary">
                 <i class="icon-dots"></i>
             </button>
-
+    
             <div class="reference-menu">
                 <a class="btn btn-text-secondary" [routerLink]="['../..', schema.name, content.id]">
                     <i class="icon-pencil"></i>
                 </a>
-
+    
                 <button type="button" class="btn btn-text-secondary" (click)="emitDelete()">
                     <i class="icon-close"></i>
                 </button>

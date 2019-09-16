@@ -6,22 +6,12 @@
 // ==========================================================================
 
 using System;
-using Squidex.Infrastructure.Orleans;
+using Orleans;
 using Squidex.Infrastructure.Orleans.Indexes;
-using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Indexes
 {
-    public sealed class RulesByAppIndexGrain : IdsIndexGrain<RulesByAppIndexState, Guid>, IRulesByAppIndexGrain
-    {
-        public RulesByAppIndexGrain(IGrainState<RulesByAppIndexState> state)
-            : base(state)
-        {
-        }
-    }
-
-    [CollectionName("Index_RulesByApp")]
-    public sealed class RulesByAppIndexState : IdsIndexState<Guid>
+    public interface IRulesByAppIndexGrain : IIdsIndexGrain<Guid>, IGrainWithGuidKey
     {
     }
 }

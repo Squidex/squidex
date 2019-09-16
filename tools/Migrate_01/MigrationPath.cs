@@ -17,7 +17,7 @@ namespace Migrate_01
 {
     public sealed class MigrationPath : IMigrationPath
     {
-        private const int CurrentVersion = 18;
+        private const int CurrentVersion = 19;
         private readonly IServiceProvider serviceProvider;
 
         public MigrationPath(IServiceProvider serviceProvider)
@@ -69,6 +69,11 @@ namespace Migrate_01
             if (version < 9)
             {
                 yield return serviceProvider.GetService<ConvertOldSnapshotStores>();
+            }
+
+            // Version 19: Unify indexes.
+            if (version < 19)
+            {
                 yield return serviceProvider.GetRequiredService<PopulateGrainIndexes>();
             }
 

@@ -23,6 +23,8 @@ namespace Squidex.Domain.Apps.Entities
 
         Task<IAppEntity> GetAppAsync(string appName);
 
+        Task<List<IAppEntity>> GetUserAppsAsync(string userId, PermissionSet permissions);
+
         Task<ISchemaEntity> GetSchemaAsync(Guid appId, Guid id, bool allowDeleted = false);
 
         Task<ISchemaEntity> GetSchemaAsync(Guid appId, string name);
@@ -30,7 +32,5 @@ namespace Squidex.Domain.Apps.Entities
         Task<List<ISchemaEntity>> GetSchemasAsync(Guid appId);
 
         Task<List<IRuleEntity>> GetRulesAsync(Guid appId);
-
-        Task<List<IAppEntity>> GetUserApps(string userId, PermissionSet permissions);
     }
 }

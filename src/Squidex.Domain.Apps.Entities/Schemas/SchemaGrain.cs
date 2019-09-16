@@ -27,16 +27,12 @@ namespace Squidex.Domain.Apps.Entities.Schemas
 {
     public sealed class SchemaGrain : DomainObjectGrain<SchemaState>, ISchemaGrain
     {
-        private readonly IAppProvider appProvider;
         private readonly IJsonSerializer serializer;
 
-        public SchemaGrain(IStore<Guid> store, ISemanticLog log, IAppProvider appProvider, IJsonSerializer serializer)
+        public SchemaGrain(IStore<Guid> store, ISemanticLog log, IJsonSerializer serializer)
             : base(store, log)
         {
-            Guard.NotNull(appProvider, nameof(appProvider));
             Guard.NotNull(serializer, nameof(serializer));
-
-            this.appProvider = appProvider;
 
             this.serializer = serializer;
         }
@@ -69,9 +65,9 @@ namespace Squidex.Domain.Apps.Entities.Schemas
                     });
 
                 case CreateSchema createSchema:
-                    return CreateReturnAsync(createSchema, async c =>
+                    return CreateReturn(createSchema, c =>
                     {
-                        await GuardSchema.CanCreate(c, appProvider);
+                        GuardSchema.CanCreate(c);
 
                         Create(c);
 

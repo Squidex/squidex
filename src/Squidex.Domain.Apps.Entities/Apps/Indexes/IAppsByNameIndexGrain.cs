@@ -6,22 +6,12 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Orleans;
+using Squidex.Infrastructure.Orleans.Indexes;
 
-namespace Squidex.Domain.Apps.Entities.Rules.Indexes
+namespace Squidex.Domain.Apps.Entities.Apps.Indexes
 {
-    public interface IRulesByAppIndex : IGrainWithGuidKey
+    public interface IAppsByNameIndexGrain : IUniqueNameIndexGrain<Guid>, IGrainWithStringKey
     {
-        Task AddRuleAsync(Guid ruleId);
-
-        Task RemoveRuleAsync(Guid ruleId);
-
-        Task RebuildAsync(HashSet<Guid> rules);
-
-        Task ClearAsync();
-
-        Task<List<Guid>> GetRuleIdsAsync();
     }
 }

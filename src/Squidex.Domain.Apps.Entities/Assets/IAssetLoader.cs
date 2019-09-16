@@ -5,14 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Commands;
 
-namespace Squidex.Domain.Apps.Entities.Comments
+namespace Squidex.Domain.Apps.Entities.Assets
 {
-    public interface ICommentGrain : IDomainObjectGrain
+    public interface IAssetLoader
     {
-        Task<CommentsResult> GetCommentsAsync(long version = EtagVersion.Any);
+        Task<IAssetEntity> GetAsync(Guid id, long version = EtagVersion.Any);
     }
 }
