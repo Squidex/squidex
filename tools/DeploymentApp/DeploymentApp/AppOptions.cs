@@ -7,7 +7,7 @@ namespace DeploymentApp
     {
         public string App { get; set; } = "commentary";
 
-        public string Url { get; set; } = "http://localhost:5000";
+        public string Url { get; set; } = "https://cosmos.systest.cha.eu-west-1.dev";
 
         public string IdentityServer { get; set; } = "http://identityservice.systest.tesla.cha.rbxd.ds/connect/token";
 
