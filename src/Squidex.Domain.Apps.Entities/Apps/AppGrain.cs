@@ -361,7 +361,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
         public void UploadImage(UploadAppImage command)
         {
-            RaiseEvent(SimpleMapper.Map(command, new AppImageUploaded()));
+            RaiseEvent(SimpleMapper.Map(command, new AppImageUploaded { Image = new AppImage(command.File.MimeType) }));
         }
 
         public void RemoveImage(RemoveAppImage command)

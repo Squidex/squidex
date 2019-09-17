@@ -29,12 +29,20 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             });
         }
 
-        public static void CanUpdate(UpdateApp command)
+        public static void CanUploadImage(UploadAppImage command)
         {
             Guard.NotNull(command, nameof(command));
+
+            Validate.It(() => "Cannot upload image.", e =>
+            {
+                if (command.File == null)
+                {
+                    e(Not.Defined("File"), nameof(command.File));
+                }
+            });
         }
 
-        public static void CanUploadImage(UploadAppImage command)
+        public static void CanUpdate(UpdateApp command)
         {
             Guard.NotNull(command, nameof(command));
         }

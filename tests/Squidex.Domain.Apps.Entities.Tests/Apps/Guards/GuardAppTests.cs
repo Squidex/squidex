@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Xunit;
@@ -54,6 +55,23 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
             var command = new CreateApp { Name = "new-app" };
 
             GuardApp.CanCreate(command);
+        }
+
+        [Fact]
+        public void CanUploadImage_should_throw_exception_if_name_not_valid()
+        {
+            var command = new UploadAppImage();
+
+            ValidationAssert.Throws(() => GuardApp.CanUploadImage(command),
+                new ValidationError("File is required.", "File"));
+        }
+
+        [Fact]
+        public void CanUploadImage_should_not_throw_exception_if_app_name_is_valid()
+        {
+            var command = new UploadAppImage { File = new AssetFile("file.png", "image/png", 100, () => null) };
+
+            GuardApp.CanUploadImage(command);
         }
 
         [Fact]

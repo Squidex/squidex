@@ -18,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
 using Squidex.Shared.Users;
@@ -123,7 +124,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
         [Fact]
         public async Task UploadImage_should_create_events_and_update_state()
         {
-            var command = new UploadAppImage { Image = new AppImage("image/png") };
+            var command = new UploadAppImage { File = new AssetFile("image.png", "image/png", 100, () => null) };
 
             await ExecuteCreateAsync();
 
@@ -135,7 +136,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             LastEvents
                 .ShouldHaveSameEvents(
-                    CreateEvent(new AppImageUploaded { Image = command.Image })
+                    CreateEvent(new AppImageUploaded { Image = sut.Snapshot.Image })
                 );
         }
 

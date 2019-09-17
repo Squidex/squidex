@@ -284,7 +284,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
                 throw new ValidationException("Cannot create asset.", error);
             }
 
-            return new UploadAppImage { File = file[0].ToAssetFile(), Image = new AppImage(file[0].ContentType) };
+            return new UploadAppImage { File = file[0].ToAssetFile() };
         }
 
         private static FileStream GetTempStream()
