@@ -109,7 +109,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 result.CanAccessContent = true;
             }
 
-            result.SetPlan(app, plans, controller);
+            result.SetPlan(app, plans, controller, permissions);
             result.SetImage(app, controller);
 
             return result.CreateLinks(controller, permissions);
@@ -132,9 +132,9 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
             return new PermissionSet(permissions);
         }
 
-        private void SetPlan(IAppEntity app, IAppPlansProvider plans, ApiController controller)
+        private void SetPlan(IAppEntity app, IAppPlansProvider plans, ApiController controller, PermissionSet permissions)
         {
-            if (controller.HasPermission(AllPermissions.AppPlansChange, app.Name))
+            if (controller.HasPermission(AllPermissions.AppPlansChange, app.Name, additional: permissions))
             {
                 PlanUpgrade = plans.GetPlanUpgradeForApp(app)?.Name;
             }
