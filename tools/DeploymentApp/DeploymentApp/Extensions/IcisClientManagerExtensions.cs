@@ -80,10 +80,10 @@ namespace DeploymentApp.Extensions
 
                     ConsoleHelper.Start($"Syncing schema {name}");
 
-                    var sync = new SynchronizeSchemaDto
+                    var sync = new SynchronizeSchemaDto 
                     {
                         NoFieldDeletion = true,
-                        NoFieldRecreation = true
+                        NoFieldRecreation = false
                     };
 
                     await upsert(sync);

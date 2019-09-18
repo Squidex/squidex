@@ -40,7 +40,8 @@ namespace DeploymentApp.Entities
                                 IsReferenceField = true,
                                 IsRequired = true,
                                 IsUnique = true,
-                                Label = "Name"
+                                Label = "Name",
+                                Partitioning = "language"
                             }
                         }
                     };
@@ -81,7 +82,51 @@ namespace DeploymentApp.Entities
                                 IsReferenceField = true,
                                 IsRequired = true,
                                 IsUnique = true,
-                                Label = "Name"
+                                Label = "Name",
+                                Partitioning = "language"
+                            }
+                        }
+                    };
+
+                    upsert.IsPublished = true;
+
+                    return Task.CompletedTask;
+                }
+            );
+        }
+
+        public static (string Name, SchemaSync Sync) Period(SquidexClientManager clientManager)
+        {
+            return ("period",
+                upsert =>
+                {
+                    upsert.Fields = new List<UpsertSchemaFieldDto>
+                    {
+                        new UpsertSchemaFieldDto
+                        {
+                            Name = "id",
+                            Properties = new StringFieldPropertiesDto
+                            {
+                                Editor = StringFieldEditor.Input,
+                                IsListField = true,
+                                IsRequired = true,
+                                IsUnique = true,
+                                Label = "Id"
+                            }
+                        },
+
+                        new UpsertSchemaFieldDto
+                        {
+                            Name = "name",
+                            Properties = new StringFieldPropertiesDto
+                            {
+                                Editor = StringFieldEditor.Input,
+                                IsListField = true,
+                                IsReferenceField = true,
+                                IsRequired = true,
+                                IsUnique = true,
+                                Label = "Name",
+                                Partitioning = "language"
                             }
                         }
                     };
@@ -134,6 +179,7 @@ namespace DeploymentApp.Entities
                             {
                                 Editor = NumberFieldEditor.Input,
                                 IsListField = true,
+                                IsReferenceField = true,
                                 Label = "Character Limit"
                             }
                         }
@@ -154,9 +200,10 @@ namespace DeploymentApp.Entities
                     async upsert =>
                     {
                         var schemasClient = clientManager.CreateSchemasClient();
-                        var commoditySchema = await schemasClient.GetSchemaAsync(clientManager.App, "commodity");
-                        var regionSchema = await schemasClient.GetSchemaAsync(clientManager.App, "region");
                         var commentaryTypeSchema = await schemasClient.GetSchemaAsync(clientManager.App, "commentary-type");
+                        var commoditySchema = await schemasClient.GetSchemaAsync(clientManager.App, "commodity");
+                        var periodSchema = await schemasClient.GetSchemaAsync(clientManager.App, "period");
+                        var regionSchema = await schemasClient.GetSchemaAsync(clientManager.App, "region");
 
                         upsert.Fields = new List<UpsertSchemaFieldDto>
                         {
@@ -207,6 +254,23 @@ namespace DeploymentApp.Entities
                                     MinItems = 1,
                                     ResolveReference = true,
                                     SchemaId = commentaryTypeSchema.Id
+                                }
+                            },
+
+                            new UpsertSchemaFieldDto
+                            {
+                                Name = "period",
+                                Partitioning = "invariant",
+                                Properties = new ReferencesFieldPropertiesDto()
+                                {
+                                    Editor = ReferencesFieldEditor.Dropdown,
+                                    IsListField = true,
+                                    IsRequired = false,
+                                    Label = "Period",
+                                    MaxItems = 1,
+                                    MinItems = 0,
+                                    ResolveReference = true,
+                                    SchemaId = periodSchema.Id
                                 }
                             },
 

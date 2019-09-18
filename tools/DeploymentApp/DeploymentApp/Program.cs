@@ -47,6 +47,7 @@ namespace DeploymentApp
 
                 await clientManager.UpsertSchema(Schemas.Commodity);
                 await clientManager.UpsertSchema(Schemas.Region);
+                await clientManager.UpsertSchema(Schemas.Period);
                 await clientManager.UpsertSchema(Schemas.CommentaryType);
                 await clientManager.UpsertSchema(Schemas.Commentary(options.Url));
 
