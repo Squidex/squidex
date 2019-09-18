@@ -170,12 +170,12 @@ namespace Squidex.Config.Domain
 
                 var result = new InitialPatterns();
 
-                foreach (var pattern in uiOptions.Value.RegexSuggestions)
+                foreach (var (key, value) in uiOptions.Value.RegexSuggestions)
                 {
-                    if (!string.IsNullOrWhiteSpace(pattern.Key) &&
-                        !string.IsNullOrWhiteSpace(pattern.Value))
+                    if (!string.IsNullOrWhiteSpace(key) &&
+                        !string.IsNullOrWhiteSpace(value))
                     {
-                        result[Guid.NewGuid()] = new AppPattern(pattern.Key, pattern.Value);
+                        result[Guid.NewGuid()] = new AppPattern(key, value);
                     }
                 }
 
@@ -283,6 +283,8 @@ namespace Squidex.Config.Domain
 
             services.AddSingletonAs<UsageTrackerCommandMiddleware>()
                 .As<ICommandMiddleware>();
+
+            services.AddSingleton(typeof(IEventEnricher<>), typeof(SquidexEventEnricher<>));
         }
 
         private static void AddBackupHandlers(this IServiceCollection services)

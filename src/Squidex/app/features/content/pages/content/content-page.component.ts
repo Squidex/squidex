@@ -8,7 +8,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { onErrorResumeNext, switchMap } from 'rxjs/operators';
+import { debounceTime, filter, onErrorResumeNext, switchMap, tap } from 'rxjs/operators';
 
 import { ContentVersionSelected } from './../messages';
 
@@ -17,6 +17,8 @@ import {
     AppLanguageDto,
     AppsState,
     AuthService,
+    AutoSaveKey,
+    AutoSaveService,
     CanComponentDeactivate,
     ContentDto,
     ContentsState,
@@ -45,6 +47,9 @@ import { DueTimeSelectorComponent } from './../../shared/due-time-selector.compo
     ]
 })
 export class ContentPageComponent extends ResourceOwner implements CanComponentDeactivate, OnInit {
+    private isLoadingContent: boolean;
+    private autoSaveKey: AutoSaveKey;
+
     public schema: SchemaDetailsDto;
 
     public formContext: any;
@@ -65,6 +70,7 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,
         public readonly appsState: AppsState,
         public readonly contentsState: ContentsState,
+        private readonly autoSaveService: AutoSaveService,
         private readonly dialogs: DialogService,
         private readonly languagesState: LanguagesState,
         private readonly messageBus: MessageBus,
@@ -93,18 +99,46 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                     if (schema) {
                         this.schema = schema!;
 
-                        this.contentForm = new EditContentForm(this.schema, this.languages);
+                        this.contentForm = new EditContentForm(this.languages, this.schema);
                     }
                 }));
 
         this.own(
             this.contentsState.selectedContent
                 .subscribe(content => {
+                    this.autoSaveKey = {
+                        schemaId: this.schema.id,
+                        schemaVersion: this.schema.version,
+                        contentId: content ? content.id : undefined
+                    };
+
+                    const autosaved = this.autoSaveService.get(this.autoSaveKey);
+
                     if (content) {
                         this.content = content;
 
-                        this.loadContent(this.content.dataDraft);
+                        this.loadContent(this.content.dataDraft, true);
                     }
+
+                    if (autosaved && this.isOtherContent(content) && this.contentForm.hasChanges(autosaved)) {
+                        this.dialogs.confirm('Unsaved changes', 'You have unsaved changes. Do you want to load them now?')
+                            .subscribe(shouldLoad => {
+                                if (shouldLoad) {
+                                    this.loadContent(autosaved, false);
+                                } else {
+                                    this.autoSaveService.remove(this.autoSaveKey);
+                                }
+                            });
+                    }
+                }));
+
+        this.own(
+            this.contentForm.form.valueChanges.pipe(
+                    filter(_ => !this.isLoadingContent),
+                    filter(_ => this.contentForm.form.enabled),
+                    debounceTime(2000)
+                ).subscribe(value => {
+                    this.autoSaveService.set(this.autoSaveKey, value);
                 }));
 
         this.own(
@@ -114,11 +148,21 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
                 }));
     }
 
+    private isOtherContent(content: ContentDto | null | undefined) {
+        return !this.content || !content || content.id !== this.content.id;
+    }
+
     public canDeactivate(): Observable<boolean> {
-        if (!this.contentForm.form.dirty) {
+        if (!this.contentForm.hasChanged()) {
             return of(true);
         } else {
-            return this.dialogs.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view and discard your changes?');
+            return this.dialogs.confirm('Unsaved changes', 'You have unsaved changes, do you want to close the current content view and discard your changes?').pipe(
+                tap(confirmed => {
+                    if (confirmed) {
+                        this.autoSaveService.remove(this.autoSaveKey);
+                    }
+                })
+            );
         }
     }
 
@@ -138,6 +182,8 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         const value = this.contentForm.submit();
 
         if (value) {
+            this.autoSaveService.remove(this.autoSaveKey);
+
             if (this.content) {
                 if (asDraft) {
                     if (this.content && !this.content.canDraftPropose) {
@@ -185,9 +231,17 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         this.router.navigate([this.schema.name], { relativeTo: this.route.parent!.parent, replaceUrl: true });
     }
 
-    private loadContent(data: any) {
-        this.contentForm.loadContent(data);
-        this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
+    private loadContent(data: any, isInitial: boolean) {
+        this.isLoadingContent = true;
+
+        this.autoSaveService.remove(this.autoSaveKey);
+
+        try {
+            this.contentForm.load(data, isInitial);
+            this.contentForm.setEnabled(!this.content || this.content.canUpdateAny);
+        } finally {
+            this.isLoadingContent = false;
+        }
     }
 
     public discardChanges() {
@@ -217,25 +271,21 @@ export class ContentPageComponent extends ResourceOwner implements CanComponentD
         if (!this.content || version === null || version.eq(this.content.version)) {
             this.contentFormCompare = null;
             this.contentVersion = null;
-            this.loadContent(this.content.dataDraft);
+            this.loadContent(this.content.dataDraft, true);
         } else {
             this.contentsState.loadVersion(this.content, version)
                 .subscribe(dto => {
                     if (compare) {
-                        if (this.contentFormCompare === null) {
-                            this.contentFormCompare = new EditContentForm(this.schema, this.languages);
-                        }
+                        this.contentFormCompare = new EditContentForm(this.languages, this.schema);
 
-                        this.contentFormCompare.loadContent(dto.payload);
+                        this.contentFormCompare.load(dto.payload);
                         this.contentFormCompare.setEnabled(false);
 
-                        this.loadContent(this.content.dataDraft);
+                        this.loadContent(this.content.dataDraft, false);
                     } else {
-                        if (this.contentFormCompare) {
-                            this.contentFormCompare = null;
-                        }
+                        this.contentFormCompare = null;
 
-                        this.loadContent(dto.payload);
+                        this.loadContent(dto.payload, false);
                     }
 
                     this.contentVersion = version;

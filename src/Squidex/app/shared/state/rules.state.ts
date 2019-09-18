@@ -46,13 +46,13 @@ export class RulesState extends State<Snapshot> {
         this.project(x => x.rules);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
 
     public canReadEvents =
-        this.project(x => !!x.canReadEvents);
+        this.project(x => x.canReadEvents === true);
 
     constructor(
         private readonly appsState: AppsState,
@@ -76,7 +76,12 @@ export class RulesState extends State<Snapshot> {
                 this.next(s => {
                     const rules = ImmutableArray.of(items);
 
-                    return { ...s, rules, isLoaded: true, canCreate, canReadEvents };
+                    return { ...s,
+                        canCreate,
+                        canReadEvents,
+                        isLoaded: true,
+                        rules
+                    };
                 });
             }),
             shareSubscribed(this.dialogs));

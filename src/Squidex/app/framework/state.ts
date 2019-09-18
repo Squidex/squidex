@@ -6,16 +6,16 @@
  */
 
 import { AbstractControl } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
+import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
 
-import { ErrorDto } from './utils/error';
+import { ErrorDto, getDisplayMessage } from './utils/error';
 
 import { ResourceLinks } from './utils/hateos';
 
 import { Types } from './utils/types';
 
-import { fullValue } from './angular/forms/forms-helper';
+import { getRawValue } from './angular/forms/forms-helper';
 
 export interface FormState {
     submitted: boolean;
@@ -70,16 +70,16 @@ export class Form<T extends AbstractControl, V> {
     }
 
     public load(value: V | undefined) {
-        this.state.next(() => ({ submitted: false, error: null }));
+        this.state.next({ submitted: false, error: null });
 
         this.setValue(value);
     }
 
     public submit(): V | null {
-        this.state.next(() => ({ submitted: true }));
+        this.state.next({ submitted: true, error: null });
 
         if (this.form.valid) {
-            const value = this.transformSubmit(fullValue(this.form));
+            const value = this.transformSubmit(getRawValue(this.form));
 
             if (value) {
                 this.disable();
@@ -92,7 +92,7 @@ export class Form<T extends AbstractControl, V> {
     }
 
     public submitCompleted(options?: { newValue?: V, noReset?: boolean }) {
-        this.state.next(() => ({ submitted: false, error: null }));
+        this.state.next({ submitted: false, error: null });
 
         this.enable();
 
@@ -104,17 +104,9 @@ export class Form<T extends AbstractControl, V> {
     }
 
     public submitFailed(error?: string | ErrorDto) {
-        this.state.next(() => ({ submitted: false, error: this.getError(error) }));
+        this.state.next({ submitted: false, error: getDisplayMessage(error) });
 
         this.enable();
-    }
-
-    private getError(error?: string | ErrorDto) {
-        if (Types.is(error, ErrorDto)) {
-            return error.displayMessage;
-        } else {
-            return error;
-        }
     }
 }
 
@@ -175,15 +167,19 @@ export class State<T extends {}> {
         return this.state.value;
     }
 
-    public project<R1>(project1: (value: T) => R1, compare?: (x: R1, y: R1) => boolean) {
+    public project<M>(project: (value: T) => M, compare?: (x: M, y: M) => boolean) {
         return this.changes.pipe(
-            map(x => project1(x)), distinctUntilChanged(compare));
+            map(x => project(x)), distinctUntilChanged(compare), shareReplay(1));
     }
 
-    public project2<R1, R2>(project1: (value: T) => R1, project2: (value: R1) => R2, compare?: (x: R2, y: R2) => boolean) {
-        return this.changes.pipe(
-            map(x => project1(x)), distinctUntilChanged(),
-            map(x => project2(x)), distinctUntilChanged(compare));
+    public projectFrom<M, N>(source: Observable<M>, project: (value: M) => N, compare?: (x: N, y: N) => boolean) {
+        return source.pipe(
+            map(x => project(x)), distinctUntilChanged(compare), shareReplay(1));
+    }
+
+    public projectFrom2<M, N, O>(lhs: Observable<M>, rhs: Observable<N>, project: (l: M, r: N) => O, compare?: (x: O, y: O) => boolean) {
+        return combineLatest(lhs, rhs, (x, y) => project(x, y)).pipe(
+            distinctUntilChanged(compare), shareReplay(1));
     }
 
     constructor(state: Readonly<T>) {

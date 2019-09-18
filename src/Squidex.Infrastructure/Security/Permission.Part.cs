@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Squidex.Infrastructure.Security
@@ -18,11 +17,11 @@ namespace Squidex.Infrastructure.Security
             private static readonly char[] AlternativeSeparators = { '|' };
             private static readonly char[] MainSeparators = { '.' };
 
-            public readonly HashSet<string> Alternatives;
+            public readonly string[] Alternatives;
 
             public readonly bool Exclusion;
 
-            public Part(HashSet<string> alternatives, bool exclusion)
+            public Part(string[] alternatives, bool exclusion)
             {
                 Alternatives = alternatives;
 
@@ -31,10 +30,16 @@ namespace Squidex.Infrastructure.Security
 
             public static Part[] ParsePath(string path)
             {
-                return path
-                    .Split(MainSeparators, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(Parse)
-                    .ToArray();
+                var parts = path.Split(MainSeparators, StringSplitOptions.RemoveEmptyEntries);
+
+                var result = new Part[parts.Length];
+
+                for (var i = 0; i < result.Length; i++)
+                {
+                    result[i] = Parse(parts[i]);
+                }
+
+                return result;
             }
 
             public static Part Parse(string part)
@@ -48,13 +53,11 @@ namespace Squidex.Infrastructure.Security
                     part = part.Substring(1);
                 }
 
-                HashSet<string> alternatives = null;
+                string[] alternatives = null;
 
                 if (part != Any)
                 {
-                    alternatives =
-                        part.Split(AlternativeSeparators, StringSplitOptions.RemoveEmptyEntries)
-                            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    alternatives = part.Split(AlternativeSeparators, StringSplitOptions.RemoveEmptyEntries);
                 }
 
                 return new Part(alternatives, isExclusion);
@@ -72,7 +75,7 @@ namespace Squidex.Infrastructure.Security
                     return true;
                 }
 
-                bool shouldIntersect = !(lhs.Exclusion ^ rhs.Exclusion);
+                var shouldIntersect = !(lhs.Exclusion ^ rhs.Exclusion);
 
                 return rhs.Alternatives != null && lhs.Alternatives.Intersect(rhs.Alternatives).Any() == shouldIntersect;
             }

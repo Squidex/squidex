@@ -21,6 +21,7 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Assets;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Log;
+using Squidex.Infrastructure.Orleans;
 using Squidex.Infrastructure.Reflection;
 using Xunit;
 
@@ -55,7 +56,7 @@ namespace Squidex.Domain.Apps.Entities.Assets
         {
             file = new AssetFile("my-image.png", "image/png", 1024, () => stream);
 
-            asset = new AssetGrain(Store, tagService, A.Dummy<ISemanticLog>());
+            asset = new AssetGrain(Store, tagService, A.Fake<IActivationLimit>(), A.Dummy<ISemanticLog>());
             asset.ActivateAsync(Id).Wait();
 
             A.CallTo(() => assetEnricher.EnrichAsync(A<IAssetEntity>.Ignored))

@@ -8,9 +8,7 @@
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
-using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
@@ -26,10 +24,19 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         public string Name { get; set; }
 
         [DataMember]
+        public string Label { get; set; }
+
+        [DataMember]
+        public string Description { get; set; }
+
+        [DataMember]
         public Roles Roles { get; set; } = Roles.Empty;
 
         [DataMember]
         public AppPlan Plan { get; set; }
+
+        [DataMember]
+        public AppImage Image { get; set; }
 
         [DataMember]
         public AppClients Clients { get; set; } = AppClients.Empty;
@@ -49,130 +56,199 @@ namespace Squidex.Domain.Apps.Entities.Apps.State
         [DataMember]
         public bool IsArchived { get; set; }
 
-        protected void On(AppCreated @event)
+        public void ApplyEvent(IEvent @event)
         {
-            Roles = Roles.CreateDefaults(@event.Name);
-
-            SimpleMapper.Map(@event, this);
-        }
-
-        protected void On(AppPlanChanged @event)
-        {
-            Plan = AppPlan.Build(@event.Actor, @event.PlanId);
-        }
-
-        protected void On(AppPlanReset @event)
-        {
-            Plan = null;
-        }
-
-        protected void On(AppContributorAssigned @event)
-        {
-            Contributors = Contributors.Assign(@event.ContributorId, @event.Role);
-        }
-
-        protected void On(AppContributorRemoved @event)
-        {
-            Contributors = Contributors.Remove(@event.ContributorId);
-        }
-
-        protected void On(AppClientAttached @event)
-        {
-            Clients = Clients.Add(@event.Id, @event.Secret);
-        }
-
-        protected void On(AppClientUpdated @event)
-        {
-            Clients = Clients.Update(@event.Id, @event.Role);
-        }
-
-        protected void On(AppClientRenamed @event)
-        {
-            Clients = Clients.Rename(@event.Id, @event.Name);
-        }
-
-        protected void On(AppClientRevoked @event)
-        {
-            Clients = Clients.Revoke(@event.Id);
-        }
-
-        protected void On(AppWorkflowAdded @event)
-        {
-            Workflows = Workflows.Add(@event.WorkflowId, @event.Name);
-        }
-
-        protected void On(AppWorkflowUpdated @event)
-        {
-            Workflows = Workflows.Update(@event.WorkflowId, @event.Workflow);
-        }
-
-        protected void On(AppWorkflowDeleted @event)
-        {
-            Workflows = Workflows.Remove(@event.WorkflowId);
-        }
-
-        protected void On(AppPatternAdded @event)
-        {
-            Patterns = Patterns.Add(@event.PatternId, @event.Name, @event.Pattern, @event.Message);
-        }
-
-        protected void On(AppPatternDeleted @event)
-        {
-            Patterns = Patterns.Remove(@event.PatternId);
-        }
-
-        protected void On(AppPatternUpdated @event)
-        {
-            Patterns = Patterns.Update(@event.PatternId, @event.Name, @event.Pattern, @event.Message);
-        }
-
-        protected void On(AppRoleAdded @event)
-        {
-            Roles = Roles.Add(@event.Name);
-        }
-
-        protected void On(AppRoleDeleted @event)
-        {
-            Roles = Roles.Remove(@event.Name);
-        }
-
-        protected void On(AppRoleUpdated @event)
-        {
-            Roles = Roles.Update(@event.Name, @event.Permissions.Prefix(Name));
-        }
-
-        protected void On(AppLanguageAdded @event)
-        {
-            LanguagesConfig = LanguagesConfig.Set(@event.Language);
-        }
-
-        protected void On(AppLanguageRemoved @event)
-        {
-            LanguagesConfig = LanguagesConfig.Remove(@event.Language);
-        }
-
-        protected void On(AppLanguageUpdated @event)
-        {
-            LanguagesConfig = LanguagesConfig.Set(@event.Language, @event.IsOptional, @event.Fallback);
-
-            if (@event.IsMaster)
+            switch (@event)
             {
-                LanguagesConfig = LanguagesConfig.MakeMaster(@event.Language);
+                case AppCreated e:
+                    {
+                        Roles = Roles.CreateDefaults(e.Name);
+
+                        SimpleMapper.Map(e, this);
+
+                        break;
+                    }
+
+                case AppUpdated e:
+                    {
+                        SimpleMapper.Map(e, this);
+
+                        break;
+                    }
+
+                case AppImageUploaded e:
+                    {
+                        Image = e.Image;
+
+                        break;
+                    }
+
+                case AppImageRemoved _:
+                    {
+                        Image = null;
+
+                        break;
+                    }
+
+                case AppPlanChanged e:
+                    {
+                        Plan = AppPlan.Build(e.Actor, e.PlanId);
+
+                        break;
+                    }
+
+                case AppPlanReset _:
+                    {
+                        Plan = null;
+
+                        break;
+                    }
+
+                case AppContributorAssigned e:
+                    {
+                        Contributors = Contributors.Assign(e.ContributorId, e.Role);
+
+                        break;
+                    }
+
+                case AppContributorRemoved e:
+                    {
+                        Contributors = Contributors.Remove(e.ContributorId);
+
+                        break;
+                    }
+
+                case AppClientAttached e:
+                    {
+                        Clients = Clients.Add(e.Id, e.Secret);
+
+                        break;
+                    }
+
+                case AppClientUpdated e:
+                    {
+                        Clients = Clients.Update(e.Id, e.Role);
+
+                        break;
+                    }
+
+                case AppClientRenamed e:
+                    {
+                        Clients = Clients.Rename(e.Id, e.Name);
+
+                        break;
+                    }
+
+                case AppClientRevoked e:
+                    {
+                        Clients = Clients.Revoke(e.Id);
+
+                        break;
+                    }
+
+                case AppWorkflowAdded e:
+                    {
+                        Workflows = Workflows.Add(e.WorkflowId, e.Name);
+
+                        break;
+                    }
+
+                case AppWorkflowUpdated e:
+                    {
+                        Workflows = Workflows.Update(e.WorkflowId, e.Workflow);
+
+                        break;
+                    }
+
+                case AppWorkflowDeleted e:
+                    {
+                        Workflows = Workflows.Remove(e.WorkflowId);
+
+                        break;
+                    }
+
+                case AppPatternAdded e:
+                    {
+                        Patterns = Patterns.Add(e.PatternId, e.Name, e.Pattern, e.Message);
+
+                        break;
+                    }
+
+                case AppPatternDeleted e:
+                    {
+                        Patterns = Patterns.Remove(e.PatternId);
+
+                        break;
+                    }
+
+                case AppPatternUpdated e:
+                    {
+                        Patterns = Patterns.Update(e.PatternId, e.Name, e.Pattern, e.Message);
+
+                        break;
+                    }
+
+                case AppRoleAdded e:
+                    {
+                        Roles = Roles.Add(e.Name);
+
+                        break;
+                    }
+
+                case AppRoleDeleted e:
+                    {
+                        Roles = Roles.Remove(e.Name);
+
+                        break;
+                    }
+
+                case AppRoleUpdated e:
+                    {
+                        Roles = Roles.Update(e.Name, e.Permissions.Prefix(Name));
+
+                        break;
+                    }
+
+                case AppLanguageAdded e:
+                    {
+                        LanguagesConfig = LanguagesConfig.Set(e.Language);
+
+                        break;
+                    }
+
+                case AppLanguageRemoved e:
+                    {
+                        LanguagesConfig = LanguagesConfig.Remove(e.Language);
+
+                        break;
+                    }
+
+                case AppLanguageUpdated e:
+                    {
+                        LanguagesConfig = LanguagesConfig.Set(e.Language, e.IsOptional, e.Fallback);
+
+                        if (e.IsMaster)
+                        {
+                            LanguagesConfig = LanguagesConfig.MakeMaster(e.Language);
+                        }
+
+                        break;
+                    }
+
+                case AppArchived _:
+                    {
+                        Plan = null;
+
+                        IsArchived = true;
+
+                        break;
+                    }
             }
-        }
-
-        protected void On(AppArchived @event)
-        {
-            Plan = null;
-
-            IsArchived = true;
         }
 
         public override AppState Apply(Envelope<IEvent> @event)
         {
-            var payload = (SquidexEvent)@event.Payload;
-
-            return Clone().Update(payload, @event.Headers, r => r.DispatchAction(payload));
+            return Clone().Update(@event, (e, s) => s.ApplyEvent(e));
         }
     }
 }

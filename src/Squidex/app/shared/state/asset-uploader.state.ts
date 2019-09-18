@@ -72,7 +72,7 @@ export class AssetUploaderState extends State<Snapshot> {
     }
 
     public uploadFile(file: File, target?: AssetsState): Observable<UploadResult> {
-        const stream = this.assetsService.uploadFile(this.appName, file);
+        const stream = this.assetsService.postAssetFile(this.appName, file);
 
         return this.upload(stream, MathHelper.guid(), file, asset  => {
             if (asset.isDuplicate) {
@@ -86,7 +86,7 @@ export class AssetUploaderState extends State<Snapshot> {
     }
 
     public uploadAsset(asset: AssetDto, file: File): Observable<UploadResult> {
-        const stream = this.assetsService.replaceFile(this.appName, asset, file, asset.version);
+        const stream = this.assetsService.putAssetFile(this.appName, asset, file, asset.version);
 
         return this.upload(stream, asset.id, file);
     }

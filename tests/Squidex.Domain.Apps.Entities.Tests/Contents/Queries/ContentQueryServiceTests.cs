@@ -415,6 +415,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
             {
                 identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.ForApp(Permissions.AppContentsRead, app.Name, schema.SchemaDef.Name).Id));
             }
+
+            requestContext.UpdatePermissions();
         }
 
         private void SetupSchemaScripting(params Guid[] ids)
@@ -492,7 +494,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries
                 Data = contentData,
                 DataDraft = contentData,
                 SchemaId = schemaId,
-                Status = status,
+                Status = status
             };
 
             return content;

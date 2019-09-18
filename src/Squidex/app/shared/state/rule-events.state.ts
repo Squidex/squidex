@@ -41,7 +41,7 @@ export class RuleEventsState extends State<Snapshot> {
         this.project(x => x.ruleEventsPager);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     constructor(
         private readonly appsState: AppsState,

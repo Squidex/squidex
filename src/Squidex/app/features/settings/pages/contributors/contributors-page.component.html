@@ -1,4 +1,4 @@
-<sqx-title message="{app} | Contributors | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
+<sqx-title message="{app} | Contributors | Settings" parameter1="app" [value1]="appsState.appDisplayName"></sqx-title>
 
 <sqx-panel desiredWidth="50rem" [showSidebar]="true">
     <ng-container title>
@@ -6,11 +6,17 @@
     </ng-container>
 
     <ng-container menu>
-        <button type="button" class="btn btn-text-secondary" (click)="reload()" title="Refresh contributors (CTRL + SHIFT + R)">
+        <button type="button" class="btn btn-text-secondary mr-2" (click)="reload()" title="Refresh contributors (CTRL + SHIFT + R)">
             <i class="icon-reset"></i> Refresh
         </button>
 
         <sqx-shortcut keys="ctrl+shift+r" (trigger)="reload()"></sqx-shortcut>
+
+        <div class="form-inline">
+            <input class="form-control" placeholder="Search"
+                [ngModel]="contributorsState.query | async"
+                (ngModelChange)="search($event)" />
+        </div>
     </ng-container>
 
     <ng-container content>
@@ -21,36 +27,50 @@
                 </div>
             </ng-container>
             
-            <ng-container *ngIf="contributorsState.contributors | async; let contributors">
-                <table class="table table-items table-fixed" *ngIf="rolesState.roles | async; let roles">
-                    <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor">
-                        <tr>
-                            <td class="cell-user">
-                                <img class="user-picture" title="{{contributor.contributorId | sqxUserName}}" [attr.src]="contributor.contributorId | sqxUserPicture" />
-                            </td>
-                            <td class="cell-auto">
-                                <span class="user-name table-cell">{{contributor.contributorId | sqxUserName}}</span>
-                            </td>
-                            <td class="cell-time">
-                                <select class="form-control" 
-                                    [ngModel]="contributor.role"
-                                    (ngModelChange)="changeRole(contributor, $event)"
-                                    [disabled]="!contributor.canUpdate">
-                                    <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
-                                </select>
-                            </td>
-                            <td class="cell-actions">
-                                <button type="button" class="btn btn-text-danger" [disabled]="!contributor.canRevoke" (click)="remove(contributor)">
-                                    <i class="icon-bin2"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="spacer"></tr>
-                    </tbody>
-                </table>
+            <ng-container *ngIf="contributorsState.contributorsPaged | async; let contributors">
+                <ng-container *ngIf="contributors.length > 0; else noContributors">
+                    <table class="table table-items table-fixed" *ngIf="rolesState.roles | async; let roles">
+                        <tbody *ngFor="let contributor of contributors; trackBy: trackByContributor">
+                            <tr>
+                                <td class="cell-user">
+                                    <img class="user-picture" title="{{contributor.contributorName}}" [attr.src]="contributor.contributorId | sqxUserPicture" />
+                                </td>
+                                <td class="cell-auto">
+                                    <span class="user-name table-cell" [innerHTML]="contributor.contributorName | sqxHighlight:contributorsState.snapshot.queryRegex"></span>
+                                </td>
+                                <td class="cell-time">
+                                    <select class="form-control" 
+                                        [ngModel]="contributor.role"
+                                        (ngModelChange)="changeRole(contributor, $event)"
+                                        [disabled]="!contributor.canUpdate">
+                                        <option *ngFor="let role of roles" [ngValue]="role.name">{{role.name}}</option>
+                                    </select>
+                                </td>
+                                <td class="cell-actions">
+                                    <button type="button" class="btn btn-text-danger" [disabled]="!contributor.canRevoke" (click)="remove(contributor)">
+                                        <i class="icon-bin2"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="spacer"></tr>
+                        </tbody>
+                    </table>
+
+                    <sqx-pager [pager]="contributorsState.contributorsPager | async" (prevPage)="goPrev()" (nextPage)="goNext()"></sqx-pager>
+                </ng-container>
+
+                <ng-template #noContributors>
+                    <div class="table-items-row table-items-row-empty">
+                        No contributors found.
+                    </div>
+                </ng-template>
                 
-                <ng-container>
-                    <div class="table-items-footer" *ngIf="contributorsState.canCreate | async">
+                <ng-container *ngIf="contributorsState.canCreate | async">
+                    <div class="table-items-footer">
+                        <sqx-form-alert marginTop="0" marginBottom="2" white="true">
+                            Just enter the email address to invite someone with no account to the app.
+                        </sqx-form-alert>
+
                         <form [formGroup]="assignContributorForm.form" (ngSubmit)="assignContributor()">
                             <div class="row no-gutters">
                                 <div class="col">
@@ -70,6 +90,10 @@
                             </div>
                         </form>
                     </div>
+
+                    <sqx-form-hint class="text-right">
+                        Big team? <a class="force" (click)="importDialog.show()">Add many contributors at once</a>
+                    </sqx-form-hint>
                 </ng-container>
             </ng-container>
         </ng-container>
@@ -87,5 +111,11 @@
         </div>
     </ng-container>
 </sqx-panel>
+
+<ng-container *sqxModal="importDialog">
+    <sqx-import-contributors-dialog 
+        (close)="importDialog.hide()">
+    </sqx-import-contributors-dialog>
+</ng-container>
 
 <router-outlet></router-outlet>

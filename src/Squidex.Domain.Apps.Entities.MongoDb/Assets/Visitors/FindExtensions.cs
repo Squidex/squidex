@@ -60,17 +60,17 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets.Visitors
                 Filter.Eq(x => x.IsDeleted, false)
             };
 
-            var filter = query.BuildFilter<MongoAssetEntity>(false);
+            var (filter, last) = query.BuildFilter<MongoAssetEntity>(false);
 
-            if (filter.Filter != null)
+            if (filter != null)
             {
-                if (filter.Last)
+                if (last)
                 {
-                    filters.Add(filter.Filter);
+                    filters.Add(filter);
                 }
                 else
                 {
-                    filters.Insert(0, filter.Filter);
+                    filters.Insert(0, filter);
                 }
             }
 

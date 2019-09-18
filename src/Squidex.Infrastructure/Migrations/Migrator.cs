@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.Log;
@@ -50,14 +51,14 @@ namespace Squidex.Infrastructure.Migrations
 
                 while (true)
                 {
-                    var migrationStep = migrationPath.GetNext(version);
+                    var (newVersion, migrations) = migrationPath.GetNext(version);
 
-                    if (migrationStep.Migrations == null || !migrationStep.Migrations.Any())
+                    if (migrations == null || !migrations.Any())
                     {
                         break;
                     }
 
-                    foreach (var migration in migrationStep.Migrations)
+                    foreach (var migration in migrations)
                     {
                         var name = migration.GetType().ToString();
 
@@ -66,16 +67,28 @@ namespace Squidex.Infrastructure.Migrations
                             .WriteProperty("status", "Started")
                             .WriteProperty("migrator", name));
 
-                        using (log.MeasureInformation(w => w
-                            .WriteProperty("action", "Migration")
-                            .WriteProperty("status", "Completed")
-                            .WriteProperty("migrator", name)))
+                        try
                         {
-                            await migration.UpdateAsync();
+                            using (log.MeasureInformation(w => w
+                                .WriteProperty("action", "Migration")
+                                .WriteProperty("status", "Completed")
+                                .WriteProperty("migrator", name)))
+                            {
+                                await migration.UpdateAsync();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            log.LogFatal(ex, w => w
+                                .WriteProperty("action", "Migration")
+                                .WriteProperty("status", "Failed")
+                                .WriteProperty("migrator", name));
+
+                            throw new MigrationFailedException(name, ex);
                         }
                     }
 
-                    version = migrationStep.Version;
+                    version = newVersion;
                 }
             }
             finally

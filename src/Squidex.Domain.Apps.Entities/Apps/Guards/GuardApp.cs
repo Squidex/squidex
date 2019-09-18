@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Guards
 {
@@ -26,6 +27,21 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
                     e(Not.ValidSlug("Name"), nameof(command.Name));
                 }
             });
+        }
+
+        public static void CanUpdate(UpdateApp command)
+        {
+            Guard.NotNull(command, nameof(command));
+        }
+
+        public static void CanUploadImage(UploadAppImage command)
+        {
+            Guard.NotNull(command, nameof(command));
+        }
+
+        public static void CanRemoveImage(RemoveAppImage command)
+        {
+            Guard.NotNull(command, nameof(command));
         }
 
         public static void CanChangePlan(ChangePlan command, AppPlan plan, IAppPlansProvider appPlans)

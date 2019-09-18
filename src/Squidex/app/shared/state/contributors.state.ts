@@ -13,6 +13,7 @@ import {
     DialogService,
     ErrorDto,
     ImmutableArray,
+    Pager,
     shareMapSubscribed,
     shareSubscribed,
     State,
@@ -39,6 +40,15 @@ interface Snapshot {
     // The maximum allowed users.
     maxContributors: number;
 
+    // The current page.
+    page: number;
+
+    // The search query.
+    query?: string;
+
+    // Query regex.
+    queryRegex?: RegExp;
+
     // The app version.
     version: Version;
 
@@ -53,21 +63,39 @@ export class ContributorsState extends State<Snapshot> {
     public contributors =
         this.project(x => x.contributors);
 
-    public isLoaded =
-        this.project(x => !!x.isLoaded);
+    public page =
+        this.project(x => x.page);
+
+    public query =
+        this.project(x => x.query);
+
+    public queryRegex =
+        this.project(x => x.queryRegex);
 
     public maxContributors =
         this.project(x => x.maxContributors);
 
+    public isLoaded =
+        this.project(x => x.isLoaded === true);
+
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
+
+    public filtered =
+        this.projectFrom2(this.queryRegex, this.contributors, (q, c) => getFilteredContributors(c, q));
+
+    public contributorsPaged =
+        this.projectFrom2(this.page, this.filtered, (p, c) => getPagedContributors(c, p));
+
+    public contributorsPager =
+        this.projectFrom2(this.page, this.filtered, (p, c) => new Pager(c.length, p, PAGE_SIZE));
 
     constructor(
         private readonly contributorsService: ContributorsService,
         private readonly appsState: AppsState,
         private readonly dialogs: DialogService
     ) {
-        super({ contributors: ImmutableArray.empty(), version: Version.EMPTY, maxContributors: -1 });
+        super({ contributors: ImmutableArray.empty(), page: 0, maxContributors: -1, version: Version.EMPTY });
     }
 
     public load(isReload = false): Observable<any> {
@@ -86,6 +114,18 @@ export class ContributorsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public goNext() {
+        this.next(s => ({ ...s, page: s.page + 1 }));
+    }
+
+    public goPrev() {
+        this.next(s => ({ ...s, page: s.page - 1 }));
+    }
+
+    public search(query: string) {
+        this.next(s => ({ ...s, query, queryRegex: new RegExp(query, 'i') }));
+    }
+
     public revoke(contributor: ContributorDto): Observable<any> {
         return this.contributorsService.deleteContributor(this.appName, contributor, this.version).pipe(
             tap(({ version, payload }) => {
@@ -94,7 +134,7 @@ export class ContributorsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public assign(request: AssignContributorDto): Observable<boolean | undefined> {
+    public assign(request: AssignContributorDto, options?: { silent: boolean }): Observable<boolean | undefined> {
         return this.contributorsService.postContributor(this.appName, request, this.version).pipe(
             catchError(error => {
                 if (Types.is(error, ErrorDto) && error.statusCode === 404) {
@@ -106,16 +146,23 @@ export class ContributorsState extends State<Snapshot> {
             tap(({ version, payload }) => {
                 this.replaceContributors(version, payload);
             }),
-            shareMapSubscribed(this.dialogs, x => x.payload._meta && x.payload._meta['isInvited'] === '1'));
+            shareMapSubscribed(this.dialogs, x => x.payload._meta && x.payload._meta['isInvited'] === '1', options));
     }
 
     private replaceContributors(version: Version, payload: ContributorsPayload) {
-        this.next(s => {
+        this.next(() => {
             const { canCreate, items, maxContributors } = payload;
 
             const contributors = ImmutableArray.of(items);
 
-            return { ...s, contributors, maxContributors, isLoaded: true, version, canCreate };
+            return {
+                canCreate,
+                contributors,
+                isLoaded: true,
+                maxContributors,
+                page: 0,
+                version
+            };
         });
     }
 
@@ -126,4 +173,20 @@ export class ContributorsState extends State<Snapshot> {
     private get version() {
         return this.snapshot.version;
     }
+}
+
+const PAGE_SIZE = 10;
+
+function getPagedContributors(contributors: ContributorsList, page: number) {
+    return ImmutableArray.of(contributors.values.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE));
+}
+
+function getFilteredContributors(contributors: ContributorsList, query?: RegExp) {
+    let filtered = contributors;
+
+    if (query) {
+        filtered = filtered.filter(x => query.test(x.contributorName));
+    }
+
+    return filtered;
 }

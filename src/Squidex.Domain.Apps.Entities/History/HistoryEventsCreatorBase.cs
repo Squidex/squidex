@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.History
 {
@@ -34,13 +35,6 @@ namespace Squidex.Domain.Apps.Entities.History
             Guard.NotNullOrEmpty(message, nameof(message));
 
             texts[typeNameRegistry.GetName<TEvent>()] = message;
-        }
-
-        protected void AddEventMessage(string type, string message)
-        {
-            Guard.NotNullOrEmpty(message, nameof(message));
-
-            texts[type] = message;
         }
 
         protected bool HasEventText(IEvent @event)

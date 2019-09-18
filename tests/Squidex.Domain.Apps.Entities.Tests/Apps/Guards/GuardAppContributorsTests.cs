@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Apps.Services;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared.Users;
 using Xunit;
 
@@ -146,7 +147,7 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
         {
             var command = new AssignContributor { ContributorId = "1" };
 
-            var contributors_1 = contributors_0.Assign("1", Role.Editor);
+            var contributors_1 = contributors_0.Assign("1", Role.Developer);
 
             await GuardAppContributors.CanAssign(contributors_1, roles, command, users, appPlan);
         }
@@ -159,8 +160,8 @@ namespace Squidex.Domain.Apps.Entities.Apps.Guards
 
             var command = new AssignContributor { ContributorId = "1" };
 
-            var contributors_1 = contributors_0.Assign("1", Role.Editor);
-            var contributors_2 = contributors_1.Assign("2", Role.Editor);
+            var contributors_1 = contributors_0.Assign("1", Role.Developer);
+            var contributors_2 = contributors_1.Assign("2", Role.Developer);
 
             await GuardAppContributors.CanAssign(contributors_2, roles, command, users, appPlan);
         }

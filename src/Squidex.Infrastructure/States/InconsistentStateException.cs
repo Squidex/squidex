@@ -26,8 +26,8 @@ namespace Squidex.Infrastructure.States
             get { return expectedVersion; }
         }
 
-        public InconsistentStateException(long currentVersion, long expectedVersion, Exception ex)
-            : base(FormatMessage(currentVersion, expectedVersion), ex)
+        public InconsistentStateException(long currentVersion, long expectedVersion, Exception inner = null)
+            : base(FormatMessage(currentVersion, expectedVersion), inner)
         {
             this.currentVersion = currentVersion;
 

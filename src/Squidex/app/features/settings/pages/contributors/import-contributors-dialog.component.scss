@@ -1,0 +1,10 @@
+@import '_vars';
+@import '_mixins';
+
+textarea {
+    resize: none;
+}
+
+.content {
+    min-height: 300px;
+}

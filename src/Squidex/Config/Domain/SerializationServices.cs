@@ -20,6 +20,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Queries.Json;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Config.Domain
 {
@@ -34,6 +35,7 @@ namespace Squidex.Config.Domain
                 new AppContributorsConverter(),
                 new AppPatternsConverter(),
                 new ClaimsPrincipalConverter(),
+                new ContentFieldDataConverter(),
                 new EnvelopeHeadersConverter(),
                 new FilterConverter(),
                 new InstantConverter(),

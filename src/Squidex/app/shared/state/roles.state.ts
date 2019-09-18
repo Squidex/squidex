@@ -49,10 +49,10 @@ export class RolesState extends State<Snapshot> {
         this.project(x => x.roles);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
 
     constructor(
         private readonly rolesService: RolesService,

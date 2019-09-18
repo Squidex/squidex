@@ -139,10 +139,10 @@ describe('EventConsumersService', () => {
     function eventConsumerResponse(id: number) {
         return {
             name: `event-consumer${id}`,
-            position: `position-${id}`,
+            position: `position${id}`,
             isStopped: true,
             isResetting: true,
-            error: `failure-${id}`,
+            error: `failure${id}`,
             _links: {
                 reset: { method: 'PUT', href: `/event-consumers/${id}/reset` }
             }
@@ -159,6 +159,6 @@ export function createEventConsumer(id: number, suffix = '') {
         `event-consumer${id}`,
         true,
         true,
-        `failure-${id}${suffix}`,
-        `position-${id}${suffix}`);
+        `failure${id}${suffix}`,
+        `position${id}${suffix}`);
 }

@@ -55,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets
         {
             using (Profiler.TraceMethod<MongoAssetRepository>())
             {
-                await Collection.Find(new BsonDocument()).ForEachPipelineAsync(x => callback(Map(x), x.Version), ct);
+                await Collection.Find(new BsonDocument(), options: Batching.Options).ForEachPipelineAsync(x => callback(Map(x), x.Version), ct);
             }
         }
 

@@ -8,8 +8,8 @@
 using System;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
 using AppPlanChangedV2 = Squidex.Domain.Apps.Events.Apps.AppPlanChanged;
 

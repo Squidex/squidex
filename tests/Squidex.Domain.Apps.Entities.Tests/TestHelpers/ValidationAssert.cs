@@ -9,7 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 using Xunit.Sdk;
 

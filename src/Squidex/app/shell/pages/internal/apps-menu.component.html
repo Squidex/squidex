@@ -2,7 +2,7 @@
     <li class="nav-item dropdown">
         <span class="nav-link dropdown-toggle" id="app-name" (click)="appsMenu.toggle()">
             <ng-container *ngIf="appsState.selectedApp | async; let selectedApp; else noApp">
-                {{selectedApp.name}}
+                {{selectedApp.displayName}}
             </ng-container>
 
             <ng-template #noApp>
@@ -11,7 +11,7 @@
         </span>
 
         <ng-container *ngIf="appsState.apps | async; let apps">
-            <ng-container *sqxModal="appsMenu;closeAlways:true">
+            <ng-container *sqxModal="appsMenu;closeAlways:true;onRoot:false">
                 <div class="dropdown-menu" @fade>
                     <a class="dropdown-item all-apps" routerLink="/app">
                         <span class="all-apps-text">All Apps</span> 
@@ -22,7 +22,7 @@
                         <div class="dropdown-divider"></div>
 
                         <div class="apps-list">
-                            <a class="dropdown-item" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.name}}</a>
+                            <a class="dropdown-item" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]" routerLinkActive="active">{{app.displayName}}</a>
                         </div>
                     </ng-container>
 

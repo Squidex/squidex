@@ -26,6 +26,7 @@ using Squidex.Config.Domain;
 using Squidex.Config.Orleans;
 using Squidex.Config.Startup;
 using Squidex.Config.Web;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.ICIS.Extensions;
@@ -103,6 +104,8 @@ namespace Squidex
                 config.GetSection("rebuild"));
             services.Configure<ExposedConfiguration>(
                 config.GetSection("exposedConfiguration"));
+            services.Configure<RuleOptions>(
+                config.GetSection("rules"));
 
             services.Configure<MyContentsControllerOptions>(
                 config.GetSection("contentsController"));

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 #pragma warning disable RECS0012 // 'if' statement can be re-written as 'switch' statement
 
@@ -22,6 +23,7 @@ namespace Squidex.Infrastructure.States
         private readonly ISnapshotStore<TSnapshot, TKey> snapshotStore;
         private readonly IStreamNameResolver streamNameResolver;
         private readonly IEventStore eventStore;
+        private readonly IEventEnricher<TKey> eventEnricher;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly PersistenceMode persistenceMode;
         private readonly HandleSnapshot<TSnapshot> applyState;
@@ -37,6 +39,7 @@ namespace Squidex.Infrastructure.States
 
         public Persistence(TKey ownerKey, Type ownerType,
             IEventStore eventStore,
+            IEventEnricher<TKey> eventEnricher,
             IEventDataFormatter eventDataFormatter,
             ISnapshotStore<TSnapshot, TKey> snapshotStore,
             IStreamNameResolver streamNameResolver,
@@ -49,6 +52,7 @@ namespace Squidex.Infrastructure.States
             this.applyState = applyState;
             this.applyEvent = applyEvent;
             this.eventStore = eventStore;
+            this.eventEnricher = eventEnricher;
             this.eventDataFormatter = eventDataFormatter;
             this.persistenceMode = persistenceMode;
             this.snapshotStore = snapshotStore;
@@ -73,7 +77,7 @@ namespace Squidex.Infrastructure.States
                 }
                 else
                 {
-                    throw new DomainObjectVersionException(ownerKey.ToString(), ownerType, version, expectedVersion);
+                    throw new InconsistentStateException(version, expectedVersion);
                 }
             }
         }
@@ -130,14 +134,7 @@ namespace Squidex.Infrastructure.States
 
             if (newVersion != versionSnapshot)
             {
-                try
-                {
-                    await snapshotStore.WriteAsync(ownerKey, state, versionSnapshot, newVersion);
-                }
-                catch (InconsistentStateException ex)
-                {
-                    throw new DomainObjectVersionException(ownerKey.ToString(), ownerType, ex.CurrentVersion, ex.ExpectedVersion);
-                }
+                await snapshotStore.WriteAsync(ownerKey, state, versionSnapshot, newVersion);
 
                 versionSnapshot = newVersion;
             }
@@ -157,6 +154,11 @@ namespace Squidex.Infrastructure.States
 
                 var commitId = Guid.NewGuid();
 
+                foreach (var @event in eventArray)
+                {
+                    eventEnricher.Enrich(@event, ownerKey);
+                }
+
                 var eventStream = GetStreamName();
                 var eventData = GetEventData(eventArray, commitId);
 
@@ -166,7 +168,7 @@ namespace Squidex.Infrastructure.States
                 }
                 catch (WrongEventVersionException ex)
                 {
-                    throw new DomainObjectVersionException(ownerKey.ToString(), ownerType, ex.CurrentVersion, ex.ExpectedVersion);
+                    throw new InconsistentStateException(ex.CurrentVersion, ex.ExpectedVersion, ex);
                 }
 
                 versionEvents += eventArray.Length;

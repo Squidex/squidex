@@ -12,6 +12,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Users
 {
@@ -82,6 +84,15 @@ namespace Squidex.Domain.Users
             var count = QueryUsers(userManager, email).LongCount();
 
             return Task.FromResult(count);
+        }
+
+        public static async Task<List<UserWithClaims>> QueryByIdsAync(this UserManager<IdentityUser> userManager, string[] ids)
+        {
+            var users = userManager.Users.Where(x => ids.Contains(x.Id)).ToList();
+
+            var result = await userManager.ResolveUsersAsync(users);
+
+            return result.ToList();
         }
 
         public static async Task<List<UserWithClaims>> QueryByEmailAsync(this UserManager<IdentityUser> userManager, string email = null, int take = 10, int skip = 0)
@@ -157,6 +168,13 @@ namespace Squidex.Domain.Users
             await UpdateAsync(userManager, user, values);
 
             return await userManager.ResolveUserAsync(user);
+        }
+
+        public static Task<IdentityResult> GenerateClientSecretAsync(this UserManager<IdentityUser> userManager, IdentityUser user)
+        {
+            var claims = new[] { new Claim(SquidexClaimTypes.ClientSecret, RandomHash.New()) };
+
+            return userManager.SyncClaimsAsync(user, claims);
         }
 
         public static async Task<IdentityResult> UpdateSafeAsync(this UserManager<IdentityUser> userManager, IdentityUser user, UserValues values)

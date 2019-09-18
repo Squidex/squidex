@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Contents
 {
@@ -55,17 +55,17 @@ namespace Squidex.Domain.Apps.Entities.Contents
 
             if (@event.Payload is SchemaEvent schemaEvent)
             {
-                result = result.AddParameter("Schema", schemaEvent.SchemaId.Name);
+                result = result.Param("Schema", schemaEvent.SchemaId.Name);
             }
 
             if (@event.Payload is ContentStatusChanged contentStatusChanged)
             {
-                result = result.AddParameter("Status", contentStatusChanged.Status);
+                result = result.Param("Status", contentStatusChanged.Status);
             }
 
             if (@event.Payload is ContentStatusScheduled contentStatusScheduled)
             {
-                result = result.AddParameter("Status", contentStatusScheduled.Status);
+                result = result.Param("Status", contentStatusScheduled.Status);
             }
 
             return Task.FromResult(result);

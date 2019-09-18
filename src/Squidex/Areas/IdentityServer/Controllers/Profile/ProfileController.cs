@@ -111,6 +111,14 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
         }
 
         [HttpPost]
+        [Route("/account/profile/generate-client-secret/")]
+        public Task<IActionResult> GenerateClientSecret()
+        {
+            return MakeChangeAsync(user => userManager.GenerateClientSecretAsync(user.Identity),
+                "Client secret generated successfully.");
+        }
+
+        [HttpPost]
         [Route("/account/profile/upload-picture/")]
         public Task<IActionResult> UploadPicture(List<IFormFile> file)
         {
@@ -193,6 +201,7 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile
             var result = new ProfileVM
             {
                 Id = user.Id,
+                ClientSecret = user.ClientSecret(),
                 Email = user.Email,
                 ErrorMessage = errorMessage,
                 ExternalLogins = taskForLogins.Result,

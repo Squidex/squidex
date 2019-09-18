@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.States
 {

@@ -30,7 +30,7 @@ namespace Squidex.Infrastructure.States
             A.CallTo(() => services.GetService(typeof(ISnapshotStore<int, string>)))
                 .Returns(snapshotStore);
 
-            sut = new Store<string>(eventStore, eventDataFormatter, services, streamNameResolver);
+            sut = new Store<string>(eventStore, new DefaultEventEnricher<string>(), eventDataFormatter, services, streamNameResolver);
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace Squidex.Infrastructure.States
             var persistedState = 0;
             var persistence = sut.WithSnapshots(None.Type, key, (int x) => persistedState = x);
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.ReadAsync(1));
+            await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.ReadAsync(1));
         }
 
         [Fact]
@@ -122,7 +122,7 @@ namespace Squidex.Infrastructure.States
         }
 
         [Fact]
-        public async Task Should_wrap_exception_when_writing_to_store_with_previous_version()
+        public async Task Should_not_wrap_exception_when_writing_to_store_with_previous_version()
         {
             A.CallTo(() => snapshotStore.ReadAsync(key))
                 .Returns((20, 10));
@@ -135,7 +135,7 @@ namespace Squidex.Infrastructure.States
 
             await persistence.ReadAsync();
 
-            await Assert.ThrowsAsync<DomainObjectVersionException>(() => persistence.WriteSnapshotAsync(100));
+            await Assert.ThrowsAsync<InconsistentStateException>(() => persistence.WriteSnapshotAsync(100));
         }
 
         [Fact]

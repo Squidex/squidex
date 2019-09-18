@@ -57,13 +57,11 @@ namespace Squidex.Domain.Apps.Entities.Contents
                         StatusColors.Published)
             });
 
-        private readonly Workflow simpleWorkflow;
-
         public DynamicContentWorkflowTests()
         {
             app = Mocks.App(appId);
 
-            simpleWorkflow = new Workflow(
+            var simpleWorkflow = new Workflow(
                 Status.Draft,
                 new Dictionary<Status, WorkflowStep>
                 {

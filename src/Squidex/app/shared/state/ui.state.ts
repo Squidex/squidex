@@ -49,16 +49,16 @@ export class UIState extends State<Snapshot> {
         this.project(x => x.settings);
 
     public canReadEvents =
-        this.project(x => !!x.canReadEvents);
+        this.project(x => x.canReadEvents === true);
 
     public canReadUsers =
-        this.project(x => !!x.canReadUsers);
+        this.project(x => x.canReadUsers === true);
 
     public canRestore =
-        this.project(x => !!x.canRestore);
+        this.project(x => x.canRestore === true);
 
     public canUserAdminResource =
-        this.project(x => !!x.canRestore || !!x.canReadUsers || !!x.canReadEvents);
+        this.project(x => x.canRestore === true || x.canReadUsers === true || x.canReadEvents === true);
 
     public get<T>(path: string, defaultValue: T) {
         return this.settings.pipe(map(x => this.getValue(x, path, defaultValue)),

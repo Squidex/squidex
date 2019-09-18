@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Generic;
 using Xunit;
 
 namespace Squidex.Infrastructure.Caching
@@ -45,6 +46,23 @@ namespace Squidex.Infrastructure.Caching
                 Assert.True(sut.TryGetValue(i.ToString(), out var value));
                 Assert.NotNull(value);
             }
+        }
+
+        [Fact]
+        public void Should_notify_about_evicted_items()
+        {
+            var evicted = new List<int>();
+
+            var cache = new LRUCache<int, int>(3, (key, _) => evicted.Add(key));
+
+            cache.Set(1, 1);
+            cache.Set(2, 2);
+            cache.Set(3, 3);
+            cache.Set(1, 1);
+            cache.Set(4, 4);
+            cache.Set(5, 5);
+
+            Assert.Equal(new List<int> { 2, 3 }, evicted);
         }
 
         [Fact]

@@ -25,7 +25,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas
 {
-    public sealed class SchemaGrain : SquidexDomainObjectGrain<SchemaState>, ISchemaGrain
+    public sealed class SchemaGrain : DomainObjectGrain<SchemaState>, ISchemaGrain
     {
         private readonly IAppProvider appProvider;
         private readonly IJsonSerializer serializer;

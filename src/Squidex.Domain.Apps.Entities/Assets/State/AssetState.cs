@@ -9,10 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Squidex.Domain.Apps.Core.ValidateContent;
-using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Assets;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
@@ -66,59 +64,71 @@ namespace Squidex.Domain.Apps.Entities.Assets.State
             get { return Id; }
         }
 
-        protected void On(AssetCreated @event)
+        public void ApplyEvent(IEvent @event)
         {
-            SimpleMapper.Map(@event, this);
-
-            FileName = @event.FileName;
-
-            if (string.IsNullOrWhiteSpace(@event.Slug))
+            switch (@event)
             {
-                Slug = @event.FileName.ToAssetSlug();
+                case AssetCreated e:
+                    {
+                        SimpleMapper.Map(e, this);
+
+                        FileName = e.FileName;
+
+                        if (string.IsNullOrWhiteSpace(e.Slug))
+                        {
+                            Slug = e.FileName.ToAssetSlug();
+                        }
+                        else
+                        {
+                            Slug = e.Slug;
+                        }
+
+                        TotalSize += e.FileSize;
+
+                        break;
+                    }
+
+                case AssetUpdated e:
+                    {
+                        SimpleMapper.Map(e, this);
+
+                        TotalSize += e.FileSize;
+
+                        break;
+                    }
+
+                case AssetAnnotated e:
+                    {
+                        if (!string.IsNullOrWhiteSpace(e.FileName))
+                        {
+                            FileName = e.FileName;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(e.Slug))
+                        {
+                            Slug = e.Slug;
+                        }
+
+                        if (e.Tags != null)
+                        {
+                            Tags = e.Tags;
+                        }
+
+                        break;
+                    }
+
+                case AssetDeleted _:
+                    {
+                        IsDeleted = true;
+
+                        break;
+                    }
             }
-            else
-            {
-                Slug = @event.Slug;
-            }
-
-            TotalSize += @event.FileSize;
-        }
-
-        protected void On(AssetUpdated @event)
-        {
-            SimpleMapper.Map(@event, this);
-
-            TotalSize += @event.FileSize;
-        }
-
-        protected void On(AssetAnnotated @event)
-        {
-            if (!string.IsNullOrWhiteSpace(@event.FileName))
-            {
-                FileName = @event.FileName;
-            }
-
-            if (!string.IsNullOrWhiteSpace(@event.Slug))
-            {
-                Slug = @event.Slug;
-            }
-
-            if (@event.Tags != null)
-            {
-                Tags = @event.Tags;
-            }
-        }
-
-        protected void On(AssetDeleted @event)
-        {
-            IsDeleted = true;
         }
 
         public override AssetState Apply(Envelope<IEvent> @event)
         {
-            var payload = (SquidexEvent)@event.Payload;
-
-            return Clone().Update(payload, @event.Headers, r => r.DispatchAction(payload));
+            return Clone().Update(@event, (e, s) => s.ApplyEvent(e));
         }
     }
 }

@@ -8,7 +8,7 @@
             </span>
         </span>
 
-        <ng-container *sqxModal="modalMenu;closeAlways:true">
+        <ng-container *sqxModal="modalMenu;closeAlways:true;onRoot:false">
             <div class="dropdown-menu" @fade>
                 <a class="dropdown-item dropdown-info" [sqxPopupLink]="snapshot.profileUrl">
                     <div>Signed in with</div>

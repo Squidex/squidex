@@ -22,12 +22,22 @@
 
 .input-group {
     .form-control {
-        width: 7.5rem;
-
         &:last-child {
             position: relative;
             padding-right: 2rem;
         }
+    }
+
+    .form-date {
+        width: 7rem;
+    }
+
+    .form-date-only {
+        width: 8.5rem;
+    }
+
+    .form-time {
+        width: 7rem;
     }
 }
 

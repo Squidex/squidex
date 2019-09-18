@@ -12,14 +12,15 @@ using Orleans;
 using Orleans.Concurrency;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Orleans;
-using Squidex.Infrastructure.States;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Grains
 {
-    public class EventConsumerGrain : GrainOfString<EventConsumerState>, IEventConsumerGrain
+    public class EventConsumerGrain : GrainOfString, IEventConsumerGrain
     {
         private readonly EventConsumerFactory eventConsumerFactory;
+        private readonly IGrainState<EventConsumerState> state;
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
         private readonly ISemanticLog log;
@@ -29,20 +30,21 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public EventConsumerGrain(
             EventConsumerFactory eventConsumerFactory,
-            IStore<string> store,
+            IGrainState<EventConsumerState> state,
             IEventStore eventStore,
             IEventDataFormatter eventDataFormatter,
             ISemanticLog log)
-            : base(store)
         {
             Guard.NotNull(eventStore, nameof(eventStore));
             Guard.NotNull(eventDataFormatter, nameof(eventDataFormatter));
             Guard.NotNull(eventConsumerFactory, nameof(eventConsumerFactory));
+            Guard.NotNull(state, nameof(state));
             Guard.NotNull(log, nameof(log));
 
             this.eventStore = eventStore;
             this.eventDataFormatter = eventDataFormatter;
             this.eventConsumerFactory = eventConsumerFactory;
+            this.state = state;
 
             this.log = log;
         }
@@ -63,7 +65,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         private Immutable<EventConsumerInfo> CreateInfo()
         {
-            return State.ToInfo(eventConsumer.Name).AsImmutable();
+            return state.Value.ToInfo(eventConsumer.Name).AsImmutable();
         }
 
         public Task OnEventAsync(Immutable<IEventSubscription> subscription, Immutable<StoredEvent> storedEvent)
@@ -85,7 +87,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                     }
                 }
 
-                State = State.Handled(storedEvent.Value.EventPosition);
+                state.Value = state.Value.Handled(storedEvent.Value.EventPosition);
             });
         }
 
@@ -100,15 +102,15 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             {
                 Unsubscribe();
 
-                State = State.Failed(exception.Value);
+                state.Value = state.Value.Failed(exception.Value);
             });
         }
 
         public Task ActivateAsync()
         {
-            if (!State.IsStopped)
+            if (!state.Value.IsStopped)
             {
-                Subscribe(State.Position);
+                Subscribe(state.Value.Position);
             }
 
             return TaskHelper.Done;
@@ -116,16 +118,16 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public async Task<Immutable<EventConsumerInfo>> StartAsync()
         {
-            if (!State.IsStopped)
+            if (!state.Value.IsStopped)
             {
                 return CreateInfo();
             }
 
             await DoAndUpdateStateAsync(() =>
             {
-                Subscribe(State.Position);
+                Subscribe(state.Value.Position);
 
-                State = State.Started();
+                state.Value = state.Value.Started();
             });
 
             return CreateInfo();
@@ -133,7 +135,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
         public async Task<Immutable<EventConsumerInfo>> StopAsync()
         {
-            if (State.IsStopped)
+            if (state.Value.IsStopped)
             {
                 return CreateInfo();
             }
@@ -142,7 +144,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
             {
                 Unsubscribe();
 
-                State = State.Stopped();
+                state.Value = state.Value.Stopped();
             });
 
             return CreateInfo();
@@ -158,7 +160,7 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
 
                 Subscribe(null);
 
-                State = State.Reset();
+                state.Value = state.Value.Reset();
             });
 
             return CreateInfo();
@@ -191,10 +193,10 @@ namespace Squidex.Infrastructure.EventSourcing.Grains
                     .WriteProperty("status", "Failed")
                     .WriteProperty("eventConsumer", eventConsumer.Name));
 
-                State = State.Failed(ex);
+                state.Value = state.Value.Failed(ex);
             }
 
-            await WriteStateAsync();
+            await state.WriteAsync();
         }
 
         private async Task ClearAsync()

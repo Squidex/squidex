@@ -66,8 +66,8 @@ export class SchemasState extends State<Snapshot> {
         return this.snapshot.selectedSchema ? this.snapshot.selectedSchema.name : '';
     }
 
-    public categories =
-        this.project2(x => x, x => buildCategories(x.categories, x.schemas));
+    public categoriesPlain =
+        this.project(x => x.categories);
 
     public selectedSchema =
         this.project(x => x.selectedSchema, sameSchema);
@@ -75,14 +75,17 @@ export class SchemasState extends State<Snapshot> {
     public schemas =
         this.project(x => x.schemas);
 
-    public publishedSchemas =
-        this.project2(x => x.schemas, x => x.filter(s => s.isPublished));
-
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
+
+    public publishedSchemas =
+        this.projectFrom(this.schemas, x => x.filter(s => s.isPublished));
+
+    public categories =
+        this.projectFrom2(this.schemas, this.categoriesPlain, (s, c) => buildCategories(c, s));
 
     constructor(
         private readonly appsState: AppsState,

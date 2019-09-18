@@ -49,7 +49,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var response = Deferred.Response(() =>
             {
-                return RolesDto.FromApp(App, this);
+                return GetResponse(App);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -160,9 +160,14 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<IAppEntity>();
-            var response = RolesDto.FromApp(result, this);
+            var response = GetResponse(result);
 
             return response;
+        }
+
+        private RolesDto GetResponse(IAppEntity result)
+        {
+            return RolesDto.FromApp(result, this);
         }
     }
 }

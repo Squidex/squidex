@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -47,7 +48,7 @@ namespace Squidex.Areas.Api.Controllers.Apps
         {
             var response = Deferred.Response(() =>
             {
-                return AppLanguagesDto.FromApp(App, this);
+                return GetResponse(App);
             });
 
             Response.Headers[HeaderNames.ETag] = App.ToEtag();
@@ -132,9 +133,14 @@ namespace Squidex.Areas.Api.Controllers.Apps
             var context = await CommandBus.PublishAsync(command);
 
             var result = context.Result<IAppEntity>();
-            var response = AppLanguagesDto.FromApp(result, this);
+            var response = GetResponse(result);
 
             return response;
+        }
+
+        private AppLanguagesDto GetResponse(IAppEntity result)
+        {
+            return AppLanguagesDto.FromApp(result, this);
         }
 
         private static Language ParseLanguage(string language)

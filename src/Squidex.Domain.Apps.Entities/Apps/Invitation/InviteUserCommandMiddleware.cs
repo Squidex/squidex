@@ -27,24 +27,26 @@ namespace Squidex.Domain.Apps.Entities.Apps.Invitation
 
         public async Task HandleAsync(CommandContext context, Func<Task> next)
         {
-            if (context.Command is AssignContributor assignContributor)
+            if (context.Command is AssignContributor assignContributor && ShouldInvite(assignContributor))
             {
-                if (assignContributor.IsInviting && assignContributor.ContributorId.IsEmail())
+                var created = await userResolver.CreateUserIfNotExists(assignContributor.ContributorId, true);
+
+                await next();
+
+                if (created && context.PlainResult is IAppEntity app)
                 {
-                    assignContributor.IsCreated = await userResolver.CreateUserIfNotExists(assignContributor.ContributorId, true);
-
-                    await next();
-
-                    if (assignContributor.IsCreated && context.PlainResult is IAppEntity app)
-                    {
-                        context.Complete(new InvitedResult { App = app });
-                    }
-
-                    return;
+                    context.Complete(new InvitedResult { App = app });
                 }
             }
+            else
+            {
+                await next();
+            }
+        }
 
-            await next();
+        private static bool ShouldInvite(AssignContributor assignContributor)
+        {
+            return assignContributor.Invite && assignContributor.ContributorId.IsEmail();
         }
     }
 }

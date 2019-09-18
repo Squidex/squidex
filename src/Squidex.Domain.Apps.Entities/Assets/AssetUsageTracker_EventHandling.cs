@@ -8,7 +8,6 @@
 using System;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Events.Assets;
-using Squidex.Infrastructure.Dispatching;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Tasks;
 using Squidex.Infrastructure.UsageTracking;
@@ -39,22 +38,24 @@ namespace Squidex.Domain.Apps.Entities.Assets
 
         public Task On(Envelope<IEvent> @event)
         {
-            return this.DispatchActionAsync(@event.Payload, @event.Headers);
+            switch (@event.Payload)
+            {
+                case AssetCreated e:
+                    return UpdateSizeAsync(e.AppId.Id, GetDate(@event), e.FileSize, 1);
+
+                case AssetUpdated e:
+                    return UpdateSizeAsync(e.AppId.Id, GetDate(@event), e.FileSize, 0);
+
+                case AssetDeleted e:
+                    return UpdateSizeAsync(e.AppId.Id, GetDate(@event), e.DeletedSize, -1);
+            }
+
+            return TaskHelper.Done;
         }
 
-        protected Task On(AssetCreated @event, EnvelopeHeaders headers)
+        private static DateTime GetDate(Envelope<IEvent> @event)
         {
-            return UpdateSizeAsync(@event.AppId.Id, headers.Timestamp().ToDateTimeUtc().Date, @event.FileSize, 1);
-        }
-
-        protected Task On(AssetUpdated @event, EnvelopeHeaders headers)
-        {
-            return UpdateSizeAsync(@event.AppId.Id, headers.Timestamp().ToDateTimeUtc().Date, @event.FileSize, 0);
-        }
-
-        protected Task On(AssetDeleted @event, EnvelopeHeaders headers)
-        {
-            return UpdateSizeAsync(@event.AppId.Id, headers.Timestamp().ToDateTimeUtc().Date, -@event.DeletedSize, -1);
+            return @event.Headers.Timestamp().ToDateTimeUtc().Date;
         }
 
         private Task UpdateSizeAsync(Guid appId, DateTime date, long size, long count)

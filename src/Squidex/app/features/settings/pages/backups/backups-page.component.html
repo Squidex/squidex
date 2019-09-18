@@ -1,4 +1,4 @@
-<sqx-title message="{app} | Backups | Settings" parameter1="app" [value1]="appsState.appName"></sqx-title>
+<sqx-title message="{app} | Backups | Settings" parameter1="app" [value1]="appsState.appDisplayName"></sqx-title>
 
 <sqx-panel desiredWidth="50rem" [showSidebar]="true">
     <ng-container title>
@@ -34,15 +34,7 @@
             <div class="table-items-row" *ngFor="let backup of backups; trackBy: trackByBackup">
                 <div class="row">
                     <div class="col-auto" [ngSwitch]="backup.status">
-                        <div *ngSwitchCase="'Failed'" class="backup-status backup-status-failed">
-                            <i class="icon-exclamation"></i>
-                        </div>
-                        <div *ngSwitchCase="'Completed'" class="backup-status backup-status-success">
-                            <i class="icon-checkmark"></i>
-                        </div>
-                        <div *ngSwitchDefault class="backup-status backup-status-pending spin">
-                            <i class="icon-hour-glass"></i>
-                        </div>
+                        <sqx-status-icon size="lg" [status]="backup.status"></sqx-status-icon>
                     </div>
                     <div class="col-auto">
                         <div>

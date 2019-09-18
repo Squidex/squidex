@@ -69,5 +69,12 @@ namespace Squidex.Domain.Users
 
             return result.OfType<IUser>().ToList();
         }
+
+        public async Task<Dictionary<string, IUser>> QueryManyAsync(string[] ids)
+        {
+            var result = await userManager.QueryByIdsAync(ids);
+
+            return result.OfType<IUser>().ToDictionary(x => x.Id);
+        }
     }
 }

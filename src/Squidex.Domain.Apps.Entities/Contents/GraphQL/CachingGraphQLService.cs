@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
 {
@@ -58,22 +59,22 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL
             return result;
         }
 
-        private async Task<(bool HasError, object Response)> QueryInternalAsync(GraphQLModel model, GraphQLExecutionContext ctx, GraphQLQuery query)
+        private static async Task<(bool HasError, object Response)> QueryInternalAsync(GraphQLModel model, GraphQLExecutionContext ctx, GraphQLQuery query)
         {
             if (string.IsNullOrWhiteSpace(query.Query))
             {
                 return (false, new { data = new object() });
             }
 
-            var result = await model.ExecuteAsync(ctx, query);
+            var (data, errors) = await model.ExecuteAsync(ctx, query);
 
-            if (result.Errors?.Any() == true)
+            if (errors?.Any() == true)
             {
-                return (false, new { data = result.Data, errors = result.Errors });
+                return (false, new { data, errors });
             }
             else
             {
-                return (false, new { data = result.Data });
+                return (false, new { data });
             }
         }
 

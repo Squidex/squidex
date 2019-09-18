@@ -18,6 +18,7 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Queries.OData;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries
 {
@@ -50,7 +51,7 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries
 
                 if (!string.IsNullOrWhiteSpace(q?.JsonQuery))
                 {
-                    result = ParseJson(q?.JsonQuery);
+                    result = ParseJson(q.JsonQuery);
                 }
                 else if (!string.IsNullOrWhiteSpace(q?.ODataQuery))
                 {

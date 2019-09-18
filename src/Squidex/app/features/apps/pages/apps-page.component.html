@@ -16,17 +16,28 @@
 
         <div class="card card-href card-app float-left" *ngFor="let app of apps; trackBy: trackByApp" [routerLink]="['/app', app.name]">
             <div class="card-body">
-                <h4 class="card-title">{{app.name}}</h4>
+                <div class="row no-gutters">
+                    <div class="col-auto card-left">
+                        <sqx-avatar [image]="app.image" [identifier]="app.name"></sqx-avatar>
+                    </div>
+                    <div class="col">
+                        <h4 class="card-title">{{app.displayName}}</h4>
 
-                <div class="card-text">
-                    <a [routerLink]="['/app', app.name]" sqxStopClick>Edit</a>
+                        <div class="card-text card-links">
+                            <a [routerLink]="['/app', app.name]" sqxStopClick>Edit</a>
 
-                    <span class="deeplinks">
-                        &nbsp;|
-                        <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>Content</a> &middot;
-                        <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>Assets</a> &middot;
-                        <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>Settings</a>
-                    </span>
+                            <span class="deeplinks">
+                                &nbsp;|
+                                <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>Content</a> &middot;
+                                <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>Assets</a> &middot;
+                                <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>Settings</a>
+                            </span>
+                        </div>
+
+                        <div class="card-text">
+                            {{app.description}}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

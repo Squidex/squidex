@@ -44,7 +44,7 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
         /// </summary>
         public Status Initial { get; set; }
 
-        public static WorkflowDto FromWorkflow(Guid id, Workflow workflow, ApiController controller, string app)
+        public static WorkflowDto FromWorkflow(Guid id, Workflow workflow)
         {
             var result = SimpleMapper.Map(workflow, new WorkflowDto
             {
@@ -54,12 +54,12 @@ namespace Squidex.Areas.Api.Controllers.Apps.Models
                 Id = id
             });
 
-            return result.CreateLinks(controller, app, id);
+            return result;
         }
 
-        private WorkflowDto CreateLinks(ApiController controller, string app, Guid id)
+        public WorkflowDto WithLinks(ApiController controller, string app)
         {
-            var values = new { app, id };
+            var values = new { app, id = Id };
 
             if (controller.HasPermission(Permissions.AppWorkflowsUpdate, app))
             {

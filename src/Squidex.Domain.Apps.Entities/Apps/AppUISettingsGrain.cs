@@ -15,29 +15,33 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Apps
 {
-    public sealed class AppUISettingsGrain : GrainOfGuid<AppUISettingsGrain.GrainState>, IAppUISettingsGrain
+    public sealed class AppUISettingsGrain : GrainOfGuid, IAppUISettingsGrain
     {
+        private readonly IGrainState<GrainState> state;
+
         [CollectionName("UISettings")]
         public sealed class GrainState
         {
             public JsonObject Settings { get; set; } = JsonValue.Object();
         }
 
-        public AppUISettingsGrain(IStore<Guid> store)
-            : base(store)
+        public AppUISettingsGrain(IGrainState<GrainState> state)
         {
+            Guard.NotNull(state, nameof(state));
+
+            this.state = state;
         }
 
         public Task<J<JsonObject>> GetAsync()
         {
-            return Task.FromResult(State.Settings.AsJ());
+            return Task.FromResult(state.Value.Settings.AsJ());
         }
 
         public Task SetAsync(J<JsonObject> settings)
         {
-            State.Settings = settings;
+            state.Value.Settings = settings;
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task SetAsync(string path, J<IJsonValue> value)
@@ -51,7 +55,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             container[key] = value.Value;
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         public Task RemoveAsync(string path)
@@ -63,7 +67,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
                 container.Remove(key);
             }
 
-            return WriteStateAsync();
+            return state.WriteAsync();
         }
 
         private JsonObject GetContainer(string path, out string key)
@@ -74,7 +78,7 @@ namespace Squidex.Domain.Apps.Entities.Apps
 
             key = segments[segments.Length - 1];
 
-            var current = State.Settings;
+            var current = state.Value.Settings;
 
             if (segments.Length > 1)
             {

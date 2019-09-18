@@ -51,10 +51,10 @@ export class ClientsState extends State<Snapshot> {
         this.project(x => x.clients);
 
     public isLoaded =
-        this.project(x => !!x.isLoaded);
+        this.project(x => x.isLoaded === true);
 
     public canCreate =
-        this.project(x => !!x.canCreate);
+        this.project(x => x.canCreate === true);
 
     constructor(
         private readonly clientsService: ClientsService,
@@ -110,7 +110,13 @@ export class ClientsState extends State<Snapshot> {
         const clients = ImmutableArray.of(items);
 
         this.next(s => {
-            return { ...s, clients, isLoaded: true, version, canCreate };
+            return {
+                ...s,
+                canCreate,
+                clients,
+                isLoaded: true,
+                version
+            };
         });
     }
 

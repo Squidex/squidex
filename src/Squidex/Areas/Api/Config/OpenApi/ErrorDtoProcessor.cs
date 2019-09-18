@@ -60,7 +60,7 @@ namespace Squidex.Areas.Api.Config.OpenApi
             }
         }
 
-        private JsonSchema GetErrorSchema(DocumentProcessorContext context)
+        private static JsonSchema GetErrorSchema(DocumentProcessorContext context)
         {
             var errorType = typeof(ErrorDto).ToContextualType();
 

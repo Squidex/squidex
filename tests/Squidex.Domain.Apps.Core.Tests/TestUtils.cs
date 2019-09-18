@@ -21,6 +21,7 @@ using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Newtonsoft;
 using Squidex.Infrastructure.Queries.Json;
+using Squidex.Infrastructure.Reflection;
 using Xunit;
 
 namespace Squidex.Domain.Apps.Core
@@ -46,6 +47,7 @@ namespace Squidex.Domain.Apps.Core
                     new AppContributorsConverter(),
                     new AppPatternsConverter(),
                     new ClaimsPrincipalConverter(),
+                    new ContentFieldDataConverter(),
                     new EnvelopeHeadersConverter(),
                     new FilterConverter(),
                     new InstantConverter(),
