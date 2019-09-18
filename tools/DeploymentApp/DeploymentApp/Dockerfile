@@ -8,7 +8,7 @@ WORKDIR /src
 COPY DeploymentApp/*.csproj /tmp/
 RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p; true; done; popd'
 
-COPY . .
+COPY ./tools/DeploymentApp/DeploymentApp .
 
 # Publish
 RUN dotnet publish DeploymentApp/DeploymentApp.csproj /p:version=$SQUIDEX__VERSION --output /out/alpine --configuration Release
