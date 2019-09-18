@@ -10,13 +10,16 @@ using Squidex.ICIS.Test.TestHelpers;
 using Squidex.ICIS.Validation.Validators;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Validation;
 using Xunit;
+
+#pragma warning disable IDE0060 // Remove unused parameter
 
 namespace Squidex.ICIS.Test.Validation.Validators
 {
     public class CommentaryCharacterCountValidatorTests
     {
-        private readonly Context context = new Context();
+        private readonly Context context = Context.Anonymous();
         private readonly TestHelper testHelper;
         private readonly CommentaryCharacterCountValidator commentaryCharacterCountValidator;
 
@@ -150,9 +153,10 @@ namespace Squidex.ICIS.Test.Validation.Validators
 
         private CreateContent CreateWorkingCommmentaryContent(ContentFieldData body)
         {
-            var content = new CreateContent();
-
-            content.SchemaId = new NamedId<Guid>(Guid.NewGuid(), "commentary");
+            var content = new CreateContent
+            {
+                SchemaId = new NamedId<Guid>(Guid.NewGuid(), "commentary")
+            };
 
             var currentTime = NodaTime.Instant.FromDateTimeUtc(DateTime.Now.ToUniversalTime());
 
@@ -171,10 +175,11 @@ namespace Squidex.ICIS.Test.Validation.Validators
 
         private CreateContent CreateWorkingCommentaryTypeContent(ContentFieldData characterLimit)
         {
-            var content = new CreateContent();
-
-            content.SchemaId = new NamedId<Guid>(Guid.NewGuid(), "commentary-type");
-            content.ContentId = commentaryTypeGuid;
+            var content = new CreateContent
+            {
+                SchemaId = new NamedId<Guid>(Guid.NewGuid(), "commentary-type"),
+                ContentId = commentaryTypeGuid
+            };
 
             var data = new NamedContentData()
             {

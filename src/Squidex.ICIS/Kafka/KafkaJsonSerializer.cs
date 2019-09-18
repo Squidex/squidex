@@ -7,7 +7,6 @@
 
 using Confluent.Kafka;
 using Newtonsoft.Json;
-using Squidex.ICIS.Kafka.Entities;
 using System;
 using System.IO;
 

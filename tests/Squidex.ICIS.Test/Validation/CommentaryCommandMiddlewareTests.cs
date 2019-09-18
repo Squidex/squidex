@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.ICIS.Validation;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Validation;
 using Xunit;
 
 namespace Squidex.ICIS.Test.Validation
@@ -17,7 +18,7 @@ namespace Squidex.ICIS.Test.Validation
     public class CommentaryCommandMiddlewareTests
     {
         private readonly Func<Task> next = A.Fake<Func<Task>>();
-        private readonly Context context = new Context();
+        private readonly Context context = Context.Anonymous();
 
         private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
         private readonly IGrainFactory grainFactory = A.Fake<IGrainFactory>();
@@ -87,19 +88,23 @@ namespace Squidex.ICIS.Test.Validation
 
         public CreateContent CreateWorkingCreateContentCommand()
         {
-            var contentCommand = new CreateContent();
-            contentCommand.SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema");
-            contentCommand.ContentId = Guid.NewGuid();
-            contentCommand.Data = new NamedContentData();
+            var contentCommand = new CreateContent
+            {
+                SchemaId = NamedId.Of(Guid.NewGuid(), "my-schema"),
+                ContentId = Guid.NewGuid(),
+                Data = new NamedContentData()
+            };
 
             return contentCommand;
         }
 
         private UpdateContent CreateWorkingUpdateContentCommand()
         {
-            var contentCommand = new UpdateContent();
-            contentCommand.ContentId = Guid.NewGuid();
-            contentCommand.Data = new NamedContentData();
+            var contentCommand = new UpdateContent
+            {
+                ContentId = Guid.NewGuid(),
+                Data = new NamedContentData()
+            };
 
             return contentCommand;
         }

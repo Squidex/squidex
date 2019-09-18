@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.ICIS.Utilities;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.ICIS.Validation.Validators
 {

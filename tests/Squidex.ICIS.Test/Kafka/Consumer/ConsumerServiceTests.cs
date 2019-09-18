@@ -38,7 +38,7 @@ namespace Squidex.ICIS.Test.Kafka.Consumer
         [Fact]
         public async Task Should_forward_message_from_kafka_to_handler()
         {
-            var context = new Context();
+            var context = Context.Anonymous();
 
             var app = A.Fake<IAppEntity>();
 
@@ -67,7 +67,7 @@ namespace Squidex.ICIS.Test.Kafka.Consumer
         [Fact]
         public async Task Should_not_forward_message_if_app_not_found()
         {
-            var context = new Context();
+            var context = Context.Anonymous();
 
             A.CallTo(() => appProvider.GetAppAsync("my-app"))
                 .Returns(Task.FromResult<IAppEntity>(null));

@@ -9,6 +9,7 @@ using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.ICIS.Validation
 {

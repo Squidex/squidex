@@ -11,12 +11,13 @@ using Squidex.ICIS.Test.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Xunit;
+using Squidex.Infrastructure.Validation;
 
 namespace Squidex.ICIS.Test.Validation.Validators
 {
     public class CommentaryUniquenessValidatorTests
     {
-        private readonly Context context = new Context();
+        private readonly Context context = Context.Anonymous();
         private readonly TestHelper testHelper;
         private readonly CommentaryUniquenessValidator commentaryUniquenessValidator;
 
@@ -107,9 +108,10 @@ namespace Squidex.ICIS.Test.Validation.Validators
 
         private CreateContent CreateWorkingCommentary()
         {
-            var commentary = new CreateContent();
-
-            commentary.SchemaId = new NamedId<Guid>(Guid.NewGuid(), "test");
+            var commentary = new CreateContent
+            {
+                SchemaId = new NamedId<Guid>(Guid.NewGuid(), "test")
+            };
 
             var currentTime = NodaTime.Instant.FromDateTimeUtc(DateTime.Now.ToUniversalTime());
 

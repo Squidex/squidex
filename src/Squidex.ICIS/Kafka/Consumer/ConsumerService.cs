@@ -23,7 +23,6 @@ namespace Squidex.ICIS.Kafka.Consumer
         private readonly IAppProvider appProvider;
         private readonly ISemanticLog log;
         private readonly RefToken actor;
-        private readonly ClaimsPrincipal user = CreateUser();
         private IAppEntity app;
         private Task consumerTask;
 
@@ -59,7 +58,9 @@ namespace Squidex.ICIS.Kafka.Consumer
 
                         // https://stackoverflow.com/a/37309427/1229622
                         contextProvider.Context.App = app;
-                        contextProvider.Context.User = user;
+
+                        var user = (ClaimsIdentity)contextProvider.Context.User.Identity;
+                        user.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
 
                         await handler.HandleAsync(actor, contextProvider.Context, consumed.Key, consumed.Value);
                     }
@@ -99,15 +100,6 @@ namespace Squidex.ICIS.Kafka.Consumer
             cts.Cancel();
 
             return consumerTask;
-        }
-
-        private static ClaimsPrincipal CreateUser()
-        {
-            var identity = new ClaimsIdentity();
-
-            identity.AddClaim(new Claim(SquidexClaimTypes.Permissions, Permissions.All));
-
-            return new ClaimsPrincipal(identity);
         }
     }
 }

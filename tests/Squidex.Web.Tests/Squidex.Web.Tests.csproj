@@ -11,7 +11,7 @@
     <ProjectReference Include="..\..\src\Squidex\Squidex.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="5.1.2" />
+    <PackageReference Include="FakeItEasy" Version="5.2.0" />
     <PackageReference Include="IdentityServer4" Version="2.5.3" />
     <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.5.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
