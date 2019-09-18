@@ -407,7 +407,7 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
         }
 
         [Fact]
-        public void Should_create_events_if_field_recreated()
+        public void Should_create_events_if_field_type_has_changed()
         {
             var sourceSchema =
                 new Schema("source")
@@ -424,6 +424,27 @@ namespace Squidex.Domain.Apps.Core.Operations.EventSynchronization
             events.ShouldHaveSameEvents(
                 new FieldDeleted { FieldId = stringId },
                 new FieldAdded { FieldId = createdId, Name = stringId.Name, Partitioning = Partitioning.Invariant.Key, Properties = new TagsFieldProperties() }
+            );
+        }
+
+        [Fact]
+        public void Should_create_events_if_field_partitioning_has_changed()
+        {
+            var sourceSchema =
+                new Schema("source")
+                    .AddString(stringId.Id, stringId.Name, Partitioning.Invariant);
+
+            var targetSchema =
+                new Schema("target")
+                    .AddString(stringId.Id, stringId.Name, Partitioning.Language);
+
+            var events = sourceSchema.Synchronize(targetSchema, jsonSerializer, idGenerator);
+
+            var createdId = NamedId.Of(50L, stringId.Name);
+
+            events.ShouldHaveSameEvents(
+                new FieldDeleted { FieldId = stringId },
+                new FieldAdded { FieldId = createdId, Name = stringId.Name, Partitioning = Partitioning.Language.Key, Properties = new StringFieldProperties() }
             );
         }
 

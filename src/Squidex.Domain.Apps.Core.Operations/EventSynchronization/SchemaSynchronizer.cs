@@ -65,7 +65,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                         E(new SchemaUnpublished());
                 }
 
-                var events = SyncFields(source.FieldCollection, target.FieldCollection, serializer, idGenerator, null, options);
+                var events = SyncFields(source.FieldCollection, target.FieldCollection, serializer, idGenerator, CanUpdateRoot, null, options);
 
                 foreach (var @event in events)
                 {
@@ -79,6 +79,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
             FieldCollection<T> target,
             IJsonSerializer serializer,
             Func<long> idGenerator,
+            Func<T, T, bool> canUpdate,
             NamedId<long> parentId, SchemaSynchronizationOptions options) where T : class, IField
         {
             FieldEvent E(FieldEvent @event)
@@ -119,7 +120,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
 
                     id = sourceField.NamedId();
 
-                    if (CanUpdate(sourceField, targetField))
+                    if (canUpdate(sourceField, targetField))
                     {
                         if (!sourceField.RawProperties.EqualsJson(targetField.RawProperties, serializer))
                         {
@@ -186,7 +187,7 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     {
                         var fields = ((IArrayField)sourceField)?.FieldCollection ?? FieldCollection<NestedField>.Empty;
 
-                        var events = SyncFields(fields, targetArrayField.FieldCollection, serializer, idGenerator, id, options);
+                        var events = SyncFields(fields, targetArrayField.FieldCollection, serializer, idGenerator, CanUpdate, id, options);
 
                         foreach (var @event in events)
                         {
@@ -205,6 +206,11 @@ namespace Squidex.Domain.Apps.Core.EventSynchronization
                     yield return new SchemaFieldsReordered { FieldIds = sourceIds.Select(x => x.Id).ToList(), ParentFieldId = parentId };
                 }
             }
+        }
+
+        private static bool CanUpdateRoot(IRootField source, IRootField target)
+        {
+            return CanUpdate(source, target) && source.Partitioning == target.Partitioning;
         }
 
         private static bool CanUpdate(IField source, IField target)

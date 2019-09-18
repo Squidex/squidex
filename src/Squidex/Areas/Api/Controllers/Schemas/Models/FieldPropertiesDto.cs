@@ -57,11 +57,6 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models
         /// </summary>
         public string EditorUrl { get; set; }
 
-        /// <summary>
-        /// Gets the partitioning of the language, e.g. invariant or language.
-        /// </summary>
-        public string Partitioning { get; set; }
-
         public abstract FieldProperties ToProperties();
 
         public static Type[] Subtypes()
