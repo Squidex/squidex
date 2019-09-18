@@ -5,10 +5,10 @@ ARG SQUIDEX__VERSION=1.0.0
 
 WORKDIR /src
 
-COPY DeploymentApp/*.csproj /tmp/
+COPY *.csproj /tmp/
 RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p; true; done; popd'
 
-COPY ./tools/DeploymentApp/DeploymentApp .
+COPY . .
 
 # Publish
 RUN dotnet publish DeploymentApp/DeploymentApp.csproj /p:version=$SQUIDEX__VERSION --output /out/alpine --configuration Release
