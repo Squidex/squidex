@@ -32,11 +32,17 @@ namespace Squidex.ICIS.Kafka.Entities
         public virtual Schema Schema => _SCHEMA;
 
         public string Id { get; set; }
+
         public string Body { get; set; }
+
         public string CommentaryTypeId { get; set; }
+
         public string CommodityId { get; set; }
+
         public string RegionId { get; set; }
+
         public long LastModified { get; set; }
+
         public long CreatedFor { get; set; }
 
         public virtual object Get(int fieldPos)

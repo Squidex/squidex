@@ -27,6 +27,7 @@ namespace Squidex.ICIS.Kafka.Entities
         public virtual Schema Schema => _SCHEMA;
 
         public string Id { get; set; }
+
         public string Name { get; set; }
 
         public virtual object Get(int fieldPos)

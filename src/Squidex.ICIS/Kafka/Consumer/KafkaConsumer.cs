@@ -1,30 +1,22 @@
 ﻿using System;
 using System.Threading;
 using Confluent.Kafka;
-using Confluent.Kafka.SyncOverAsync;
-using Confluent.SchemaRegistry;
-using Confluent.SchemaRegistry.Serdes;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Squidex.ICIS.Kafka.Config;
 using Squidex.ICIS.Utilities;
 
 namespace Squidex.ICIS.Kafka.Consumer
 {
-    public class KafkaConsumer<T> : IKafkaConsumer<T>
+    public abstract class KafkaConsumer<T> : IKafkaConsumer<T>
     {
         private readonly IConsumer<string, T> consumer;
 
-        public KafkaConsumer(IOptions<ICISKafkaOptions> options, ConsumerOptions consumerOptions, ISchemaRegistryClient schemaRegistry, ILogger<KafkaConsumer<T>> log)
+        protected KafkaConsumer(string topicName,
+            ConsumerConfig consumerConfig,
+            ConsumerOptions consumerOptions,
+            ILogger<KafkaConsumer<T>> log,
+            Action<ConsumerBuilder<string, T>> configure = null)
         {
-            var topicName = consumerOptions.SchemaName;
-
-            if (consumerOptions.TopicName != null)
-            {
-                topicName = consumerOptions.TopicName;
-            }
-
-            var config = new ConsumerConfig(options.Value.Consumer)
+            var config = new ConsumerConfig(consumerConfig)
             {
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
@@ -39,14 +31,16 @@ namespace Squidex.ICIS.Kafka.Consumer
                 config.GroupId = consumerOptions.GroupId;
             }
 
-            consumer = new ConsumerBuilder<string, T>(config)
-                .SetKeyDeserializer(Deserializers.Utf8)
-                .SetValueDeserializer(new AvroDeserializer<T>(schemaRegistry).AsSyncOverAsync())
-                .SetLogHandler(LogFactory<T>.ConsumerLog(log))
-                .SetErrorHandler(LogFactory<T>.ConsumerError(log))
-                .SetStatisticsHandler(LogFactory<T>.ConsumerStats(log))
-                .Build();
+            var builder =
+                new ConsumerBuilder<string, T>(config)
+                    .SetKeyDeserializer(Deserializers.Utf8)
+                    .SetLogHandler(LogFactory<T>.ConsumerLog(log))
+                    .SetErrorHandler(LogFactory<T>.ConsumerError(log))
+                    .SetStatisticsHandler(LogFactory<T>.ConsumerStats(log));
 
+            configure?.Invoke(builder);
+
+            consumer = builder.Build();
             consumer.Subscribe(topicName);
         }
 

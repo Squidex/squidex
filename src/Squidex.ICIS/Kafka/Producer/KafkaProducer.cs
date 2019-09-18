@@ -6,10 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Tasks;
-using Avro.Specific;
 using Confluent.Kafka;
-using Confluent.SchemaRegistry;
-using Confluent.SchemaRegistry.Serdes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.ICIS.Kafka.Config;
@@ -17,19 +14,26 @@ using Squidex.ICIS.Utilities;
 
 namespace Squidex.ICIS.Kafka.Producer
 {
-    public class KafkaProducer<T> : IKafkaProducer<T> where T : ISpecificRecord
+    public abstract class KafkaProducer<T> : IKafkaProducer<T>
     {
         private readonly IProducer<string, T> producer;
 
-        public KafkaProducer(IOptions<ICISKafkaOptions> options, ISchemaRegistryClient schemaRegistry, ILogger<KafkaProducer<T>> log)
+        protected KafkaProducer(IOptions<ICISKafkaOptions> options, ILogger<KafkaProducer<T>> log)
         {
-            producer = new ProducerBuilder<string, T>(options.Value.Producer)
-                .SetKeySerializer(Serializers.Utf8)
-                .SetValueSerializer(new AvroSerializer<T>(schemaRegistry))
-                .SetLogHandler(LogFactory<T>.ProducerLog(log))
-                .SetErrorHandler(LogFactory<T>.ProducerError(log))
-                .SetStatisticsHandler(LogFactory<T>.ProducerStats(log))
-                .Build();
+            var builder = 
+                new ProducerBuilder<string, T>(options.Value.Producer)
+                    .SetKeySerializer(Serializers.Utf8)
+                    .SetLogHandler(LogFactory<T>.ProducerLog(log))
+                    .SetErrorHandler(LogFactory<T>.ProducerError(log))
+                    .SetStatisticsHandler(LogFactory<T>.ProducerStats(log));
+
+            Configure(builder);
+
+            producer = builder.Build();
+        }
+
+        protected virtual void Configure(ProducerBuilder<string, T> builder)
+        {
         }
 
         public async Task<DeliveryResult<string, T>> Send(string topicName, string key, T val)

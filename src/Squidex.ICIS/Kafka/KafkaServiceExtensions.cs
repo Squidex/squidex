@@ -1,4 +1,4 @@
-﻿using Avro.Generic;
+﻿using Avro.Specific;
 using Confluent.SchemaRegistry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +8,9 @@ using Squidex.ICIS.Kafka.Config;
 using Squidex.ICIS.Kafka.Consumer;
 using Squidex.ICIS.Kafka.Entities;
 using Squidex.ICIS.Kafka.Producer;
+using System;
+using System.Linq;
+using System.Reflection;
 
 namespace Squidex.ICIS.Kafka
 {
@@ -15,7 +18,9 @@ namespace Squidex.ICIS.Kafka
     {
         public static void AddKafkaServices(IServiceCollection services, IConfiguration config)
         {
-            services.Configure<ICISKafkaOptions>(config.GetSection("kafka"));
+            services.Configure<ICISKafkaOptions>
+                (config.GetSection("kafka"));
+
             AddKafkaRuleExtension(services, config);
             AddKafkaConsumers(services, config);
         }
@@ -23,14 +28,14 @@ namespace Squidex.ICIS.Kafka
         private static void AddKafkaRuleExtension(IServiceCollection services, IConfiguration config)
         {
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
-            if (kafkaOptions.IsProducerConfigured())
+
+            if (kafkaOptions.IsProducerConfiguredForAvro())
             {
                 services.TryAddSingleton<ISchemaRegistryClient>(c => new CachedSchemaRegistryClient(kafkaOptions.SchemaRegistry));
 
-                services.AddSingleton<KafkaProducer<Commentary>>();
-                services.AddSingleton<KafkaProducer<CommentaryType>>();
-                services.AddSingleton<KafkaProducer<Commodity>>();
-                services.AddSingleton<KafkaProducer<Region>>();
+                services.RegisterKafkaProducer<Commentary>();
+                services.RegisterKafkaProducer<CommentaryType>();
+
                 services.AddRuleAction<ICISKafkaAction, ICISKafkaActionHandler>();
             }
         }
@@ -38,24 +43,40 @@ namespace Squidex.ICIS.Kafka
         private static void AddKafkaConsumers(this IServiceCollection services, IConfiguration config)
         {
             var kafkaOptions = config.GetSection("kafka").Get<ICISKafkaOptions>();
-            if (kafkaOptions.IsConsumerConfigured())
+
+            if (kafkaOptions.IsConsumerConfiguredForJson())
             {
-                services.TryAddSingleton<ISchemaRegistryClient>(c => new CachedSchemaRegistryClient(kafkaOptions.SchemaRegistry));
+                services.Configure<ConsumerOptions>(
+                    config.GetSection("kafka:jsonConsumers"));
 
-                var consumerServices = config.GetSection("kafka:consumers").GetChildren();
+                services.AddSingleton<JsonKafkaHandler>();
 
-                foreach (var service in consumerServices)
+                var types =
+                    typeof(KafkaServiceExtensions).Assembly.GetTypes()
+                        .Where(x => x.GetCustomAttribute<TopicNameAttribute>() != null);
+
+                foreach (var type in types)
                 {
-                    var option = service.Get<ConsumerOptions>();
-
-                    services.AddSingleton<IHostedService>(c =>
-                    {
-                        IKafkaConsumer<GenericRecord> consumer = ActivatorUtilities.CreateInstance<KafkaConsumer<GenericRecord>>(c, option);
-
-                        return ActivatorUtilities.CreateInstance<ConsumerService>(c, option, consumer);
-                    });
+                    ConfigureConsumer(services, type);
                 }
             }
+        }
+
+        private static void ConfigureConsumer(this IServiceCollection services, Type type)
+        {
+            services.AddSingleton<IHostedService>(c =>
+            {
+                var consumer = ActivatorUtilities.CreateInstance<KafkaJsonConsumer>(c, type);
+                var consumerHandler = (IKafkaHandler<IRefDataEntity>)c.GetService<JsonKafkaHandler>();
+                var consumerService = ActivatorUtilities.CreateInstance<ConsumerService<IRefDataEntity>>(c, consumer, consumerHandler);
+
+                return consumerService;
+            });
+        }
+
+        private static void RegisterKafkaProducer<T>(this IServiceCollection services) where T : ISpecificRecord
+        {
+            services.AddSingleton<IKafkaProducer<T>, KafkaAvroProducer<T>>();
         }
     }
 }

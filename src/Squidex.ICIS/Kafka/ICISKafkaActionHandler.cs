@@ -21,26 +21,20 @@ namespace Squidex.ICIS.Kafka
     public sealed class ICISKafkaActionHandler : RuleActionHandler<ICISKafkaAction, ICISKafkaJob>
     {
         private const string DescriptionIgnore = "Ignore";
-        private readonly KafkaProducer<Commentary> kafkaCommentaryProducer;
-        private readonly KafkaProducer<CommentaryType> kafkaCommentaryTypeProducer;
-        private readonly KafkaProducer<Commodity> kafkaCommodityProducer;
-        private readonly KafkaProducer<Region> kafkaRegionProducer;
+        private readonly IKafkaProducer<Commentary> kafkaCommentaryProducer;
+        private readonly IKafkaProducer<CommentaryType> kafkaCommentaryTypeProducer;
         private readonly IAppProvider appProvider;
         private readonly IContentRepository contentRepository;
 
-        public ICISKafkaActionHandler(RuleEventFormatter formatter, 
-            KafkaProducer<Commentary> kafkaCommentaryProducer, 
-            KafkaProducer<CommentaryType> kafkaCommentaryTypeProducer, 
-            KafkaProducer<Commodity> kafkaCommodityProducer,
-            KafkaProducer<Region> kafkaRegionProducer,
+        public ICISKafkaActionHandler(RuleEventFormatter formatter,
+            IKafkaProducer<Commentary> kafkaCommentaryProducer,
+            IKafkaProducer<CommentaryType> kafkaCommentaryTypeProducer,
             IAppProvider appProvider, 
             IContentRepository contentRepository)
             : base(formatter)
         {
             this.kafkaCommentaryProducer = kafkaCommentaryProducer;
             this.kafkaCommentaryTypeProducer = kafkaCommentaryTypeProducer;
-            this.kafkaCommodityProducer = kafkaCommodityProducer;
-            this.kafkaRegionProducer = kafkaRegionProducer;
             this.appProvider = appProvider;
             this.contentRepository = contentRepository;
         }
@@ -81,14 +75,6 @@ namespace Squidex.ICIS.Kafka
                     case "commentary-type":
                         var commentaryTypeData = CommentaryTypeMapper.ToAvro(job.Message);
                         await kafkaCommentaryTypeProducer.Send(job.TopicName, commentaryTypeData.Id, commentaryTypeData);
-                        break;
-                    case "commodity":
-                        var commodityData = CommodityMapper.ToAvro(job.Message);
-                        await kafkaCommodityProducer.Send(job.TopicName, commodityData.Id, commodityData);
-                        break;
-                    case "region":
-                        var regionData = RegionMapper.ToAvro(job.Message);
-                        await kafkaRegionProducer.Send(job.TopicName, regionData.Id, regionData);
                         break;
                     default:
                         throw new Exception($"Schema {job.Message.SchemaId.Name} not configured for Kafka Integration.");

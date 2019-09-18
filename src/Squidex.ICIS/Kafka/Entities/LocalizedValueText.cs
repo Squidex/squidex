@@ -5,14 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System;
-using System.Threading.Tasks;
-using Confluent.Kafka;
+using Newtonsoft.Json;
 
-namespace Squidex.ICIS.Kafka.Producer
+namespace Squidex.ICIS.Kafka.Entities
 {
-    public interface IKafkaProducer<T> : IDisposable
+    public sealed class LocalizedValueText
     {
-        Task<DeliveryResult<string, T>> Send(string topicName, string key, T val);
+        [JsonProperty("lang")]
+        public string Language { get; set; }
+
+        [JsonProperty("value")]
+        public string Text { get; set; }
     }
 }

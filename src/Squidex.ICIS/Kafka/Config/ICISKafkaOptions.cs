@@ -13,14 +13,24 @@ namespace Squidex.ICIS.Kafka.Config
         public ICISKafkaConsumerOptions Consumer { get; set; }
         public ICISKafkaSchemaRegistryOptions SchemaRegistry { get; set; }
 
-        public bool IsProducerConfigured()
+        public bool IsProducerConfiguredForAvro()
         {
-            return this.Producer != null && SchemaRegistry != null && !string.IsNullOrWhiteSpace(Producer.BootstrapServers) && !string.IsNullOrWhiteSpace(SchemaRegistry.SchemaRegistryUrl);
+            return !string.IsNullOrWhiteSpace(Producer?.BootstrapServers) && !string.IsNullOrWhiteSpace(SchemaRegistry?.SchemaRegistryUrl);
         }
 
-        public bool IsConsumerConfigured()
+        public bool IsConsumerConfiguredForAvro()
         {
-            return this.Consumer != null && SchemaRegistry != null && !string.IsNullOrWhiteSpace(Consumer.BootstrapServers) && !string.IsNullOrWhiteSpace(SchemaRegistry.SchemaRegistryUrl);
+            return !string.IsNullOrWhiteSpace(Consumer?.BootstrapServers) && !string.IsNullOrWhiteSpace(SchemaRegistry?.SchemaRegistryUrl);
+        }
+
+        public bool IsProducerConfiguredForJson()
+        {
+            return !string.IsNullOrWhiteSpace(Producer?.BootstrapServers);
+        }
+
+        public bool IsConsumerConfiguredForJson()
+        {
+            return !string.IsNullOrWhiteSpace(Consumer?.BootstrapServers);
         }
     }
 }
