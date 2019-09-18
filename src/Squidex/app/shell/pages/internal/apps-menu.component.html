@@ -40,7 +40,7 @@
         </ng-container>
     </li>
 
-    <ng-container *ngIf="appsState.selectedApp | async; let app">
+    <ng-container *ngIf="appsState.selectedAppOrNull | async; let app">
         <li class="nav-item" *ngIf="app.planUpgrade && app.planName">
             <div class="btn-group app-upgrade">
                 <button type="button" class="btn btn-primary btn-plan">
