@@ -25,7 +25,7 @@ try{
 		--build-arg SQUIDEX__VERSION=$env:Version
 		
 	Write-Host "Building docker image $semanticDockerDeployAppTag"
-    docker build . -t $semanticDockerDeployAppTag --pull `
+    docker build ./tools/DeploymentApp/DeploymentApp -t $semanticDockerDeployAppTag --pull `
         --build-arg http_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
         --build-arg https_proxy=http://outboundproxycha.cha.rbxd.ds:3128 `
 		--build-arg SQUIDEX__VERSION=$env:Version
