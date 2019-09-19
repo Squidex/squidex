@@ -1,7 +1,8 @@
 import {
     browser,
     ElementFinder,
-    protractor
+    protractor,
+    WebElement
 } from 'protractor';
 
 /**
@@ -11,21 +12,27 @@ import {
  */
 export class BrowserUtil {
     // waits for element to be present on the DOM - angular
-    public async waitForElementToBePresent(locator: ElementFinder, timeout = 100000) {
+    public async waitForElementToBePresent(locator: ElementFinder, timeout = 20000) {
         const until = protractor.ExpectedConditions;
         await browser.wait(until.visibilityOf(locator), timeout);
         return await locator;
     }
 
     // waits for the element to be clickable and clicks
-    public async waitForElementToBeVisibleAndClick(locator: ElementFinder, timeout = 100000) {
+    public async waitForElementToBeVisibleAndClick(locator: ElementFinder, timeout = 20000) {
         const until = protractor.ExpectedConditions;
         await browser.wait(until.elementToBeClickable(locator), timeout, 'Element not clickable');
         return await locator.click();
     }
 
+    public async waitForElementToBeVisibleAndGetText(locator: ElementFinder, timeout = 20000) {
+        const until = protractor.ExpectedConditions;
+        await browser.wait(until.elementToBeClickable(locator), timeout, 'Element not clickable');
+        return await locator.getText();
+    }
+
     // waits for the element to be present and writes
-    public async waitForElementToBePresentAndWrite(locator: ElementFinder, text: string, timeout = 100000) {
+    public async waitForElementToBePresentAndWrite(locator: ElementFinder, text: string, timeout = 20000) {
         const until = protractor.ExpectedConditions;
         await browser.wait(until.presenceOf(locator), timeout);
         await locator.clear();
@@ -39,7 +46,7 @@ export class BrowserUtil {
     }
 
     // brings the element to focus and writes
-    public async mouseMoveAndWrite(locator: ElementFinder, text: string) {
+    public async mouseMoveAndWrite(locator: ElementFinder | WebElement, text: string) {
         await browser.actions().mouseMove(locator).click().perform();
         await locator.sendKeys(text);
     }
@@ -67,6 +74,14 @@ export class BrowserUtil {
             });
     }
 
+    public async scrollIntoView(webelement: ElementFinder | WebElement): Promise<ElementFinder | WebElement> {
+        await browser
+            .executeScript('arguments[0].scrollIntoView()', webelement)
+            .then(() => {
+                return webelement;
+            });
+    }
+
     // waits for the page to load before performing any further operations. waits until the document.ready state becomes interactive or complete and returns the same.
     public async getReadyState() {
         let states;
@@ -78,7 +93,7 @@ export class BrowserUtil {
                 }
             });
         }, 100000);
-        return await states;
+        return states;
     }
 
     // get current url of the page
@@ -99,10 +114,14 @@ export class BrowserUtil {
     public async selectAllContent() {
         await browser
             .actions()
-            .keyDown(protractor.Key.ALT)
+            .keyDown(protractor.Key.CONTROL)
             .sendKeys('a')
-            .keyUp(protractor.Key.ALT)
             .perform();
+    }
+
+    // refresh the chrome instance
+    public async browserRefresh() {
+        await browser.refresh();
     }
 
 }

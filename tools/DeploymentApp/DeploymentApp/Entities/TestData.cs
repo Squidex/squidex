@@ -16,11 +16,11 @@
             ("http://iddn.icis.com/ref-data/location/1", "Africa"),
             ("http://iddn.icis.com/ref-data/location/2", "CIS/Central Asia"),
             ("http://iddn.icis.com/ref-data/location/3", "Latin America"),
-            ("http://iddn.icis.com/ref-data/location/5", "Middle East"),
-            ("http://iddn.icis.com/ref-data/location/6", "North America"),
-            ("http://iddn.icis.com/ref-data/location/7", "North East Asia"),
-            ("http://iddn.icis.com/ref-data/location/8", "South East Asia & Pacific"),
-            ("http://iddn.icis.com/ref-data/location/9", "South Asia")
+            ("http://iddn.icis.com/ref-data/location/4", "Middle East"),
+            ("http://iddn.icis.com/ref-data/location/5", "North America"),
+            ("http://iddn.icis.com/ref-data/location/6", "North East Asia"),
+            ("http://iddn.icis.com/ref-data/location/7", "South East Asia & Pacific"),
+            ("http://iddn.icis.com/ref-data/location/8", "South Asia")
         };
 
         public static (string Id, string Name)[] Commodities =

@@ -1,4 +1,6 @@
-import { browser, by, element, ElementFinder, protractor } from 'protractor';
+import { browser, by, element, ElementFinder, protractor, WebElement } from 'protractor';
+import { constants } from './../utils/constants';
+
 
 import { BrowserUtil } from './../utils';
 
@@ -8,7 +10,15 @@ export class ContentPage extends BrowserUtil {
 
     public calendar = element(by.xpath('//div[@class=\'input-group\']/input'));
 
-    public getCommentaryEditor = element(by.xpath('//iframe[@src=\'http://localhost:5000/editors/toastui/md-editor.html\']'));
+    public getRefData = element.all(by.xpath('//div[@class=\'control-dropdown-items\']/div/span'));
+
+    public async getCommentaryEditorFrame(): Promise<WebElement> {
+        return await element(by.xpath('//iframe[@src=\'' + constants.refDataLocators.editorUrl + '\']')).getWebElement();
+    }
+
+    public async commentaryEditor() {
+        return await this.waitForElementToBePresent(element(by.xpath('//iframe[@src=\'' + constants.refDataLocators.editorUrl + '\']')));
+    }
 
     public async getSearchBar() {
         return await element(by.xpath('//input[@placeholder=\'Search\']'));
@@ -24,10 +34,12 @@ export class ContentPage extends BrowserUtil {
         return await this.waitForElementToBeVisibleAndClick(await element(by.buttonText('Today')));
     }
 
-    public async getRefData() {
-        return await element.all(
-            by.css('.control-dropdown-item control-dropdown-item-selectable ng-star-inserted')
-        );
+    public async autoSavePopUp() {
+        return await this.waitForElementToBePresent(element(by.xpath('//div[@class=\'modal-content\']')));
+    }
+
+    public async acceptAutoSave() {
+        return await this.waitForElementToBeVisibleAndClick(await element(by.buttonText('Yes')));
     }
 
     public async getCommentaryEditorInput() {
@@ -63,8 +75,21 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async captureContentValidationMessage() {
-        return await element(by.xpath('//div[@class=\'alert alert-dismissible alert-danger ng-trigger ng-trigger-fade ng-star-inserted\']/span')).getText();
+        return await this.waitForElementToBeVisibleAndGetText(await element(by.xpath('//div[@class=\'alert alert-dismissible alert-danger ng-trigger ng-trigger-fade ng-star-inserted\']/span')));
     }
+
+    public async captureUnsavedChangesPopUpMessage() {
+        return await this.waitForElementToBeVisibleAndGetText(element(by.xpath('//div[@class=\'modal-body \']')));
+    }
+
+    public async navigateToContentsTable() {
+        return await this.waitForElementToBeVisibleAndClick(await element(by.xpath('//i[@class=\'icon-angle-left\']')));
+    }
+
+    public async createCommentaryWithoutSave(commentary: string) {
+        await this.writeCommentary(commentary);
+    }
+
 
     public async navigateToCommentaryAppPage() {
         const commentaryApp = element(by.cssContainingText('.card-title', 'commentary'));
@@ -76,17 +101,6 @@ export class ContentPage extends BrowserUtil {
         await this.clickOnNewButton();
     }
 
-    public async selectRandomReferences() {
-        await this.scrollIntoViewAndClick(await this.getCalender());
-        await this.selectRandomDate(new Date());
-        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(' Commodity  '));
-        await this.randomSelection();
-        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(' Commentary Type  '));
-        await this.randomSelection();
-        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(' Region  '));
-        await this.randomSelection();
-    }
-
     public async selectContentValue(content: string) {
         await this.waitForElementToBePresentAndWrite(await this.getSearchBar(), content);
         if (this.searchResult.isPresent() && (await this.searchResult.getText()).indexOf(content) !== -1) {
@@ -95,25 +109,13 @@ export class ContentPage extends BrowserUtil {
         await browser.actions().sendKeys(protractor.Key.ENTER).perform();
     }
 
-    public async selectRandomDate(createdForDate: Date) {
-        return new Date(createdForDate.getDate() + (Math.random() * createdForDate.getDate()));
-    }
-
-    public async randomSelection() {
-        await this.getRefData().then(async selection => {
-            const randomItem = await selection[Math.floor(Math.random() * selection.length)];
-            await randomItem.getWebElement().click();
-            return;
-        });
-    }
-
     public async datePicker(addDays: number) {
-        await expect(this.calendar);
-        let today = await new Date();
-        let date = await today.getDate() + addDays;
-        let month = await today.getMonth() + 1; // By default January counts as 0
-        let year = await today.getFullYear();
-        return await year + '-' + month + '-' + date;
+        expect(await this.calendar);
+        let today = new Date();
+        let date = today.getDate() + addDays;
+        let month = today.getMonth() + 1; // By default January counts as 0
+        let year = today.getFullYear();
+        return year + '-' + month + '-' + date;
     }
 
     public async selectDate(number: number) {
@@ -122,14 +124,13 @@ export class ContentPage extends BrowserUtil {
         await this.calendar.sendKeys(await this.datePicker(number));
     }
 
-    public async selectContentFromDropDown(contentType: string, region: string) {
+    public async selectContentFromDropDown(contentType: string, value: string) {
         await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(contentType));
-        await this.selectContentValue(region);
+        await this.selectContentValue(value);
     }
 
     public async getCommentary(contentEntryPlaceHolder: ElementFinder) {
-        await this.waitForElementToBePresent(await this.getCommentaryEditor);
-        const editorFrame = await this.getCommentaryEditor.getWebElement();
+        const editorFrame = await this.getCommentaryEditorFrame();
         try {
             await browser.switchTo().frame(editorFrame);
             return await contentEntryPlaceHolder.getText();
@@ -140,7 +141,7 @@ export class ContentPage extends BrowserUtil {
     }
 
     public async writeCommentary(commentaryText: string) {
-        const editorFrame = await this.getCommentaryEditor;
+        const editorFrame = await this.getCommentaryEditorFrame();
         try {
             await browser.switchTo().frame(editorFrame);
             const editor = await this.getCommentaryEditorInput();
@@ -151,22 +152,46 @@ export class ContentPage extends BrowserUtil {
         }
     }
 
+    public async randomValueSelection(number: number) {
+        this.getRefData.count().then( (numberOfItems) => {
+        return Math.floor(Math.random() * numberOfItems + number );
+        }).then(async (randomNumber) => {
+            await this.waitForElementToBeVisibleAndClick(this.getRefData.get(randomNumber));
+        });
+    }
+
+    public async selectRandomReferences() {
+        await this.selectDate(2);
+        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(constants.refDataLocators.commodity));
+        await this.randomValueSelection(1);
+        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(constants.refDataLocators.commentaryType));
+        await this.randomValueSelection(2);
+        await this.scrollIntoViewAndClick(await this.getReferencePlaceHolder(constants.refDataLocators.region));
+        await this.randomValueSelection(3);
+    }
+
     public async createCommentary(commentary: string) {
         await this.writeCommentary(commentary);
         await this.saveContent();
     }
 
     public async commentaryEditorTest(commentary: string) {
-        await this.navigateToCommentaryAppPage();
-        await this.clickOnNewButton();
         await this.selectRandomReferences();
         await this.writeCommentary(commentary);
         await this.selectAllContent();
     }
 
     public async createCommentaryAndApplyEditorOptions(commentary: string, editorToolBarOption: string) {
+        const editorFrame = await this.scrollIntoView(await this.getCommentaryEditorFrame());
         await this.commentaryEditorTest(commentary);
-        await this.waitForElementToBeVisibleAndClick(await this.getEditorToolBarOptions(editorToolBarOption));
+        try {
+            await browser.switchTo().frame(editorFrame);
+            const editor = await this.getEditorToolBarOptions(editorToolBarOption);
+            await this.waitForElementToBeVisibleAndClick(editor);
+        } finally {
+            await browser.switchTo().defaultContent();
+            await browser.waitForAngular();
+        }
         await this.saveContent();
     }
 }

@@ -6,11 +6,11 @@
 
     npm i
 
-###  2. Setup protractor
+###  2. Setup webdriver
 
-You have to run the following command before every testing session:
+You have to run the following command before every testing session to start selenium server for protractor:
 
-    npm run preparee
+    npm run webdriver
 
 ### 3. Run the frontend server
 

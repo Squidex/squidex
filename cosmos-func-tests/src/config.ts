@@ -8,28 +8,35 @@ import {
     stopSquidex
 } from './setup';
 
-declare const allure: any;
-
 export function buildConfig(options: { url: string, setup: boolean }): Config {
-    function addAllure() {
-        const AllureReporter = require('jasmine-allure-reporter');
 
-        jasmine.getEnv().addReporter(new AllureReporter({
-            resultsDir: '_screenshots'
-        }));
-
-        jasmine.getEnv().afterEach((done) => {
-            browser.takeScreenshot().then((png) => {
-                allure.createAttachment('Screenshot', () => {
-                    return new Buffer(png, 'base64');
-                }, 'image/png')();
-
-                done();
-            });
-        });
+    function addHtmlReporter() {
+        const HtmlReporter = require('protractor-beautiful-reporter');
+        let reporter = new HtmlReporter({
+            baseDirectory: '_results-reports'
+            , screenshotsSubfolder: '_images'
+            , jsonsSubfolder: 'jsons'
+            , excludeSkippedSpecs: true
+            , takeScreenShotsOnlyForFailedSpecs: true
+            , docTitle: 'Cosmos Test Suite Last Run Report'
+            , docName: 'lastrunresults.html'
+            , gatherBrowserLogs: false
+            , preserveDirectory: false
+            , clientDefaults: {
+                showTotalDurationIn: 'header',
+                totalDurationFormat: 'hms'
+            }
+         });
+         jasmine.getEnv().addReporter(reporter.getJasmine2Reporter());
     }
 
+    let isCleanup = false;
+
     function cleanup() {
+        if (isCleanup) {
+            return;
+        }
+
         console.log('Cleaning');
 
         browser.close();
@@ -70,21 +77,32 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
 
         onPrepare: async () => {
             console.log('Preparing');
+            addHtmlReporter();
+            try {
 
-            addAllure();
+                if (options.setup) {
+                    startMongoDb();
+                    startSquidex();
 
-            if (options.setup) {
-                startMongoDb();
-                startSquidex();
+                    await runDeployment(options.url);
+                }
 
-                await runDeployment(options.url);
+                browser.manage().timeouts().implicitlyWait(5000);
+                browser.driver
+                    .manage()
+                    .window()
+                    .maximize();
+            } catch (ex) {
+                browser.close();
+
+                if (options.setup) {
+                    stopSquidex();
+                    stopMongoDB();
+                }
+                cleanup();
+
+                throw ex;
             }
-
-            browser.manage().timeouts().implicitlyWait(5000);
-            browser.driver
-                .manage()
-                .window()
-                .maximize();
 
             console.log('Prepared');
         },
@@ -96,6 +114,16 @@ export function buildConfig(options: { url: string, setup: boolean }): Config {
         getPageTimeout: 50000,
 
         // Before performing any action, Protractor waits until there are no pending asynchronous tasks in your Angular application.
-        allScriptsTimeout: 50000
+        allScriptsTimeout: 50000,
+
+        onCleanup: () => {
+            browser.close();
+
+            if (options.setup) {
+                stopSquidex();
+                stopMongoDB();
+            }
+            cleanup();
+        }
     };
 }

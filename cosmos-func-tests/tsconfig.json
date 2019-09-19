@@ -16,13 +16,13 @@
       "jasmine", 
       "jasmine-expect",
       "node"
-    ],                   
+    ]                   
   },
   "exclude": [
     "node_modules"
   ],
   "include":[
-    "src/**/*.ts",
+    "src/**/*.ts"
   ],
   "compileOnSave": false
 }

@@ -299,7 +299,7 @@ namespace DeploymentApp.Entities
                                 {
                                     Editor = StringFieldEditor.Input,
                                     EditorUrl = $"{baseUrl}/editors/toastui/md-editor.html",
-                                    IsListField = false,
+                                    IsListField = true,
                                     IsRequired = false,
                                     IsUnique = false,
                                     Label = "Body",
