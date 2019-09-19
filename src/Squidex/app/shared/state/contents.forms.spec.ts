@@ -272,7 +272,7 @@ describe('DateTimeField', () => {
     it('should return calculated date when Today for DateFieldProperties', () => {
         const field2 = createField({ properties: new DateTimeFieldPropertiesDto('DateTime', { calculatedDefaultValue: 'Today' }) });
 
-        expect(FieldDefaultValue.get(field2, now)).toEqual('2017-10-12');
+        expect(FieldDefaultValue.get(field2, now)).toEqual('2017-10-12T00:00:00Z');
     });
 
     it('should return calculated date when Now for DateFieldProperties', () => {

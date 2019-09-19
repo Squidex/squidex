@@ -346,9 +346,9 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
         const now = this.now || DateTime.now();
 
         if (properties.calculatedDefaultValue === 'Now') {
-            return now.toUTCStringFormat('YYYY-MM-DDTHH:mm:ss') + 'Z';
+            return `${now.toUTCStringFormat('YYYY-MM-DDTHH:mm:ss')}Z`;
         } else if (properties.calculatedDefaultValue === 'Today') {
-            return now.toUTCStringFormat('YYYY-MM-DD');
+            return `${now.toUTCStringFormat('YYYY-MM-DD')}T00:00:00Z`;
         } else {
             return properties.defaultValue;
         }
