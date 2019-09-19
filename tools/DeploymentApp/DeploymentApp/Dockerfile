@@ -11,7 +11,7 @@ RUN bash -c 'pushd /tmp; for p in *.csproj; do dotnet restore $p; true; done; po
 COPY . .
 
 # Publish
-RUN dotnet publish DeploymentApp/DeploymentApp.csproj /p:version=$SQUIDEX__VERSION --output /out/alpine --configuration Release
+RUN dotnet publish DeploymentApp.csproj /p:version=$SQUIDEX__VERSION --output /out/alpine --configuration Release
 
 # Stage 2, Build runtime
 FROM nexus.cha.rbxd.ds:8000/dotnet/core/runtime:2.2.5-alpine3.9
