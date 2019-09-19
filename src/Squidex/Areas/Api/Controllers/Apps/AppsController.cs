@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Controllers.Apps.Models;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;

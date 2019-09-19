@@ -9,14 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Squidex.Domain.Apps.Entities.Apps.Indexes;
-using Squidex.Domain.Apps.Entities.Apps.State;
 using Squidex.Domain.Apps.Entities.Rules.Indexes;
-using Squidex.Domain.Apps.Entities.Rules.State;
 using Squidex.Domain.Apps.Entities.Schemas.Indexes;
-using Squidex.Domain.Apps.Entities.Schemas.State;
+using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Domain.Apps.Events.Rules;
+using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
 namespace Migrate_01.Migrations
@@ -26,29 +26,26 @@ namespace Migrate_01.Migrations
         private readonly IAppsIndex indexApps;
         private readonly IRulesIndex indexRules;
         private readonly ISchemasIndex indexSchemas;
-        private readonly ISnapshotStore<AppState, Guid> statesForApps;
-        private readonly ISnapshotStore<RuleState, Guid> statesForRules;
-        private readonly ISnapshotStore<SchemaState, Guid> statesForSchemas;
+        private readonly IEventDataFormatter eventDataFormatter;
+        private readonly IEventStore eventStore;
 
         public PopulateGrainIndexes(
             IAppsIndex indexApps,
             IRulesIndex indexRules,
             ISchemasIndex indexSchemas,
-            ISnapshotStore<AppState, Guid> statesForApps,
-            ISnapshotStore<RuleState, Guid> statesForRules,
-            ISnapshotStore<SchemaState, Guid> statesForSchemas)
+            IEventDataFormatter eventDataFormatter,
+            IEventStore eventStore)
         {
             this.indexApps = indexApps;
             this.indexRules = indexRules;
             this.indexSchemas = indexSchemas;
-            this.statesForApps = statesForApps;
-            this.statesForRules = statesForRules;
-            this.statesForSchemas = statesForSchemas;
+            this.eventDataFormatter = eventDataFormatter;
+            this.eventStore = eventStore;
         }
 
-        public Task UpdateAsync()
+        public async Task UpdateAsync()
         {
-            return Task.WhenAll(
+            await Task.WhenAll(
                 RebuildAppIndexes(),
                 RebuildRuleIndexes(),
                 RebuildSchemaIndexes());
@@ -59,20 +56,35 @@ namespace Migrate_01.Migrations
             var appsByName = new Dictionary<string, Guid>();
             var appsByUser = new Dictionary<string, HashSet<Guid>>();
 
-            await statesForApps.ReadAllAsync((app, version) =>
+            await eventStore.QueryAsync(storedEvent =>
             {
-                if (!app.IsArchived)
-                {
-                    appsByName[app.Name] = app.Id;
+                var @event = eventDataFormatter.Parse(storedEvent.Data);
 
-                    foreach (var contributor in app.Contributors.Keys)
-                    {
-                        appsByUser.GetOrAddNew(contributor).Add(app.Id);
-                    }
+                switch (@event.Payload)
+                {
+                    case AppCreated appCreated:
+                        appsByName[appCreated.Name] = appCreated.AppId.Id;
+                        break;
+                    case AppContributorAssigned appContributorAssigned:
+                        appsByUser.GetOrAddNew(appContributorAssigned.ContributorId).Add(appContributorAssigned.AppId.Id);
+                        break;
+                    case AppContributorRemoved contributorRemoved:
+                        appsByUser.GetOrAddNew(contributorRemoved.ContributorId).Remove(contributorRemoved.AppId.Id);
+                        break;
+                    case AppArchived appArchived:
+                        {
+                            foreach (var apps in appsByUser.Values)
+                            {
+                                apps.Remove(appArchived.AppId.Id);
+                            }
+
+                            appsByName.Remove(appArchived.AppId.Name);
+                            break;
+                        }
                 }
 
                 return TaskHelper.Done;
-            });
+            }, "^app\\-");
 
             await indexApps.RebuildAsync(appsByName);
 
@@ -86,15 +98,22 @@ namespace Migrate_01.Migrations
         {
             var rulesByApp = new Dictionary<Guid, HashSet<Guid>>();
 
-            await statesForRules.ReadAllAsync((rule, version) =>
+            await eventStore.QueryAsync(storedEvent =>
             {
-                if (!rule.IsDeleted)
+                var @event = eventDataFormatter.Parse(storedEvent.Data);
+
+                switch (@event.Payload)
                 {
-                    rulesByApp.GetOrAddNew(rule.AppId.Id).Add(rule.Id);
+                    case RuleCreated ruleCreated:
+                        rulesByApp.GetOrAddNew(ruleCreated.AppId.Id).Add(ruleCreated.RuleId);
+                        break;
+                    case RuleDeleted ruleDeleted:
+                        rulesByApp.GetOrAddNew(ruleDeleted.AppId.Id).Remove(ruleDeleted.RuleId);
+                        break;
                 }
 
                 return TaskHelper.Done;
-            });
+            }, "^rule\\-");
 
             foreach (var kvp in rulesByApp)
             {
@@ -106,15 +125,22 @@ namespace Migrate_01.Migrations
         {
             var schemasByApp = new Dictionary<Guid, Dictionary<string, Guid>>();
 
-            await statesForSchemas.ReadAllAsync((schema, version) =>
+            await eventStore.QueryAsync(storedEvent =>
             {
-                if (!schema.IsDeleted)
+                var @event = eventDataFormatter.Parse(storedEvent.Data);
+
+                switch (@event.Payload)
                 {
-                    schemasByApp.GetOrAddNew(schema.AppId.Id)[schema.SchemaDef.Name] = schema.Id;
+                    case SchemaCreated schemaCreated:
+                        schemasByApp.GetOrAddNew(schemaCreated.AppId.Id)[schemaCreated.SchemaId.Name] = schemaCreated.SchemaId.Id;
+                        break;
+                    case SchemaDeleted schemaDeleted:
+                        schemasByApp.GetOrAddNew(schemaDeleted.AppId.Id).Remove(schemaDeleted.SchemaId.Name);
+                        break;
                 }
 
                 return TaskHelper.Done;
-            });
+            }, "^schema\\-");
 
             foreach (var kvp in schemasByApp)
             {
