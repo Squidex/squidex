@@ -30,10 +30,7 @@ namespace Migrate_01.Migrations
         private readonly IEventDataFormatter eventDataFormatter;
         private readonly IEventStore eventStore;
 
-        public PopulateGrainIndexes(
-            IAppsIndex indexApps,
-            IRulesIndex indexRules,
-            ISchemasIndex indexSchemas,
+        public PopulateGrainIndexes(IAppsIndex indexApps, IRulesIndex indexRules, ISchemasIndex indexSchemas,
             IEventDataFormatter eventDataFormatter,
             IEventStore eventStore)
         {
