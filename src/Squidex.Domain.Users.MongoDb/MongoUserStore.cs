@@ -165,6 +165,11 @@ namespace Squidex.Domain.Users.MongoDb
 
         public async Task<IdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
+            if (!IsId(userId))
+            {
+                return null;
+            }
+
             return await Collection.Find(x => x.Id == userId).FirstOrDefaultAsync(cancellationToken);
         }
 
